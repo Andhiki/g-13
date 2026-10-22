@@ -1,0 +1,1115 @@
+{
+  "schema_version": "1.0",
+  "program": "UGM S1 Ilmu Komputer (Ilkom), Kurikulum 2021 Revisi 2023",
+  "source_pdf": "output/sources/fmipa-kurikulum-sarjana-2021-revisi-2023.pdf",
+  "scope": {
+    "printed_pages": [
+      213,
+      343
+    ],
+    "pdf_pages": [
+      228,
+      358
+    ],
+    "page_count": 131,
+    "numbering": "Printed page numbers and 1-based physical PDF page numbers are both retained.",
+    "coverage": "Page manifest and table/rule page references only; no narrative or syllabus text is reproduced here.",
+    "full_chapter_text_local_intermediate": "tmp/pdfs/ilkom-2021-full-chapter-pages.json"
+  },
+  "chapter_section_manifest": [
+    {
+      "section": "3.3",
+      "title": "Program Studi Ilmu Komputer",
+      "source_refs": [
+        {
+          "printed_page": 213,
+          "pdf_page": 228,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.1",
+      "title": "Identitas Program Studi",
+      "source_refs": [
+        {
+          "printed_page": 213,
+          "pdf_page": 228,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.6",
+      "title": "Penetapan Bidang Kajian",
+      "source_refs": [
+        {
+          "printed_page": 221,
+          "pdf_page": 236,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.7",
+      "title": "Pembentukan Mata Kuliah dan Bobot SKS",
+      "source_refs": [
+        {
+          "printed_page": 236,
+          "pdf_page": 251,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.8",
+      "title": "Matriks dan Peta Kurikulum",
+      "source_refs": [
+        {
+          "printed_page": 239,
+          "pdf_page": 254,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.9.1",
+      "title": "Struktur Kurikulum dan Distribusi Mata Kuliah",
+      "source_refs": [
+        {
+          "printed_page": 251,
+          "pdf_page": 266,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.26"
+        }
+      ]
+    },
+    {
+      "section": "3.3.9.2",
+      "title": "Kegiatan Akademik Internasional",
+      "source_refs": [
+        {
+          "printed_page": 252,
+          "pdf_page": 267,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.9.3",
+      "title": "Kesetaraan Mata Kuliah",
+      "source_refs": [
+        {
+          "printed_page": 264,
+          "pdf_page": 279,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.28"
+        }
+      ]
+    },
+    {
+      "section": "3.3.9.4",
+      "title": "Aturan Peralihan dan Kesetaraan",
+      "source_refs": [
+        {
+          "printed_page": 264,
+          "pdf_page": 279,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.28"
+        },
+        {
+          "printed_page": 265,
+          "pdf_page": 280,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.29"
+        },
+        {
+          "printed_page": 266,
+          "pdf_page": 281,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.10",
+      "title": "Implementasi Hak MBKM",
+      "source_refs": [
+        {
+          "printed_page": 266,
+          "pdf_page": 281,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.11",
+      "title": "Manajemen Pelaksanaan Kurikulum dan SPMI",
+      "source_refs": [
+        {
+          "printed_page": 284,
+          "pdf_page": 299,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    },
+    {
+      "section": "3.3.12",
+      "title": "Silabus Mata Kuliah Program Studi Ilmu Komputer",
+      "source_refs": [
+        {
+          "printed_page": 289,
+          "pdf_page": 304,
+          "pdf_page_numbering": "1-based physical PDF page"
+        }
+      ]
+    }
+  ],
+  "page_manifest": [
+    {
+      "printed_page": 213,
+      "pdf_page": 228,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 214,
+      "pdf_page": 229,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 215,
+      "pdf_page": 230,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 216,
+      "pdf_page": 231,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 217,
+      "pdf_page": 232,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 218,
+      "pdf_page": 233,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 219,
+      "pdf_page": 234,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 220,
+      "pdf_page": 235,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 221,
+      "pdf_page": 236,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 222,
+      "pdf_page": 237,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 223,
+      "pdf_page": 238,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 224,
+      "pdf_page": 239,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 225,
+      "pdf_page": 240,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 226,
+      "pdf_page": 241,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 227,
+      "pdf_page": 242,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 228,
+      "pdf_page": 243,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 229,
+      "pdf_page": 244,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 230,
+      "pdf_page": 245,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 231,
+      "pdf_page": 246,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 232,
+      "pdf_page": 247,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 233,
+      "pdf_page": 248,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 234,
+      "pdf_page": 249,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 235,
+      "pdf_page": 250,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 236,
+      "pdf_page": 251,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 237,
+      "pdf_page": 252,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 238,
+      "pdf_page": 253,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 239,
+      "pdf_page": 254,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 240,
+      "pdf_page": 255,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 241,
+      "pdf_page": 256,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 242,
+      "pdf_page": 257,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 243,
+      "pdf_page": 258,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 244,
+      "pdf_page": 259,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 245,
+      "pdf_page": 260,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 246,
+      "pdf_page": 261,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 247,
+      "pdf_page": 262,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 248,
+      "pdf_page": 263,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 249,
+      "pdf_page": 264,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 250,
+      "pdf_page": 265,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 251,
+      "pdf_page": 266,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 252,
+      "pdf_page": 267,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 253,
+      "pdf_page": 268,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 254,
+      "pdf_page": 269,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 255,
+      "pdf_page": 270,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 256,
+      "pdf_page": 271,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 257,
+      "pdf_page": 272,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 258,
+      "pdf_page": 273,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 259,
+      "pdf_page": 274,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 260,
+      "pdf_page": 275,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 261,
+      "pdf_page": 276,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 262,
+      "pdf_page": 277,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 263,
+      "pdf_page": 278,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 264,
+      "pdf_page": 279,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 265,
+      "pdf_page": 280,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 266,
+      "pdf_page": 281,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 267,
+      "pdf_page": 282,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 268,
+      "pdf_page": 283,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 269,
+      "pdf_page": 284,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 270,
+      "pdf_page": 285,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 271,
+      "pdf_page": 286,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 272,
+      "pdf_page": 287,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 273,
+      "pdf_page": 288,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 274,
+      "pdf_page": 289,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 275,
+      "pdf_page": 290,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 276,
+      "pdf_page": 291,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 277,
+      "pdf_page": 292,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 278,
+      "pdf_page": 293,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 279,
+      "pdf_page": 294,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 280,
+      "pdf_page": 295,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 281,
+      "pdf_page": 296,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 282,
+      "pdf_page": 297,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 283,
+      "pdf_page": 298,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 284,
+      "pdf_page": 299,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 285,
+      "pdf_page": 300,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 286,
+      "pdf_page": 301,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 287,
+      "pdf_page": 302,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 288,
+      "pdf_page": 303,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 289,
+      "pdf_page": 304,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 290,
+      "pdf_page": 305,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 291,
+      "pdf_page": 306,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 292,
+      "pdf_page": 307,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 293,
+      "pdf_page": 308,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 294,
+      "pdf_page": 309,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 295,
+      "pdf_page": 310,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 296,
+      "pdf_page": 311,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 297,
+      "pdf_page": 312,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 298,
+      "pdf_page": 313,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 299,
+      "pdf_page": 314,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 300,
+      "pdf_page": 315,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 301,
+      "pdf_page": 316,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 302,
+      "pdf_page": 317,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 303,
+      "pdf_page": 318,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 304,
+      "pdf_page": 319,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 305,
+      "pdf_page": 320,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 306,
+      "pdf_page": 321,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 307,
+      "pdf_page": 322,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 308,
+      "pdf_page": 323,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 309,
+      "pdf_page": 324,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 310,
+      "pdf_page": 325,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 311,
+      "pdf_page": 326,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 312,
+      "pdf_page": 327,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 313,
+      "pdf_page": 328,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 314,
+      "pdf_page": 329,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 315,
+      "pdf_page": 330,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 316,
+      "pdf_page": 331,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 317,
+      "pdf_page": 332,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 318,
+      "pdf_page": 333,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 319,
+      "pdf_page": 334,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 320,
+      "pdf_page": 335,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 321,
+      "pdf_page": 336,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 322,
+      "pdf_page": 337,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 323,
+      "pdf_page": 338,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 324,
+      "pdf_page": 339,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 325,
+      "pdf_page": 340,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 326,
+      "pdf_page": 341,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 327,
+      "pdf_page": 342,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 328,
+      "pdf_page": 343,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 329,
+      "pdf_page": 344,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 330,
+      "pdf_page": 345,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 331,
+      "pdf_page": 346,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 332,
+      "pdf_page": 347,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 333,
+      "pdf_page": 348,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 334,
+      "pdf_page": 349,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 335,
+      "pdf_page": 350,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 336,
+      "pdf_page": 351,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 337,
+      "pdf_page": 352,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 338,
+      "pdf_page": 353,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 339,
+      "pdf_page": 354,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 340,
+      "pdf_page": 355,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 341,
+      "pdf_page": 356,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 342,
+      "pdf_page": 357,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    },
+    {
+      "printed_page": 343,
+      "pdf_page": 358,
+      "section": "3.3 Program Studi Ilmu Komputer"
+    }
+  ],
+  "key_table_page_refs": [
+    {
+      "table": "3.26",
+      "printed_pages": [
+        256,
+        258
+      ],
+      "pdf_pages": [
+        271,
+        273
+      ],
+      "description": "Semester curriculum, prerequisite strings, legends, credit totals."
+    },
+    {
+      "table": "3.27",
+      "printed_pages": [
+        259,
+        263
+      ],
+      "pdf_pages": [
+        274,
+        278
+      ],
+      "description": "Program elective catalog, prerequisites, and elective legends."
+    },
+    {
+      "table": "3.28",
+      "printed_pages": [
+        264,
+        264
+      ],
+      "pdf_pages": [
+        279,
+        279
+      ],
+      "description": "2016-to-2021 equivalency and 2021 revision rows."
+    },
+    {
+      "table": "3.29",
+      "printed_pages": [
+        265,
+        265
+      ],
+      "pdf_pages": [
+        280,
+        280
+      ],
+      "description": "Worked transition equivalency alternatives."
+    },
+    {
+      "table": "3.26 legends and annual offering symbols",
+      "printed_pages": [
+        258,
+        258
+      ],
+      "pdf_pages": [
+        273,
+        273
+      ],
+      "description": "Prerequisite *, per-semester availability, religious course choice, elective types, KKN and thesis composition."
+    },
+    {
+      "table": "3.27 legends",
+      "printed_pages": [
+        263,
+        263
+      ],
+      "pdf_pages": [
+        278,
+        278
+      ],
+      "description": "MBKM course marker ** and certification marker ***."
+    },
+    {
+      "section": "3.3.11.5-3.3.11.7",
+      "printed_pages": [
+        286,
+        287
+      ],
+      "pdf_pages": [
+        301,
+        302
+      ],
+      "description": "Curriculum change statement, KKN eligibility, thesis requirements."
+    }
+  ],
+  "factual_table_summary": {
+    "credit_summary": {
+      "required_sks": 104,
+      "elective_min_sks": 40,
+      "total_sks": 144,
+      "source_refs": [
+        {
+          "printed_page": 258,
+          "pdf_page": 273,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.26"
+        }
+      ]
+    },
+    "required_schedule_course_row_count": 53,
+    "elective_slot_row_count": 15,
+    "elective_catalog_course_row_count": 114,
+    "prerequisite_legends": [
+      {
+        "marker": "none",
+        "meaning": "A prerequisite without an asterisk must have been taken through the final examination before the course is taken.",
+        "raw_source_text": "Mata kuliah prasyarat tanpa simbol/tanda * adalah mata kuliah (yang terdapat pada semeter sebelumnya) harus telah diikuti oleh mahasiswa sampai dengan ujian akhir.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "*",
+        "meaning": "The prerequisite may be taken concurrently.",
+        "raw_source_text": "Mata kuliah yang ditandai simbul * adalah mata kuliah prasyarat yang boleh diambil secara bersamaan.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "",
+        "meaning": "Offered each semester, in both odd and even semesters.",
+        "raw_source_text": "Mata kuliah yang ditandai simbul  adalah mata kuliah yang ditawarkan/dibuka pada setiap semester, baik pada semester genap maupun pada semester ganjil.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "",
+        "meaning": "Choose the religion course according to the student’s religion.",
+        "raw_source_text": "Simbul  dimaksudkan untuk mata kuliah Agama: setiap mahasiswa harus memilih sesuai dengan agama kepercayaan yang dianut.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "",
+        "meaning": "Choose elective courses by research-lab interest or for certification recognition; the PDF states each student must hold one competency certification.",
+        "raw_source_text": "Simbul  dimaksudkan: setiap mahasiswa dapat memilih mata kuliah pilihan sesuai keterikan terhadap Lab Riset yang akan dikuti, atau mahasiswa dapat memilih mata kuliah pilihan untuk rekognisi suatu kegiatan pelatihan ataupun ujian sertifikasi kompetensi industri/TI. Setiap mahasiswa wajib memiliki satu sertifikasi kompetensi untuk menunjang karir.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "",
+        "meaning": "Electives may be selected based on GPA from research-lab offerings or recognized MBKM activities.",
+        "raw_source_text": "Simbul  dimaksudkan: setiap mahasiswa dapat memilih sejumlah mata kuliah pilihan berdasarkan IPK yang dicapai baik yang tawarkan oleh Lab Riset (lihat Tabel 3.34); atau dapat dipilih dari mata kuliah pilihan MBKM yang akan dikonversikan dari suatu kegiatan MBKM dari luar kampus.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "",
+        "meaning": "KKN totals 8 SKS and is mandatory; an inter-semester KKN period may also be used.",
+        "raw_source_text": "Simbul  dimaksudkan: total SKS dari mata kuliah KKN adalah 8 SKS yang wajib diambil oleh setiap mahasiswa. Setiap mahasiswa dapat juga mengikuti periode KKN yang diadakan pada semester antara.",
+        "source_refs": [
+          {
+            "printed_page": 258,
+            "pdf_page": 273,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.26"
+          }
+        ]
+      },
+      {
+        "marker": "**",
+        "meaning": "Marked MBKM electives are mandatory within the selected MBKM activity type.",
+        "raw_source_text": "Mata kuliah dengan simbol ** adalah mata kuliah pilihan MBKM yang wajib diambil pada masing-masing jenis kegiatan MBKM tersebut.",
+        "source_refs": [
+          {
+            "printed_page": 263,
+            "pdf_page": 278,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.27"
+          }
+        ]
+      },
+      {
+        "marker": "***",
+        "meaning": "Certification course names and credits are referred to elsewhere in the document; the source gives a different cross-reference in another note.",
+        "raw_source_text": "Simbol *** dimaksudkan untuk Daftar Nama Mata kuliah sertifikasi dan SKS, dapat dilihat pada Tabel 3.47.",
+        "source_refs": [
+          {
+            "printed_page": 263,
+            "pdf_page": 278,
+            "pdf_page_numbering": "1-based physical PDF page",
+            "table": "3.27"
+          }
+        ]
+      }
+    ],
+    "mandatory_credit_reconciliation": {
+      "scheduled_course_rows": 53,
+      "elective_slot_rows": 15,
+      "complete_unique_course_codes_before_religion_choice": 49,
+      "raw_sksw_sum_across_all_table_course_rows": 125,
+      "religion_choice_adjustment_sks": -10,
+      "religion_choice_rows": 6,
+      "religion_choice_basis": "Six 2-SKS agama alternatives are listed; choose one according to the source legend, removing five alternatives from the raw row sum.",
+      "repeated_semester_placement_adjustment_sks": -11,
+      "repeated_placement_rows": [
+        {
+          "code": "MII21-3002",
+          "row_count": 2,
+          "duplicate_credit_beyond_one_placement": 2
+        },
+        {
+          "code": "MII21-4001",
+          "row_count": 2,
+          "duplicate_credit_beyond_one_placement": 2
+        },
+        {
+          "code": "MII21-4003",
+          "row_count": 2,
+          "duplicate_credit_beyond_one_placement": 1
+        },
+        {
+          "code": "MII21-4002",
+          "row_count": 2,
+          "duplicate_credit_beyond_one_placement": 6
+        }
+      ],
+      "reconciled_mandatory_sks": 104,
+      "printed_mandatory_sks": 104,
+      "source_refs": [
+        {
+          "printed_page": 256,
+          "pdf_page": 271,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.26"
+        },
+        {
+          "printed_page": 257,
+          "pdf_page": 272,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.26"
+        },
+        {
+          "printed_page": 258,
+          "pdf_page": 273,
+          "pdf_page_numbering": "1-based physical PDF page",
+          "table": "3.26"
+        }
+      ],
+      "interpretation_note": "Raw course rows intentionally retain all religion alternatives and repeated semester placements; the adjustment explains the printed 104-SKS total and does not delete those rows."
+    },
+    "table_3_26_total_row_raw_cells": [
+      "",
+      "",
+      "",
+      "JUMLAH SKS",
+      "SKS TOTAL",
+      "",
+      "144",
+      "104",
+      "40",
+      ""
+    ],
+    "coverage_note": "Full row-level data, raw cells, transitions, and reconciliation are in ugm-ilkom-2021.json."
+  }
+}
