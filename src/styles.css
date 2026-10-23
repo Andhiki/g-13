@@ -62,11 +62,55 @@ select:focus-visible {
 }
 
 .map-stage {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
+  position: fixed;
+  inset: 0;
+  min-height: 100dvh;
   overflow: hidden;
   background: #f5f6f0;
+}
+body:has(.map-stage) #root > div > header {
+  position: fixed;
+  z-index: 9;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+body:has(.map-stage) #root > div > header > a { display: none; }
+body:has(.map-stage) #root > div > header > div {
+  gap: 8px;
+  padding: 5px;
+  border: 1px solid #d7ded6;
+  border-radius: 7px;
+  background: #fffefa;
+}
+body:has(.map-stage) #root > div > section[aria-label="Filter peta kurikulum"] {
+  position: fixed;
+  z-index: 9;
+  top: 14px;
+  left: 16px;
+  display: grid;
+  width: min(690px, calc(100vw - 440px));
+  min-height: 0;
+  grid-template-columns: minmax(210px, 1.2fr) minmax(190px, 1fr) minmax(140px, .7fr);
+  gap: 8px;
+  padding: 5px;
+  border: 1px solid #d7ded6;
+  border-radius: 7px;
+  background: #fffefa;
+}
+body:has(.map-stage) #root > div > section > div { min-width: 0; }
+body:has(.map-stage) #root > div > section label,
+body:has(.map-stage) #root > div > section > div > span { display: none; }
+.map-stage > .react-flow {
+  z-index: 0;
+}
+.canvas-caption,
+.canvas-footer {
+  display: none;
 }
 .map-stage > .react-flow {
   position: absolute;
@@ -582,6 +626,31 @@ select:focus-visible {
 }
 
 @media (max-width: 650px) {
+  body:has(.map-stage) #root > div > header {
+    top: 66px;
+    right: 10px;
+  }
+  body:has(.map-stage) #root > div > header > div { gap: 4px; padding: 4px; }
+  body:has(.map-stage) #root > div > section[aria-label="Filter peta kurikulum"] {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    padding: 5px;
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(2) { display: none; }
+  body:has(.map-stage) #root > div > section > div:nth-child(3) {
+    position: fixed;
+    top: 66px;
+    left: 10px;
+    width: min(185px, calc(100vw - 220px));
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(3) > div { width: 100%; }
+  body:has(.map-stage) #root > div > section > div:nth-child(3) button { width: 100%; }
+  .react-flow__controls { margin-bottom: 10px; }
+  .react-flow__minimap { display: none; }
   .canvas-caption {
     top: 10px;
     left: 11px;
