@@ -657,3 +657,54 @@ select:focus-visible {
     animation-duration: 0.01ms !important;
   }
 }
+
+body:has(.map-stage) #root > div > section label,
+body:has(.map-stage) #root > div > section > div > span {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 850px) {
+  body:has(.map-stage) #root > div > header {
+    top: 58px;
+  }
+  body:has(.map-stage) #root > div > section[aria-label="Filter peta kurikulum"] {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  body:has(.map-stage) #root > div > section > div:first-child {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: calc(100vw - 20px);
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(2),
+  body:has(.map-stage) #root > div > section > div:nth-child(3) {
+    position: fixed;
+    top: 106px;
+    width: calc((100vw - 30px) / 2);
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(2) {
+    display: block;
+    left: 10px;
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(3) {
+    right: 10px;
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(2) > div,
+  body:has(.map-stage) #root > div > section > div:nth-child(3) > div {
+    width: 100%;
+  }
+  body:has(.map-stage) #root > div > section > div:nth-child(2) button,
+  body:has(.map-stage) #root > div > section > div:nth-child(3) button {
+    width: 100%;
+  }
+}
