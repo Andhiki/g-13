@@ -5,5 +5,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { nitro } from "nitro/vite";
 
 export default defineConfig({
+  server: { host: true },
   plugins: [tailwindcss(), tanstackStart(), nitro({ preset: "bun" }), react()],
 });
