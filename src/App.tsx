@@ -1,6 +1,14 @@
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { ThemeSwitch } from "./ui/theme-switch";
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RiArrowDownSLine, RiSearchLine } from "@remixicon/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import {
   Background,
   BackgroundVariant,
@@ -568,6 +576,7 @@ export default function App() {
   const [group, setGroup] = useState("__all__");
   const [scope, setScope] = useState<Scope>("all");
   const [query, setQuery] = useState("");
+  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
   const data = curricula[curriculum];
   const relations = useMemo(() => deriveRelations(data), [data]);
   const visible = useMemo(
@@ -603,8 +612,8 @@ export default function App() {
     updateUrl(curriculum, id);
   };
 
-  const changeVersion = (event: ChangeEvent<HTMLSelectElement>) => {
-    const version: CurriculumId = event.target.value === "2021" ? "2021" : "2026";
+  const changeVersion = (value: string) => {
+    const version: CurriculumId = value === "2021" ? "2021" : "2026";
     setGroup("__all__");
     setScope("all");
     setQuery("");
@@ -616,7 +625,7 @@ export default function App() {
     navigateToCourse(course.id);
   };
 
-  const changeGroup = (event: ChangeEvent<HTMLSelectElement>) => setGroup(event.target.value);
+  const changeGroup = (value: string) => setGroup(value);
   const closeDetails = () => {
     updateUrl(curriculum, null);
   };
@@ -651,17 +660,25 @@ export default function App() {
           </span>
         </Link>
         <div className="topbar-right">
-          <span className="community">
-            <i />
-            Proyek komunitas mahasiswa
-          </span>
-          <label className="version-select">
-            <span>Kurikulum</span>
-            <select value={curriculum} onChange={changeVersion}>
-              <option value="2021">2021 · Revisi 2023</option>
-              <option value="2026">2026</option>
-            </select>
-          </label>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="topbar-menu-trigger"
+              aria-label={`Versi kurikulum: ${curriculum === "2021" ? "2021, Revisi 2023" : "2026"}`}
+            >
+              <span>Kurikulum {curriculum === "2021" ? "2021 · Revisi 2023" : "2026"}</span>
+              <RiArrowDownSLine aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" aria-label="Pilih versi kurikulum">
+              <DropdownMenuRadioGroup value={curriculum} onValueChange={changeVersion}>
+                <DropdownMenuRadioItem value="2021">
+                  <span>2021 · Revisi 2023</span>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="2026">
+                  <span>2026</span>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ThemeSwitch />
         </div>
       </header>
@@ -670,15 +687,49 @@ export default function App() {
         <div className="search-field">
           <label htmlFor="course-search">Cari mata kuliah</label>
           <div className="search-wrap">
-            <span aria-hidden="true">⌕</span>
+            <RiSearchLine aria-hidden="true" />
             <input
               id="course-search"
               type="search"
+              role="combobox"
+              aria-autocomplete="list"
               placeholder="Nama, kode, prasyarat…"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setActiveSearchIndex(0);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  setQuery("");
+                  setActiveSearchIndex(0);
+                  return;
+                }
+                if (!searchResults.length) return;
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setActiveSearchIndex((index) => (index + 1) % searchResults.length);
+                } else if (event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setActiveSearchIndex(
+                    (index) => (index - 1 + searchResults.length) % searchResults.length,
+                  );
+                } else if (event.key === "Enter") {
+                  event.preventDefault();
+                  chooseSearchResult(searchResults[activeSearchIndex]);
+                }
+              }}
               autoComplete="off"
-              aria-controls="course-search-results"
+              aria-expanded={Boolean(query) && searchResults.length > 0}
+              aria-haspopup="listbox"
+              aria-controls={
+                query && searchResults.length > 0 ? "course-search-results" : undefined
+              }
+              aria-activedescendant={
+                query && searchResults.length > 0
+                  ? `course-search-option-${activeSearchIndex}`
+                  : undefined
+              }
             />
             {query && (
               <button type="button" aria-label="Hapus pencarian" onClick={() => setQuery("")}>
@@ -686,44 +737,74 @@ export default function App() {
               </button>
             )}
             {query && (
-              <div className="search-results" id="course-search-results" role="listbox">
+              <div className="search-results">
                 {searchResults.length > 0 ? (
-                  searchResults.map((course) => (
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={course.id === courseId}
-                      key={course.id}
-                      onClick={() => chooseSearchResult(course)}
-                    >
-                      <i>{course.code || "Pilihan"}</i>
-                      <span>{course.title}</span>
-                      <small>{semesterLabel(course)}</small>
-                    </button>
-                  ))
+                  <div
+                    id="course-search-results"
+                    role="listbox"
+                    aria-label="Hasil pencarian mata kuliah"
+                  >
+                    {searchResults.map((course, index) => (
+                      <div
+                        id={`course-search-option-${index}`}
+                        role="option"
+                        aria-selected={index === activeSearchIndex}
+                        key={course.id}
+                        onMouseDown={(event) => event.preventDefault()}
+                        onMouseEnter={() => setActiveSearchIndex(index)}
+                        onClick={() => chooseSearchResult(course)}
+                      >
+                        <i>{course.code || "Pilihan"}</i>
+                        <span>{course.title}</span>
+                        <small>{semesterLabel(course)}</small>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <p className="search-empty">Tidak ada mata kuliah yang cocok.</p>
+                  <p className="search-empty" role="status">
+                    Tidak ada mata kuliah yang cocok.
+                  </p>
                 )}
               </div>
             )}
           </div>
         </div>
-        <label className="field group-field">
+        <div className="group-filter">
           <span>Kelompok pilihan</span>
-          <select value={group} onChange={changeGroup}>
-            <option value="__all__">Semua mata kuliah</option>
-            {data.groups.map((item) => (
-              <option value={item.name} key={item.name}>
-                {item.name} ({item.count})
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="semester-nav" aria-label="Fokus peta">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="filter-menu-trigger"
+              aria-label={`Kelompok pilihan: ${group === "__all__" ? "Semua mata kuliah" : group}`}
+            >
+              <span>{group === "__all__" ? "Semua mata kuliah" : group}</span>
+              <RiArrowDownSLine aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              aria-label="Pilih kelompok mata kuliah"
+              className="group-menu-content"
+            >
+              <DropdownMenuRadioGroup value={group} onValueChange={changeGroup}>
+                <DropdownMenuRadioItem value="__all__">
+                  <span>Semua mata kuliah</span>
+                </DropdownMenuRadioItem>
+                {data.groups.map((item) => (
+                  <DropdownMenuRadioItem value={item.name} key={item.name}>
+                    <span>
+                      {item.name} ({item.count})
+                    </span>
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="semester-nav">
           <span>Fokus</span>
-          <div className="semester-options">
+          <div className="semester-options" role="group" aria-label="Fokus semester">
             <button
               className={scope === "all" ? "active" : ""}
+              aria-pressed={scope === "all"}
               onClick={() => setScope("all")}
               type="button"
             >
@@ -732,6 +813,7 @@ export default function App() {
             {[1, 2, 3, 4, 5, 6, 7, 8].map((value) => (
               <button
                 className={scope === String(value) ? "active" : ""}
+                aria-pressed={scope === String(value)}
                 key={value}
                 onClick={() => setScope(String(value) as Scope)}
                 type="button"
@@ -741,6 +823,7 @@ export default function App() {
             ))}
             <button
               className={scope === "choices" ? "active" : ""}
+              aria-pressed={scope === "choices"}
               onClick={() => setScope("choices")}
               type="button"
             >

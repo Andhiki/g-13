@@ -111,14 +111,6 @@ select:focus-visible {
   align-items: center;
   gap: 22px;
 }
-.community {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #5d6c63;
-  font-size: 11px;
-}
-.community i,
 .drawer-state i {
   width: 7px;
   height: 7px;
@@ -126,36 +118,6 @@ select:focus-visible {
   background: #b38542;
   box-shadow: 0 0 0 4px #eee7d8;
 }
-.version-select {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.version-select > span {
-  color: #718078;
-  font-size: 10px;
-}
-.version-select select,
-.field select {
-  min-height: 37px;
-  border: 1px solid #d5ddd5;
-  border-radius: 4px;
-  padding: 0 34px 0 11px;
-  appearance: none;
-  background-color: #fffefa;
-  background-image:
-    linear-gradient(45deg, transparent 50%, #77877d 50%),
-    linear-gradient(135deg, #77877d 50%, transparent 50%);
-  background-position:
-    calc(100% - 15px) 15px,
-    calc(100% - 10px) 15px;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-  color: #31443a;
-  font-size: 11px;
-  cursor: pointer;
-}
-
 .map-toolbar {
   z-index: 8;
   flex: 0 0 auto;
@@ -165,11 +127,12 @@ select:focus-visible {
   align-items: center;
   gap: 14px;
   padding: 10px 24px;
-  border-bottom: 1px solid #dce1d9;
-  background: #f8f8f3;
+  border-bottom: 1px solid var(--color-stroke-soft-200);
+  background: var(--color-bg-weak-25);
+  color: var(--color-text-strong-950);
 }
 .search-field,
-.field {
+.group-filter {
   position: relative;
   display: flex;
   min-width: 0;
@@ -177,57 +140,68 @@ select:focus-visible {
   gap: 5px;
 }
 .search-field > label,
-.field > span {
-  color: #718078;
-  font-size: 10px;
-  font-weight: 600;
+.group-filter > span,
+.semester-nav > span {
+  color: var(--color-text-sub-600);
+  font-size: var(--text-label-xs);
+  font-weight: 500;
+  line-height: 16px;
 }
 .search-wrap {
   position: relative;
   display: flex;
-  height: 38px;
+  height: 40px;
   align-items: center;
-  border: 1px solid #d7ded6;
-  border-radius: 4px;
-  background: #fffefa;
+  border: 1px solid var(--color-stroke-soft-200);
+  border-radius: 8px;
+  background: var(--color-bg-white-0);
+  box-shadow: var(--shadow-regular-xs);
 }
-.search-wrap > span {
-  margin: 0 9px 2px 11px;
-  color: var(--wine);
-  font-size: 20px;
+.search-wrap > svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 0 9px 0 11px;
+  color: var(--color-text-sub-600);
 }
 .search-wrap input {
   width: 100%;
   min-width: 0;
-  height: 36px;
-  padding: 0 32px 0 0;
+  height: 38px;
+  padding: 0 40px 0 0;
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--ink);
-  font-size: 11px;
+  color: var(--color-text-strong-950);
+  font-size: var(--text-paragraph-sm);
 }
 .search-wrap input:focus-visible {
   outline: 0;
 }
 .search-wrap:focus-within {
-  outline: 3px solid #c1873f;
+  outline: 2px solid var(--color-primary-base);
   outline-offset: 2px;
 }
 .search-wrap input::placeholder {
-  color: #9aa59d;
+  color: var(--color-text-soft-400);
 }
 .search-wrap > button {
   position: absolute;
-  right: 8px;
+  right: 4px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
   border: 0;
-  background: none;
-  color: #738078;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-sub-600);
   font-size: 18px;
   cursor: pointer;
 }
-.group-field select {
-  width: 100%;
+.search-wrap > button:hover {
+  background: var(--color-bg-weak-50);
+  color: var(--color-text-strong-950);
 }
 .search-results {
   position: absolute;
@@ -237,50 +211,56 @@ select:focus-visible {
   right: 0;
   max-height: min(360px, 55vh);
   overflow: auto;
-  border: 1px solid #d0d8cf;
-  border-radius: 5px;
-  background: #fffefa;
-  box-shadow: 0 12px 30px #1b30251f;
+  border: 1px solid var(--color-stroke-soft-200);
+  border-radius: 10px;
+  background: var(--color-bg-white-0);
+  box-shadow: var(--shadow-regular-md);
 }
-.search-results button {
+.search-results [role="option"] {
   width: 100%;
   display: grid;
   grid-template-columns: 90px 1fr;
   align-items: center;
   gap: 4px 9px;
   padding: 9px 11px;
+  cursor: pointer;
+  min-height: 52px;
   border: 0;
-  border-bottom: 1px solid #edf0eb;
+  border-bottom: 1px solid var(--color-stroke-soft-200);
   background: transparent;
   text-align: left;
-  cursor: pointer;
 }
-.search-results button:hover,
-.search-results button[aria-selected="true"] {
-  background: #f0f3ed;
+.search-results [role="option"]:hover,
+.search-results [role="option"][aria-selected="true"] {
+  background: var(--color-bg-weak-50);
 }
-.search-results button > i {
+.search-results [role="option"] > i {
   overflow: hidden;
-  color: var(--wine);
-  font-size: 9px;
+  color: var(--color-text-sub-600);
+  font-size: var(--text-label-xs);
   font-style: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.search-results button > span {
-  color: #314239;
-  font-size: 11px;
+.search-results [role="option"] > span {
+  color: var(--color-text-strong-950);
+  font-size: var(--text-paragraph-sm);
 }
-.search-results button > small {
+.search-results [role="option"] > small {
   grid-column: 2;
-  color: #829087;
-  font-size: 9px;
+  color: var(--color-text-sub-600);
+  font-size: var(--text-label-xs);
 }
 .search-empty {
   margin: 0;
   padding: 14px;
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--color-text-sub-600);
+  font-size: var(--text-paragraph-sm);
+}
+.filter-menu-trigger {
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
 }
 .semester-nav {
   display: flex;
@@ -290,9 +270,6 @@ select:focus-visible {
 }
 .semester-nav > span {
   flex: none;
-  color: #718078;
-  font-size: 10px;
-  font-weight: 600;
 }
 .semester-options {
   display: flex;
@@ -305,14 +282,14 @@ select:focus-visible {
 }
 .semester-options button {
   flex: none;
-  min-width: 29px;
-  height: 29px;
+  min-width: 32px;
+  height: 36px;
   padding: 0 8px;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 8px;
   background: transparent;
-  color: #6d7b72;
-  font-size: 10px;
+  color: var(--color-text-sub-600);
+  font-size: var(--text-label-sm);
   cursor: pointer;
 }
 .semester-options button:first-child {
@@ -322,13 +299,19 @@ select:focus-visible {
   padding: 0 11px;
 }
 .semester-options button:hover {
-  background: #edf0e9;
+  background: var(--color-bg-weak-50);
+  color: var(--color-text-strong-950);
+}
+.semester-options button:focus-visible {
+  outline: 2px solid var(--color-primary-base);
+  outline-offset: 1px;
 }
 .semester-options button.active {
-  border-color: #d7dfd5;
-  background: #e8eee7;
-  color: #783543;
-  font-weight: 700;
+  border-color: var(--color-stroke-soft-200);
+  background: var(--color-bg-white-0);
+  color: var(--color-text-strong-950);
+  box-shadow: var(--shadow-regular-xs);
+  font-weight: 500;
 }
 
 .map-stage {
@@ -715,7 +698,7 @@ select:focus-visible {
 }
 .facts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   margin-top: 16px;
   border-top: 1px solid #e7ebe5;
   border-bottom: 1px solid #e7ebe5;
@@ -891,58 +874,19 @@ select:focus-visible {
   .topbar-right {
     gap: 8px;
   }
-  .community {
-    max-width: 95px;
-    gap: 6px;
-    font-size: 8px;
-    line-height: 1.25;
-    text-align: right;
-  }
-  .community i {
-    width: 6px;
-    height: 6px;
-    box-shadow: 0 0 0 3px #eee7d8;
-  }
-  .version-select {
-    gap: 5px;
-  }
-  .version-select > span {
-    display: none;
-  }
-  .version-select select {
-    max-width: 112px;
-    min-height: 32px;
-    padding: 0 23px 0 7px;
-    background-position:
-      calc(100% - 11px) 13px,
-      calc(100% - 6px) 13px;
-    font-size: 9px;
-  }
   .map-toolbar {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
     min-height: 111px;
     padding: 8px 11px 7px;
   }
-  .search-field > label,
-  .field > span,
-  .semester-nav > span {
-    font-size: 9px;
-  }
-  .search-wrap {
-    height: 34px;
+  .search-wrap,
+  .filter-menu-trigger {
+    min-height: 44px;
   }
   .search-wrap input {
-    height: 32px;
-    font-size: 10px;
-  }
-  .search-wrap > span {
-    margin-left: 8px;
-  }
-  .group-field select {
-    min-height: 34px;
-    padding-left: 8px;
-    font-size: 9px;
+    height: 42px;
+    font-size: var(--text-paragraph-xs);
   }
   .semester-nav {
     grid-column: 1 / -1;
@@ -953,10 +897,8 @@ select:focus-visible {
     padding: 1px;
   }
   .semester-options button {
-    min-width: 27px;
-    height: 27px;
+    height: 44px;
     padding: 0 6px;
-    font-size: 9px;
   }
   .semester-options button:first-child,
   .semester-options button:last-child {
