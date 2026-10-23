@@ -1,16 +1,10 @@
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { ThemeSwitch } from "./ui/theme-switch";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RiArrowDownSLine, RiSearchLine } from "@remixicon/react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  dropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { tv } from "tailwind-variants";
+import { RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { CompactButton } from "./ui/compact-button";
+import { AlignInput } from "./ui/input";
+import { AlignSelect } from "./ui/select";
 import {
   Background,
   BackgroundVariant,
@@ -53,16 +47,6 @@ type LaneNodeData = {
 };
 type MapNode = Node<CourseNodeData, "course"> | Node<LaneNodeData, "lane">;
 type Scope = "all" | "choices" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8";
-
-const semesterOption = tv({
-  base: "h-9 min-w-8 shrink-0 cursor-pointer rounded-lg border border-transparent bg-transparent px-2 text-label-sm text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base max-[650px]:h-11 max-[650px]:px-1.5",
-  variants: {
-    active: {
-      true: "border-stroke-soft-200 bg-bg-white-0 font-medium text-text-strong-950 shadow-regular-xs",
-    },
-    wide: { true: "px-2.5 max-[650px]:px-2" },
-  },
-});
 
 const LANE_X = 48;
 const LANE_STEP = 300;
@@ -674,25 +658,19 @@ export default function App() {
           </span>
         </Link>
         <div className="flex items-center gap-2.5 max-[700px]:w-full max-[700px]:justify-between max-[700px]:gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={dropdownMenuTrigger({ mobile: true })}
+          <AlignSelect.Root variant="compact" value={curriculum} onValueChange={changeVersion}>
+            <AlignSelect.Trigger
               aria-label={`Versi kurikulum: ${curriculum === "2021" ? "2021, Revisi 2023" : "2026"}`}
             >
-              <span>Kurikulum {curriculum === "2021" ? "2021 · Revisi 2023" : "2026"}</span>
-              <RiArrowDownSLine aria-hidden="true" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" aria-label="Pilih versi kurikulum">
-              <DropdownMenuRadioGroup value={curriculum} onValueChange={changeVersion}>
-                <DropdownMenuRadioItem value="2021">
-                  <span>2021 · Revisi 2023</span>
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="2026">
-                  <span>2026</span>
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <AlignSelect.Value>
+                {`Kurikulum ${curriculum === "2021" ? "2021 · Revisi 2023" : "2026"}`}
+              </AlignSelect.Value>
+            </AlignSelect.Trigger>
+            <AlignSelect.Content>
+              <AlignSelect.Item value="2021">2021 · Revisi 2023</AlignSelect.Item>
+              <AlignSelect.Item value="2026">2026</AlignSelect.Item>
+            </AlignSelect.Content>
+          </AlignSelect.Root>
           <ThemeSwitch />
         </div>
       </header>
@@ -708,65 +686,62 @@ export default function App() {
           >
             Cari mata kuliah
           </label>
-          <div className="relative flex h-10 items-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xs focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary-base max-[650px]:min-h-11">
-            <RiSearchLine
-              className="mx-[9px] ml-[11px] size-[18px] shrink-0 text-text-sub-600"
-              aria-hidden="true"
-            />
-            <input
-              className="h-[38px] min-w-0 w-full border-0 bg-transparent py-0 pr-10 pl-0 text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus-visible:outline-none max-[650px]:h-[42px] max-[650px]:text-paragraph-xs"
-              id="course-search"
-              type="search"
-              role="combobox"
-              aria-autocomplete="list"
-              placeholder="Nama, kode, prasyarat…"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setActiveSearchIndex(0);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Escape") {
-                  setQuery("");
-                  setActiveSearchIndex(0);
-                  return;
-                }
-                if (!searchResults.length) return;
-                if (event.key === "ArrowDown") {
-                  event.preventDefault();
-                  setActiveSearchIndex((index) => (index + 1) % searchResults.length);
-                } else if (event.key === "ArrowUp") {
-                  event.preventDefault();
-                  setActiveSearchIndex(
-                    (index) => (index - 1 + searchResults.length) % searchResults.length,
-                  );
-                } else if (event.key === "Enter") {
-                  event.preventDefault();
-                  chooseSearchResult(searchResults[activeSearchIndex]);
-                }
-              }}
-              autoComplete="off"
-              aria-expanded={Boolean(query) && searchResults.length > 0}
-              aria-haspopup="listbox"
-              aria-controls={
-                query && searchResults.length > 0 ? "course-search-results" : undefined
-              }
-              aria-activedescendant={
-                query && searchResults.length > 0
-                  ? `course-search-option-${activeSearchIndex}`
-                  : undefined
-              }
-            />
-            {query && (
-              <button
-                className="absolute right-1 grid size-8 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
-                type="button"
-                aria-label="Hapus pencarian"
-                onClick={() => setQuery("")}
-              >
-                ×
-              </button>
-            )}
+          <div className="relative">
+            <AlignInput.Root>
+              <AlignInput.Wrapper>
+                <AlignInput.Icon aria-hidden="true">
+                  <RiSearchLine />
+                </AlignInput.Icon>
+                <AlignInput.Input
+                  id="course-search"
+                  type="search"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  placeholder="Nama, kode, prasyarat…"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setActiveSearchIndex(0);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      setQuery("");
+                      setActiveSearchIndex(0);
+                      return;
+                    }
+                    if (!searchResults.length) return;
+                    if (event.key === "ArrowDown") {
+                      event.preventDefault();
+                      setActiveSearchIndex((index) => (index + 1) % searchResults.length);
+                    } else if (event.key === "ArrowUp") {
+                      event.preventDefault();
+                      setActiveSearchIndex(
+                        (index) => (index - 1 + searchResults.length) % searchResults.length,
+                      );
+                    } else if (event.key === "Enter") {
+                      event.preventDefault();
+                      chooseSearchResult(searchResults[activeSearchIndex]);
+                    }
+                  }}
+                  autoComplete="off"
+                  aria-expanded={Boolean(query) && searchResults.length > 0}
+                  aria-haspopup="listbox"
+                  aria-controls={
+                    query && searchResults.length > 0 ? "course-search-results" : undefined
+                  }
+                  aria-activedescendant={
+                    query && searchResults.length > 0
+                      ? `course-search-option-${activeSearchIndex}`
+                      : undefined
+                  }
+                />
+                {query && (
+                  <CompactButton aria-label="Hapus pencarian" onClick={() => setQuery("")}>
+                    <RiCloseLine aria-hidden="true" />
+                  </CompactButton>
+                )}
+              </AlignInput.Wrapper>
+            </AlignInput.Root>
             {query && (
               <div className="absolute top-[calc(100%+6px)] right-0 left-0 z-30 max-h-[min(360px,55vh)] overflow-auto rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 shadow-regular-md">
                 {searchResults.length > 0 ? (
@@ -811,71 +786,45 @@ export default function App() {
           <span className="text-label-xs font-medium leading-4 text-text-sub-600">
             Kelompok pilihan
           </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={dropdownMenuTrigger({ full: true, touch: true })}
+          <AlignSelect.Root value={group} onValueChange={changeGroup}>
+            <AlignSelect.Trigger
               aria-label={`Kelompok pilihan: ${group === "__all__" ? "Semua mata kuliah" : group}`}
             >
-              <span>{group === "__all__" ? "Semua mata kuliah" : group}</span>
-              <RiArrowDownSLine aria-hidden="true" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              aria-label="Pilih kelompok mata kuliah"
-              className="max-h-[min(360px,calc(100dvh-32px))] overflow-y-auto"
-            >
-              <DropdownMenuRadioGroup value={group} onValueChange={changeGroup}>
-                <DropdownMenuRadioItem value="__all__">
-                  <span>Semua mata kuliah</span>
-                </DropdownMenuRadioItem>
-                {data.groups.map((item) => (
-                  <DropdownMenuRadioItem value={item.name} key={item.name}>
-                    <span>
-                      {item.name} ({item.count})
-                    </span>
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <AlignSelect.Value>
+                {group === "__all__" ? "Semua mata kuliah" : group}
+              </AlignSelect.Value>
+            </AlignSelect.Trigger>
+            <AlignSelect.Content>
+              <AlignSelect.Item value="__all__">Semua mata kuliah</AlignSelect.Item>
+              {data.groups.map((item) => (
+                <AlignSelect.Item value={item.name} key={item.name}>
+                  {item.name} ({item.count})
+                </AlignSelect.Item>
+              ))}
+            </AlignSelect.Content>
+          </AlignSelect.Root>
         </div>
         <div className="flex min-w-0 items-center gap-2.5 max-[1050px]:col-span-full max-[650px]:gap-[7px]">
-          <span className="shrink-0 text-label-xs font-medium leading-4 text-text-sub-600">
-            Fokus
-          </span>
-          <div
-            className="flex min-w-0 w-full items-center gap-[3px] overflow-x-auto p-[3px] [scrollbar-width:thin] max-[650px]:gap-px max-[650px]:p-px"
-            role="group"
-            aria-label="Fokus semester"
+          <label
+            className="shrink-0 text-label-xs font-medium leading-4 text-text-sub-600"
+            htmlFor="semester-focus"
           >
-            <button
-              className={semesterOption({ active: scope === "all", wide: true })}
-              aria-pressed={scope === "all"}
-              onClick={() => setScope("all")}
-              type="button"
-            >
-              Semua
-            </button>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((value) => (
-              <button
-                className={semesterOption({ active: scope === String(value) })}
-                aria-pressed={scope === String(value)}
-                key={value}
-                onClick={() => setScope(String(value) as Scope)}
-                type="button"
-              >
-                {value}
-              </button>
-            ))}
-            <button
-              className={semesterOption({ active: scope === "choices", wide: true })}
-              aria-pressed={scope === "choices"}
-              onClick={() => setScope("choices")}
-              type="button"
-            >
-              Pilihan
-            </button>
-          </div>
+            Fokus
+          </label>
+          <AlignSelect.Root value={scope} onValueChange={(value) => setScope(value as Scope)}>
+            <AlignSelect.Trigger id="semester-focus" aria-label="Fokus semester">
+              <AlignSelect.Value />
+            </AlignSelect.Trigger>
+            <AlignSelect.Content>
+              <AlignSelect.Item value="all">Semua</AlignSelect.Item>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((value) => (
+                <AlignSelect.Item value={String(value)} key={value}>
+                  Semester {value}
+                </AlignSelect.Item>
+              ))}
+              <AlignSelect.Item value="choices">Pilihan</AlignSelect.Item>
+            </AlignSelect.Content>
+          </AlignSelect.Root>
         </div>
       </section>
 

@@ -1,14 +1,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  dropdownMenuTrigger,
-} from "./dropdown-menu";
+import { AlignSelect } from "./select";
 
 const themes = [
   { value: "light", label: "Terang", Icon: RiSunLine },
@@ -22,31 +15,22 @@ export function ThemeSwitch() {
   useEffect(() => setMounted(true), []);
   const selectedTheme = mounted ? (theme ?? "system") : "system";
   const current = themes.find((item) => item.value === selectedTheme) ?? themes[2];
-  const Icon = current.Icon;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={dropdownMenuTrigger({ theme: true })}
-        aria-label={`Tema tampilan: ${current.label}`}
-      >
-        <Icon aria-hidden="true" />
-        <span>Tema: {current.label}</span>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        aria-label="Pilih tema tampilan"
-        className="min-w-[184px] [&_[role=menuitemradio]]:min-h-11"
-      >
-        <DropdownMenuRadioGroup value={selectedTheme} onValueChange={setTheme}>
-          {themes.map(({ value, label, Icon: OptionIcon }) => (
-            <DropdownMenuRadioItem key={value} value={value}>
+    <AlignSelect.Root variant="compact" value={selectedTheme} onValueChange={setTheme}>
+      <AlignSelect.Trigger aria-label={`Tema tampilan: ${current.label}`}>
+        <AlignSelect.Value>{`Tema: ${current.label}`}</AlignSelect.Value>
+      </AlignSelect.Trigger>
+      <AlignSelect.Content>
+        {themes.map(({ value, label, Icon: OptionIcon }) => (
+          <AlignSelect.Item key={value} value={value}>
+            <AlignSelect.ItemIcon>
               <OptionIcon aria-hidden="true" />
-              <span>{label}</span>
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            </AlignSelect.ItemIcon>
+            <span>{label}</span>
+          </AlignSelect.Item>
+        ))}
+      </AlignSelect.Content>
+    </AlignSelect.Root>
   );
 }

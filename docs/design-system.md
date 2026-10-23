@@ -5,46 +5,54 @@ is [AlignUI's Next.js TypeScript starter](https://github.com/alignui/alignui-nex
 checked at commit `f37bd913a058ceca39d5bfc2369ec420018e5716`. The copyright and MIT terms are retained
 in [docs/licenses/alignui.txt](licenses/alignui.txt).
 
-`src/ui/compact-button.tsx` adapts the AlignUI CompactButton styling to Tailwind Variants. Its
-source is `components/ui/compact-button.tsx` in the upstream starter. `src/ui/dropdown-menu.tsx`
-adapts the upstream `components/ui/dropdown.tsx` content, item, and radio item patterns to Tailwind Variants
-and Radix primitives. The app uses the free Dropdown source pattern for curriculum, theme, and
-interest group selection. The app intentionally uses plain text labels with a selection mark in place
-of the starter's icon-heavy general-purpose menu options.
+AlignUI publishes components as source to copy into the app, not as a runtime component package.
+Its components use Radix for behavior and Tailwind for their default styling. Use those upstream
+component sources and defaults for standard controls. Do not rebuild them from raw Radix primitives
+or restyle them through local variants or caller `className` values. Keep app data, callbacks, and
+domain-specific logic in the app. `src/ui/input.tsx` and `src/ui/select.tsx` use the documented
+AlignUI v1.2 default variants for Input and Select. The existing
+[`CompactButton`](../src/ui/compact-button.tsx) source is from the pinned AlignUI starter. The
+license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt). See the upstream
+[Dropdown](https://www.alignui.com/docs/v1.2/ui/dropdown),
+[Select](https://www.alignui.com/docs/v1.2/ui/select), and
+[Input](https://www.alignui.com/docs/v1.2/ui/input) documentation.
 
 The token stylesheet `src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
 Project surfaces and controls use these tokens. The existing curriculum map layout and its data
-visualization styles remain in place while the shell, dropdown, search, and filter controls migrate.
+visualization styles remain in place while tickets 03–05 migrate the remaining UI.
 
 ## Styling policy
 
-Use Tailwind CSS v4 utilities for component styling, layout, responsive behavior, and interaction
-states. Reuse AlignUI's Tailwind component source and theme tokens. Shared variants may use
-Tailwind Variants.
+Use AlignUI's upstream component source and default variants for interactive controls. Tailwind
+utilities outside those components may arrange app layout and responsive behavior. Pass data and
+callbacks into AlignUI components without overriding their default styles or behavior.
 
-Write custom CSS only for a feature Tailwind cannot express, and document the specific limitation
-beside that rule. Token declarations, font imports, and framework imports remain stylesheet setup.
-Do not introduce custom CSS classes merely to group styles that Tailwind utilities already support.
+Use custom controls only where AlignUI has no matching component, such as the curriculum graph's
+course nodes and relationship visualization. Keep their custom behavior domain-specific and document
+the exception. Token declarations, font imports, and framework imports remain stylesheet setup.
 
-Ticket 02 migrated the shell, dropdown, search, and filter styles to Tailwind utilities and shared
-variants. The remaining custom CSS styles the curriculum graph and detail panel, which tickets 03–05
-will migrate under this policy.
+Ticket 02 uses AlignUI Input for search and Select for all single-choice controls. Its inline
+course suggestion popup retains app-specific matching and listbox behavior because AlignUI has no
+inline autocomplete component. Tickets 03–05 apply the same policy to the list, detail panel, and
+graph controls.
 
-## Ticket 02 functional verification
+## Ticket 02 previous implementation verification
 
-Verified on 23 October 2026 against the production build in Chromium at 1440px, 768px, and 390px.
+The initial Tailwind implementation was verified on 23 October 2026 against the production build in Chromium at 1440px, 768px, and 390px.
 Eighteen browser scenarios covered both curricula and themes, dropdown keyboard selection, Escape
 dismissal and focus return, search selection and empty results, semester/group filters, saved theme
 choices, and system theme changes. Additional checks covered browser history, keyboard search, and
-saved theme application before hydration. No JavaScript or hydration errors occurred.
+saved theme application before hydration. No JavaScript or hydration errors occurred. These results
+do not cover the current AlignUI Input and Select migration.
 
-The project checks and production build passed. Standards and spec reviews cleared the final changes.
+The project checks and production build passed for that implementation. Standards and spec reviews
+cleared those changes.
 The build retains bundle-size and upstream module-directive warnings.
 
 The design inspector still flags the existing map's small text, contrast, clipped canvas content,
 and long semester lanes. These belong to the graph migration in ticket 04. AlignUI's requested default
 control shadows and brand mark are retained despite the inspector's generic style warnings.
 
-The Tailwind styling follow-up passes `bun run check` and `bun run build`. A browser review of the
-updated styles is still pending because Chromium cannot start without `libcups.so.2`; the configured
-JetBrains runtime fallback is not installed in this environment.
+The AlignUI source control update passes `bun run check` and `bun run build`. Browser review remains
+pending because Chromium and the configured JetBrains runtime fallback are unavailable in this
+environment.

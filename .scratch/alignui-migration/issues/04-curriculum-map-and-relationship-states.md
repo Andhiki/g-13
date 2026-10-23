@@ -8,7 +8,7 @@
 
 - [ ] Follow the [Tailwind-first styling policy](../../../docs/design-system.md#styling-policy) for migrated graph UI. Document any custom CSS or dynamic graph styling that Tailwind cannot express.
 
-- [ ] Apply shared theme tokens to custom course nodes, semester lanes, connections, canvas, minimap, and map controls. Keep the existing graph layout and academic relationship derivation.
+- [ ] Use AlignUI's upstream components and default variants for standard map controls. Keep the course nodes, semester lanes, and connections as domain-specific graph visuals; use shared theme tokens for those visuals and the canvas/minimap. Preserve the existing graph layout and academic relationship derivation.
 - [ ] Use AlignUI's primary color for the selected course and separate theme colors for prerequisite and dependent-course directions. Keep arrow direction and provide text labels or a legend so color is not the only distinction.
 - [ ] Preserve existing pan, zoom, course selection, related-course highlighting, and detail-opening behavior.
 - [ ] Keep course text, selected and related states, connections, and controls readable in light and dark themes. Present relationship states as academic relationships, not personal enrollment eligibility.
