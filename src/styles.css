@@ -1,5 +1,6 @@
 @import "@fontsource-variable/inter";
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "./alignui.css";
 
 :root {
