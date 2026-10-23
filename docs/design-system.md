@@ -9,8 +9,8 @@ AlignUI publishes components as source to copy into the app, not as a runtime co
 Its components use Radix for behavior and Tailwind for their default styling. Use those upstream
 component sources and defaults for standard controls. Do not rebuild them from raw Radix primitives
 or restyle them through local variants or caller `className` values. Keep app data, callbacks, and
-domain-specific logic in the app. `src/ui/input.tsx` and `src/ui/select.tsx` use the documented
-AlignUI v1.2 default variants for Input and Select. The existing
+domain-specific logic in the app. `src/ui/input.tsx`, `src/ui/select.tsx`, and `src/ui/dropdown.tsx`
+use the documented AlignUI v1.2 default variants for Input, Select, and Dropdown. The existing
 [`CompactButton`](../src/ui/compact-button.tsx) source is from the pinned AlignUI starter. The
 license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt). See the upstream
 [Dropdown](https://www.alignui.com/docs/v1.2/ui/dropdown),
@@ -31,10 +31,10 @@ Use custom controls only where AlignUI has no matching component, such as the cu
 course nodes and relationship visualization. Keep their custom behavior domain-specific and document
 the exception. Token declarations, font imports, and framework imports remain stylesheet setup.
 
-Ticket 02 uses AlignUI Input for search and Select for all single-choice controls. Its inline
-course suggestion popup retains app-specific matching and listbox behavior because AlignUI has no
-inline autocomplete component. Tickets 03–05 apply the same policy to the list, detail panel, and
-graph controls.
+Ticket 02 uses AlignUI Input for search, Select for curriculum and filters, and Dropdown for the
+theme menu with an icon-only CompactButton trigger. Its inline course suggestion popup retains
+app-specific matching and listbox behavior because AlignUI has no inline autocomplete component.
+Tickets 03–05 apply the same policy to the list, detail panel, and graph controls.
 
 ## Ticket 02 previous implementation verification
 

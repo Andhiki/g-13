@@ -1,7 +1,8 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
-import { AlignSelect } from "./select";
+import { CompactButton } from "./compact-button";
+import { AlignDropdown } from "./dropdown";
 
 const themes = [
   { value: "light", label: "Terang", Icon: RiSunLine },
@@ -15,22 +16,30 @@ export function ThemeSwitch() {
   useEffect(() => setMounted(true), []);
   const selectedTheme = mounted ? (theme ?? "system") : "system";
   const current = themes.find((item) => item.value === selectedTheme) ?? themes[2];
+  const CurrentIcon = current.Icon;
 
   return (
-    <AlignSelect.Root variant="compact" value={selectedTheme} onValueChange={setTheme}>
-      <AlignSelect.Trigger aria-label={`Tema tampilan: ${current.label}`}>
-        <AlignSelect.Value>{`Tema: ${current.label}`}</AlignSelect.Value>
-      </AlignSelect.Trigger>
-      <AlignSelect.Content>
-        {themes.map(({ value, label, Icon: OptionIcon }) => (
-          <AlignSelect.Item key={value} value={value}>
-            <AlignSelect.ItemIcon>
-              <OptionIcon aria-hidden="true" />
-            </AlignSelect.ItemIcon>
-            <span>{label}</span>
-          </AlignSelect.Item>
-        ))}
-      </AlignSelect.Content>
-    </AlignSelect.Root>
+    <AlignDropdown.Root>
+      <AlignDropdown.Trigger asChild>
+        <CompactButton
+          aria-label={`Pilih tema tampilan. Saat ini ${current.label}.`}
+          title={`Tema tampilan: ${current.label}`}
+        >
+          <CurrentIcon aria-hidden="true" />
+        </CompactButton>
+      </AlignDropdown.Trigger>
+      <AlignDropdown.Content align="end" aria-label="Pilih tema tampilan">
+        <AlignDropdown.RadioGroup value={selectedTheme} onValueChange={setTheme}>
+          {themes.map(({ value, label, Icon: OptionIcon }) => (
+            <AlignDropdown.RadioItem key={value} value={value}>
+              <AlignDropdown.ItemIcon>
+                <OptionIcon aria-hidden="true" />
+              </AlignDropdown.ItemIcon>
+              <span>{label}</span>
+            </AlignDropdown.RadioItem>
+          ))}
+        </AlignDropdown.RadioGroup>
+      </AlignDropdown.Content>
+    </AlignDropdown.Root>
   );
 }
