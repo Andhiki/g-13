@@ -84,8 +84,16 @@ and sizing refinements are exceptions to the default control styling policy abov
 The top-center semester control is a group of buttons numbered 1–8. It uses the
 existing scope filter and shows the selected semester; viewport-driven highlighting
 is deferred. A single bottom-right "Switch View" button replaces the Peta/Daftar
-pair. The React Flow minimap is removed. Controls stack below 1100px to keep the
-semester group clear of the right-hand search and theme controls.
+pair. The React Flow minimap is removed. Below 1100px, search, theme, and an icon-only filter
+trigger share one row, with an eight-column semester strip beneath. Semester buttons share the
+available width instead of forcing fixed-width controls to overflow. The 40px filter trigger and
+responsive semester padding are sizing exceptions to the default component policy.
+
+Curriculum and interest filters move into the existing AlignUI drawer below 1100px. The drawer
+slides up from the bottom and fits its two filters, with a maximum height of 85dvh. Only one copy
+of those controls is mounted; their values stay in the curriculum explorer when switching layouts.
+Below 650px, the command menu fills the viewport, with a visible cancel action and scrolling
+results. The list reserves only the compact header's height.
 
 Course cards use neutral AlignUI surfaces and typography, with plain 12px credit metadata beside
 the course code and a 14px course title. Semester labels are provided by the enclosing lanes.

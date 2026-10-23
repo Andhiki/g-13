@@ -37,7 +37,7 @@ function Dialog({
           shouldFilter={shouldFilter}
           className={twMerge(
             "divide-y divide-stroke-soft-200",
-            "grid min-h-0 auto-cols-auto grid-flow-row",
+            "grid min-h-0 auto-cols-auto grid-flow-row max-[650px]:flex-1 max-[650px]:grid-rows-[auto_minmax(0,1fr)]",
             "[&>[cmdk-label]+*]:!border-t-0",
           )}
         >

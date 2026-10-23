@@ -39,6 +39,7 @@ for (const curriculum of [
 
   test(`${curriculum.edition}: search by keyboard, filter the list, and retain the theme after reload`, async ({
     page,
+    isMobile,
   }) => {
     await page.goto(`/?kurikulum=${curriculum.edition}`);
     await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
@@ -49,7 +50,8 @@ for (const curriculum of [
     await expect(
       page.getByText("Tidak ada mata kuliah yang cocok.", { exact: true }),
     ).toBeVisible();
-    await page.keyboard.press("Escape");
+    if (isMobile) await page.getByRole("button", { name: "Tutup pencarian" }).click();
+    else await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
     await page.keyboard.press("/");
     await expect(input).toBeFocused();

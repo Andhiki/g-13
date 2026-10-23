@@ -39,10 +39,10 @@ function ViewportFocus({
           const stageHeight =
             document.querySelector(".map-stage")?.getBoundingClientRect().height ??
             window.innerHeight;
-          const phoneOffset = window.matchMedia("(max-width: 650px)").matches
+          const phoneOffset = window.matchMedia("(width < 650px)").matches
             ? (stageHeight * 0.12) / zoom
             : 0;
-          const panelOffset = window.matchMedia("(max-width: 650px)").matches ? 0 : 200 / zoom;
+          const panelOffset = window.matchMedia("(width < 650px)").matches ? 0 : 200 / zoom;
           setCenter(position.x + 124 - panelOffset, position.y + 40 + phoneOffset, {
             zoom,
             duration: 350,
@@ -62,7 +62,7 @@ function ViewportFocus({
         });
         return;
       }
-      const phone = window.matchMedia("(max-width: 650px)").matches;
+      const phone = window.matchMedia("(width < 650px)").matches;
       setCenter(phone ? 250 : 900, 360, {
         zoom: phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
         duration: 350,

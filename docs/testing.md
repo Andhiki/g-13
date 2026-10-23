@@ -21,7 +21,9 @@ desktop and phone sizes. The tests use real mouse and keyboard interactions to
 open course details, follow prerequisites, restore direct links after reload,
 open search with `/` without inserting it into the query, type normally in the
 search field, dismiss empty results, select search results, switch to the list,
-filter semesters, and persist the dark theme. They verify rendered arrow paths
+filter semesters, and persist the dark theme. Filter-drawer tests also check
+curriculum and interest selection, retained required courses, dismissal and focus
+return, and preserving filter values when resizing to the desktop panel. They verify rendered arrow paths
 and arrowheads as well as course selection. Drawer tests verify opening and closing
 animation events and dismissal in both map and list views. Traces are retained for failures in
 `test-results/`.

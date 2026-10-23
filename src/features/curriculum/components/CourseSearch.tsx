@@ -16,6 +16,10 @@ export function CourseSearch({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const changeOpen = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) setQuery("");
+  };
   useHotkey("/", () => setOpen(true), {
     enabled: !open,
     ignoreInputs: true,
@@ -44,10 +48,9 @@ export function CourseSearch({
       </AlignButton.Root>
       <AlignCommandMenu.Dialog
         open={open}
-        onOpenChange={(nextOpen) => {
-          setOpen(nextOpen);
-          if (!nextOpen) setQuery("");
-        }}
+        onOpenChange={changeOpen}
+        overlayClassName="max-[650px]:p-0"
+        className="max-[650px]:h-dvh max-[650px]:max-w-none max-[650px]:rounded-none"
         onCloseAutoFocus={(event) => {
           event.preventDefault();
           triggerRef.current?.focus();
@@ -60,16 +63,29 @@ export function CourseSearch({
         <AlignCommandMenu.DialogDescription className="sr-only">
           Cari berdasarkan nama, kode, atau prasyarat.
         </AlignCommandMenu.DialogDescription>
-        <div className="px-5 py-4">
-          <AlignCommandMenu.Input
-            autoFocus
-            aria-label="Cari mata kuliah"
-            placeholder="Nama, kode, prasyarat…"
-            value={query}
-            onValueChange={setQuery}
-          />
+        <div className="flex items-center gap-3 px-5 py-4">
+          <div className="min-w-0 flex-1">
+            <AlignCommandMenu.Input
+              autoFocus
+              aria-label="Cari mata kuliah"
+              placeholder="Nama, kode, prasyarat…"
+              value={query}
+              onValueChange={setQuery}
+            />
+          </div>
+          <div className="shrink-0 min-[650px]:hidden">
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              size="small"
+              onClick={() => changeOpen(false)}
+              aria-label="Tutup pencarian"
+            >
+              Batal
+            </AlignButton.Root>
+          </div>
         </div>
-        <AlignCommandMenu.List>
+        <AlignCommandMenu.List className="max-[650px]:max-h-none">
           {query.trim() ? (
             results.length ? (
               <AlignCommandMenu.Group>

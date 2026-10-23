@@ -6,7 +6,7 @@ import { CourseSearch } from "./components/CourseSearch";
 import { CurriculumMap } from "./components/CurriculumMap";
 import { SemesterFilter } from "./components/SemesterFilter";
 import { ViewSwitch } from "./components/ViewSwitch";
-import { Overlay, OverlayControl } from "./components/Overlay";
+import { Overlay } from "./components/Overlay";
 import { useCurriculumExplorer } from "./useCurriculumExplorer";
 
 export function CurriculumPage() {
@@ -34,12 +34,8 @@ export function CurriculumPage() {
           />
         }
       >
-        <OverlayControl slot="version">
-          <CurriculumVersionFilter curriculum={curriculum} onChange={explorer.changeVersion} />
-        </OverlayControl>
-        <OverlayControl slot="group">
-          <ChoiceGroupFilter data={data} group={group} onChange={explorer.setGroup} />
-        </OverlayControl>
+        <CurriculumVersionFilter curriculum={curriculum} onChange={explorer.changeVersion} />
+        <ChoiceGroupFilter data={data} group={group} onChange={explorer.setGroup} />
       </Overlay>
 
       <main
@@ -58,7 +54,7 @@ export function CurriculumPage() {
             positions={map.positions}
           />
         ) : (
-          <section className="bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 min-[1100px]:pr-[348px] max-[1100px]:pt-[202px]">
+          <section className="bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 min-[1100px]:pr-[348px] max-[1100px]:pt-[116px]">
             <div className="mx-auto max-w-5xl">
               <div className="mb-3 flex items-baseline justify-between gap-4">
                 <h1 className="m-0 text-label-md text-text-strong-950">Mata kuliah</h1>

@@ -12,10 +12,7 @@ export function ChoiceGroupFilter({
 }) {
   return (
     <div className="relative flex min-w-0 flex-col gap-[5px]">
-      <label
-        className="text-label-xs text-text-sub-600 max-[1100px]:sr-only"
-        htmlFor="course-group"
-      >
+      <label className="text-label-xs text-text-sub-600" htmlFor="course-group">
         Kelompok pilihan
       </label>
       <AlignSelect.Root value={group} onValueChange={onChange}>
@@ -47,10 +44,7 @@ export function CurriculumVersionFilter({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-[5px]">
-      <label
-        className="text-label-xs text-text-sub-600 max-[1100px]:sr-only"
-        htmlFor="curriculum-version"
-      >
+      <label className="text-label-xs text-text-sub-600" htmlFor="curriculum-version">
         Versi kurikulum
       </label>
       <AlignSelect.Root variant="compact" value={curriculum} onValueChange={onChange}>
