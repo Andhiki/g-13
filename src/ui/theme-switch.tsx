@@ -7,6 +7,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  dropdownMenuTrigger,
 } from "./dropdown-menu";
 
 const themes = [
@@ -26,7 +27,7 @@ export function ThemeSwitch() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="topbar-menu-trigger theme-menu-trigger"
+        className={dropdownMenuTrigger({ theme: true })}
         aria-label={`Tema tampilan: ${current.label}`}
       >
         <Icon aria-hidden="true" />
@@ -35,7 +36,7 @@ export function ThemeSwitch() {
       <DropdownMenuContent
         align="end"
         aria-label="Pilih tema tampilan"
-        className="theme-menu-content"
+        className="min-w-[184px] [&_[role=menuitemradio]]:min-h-11"
       >
         <DropdownMenuRadioGroup value={selectedTheme} onValueChange={setTheme}>
           {themes.map(({ value, label, Icon: OptionIcon }) => (

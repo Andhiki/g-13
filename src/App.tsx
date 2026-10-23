@@ -8,7 +8,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  dropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { tv } from "tailwind-variants";
 import {
   Background,
   BackgroundVariant,
@@ -51,6 +53,16 @@ type LaneNodeData = {
 };
 type MapNode = Node<CourseNodeData, "course"> | Node<LaneNodeData, "lane">;
 type Scope = "all" | "choices" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8";
+
+const semesterOption = tv({
+  base: "h-9 min-w-8 shrink-0 cursor-pointer rounded-lg border border-transparent bg-transparent px-2 text-label-sm text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base max-[650px]:h-11 max-[650px]:px-1.5",
+  variants: {
+    active: {
+      true: "border-stroke-soft-200 bg-bg-white-0 font-medium text-text-strong-950 shadow-regular-xs",
+    },
+    wide: { true: "px-2.5 max-[650px]:px-2" },
+  },
+});
 
 const LANE_X = 48;
 const LANE_STEP = 300;
@@ -645,24 +657,26 @@ export default function App() {
   );
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-bg-white-0">
+      <header className="z-10 flex shrink-0 basis-16 items-center justify-between gap-5 border-b border-stroke-soft-200 bg-bg-white-0 px-[25px] text-text-strong-950 max-[1050px]:px-[17px] max-[700px]:relative max-[700px]:min-h-28 max-[700px]:basis-auto max-[700px]:flex-wrap max-[700px]:gap-2 max-[700px]:px-4 max-[700px]:py-3">
         <Link
-          className="brand"
+          className="inline-flex items-center gap-3 text-text-strong-950 no-underline max-[700px]:gap-2.5"
           to="/"
           search={{ kurikulum: "2026" }}
           aria-label="Peta kurikulum Ilmu Komputer UGM"
         >
-          <span className="brand-mark">IK</span>
-          <span className="brand-copy">
-            <h1>Peta Kurikulum</h1>
-            <small>Ilmu Komputer · UGM</small>
+          <span className="grid size-9 place-items-center rounded-lg border border-primary-light bg-primary-lighter text-sm font-medium text-primary-base">
+            IK
+          </span>
+          <span className="flex flex-col gap-0.5">
+            <h1 className="m-0 text-label-sm">Peta Kurikulum</h1>
+            <small className="text-paragraph-xs text-text-sub-600">Ilmu Komputer · UGM</small>
           </span>
         </Link>
-        <div className="topbar-right">
+        <div className="flex items-center gap-2.5 max-[700px]:w-full max-[700px]:justify-between max-[700px]:gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="topbar-menu-trigger"
+              className={dropdownMenuTrigger({ mobile: true })}
               aria-label={`Versi kurikulum: ${curriculum === "2021" ? "2021, Revisi 2023" : "2026"}`}
             >
               <span>Kurikulum {curriculum === "2021" ? "2021 · Revisi 2023" : "2026"}</span>
@@ -683,12 +697,24 @@ export default function App() {
         </div>
       </header>
 
-      <section className="map-toolbar" aria-label="Filter peta kurikulum">
-        <div className="search-field">
-          <label htmlFor="course-search">Cari mata kuliah</label>
-          <div className="search-wrap">
-            <RiSearchLine aria-hidden="true" />
+      <section
+        className="z-[8] grid min-h-[77px] shrink-0 grid-cols-[minmax(230px,300px)_minmax(205px,250px)_minmax(350px,1fr)] items-center gap-3.5 border-b border-stroke-soft-200 bg-bg-weak-25 px-6 py-2.5 text-text-strong-950 max-[1050px]:min-h-[105px] max-[1050px]:grid-cols-[minmax(190px,1fr)_minmax(175px,0.9fr)] max-[1050px]:gap-x-3 max-[1050px]:gap-y-[9px] max-[1050px]:px-[17px] max-[650px]:min-h-[111px] max-[650px]:grid-cols-2 max-[650px]:gap-2 max-[650px]:px-[11px] max-[650px]:pt-2 max-[650px]:pb-[7px]"
+        aria-label="Filter peta kurikulum"
+      >
+        <div className="relative flex min-w-0 flex-col gap-[5px]">
+          <label
+            className="text-label-xs font-medium leading-4 text-text-sub-600"
+            htmlFor="course-search"
+          >
+            Cari mata kuliah
+          </label>
+          <div className="relative flex h-10 items-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xs focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary-base max-[650px]:min-h-11">
+            <RiSearchLine
+              className="mx-[9px] ml-[11px] size-[18px] shrink-0 text-text-sub-600"
+              aria-hidden="true"
+            />
             <input
+              className="h-[38px] min-w-0 w-full border-0 bg-transparent py-0 pr-10 pl-0 text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus-visible:outline-none max-[650px]:h-[42px] max-[650px]:text-paragraph-xs"
               id="course-search"
               type="search"
               role="combobox"
@@ -732,12 +758,17 @@ export default function App() {
               }
             />
             {query && (
-              <button type="button" aria-label="Hapus pencarian" onClick={() => setQuery("")}>
+              <button
+                className="absolute right-1 grid size-8 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
+                type="button"
+                aria-label="Hapus pencarian"
+                onClick={() => setQuery("")}
+              >
                 ×
               </button>
             )}
             {query && (
-              <div className="search-results">
+              <div className="absolute top-[calc(100%+6px)] right-0 left-0 z-30 max-h-[min(360px,55vh)] overflow-auto rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 shadow-regular-md">
                 {searchResults.length > 0 ? (
                   <div
                     id="course-search-results"
@@ -746,6 +777,7 @@ export default function App() {
                   >
                     {searchResults.map((course, index) => (
                       <div
+                        className="grid min-h-[52px] w-full cursor-pointer grid-cols-[90px_1fr] items-center gap-x-[9px] gap-y-1 border-x-0 border-t-0 border-b border-stroke-soft-200 bg-transparent px-[11px] py-[9px] text-left hover:bg-bg-weak-50 aria-selected:bg-bg-weak-50"
                         id={`course-search-option-${index}`}
                         role="option"
                         aria-selected={index === activeSearchIndex}
@@ -754,14 +786,20 @@ export default function App() {
                         onMouseEnter={() => setActiveSearchIndex(index)}
                         onClick={() => chooseSearchResult(course)}
                       >
-                        <i>{course.code || "Pilihan"}</i>
-                        <span>{course.title}</span>
-                        <small>{semesterLabel(course)}</small>
+                        <i className="overflow-hidden text-ellipsis whitespace-nowrap text-label-xs not-italic text-text-sub-600">
+                          {course.code || "Pilihan"}
+                        </i>
+                        <span className="text-paragraph-sm text-text-strong-950">
+                          {course.title}
+                        </span>
+                        <small className="col-start-2 text-label-xs text-text-sub-600">
+                          {semesterLabel(course)}
+                        </small>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="search-empty" role="status">
+                  <p className="m-0 p-3.5 text-paragraph-sm text-text-sub-600" role="status">
                     Tidak ada mata kuliah yang cocok.
                   </p>
                 )}
@@ -769,11 +807,13 @@ export default function App() {
             )}
           </div>
         </div>
-        <div className="group-filter">
-          <span>Kelompok pilihan</span>
+        <div className="relative flex min-w-0 flex-col gap-[5px]">
+          <span className="text-label-xs font-medium leading-4 text-text-sub-600">
+            Kelompok pilihan
+          </span>
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="filter-menu-trigger"
+              className={dropdownMenuTrigger({ full: true, touch: true })}
               aria-label={`Kelompok pilihan: ${group === "__all__" ? "Semua mata kuliah" : group}`}
             >
               <span>{group === "__all__" ? "Semua mata kuliah" : group}</span>
@@ -782,7 +822,7 @@ export default function App() {
             <DropdownMenuContent
               align="start"
               aria-label="Pilih kelompok mata kuliah"
-              className="group-menu-content"
+              className="max-h-[min(360px,calc(100dvh-32px))] overflow-y-auto"
             >
               <DropdownMenuRadioGroup value={group} onValueChange={changeGroup}>
                 <DropdownMenuRadioItem value="__all__">
@@ -799,11 +839,17 @@ export default function App() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="semester-nav">
-          <span>Fokus</span>
-          <div className="semester-options" role="group" aria-label="Fokus semester">
+        <div className="flex min-w-0 items-center gap-2.5 max-[1050px]:col-span-full max-[650px]:gap-[7px]">
+          <span className="shrink-0 text-label-xs font-medium leading-4 text-text-sub-600">
+            Fokus
+          </span>
+          <div
+            className="flex min-w-0 w-full items-center gap-[3px] overflow-x-auto p-[3px] [scrollbar-width:thin] max-[650px]:gap-px max-[650px]:p-px"
+            role="group"
+            aria-label="Fokus semester"
+          >
             <button
-              className={scope === "all" ? "active" : ""}
+              className={semesterOption({ active: scope === "all", wide: true })}
               aria-pressed={scope === "all"}
               onClick={() => setScope("all")}
               type="button"
@@ -812,7 +858,7 @@ export default function App() {
             </button>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((value) => (
               <button
-                className={scope === String(value) ? "active" : ""}
+                className={semesterOption({ active: scope === String(value) })}
                 aria-pressed={scope === String(value)}
                 key={value}
                 onClick={() => setScope(String(value) as Scope)}
@@ -822,7 +868,7 @@ export default function App() {
               </button>
             ))}
             <button
-              className={scope === "choices" ? "active" : ""}
+              className={semesterOption({ active: scope === "choices", wide: true })}
               aria-pressed={scope === "choices"}
               onClick={() => setScope("choices")}
               type="button"
@@ -833,7 +879,7 @@ export default function App() {
         </div>
       </section>
 
-      <main className="map-stage">
+      <main className="map-stage scheme-light text-[var(--ink)]">
         <ReactFlow<MapNode, Edge>
           key={curriculum}
           nodes={map.nodes}

@@ -17,10 +17,12 @@
 
 ## Comments
 
-Reopened after the user requested Tailwind-first styling. The functional work below is complete;
-the following styling follow-up remains:
+Reopened after the user requested Tailwind-first styling. The functional migration is complete;
+the remaining styling and verification work is:
 
-- [ ] Migrate the shell, navbar dropdowns, search, and semester/group controls from custom CSS to Tailwind utilities and shared variants, following the [styling policy](../../../docs/design-system.md#styling-policy). Keep custom CSS only for a documented feature Tailwind cannot express.
-- [ ] Remove obsolete custom rules and verify unchanged appearance, keyboard behavior, theme persistence, and mobile layouts in both themes. Run the project checks and production build.
+- [x] Migrate the shell, navbar dropdowns, search, and semester/group controls from custom CSS to Tailwind utilities and shared variants, following the [styling policy](../../../docs/design-system.md#styling-policy). Keep custom CSS only for a documented feature Tailwind cannot express.
+- [ ] Verify unchanged appearance, keyboard behavior, theme persistence, and mobile layouts in both themes. Run the project checks and production build.
 
 Completed on 23 October 2026 with a Luna implementation worker and separate standards/spec reviews. Public browser checks passed for both curricula and themes at desktop, tablet, and mobile widths. Project checks and the production build passed. See [verification and source notes](../../../docs/design-system.md). The user confirmed that the new list view and map/list switch belong to ticket 03.
+
+Tailwind migration implemented on 23 October 2026. Project checks and the production build pass. Browser verification remains because the local Chromium cannot start without `libcups.so.2`, and the JetBrains runtime fallback is unavailable. See [styling policy and verification notes](../../../docs/design-system.md).

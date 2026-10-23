@@ -7,7 +7,7 @@ in [docs/licenses/alignui.txt](licenses/alignui.txt).
 
 `src/ui/compact-button.tsx` adapts the AlignUI CompactButton styling to Tailwind Variants. Its
 source is `components/ui/compact-button.tsx` in the upstream starter. `src/ui/dropdown-menu.tsx`
-adapts the upstream `components/ui/dropdown.tsx` content, item, and radio item patterns to local CSS
+adapts the upstream `components/ui/dropdown.tsx` content, item, and radio item patterns to Tailwind Variants
 and Radix primitives. The app uses the free Dropdown source pattern for curriculum, theme, and
 interest group selection. The app intentionally uses plain text labels with a selection mark in place
 of the starter's icon-heavy general-purpose menu options.
@@ -26,11 +26,11 @@ Write custom CSS only for a feature Tailwind cannot express, and document the sp
 beside that rule. Token declarations, font imports, and framework imports remain stylesheet setup.
 Do not introduce custom CSS classes merely to group styles that Tailwind utilities already support.
 
-The current shell, dropdown, search, and filter styles still contain custom CSS. Ticket 02 is
-reopened to migrate those styles without changing appearance or behavior. Tickets 03–05 follow
-this policy as they migrate the remaining app.
+Ticket 02 migrated the shell, dropdown, search, and filter styles to Tailwind utilities and shared
+variants. The remaining custom CSS styles the curriculum graph and detail panel, which tickets 03–05
+will migrate under this policy.
 
-## Ticket 02 verification
+## Ticket 02 functional verification
 
 Verified on 23 October 2026 against the production build in Chromium at 1440px, 768px, and 390px.
 Eighteen browser scenarios covered both curricula and themes, dropdown keyboard selection, Escape
@@ -44,3 +44,7 @@ The build retains bundle-size and upstream module-directive warnings.
 The design inspector still flags the existing map's small text, contrast, clipped canvas content,
 and long semester lanes. These belong to the graph migration in ticket 04. AlignUI's requested default
 control shadows and brand mark are retained despite the inspector's generic style warnings.
+
+The Tailwind styling follow-up passes `bun run check` and `bun run build`. A browser review of the
+updated styles is still pending because Chromium cannot start without `libcups.so.2`; the configured
+JetBrains runtime fallback is not installed in this environment.
