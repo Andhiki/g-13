@@ -1,12 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap");
+@import "@fontsource-variable/inter";
 @import "tailwindcss";
+@import "./alignui.css";
+@import "./shell.css";
 
 :root {
-  font-family: "Figtree", "Segoe UI", Arial, sans-serif;
+  font-family: "Inter Variable", "Segoe UI", Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  color: #21312b;
-  background: #f2f3ed;
+  color: var(--color-text-strong-950);
+  background: var(--color-bg-white-0);
   --ink: #21312b;
   --muted: #77837b;
   --line: #dce2d9;
@@ -14,7 +16,8 @@
   --green: #234b40;
   --wine: #8a3b49;
   --gold: #a36e2b;
-  --font: "Figtree", "Segoe UI", Arial, sans-serif;
+  --font: "Inter Variable", "Segoe UI", Arial, sans-serif;
+  --font-sans: "Inter Variable", "Segoe UI", Arial, sans-serif;
 }
 
 * {
@@ -30,7 +33,7 @@ body,
 }
 body {
   overflow: hidden;
-  background: #f2f3ed;
+  background: var(--color-bg-white-0);
 }
 button,
 input,
@@ -41,11 +44,13 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid #c1873f;
+  outline: 3px solid var(--color-primary-base);
   outline-offset: 3px;
 }
-button {
-  color: inherit;
+@layer base {
+  button {
+    color: inherit;
+  }
 }
 
 .app-shell {
@@ -54,7 +59,7 @@ button {
   width: 100%;
   height: 100dvh;
   overflow: hidden;
-  background: #f2f3ed;
+  background: var(--color-bg-white-0);
 }
 .topbar {
   z-index: 10;
@@ -93,7 +98,7 @@ button {
   flex-direction: column;
   gap: 2px;
 }
-.brand-copy b {
+.brand-copy h1 {
   font-size: 13px;
   font-weight: 700;
 }
@@ -877,7 +882,7 @@ button {
     height: 32px;
     font-size: 12px;
   }
-  .brand-copy b {
+  .brand-copy h1 {
     font-size: 11px;
   }
   .brand-copy small {

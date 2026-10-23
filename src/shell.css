@@ -1,0 +1,144 @@
+.app-shell > .topbar {
+  border-color: var(--color-stroke-soft-200);
+  background: var(--color-bg-white-0);
+  color: var(--color-text-strong-950);
+}
+
+.topbar .brand {
+  color: var(--color-text-strong-950);
+}
+
+.topbar .brand-mark {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 8px;
+  outline: none;
+  background: var(--color-primary-lighter);
+  color: var(--color-primary-base);
+  font-weight: 500;
+}
+
+.topbar .brand-copy h1 {
+  margin: 0;
+  font-size: var(--text-label-sm);
+  line-height: 20px;
+  letter-spacing: -0.006em;
+  font-weight: 500;
+}
+
+.topbar .brand-copy small,
+.topbar .community,
+.topbar .version-select > span {
+  color: var(--color-text-sub-600);
+  font-size: var(--text-paragraph-xs);
+  line-height: 16px;
+}
+
+.topbar .community i {
+  background: var(--color-text-sub-600);
+  box-shadow: none;
+}
+
+.topbar .version-select select {
+  min-height: 36px;
+  max-width: none;
+  border: 1px solid var(--color-stroke-soft-200);
+  border-radius: 8px;
+  padding: 0 10px;
+  appearance: auto;
+  background: var(--color-bg-white-0);
+  color: var(--color-text-strong-950);
+  box-shadow: var(--shadow-regular-xs);
+  font-size: var(--text-label-sm);
+  line-height: 20px;
+}
+
+.topbar .version-select select:hover {
+  background: var(--color-bg-weak-50);
+}
+
+.theme-switch {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.theme-option {
+  cursor: pointer;
+}
+
+.theme-option[aria-pressed="true"]:not(:focus-visible) {
+  border-color: var(--color-stroke-sub-300);
+  background: var(--color-bg-weak-50);
+  color: var(--color-text-strong-950);
+  box-shadow: none;
+}
+
+.theme-option:focus-visible {
+  outline: 2px solid var(--color-primary-base);
+  outline-offset: 2px;
+}
+
+/* Remaining controls and graph retain their light appearance until tickets 02–04. */
+.map-toolbar,
+.map-stage {
+  color-scheme: light;
+  color: var(--ink);
+}
+
+@media (max-width: 700px) {
+  .app-shell > .topbar {
+    position: relative;
+    flex-basis: auto;
+    min-height: 112px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  .topbar .brand {
+    gap: 10px;
+  }
+
+  .topbar .topbar-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .topbar .version-select {
+    gap: 8px;
+  }
+
+  .topbar .community {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: inline-flex;
+    max-width: 144px;
+    text-align: right;
+  }
+
+  .topbar .version-select select {
+    min-height: 44px;
+    max-width: 168px;
+  }
+
+  .theme-switch .theme-option {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1050px) {
+  .topbar .community {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .topbar .version-select > span {
+    display: none;
+  }
+}

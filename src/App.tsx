@@ -1,4 +1,5 @@
 import { getRouteApi, Link } from "@tanstack/react-router";
+import { ThemeSwitch } from "./ui/theme-switch";
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   Background,
@@ -645,7 +646,7 @@ export default function App() {
         >
           <span className="brand-mark">IK</span>
           <span className="brand-copy">
-            <b>Peta Kurikulum</b>
+            <h1>Peta Kurikulum</h1>
             <small>Ilmu Komputer · UGM</small>
           </span>
         </Link>
@@ -661,6 +662,7 @@ export default function App() {
               <option value="2026">2026</option>
             </select>
           </label>
+          <ThemeSwitch />
         </div>
       </header>
 

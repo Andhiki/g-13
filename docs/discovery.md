@@ -61,6 +61,32 @@ Potential later scope: personal completion checklist, KRS planning, cross-progra
 
 ## Design tree
 
+### AlignUI design system interview, 23 October 2026
+
+Accepted: use [AlignUI base components and foundations](https://alignui.com/docs/v1.2/introduction) as the default source for component implementations and design tokens. Keep brand overrides documented. Curriculum-specific elements, including course nodes and prerequisite connections, remain custom and follow the same visual system.
+
+Accepted: adopt AlignUI's default visual foundation, including colors, typography, and control styling. Replace the current green/cream palette and Figtree rather than retaining them as brand overrides.
+
+Accepted: migrate the entire existing app, including controls, course cards, list view, and course detail panel. Preserve the current layout and curriculum behavior while applying AlignUI's default visual foundation throughout.
+
+Accepted: support both light and dark themes using AlignUI's theme tokens. Follow the system preference initially and provide a persistent manual theme toggle. Course states and prerequisite connections must remain readable in both themes.
+
+Accepted: use AlignUI's free base components. Pro components are outside the migration scope. Style custom curriculum elements with the same tokens.
+
+Accepted: distinguish the selected course, its prerequisites, and courses that depend on it. Use AlignUI's primary color for selection and separate theme colors for the two relationship directions. Provide arrows and text labels so color is not the only distinction. These states describe relationships, not personal enrollment eligibility.
+
+These decisions establish the intended direction. The current custom controls and CSS have not yet migrated.
+
+### Approved migration ticket breakdown
+
+The user approved these five implementation slices. Published as individual local Markdown tickets in `.scratch/alignui-migration/issues/`, using the default triage labels. Tracker conventions are in `docs/agents/issue-tracker.md`.
+
+1. App shell and theme switching. No blockers. Establish AlignUI's free foundations and default typography, migrate shell controls, and deliver both themes with system preference and a saved manual toggle.
+2. Search and curriculum filters. Blocked by ticket 1. Migrate search, curriculum selection, filters, and map/list switching while preserving filtering behavior and shareable URLs.
+3. Course list and detail panel. Blocked by ticket 1. Migrate course rows, badges, and detail panels while preserving prerequisite text, source attribution, and mobile access.
+4. Curriculum map and relationship states. Blocked by ticket 1. Restyle course nodes, connections, and map controls, with distinct selection and relationship states using theme colors, arrows, and labels.
+5. Finish migration and verify the whole app. Blocked by tickets 2, 3, and 4. Remove obsolete styles and verify both curricula, themes, mobile layouts, keyboard access, and direct links.
+
 - Root: primary job (open Q1).
   - Curriculum explorer -> curriculum/cohort coverage -> data contract -> map/list interactions.
   - Personal KRS planner -> eligibility semantics -> local/cloud state -> privacy and integrations.

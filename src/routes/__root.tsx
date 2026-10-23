@@ -1,5 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "next-themes";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
 
@@ -8,7 +9,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#f5f3ed" },
+      { name: "theme-color", content: "#ffffff", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#171717", media: "(prefers-color-scheme: dark)" },
       {
         name: "description",
         content: "Peta kurikulum dan prasyarat Program Studi Ilmu Komputer UGM.",
@@ -34,12 +36,14 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        <div id="root">{children}</div>
+        <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
+          <div id="root">{children}</div>
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>
