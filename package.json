@@ -1,1 +1,41 @@
-{"name":"g-13-kurikulum-ilkom-ugm","private":true,"version":"0.1.0","type":"module","scripts":{"dev":"vite","build":"tsc --noEmit && vite build","preview":"vite preview"},"dependencies":{"@xyflow/react":"^12.12.0","react":"^19.3.1","react-dom":"^19.3.1"},"devDependencies":{"@types/react":"^19.3.0","@types/react-dom":"^19.3.0","@vitejs/plugin-react":"^6.1.2","typescript":"^7.0.2","vite":"^8.3.5"}}
+{
+  "name": "g-13-kurikulum-ilkom-ugm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && bun run typecheck",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings src vite.config.ts",
+    "lint:fix": "oxlint --fix src vite.config.ts",
+    "fmt": "oxfmt src vite.config.ts package.json tsconfig.json",
+    "fmt:check": "oxfmt --check src vite.config.ts package.json tsconfig.json",
+    "check": "bun run lint && bun run fmt:check && bun run typecheck && bun run test",
+    "start": "bun .output/server/index.mjs",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "^1.170.46",
+    "@tanstack/react-start": "^1.169.4",
+    "@xyflow/react": "^12.12.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "nitro": "^3.0.260903-beta",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  },
+  "packageManager": "bun@1.4.3"
+}

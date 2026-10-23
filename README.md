@@ -11,12 +11,41 @@ Peta kurikulum S1 Ilmu Komputer UGM, proyek komunitas publik yang dikerjakan pen
 
 ## Menjalankan prototipe
 
-Node.js 20.19+ atau 22.12+ diperlukan.
+Bun 1.4.3 digunakan untuk mengelola dependensi dan menjalankan skrip.
+Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
 
-    npm install
-    npm run dev
+    bun install --frozen-lockfile
+    bun run dev
 
-Build statis lokal dijalankan dengan npm run build; hasilnya berada di dist/.
+Aplikasi memakai TanStack Start dan TanStack Router untuk routing berbasis file,
+validasi parameter pencarian, dan server-side rendering. Tailwind CSS diproses
+melalui plugin Vite. React Flow tetap menangani peta interaktif.
+
+Build produksi dan server Bun:
+
+    bun run build
+    bun run start
+
+Nitro menghasilkan server Bun di `.output/server/` dan aset di `.output/public/`.
+Gunakan `PORT=8080 bun run start` untuk mengganti port. `bun run preview` juga
+tersedia untuk memeriksa build secara lokal. Deployment memerlukan runtime Bun,
+bukan hanya hosting file statis.
+
+Rute berada di `src/routes/`, dokumen HTML dan metadata di `src/routes/__root.tsx`,
+dan konfigurasi router di `src/router.tsx`. Parameter `kurikulum` dan `mk` tetap
+mendukung tautan langsung. `src/routeTree.gen.ts` dibuat otomatis saat menjalankan
+server pengembangan atau build; file ini disimpan di Git dan tidak diformat manual.
+
+Pemeriksaan lokal:
+
+    bun run check
+
+`check` menjalankan Oxlint, pemeriksaan format Oxfmt, TypeScript, dan tes Bun.
+Gunakan `bun run test` untuk menjalankan tes validasi tautan kurikulum saja.
+Gunakan `bun run fmt` untuk memformat kode dan konfigurasi aplikasi, atau
+`bun run lint:fix` untuk menerapkan perbaikan lint otomatis.
+Dataset dan dokumen sumber tidak termasuk dalam cakupan formatter.
+Commit `bun.lock` saat mengubah dependensi.
 
 ## Dokumen dan data
 
