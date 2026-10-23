@@ -9,7 +9,7 @@ Peta kurikulum S1 Ilmu Komputer UGM, proyek komunitas publik yang dikerjakan pen
 - Tidak meminta transkrip atau menghitung kelayakan KRS pribadi.
 - Tidak mengasumsikan afiliasi Himakom atau pengesahan prodi.
 
-## Menjalankan prototipe
+## Menjalankan aplikasi
 
 Bun 1.4.3 digunakan untuk mengelola dependensi dan menjalankan skrip.
 Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
@@ -19,17 +19,28 @@ Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
 
 Aplikasi memakai TanStack Start dan TanStack Router untuk routing berbasis file,
 validasi parameter pencarian, dan server-side rendering. Tailwind CSS diproses
-melalui plugin Vite. React Flow tetap menangani peta interaktif.
+melalui plugin Vite. React Flow tetap menangani peta interaktif. Vite memakai
+Cloudflare plugin untuk menjalankan SSR pada runtime Workers.
 
-Build produksi dan server Bun:
+Build dan preview lokal:
 
     bun run build
-    bun run start
+    bun run preview
 
-Nitro menghasilkan server Bun di `.output/server/` dan aset di `.output/public/`.
-Gunakan `PORT=8080 bun run start` untuk mengganti port. `bun run preview` juga
-tersedia untuk memeriksa build secara lokal. Deployment memerlukan runtime Bun,
-bukan hanya hosting file statis.
+## Deploy ke Cloudflare Workers
+
+`wrangler.jsonc` menyetel entrypoint TanStack Start dan kompatibilitas runtime
+Workers. Deploy lokal setelah build:
+
+    bun run build
+    bun run deploy
+
+Untuk deploy otomatis dari GitHub, hubungkan repository melalui **Workers & Pages**
+di dashboard Cloudflare. Nama Worker harus sama dengan `name` di `wrangler.jsonc`.
+Gunakan `bun run build` sebagai build command, `bun run deploy` sebagai deploy
+command, dan `bunx wrangler preview` sebagai preview command. Pilih branch
+produksi, biasanya `main`. Aktifkan preview builds untuk branch dan pull request
+lain.
 
 Rute berada di `src/routes/`, dokumen HTML dan metadata di `src/routes/__root.tsx`,
 dan konfigurasi router di `src/router.tsx`. Parameter `kurikulum` dan `mk` tetap
