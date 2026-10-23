@@ -5,3 +5,5 @@ dist/
 .output/
 .nitro/
 .tanstack/
+.dev.vars
+.wrangler/
