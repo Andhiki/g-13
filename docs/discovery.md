@@ -75,12 +75,13 @@ Accepted: use AlignUI's free base components. Pro components are outside the mig
 
 Accepted: distinguish the selected course, its prerequisites, and courses that depend on it. Use AlignUI's primary color for selection and separate theme colors for the two relationship directions. Provide arrows and text labels so color is not the only distinction. These states describe relationships, not personal enrollment eligibility.
 
-The shell, theme selection, search, and curriculum filters now use AlignUI foundations. Course details,
-the new list view, and graph styling remain in tickets 03 and 04.
+The shell, controls, course details, semester tables, and graph now use AlignUI foundations.
+Completed and superseded implementation tickets were removed on 24 October 2026.
 
 ### Approved migration ticket breakdown
 
-The user approved these five implementation slices. Published as individual local Markdown tickets in `.scratch/alignui-migration/issues/`, using the default triage labels. Tracker conventions are in `docs/agents/issue-tracker.md`.
+The user approved these five implementation slices. The list below records the original plan;
+its implementation tickets have since been removed. Tracker conventions are in `docs/agents/issue-tracker.md`.
 
 1. App shell and theme switching. No blockers. Establish AlignUI's free foundations and default typography, migrate shell controls, and deliver both themes with system preference and a saved manual toggle.
 2. Search and curriculum filters. Blocked by ticket 1. Migrate search, curriculum selection, filters, and map/list switching while preserving filtering behavior and shareable URLs.

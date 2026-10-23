@@ -1,7 +1,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
-import { CompactButton } from "./compact-button";
+import { AlignButton } from "./button";
 import { AlignDropdown } from "./dropdown";
 
 const themes = [
@@ -21,19 +21,23 @@ export function ThemeSwitch() {
   return (
     <AlignDropdown.Root>
       <AlignDropdown.Trigger asChild>
-        <CompactButton
+        <AlignButton.Root
+          variant="neutral"
+          mode="stroke"
+          size="medium"
+          className="size-10 p-2.5"
           aria-label={`Pilih tema tampilan. Saat ini ${current.label}.`}
           title={`Tema tampilan: ${current.label}`}
         >
-          <CurrentIcon aria-hidden="true" />
-        </CompactButton>
+          <CurrentIcon className="size-5" aria-hidden="true" />
+        </AlignButton.Root>
       </AlignDropdown.Trigger>
       <AlignDropdown.Content align="end" aria-label="Pilih tema tampilan">
         <AlignDropdown.RadioGroup value={selectedTheme} onValueChange={setTheme}>
           {themes.map(({ value, label, Icon: OptionIcon }) => (
             <AlignDropdown.RadioItem key={value} value={value}>
               <AlignDropdown.ItemIcon>
-                <OptionIcon aria-hidden="true" />
+                <OptionIcon className="size-5" aria-hidden="true" />
               </AlignDropdown.ItemIcon>
               <span>{label}</span>
             </AlignDropdown.RadioItem>

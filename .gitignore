@@ -7,3 +7,5 @@ dist/
 .tanstack/
 .dev.vars
 .wrangler/
+test-results/
+playwright-report/

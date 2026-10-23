@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import App from "../App";
+import { CurriculumPage } from "../features/curriculum/CurriculumPage";
 import { validateCurriculumSearch } from "../search";
 
 export const Route = createFileRoute("/")({
   validateSearch: validateCurriculumSearch,
-  component: App,
+  component: CurriculumPage,
 });

@@ -9,17 +9,26 @@ AlignUI publishes components as source to copy into the app, not as a runtime co
 Its components use Radix for behavior and Tailwind for their default styling. Use those upstream
 component sources and defaults for standard controls. Do not rebuild them from raw Radix primitives
 or restyle them through local variants or caller `className` values. Keep app data, callbacks, and
-domain-specific logic in the app. `src/ui/input.tsx`, `src/ui/select.tsx`, and `src/ui/dropdown.tsx`
-use the documented AlignUI v1.2 default variants for Input, Select, and Dropdown. The existing
+domain-specific logic in the app. `src/ui/select.tsx`, `src/ui/dropdown.tsx`, `src/ui/button.tsx`,
+`src/ui/badge.tsx`, `src/ui/drawer.tsx`, `src/ui/modal.tsx`, `src/ui/kbd.tsx`, and
+`src/ui/command-menu.tsx` use
+AlignUI v1.2 source and variants for Select, Dropdown, Button, Badge, Drawer, Modal, Kbd, and
+Command Menu. The existing
 [`CompactButton`](../src/ui/compact-button.tsx) source is from the pinned AlignUI starter. The
 license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt). See the upstream
+[Button](https://www.alignui.com/docs/v1.2/ui/button),
+[Badge](https://www.alignui.com/docs/v1.2/ui/badge),
+[Drawer](https://www.alignui.com/docs/v1.2/ui/drawer),
+[Modal](https://www.alignui.com/docs/v1.2/ui/modal),
+[Command Menu](https://www.alignui.com/docs/v1.2/ui/command-menu),
+[Kbd](https://alignui.com/docs/v1.2/ui/kbd),
 [Dropdown](https://www.alignui.com/docs/v1.2/ui/dropdown),
-[Select](https://www.alignui.com/docs/v1.2/ui/select), and
-[Input](https://www.alignui.com/docs/v1.2/ui/input) documentation.
+[Select](https://www.alignui.com/docs/v1.2/ui/select) documentation.
 
 The token stylesheet `src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
-Project surfaces and controls use these tokens. The existing curriculum map layout and its data
-visualization styles remain in place while tickets 03–05 migrate the remaining UI.
+Project surfaces and controls use these tokens. The React Flow canvas, semester lanes, course nodes,
+and relationship edges are the remaining domain-specific visuals and keep their layout in
+`src/styles.css`.
 
 ## Styling policy
 
@@ -30,29 +39,94 @@ callbacks into AlignUI components without overriding their default styles or beh
 Use custom controls only where AlignUI has no matching component, such as the curriculum graph's
 course nodes and relationship visualization. Keep their custom behavior domain-specific and document
 the exception. Token declarations, font imports, and framework imports remain stylesheet setup.
+The global stylesheet leaves standard control typography and focus styling to Tailwind Preflight and
+AlignUI. It adds focus styling only for links and the app-specific graph-node buttons.
 
-Ticket 02 uses AlignUI Input for search, Select for curriculum and filters, and Dropdown for the
-theme menu with an icon-only CompactButton trigger. Its inline course suggestion popup retains
-app-specific matching and listbox behavior because AlignUI has no inline autocomplete component.
-Tickets 03–05 apply the same policy to the list, detail panel, and graph controls.
+Search uses AlignUI Command Menu, curriculum and interest filters use Select, and the theme menu
+uses Dropdown. The app retains its course matching and routing behavior, and the search control
+has no magnifying-glass icon. The same component policy applies to lists, details, and graph controls.
 
-## Ticket 02 previous implementation verification
+The Command Menu uses `cmdk` for its list keyboard behavior and Radix Dialog for modal behavior. The
+app disables `cmdk`'s built-in fuzzy filtering so the existing course matcher and result order remain
+unchanged. Its controlled trigger restores focus through Radix Dialog's close autofocus callback.
+The search trigger shows the upstream AlignUI Kbd component with `/`. TanStack React Hotkeys
+registers the shortcut while search is closed, ignores editable fields, and prevents the opening
+keystroke from entering the query. The menu's existing autofocus and focus return remain in place.
 
-The initial Tailwind implementation was verified on 23 October 2026 against the production build in Chromium at 1440px, 768px, and 390px.
-Eighteen browser scenarios covered both curricula and themes, dropdown keyboard selection, Escape
-dismissal and focus return, search selection and empty results, semester/group filters, saved theme
-choices, and system theme changes. Additional checks covered browser history, keyboard search, and
-saved theme application before hydration. No JavaScript or hydration errors occurred. These results
-do not cover the current AlignUI Input and Select migration.
+Results use AlignUI Command Menu Group with its default inset padding. List separators divide
+groups rather than individual course results. Each result places the title and muted code on
+the first row, with semester guidance below the title.
 
-The project checks and production build passed for that implementation. Standards and spec reviews
-cleared those changes.
-The build retains bundle-size and upstream module-directive warnings.
+## Curriculum graph styling
 
-The design inspector still flags the existing map's small text, contrast, clipped canvas content,
-and long semester lanes. These belong to the graph migration in ticket 04. AlignUI's requested default
-control shadows and brand mark are retained despite the inspector's generic style warnings.
+Course nodes, semester lanes, connections and canvas dots are domain-specific React Flow
+visuals, so their dynamic state and selectors stay in `src/styles.css`. They use AlignUI theme tokens
+for surfaces, text, selection, and relationship colors. Map zoom and fit buttons are omitted; users navigate through React Flow's
+pan and zoom gestures. The relationship legend names prerequisite and dependent-course directions, while arrows retain
+the academic prerequisite-to-dependent direction.
 
-The AlignUI source control update passes `bun run check` and `bun run build`. Browser review remains
-pending because Chromium and the configured JetBrains runtime fallback are unavailable in this
-environment.
+## Verification
+
+See [Testing](testing.md) for the current Bun and browser suites. Historical migration tickets
+and their temporary verification blockers were removed after implementation. Browser tests cover
+both curricula on desktop and phones, including course clicks, relationships, search, list navigation,
+and saved themes. The production build retains bundle-size and sourcemap warnings.
+
+## Overlay control refinements
+
+Search and the theme trigger use medium AlignUI Buttons with 40px heights and
+10px corner radii. The theme trigger is a 40px square with 10px padding around
+its 20px icon. The filter card uses the same corner radius, inset stroke token,
+and resting shadow as these controls. Theme menu radio indicators sit on the
+right, leaving the icons and labels aligned on the left. These requested layout
+and sizing refinements are exceptions to the default control styling policy above.
+
+The top-center semester control is a group of buttons numbered 1–8. It uses the
+existing scope filter and shows the selected semester; viewport-driven highlighting
+is deferred. A single bottom-right "Switch View" button replaces the Peta/Daftar
+pair. The React Flow minimap is removed. Controls stack below 1100px to keep the
+semester group clear of the right-hand search and theme controls.
+
+Course cards use neutral AlignUI surfaces and typography, with plain 12px credit metadata beside
+the course code and a 14px course title. Semester labels are provided by the enclosing lanes.
+Their graph-specific button and connection handles remain custom, with uniform borders for selection
+and relationship states instead of left accent bars. Handles extend outside the card without clipping.
+Map details use a nonmodal AlignUI drawer on the left without an overlay so connections remain
+visible and the canvas stays interactive. Course nodes explicitly enable pointer events because
+React Flow disables them on nodes that are neither draggable nor selectable. List details retain the default modal drawer.
+
+## Semester tables
+
+The Daftar view uses the Table primitives from the AlignUI v1.2
+[Data Table source](https://alignui.com/docs/v1.2/ui/data-table), adapted in
+`src/ui/table.tsx`. It does not require TanStack Table for static grouped rows.
+Only the primitives needed by this view are included. Column headings use 12px
+text to keep metadata smaller than the 14px course titles.
+
+`CourseTable` uses four columns: code, course, credits, and category. Category and
+code metadata use 12px text; semester headings use 16px text. Course titles open
+the existing detail drawer. The title button's alignment and wrapping adapt to
+its table cell. On small screens, code and category move below the title, and
+SKS stays in its own column.
+
+Required courses appear once under their first documented core semester.
+Required courses without a semester remain in a separate unassigned section.
+Electives appear once in their own section with their original semester labels.
+Distinct source credit values remain visible rather than choosing one value.
+The table area reserves desktop space for the filter card.
+
+The Daftar view scrolls as a document rather than inside the course list. Overlay
+controls stay fixed; the map keeps its viewport-sized canvas.
+
+## Drawer motion
+
+The course panel uses the local AlignUI Drawer adaptation. Both modal list details
+and nonmodal map details use 200ms slide-in and slide-out animations. On phones,
+nonmodal map details slide vertically from the bottom to match their bottom-panel
+layout; desktop details slide from the left. The modal overlay fades for the same
+duration as the panel.
+
+`CourseDetails` keeps the last selected content while its controlled Radix root
+closes. Removing that root when selection clears skips Radix's exit animation.
+Course selection and the URL still clear immediately; Radix handles removing the
+panel after the animation. The existing reduced-motion rule suppresses movement.
