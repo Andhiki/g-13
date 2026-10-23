@@ -83,9 +83,9 @@ body:has(.map-stage) #root > div > header > a { display: none; }
 body:has(.map-stage) #root > div > header > div {
   gap: 8px;
   padding: 5px;
-  border: 1px solid #d7ded6;
+  border: 1px solid var(--color-stroke-soft-200);
   border-radius: 7px;
-  background: #fffefa;
+  background: var(--color-bg-white-0);
 }
 body:has(.map-stage) #root > div > section[aria-label="Filter peta kurikulum"] {
   position: fixed;
@@ -98,21 +98,19 @@ body:has(.map-stage) #root > div > section[aria-label="Filter peta kurikulum"] {
   grid-template-columns: minmax(210px, 1.2fr) minmax(190px, 1fr) minmax(140px, .7fr);
   gap: 8px;
   padding: 5px;
-  border: 1px solid #d7ded6;
+  border: 1px solid var(--color-stroke-soft-200);
   border-radius: 7px;
-  background: #fffefa;
+  background: var(--color-bg-white-0);
 }
 body:has(.map-stage) #root > div > section > div { min-width: 0; }
 body:has(.map-stage) #root > div > section label,
 body:has(.map-stage) #root > div > section > div > span { display: none; }
-.map-stage > .react-flow {
-  z-index: 0;
-}
 .canvas-caption,
 .canvas-footer {
   display: none;
 }
 .map-stage > .react-flow {
+  z-index: 0;
   position: absolute;
   inset: 0;
   background: transparent;
@@ -644,33 +642,14 @@ body:has(.map-stage) #root > div > section > div > span { display: none; }
   body:has(.map-stage) #root > div > section > div:nth-child(3) {
     position: fixed;
     top: 66px;
-    left: 10px;
+    left: auto;
     width: min(185px, calc(100vw - 220px));
   }
   body:has(.map-stage) #root > div > section > div:nth-child(3) > div { width: 100%; }
   body:has(.map-stage) #root > div > section > div:nth-child(3) button { width: 100%; }
-  .react-flow__controls { margin-bottom: 10px; }
   .react-flow__minimap { display: none; }
-  .canvas-caption {
-    top: 10px;
-    left: 11px;
-  }
-  .canvas-caption strong {
-    font-size: 10px;
-  }
-  .canvas-caption span {
-    font-size: 8px;
-  }
-  .canvas-caption .canvas-hint {
-    display: none;
-  }
   .react-flow__controls {
     margin: 0 0 10px 10px;
-  }
-  .react-flow__minimap {
-    width: 104px !important;
-    height: 74px !important;
-    margin: 0 10px 25px 0;
   }
   .canvas-footer {
     bottom: 10px;
@@ -711,9 +690,6 @@ body:has(.map-stage) #root > div > section > div > span { display: none; }
   }
   .detail-section {
     padding-top: 12px;
-  }
-  .react-flow__minimap {
-    opacity: 0.7;
   }
 }
 
