@@ -8,6 +8,8 @@ The current app has no list view. Add the list view and an accessible map/list s
 
 **Status:** ready-for-agent
 
+- [ ] Follow the [Tailwind-first styling policy](../../../docs/design-system.md#styling-policy) for all migrated and new UI.
+
 - [ ] Migrate course rows, category badges, detail panels, and their actions using the shared AlignUI components and tokens. Preserve the current layout and available content.
 - [ ] Add an accessible switch between the existing peta kurikulum and the new course list. Keep search, curriculum, semester, and interest/group filters in effect when switching views.
 - [ ] Preserve course names, codes, SKS, semester information, category labels, raw prerequisite text, matched prerequisite/dependent-course lists, and source locations wherever currently displayed.

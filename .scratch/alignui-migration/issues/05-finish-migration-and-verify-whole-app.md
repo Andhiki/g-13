@@ -6,6 +6,8 @@
 
 **Status:** ready-for-agent
 
+- [ ] Audit the whole app against the [Tailwind-first styling policy](../../../docs/design-system.md#styling-policy). Remove custom CSS where Tailwind utilities cover the same behavior and document each necessary exception.
+
 - [ ] Audit all visible app areas and states, migrate any remaining custom standard controls, and remove obsolete palette, typography, duplicate control styles, and migration-only compatibility styling.
 - [ ] Use only AlignUI's free base components and shared tokens for standard UI. Custom curriculum elements follow the same tokens. Document any necessary deviations and adopted upstream sources.
 - [ ] Verify complete journeys for kurikulum 2021 Revisi 2023 and 2026: search, filters, map/list switching, selection, detail reading, related-course navigation, and source attribution.

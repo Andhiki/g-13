@@ -16,6 +16,20 @@ The token stylesheet `src/alignui.css` was generated from AlignUI CLI 0.0.19's b
 Project surfaces and controls use these tokens. The existing curriculum map layout and its data
 visualization styles remain in place while the shell, dropdown, search, and filter controls migrate.
 
+## Styling policy
+
+Use Tailwind CSS v4 utilities for component styling, layout, responsive behavior, and interaction
+states. Reuse AlignUI's Tailwind component source and theme tokens. Shared variants may use
+Tailwind Variants.
+
+Write custom CSS only for a feature Tailwind cannot express, and document the specific limitation
+beside that rule. Token declarations, font imports, and framework imports remain stylesheet setup.
+Do not introduce custom CSS classes merely to group styles that Tailwind utilities already support.
+
+The current shell, dropdown, search, and filter styles still contain custom CSS. Ticket 02 is
+reopened to migrate those styles without changing appearance or behavior. Tickets 03–05 follow
+this policy as they migrate the remaining app.
+
 ## Ticket 02 verification
 
 Verified on 23 October 2026 against the production build in Chromium at 1440px, 768px, and 390px.

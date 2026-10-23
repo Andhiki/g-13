@@ -4,7 +4,7 @@
 
 **Blocked by:** 01: App shell and theme switching.
 
-**Status:** completed
+**Status:** ready-for-agent
 
 - [x] Migrate search, curriculum selection, semester and interest/group filters using the shared AlignUI components and tokens.
 - [x] Replace the navbar's browser-native curriculum selector with AlignUI's free dropdown component. Show the current versi kurikulum and preserve the existing curriculum-switching behavior.
@@ -16,5 +16,11 @@
 - [x] Verify representative searches, filter combinations, and curriculum switching at desktop and mobile widths in both themes. Verify both navbar dropdowns support keyboard opening, option selection, Escape dismissal, focus return, and a visible selected state. Confirm theme persistence after reload. Run the existing checks and add behavior tests only where changed interaction logic needs coverage.
 
 ## Comments
+
+Reopened after the user requested Tailwind-first styling. The functional work below is complete;
+the following styling follow-up remains:
+
+- [ ] Migrate the shell, navbar dropdowns, search, and semester/group controls from custom CSS to Tailwind utilities and shared variants, following the [styling policy](../../../docs/design-system.md#styling-policy). Keep custom CSS only for a documented feature Tailwind cannot express.
+- [ ] Remove obsolete custom rules and verify unchanged appearance, keyboard behavior, theme persistence, and mobile layouts in both themes. Run the project checks and production build.
 
 Completed on 23 October 2026 with a Luna implementation worker and separate standards/spec reviews. Public browser checks passed for both curricula and themes at desktop, tablet, and mobile widths. Project checks and the production build passed. See [verification and source notes](../../../docs/design-system.md). The user confirmed that the new list view and map/list switch belong to ticket 03.
