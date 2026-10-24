@@ -170,6 +170,33 @@ a:focus-visible {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+/* Sonic mask reveal adapted from portfolio-magic's ModeToggle. */
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-transition::view-transition-old(root) {
+  z-index: 1;
+}
+html.theme-transition::view-transition-new(root) {
+  z-index: 2;
+  mask: url("/theme/sonic-dancing.gif") center / 0 no-repeat;
+  animation: theme-reveal 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes theme-reveal {
+  0% {
+    mask-size: 0;
+  }
+  18%,
+  48% {
+    mask-size: 24vmax;
+  }
+  100% {
+    mask-size: 400vmax;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

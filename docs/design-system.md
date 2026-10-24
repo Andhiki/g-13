@@ -129,6 +129,13 @@ controls stay fixed; the map keeps its viewport-sized canvas.
 
 ## Drawer motion
 
+Theme changes retain the Terang/Gelap/Sistem dropdown and use the Sonic GIF mask
+reveal from portfolio-magic through the View Transitions API. The 1100ms reveal
+keeps the old page opaque beneath the new page; the menu closes before capture.
+The mask is preloaded and served locally from `public/theme/`. Reduced motion,
+hidden documents, unsupported browsers, and selections with the same resolved
+appearance switch immediately. System appearance changes remain automatic.
+
 The course panel uses the local AlignUI Drawer adaptation. Both list and map
 details use the same nonmodal drawer with 200ms slide-in and slide-out animations. On phones, details slide vertically from the bottom to match
 their bottom-panel layout; desktop details slide from the left.

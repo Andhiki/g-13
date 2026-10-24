@@ -1,5 +1,9 @@
 # Testing
 
+`e2e/theme.e2e.ts` checks the theme reveal in both directions, system preference
+updates, persistence, focus return, reduced motion, and missing View Transitions
+support on desktop and phone sizes.
+
 Run `bun run check` for lint, formatting, type checking, and the Bun suite. Run
 `bun run build` to verify the production client and server bundles.
 

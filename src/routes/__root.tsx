@@ -18,6 +18,7 @@ export const Route = createRootRoute({
       { title: "Peta Kurikulum Ilmu Komputer UGM" },
     ],
     links: [
+      { rel: "preload", href: "/theme/sonic-dancing.gif", as: "image" },
       { rel: "stylesheet", href: flowStyles },
       { rel: "stylesheet", href: appStyles },
     ],
