@@ -21,7 +21,7 @@ export type MapNode = Node<CourseNodeData, "course"> | Node<LaneNodeData, "lane"
 export type { CourseNodeData, LaneNodeData };
 
 export const LANE_X = 48;
-export const LANE_STEP = 300;
+export const LANE_STEP = 360;
 export const LANE_WIDTH = 270;
 const CHOICE_COLUMNS = 3;
 const ROW_STEP = 96;
@@ -165,7 +165,8 @@ export function buildMap(
       sourceHandle: "out:" + relation.target,
       target: relation.target,
       targetHandle: "in:" + relation.source,
-      type: "smoothstep",
+      type: "default",
+      zIndex: 3,
       markerEnd: { type: MarkerType.ArrowClosed, color },
       style: { stroke: color, strokeWidth: 2.2, opacity: 1 },
     };

@@ -127,6 +127,20 @@ export function CourseSearch({
             </AlignCommandMenu.Empty>
           )}
         </AlignCommandMenu.List>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-paragraph-xs text-text-sub-600">
+          <span className="flex items-center gap-1.5">
+            <AlignKbd.Root aria-label="Panah bawah">↓</AlignKbd.Root>
+            Turun
+          </span>
+          <span className="flex items-center gap-1.5">
+            <AlignKbd.Root aria-label="Panah atas">↑</AlignKbd.Root>
+            Naik
+          </span>
+          <span className="flex items-center gap-1.5">
+            <AlignKbd.Root>Enter</AlignKbd.Root>
+            Buka mata kuliah
+          </span>
+        </div>
       </AlignCommandMenu.Dialog>
     </div>
   );

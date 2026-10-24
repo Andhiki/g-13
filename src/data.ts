@@ -23,7 +23,7 @@ export function courseSemesters(course: Course): number[] {
     ...new Set(course.placements.map((p) => p.semester).filter((n): n is number => n !== null)),
   ].sort((a, b) => a - b);
 }
-function normalized(value: string): string {
+export function normalizeCourseTitle(value: string): string {
   return value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -38,7 +38,7 @@ export type Relation = { source: string; target: string };
 export function deriveRelations(data: Curriculum): Relation[] {
   const titles = new Map<string, Course[]>();
   for (const course of data.all) {
-    const key = normalized(course.title);
+    const key = normalizeCourseTitle(course.title);
     titles.set(key, [...(titles.get(key) ?? []), course]);
   }
   const relations = new Map<string, Relation>();
@@ -48,7 +48,7 @@ export function deriveRelations(data: Curriculum): Relation[] {
       if (!raw || raw === "-" || raw.toLowerCase().includes("sks")) continue;
       for (const token of raw
         .split(/[,\n;]+/)
-        .map(normalized)
+        .map(normalizeCourseTitle)
         .filter(Boolean)) {
         const matches = titles.get(token) ?? [];
         if (matches.length !== 1 || matches[0].id === course.id) continue;

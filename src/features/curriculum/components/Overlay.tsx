@@ -11,6 +11,33 @@ function subscribeToCompactControls(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
+function BrandLogo() {
+  return (
+    <a
+      href="https://www.omahti.web.id/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="OmahTI, pembuat peta kurikulum"
+      className="pointer-events-auto flex h-10 shrink-0 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
+    >
+      <img
+        src="/brand/omahti-light.svg"
+        alt="OmahTI"
+        width={54}
+        height={21}
+        className="h-[21px] w-auto dark:hidden"
+      />
+      <img
+        src="/brand/omahti-dark.svg"
+        alt="OmahTI"
+        width={54}
+        height={21}
+        className="hidden h-[21px] w-auto dark:block"
+      />
+    </a>
+  );
+}
+
 function FilterDrawer({ children }: { children: ReactNode }) {
   return (
     <AlignDrawer.Root>
@@ -75,13 +102,15 @@ export function Overlay({
         className="pointer-events-none fixed inset-x-0 top-0 z-[9] h-28 bg-linear-to-b from-bg-white-0 from-40% via-bg-white-0/90 via-60% to-transparent max-[1100px]:h-32"
       />
       <header className="pointer-events-none fixed inset-x-4 top-[14px] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-3 max-[1100px]:flex-col max-[1100px]:gap-2">
-        <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden" aria-hidden="true" />
+        <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">
+          <BrandLogo />
+        </div>
         <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
           {navigation}
         </div>
         <div className="flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
           <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
-            <div className="pointer-events-auto min-w-0 flex-1">{search}</div>
+            <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             <div className="pointer-events-auto shrink-0">{appearance}</div>
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
               {compact && <FilterDrawer>{children}</FilterDrawer>}

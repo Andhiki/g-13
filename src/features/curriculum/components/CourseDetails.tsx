@@ -1,17 +1,10 @@
 import { useMemo, useState } from "react";
-import { RiCloseLine } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
+import { RiArrowRightLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
 import { CompactButton } from "../../../ui/compact-button";
-import type { Course, Curriculum, Relation } from "../../../data";
-import {
-  courseLabels,
-  creditsFor,
-  requirementText,
-  semesterLabel,
-  sourceLocation,
-} from "../course-utils";
+import { normalizeCourseTitle, type Course, type Curriculum, type Relation } from "../../../data";
+import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
 
 type CourseDetailsProps = {
   course: Course | null;
@@ -71,9 +64,16 @@ function CourseDetailsContent({
     .map((item) => byId.get(item.target))
     .filter((item): item is Course => Boolean(item));
   const labels = courseLabels(course);
-  const requirements = requirementText(course);
-  const locations = sourceLocation(course);
+  const linkedPrerequisites = new Set(prereqs.map((item) => normalizeCourseTitle(item.title)));
+  const requirements = requirementText(course)
+    .flatMap((item) => item.split(/[,\n;]+/))
+    .map((item) => item.trim())
+    .filter((item) => item && !linkedPrerequisites.has(normalizeCourseTitle(item)));
   const credit = creditsFor(course);
+  const curriculumLabel =
+    data.edition === `Kurikulum ${data.id}`
+      ? data.edition
+      : `Kurikulum ${data.id} · ${data.edition}`;
   return (
     <AlignDrawer.Content
       modal={modal}
@@ -85,14 +85,17 @@ function CourseDetailsContent({
       onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
       aria-label={`Detail ${course.title}`}
     >
-      <AlignDrawer.Header className="border-b">
+      <AlignDrawer.Header className="shrink-0 items-start gap-4 border-b p-4 sm:p-5">
         <div className="min-w-0 flex-1">
           <p className="m-0 text-paragraph-xs text-text-sub-600">
-            Kurikulum {data.id} · {data.edition} · {course.code || "Mata kuliah pilihan"}
+            {curriculumLabel} · {course.code || "Mata kuliah pilihan"}
           </p>
-          <AlignDrawer.Title className="mt-1 line-clamp-2 text-label-lg text-text-strong-950">
+          <AlignDrawer.Title className="mt-1 text-label-lg text-text-strong-950">
             {course.title}
           </AlignDrawer.Title>
+          {course.englishTitle && (
+            <p className="mb-0 mt-1 text-paragraph-sm text-text-sub-600">{course.englishTitle}</p>
+          )}
         </div>
         <AlignDrawer.Close asChild>
           <CompactButton aria-label="Tutup detail mata kuliah">
@@ -101,20 +104,21 @@ function CourseDetailsContent({
         </AlignDrawer.Close>
       </AlignDrawer.Header>
       <AlignDrawer.Description className="sr-only">
-        Informasi akademik dan sumber mata kuliah {course.title}.
+        Informasi akademik mata kuliah {course.title}.
       </AlignDrawer.Description>
-      <AlignDrawer.Body className="overflow-y-auto p-5">
-        {course.englishTitle && (
-          <p className="mb-4 text-paragraph-sm text-text-sub-600">{course.englishTitle}</p>
-        )}
+      <AlignDrawer.Body className="min-h-0 overflow-y-auto p-4 sm:p-5">
         <div className="flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
           {labels.map((label) => (
-            <AlignBadge.Root variant="light" key={label}>
+            <AlignBadge.Root
+              variant="light"
+              className="h-auto min-h-5 py-0.5 text-[12px] leading-4 font-medium"
+              key={label}
+            >
               {label}
             </AlignBadge.Root>
           ))}
         </div>
-        <dl className="mt-5 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
+        <dl className="mt-4 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
           <div className="pr-3">
             <dt className="text-paragraph-xs text-text-sub-600">Semester panduan</dt>
             <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
@@ -128,98 +132,59 @@ function CourseDetailsContent({
             </dd>
           </div>
         </dl>
-        <section className="mt-5">
-          <h3 className="m-0 text-label-sm text-text-strong-950">Prasyarat pada sumber</h3>
-          {requirements.length ? (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-paragraph-sm text-text-sub-600">
-              {requirements.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-2 text-paragraph-sm text-text-sub-600">
-              Tabel sumber tidak mencantumkan prasyarat mata kuliah untuk baris ini.
-            </p>
-          )}
-          <p className="mb-0 mt-3 text-paragraph-xs text-text-sub-600">
-            Teks sumber dipertahankan apa adanya. Peta ini tidak menghitung kelayakan registrasi
-            pribadi.
-          </p>
-        </section>
-        {(prereqs.length > 0 || next.length > 0) && (
+        {(prereqs.length > 0 || requirements.length > 0) && (
           <section className="mt-5">
-            <h3 className="m-0 text-label-sm text-text-strong-950">Relasi nama yang cocok</h3>
+            <h3 className="m-0 text-label-sm text-text-strong-950">Prasyarat</h3>
             {prereqs.length > 0 && (
-              <div className="mt-3">
-                <h4 className="m-0 text-paragraph-xs text-text-sub-600">Prasyarat</h4>
-                <ul className="mt-1 divide-y divide-stroke-soft-200">
-                  {prereqs.map((item) => (
-                    <li className="flex items-center justify-between gap-3 py-2" key={item.id}>
-                      <span className="text-paragraph-sm text-text-strong-950">{item.title}</span>
-                      <AlignButton.Root
-                        variant="neutral"
-                        mode="ghost"
-                        size="xsmall"
-                        onClick={() => select(item.id)}
-                        aria-label={"Buka detail " + item.title}
-                      >
-                        Buka
-                      </AlignButton.Root>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
+                {prereqs.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                      onClick={() => select(item.id)}
+                      aria-label={"Buka detail " + item.title}
+                    >
+                      <span className="min-w-0">{item.title}</span>
+                      <RiArrowRightLine
+                        className="size-4 shrink-0 text-text-sub-600"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
-            {next.length > 0 && (
-              <div className="mt-3">
-                <h4 className="m-0 text-paragraph-xs text-text-sub-600">
-                  Dirujuk sebagai prasyarat oleh
-                </h4>
-                <ul className="mt-1 divide-y divide-stroke-soft-200">
-                  {next.map((item) => (
-                    <li className="flex items-center justify-between gap-3 py-2" key={item.id}>
-                      <span className="text-paragraph-sm text-text-strong-950">{item.title}</span>
-                      <AlignButton.Root
-                        variant="neutral"
-                        mode="ghost"
-                        size="xsmall"
-                        onClick={() => select(item.id)}
-                        aria-label={"Buka detail " + item.title}
-                      >
-                        Buka
-                      </AlignButton.Root>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {requirements.map((item) => (
+              <p key={item} className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">
+                {item}
+              </p>
+            ))}
           </section>
         )}
-        <section className="mt-5 border-t border-stroke-soft-200 pt-4">
-          <h3 className="m-0 text-label-sm text-text-strong-950">Lokasi sumber</h3>
-          <p className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">{data.sourceTitle}</p>
-          {locations.length ? (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-paragraph-sm text-text-sub-600">
-              {locations.map((item) => (
-                <li key={item}>{item}</li>
+        {next.length > 0 && (
+          <section className="mt-5">
+            <h3 className="m-0 text-label-sm text-text-strong-950">Menjadi prasyarat untuk</h3>
+            <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
+              {next.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                    onClick={() => select(item.id)}
+                    aria-label={"Buka detail " + item.title}
+                  >
+                    <span className="min-w-0">{item.title}</span>
+                    <RiArrowRightLine
+                      className="size-4 shrink-0 text-text-sub-600"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </li>
               ))}
             </ul>
-          ) : (
-            <p className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">
-              Lokasi baris belum dipetakan.
-            </p>
-          )}
-        </section>
-        <details className="mt-5 border-t border-stroke-soft-200 pt-4">
-          <summary className="cursor-pointer text-label-sm text-text-strong-950">
-            Cara membaca kurikulum {data.id}
-          </summary>
-          {data.readingNotes.map((note, index) => (
-            <p className="mb-0 mt-3 text-paragraph-sm text-text-sub-600" key={index}>
-              {note}
-            </p>
-          ))}
-        </details>
+          </section>
+        )}
       </AlignDrawer.Body>
     </AlignDrawer.Content>
   );

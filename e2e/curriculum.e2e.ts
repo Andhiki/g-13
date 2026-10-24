@@ -23,7 +23,9 @@ for (const curriculum of [
     await expect(incoming).toBeVisible();
     await expect(incoming).toHaveAttribute("marker-end", /url\(.+\)/);
     await expect(page.locator(".course-node.dependent").first()).toBeAttached();
-    await expect(details.getByText(/Cetak hlm\./).first()).toBeVisible();
+    await expect(details.getByRole("heading", { name: "Lokasi sumber" })).toHaveCount(0);
+    await expect(details.getByRole("heading", { name: "Prasyarat", exact: true })).toHaveCount(1);
+    await expect(details.getByText("Prasyarat tidak tercantum.", { exact: true })).toHaveCount(0);
     await details.getByRole("button", { name: "Buka detail Pemrograman", exact: true }).click();
     await expect(details.getByRole("heading", { name: "Pemrograman", exact: true })).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`mk=${curriculum.prerequisite}`));

@@ -94,6 +94,7 @@ export function CurriculumMap({
   return (
     <ReactFlow<MapNode, Edge>
       key={curriculum}
+      proOptions={{ hideAttribution: true }}
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
