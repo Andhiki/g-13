@@ -71,7 +71,7 @@ export function CurriculumPage() {
           </section>
         )}
         <CourseDetails
-          modal={view !== "map"}
+          modal={false}
           course={selected}
           data={data}
           relations={relations}

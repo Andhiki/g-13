@@ -101,7 +101,8 @@ Their graph-specific button and connection handles remain custom, with uniform b
 and relationship states instead of left accent bars. Handles extend outside the card without clipping.
 Map details use a nonmodal AlignUI drawer on the left without an overlay so connections remain
 visible and the canvas stays interactive. Course nodes explicitly enable pointer events because
-React Flow disables them on nodes that are neither draggable nor selectable. List details retain the default modal drawer.
+React Flow disables them on nodes that are neither draggable nor selectable. List details use the same
+nonmodal drawer, opening from the bottom below 650px and from the left on desktop.
 
 ## Semester tables
 
@@ -128,11 +129,9 @@ controls stay fixed; the map keeps its viewport-sized canvas.
 
 ## Drawer motion
 
-The course panel uses the local AlignUI Drawer adaptation. Both modal list details
-and nonmodal map details use 200ms slide-in and slide-out animations. On phones,
-nonmodal map details slide vertically from the bottom to match their bottom-panel
-layout; desktop details slide from the left. The modal overlay fades for the same
-duration as the panel.
+The course panel uses the local AlignUI Drawer adaptation. Both list and map
+details use the same nonmodal drawer with 200ms slide-in and slide-out animations. On phones, details slide vertically from the bottom to match
+their bottom-panel layout; desktop details slide from the left.
 
 `CourseDetails` keeps the last selected content while its controlled Radix root
 closes. Removing that root when selection clears skips Radix's exit animation.

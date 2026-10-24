@@ -53,7 +53,7 @@ for (const view of ["map", "list"] as const) {
     const opening = await page.evaluate(() =>
       window.drawerAnimations.find((event) => event.state === "open"),
     );
-    const bottomDrawer = view === "map" && (page.viewportSize()?.width ?? 1440) < 650;
+    const bottomDrawer = (page.viewportSize()?.width ?? 1440) < 650;
     if (bottomDrawer) {
       expect(opening?.translateX).toBeCloseTo(0);
       expect(opening?.translateY).toBeGreaterThan(0);
