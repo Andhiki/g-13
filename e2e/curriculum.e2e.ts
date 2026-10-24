@@ -89,10 +89,12 @@ for (const curriculum of [
         .getByRole("heading", { name: "Algoritma dan Struktur Data", exact: true }),
     ).toBeVisible();
     await page.keyboard.press("Escape");
-    await page.getByRole("button", { name: /Pilih tema tampilan/ }).click();
-    await page.getByRole("menuitemradio", { name: "Gelap", exact: true }).click();
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.getByRole("button", { name: "Ganti ke tema gelap", exact: true }).click();
     await expect(page.locator("html")).toHaveClass(/dark/);
     await page.reload();
     await expect(page.locator("html")).toHaveClass(/dark/);
+    await page.getByRole("button", { name: "Ganti ke tema terang", exact: true }).click();
+    await expect(page.locator("html")).toHaveClass(/light/);
   });
 }
