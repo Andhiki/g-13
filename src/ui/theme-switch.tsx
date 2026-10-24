@@ -1,15 +1,51 @@
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { RiMoonLine, RiSunLine } from "@remixicon/react";
 import { AlignButton } from "./button";
 
 export function ThemeSwitch() {
   const { resolvedTheme, setTheme } = useTheme();
+  const transitioning = useRef(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
   const label = isDark ? "Ganti ke tema terang" : "Ganti ke tema gelap";
   const Icon = isDark ? RiSunLine : RiMoonLine;
+
+  const changeTheme = (value: "light" | "dark") => {
+    if (transitioning.current) return;
+    if (
+      value === resolvedTheme ||
+      document.hidden ||
+      !document.startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setTheme(value);
+      return;
+    }
+
+    transitioning.current = true;
+    requestAnimationFrame(() => {
+      const root = document.documentElement;
+      root.classList.add("theme-transition");
+      try {
+        const transition = document.startViewTransition(() => {
+          flushSync(() => setTheme(value));
+        });
+        void transition.finished
+          .catch(() => {})
+          .finally(() => {
+            root.classList.remove("theme-transition");
+            transitioning.current = false;
+          });
+      } catch {
+        setTheme(value);
+        root.classList.remove("theme-transition");
+        transitioning.current = false;
+      }
+    });
+  };
 
   return (
     <AlignButton.Root
@@ -21,7 +57,7 @@ export function ThemeSwitch() {
       aria-label={label}
       title={label}
       disabled={!mounted}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => changeTheme(isDark ? "light" : "dark")}
     >
       <Icon className="size-5" aria-hidden="true" />
     </AlignButton.Root>

@@ -42,8 +42,8 @@ the exception. Token declarations, font imports, and framework imports remain st
 The global stylesheet leaves standard control typography and focus styling to Tailwind Preflight and
 AlignUI. It adds focus styling only for links and the app-specific graph-node buttons.
 
-Search uses AlignUI Command Menu, curriculum and interest filters use Select, and the theme menu
-uses Dropdown. The app retains its course matching and routing behavior, and the search control
+Search uses AlignUI Command Menu, curriculum and interest filters use Select, and the theme toggle
+uses Button. The app retains its course matching and routing behavior, and the search control
 has no magnifying-glass icon. The same component policy applies to lists, details, and graph controls.
 
 The Command Menu uses `cmdk` for its list keyboard behavior and Radix Dialog for modal behavior. The
@@ -77,8 +77,7 @@ and saved themes. The production build retains bundle-size and sourcemap warning
 Search and the theme trigger use medium AlignUI Buttons with 40px heights and
 10px corner radii. The theme trigger is a 40px square with 10px padding around
 its 20px icon. The filter card uses the same corner radius, inset stroke token,
-and resting shadow as these controls. Theme menu radio indicators sit on the
-right, leaving the icons and labels aligned on the left. These requested layout
+and resting shadow as these controls. These requested layout
 and sizing refinements are exceptions to the default control styling policy above.
 
 The top-center semester control is a group of buttons numbered 1–8. It uses the
@@ -128,6 +127,13 @@ The Daftar view scrolls as a document rather than inside the course list. Overla
 controls stay fixed; the map keeps its viewport-sized canvas.
 
 ## Drawer motion
+
+Theme changes use a light/dark toggle button and use the Sonic GIF mask
+reveal from portfolio-magic through the View Transitions API. The 2000ms reveal
+keeps the old page opaque beneath the new page; the button starts the transition.
+The mask is preloaded and served locally from `public/theme/`. Reduced motion,
+hidden documents, unsupported browsers, and selections with the same resolved
+appearance switch immediately. System appearance changes remain automatic.
 
 The course panel uses the local AlignUI Drawer adaptation. Both list and map
 details use the same nonmodal drawer with 200ms slide-in and slide-out animations. On phones, details slide vertically from the bottom to match
