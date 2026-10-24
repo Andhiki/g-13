@@ -1,4 +1,4 @@
-/* AlignUI CLI 0.0.19, blue/gray defaults. MIT license: ../docs/licenses/alignui.txt. */
+/* AlignUI CLI 0.0.19, orange/gray theme. MIT license: ../docs/licenses/alignui.txt. */
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
   /* AlignUI Raw Colors */
@@ -181,14 +181,14 @@
   --color-neutral-alpha-16: var(--color-gray-alpha-16);
   --color-neutral-alpha-10: var(--color-gray-alpha-10);
   /* AlignUI Dynamic Primary Colors */
-  --color-primary-dark: var(--color-blue-800);
-  --color-primary-darker: var(--color-blue-700);
-  --color-primary-base: var(--color-blue-500);
-  --color-primary-light: var(--color-blue-100);
-  --color-primary-lighter: var(--color-blue-50);
-  --color-primary-alpha-24: var(--color-blue-alpha-24);
-  --color-primary-alpha-16: var(--color-blue-alpha-16);
-  --color-primary-alpha-10: var(--color-blue-alpha-10);
+  --color-primary-dark: var(--color-orange-950);
+  --color-primary-darker: var(--color-orange-900);
+  --color-primary-base: var(--color-orange-800);
+  --color-primary-light: var(--color-orange-100);
+  --color-primary-lighter: var(--color-orange-50);
+  --color-primary-alpha-24: var(--color-orange-alpha-24);
+  --color-primary-alpha-16: var(--color-orange-alpha-16);
+  --color-primary-alpha-10: var(--color-orange-alpha-10);
   /* AlignUI Social Colors */
   --color-social-apple: #000;
   --color-social-twitter: #010101;
@@ -544,9 +544,9 @@
   --color-stable-base: var(--color-teal-600);
   --color-stable-light: var(--color-teal-alpha-24);
   --color-stable-lighter: var(--color-teal-alpha-16);
-  --color-primary-base: var(--color-blue-400);
-  --color-primary-light: var(--color-blue-alpha-16);
-  --color-primary-lighter: var(--color-blue-alpha-10);
+  --color-primary-base: var(--color-orange-400);
+  --color-primary-light: var(--color-orange-alpha-16);
+  --color-primary-lighter: var(--color-orange-alpha-10);
   --color-overlay-gray: #3333338f;
   --color-overlay-slate: #2b303b8f;
   --color-overlay: var(--color-overlay-gray);

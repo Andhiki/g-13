@@ -21,8 +21,8 @@ export function SemesterFilter({
         {semesters.map((semester) => (
           <AlignButton.Root
             key={semester}
-            variant="neutral"
-            mode={scope === semester ? "filled" : "ghost"}
+            variant={scope === semester ? "primary" : "neutral"}
+            mode={scope === semester ? "lighter" : "ghost"}
             size="xsmall"
             className="max-[1100px]:min-w-0 max-[1100px]:px-0"
             aria-label={`Semester ${semester}`}
