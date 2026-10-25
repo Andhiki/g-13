@@ -86,6 +86,8 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await toggle.click();
   const version = page.getByRole("combobox", { name: /Versi kurikulum/ });
   await expect(version).toBeVisible();
+  await expect(toggle.locator("span").nth(1)).toHaveCSS("opacity", "1");
+  await expect(toggle.locator("span").nth(0)).toHaveCSS("opacity", "0");
   expect(await version.evaluate((el) => getComputedStyle(el).fontSize)).toBe("14px");
   expect(await version.evaluate((el) => getComputedStyle(el).height)).toBe("36px");
   await version.click();
@@ -96,6 +98,8 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await page.keyboard.press("Escape");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(toggle).toBeFocused();
+  await expect(toggle.locator("span").nth(0)).toHaveCSS("opacity", "1");
+  await expect(toggle.locator("span").nth(1)).toHaveCSS("opacity", "0");
   await toggle.click();
   await expect(version).toContainText("2021");
   await toggle.click();

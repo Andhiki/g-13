@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { RiFilter3Line } from "@remixicon/react";
+import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
 import { AlignButton } from "../../../ui/button";
 import { AlignDrawer } from "../../../ui/drawer";
 
@@ -95,7 +95,9 @@ function DesktopFilters({ children, label }: { children: ReactNode; label: strin
     <motion.section
       initial={false}
       animate={{ width: open ? 300 : 40, height: open ? "auto" : 40 }}
-      transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}
+      transition={
+        reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
+      }
       className="pointer-events-auto relative overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
       aria-label={label}
     >
@@ -110,7 +112,27 @@ function DesktopFilters({ children, label }: { children: ReactNode; label: strin
         aria-controls="desktop-filters"
         onClick={() => setOpen(!open)}
       >
-        <RiFilter3Line className="size-5" aria-hidden="true" />
+        {[
+          { Icon: RiFilter3Line, name: "filter", active: !open },
+          { Icon: RiCloseLine, name: "close", active: open },
+        ].map(({ Icon, name, active }) => (
+          <motion.span
+            key={name}
+            initial={false}
+            animate={{
+              opacity: active ? 1 : 0,
+              scale: active ? 1 : 0.25,
+              filter: active ? "blur(0px)" : "blur(4px)",
+            }}
+            transition={
+              reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
+            }
+            className="absolute flex size-5 items-center justify-center"
+            aria-hidden="true"
+          >
+            <Icon className="size-5" />
+          </motion.span>
+        ))}
       </AlignButton.Root>
       <motion.div
         id="desktop-filters"
