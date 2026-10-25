@@ -36,7 +36,9 @@ test("curriculum and interest filters persist between the drawer, list, and desk
     expect(bounds!.height).toBeLessThan(page.viewportSize()!.height / 2);
     expect(bounds!.width).toBe(page.viewportSize()!.width);
   } else {
-    await expect(filterTrigger).toHaveCount(0);
+    await expect(filterTrigger).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("combobox", { name: /Versi kurikulum/ })).toHaveCount(0);
+    await filterTrigger.click();
   }
   await page.getByRole("combobox", { name: /Versi kurikulum/ }).click();
   await page.getByRole("option", { name: "2021 · Revisi 2023", exact: true }).click();
@@ -67,8 +69,35 @@ test("curriculum and interest filters persist between the drawer, list, and desk
     await page.keyboard.press("Escape");
     await expect(filterTrigger).toBeFocused();
     await page.setViewportSize({ width: 1440, height: 900 });
+    await filterTrigger.click();
     await expect(page.getByRole("combobox", { name: /Kelompok pilihan/ })).toContainText(
       "Lab Sistem Komputer dan Jaringan",
     );
   }
+});
+
+test("desktop filter toggles, keeps choices, and closes with Escape", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile);
+  await page.goto("/?kurikulum=2026");
+  const toggle = page.getByRole("button", { name: /filter kurikulum/ });
+  await toggle.click();
+  const version = page.getByRole("combobox", { name: /Versi kurikulum/ });
+  await expect(version).toBeVisible();
+  expect(await version.evaluate((el) => getComputedStyle(el).fontSize)).toBe("14px");
+  expect(await version.evaluate((el) => getComputedStyle(el).height)).toBe("36px");
+  await version.click();
+  await page.getByRole("option", { name: "2021 · Revisi 2023", exact: true }).click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await page.locator("main").click({ position: { x: 20, y: 300 } });
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toBeFocused();
+  await toggle.click();
+  await expect(version).toContainText("2021");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });

@@ -1,4 +1,5 @@
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { RiFilter3Line } from "@remixicon/react";
 import { AlignButton } from "../../../ui/button";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -18,7 +19,7 @@ function BrandLogo() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="OmahTI, pembuat peta kurikulum"
-      className="pointer-events-auto flex h-10 shrink-0 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
+      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
     >
       <img
         src="/brand/omahti-light.svg"
@@ -74,6 +75,59 @@ function FilterDrawer({ children }: { children: ReactNode }) {
   );
 }
 
+function DesktopFilters({ children, label }: { children: ReactNode; label: string }) {
+  const [open, setOpen] = useState(false);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!open) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      setOpen(false);
+      toggle.current?.focus();
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
+
+  return (
+    <motion.section
+      initial={false}
+      animate={{ width: open ? 300 : 40, height: open ? "auto" : 40 }}
+      transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}
+      className="pointer-events-auto relative overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
+      aria-label={label}
+    >
+      <AlignButton.Root
+        ref={toggle}
+        variant="neutral"
+        mode="ghost"
+        size="medium"
+        className="absolute right-0 top-0 z-10 size-10 p-2.5"
+        aria-label={open ? "Tutup filter kurikulum" : "Buka filter kurikulum"}
+        aria-expanded={open}
+        aria-controls="desktop-filters"
+        onClick={() => setOpen(!open)}
+      >
+        <RiFilter3Line className="size-5" aria-hidden="true" />
+      </AlignButton.Root>
+      <motion.div
+        id="desktop-filters"
+        inert={!open}
+        aria-hidden={!open}
+        initial={false}
+        animate={{ opacity: open ? 1 : 0 }}
+        transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
+        className="flex w-[300px] flex-col gap-3 p-4"
+      >
+        <h2 className="m-0 pr-8 text-label-sm">Filter</h2>
+        {children}
+      </motion.div>
+    </motion.section>
+  );
+}
+
 export function Overlay({
   navigation,
   appearance,
@@ -116,15 +170,7 @@ export function Overlay({
               {compact && <FilterDrawer>{children}</FilterDrawer>}
             </div>
           </div>
-          {!compact && (
-            <section
-              className="pointer-events-auto flex w-[300px] flex-col gap-3 rounded-10 bg-bg-white-0 p-4 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
-              aria-label={controlsLabel}
-            >
-              <h2 className="m-0 text-label-sm">Filter</h2>
-              {children}
-            </section>
-          )}
+          {!compact && <DesktopFilters label={controlsLabel}>{children}</DesktopFilters>}
         </div>
       </header>
       <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">

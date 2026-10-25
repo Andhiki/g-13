@@ -17,6 +17,7 @@ export function ChoiceGroupFilter({
       </label>
       <AlignSelect.Root value={group} onValueChange={onChange}>
         <AlignSelect.Trigger
+          className="h-9 min-h-9 text-[14px]"
           id="course-group"
           aria-label={`Kelompok pilihan: ${group === "__all__" ? "Semua mata kuliah" : group}`}
         >
@@ -49,6 +50,7 @@ export function CurriculumVersionFilter({
       </label>
       <AlignSelect.Root variant="compact" value={curriculum} onValueChange={onChange}>
         <AlignSelect.Trigger
+          className="h-9 min-h-9 text-[14px]"
           id="curriculum-version"
           aria-label={`Versi kurikulum: ${curriculum === "2021" ? "2021, Revisi 2023" : "2026"}`}
         >
