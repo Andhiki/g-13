@@ -53,58 +53,6 @@ test("focus gathers connections, follows neighbors, and restores semester filter
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
-test("course gathering eases out without overshoot and respects reduced motion", async ({
-  page,
-}) => {
-  await page.goto("/?kurikulum=2026");
-  const optional = page.locator('[data-id="PACS262526"]');
-  await expect(optional).toBeAttached();
-  const samples = await page.evaluate(async () => {
-    const node = document.querySelector<HTMLElement>('[data-id="PACS262526"]')!;
-    const samples: { time: number; x: number }[] = [];
-    const start = performance.now();
-    const initialX = new DOMMatrixReadOnly(node.style.transform).m41;
-    let movingSince: number | undefined;
-    document.querySelector<HTMLButtonElement>('[data-id="PACS262201"] button')!.click();
-    await new Promise<void>((resolve) => {
-      const sample = () => {
-        const x = new DOMMatrixReadOnly(node.style.transform).m41;
-        if (x !== initialX && movingSince === undefined) movingSince = performance.now();
-        const elapsed = movingSince === undefined ? 0 : performance.now() - movingSince;
-        samples.push({ time: elapsed, x });
-        if (elapsed < 1500 && performance.now() - start < 4000) requestAnimationFrame(sample);
-        else resolve();
-      };
-      requestAnimationFrame(sample);
-    });
-    return samples;
-  });
-  const finalX = 780;
-  const initialX = samples[0]!.x;
-  const at400 = samples.find((sample) => sample.time >= 400)!.x;
-  expect(initialX - at400).toBeGreaterThan((initialX - finalX) * 0.5);
-  expect(at400 - finalX).toBeGreaterThan(1);
-  expect(Math.min(...samples.map((sample) => sample.x))).toBeGreaterThanOrEqual(finalX - 0.01);
-  expect(samples.at(-1)!.x).toBeCloseTo(finalX);
-  expect(
-    samples
-      .filter((sample) => sample.time >= 1250)
-      .every((sample) => Math.abs(sample.x - finalX) < 0.01),
-  ).toBe(true);
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.getByRole("button", { name: "Tutup detail mata kuliah" }).click();
-  const immediateX = await page.evaluate(async () => {
-    document.querySelector<HTMLButtonElement>('[data-id="PACS262201"] button')!.click();
-    await new Promise<void>((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-    );
-    return new DOMMatrixReadOnly(
-      document.querySelector<HTMLElement>('[data-id="PACS262526"]')!.style.transform,
-    ).m41;
-  });
-  expect(immediateX).toBe(finalX);
-});
-
 for (const theme of ["light", "dark"] as const) {
   test(`graph styling preserves course states and edge colors in ${theme} mode`, async ({
     page,
