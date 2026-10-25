@@ -4,6 +4,10 @@ Proyek komunitas publik untuk membantu mahasiswa S1 Ilmu Komputer UGM memahami a
 
 ## Language
 
+**Roadmap kuliah**:
+Rencana perjalanan kuliah per semester berdasarkan versi kurikulum, peminatan, status kelas internasional, dan pilihan kegiatan mahasiswa. Setiap mata kuliah ditampilkan secara individual beserta hubungan prasyaratnya, dengan pilihan target selesai 7 atau 8 semester.
+_Avoid_: Peta kurikulum, KRS
+
 **Mata kuliah terhubung**:
 Mata kuliah yang menjadi prasyarat langsung bagi mata kuliah yang dipilih, atau yang secara langsung mensyaratkan mata kuliah tersebut. Tidak mencakup hubungan tidak langsung melalui mata kuliah lain.
 _Avoid_: Seluruh rantai prasyarat

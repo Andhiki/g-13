@@ -59,3 +59,14 @@ describe("2026 curriculum source adapter", () => {
     });
   });
 });
+
+test("exposes internship activity courses with source provenance and both permitted semesters", () => {
+  const course = curriculum.all.find((x) => x.id === "PACS262609");
+  expect(course?.placements.map((x) => x.semester)).toEqual([6, 7]);
+  expect(course?.placements[0]).toMatchObject({
+    section: "elective",
+    credits: 16,
+    printedPage: 174,
+    pdfPage: 192,
+  });
+});

@@ -41,3 +41,11 @@ to the project configuration.
 course details, checks their opening and closing directions at desktop and phone
 sizes, and verifies reduced-motion dismissal. It catches missing nonmodal motion
 and premature unmounting before the exit animation.
+
+The roadmap tests exercise the planner and URL boundary with both real curricula.
+They check required-credit totals, unique courses, every peminatan under both
+exposure semesters and graduation targets, internship tiers, unresolved recognition,
+source prerequisite conflicts, protected courses, and edited-plan restoration.
+`e2e/roadmap.e2e.ts` covers the full-screen quiz, conditional follow-ups, Back,
+browser history, course replacement, exposure controls, and clipboard fallback at
+both viewport sizes. The fallback must disappear when the displayed plan changes.

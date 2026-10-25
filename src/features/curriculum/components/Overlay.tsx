@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
@@ -179,7 +180,16 @@ export function Overlay({
       />
       <header className="pointer-events-none fixed inset-x-4 top-[14px] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-3 max-[1100px]:flex-col max-[1100px]:gap-2">
         <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">
-          <BrandLogo />
+          <div className="flex items-center gap-4">
+            <BrandLogo />
+            <Link
+              to="/roadmap"
+              search={{ lulus: 8, semesterPaparan: 6 }}
+              className="pointer-events-auto text-label-sm text-text-sub-600 hover:text-text-strong-950"
+            >
+              Roadmap kuliah
+            </Link>
+          </div>
         </div>
         <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
           {navigation}
@@ -188,6 +198,13 @@ export function Overlay({
           <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             <div className="pointer-events-auto shrink-0">{appearance}</div>
+            <Link
+              to="/roadmap"
+              search={{ lulus: 8, semesterPaparan: 6 }}
+              className="pointer-events-auto flex h-10 items-center text-label-sm text-text-sub-600 min-[1100px]:hidden"
+            >
+              Roadmap
+            </Link>
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
               {compact && <FilterDrawer>{children}</FilterDrawer>}
             </div>

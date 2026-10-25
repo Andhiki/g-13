@@ -150,3 +150,17 @@ their bottom-panel layout; desktop details slide from the left.
 closes. Removing that root when selection clears skips Radix's exit animation.
 Course selection and the URL still clear immediately; Radix handles removing the
 panel after the animation. The existing reduced-motion rule suppresses movement.
+
+## Roadmap quiz controls
+
+The roadmap uses native radio inputs inside large answer labels for its full-screen,
+one-question-at-a-time interaction. The local AlignUI set has no radio-group
+component. The labels use the app's tokens, checked state, and visible keyboard focus.
+The clipboard fallback is a native read-only input that selects its complete URL on
+focus. It uses the same tokens and introduces no general-purpose input component.
+All standard buttons, selects, modals, and course details reuse the existing controls.
+
+The roadmap reuses the curriculum course nodes. The initial view fits every semester;
+semester navigation and zoom reveal the labels at reading size. The 12px source-code
+and credit tabs retain the existing graph's typography rather than changing shared
+course nodes for this page.

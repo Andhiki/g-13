@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { RiArrowRightLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -13,6 +13,7 @@ type CourseDetailsProps = {
   select: (id: string) => void;
   close: () => void;
   modal?: boolean;
+  footer?: ReactNode;
 };
 
 export function CourseDetails({
@@ -22,6 +23,7 @@ export function CourseDetails({
   select,
   close,
   modal = true,
+  footer,
 }: CourseDetailsProps) {
   const selection = course ? { course, data, relations } : null;
   // Retain the content while Radix runs the close animation.
@@ -42,7 +44,9 @@ export function CourseDetails({
       open={course !== null}
       onOpenChange={(open) => !open && close()}
     >
-      {content && <CourseDetailsContent {...content} select={select} modal={modal} />}
+      {content && (
+        <CourseDetailsContent {...content} select={select} modal={modal} footer={footer} />
+      )}
     </AlignDrawer.Root>
   );
 }
@@ -53,6 +57,7 @@ function CourseDetailsContent({
   relations,
   select,
   modal,
+  footer,
 }: Omit<CourseDetailsProps, "course" | "close"> & { course: Course }) {
   const byId = useMemo(() => new Map(data.all.map((item) => [item.id, item])), [data]);
   const prereqs = relations
@@ -186,6 +191,7 @@ function CourseDetailsContent({
           </section>
         )}
       </AlignDrawer.Body>
+      {footer && <div className="shrink-0 border-t border-stroke-soft-200 p-4">{footer}</div>}
     </AlignDrawer.Content>
   );
 }

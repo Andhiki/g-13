@@ -58,6 +58,33 @@ export function adaptCurriculum2026(source: Raw): Curriculum {
       ),
     });
   });
+  for (const row of schedule.outside_program_activity_elective_rows as Raw[]) {
+    const terms = text(row.semester_guidance_raw);
+    const range = terms.match(/^(\d)-(\d)$/);
+    const semesters = range
+      ? Array.from(
+          { length: Number(range[2]) - Number(range[1]) + 1 },
+          (_, i) => Number(range[1]) + i,
+        )
+      : terms.split(",").map(Number);
+    for (const term of semesters)
+      rows.push({
+        id: text(row.course_code_raw),
+        code: text(row.course_code_raw),
+        title: text(row.course_title_id_raw),
+        englishTitle: text(row.course_title_en_raw),
+        placement: makePlacement(
+          "elective",
+          "Aktivitas di luar program studi",
+          "Aktivitas di luar program studi",
+          term,
+          row.credits_total,
+          row.prerequisite_raw,
+          null,
+          row.source_page,
+        ),
+      });
+  }
   const all = merge(rows),
     core = all.filter((course) =>
       course.placements.some((placement) => placement.section === "core"),

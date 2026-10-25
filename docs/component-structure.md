@@ -50,3 +50,20 @@ feature actually needs it. Retain the existing shared AlignUI controls in
 Preserve the page appearance, interactions, URLs, and styling when reorganizing
 components, state, and graph logic. Extract individual controls only when they
 add meaningful behavior or repeated markup; otherwise use a shared UI component.
+
+## Roadmap feature
+
+The `/roadmap` route validates URL search through the roadmap feature's `search.ts`.
+`RoadmapPage` composes the full-screen quiz or result. `quiz.ts` owns conditional
+questions and answer invalidation. `options.ts` owns source-specific choices and the
+shared elective eligibility filter.
+
+`planner.ts` builds the selected course set and applies elective replacements.
+`activities.ts`, `schedule.ts`, and `conflicts.ts` handle outside activities, semester
+placements, and unresolved conditions. These functions operate on source data and
+return a suggested plan, not academic eligibility.
+
+`RoadmapGraph` reuses the curriculum's course and semester nodes. `RoadmapResult`
+composes result controls, conflict notes, sharing, and the existing course drawer.
+The drawer's optional footer hosts roadmap-specific actions without importing the
+roadmap feature. `ElectiveReplacement` owns replacement selection and source preview.
