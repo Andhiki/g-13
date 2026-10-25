@@ -39,8 +39,11 @@ export function CurriculumPage() {
       </Overlay>
 
       <main
+        data-map-stage={view === "map" ? "" : undefined}
         className={
-          view === "map" ? "map-stage text-text-strong-950" : "min-h-dvh text-text-strong-950"
+          view === "map"
+            ? "fixed inset-0 min-h-dvh overflow-hidden bg-bg-weak-25 text-text-strong-950"
+            : "min-h-dvh text-text-strong-950"
         }
       >
         {view === "map" ? (

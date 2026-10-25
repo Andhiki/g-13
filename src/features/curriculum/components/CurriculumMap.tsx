@@ -75,7 +75,7 @@ function ViewportFocus({
     const timer = window.setTimeout(() => {
       if (selectedId) {
         const points = [...positions.values()];
-        const stage = document.querySelector(".map-stage")!.getBoundingClientRect();
+        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
         const phone = window.matchMedia("(width < 650px)").matches;
         const left = phone ? 16 : 424;
         const top = phone ? 128 : 96;
@@ -155,6 +155,7 @@ export function CurriculumMap({
   return (
     <ReactFlow<MapNode, Edge>
       key={curriculum}
+      className="absolute! inset-0 z-0 bg-transparent!"
       proOptions={{ hideAttribution: true }}
       onPaneClick={close}
       nodes={animatedNodes}
@@ -179,6 +180,7 @@ export function CurriculumMap({
         positions={positions}
       />
       <Background
+        className="bg-bg-weak-25"
         variant={BackgroundVariant.Dots}
         color="var(--color-stroke-sub-300)"
         gap={24}

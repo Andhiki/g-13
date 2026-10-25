@@ -10,10 +10,10 @@ test("focus gathers connections, follows neighbors, and restores semester filter
   const selected = page.locator('[data-id="PACS262201"]');
   const original = await selected.getAttribute("style");
   await selected.getByRole("button").click();
-  await expect(page.locator(".course-node.unrelated")).toHaveCount(0);
-  await expect(page.locator(".map-lane")).toHaveCount(0);
-  await expect(page.locator(".course-node.prerequisite").first()).toBeVisible();
-  await expect(page.locator(".course-node.dependent").first()).toBeVisible();
+  await expect(page.locator("[data-course-state=unrelated]")).toHaveCount(0);
+  await expect(page.locator("[data-map-lane]")).toHaveCount(0);
+  await expect(page.locator("[data-course-state=prerequisite]").first()).toBeVisible();
+  await expect(page.locator("[data-course-state=dependent]").first()).toBeVisible();
   expect(await selected.getAttribute("style")).toBe(original);
   await expect
     .poll(() =>
@@ -30,7 +30,7 @@ test("focus gathers connections, follows neighbors, and restores semester filter
       ),
     )
     .toBe(true);
-  await page.locator(".course-node.prerequisite button").first().click();
+  await page.locator("[data-course-state=prerequisite] button").first().click();
   await expect(page).not.toHaveURL(/mk=PACS262201/);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -104,3 +104,38 @@ test("course gathering eases out without overshoot and respects reduced motion",
   });
   expect(immediateX).toBe(finalX);
 });
+
+for (const theme of ["light", "dark"] as const) {
+  test(`graph styling preserves course states and edge colors in ${theme} mode`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("/?kurikulum=2026");
+    const core = page.locator('[data-course="PACS262201"]');
+    const choice = page.locator('[data-course-kind="choice"]').first();
+    await expect(core).toHaveCSS("width", "246px");
+    await expect(choice).toHaveCSS("opacity", "1");
+    const coreTitle = await core.locator("strong").evaluate((node) => getComputedStyle(node).color);
+    await expect(choice.locator("strong")).not.toHaveCSS("color", coreTitle);
+    await core.getByRole("button").click();
+    const incoming = page.locator('[data-testid="rf__edge-PAKF262105->PACS262201"] path').first();
+    await expect(incoming).toHaveCSS("stroke-width", "2.2px");
+    await expect(incoming).toHaveCSS("stroke-linecap", "round");
+    const prerequisiteHandle = page
+      .locator('[data-course-state="prerequisite"] .react-flow__handle')
+      .first();
+    await expect(prerequisiteHandle).toHaveCSS("width", "7px");
+    const relationshipColor = await prerequisiteHandle.evaluate(
+      (node) => getComputedStyle(node).backgroundColor,
+    );
+    await expect(incoming).toHaveCSS("stroke", relationshipColor);
+    const selectedHandle = core.locator(".react-flow__handle").first();
+    const selectedColor = await selectedHandle.evaluate(
+      (node) => getComputedStyle(node).backgroundColor,
+    );
+    await expect(core.locator('[aria-hidden="true"]')).toHaveCSS("border-top-color", selectedColor);
+    await expect(
+      page.locator('[data-course-kind="choice"][data-course-state="dependent"] strong').first(),
+    ).toHaveCSS("color", coreTitle);
+  });
+}

@@ -37,13 +37,19 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className="m-0 h-full w-full min-w-80 bg-bg-white-0 font-sans text-text-strong-950 [&_.remixicon_path]:origin-center [&_.remixicon_path]:scale-[0.8996] [font-synthesis:none] [text-rendering:optimizeLegibility] [&_a:focus-visible]:outline-3 [&_a:focus-visible]:outline-offset-3 [&_a:focus-visible]:outline-primary-base"
+    >
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-          <div id="root">{children}</div>
+          <div id="root" className="m-0 h-full w-full min-w-80">
+            {children}
+          </div>
         </ThemeProvider>
         <Scripts />
       </body>

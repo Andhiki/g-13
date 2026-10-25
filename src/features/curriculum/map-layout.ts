@@ -77,7 +77,8 @@ export function buildMap(
       id: "lane-semester-" + term,
       type: "lane",
       position: { x: LANE_X + (term - 1) * LANE_STEP, y: 100 },
-      style: { width: LANE_WIDTH, height: 40, zIndex: -1 },
+      className: "w-[270px]! h-10!",
+      zIndex: -1,
       data: {
         kind: "lane",
         title: "Semester " + term,
@@ -101,11 +102,8 @@ export function buildMap(
     id: "lane-choices",
     type: "lane",
     position: { x: choiceStartX, y: 100 },
-    style: {
-      width: CHOICE_COLUMNS * LANE_WIDTH + (CHOICE_COLUMNS - 1) * (LANE_STEP - LANE_WIDTH),
-      height: 40,
-      zIndex: -1,
-    },
+    className: "w-[990px]! h-10!",
+    zIndex: -1,
     data: {
       kind: "lane",
       title: "Pilihan",
@@ -174,14 +172,14 @@ export function buildMap(
         outgoing: (outgoing.get(course.id) ?? []).sort(byVerticalPosition),
         choose,
       },
-      style: { pointerEvents: "all" },
+      className: "pointer-events-auto!",
       zIndex: 2,
     });
   }
 
   const edges: Edge[] = focusedRelations.map((relation) => {
     const isPrerequisite = relation.target === selectedId;
-    const color = isPrerequisite ? "var(--map-prerequisite)" : "var(--map-dependent)";
+    const color = isPrerequisite ? "var(--color-warning-dark)" : "var(--color-feature-dark)";
     return {
       id: relation.source + "->" + relation.target,
       source: relation.source,
@@ -191,7 +189,9 @@ export function buildMap(
       type: "default",
       zIndex: 3,
       markerEnd: { type: MarkerType.ArrowClosed, color },
-      style: { stroke: color, strokeWidth: 2.2, opacity: 1 },
+      className: isPrerequisite
+        ? "[&>path:first-child]:stroke-warning-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]"
+        : "[&>path:first-child]:stroke-feature-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]",
     };
   });
   return { nodes, edges, positions, relationCount: availableRelations.length };

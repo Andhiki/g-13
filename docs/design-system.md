@@ -27,8 +27,7 @@ license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt).
 
 The token stylesheet `src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
 Project surfaces and controls use these tokens. The React Flow canvas, semester lanes, course nodes,
-and relationship edges are the remaining domain-specific visuals and keep their layout in
-`src/styles.css`.
+and relationship edges use Tailwind utilities in their owning components and map definitions.
 
 ## Styling policy
 
@@ -39,8 +38,13 @@ callbacks into AlignUI components without overriding their default styles or beh
 Use custom controls only where AlignUI has no matching component, such as the curriculum graph's
 course nodes and relationship visualization. Keep their custom behavior domain-specific and document
 the exception. Token declarations, font imports, and framework imports remain stylesheet setup.
-The global stylesheet leaves standard control typography and focus styling to Tailwind Preflight and
-AlignUI. It adds focus styling only for links and the app-specific graph-node buttons.
+Use Tailwind for app component styling. Keep global view-transition pseudo-elements, custom
+theme-reveal keyframes, and the reduced-motion safety rule in `src/styles.css`; retain React Flow's
+required vendor stylesheet. The Select viewport's inline `overflowY: undefined` is a Radix
+compatibility override, not component appearance styling.
+Tailwind Preflight and AlignUI provide standard control typography and focus styling. Link focus
+styles are document-level Tailwind descendant variants, and graph buttons define their own
+focus utilities.
 
 Search uses AlignUI Command Menu, curriculum and interest filters use Select, and the theme toggle
 uses Button. The app retains its course matching and routing behavior, and the search control
@@ -59,9 +63,12 @@ the first row, with semester guidance below the title.
 
 ## Curriculum graph styling
 
-Course nodes, semester lanes, connections and canvas dots are domain-specific React Flow
-visuals, so their dynamic state and selectors stay in `src/styles.css`. They use AlignUI theme tokens
-for surfaces, text, selection, and relationship colors. Map zoom and fit buttons are omitted; users navigate through React Flow's
+Course nodes, semester lanes, connections and canvas dots use Tailwind utilities with AlignUI
+theme tokens for surfaces, text, selection, and relationship colors. Course variants are defined
+with `tailwind-variants` in `MapNodes.tsx`. Data attributes identify courses, states, lanes, and the
+map stage for behavior and tests without depending on styling classes. Motion controls course
+position animation; React Flow owns calculated coordinates and SVG marker configuration.
+Map zoom and fit buttons are omitted; users navigate through React Flow's
 pan and zoom gestures. The relationship legend names prerequisite and dependent-course directions, while arrows retain
 the academic prerequisite-to-dependent direction.
 

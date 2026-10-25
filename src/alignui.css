@@ -1,6 +1,7 @@
 /* AlignUI CLI 0.0.19, orange/gray theme. MIT license: ../docs/licenses/alignui.txt. */
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
+  --font-sans: "Inter Variable", "Segoe UI", Arial, sans-serif;
   /* AlignUI Raw Colors */
   --color-gray-950: #171717;
   --color-gray-900: #1c1c1c;
@@ -666,9 +667,4 @@
     height: 0;
     opacity: 0;
   }
-}
-/* Custom styles */
-.remixicon path {
-  transform: scale(0.8996);
-  transform-origin: center;
 }

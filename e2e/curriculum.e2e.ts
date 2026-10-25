@@ -23,7 +23,8 @@ for (const curriculum of [
     await expect(incoming).toBeAttached();
     await expect(incoming).toHaveAttribute("d", /^M.+C/);
     await expect(incoming).toHaveAttribute("marker-end", /url\(.+\)/);
-    await expect(page.locator(".course-node.dependent").first()).toBeAttached();
+    await expect(incoming).toHaveCSS("stroke-width", "2.2px");
+    await expect(page.locator("[data-course-state=dependent]").first()).toBeAttached();
     await expect(details.getByRole("heading", { name: "Lokasi sumber" })).toHaveCount(0);
     await expect(details.getByRole("heading", { name: "Prasyarat", exact: true })).toHaveCount(1);
     await expect(details.getByText("Prasyarat tidak tercantum.", { exact: true })).toHaveCount(0);

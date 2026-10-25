@@ -22,10 +22,17 @@ export function SemesterFilter({
       aria-label="Filter semester"
     >
       <motion.span
-        initial={reducedMotion ? false : { opacity: 0 }}
-        animate={{ opacity: reducedMotion || entered ? 1 : 0 }}
-        transition={{ duration: reducedMotion ? 0 : 0.15 }}
-        className="text-label-sm max-[1100px]:sr-only"
+        initial={reducedMotion ? false : { x: "120%", opacity: 0 }}
+        animate={{
+          x: reducedMotion || entered ? "0%" : "120%",
+          opacity: reducedMotion || entered ? 1 : 0,
+        }}
+        transition={{
+          duration: reducedMotion ? 0 : 0.45,
+          ease: [0.16, 1, 0.3, 1],
+          opacity: { duration: 0 },
+        }}
+        className="relative z-0 text-label-sm max-[1100px]:sr-only"
       >
         Semester
       </motion.span>
@@ -36,7 +43,7 @@ export function SemesterFilter({
         transition={
           reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
         }
-        className="flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:grid max-[1100px]:w-full max-[1100px]:grid-cols-8"
+        className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:grid max-[1100px]:w-full max-[1100px]:grid-cols-8"
       >
         {semesters.map((semester) => (
           <AlignButton.Root

@@ -106,7 +106,23 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
-test("semester switcher finishes its entrance and still filters", async ({ page }) => {
+test("semester switcher finishes its entrance and still filters", async ({ page, isMobile }) => {
+  await page.addInitScript(() => {
+    new MutationObserver((records) => {
+      for (const { target } of records) {
+        if (
+          !(target instanceof HTMLElement) ||
+          target.tagName !== "SPAN" ||
+          target.textContent !== "Semester"
+        )
+          continue;
+        const style = getComputedStyle(target);
+        if (style.opacity === "1" && new DOMMatrixReadOnly(style.transform).m41 > 1) {
+          document.documentElement.dataset.semesterSlides = "true";
+        }
+      }
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style"] });
+  });
   await page.goto("/?kurikulum=2026");
   const switcher = page.getByRole("group", { name: "Filter semester" }).locator("div");
   await expect(switcher).toHaveCSS("opacity", "1");
@@ -114,6 +130,11 @@ test("semester switcher finishes its entrance and still filters", async ({ page 
   await expect(
     page.getByRole("group", { name: "Filter semester" }).getByText("Semester", { exact: true }),
   ).toHaveCSS("opacity", "1");
+  const label = page
+    .getByRole("group", { name: "Filter semester" })
+    .getByText("Semester", { exact: true });
+  await expect(label).toHaveCSS("transform", "none");
+  if (!isMobile) await expect(page.locator("html")).toHaveAttribute("data-semester-slides", "true");
   const semester = page.getByRole("button", { name: "Semester 2", exact: true });
   await semester.click();
   await expect(semester).toHaveAttribute("aria-pressed", "true");

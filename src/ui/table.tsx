@@ -27,10 +27,10 @@ function Head({ className, ...props }: ComponentProps<"th">) {
   );
 }
 
-function Body({ spacing = 8, ...props }: ComponentProps<"tbody"> & { spacing?: number }) {
+function Body(props: ComponentProps<"tbody">) {
   return (
     <>
-      <tbody aria-hidden="true" className="table-row" style={{ height: spacing }} />
+      <tbody aria-hidden="true" className="table-row h-2" />
       <tbody {...props} />
     </>
   );
