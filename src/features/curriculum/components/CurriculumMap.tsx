@@ -13,6 +13,7 @@ import type { CurriculumId } from "../../../data";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import type { Scope } from "../scope";
+import { courseMotion } from "../map-motion";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
@@ -24,16 +25,21 @@ function useAnimatedNodes(nodes: MapNode[]) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const previous = new Map(current.current.map((node) => [node.id, node.position]));
     const starts = nodes.map((node) => previous.get(node.id) ?? node.position);
+    const selected = nodes.find((node) => node.type === "course" && node.data.state === "selected");
+    const paths = nodes.map((node, index) =>
+      courseMotion(
+        starts[index]!,
+        node.position,
+        node.id === selected?.id ? undefined : selected?.position,
+      ),
+    );
     const moving = nodes.some(
       (node, index) => node.position.x !== starts[index]!.x || node.position.y !== starts[index]!.y,
     );
     const update = (progress: number) => {
       const frame = nodes.map((node, index) => ({
         ...node,
-        position: {
-          x: starts[index]!.x + (node.position.x - starts[index]!.x) * progress,
-          y: starts[index]!.y + (node.position.y - starts[index]!.y) * progress,
-        },
+        position: paths[index]!(progress),
       }));
       current.current = frame;
       setDisplayed(frame);

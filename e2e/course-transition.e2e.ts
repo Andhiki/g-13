@@ -40,3 +40,36 @@ test("following an unlocked course keeps its position and moves the camera direc
     Math.max(first.zoom, last.zoom) + 0.001,
   );
 });
+
+test("gathering courses avoid the selected card", async ({ page }) => {
+  await page.goto("/?kurikulum=2026");
+  await expect(page.locator('[data-id="PAKF262106"]')).toBeAttached();
+  const collisions = await page.evaluate(async () => {
+    const selected = document.querySelector<HTMLElement>('[data-id="PAKF262106"]')!;
+    selected.querySelector<HTMLButtonElement>("button")!.click();
+    const collisions: string[] = [];
+    const start = performance.now();
+    await new Promise<void>((resolve) => {
+      const sample = () => {
+        const a = selected.getBoundingClientRect();
+        for (const node of document.querySelectorAll<HTMLElement>(".react-flow__node-course")) {
+          if (node === selected) continue;
+          const b = node.getBoundingClientRect();
+          if (
+            a.left < b.right - 1 &&
+            a.right > b.left + 1 &&
+            a.top < b.bottom - 1 &&
+            a.bottom > b.top + 1
+          ) {
+            collisions.push(node.dataset.id!);
+          }
+        }
+        if (performance.now() - start < 1500) requestAnimationFrame(sample);
+        else resolve();
+      };
+      requestAnimationFrame(sample);
+    });
+    return collisions;
+  });
+  expect(collisions).toEqual([]);
+});
