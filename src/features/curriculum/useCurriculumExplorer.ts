@@ -20,7 +20,7 @@ export function useCurriculumExplorer() {
   );
   const selected = data.all.find((course) => course.id === courseId) ?? null;
   const positions = useRef(new Map<string, { x: number; y: number }>());
-  const [anchor, setAnchor] = useState<{ x: number; y: number }>();
+  const anchor = useRef<{ x: number; y: number } | undefined>(undefined);
 
   const updateUrl = useCallback(
     (version: CurriculumId, id: string | null) => {
@@ -31,14 +31,14 @@ export function useCurriculumExplorer() {
 
   const selectCourse = useCallback(
     (id: string) => {
-      setAnchor(positions.current.get(id));
+      anchor.current = positions.current.get(id);
       updateUrl(curriculum, id);
     },
     [curriculum, updateUrl],
   );
   const navigateToCourse = useCallback(
     (id: string) => {
-      setAnchor(undefined);
+      anchor.current = undefined;
       setGroup("__all__");
       setScope("all");
       updateUrl(curriculum, id);
@@ -48,7 +48,7 @@ export function useCurriculumExplorer() {
   const changeVersion = useCallback(
     (value: string) => {
       const version: CurriculumId = value === "2021" ? "2021" : "2026";
-      setAnchor(undefined);
+      anchor.current = undefined;
       setGroup("__all__");
       setScope("all");
       updateUrl(version, null);
@@ -57,8 +57,9 @@ export function useCurriculumExplorer() {
   );
   const closeDetails = useCallback(() => updateUrl(curriculum, null), [curriculum, updateUrl]);
   const map = useMemo(
-    () => buildMap(data, visible, relations, selected?.id ?? null, scope, selectCourse, anchor),
-    [data, visible, relations, selected?.id, scope, selectCourse, anchor],
+    () =>
+      buildMap(data, visible, relations, selected?.id ?? null, scope, selectCourse, anchor.current),
+    [data, visible, relations, selected?.id, scope, selectCourse],
   );
 
   useEffect(() => {

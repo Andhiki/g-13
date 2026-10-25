@@ -101,6 +101,7 @@ function ViewportFocus({
           {
             duration: reducedMotion ? 0 : 1000,
             ease: (t) => 1 - Math.pow(1 - t, 4),
+            interpolate: "linear",
           },
         );
         return;
