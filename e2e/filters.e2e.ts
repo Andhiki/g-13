@@ -106,7 +106,10 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
-test("semester switcher finishes its entrance and still filters", async ({ page, isMobile }) => {
+test("semester switcher finishes its entrance and navigates without filtering", async ({
+  page,
+  isMobile,
+}) => {
   await page.addInitScript(() => {
     new MutationObserver((records) => {
       for (const { target } of records) {
@@ -124,18 +127,89 @@ test("semester switcher finishes its entrance and still filters", async ({ page,
     }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style"] });
   });
   await page.goto("/?kurikulum=2026");
-  const switcher = page.getByRole("group", { name: "Filter semester" }).locator("div");
+  const switcher = page.getByRole("group", { name: "Navigasi semester" }).locator("div").first();
   await expect(switcher).toHaveCSS("opacity", "1");
   await expect(switcher).toHaveCSS("transform", "none");
   await expect(
-    page.getByRole("group", { name: "Filter semester" }).getByText("Semester", { exact: true }),
+    page.getByRole("group", { name: "Navigasi semester" }).getByText("Semester", { exact: true }),
   ).toHaveCSS("opacity", "1");
   const label = page
-    .getByRole("group", { name: "Filter semester" })
+    .getByRole("group", { name: "Navigasi semester" })
     .getByText("Semester", { exact: true });
   await expect(label).toHaveCSS("transform", "none");
   if (!isMobile) await expect(page.locator("html")).toHaveAttribute("data-semester-slides", "true");
   const semester = page.getByRole("button", { name: "Semester 2", exact: true });
+  const count = await page.locator(".react-flow__node-course").count();
   await semester.click();
   await expect(semester).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".react-flow__node-course")).toHaveCount(count);
+});
+
+test("semester band follows map panning and zooming", async ({ page }) => {
+  await page.goto("/?kurikulum=2026");
+  const buttons = page.getByRole("group", { name: "Navigasi semester" }).getByRole("button");
+  const count = await page.locator(".react-flow__node-course").count();
+  await page.getByRole("button", { name: "Semester 8", exact: true }).click();
+  await expect(buttons.nth(7)).toHaveAttribute("aria-pressed", "true");
+  await expect(buttons.nth(0)).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".react-flow__node-course")).toHaveCount(count);
+  await expect
+    .poll(async () => {
+      const bounds = await page.locator('[data-id="lane-semester-8"]').boundingBox();
+      return Math.round(bounds!.x + bounds!.width / 2);
+    })
+    .toBe(page.viewportSize()!.width / 2);
+  await page.mouse.move(20, 180);
+  await page.mouse.down();
+  await page.mouse.move(page.viewportSize()!.width - 20, 180, { steps: 12 });
+  await page.mouse.up();
+  await expect(buttons.nth(7)).toHaveAttribute("aria-pressed", "false");
+  await page.mouse.move(200, 350);
+  await page.mouse.wheel(0, 2400);
+  await expect(
+    page.locator('[aria-label="Navigasi semester"] button[aria-pressed="true"]'),
+  ).toHaveCount(8);
+  await expect(page.locator("[data-semester-band]")).toHaveCount(1);
+});
+
+test("list semester navigation keeps courses and follows manual scrolling", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?kurikulum=2026");
+  await page.getByRole("button", { name: "Switch View", exact: true }).click();
+  const tables = await page.getByRole("table").count();
+  await page.getByRole("button", { name: "Semester 3", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Semester 3", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.getByRole("table")).toHaveCount(tables);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Math.round(document.getElementById("semester-3")!.getBoundingClientRect().top),
+      ),
+    )
+    .toBeLessThan(130);
+  await page.mouse.move(100, 300);
+  await page.mouse.wheel(0, -20000);
+  await expect(page.getByRole("button", { name: "Semester 1", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
+test("semester navigation respects reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?kurikulum=2026");
+  await page.getByRole("button", { name: "Semester 8", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Semester 8", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Switch View", exact: true }).click();
+  await page.getByRole("button", { name: "Semester 1", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Semester 1", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });

@@ -16,7 +16,11 @@ export function CourseTable({
   const headingId = useId();
 
   return (
-    <section aria-labelledby={headingId}>
+    <section
+      id={section.id}
+      data-semester={section.kind === "semester" ? section.id.replace("semester-", "") : undefined}
+      aria-labelledby={headingId}
+    >
       <div className="mb-3 flex items-baseline justify-between gap-4">
         <h2 id={headingId} className="m-0 text-label-md text-text-strong-950">
           {section.title}

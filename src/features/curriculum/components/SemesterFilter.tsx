@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { AlignButton } from "../../../ui/button";
-import type { Scope } from "../scope";
 
 const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
 
 export function SemesterFilter({
-  scope,
-  onChange,
+  visible,
+  onNavigate,
 }: {
-  scope: Scope;
-  onChange: (scope: Scope) => void;
+  visible: number[];
+  onNavigate: (semester: number) => void;
 }) {
   const reducedMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
@@ -19,7 +18,7 @@ export function SemesterFilter({
     <div
       className="flex min-w-0 items-center gap-3 max-[1100px]:w-full max-[1100px]:max-w-[360px]"
       role="group"
-      aria-label="Filter semester"
+      aria-label="Navigasi semester"
     >
       <motion.span
         initial={reducedMotion ? false : { x: "120%", opacity: 0 }}
@@ -43,23 +42,37 @@ export function SemesterFilter({
         transition={
           reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
         }
-        className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:grid max-[1100px]:w-full max-[1100px]:grid-cols-8"
+        className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:w-full"
       >
-        {semesters.map((semester) => (
-          <AlignButton.Root
-            key={semester}
-            variant={scope === semester ? "primary" : "neutral"}
-            mode={scope === semester ? "lighter" : "ghost"}
-            size="xsmall"
-            className="hover:bg-primary-alpha-16 hover:text-primary-base hover:ring-transparent max-[1100px]:min-w-0 max-[1100px]:px-0"
-            aria-label={`Semester ${semester}`}
-            aria-pressed={scope === semester}
-            title={scope === semester ? "Tampilkan semua semester" : `Semester ${semester}`}
-            onClick={() => onChange(scope === semester ? "all" : semester)}
-          >
-            {semester}
-          </AlignButton.Root>
-        ))}
+        <div className="relative grid w-full grid-cols-8 gap-0.5">
+          <motion.div
+            aria-hidden="true"
+            data-semester-band=""
+            initial={false}
+            animate={{
+              left: `${((visible[0] ?? 1) - 1) * 12.5}%`,
+              width: `${visible.length ? (visible[visible.length - 1]! - visible[0]! + 1) * 12.5 : 0}%`,
+              opacity: visible.length ? 1 : 0,
+            }}
+            transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}
+            className="pointer-events-none absolute inset-y-0 rounded-lg bg-primary-alpha-10"
+          />
+          {semesters.map((semester) => (
+            <AlignButton.Root
+              key={semester}
+              variant={visible.includes(Number(semester)) ? "primary" : "neutral"}
+              mode="ghost"
+              size="xsmall"
+              className="hover:bg-primary-alpha-16 hover:text-primary-base hover:ring-transparent max-[1100px]:min-w-0 max-[1100px]:px-0"
+              aria-label={`Semester ${semester}`}
+              aria-pressed={visible.includes(Number(semester))}
+              title={`Ke semester ${semester}`}
+              onClick={() => onNavigate(Number(semester))}
+            >
+              {semester}
+            </AlignButton.Root>
+          ))}
+        </div>
       </motion.div>
     </div>
   );

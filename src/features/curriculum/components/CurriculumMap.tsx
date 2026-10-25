@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate } from "motion/react";
 import {
   getViewportForBounds,
@@ -9,6 +9,7 @@ import {
   BackgroundVariant,
   ReactFlow,
   useReactFlow,
+  useOnViewportChange,
   type Edge,
   type NodeTypes,
 } from "@xyflow/react";
@@ -92,6 +93,7 @@ function RevealingEdge(props: EdgeProps<Edge<{ progress: number }>>) {
 const edgeTypes = { reveal: RevealingEdge };
 
 function ViewportFocus({
+  navigation,
   focusKey,
   focusTarget,
   scope,
@@ -99,6 +101,7 @@ function ViewportFocus({
   selectedId,
   positions,
 }: {
+  navigation: { semester: number } | null;
   focusKey: string;
   focusTarget: CurriculumId;
   scope: Scope;
@@ -158,6 +161,13 @@ function ViewportFocus({
         });
         return;
       }
+      if (navigation) {
+        setCenter(LANE_X + (navigation.semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
+          zoom: 0.72,
+          duration: reducedMotion ? 0 : 600,
+        });
+        return;
+      }
       if (scope === "choices" || group !== "__all__") {
         setCenter(LANE_X + 8 * LANE_STEP + 430, 350, {
           zoom: 0.58,
@@ -183,11 +193,75 @@ function ViewportFocus({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [focusKey, focusTarget, scope, group, selectedId, positions, setCenter, setViewport]);
+  }, [
+    navigation,
+    focusKey,
+    focusTarget,
+    scope,
+    group,
+    selectedId,
+    positions,
+    setCenter,
+    setViewport,
+  ]);
+  return null;
+}
+
+function SemesterViewport({
+  selectedId,
+  onVisibleSemesters,
+}: {
+  selectedId: string | null;
+  onVisibleSemesters: (semesters: number[]) => void;
+}) {
+  const flow = useReactFlow();
+  const update = useCallback(() => {
+    if (selectedId) {
+      onVisibleSemesters([]);
+      return;
+    }
+    const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
+    const viewport = flow.getViewport();
+    const semesters: number[] = [];
+    const nodes = flow.getNodes();
+    const top = window.matchMedia("(width < 1100px)").matches ? 116 : 76;
+    for (let semester = 1; semester <= 8; semester++) {
+      const laneX = LANE_X + (semester - 1) * LANE_STEP;
+      const left = viewport.x + laneX * viewport.zoom;
+      const width = LANE_WIDTH * viewport.zoom;
+      const bottom = Math.max(
+        140,
+        ...nodes
+          .filter(
+            (node) =>
+              node.type === "course" &&
+              node.position.x >= laneX &&
+              node.position.x < laneX + LANE_WIDTH,
+          )
+          .map((node) => node.position.y + 82),
+      );
+      if (
+        Math.min(stage.width, left + width) - Math.max(0, left) >= width / 2 &&
+        viewport.y + bottom * viewport.zoom > top &&
+        viewport.y + 100 * viewport.zoom < stage.height
+      ) {
+        semesters.push(semester);
+      }
+    }
+    onVisibleSemesters(semesters);
+  }, [flow, selectedId, onVisibleSemesters]);
+  useOnViewportChange({ onChange: update });
+  useEffect(() => {
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [update]);
   return null;
 }
 
 export function CurriculumMap({
+  navigation,
+  onVisibleSemesters,
   close,
   curriculum,
   scope,
@@ -197,6 +271,8 @@ export function CurriculumMap({
   edges,
   positions,
 }: {
+  navigation: { semester: number } | null;
+  onVisibleSemesters: (semesters: number[]) => void;
   close: () => void;
   curriculum: CurriculumId;
   scope: Scope;
@@ -233,6 +309,7 @@ export function CurriculumMap({
       aria-label="Peta kurikulum Ilmu Komputer UGM"
     >
       <ViewportFocus
+        navigation={navigation}
         focusKey={focusKey}
         focusTarget={curriculum}
         scope={scope}
@@ -240,6 +317,7 @@ export function CurriculumMap({
         selectedId={selectedId}
         positions={positions}
       />
+      <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
       <Background
         className="bg-bg-weak-25"
         variant={BackgroundVariant.Dots}

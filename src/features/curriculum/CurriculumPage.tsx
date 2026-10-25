@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { CourseDetails } from "./components/CourseDetails";
 import { ChoiceGroupFilter, CurriculumVersionFilter } from "./components/CourseFilters";
@@ -13,6 +14,16 @@ export function CurriculumPage() {
   const explorer = useCurriculumExplorer();
   const { curriculum, data, relations, visible, selected, group, scope, view, map } = explorer;
 
+  const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
+  const [semesterNavigation, setSemesterNavigation] = useState<{ semester: number } | null>(null);
+  const reportSemesters = useCallback((next: number[]) => {
+    setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
+  }, []);
+  const navigateToSemester = (semester: number) => {
+    explorer.closeDetails();
+    setSemesterNavigation({ semester });
+  };
+
   return (
     <div
       className={
@@ -23,7 +34,12 @@ export function CurriculumPage() {
     >
       <Overlay
         controlsLabel="Filter peta kurikulum"
-        navigation={<SemesterFilter scope={scope} onChange={explorer.setScope} />}
+        navigation={
+          <SemesterFilter
+            visible={view === "map" && selected ? [] : visibleSemesters}
+            onNavigate={navigateToSemester}
+          />
+        }
         viewControl={<ViewSwitch view={view} onViewChange={explorer.setView} />}
         appearance={<ThemeSwitch />}
         search={
@@ -34,8 +50,21 @@ export function CurriculumPage() {
           />
         }
       >
-        <CurriculumVersionFilter curriculum={curriculum} onChange={explorer.changeVersion} />
-        <ChoiceGroupFilter data={data} group={group} onChange={explorer.setGroup} />
+        <CurriculumVersionFilter
+          curriculum={curriculum}
+          onChange={(value) => {
+            setSemesterNavigation(null);
+            explorer.changeVersion(value);
+          }}
+        />
+        <ChoiceGroupFilter
+          data={data}
+          group={group}
+          onChange={(value) => {
+            setSemesterNavigation(null);
+            explorer.setGroup(value);
+          }}
+        />
       </Overlay>
 
       <main
@@ -48,6 +77,8 @@ export function CurriculumPage() {
       >
         {view === "map" ? (
           <CurriculumMap
+            navigation={semesterNavigation}
+            onVisibleSemesters={reportSemesters}
             close={explorer.closeDetails}
             curriculum={curriculum}
             scope={scope}
@@ -67,6 +98,8 @@ export function CurriculumPage() {
                 </span>
               </div>
               <CourseList
+                navigation={semesterNavigation}
+                onVisibleSemesters={reportSemesters}
                 courses={visible}
                 selectedId={selected?.id ?? null}
                 select={explorer.selectCourse}

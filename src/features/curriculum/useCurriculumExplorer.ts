@@ -10,7 +10,7 @@ export function useCurriculumExplorer() {
   const { kurikulum: curriculum, mk: courseId } = route.useSearch();
   const navigate = route.useNavigate();
   const [group, setGroup] = useState("__all__");
-  const [scope, setScope] = useState<Scope>("all");
+  const scope: Scope = "all";
   const [view, setView] = useState<"map" | "list">("map");
   const data = curricula[curriculum];
   const relations = useMemo(() => deriveRelations(data), [data]);
@@ -40,7 +40,6 @@ export function useCurriculumExplorer() {
     (id: string) => {
       anchor.current = undefined;
       setGroup("__all__");
-      setScope("all");
       updateUrl(curriculum, id);
     },
     [curriculum, updateUrl],
@@ -50,7 +49,6 @@ export function useCurriculumExplorer() {
       const version: CurriculumId = value === "2021" ? "2021" : "2026";
       anchor.current = undefined;
       setGroup("__all__");
-      setScope("all");
       updateUrl(version, null);
     },
     [updateUrl],
@@ -78,10 +76,6 @@ export function useCurriculumExplorer() {
     map,
     setGroup: (value: string) => {
       setGroup(value);
-      closeDetails();
-    },
-    setScope: (value: Scope) => {
-      setScope(value);
       closeDetails();
     },
     setView,

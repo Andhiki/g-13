@@ -41,7 +41,7 @@ for (const curriculum of [
     expect(errors).toEqual([]);
   });
 
-  test(`${curriculum.edition}: search by keyboard, filter the list, and retain the theme after reload`, async ({
+  test(`${curriculum.edition}: search by keyboard, navigate the list, and retain the theme after reload`, async ({
     page,
     isMobile,
   }) => {
@@ -81,7 +81,7 @@ for (const curriculum of [
       "aria-pressed",
       "true",
     );
-    await expect(religionCourses).toHaveCount(0);
+    await expect(religionCourses.first()).toBeAttached();
     await page
       .getByRole("button", { name: "Buka detail Algoritma dan Struktur Data", exact: true })
       .click();

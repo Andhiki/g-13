@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("focus gathers connections, follows neighbors, and restores semester filters", async ({
+test("focus gathers connections, follows neighbors, and restores semester navigation", async ({
   page,
   isMobile,
 }) => {
