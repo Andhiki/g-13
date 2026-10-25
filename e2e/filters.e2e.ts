@@ -105,3 +105,16 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
+
+test("semester switcher finishes its entrance and still filters", async ({ page }) => {
+  await page.goto("/?kurikulum=2026");
+  const switcher = page.getByRole("group", { name: "Filter semester" }).locator("div");
+  await expect(switcher).toHaveCSS("opacity", "1");
+  await expect(switcher).toHaveCSS("transform", "none");
+  await expect(
+    page.getByRole("group", { name: "Filter semester" }).getByText("Semester", { exact: true }),
+  ).toHaveCSS("opacity", "1");
+  const semester = page.getByRole("button", { name: "Semester 2", exact: true });
+  await semester.click();
+  await expect(semester).toHaveAttribute("aria-pressed", "true");
+});

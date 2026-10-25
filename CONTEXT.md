@@ -4,6 +4,10 @@ Proyek komunitas publik untuk membantu mahasiswa S1 Ilmu Komputer UGM memahami a
 
 ## Language
 
+**Mata kuliah terhubung**:
+Mata kuliah yang menjadi prasyarat langsung bagi mata kuliah yang dipilih, atau yang secara langsung mensyaratkan mata kuliah tersebut. Tidak mencakup hubungan tidak langsung melalui mata kuliah lain.
+_Avoid_: Seluruh rantai prasyarat
+
 **Peta kurikulum**:
 Representasi mata kuliah dan hubungan prasyarat dalam suatu versi kurikulum.
 _Avoid_: KRS, jadwal kuliah

@@ -99,40 +99,47 @@ a:focus-visible {
 }
 .course-node {
   width: 246px;
-  border: 1px solid var(--color-stroke-soft-200);
-  border-radius: 10px;
-  background: var(--color-bg-white-0);
-  transition:
-    border-color 0.14s ease,
-    background-color 0.14s ease,
-    opacity 0.14s ease;
+  --course-border: var(--color-stroke-soft-200);
+  --course-bg: var(--color-bg-white-0);
+  position: relative;
+  transition: opacity 0.14s ease;
+}
+.course-node::before {
+  position: absolute;
+  inset: 24px 0 0;
+  border: 1px solid var(--course-border);
+  border-radius: 0 8px 8px 8px;
+  background: var(--course-bg);
+  content: "";
+  pointer-events: none;
 }
 .course-node:hover {
-  border-color: var(--color-stroke-sub-300);
-  background: var(--color-bg-weak-50);
+  --course-border: var(--color-stroke-sub-300);
+  --course-bg: var(--color-bg-weak-50);
 }
 .course-node.selected {
-  border-color: var(--color-primary-base);
-  background: var(--color-primary-lighter);
+  --course-border: var(--color-primary-base);
+  --course-bg: var(--color-primary-lighter);
 }
 .course-node.prerequisite {
-  border-color: var(--map-prerequisite);
+  --course-border: var(--map-prerequisite);
 }
 .course-node.dependent {
-  border-color: var(--map-dependent);
+  --course-border: var(--map-dependent);
 }
 .course-node.unrelated {
   opacity: 0.42;
 }
 .course-node > button {
+  position: relative;
   display: flex;
   width: 100%;
-  height: 80px;
+  height: 82px;
   flex-direction: column;
   align-items: stretch;
-  padding: 10px 12px;
+  padding: 34px 12px 10px;
   border: 0;
-  border-radius: inherit;
+  border-radius: 8px;
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -142,10 +149,10 @@ a:focus-visible {
   outline-offset: 3px;
 }
 .course-node-top {
+  position: absolute;
+  inset: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
 }
 .course-node-top > span {
   overflow: hidden;
@@ -154,15 +161,26 @@ a:focus-visible {
   line-height: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;
+  height: 25px;
+  padding: 3px 12px 0;
+  border: 1px solid var(--course-border);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--course-bg);
+}
+.course-node-top > span:first-child {
+  max-width: calc(100% - 72px);
 }
 .course-node-top > .course-node-credits {
+  margin-left: -1px;
+  background: color-mix(in srgb, var(--color-bg-weak-50) 65%, var(--course-bg));
   flex: none;
   font-weight: 400;
 }
 .course-node strong {
   display: -webkit-box;
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: 0;
   color: var(--color-text-strong-950);
   font-size: 14px;
   font-weight: 500;

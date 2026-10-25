@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { curricula, deriveRelations, type CurriculumId } from "../../data";
 import { coursesForScope, type Scope } from "./scope";
@@ -18,11 +18,9 @@ export function useCurriculumExplorer() {
     () => coursesForScope(data, relations, group, scope),
     [data, relations, group, scope],
   );
-  const visibleIds = useMemo(() => new Set(visible.map((course) => course.id)), [visible]);
-  const selected =
-    courseId && visibleIds.has(courseId)
-      ? (data.all.find((course) => course.id === courseId) ?? null)
-      : null;
+  const selected = data.all.find((course) => course.id === courseId) ?? null;
+  const positions = useRef(new Map<string, { x: number; y: number }>());
+  const [anchor, setAnchor] = useState<{ x: number; y: number }>();
 
   const updateUrl = useCallback(
     (version: CurriculumId, id: string | null) => {
@@ -31,16 +29,16 @@ export function useCurriculumExplorer() {
     [navigate],
   );
 
-  useEffect(() => {
-    if (courseId && !visibleIds.has(courseId)) updateUrl(curriculum, null);
-  }, [courseId, visibleIds, curriculum, updateUrl]);
-
   const selectCourse = useCallback(
-    (id: string) => updateUrl(curriculum, id),
+    (id: string) => {
+      setAnchor(positions.current.get(id));
+      updateUrl(curriculum, id);
+    },
     [curriculum, updateUrl],
   );
   const navigateToCourse = useCallback(
     (id: string) => {
+      setAnchor(undefined);
       setGroup("__all__");
       setScope("all");
       updateUrl(curriculum, id);
@@ -50,6 +48,7 @@ export function useCurriculumExplorer() {
   const changeVersion = useCallback(
     (value: string) => {
       const version: CurriculumId = value === "2021" ? "2021" : "2026";
+      setAnchor(undefined);
       setGroup("__all__");
       setScope("all");
       updateUrl(version, null);
@@ -58,9 +57,13 @@ export function useCurriculumExplorer() {
   );
   const closeDetails = useCallback(() => updateUrl(curriculum, null), [curriculum, updateUrl]);
   const map = useMemo(
-    () => buildMap(data, visible, relations, selected?.id ?? null, scope, selectCourse),
-    [data, visible, relations, selected?.id, scope, selectCourse],
+    () => buildMap(data, visible, relations, selected?.id ?? null, scope, selectCourse, anchor),
+    [data, visible, relations, selected?.id, scope, selectCourse, anchor],
   );
+
+  useEffect(() => {
+    positions.current = map.positions;
+  }, [map.positions]);
 
   return {
     curriculum,
@@ -72,8 +75,14 @@ export function useCurriculumExplorer() {
     scope,
     view,
     map,
-    setGroup,
-    setScope,
+    setGroup: (value: string) => {
+      setGroup(value);
+      closeDetails();
+    },
+    setScope: (value: Scope) => {
+      setScope(value);
+      closeDetails();
+    },
     setView,
     changeVersion,
     selectCourse,

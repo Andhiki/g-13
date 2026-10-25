@@ -20,7 +20,8 @@ for (const curriculum of [
     const incoming = page.locator(
       `[data-testid="rf__edge-${curriculum.prerequisite}->${curriculum.selected}"] .react-flow__edge-path`,
     );
-    await expect(incoming).toBeVisible();
+    await expect(incoming).toBeAttached();
+    await expect(incoming).toHaveAttribute("d", /^M.+C/);
     await expect(incoming).toHaveAttribute("marker-end", /url\(.+\)/);
     await expect(page.locator(".course-node.dependent").first()).toBeAttached();
     await expect(details.getByRole("heading", { name: "Lokasi sumber" })).toHaveCount(0);

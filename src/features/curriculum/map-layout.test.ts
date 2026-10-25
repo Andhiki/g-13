@@ -21,7 +21,12 @@ for (const data of Object.values(curricula)) {
       expect(states.get(selected)).toBe("selected");
       expect(states.get(prerequisite)).toBe("prerequisite");
       expect(states.get(dependent)).toBe("dependent");
-      expect([...states.values()]).toContain("unrelated");
+      expect([...states.values()]).not.toContain("unrelated");
+      expect(map.nodes.every((node) => node.type === "course")).toBe(true);
+      const overview = buildMap(data, visible, relations, null, "2", () => {});
+      expect(map.positions.get(selected)).toEqual(overview.positions.get(selected));
+      expect(map.positions.get(prerequisite)!.x).toBeLessThan(map.positions.get(selected)!.x);
+      expect(map.positions.get(dependent)!.x).toBeGreaterThan(map.positions.get(selected)!.x);
       expect(map.edges).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ source: prerequisite, target: selected }),
@@ -50,6 +55,7 @@ for (const data of Object.values(curricula)) {
         incoming: [],
         outgoing: [],
       });
+      expect(map.nodes).toHaveLength(1);
       expect(map.edges).toEqual([]);
       const overview = buildMap(data, data.all, relations, null, "all", () => {});
       expect(overview.edges).toEqual([]);
@@ -61,3 +67,25 @@ for (const data of Object.values(curricula)) {
     });
   });
 }
+
+test("focus includes connections outside filters and preserves a clicked neighbor position", () => {
+  const data = curricula["2026"];
+  const relations = deriveRelations(data);
+  const selected = data.all.find((course) => course.id === "PACS262201")!;
+  const first = buildMap(data, [selected], relations, selected.id, "2", () => {});
+  expect(first.nodes.length).toBeGreaterThan(1);
+  const neighbor = first.nodes.find((node) => node.id !== selected.id)!;
+  const next = buildMap(data, [selected], relations, neighbor.id, "2", () => {}, neighbor.position);
+  expect(next.positions.get(neighbor.id)).toEqual(neighbor.position);
+  expect(
+    next.nodes.every(
+      (node) =>
+        node.id === neighbor.id ||
+        relations.some(
+          (edge) =>
+            (edge.source === neighbor.id && edge.target === node.id) ||
+            (edge.target === neighbor.id && edge.source === node.id),
+        ),
+    ),
+  ).toBe(true);
+});

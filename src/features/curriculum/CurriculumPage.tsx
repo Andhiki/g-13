@@ -45,6 +45,7 @@ export function CurriculumPage() {
       >
         {view === "map" ? (
           <CurriculumMap
+            close={explorer.closeDetails}
             curriculum={curriculum}
             scope={scope}
             group={group}
@@ -75,7 +76,7 @@ export function CurriculumPage() {
           course={selected}
           data={data}
           relations={relations}
-          select={explorer.navigateToCourse}
+          select={explorer.selectCourse}
           close={explorer.closeDetails}
         />
       </main>

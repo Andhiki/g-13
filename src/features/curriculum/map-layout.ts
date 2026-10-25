@@ -35,13 +35,24 @@ export function buildMap(
   selectedId: string | null,
   scope: Scope,
   choose: (id: string) => void,
+  anchor?: { x: number; y: number },
 ): {
   nodes: MapNode[];
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
   relationCount: number;
 } {
-  const visibleIds = new Set(visible.map((course) => course.id));
+  const focusedRelations = selectedId
+    ? relations.filter(
+        (relation) => relation.source === selectedId || relation.target === selectedId,
+      )
+    : [];
+  const focusedIds = new Set([
+    selectedId,
+    ...focusedRelations.flatMap((relation) => [relation.source, relation.target]),
+  ]);
+  const courses = selectedId ? data.all.filter((course) => focusedIds.has(course.id)) : visible;
+  const visibleIds = new Set(courses.map((course) => course.id));
   const choiceStartX = LANE_X + 8 * LANE_STEP;
   const layoutCore = new Map<number, Course[]>();
   for (let term = 1; term <= 8; term += 1) {
@@ -118,11 +129,23 @@ export function buildMap(
   const availableRelations = relations.filter(
     (relation) => visibleIds.has(relation.source) && visibleIds.has(relation.target),
   );
-  const focusedRelations = selectedId
-    ? availableRelations.filter(
-        (relation) => relation.source === selectedId || relation.target === selectedId,
-      )
-    : [];
+  if (selectedId) {
+    nodes.length = 0;
+    const center = anchor ?? positions.get(selectedId)!;
+    positions.set(selectedId, center);
+    for (const side of ["source", "target"] as const) {
+      const neighbors = focusedRelations
+        .filter((relation) => relation[side] !== selectedId)
+        .map((relation) => relation[side])
+        .sort((a, b) => (positions.get(a)?.y ?? 0) - (positions.get(b)?.y ?? 0));
+      neighbors.forEach((id, index) => {
+        positions.set(id, {
+          x: center.x + (side === "source" ? -LANE_STEP : LANE_STEP),
+          y: center.y + (index - (neighbors.length - 1) / 2) * ROW_STEP,
+        });
+      });
+    }
+  }
   const incoming = new Map<string, string[]>();
   const outgoing = new Map<string, string[]>();
   for (const relation of focusedRelations) {
@@ -131,7 +154,7 @@ export function buildMap(
   }
   const byVerticalPosition = (left: string, right: string) =>
     (positions.get(left)?.y ?? 0) - (positions.get(right)?.y ?? 0);
-  for (const course of visible) {
+  for (const course of courses) {
     const position = positions.get(course.id);
     if (!position) continue;
     nodes.push({

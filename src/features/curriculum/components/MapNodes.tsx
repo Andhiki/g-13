@@ -7,14 +7,8 @@ export function CourseNode({ data }: NodeProps<Node<CourseNodeData, "course">>) 
   const credit = creditsFor(course);
   return (
     <div className={"course-node" + (data.state ? " " + data.state : "")}>
-      {data.incoming.map((id, index) => (
-        <Handle
-          key={id}
-          id={"in:" + id}
-          type="target"
-          position={Position.Left}
-          style={{ top: `${((index + 1) / (data.incoming.length + 1)) * 100}%` }}
-        />
+      {data.incoming.map((id) => (
+        <Handle key={id} id={"in:" + id} type="target" position={Position.Left} />
       ))}
       <button
         type="button"
@@ -28,14 +22,8 @@ export function CourseNode({ data }: NodeProps<Node<CourseNodeData, "course">>) 
         </div>
         <strong>{course.title}</strong>
       </button>
-      {data.outgoing.map((id, index) => (
-        <Handle
-          key={id}
-          id={"out:" + id}
-          type="source"
-          position={Position.Right}
-          style={{ top: `${((index + 1) / (data.outgoing.length + 1)) * 100}%` }}
-        />
+      {data.outgoing.map((id) => (
+        <Handle key={id} id={"out:" + id} type="source" position={Position.Right} />
       ))}
     </div>
   );
