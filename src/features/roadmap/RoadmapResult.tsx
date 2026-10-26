@@ -1,7 +1,8 @@
+import { motion, useReducedMotion } from "motion/react";
 import { Typography } from "../../ui/typography";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine, RiShareLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiShareLine, RiCheckLine, RiRestartLine } from "@remixicon/react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { AlignModal } from "../../ui/modal";
 import { Overlay } from "../curriculum/components/Overlay";
@@ -9,7 +10,7 @@ import { SemesterFilter } from "../curriculum/components/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
 import { curricula } from "../../data";
-import { AlignButton } from "../../ui/button";
+import { AlignButton, buttonVariants } from "../../ui/button";
 import { CourseDetails } from "../curriculum/components/CourseDetails";
 import { buildRoadmap } from "./planner";
 import { RoadmapGraph } from "./RoadmapGraph";
@@ -37,6 +38,12 @@ export function RoadmapResult({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
   const [share, setShare] = useState<"idle" | "copied" | "manual">("idle");
+  const reducedMotion = useReducedMotion();
+  useEffect(() => {
+    if (share !== "copied") return;
+    const timer = window.setTimeout(() => setShare("idle"), 2000);
+    return () => window.clearTimeout(timer);
+  }, [share]);
   const selected = plan.courses.find((x) => x.course.id === selectedId);
   const data = curricula[answers.kurikulum ?? "2026"];
   const detailsData = useMemo(
@@ -82,15 +89,29 @@ export function RoadmapResult({
           description: "Bandingkan target selesai dan waktu kegiatan.",
         }}
         home={
-          <Link
-            to="/"
-            search={{ kurikulum: answers.kurikulum ?? "2026" }}
-            aria-label="Peta kurikulum"
-            className="pointer-events-auto flex h-10 items-center gap-2 text-label-sm text-text-sub-600 hover:text-text-strong-950"
-          >
-            <RiArrowLeftLine className="size-5" aria-hidden="true" />
-            <span className="max-[1100px]:hidden">Peta kurikulum</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              search={{ kurikulum: answers.kurikulum ?? "2026" }}
+              className={buttonVariants({
+                variant: "neutral",
+                mode: "stroke",
+                className: "pointer-events-auto",
+              })}
+            >
+              <RiArrowLeftLine className="size-5" aria-hidden="true" />
+              Kembali
+            </Link>
+            <AlignButton.Root
+              variant="neutral"
+              mode="stroke"
+              className="pointer-events-auto size-10 p-2.5"
+              aria-label="Mulai lagi"
+              onClick={restart}
+            >
+              <RiRestartLine className="size-5" aria-hidden="true" />
+            </AlignButton.Root>
+          </div>
         }
         navigation={
           <SemesterFilter
@@ -102,12 +123,41 @@ export function RoadmapResult({
             lastSemester={Math.max(answers.lulus, ...plan.courses.map((x) => x.semester))}
           />
         }
-        appearance={<ThemeSwitch />}
+        appearance={null}
         search={
-          <div className="flex justify-end">
-            <AlignButton.Root variant="neutral" mode="stroke" onClick={copyLink}>
-              <RiShareLine className="size-5" aria-hidden="true" />
-              {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
+          <div className="flex items-center justify-end gap-2">
+            <ThemeSwitch />
+            <AlignButton.Root
+              variant="neutral"
+              mode="stroke"
+              onClick={copyLink}
+              className="max-[650px]:size-10 max-[650px]:p-2.5"
+            >
+              <span className="relative size-5" aria-hidden="true">
+                {[
+                  { Icon: RiShareLine, active: share !== "copied" || sharedPlan !== answers },
+                  { Icon: RiCheckLine, active: share === "copied" && sharedPlan === answers },
+                ].map(({ Icon, active }, index) => (
+                  <motion.span
+                    key={index}
+                    initial={false}
+                    className="absolute inset-0"
+                    animate={{
+                      opacity: active ? 1 : 0,
+                      scale: active || reducedMotion ? 1 : 0.25,
+                      filter: active || reducedMotion ? "blur(0px)" : "blur(4px)",
+                    }}
+                    transition={
+                      reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
+                    }
+                  >
+                    <Icon className="size-5" />
+                  </motion.span>
+                ))}
+              </span>
+              <span className="max-[650px]:sr-only">
+                {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
+              </span>
             </AlignButton.Root>
           </div>
         }
@@ -115,12 +165,7 @@ export function RoadmapResult({
           <RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={data.sourceTitle} />
         }
       >
-        <RoadmapFilters
-          answers={answers}
-          totalCredits={plan.totalCredits}
-          update={update}
-          restart={restart}
-        />
+        <RoadmapFilters answers={answers} update={update} />
       </Overlay>
       <span className="sr-only" role="status">
         {share === "copied" && sharedPlan === answers ? "Tautan roadmap disalin." : ""}

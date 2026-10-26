@@ -193,8 +193,14 @@ function ViewportFocus({
         return;
       }
       const phone = window.matchMedia("(width < 650px)").matches;
-      setCenter(phone ? 250 : 900, 360, {
-        zoom: phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
+      const title = document.querySelector<HTMLElement>("[data-map-title]")!;
+      const heading = title.querySelector("h1")!;
+      const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
+      setCenter(LANE_X + 12 + title.offsetWidth / 2, title.offsetTop + heading.offsetHeight / 2, {
+        zoom: Math.min(
+          phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
+          (stage.width - 32) / title.offsetWidth,
+        ),
         duration: reducedMotion ? 0 : 1000,
       });
     }, 30);
@@ -337,7 +343,8 @@ export function CurriculumMap({
         <ViewportPortal>
           {selectedId === null && (
             <div
-              className="absolute -top-[72px] flex flex-col items-start gap-4 max-[650px]:-top-8"
+              data-map-title
+              className="absolute -top-[144px] flex flex-col items-start gap-4 max-[650px]:-top-[104px]"
               style={{ left: LANE_X + 12 }}
             >
               <Typography

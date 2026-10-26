@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { RiCheckboxLine, RiFileCopyLine } from "@remixicon/react";
+import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
 import { CompactButton } from "../../../ui/compact-button";
 import { AlignTooltip } from "../../../ui/tooltip";
 
@@ -19,7 +19,7 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
       : status === "error"
         ? "Gagal menyalin. Coba lagi."
         : "Salin ID mata kuliah";
-  const Icon = status === "copied" ? RiCheckboxLine : RiFileCopyLine;
+  const Icon = status === "copied" ? RiCheckLine : RiFileCopyLine;
   const hidden = {
     opacity: 0,
     scale: reducedMotion ? 1 : 0.25,
@@ -40,7 +40,7 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
               }
             }}
           >
-            <span className="grid size-5" aria-hidden="true">
+            <span className="grid size-4" aria-hidden="true">
               <AnimatePresence initial={false}>
                 <motion.span
                   key={status === "copied" ? "copied" : "copy"}
@@ -52,13 +52,15 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
                     reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
                   }
                 >
-                  <Icon className="size-5" />
+                  <Icon className="size-4" />
                 </motion.span>
               </AnimatePresence>
             </span>
           </CompactButton>
         </AlignTooltip.Trigger>
-        <AlignTooltip.Content side="bottom">{label}</AlignTooltip.Content>
+        <AlignTooltip.Content size="xsmall" side="bottom">
+          {label}
+        </AlignTooltip.Content>
       </AlignTooltip.Root>
       <span role="status" className="sr-only">
         {status === "idle" ? "" : label}

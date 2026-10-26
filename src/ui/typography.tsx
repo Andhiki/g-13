@@ -5,15 +5,15 @@ export const typographyVariants = tv(
   {
     variants: {
       variant: {
-        title: "text-title-h4",
-        subtitle1: "text-label-lg",
-        subtitle2: "text-label-md",
+        title: "font-display text-title-h4",
+        subtitle1: "font-display text-label-lg",
+        subtitle2: "font-display text-label-md",
         paragraph: "text-paragraph-sm",
         caption: "text-paragraph-xs",
         label: "text-label-sm",
         labelSmall: "text-label-xs",
-        graphTitle: "text-[72px] font-semibold tracking-[-0.03em] max-[650px]:text-[30px]",
-        question: "text-[26px] font-semibold leading-tight tracking-[-0.03em] sm:text-[32px]",
+        graphTitle: "font-display text-title-h1 max-[650px]:text-title-h4",
+        question: "font-display text-title-h5 sm:text-title-h4",
       },
     },
     defaultVariants: { variant: "paragraph" },
@@ -63,6 +63,9 @@ export function Typography<T extends TextElement = "p">({
 }: TypographyProps<T>) {
   return createElement(as ?? "p", {
     ...props,
-    className: typographyVariants({ variant, className }),
+    className: typographyVariants({
+      variant,
+      className: [as?.startsWith("h") && "font-display", className],
+    }),
   });
 }

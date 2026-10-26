@@ -9,7 +9,7 @@ async function advance(page: Page, answer: RegExp) {
 }
 async function openFilters(page: Page) {
   await expect(page.locator('[role="dialog"][data-state="closed"]')).toHaveCount(0);
-  if (!(await page.getByRole("combobox", { name: "Target selesai", exact: true }).isVisible()))
+  if (!(await page.getByRole("tablist", { name: "Target selesai", exact: true }).isVisible()))
     await page.getByRole("button", { name: "Buka filter roadmap", exact: true }).click();
 }
 async function closeFilters(page: Page) {
@@ -18,8 +18,7 @@ async function closeFilters(page: Page) {
 }
 async function chooseTarget(page: Page, target: number) {
   await openFilters(page);
-  await page.getByRole("combobox", { name: "Target selesai", exact: true }).click();
-  await page.getByRole("option", { name: `${target} semester`, exact: true }).click();
+  await page.getByRole("tab", { name: `${target} semester`, exact: true }).click();
   await closeFilters(page);
 }
 
@@ -37,8 +36,7 @@ test("roadmap filter applies immediately and closes from its header", async ({
   const dialog = page.getByRole("dialog", { name: "Filter roadmap" });
   await expect(dialog).toBeVisible();
   await expect(page.getByRole("button", { name: "Tampilkan roadmap", exact: true })).toHaveCount(0);
-  await page.getByRole("combobox", { name: "Target selesai", exact: true }).click();
-  await page.getByRole("option", { name: "7 semester", exact: true }).click();
+  await page.getByRole("tab", { name: "7 semester", exact: true }).click();
   await expect(page).toHaveURL(/lulus=7/);
   await expect(dialog).toBeVisible();
   await closeFilters(page);
@@ -80,7 +78,7 @@ for (const curriculum of ["2026", "2021"])
         .getByRole("heading", { name: "Roadmap kuliah", exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("combobox", { name: "Target selesai", exact: true }),
+      page.getByRole("tablist", { name: "Target selesai", exact: true }),
     ).not.toBeVisible();
     const viewport = await page.locator(".react-flow").boundingBox();
     expect(viewport?.x).toBe(0);
@@ -132,7 +130,7 @@ for (const curriculum of ["2026", "2021"])
     await expect(
       page.getByRole("dialog").getByRole("heading", { name: "Asumsi dan sumber" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Tutup catatan roadmap", exact: true }).click();
+    await page.getByRole("button", { name: "Tutup dialog", exact: true }).click();
     expect(
       await page.evaluate(
         () =>
@@ -300,12 +298,11 @@ test("quiz layout, saved answers, shared links, and deliberate restart", async (
   await expect(page).toHaveURL(savedUrl);
   await expect(
     page.getByRole("button", { name: "Bagikan", exact: true }).locator("svg"),
-  ).toHaveCount(1);
+  ).toHaveCount(2);
   await page.goto(
     "/roadmap?kurikulum=2021&minat=Lab%20Rekayasa%20Perangkat%20Lunak%20dan%20Data&iup=tidak&magang=tidak&hasil=true&lulus=8",
   );
   await expect(page).toHaveURL(/kurikulum=(?:%22)?2021/);
-  await openFilters(page);
   await page.getByRole("button", { name: "Mulai lagi", exact: true }).click();
   await expect(page.getByRole("button", { name: "Lanjut", exact: true })).toBeDisabled();
   await page.goto("/roadmap");
@@ -324,4 +321,33 @@ test("quiz works with invalid or unavailable storage", async ({ page }) => {
   });
   await advance(page, /^2026$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kamu mahasiswa IUP?");
+});
+
+test("roadmap opens on a centered title and shares with a check icon", async ({ page }) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => {} },
+    }),
+  );
+  await page.goto(
+    "/roadmap?kurikulum=2026&minat=Analisis%20Data&iup=tidak&magang=tidak&hasil=true",
+  );
+  const title = page.getByRole("heading", { name: "Roadmap kuliah", exact: true });
+  await expect
+    .poll(async () => {
+      const box = await title.boundingBox();
+      return Math.abs(box!.x + box!.width / 2 - page.viewportSize()!.width / 2);
+    })
+    .toBeLessThan(2);
+  const titleBox = await title.boundingBox();
+  const laneBox = await page.locator(".react-flow__node-lane").first().boundingBox();
+  expect(laneBox!.y - titleBox!.y - titleBox!.height).toBeGreaterThan(40);
+  await page.getByRole("button", { name: "Bagikan", exact: true }).click();
+  const shared = page.getByRole("button", { name: "Tautan disalin", exact: true });
+  await expect(shared).toBeVisible();
+  await expect(shared.locator("svg").last().locator("..")).toHaveCSS("opacity", "1");
+  await expect(page.getByRole("button", { name: "Bagikan", exact: true })).toBeVisible({
+    timeout: 4000,
+  });
 });

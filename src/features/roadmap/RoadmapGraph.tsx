@@ -4,6 +4,7 @@ import {
   Background,
   BackgroundVariant,
   ReactFlow,
+  useReactFlow,
   type ReactFlowInstance,
   type Node,
   type NodeProps,
@@ -24,9 +25,23 @@ type ActivityNode = Node<{ activity: Activity }, "activity">;
 type TitleNode = Node<{ title: string }, "title">;
 type RoadmapNode = MapNode | ActivityNode | TitleNode;
 
-function RoadmapTitle({ data }: NodeProps<TitleNode>) {
+function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<TitleNode>) {
+  const heading = useRef<HTMLHeadingElement>(null);
+  const { setCenter, viewportInitialized } = useReactFlow();
+  useEffect(() => {
+    if (!viewportInitialized || !heading.current) return;
+    const { offsetWidth: width, offsetHeight: height } = heading.current;
+    void setCenter(positionAbsoluteX + width / 2, positionAbsoluteY + height / 2, {
+      zoom: Math.min(0.8, (window.innerWidth - 32) / width),
+    });
+  }, [viewportInitialized, setCenter, positionAbsoluteX, positionAbsoluteY]);
   return (
-    <Typography as="h1" variant="graphTitle" className="m-0 whitespace-nowrap text-text-strong-950">
+    <Typography
+      ref={heading}
+      as="h1"
+      variant="graphTitle"
+      className="m-0 whitespace-nowrap text-text-strong-950"
+    >
       {data.title}
     </Typography>
   );
@@ -99,7 +114,7 @@ export function RoadmapGraph({
       nodes.push({
         id: `semester-${semester}`,
         type: "lane",
-        position: { x, y: 100 },
+        position: { x, y: 164 },
         style: { width: 270, height: 40 },
         data: {
           kind: "lane",
@@ -114,7 +129,7 @@ export function RoadmapGraph({
         nodes.push({
           id: item.course.id,
           type: "course",
-          position: { x: x + 12, y: 156 + index * 96 },
+          position: { x: x + 12, y: 220 + index * 96 },
           data: {
             kind: "course",
             course: item.course,
@@ -147,7 +162,7 @@ export function RoadmapGraph({
         nodes.push({
           id: `${activity.id}-${semester}`,
           type: "activity",
-          position: { x: x + 12, y: 156 + list.length * 96 + index * 190 },
+          position: { x: x + 12, y: 220 + list.length * 96 + index * 190 },
           data: { activity },
           zIndex: 2,
         }),
@@ -204,8 +219,6 @@ export function RoadmapGraph({
           edgeTypes={routedEdgeTypes}
           onInit={(instance) => {
             flow.current = instance;
-            const phone = window.matchMedia("(width < 650px)").matches;
-            void instance.setCenter(phone ? 250 : 900, 360, { zoom: phone ? 0.64 : 0.68 });
           }}
           defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
           onMoveEnd={(_, viewport) => {

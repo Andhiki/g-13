@@ -91,27 +91,22 @@ test("syllabus closing does not rebound before content unmounts", async ({ page 
   expect(rebounds, JSON.stringify(heights)).toEqual([]);
 });
 
-test("course syllabus can be expanded and collapsed", async ({ page, isMobile }) => {
+test("course syllabus can be expanded and collapsed", async ({ page }) => {
   await page.goto("/?kurikulum=2026");
   await page
     .getByRole("button", { name: "Buka detail Algoritma dan Struktur Data", exact: true })
     .click();
   const trigger = page.getByRole("button", { name: "Silabus", exact: true });
-  const typography = (element: Element) => {
-    const style = getComputedStyle(element);
-    return [style.fontSize, style.fontWeight, style.lineHeight, style.letterSpacing, style.color];
-  };
-  expect(await trigger.evaluate(typography)).toEqual(
-    await page.getByRole("heading", { name: "Prasyarat", exact: true }).evaluate(typography),
+  await expect(trigger.locator("span").first()).toHaveCSS("font-size", "18px");
+  await expect(page.getByRole("heading", { name: "Prasyarat", exact: true })).toHaveCSS(
+    "font-size",
+    "16px",
   );
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await trigger.click();
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByText("Disjoint Set", { exact: false })).toBeVisible();
-  await expect(page.getByText("Disjoint Set", { exact: false })).toHaveCSS(
-    "font-size",
-    isMobile ? "12px" : "13px",
-  );
+  await expect(page.getByText("Disjoint Set", { exact: false })).toHaveCSS("font-size", "14px");
   await expect(page.getByRole("list", { name: "Pokok bahasan" }).getByRole("listitem")).toHaveCount(
     14,
   );

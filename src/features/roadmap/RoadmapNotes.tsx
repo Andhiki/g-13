@@ -1,8 +1,7 @@
 import { Typography } from "../../ui/typography";
-import { RiInformationLine, RiCloseLine } from "@remixicon/react";
+import { RiInformationLine } from "@remixicon/react";
 import { AlignButton } from "../../ui/button";
-import { AlignDrawer } from "../../ui/drawer";
-import { CompactButton } from "../../ui/compact-button";
+import { AlignModal } from "../../ui/modal";
 import type { Roadmap } from "./planner";
 
 export function RoadmapNotes({
@@ -15,32 +14,27 @@ export function RoadmapNotes({
   sourceTitle: string;
 }) {
   return (
-    <AlignDrawer.Root>
-      <AlignDrawer.Trigger asChild>
+    <AlignModal.Root>
+      <AlignModal.Trigger asChild>
         <AlignButton.Root variant="neutral" mode="stroke">
           <RiInformationLine className="size-5" aria-hidden="true" />
           Catatan{plan.conflicts.length ? ` · ${plan.conflicts.length}` : ""}
         </AlignButton.Root>
-      </AlignDrawer.Trigger>
-      <AlignDrawer.Content>
-        <AlignDrawer.Header>
-          <AlignDrawer.Title asChild>
+      </AlignModal.Trigger>
+      <AlignModal.Content className="max-w-[560px] max-h-[85dvh] overflow-y-auto">
+        <div className="p-5 pr-12">
+          <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle1" className="flex-1">
               Catatan roadmap
             </Typography>
-          </AlignDrawer.Title>
-          <AlignDrawer.Close asChild>
-            <CompactButton aria-label="Tutup catatan roadmap">
-              <RiCloseLine aria-hidden="true" />
-            </CompactButton>
-          </AlignDrawer.Close>
-        </AlignDrawer.Header>
-        <AlignDrawer.Description asChild>
+          </AlignModal.Title>
+        </div>
+        <AlignModal.Description asChild>
           <Typography as="p" variant="caption" className="sr-only">
             Pemeriksaan rencana, asumsi, dan sumber kurikulum.
           </Typography>
-        </AlignDrawer.Description>
-        <AlignDrawer.Body className="space-y-6 overflow-y-auto p-5 pt-0 text-paragraph-sm">
+        </AlignModal.Description>
+        <div className="space-y-6 overflow-y-auto p-5 pt-0 text-paragraph-sm">
           <section>
             <Typography as="h2" variant="label" className="m-0">
               {plan.conflicts.length
@@ -79,8 +73,8 @@ export function RoadmapNotes({
               ))}
             </ul>
           </section>
-        </AlignDrawer.Body>
-      </AlignDrawer.Content>
-    </AlignDrawer.Root>
+        </div>
+      </AlignModal.Content>
+    </AlignModal.Root>
   );
 }

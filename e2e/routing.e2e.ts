@@ -58,8 +58,7 @@ for (const curriculum of ["2021", "2026"]) {
     );
     await expectClearRoutes(page);
     await page.getByRole("button", { name: "Buka filter roadmap", exact: true }).click();
-    await page.getByRole("combobox", { name: "Target selesai", exact: true }).click();
-    await page.getByRole("option", { name: "7 semester", exact: true }).click();
+    await page.getByRole("tab", { name: "7 semester", exact: true }).click();
     await expect(page).toHaveURL(/lulus=7/);
     await expectClearRoutes(page);
   });

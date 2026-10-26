@@ -1,3 +1,4 @@
+import { RiArrowLeftLine, RiCornerDownLeftLine } from "@remixicon/react";
 import { Typography } from "../../ui/typography";
 import { useEffect, useRef } from "react";
 import { useHotkey, useHotkeys } from "@tanstack/react-hotkeys";
@@ -140,7 +141,9 @@ export function RoadmapQuiz({
           onClick={back}
         >
           Kembali
-          <AlignKbd.Root aria-hidden="true">←</AlignKbd.Root>
+          <AlignKbd.Root aria-hidden="true">
+            <RiArrowLeftLine className="size-3" />
+          </AlignKbd.Root>
         </AlignButton.Root>
         <AlignButton.Root
           variant="neutral"
@@ -150,8 +153,9 @@ export function RoadmapQuiz({
           onClick={advance}
         >
           {index === questions.length - 1 ? "Lihat roadmap" : "Lanjut"}
-          <AlignKbd.Root aria-hidden="true">→</AlignKbd.Root>
-          <AlignKbd.Root aria-hidden="true">Enter</AlignKbd.Root>
+          <AlignKbd.Root aria-hidden="true">
+            <RiCornerDownLeftLine className="size-3" />
+          </AlignKbd.Root>
         </AlignButton.Root>
       </footer>
     </main>

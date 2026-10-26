@@ -107,6 +107,26 @@ for (const curriculum of [
   });
 }
 
+for (const edition of ["2021", "2026"]) {
+  test(`${edition}: opens centered on the title`, async ({ page }) => {
+    await page.goto(`/?kurikulum=${edition}`);
+    const title = page.locator("[data-map-title] h1");
+    await expect
+      .poll(async () => {
+        const bounds = await title.boundingBox();
+        const viewport = page.viewportSize()!;
+        return Math.max(
+          Math.abs(bounds!.x + bounds!.width / 2 - viewport.width / 2),
+          Math.abs(bounds!.y + bounds!.height / 2 - viewport.height / 2),
+        );
+      })
+      .toBeLessThan(2);
+    const bounds = await title.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(15);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width - 15);
+  });
+}
+
 test("course drawer groups credits with its title and shows the semester track", async ({
   page,
   isMobile,
@@ -163,7 +183,8 @@ test("course ID copy reports clipboard success and failure", async ({ page }) =>
   expect(copyBox!.y).toBe(closeBox!.y);
   expect(copyBox!.width).toBe(closeBox!.width);
   expect(copyBox!.height).toBe(closeBox!.height);
-  await expect(copy.locator("svg")).toHaveCSS("width", "20px");
+  await expect(copy.locator("svg")).toHaveCSS("width", "16px");
+  await expect(page.getByRole("tooltip")).toHaveCSS("font-size", "12px");
   await expect(close.locator("svg")).toHaveCSS("width", "20px");
   await copy.click();
   await expect(page.locator("html")).toHaveAttribute("data-copied-course", "PACS262411");

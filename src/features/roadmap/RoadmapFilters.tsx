@@ -1,46 +1,35 @@
 import { Typography } from "../../ui/typography";
-import { AlignButton } from "../../ui/button";
+import * as SegmentedControl from "../../ui/segmented-control";
 import { AlignSelect } from "../../ui/select";
 import type { RoadmapSearch } from "./search";
 
 export function RoadmapFilters({
   answers,
-  totalCredits,
   update,
-  restart,
 }: {
-  restart: () => void;
   answers: RoadmapSearch;
-  totalCredits: number;
   update: (next: RoadmapSearch) => void;
 }) {
   return (
     <>
-      <Typography as="p" variant="paragraph" className="m-0 text-text-sub-600">
-        Kurikulum {answers.kurikulum} · {answers.minat?.replace(/^Lab /, "")} · {totalCredits} SKS
-        direncanakan
-      </Typography>
       <div className="flex flex-col gap-[5px]">
         <Typography
-          as="label"
+          as="p"
           variant="labelSmall"
-          htmlFor="roadmap-target"
-          className="text-text-sub-600"
+          id="roadmap-target-label"
+          className="m-0 text-text-sub-600"
         >
           Target selesai
         </Typography>
-        <AlignSelect.Root
+        <SegmentedControl.Root
           value={String(answers.lulus)}
           onValueChange={(value) => update({ ...answers, lulus: value === "7" ? 7 : 8 })}
         >
-          <AlignSelect.Trigger id="roadmap-target" aria-label="Target selesai">
-            <AlignSelect.Value />
-          </AlignSelect.Trigger>
-          <AlignSelect.Content>
-            <AlignSelect.Item value="7">7 semester</AlignSelect.Item>
-            <AlignSelect.Item value="8">8 semester</AlignSelect.Item>
-          </AlignSelect.Content>
-        </AlignSelect.Root>
+          <SegmentedControl.List aria-labelledby="roadmap-target-label">
+            <SegmentedControl.Trigger value="7">7 semester</SegmentedControl.Trigger>
+            <SegmentedControl.Trigger value="8">8 semester</SegmentedControl.Trigger>
+          </SegmentedControl.List>
+        </SegmentedControl.Root>
       </div>
       {answers.iup === "ya" && ["exchange", "internship"].includes(answers.paparan ?? "") && (
         <div className="flex flex-col gap-[5px]">
@@ -68,16 +57,6 @@ export function RoadmapFilters({
           </AlignSelect.Root>
         </div>
       )}
-      <AlignButton.Root
-        variant="neutral"
-        mode="stroke"
-        onClick={() => update({ ...answers, hasil: undefined, langkah: "kurikulum" })}
-      >
-        Ubah jawaban
-      </AlignButton.Root>
-      <AlignButton.Root variant="neutral" mode="ghost" onClick={restart}>
-        Mulai lagi
-      </AlignButton.Root>
     </>
   );
 }

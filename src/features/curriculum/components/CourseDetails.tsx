@@ -135,7 +135,7 @@ function CourseDetailsContent({
               <span
                 role="img"
                 aria-label={`${credit} SKS`}
-                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 text-label-sm text-text-strong-950"
+                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 font-display text-label-sm text-text-strong-950"
               >
                 <span aria-hidden="true">{credit}</span>
               </span>
@@ -173,11 +173,8 @@ function CourseDetailsContent({
         </Typography>
       </AlignDrawer.Description>
       <AlignDrawer.Body className="min-h-0 overflow-y-auto">
-        <div className="p-4 sm:p-5">
+        <div className="px-4 pb-4 pt-0 sm:px-5 sm:pb-5">
           <div className="mb-6">
-            <Typography as="p" variant="caption" className="m-0 mt-1 text-text-sub-600">
-              Semester anjuran
-            </Typography>
             {credit === null && (
               <Typography as="p" variant="caption" className="mt-2 text-text-sub-600">
                 SKS belum dinyatakan
@@ -190,7 +187,9 @@ function CourseDetailsContent({
               <Accordion.Item value="syllabus">
                 <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
                   <Accordion.Trigger>
-                    <span>Silabus</span>
+                    <Typography as="span" variant="subtitle1">
+                      Silabus
+                    </Typography>
                     <Accordion.Arrow aria-hidden="true" />
                   </Accordion.Trigger>
                 </Accordion.Header>
@@ -224,8 +223,8 @@ function CourseDetailsContent({
             </Accordion.Root>
           </div>
           {(prereqs.length > 0 || requirements.length > 0) && (
-            <section className="mt-2">
-              <Typography as="h3" variant="label" className="m-0 py-3 text-text-strong-950">
+            <section className="mt-4 border-t border-stroke-soft-200 pt-2">
+              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
                 Prasyarat
               </Typography>
               {prereqs.length > 0 && (
@@ -261,8 +260,8 @@ function CourseDetailsContent({
             </section>
           )}
           {next.length > 0 && (
-            <section className="mt-2">
-              <Typography as="h3" variant="label" className="m-0 py-3 text-text-strong-950">
+            <section className="mt-4 border-t border-stroke-soft-200 pt-2">
+              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
                 Menjadi prasyarat untuk
               </Typography>
               <ul className="-mx-2 divide-y divide-stroke-soft-200">
@@ -298,34 +297,31 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
     <>
       {syllabus.description && (
         <>
-          <Typography as="h3" variant="label" className="mt-3 text-text-strong-950">
+          <Typography as="h3" variant="subtitle2" className="mt-3 text-text-strong-950">
             Tujuan pembelajaran
           </Typography>
-          <Typography as="p" variant="caption" className="mt-2 sm:text-[13px] sm:leading-5">
+          <Typography as="p" variant="paragraph" className="mt-2">
             {syllabus.description}
           </Typography>
         </>
       )}
       {topics.length > 1 ? (
-        <ul
-          aria-label="Pokok bahasan"
-          className="list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5"
-        >
+        <ul aria-label="Pokok bahasan" className="list-disc space-y-1 pl-5 text-paragraph-sm">
           {topics.map((topic, index) => (
             <li key={index}>{topic}</li>
           ))}
         </ul>
       ) : (
-        <Typography as="p" variant="caption" className="sm:text-[13px] sm:leading-5">
+        <Typography as="p" variant="paragraph">
           {syllabus.syllabus}
         </Typography>
       )}
       {syllabus.references.length > 0 && (
         <>
-          <Typography as="h3" variant="label" className="mt-4 text-text-strong-950">
+          <Typography as="h3" variant="subtitle2" className="mt-4 text-text-strong-950">
             Referensi
           </Typography>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5">
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-sm">
             {syllabus.references.map((reference, index) => (
               <li key={index} className="pl-1">
                 <a

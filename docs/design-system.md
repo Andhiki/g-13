@@ -198,5 +198,8 @@ Interactive controls retain their existing AlignUI typography.
 
 Course drawer actions use a flex row of CompactButtons. Copying a course ID uses
 `src/ui/tooltip.tsx`, adapted from [AlignUI Tooltip v1.2](https://www.alignui.com/docs/v1.2/ui/tooltip)
-with its default variants and Radix behavior. The copy icon changes to a checked
-box after a successful clipboard write; reduced motion removes the animation.
+with the xsmall variant and Radix behavior. The 16px copy icon changes to a check
+after a successful clipboard write; reduced motion removes the animation.
+Graph titles and quiz questions use the AlignUI title scale. Typography accepts
+`className` for layout, contextual colors, and size overrides. Roadmap notes use
+the shared AlignUI modal.
