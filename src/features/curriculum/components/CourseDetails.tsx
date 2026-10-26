@@ -1,7 +1,10 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { RiArrowRightLine, RiCloseLine } from "@remixicon/react";
+import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
+import { syllabusPoints } from "../syllabus-format";
+import * as Accordion from "../../../ui/accordion";
+import syllabi from "../../../data/syllabi.json";
 import { CompactButton } from "../../../ui/compact-button";
 import { normalizeCourseTitle, type Course, type Curriculum, type Relation } from "../../../data";
 import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
@@ -75,6 +78,19 @@ function CourseDetailsContent({
     .map((item) => item.trim())
     .filter((item) => item && !linkedPrerequisites.has(normalizeCourseTitle(item)));
   const credit = creditsFor(course);
+  const editionSyllabi = syllabi[data.id];
+  const syllabus = editionSyllabi[
+    course.code.replaceAll("-", "") as keyof typeof editionSyllabi
+  ] as
+    | {
+        description: string;
+        syllabus: string;
+        references: string[];
+        printedPage: number;
+        pdfPage: number;
+      }
+    | undefined;
+  const topics = syllabus ? syllabusPoints(syllabus.syllabus) : [];
   const curriculumLabel =
     data.edition === `Kurikulum ${data.id}`
       ? data.edition
@@ -111,38 +127,142 @@ function CourseDetailsContent({
       <AlignDrawer.Description className="sr-only">
         Informasi akademik mata kuliah {course.title}.
       </AlignDrawer.Description>
-      <AlignDrawer.Body className="min-h-0 overflow-y-auto p-4 sm:p-5">
-        <div className="flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
-          {labels.map((label) => (
-            <AlignBadge.Root
-              variant="light"
-              className="h-auto min-h-5 py-0.5 text-[12px] leading-4 font-medium"
-              key={label}
-            >
-              {label}
-            </AlignBadge.Root>
-          ))}
-        </div>
-        <dl className="mt-4 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
-          <div className="pr-3">
-            <dt className="text-paragraph-xs text-text-sub-600">Semester panduan</dt>
-            <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
-              {semesterLabel(course).replace("Semester ", "")}
-            </dd>
+      <AlignDrawer.Body className="min-h-0 overflow-y-auto">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
+            {labels.map((label) => (
+              <AlignBadge.Root
+                variant="light"
+                className="h-auto min-h-5 py-0.5 text-[12px] leading-4 font-medium"
+                key={label}
+              >
+                {label}
+              </AlignBadge.Root>
+            ))}
           </div>
-          <div className="pl-3">
-            <dt className="text-paragraph-xs text-text-sub-600">Beban</dt>
-            <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
-              {credit === null ? "—" : credit + " SKS"}
-            </dd>
+          <dl className="mt-4 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
+            <div className="pr-3">
+              <dt className="text-paragraph-xs text-text-sub-600">Semester panduan</dt>
+              <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
+                {semesterLabel(course).replace("Semester ", "")}
+              </dd>
+            </div>
+            <div className="pl-3">
+              <dt className="text-paragraph-xs text-text-sub-600">Beban</dt>
+              <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
+                {credit === null ? "—" : credit + " SKS"}
+              </dd>
+            </div>
+          </dl>
+          <div className="mt-2">
+            <Accordion.Root key={`${data.id}-${course.id}`} type="single" collapsible>
+              <Accordion.Item value="syllabus">
+                <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
+                  <Accordion.Trigger>
+                    <span>Silabus</span>
+                    <Accordion.Arrow aria-hidden="true" />
+                  </Accordion.Trigger>
+                </Accordion.Header>
+                <Accordion.Content>
+                  {syllabus ? (
+                    <>
+                      {syllabus.description && (
+                        <>
+                          <h3 className="mt-3 text-label-sm text-text-strong-950">
+                            Tujuan pembelajaran
+                          </h3>
+                          <p className="mt-2 text-paragraph-xs sm:text-[13px] sm:leading-5">
+                            {syllabus.description}
+                          </p>
+                        </>
+                      )}
+                      {topics.length > 1 ? (
+                        <ul
+                          aria-label="Pokok bahasan"
+                          className="list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5"
+                        >
+                          {topics.map((topic, index) => (
+                            <li key={index}>{topic}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-paragraph-xs sm:text-[13px] sm:leading-5">
+                          {syllabus.syllabus}
+                        </p>
+                      )}
+                      {syllabus.references.length > 0 && (
+                        <>
+                          <h3 className="mt-4 text-label-sm text-text-strong-950">Referensi</h3>
+                          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5">
+                            {syllabus.references.map((reference, index) => (
+                              <li key={index} className="pl-1">
+                                <a
+                                  href={`https://www.google.com/search?q=${encodeURIComponent(reference)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                                  aria-label={`${reference} (cari di Google, tab baru)`}
+                                >
+                                  {reference}{" "}
+                                  <RiArrowRightUpLine
+                                    className="inline-block size-3.5 align-text-bottom"
+                                    aria-hidden="true"
+                                  />
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                      <p className="mt-4 text-paragraph-xs">
+                        Sumber: {data.sourceTitle}, halaman cetak {syllabus.printedPage} (halaman
+                        PDF {syllabus.pdfPage}).
+                      </p>
+                    </>
+                  ) : (
+                    <p>Silabus mata kuliah ini belum tersedia dalam data kurikulum {data.id}.</p>
+                  )}
+                </Accordion.Content>
+              </Accordion.Item>
+            </Accordion.Root>
           </div>
-        </dl>
-        {(prereqs.length > 0 || requirements.length > 0) && (
-          <section className="mt-5">
-            <h3 className="m-0 text-label-sm text-text-strong-950">Prasyarat</h3>
-            {prereqs.length > 0 && (
-              <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
-                {prereqs.map((item) => (
+          {(prereqs.length > 0 || requirements.length > 0) && (
+            <section className="mt-2">
+              <h3 className="m-0 py-3 text-label-sm text-text-strong-950">Prasyarat</h3>
+              {prereqs.length > 0 && (
+                <ul className="-mx-2 divide-y divide-stroke-soft-200">
+                  {prereqs.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                        onClick={() => select(item.id)}
+                        aria-label={"Buka detail " + item.title}
+                      >
+                        <span className="min-w-0">{item.title}</span>
+                        <RiArrowRightLine
+                          className="size-4 shrink-0 text-text-sub-600"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {requirements.map((item) => (
+                <p key={item} className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">
+                  {item}
+                </p>
+              ))}
+            </section>
+          )}
+          {next.length > 0 && (
+            <section className="mt-2">
+              <h3 className="m-0 py-3 text-label-sm text-text-strong-950">
+                Menjadi prasyarat untuk
+              </h3>
+              <ul className="-mx-2 divide-y divide-stroke-soft-200">
+                {next.map((item) => (
                   <li key={item.id}>
                     <button
                       type="button"
@@ -159,37 +279,9 @@ function CourseDetailsContent({
                   </li>
                 ))}
               </ul>
-            )}
-            {requirements.map((item) => (
-              <p key={item} className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">
-                {item}
-              </p>
-            ))}
-          </section>
-        )}
-        {next.length > 0 && (
-          <section className="mt-5">
-            <h3 className="m-0 text-label-sm text-text-strong-950">Menjadi prasyarat untuk</h3>
-            <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
-              {next.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                    onClick={() => select(item.id)}
-                    aria-label={"Buka detail " + item.title}
-                  >
-                    <span className="min-w-0">{item.title}</span>
-                    <RiArrowRightLine
-                      className="size-4 shrink-0 text-text-sub-600"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+            </section>
+          )}
+        </div>
       </AlignDrawer.Body>
       {footer && <div className="shrink-0 border-t border-stroke-soft-200 p-4">{footer}</div>}
     </AlignDrawer.Content>
