@@ -2,7 +2,6 @@ import { Typography } from "../../ui/typography";
 import { useEffect, useRef } from "react";
 import { useHotkey, useHotkeys } from "@tanstack/react-hotkeys";
 import { motion, useReducedMotion } from "motion/react";
-import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { AlignKbd } from "../../ui/kbd";
 import { AlignButton } from "../../ui/button";
 import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
@@ -54,11 +53,10 @@ export function RoadmapQuiz({
     ignoreInputs: true,
     requireReset: true,
   });
-  useHotkey("ArrowRight", advance, {
-    enabled: canAdvance,
-    ignoreInputs: true,
-    requireReset: true,
-  });
+  useHotkeys(
+    ["ArrowRight", "Enter"].map((key) => ({ hotkey: { key }, callback: advance })),
+    { enabled: canAdvance, ignoreInputs: true, requireReset: true },
+  );
   return (
     <main className="mx-auto flex w-full max-w-[960px] flex-1 flex-col px-5 pt-6 pb-28 sm:px-10 sm:py-10">
       <motion.section
@@ -141,19 +139,19 @@ export function RoadmapQuiz({
           aria-keyshortcuts="ArrowLeft"
           onClick={back}
         >
-          <RiArrowLeftLine className="size-5" aria-hidden="true" /> Kembali
+          Kembali
           <AlignKbd.Root aria-hidden="true">←</AlignKbd.Root>
         </AlignButton.Root>
         <AlignButton.Root
           variant="neutral"
           mode="filled"
           disabled={!canAdvance}
-          aria-keyshortcuts="ArrowRight"
+          aria-keyshortcuts="ArrowRight Enter"
           onClick={advance}
         >
-          {index === questions.length - 1 ? "Lihat roadmap" : "Lanjut"}{" "}
-          <RiArrowRightLine className="size-5" aria-hidden="true" />
+          {index === questions.length - 1 ? "Lihat roadmap" : "Lanjut"}
           <AlignKbd.Root aria-hidden="true">→</AlignKbd.Root>
+          <AlignKbd.Root aria-hidden="true">Enter</AlignKbd.Root>
         </AlignButton.Root>
       </footer>
     </main>
