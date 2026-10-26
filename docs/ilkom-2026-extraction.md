@@ -8,7 +8,10 @@ The extraction keeps required, interest-area, outside-program activity, equivale
 
 ### Syllabus duplicate audit (2026-10-26)
 
-The syllabus range (PDF pp. 210–238) contains 88 coded headings with 87 unique codes.
+The syllabus range (PDF pp. 210–238) contains all 89 numbered headings (1–89), with 88 unique codes.
+The 2026 extraction also includes 18 shared university/faculty syllabi on PDF pp. 39–44,
+for 106 unique syllabus codes in total. Matching these against 108 table course codes
+yields 97 direct matches and 11 unresolved rows; see [the coverage audit](ilkom-2026-coverage-audit.md).
 `PACS262413` Pembelajaran Mesin occurs twice: printed p. 199 / PDF p. 217 and
 printed p. 211 / PDF p. 229. The topic lists differ. Both source versions are kept:
 the first occurrence is the main record and the second is in `alternatives`.
@@ -18,7 +21,8 @@ shows both versions with separate page references; no topics are merged or infer
 Re-extract with `python scripts/extract-syllabi.py`; format the generated JSON with
 `bunx oxfmt src/data/syllabi.json`. Validate parser behavior with
 `python -m unittest discover -s scripts -p test_extract_syllabi.py` and source records
-with `bun test src/data/syllabi.test.ts`. The extractor preserves repeated codes
+with `bun test src/data/syllabi.test.ts`. Rebuild the independent 1–89 reconciliation
+with `python scripts/audit-syllabi-2026.py` and format its JSON output. The extractor preserves repeated codes
 with matching titles, but reports and excludes codes reused for different titles.
 The 2021 source has such an unresolved collision at `MII213603` (PDF p. 338:
 Lingkungan Cerdas dan Intelijen / Pengantar Blockchain); that code remains excluded.
@@ -44,4 +48,8 @@ Lingkungan Cerdas dan Intelijen / Pengantar Blockchain); that code remains exclu
 
 ## Coverage limits
 
-The text companion retains extracted text, not page images. Printed pages 182–188 (PDF 200–206) contain curriculum-map diagrams with sparse extracted text; their captions are retained, but the diagram contents are not transcribed into the structured data. Tables 3.8–3.11 and CPL mapping remain in the page-text companion rather than normalized fields. Syllabus topics and references are also available in `src/data/syllabi.json`; the duplicate audit above describes the unresolved source limits. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.
+The text companion retains extracted text, not page images. Printed pages 182–188 (PDF 200–206) contain curriculum-map diagrams with sparse extracted text; the interest-specific course blocks on PDF pp. 201–206 have now been visually transcribed
+into `output/data/ugm-ilkom-2026-interest-maps.json`. This includes 57 named placements,
+WM/P roles, credits, semesters, generic choice buckets and selection notes. The shared
+required-course nodes and arrow connections remain untranscribed. Diagram/table
+differences are retained separately; the application continues to use its existing table data. Tables 3.8–3.11 and CPL mapping remain in the page-text companion rather than normalized fields. Syllabus topics and references are also available in `src/data/syllabi.json`; the duplicate audit above describes the unresolved source limits. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.

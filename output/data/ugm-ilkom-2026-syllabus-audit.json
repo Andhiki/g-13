@@ -1,0 +1,831 @@
+{
+  "source": {
+    "file": "output/sources/fmipa-kurikulum-sarjana-2026.pdf",
+    "sha256": "ffa6d141c99228b79092d9da647f47e9b37d2966f6aca8ca9567de8b7a506520",
+    "syllabus_pdf_ranges": [
+      [39, 44],
+      [210, 238]
+    ]
+  },
+  "numbered_ilkom_section": {
+    "expected_ordinals": [1, 89],
+    "entry_count": 89,
+    "unique_codes": 88,
+    "missing_ordinals": [],
+    "duplicate_codes": [
+      {
+        "code": "PACS262413",
+        "ordinals": [21, 58],
+        "pdf_pages": [217, 229]
+      }
+    ],
+    "unextracted_entries": [],
+    "entries": [
+      {
+        "ordinal": 1,
+        "code": "PACS262101",
+        "title_raw": "Aljabar Vektor dan Matriks (2 SKS)",
+        "pdf_page": 210,
+        "printed_page": 192,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 2,
+        "code": "PACS262102",
+        "title_raw": "Logika Informatika (2 SKS)",
+        "pdf_page": 211,
+        "printed_page": 193,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 3,
+        "code": "PACS262103",
+        "title_raw": "Matematika Diskrit (3 SKS)",
+        "pdf_page": 211,
+        "printed_page": 193,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 4,
+        "code": "PAKF262106",
+        "title_raw": "Praktikum Pemrograman (1 SKS)",
+        "pdf_page": 211,
+        "printed_page": 193,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 5,
+        "code": "PACS262201",
+        "title_raw": "Algoritma dan Struktur Data (3 SKS)",
+        "pdf_page": 212,
+        "printed_page": 194,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 6,
+        "code": "PACS262202",
+        "title_raw": "Jaringan Komputer (2 SKS)",
+        "pdf_page": 212,
+        "printed_page": 194,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 7,
+        "code": "PACS262203",
+        "title_raw": "Kalkulus Vektor dan Integral (3 SKS)",
+        "pdf_page": 212,
+        "printed_page": 194,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 8,
+        "code": "PACS262204",
+        "title_raw": "Organisasi dan Arsitektur Komputer (2 SKS)",
+        "pdf_page": 213,
+        "printed_page": 195,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 9,
+        "code": "PACS262205",
+        "title_raw": "Praktikum Algoritma dan Struktur Data (1 SKS)",
+        "pdf_page": 213,
+        "printed_page": 195,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 10,
+        "code": "PACS262206",
+        "title_raw": "Probabilitas dan Statistika (3 SKS)",
+        "pdf_page": 213,
+        "printed_page": 195,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 11,
+        "code": "PACS262207",
+        "title_raw": "Sistem Digital (2 SKS)",
+        "pdf_page": 214,
+        "printed_page": 196,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 12,
+        "code": "PACS262304",
+        "title_raw": "Kecerdasan Artifisial (3 SKS)",
+        "pdf_page": 214,
+        "printed_page": 196,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 13,
+        "code": "PACS262301",
+        "title_raw": "Basis Data (3 SKS)",
+        "pdf_page": 214,
+        "printed_page": 196,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 14,
+        "code": "PACS262302",
+        "title_raw": "Desain dan Analisis Algoritma (3 SKS)",
+        "pdf_page": 215,
+        "printed_page": 197,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 15,
+        "code": "PACS262308",
+        "title_raw": "Kriptografi dan Keamanan Informasi (3 SKS)",
+        "pdf_page": 215,
+        "printed_page": 197,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 16,
+        "code": "PACS262309",
+        "title_raw": "Metode Numerik (2 SKS)",
+        "pdf_page": 215,
+        "printed_page": 197,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 17,
+        "code": "PACS262311",
+        "title_raw": "Penulisan dan Integritas Akademik (2 SKS)",
+        "pdf_page": 216,
+        "printed_page": 198,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 18,
+        "code": "PACS262312",
+        "title_raw": "Praktikum Basis Data (1 SKS)",
+        "pdf_page": 216,
+        "printed_page": 198,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 19,
+        "code": "PACS262313",
+        "title_raw": "Sistem Operasi (2 SKS)",
+        "pdf_page": 216,
+        "printed_page": 198,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 20,
+        "code": "PACS262423",
+        "title_raw": "Ventura Digital dan Inovasi Bisnis (3 SKS)",
+        "pdf_page": 217,
+        "printed_page": 199,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 21,
+        "code": "PACS262413",
+        "title_raw": "Pembelajaran Mesin (3 SKS)",
+        "pdf_page": 217,
+        "printed_page": 199,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 22,
+        "code": "PACS262411",
+        "title_raw": "Metode Rekayasa Perangkat Lunak (2 SKS)",
+        "pdf_page": 217,
+        "printed_page": 199,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 23,
+        "code": "PACS262418",
+        "title_raw": "Praktikum Sistem Operasi dan Jaringan (1 SKS)",
+        "pdf_page": 218,
+        "printed_page": 200,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 24,
+        "code": "PACS262409",
+        "title_raw": "Manajemen Proyek (3 SKS)",
+        "pdf_page": 218,
+        "printed_page": 200,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 25,
+        "code": "PACS262424",
+        "title_raw": "Workshop Proyek Kecerdasan Artifisial (2 SKS)",
+        "pdf_page": 218,
+        "printed_page": 200,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 26,
+        "code": "PACS262425",
+        "title_raw": "Workshop Rekayasa Perangkat Lunak (2 SKS)",
+        "pdf_page": 219,
+        "printed_page": 201,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 27,
+        "code": "PACS262412",
+        "title_raw": "Metodologi Penelitian Ilmu Komputer (2 SKS)",
+        "pdf_page": 219,
+        "printed_page": 201,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 28,
+        "code": "PACS262525",
+        "title_raw": "Proyek Capstone (3 SKS)",
+        "pdf_page": 219,
+        "printed_page": 201,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 29,
+        "code": "PACS262514",
+        "title_raw": "Olahraga dan Seni (1 SKS)",
+        "pdf_page": 220,
+        "printed_page": 202,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 30,
+        "code": "PACS262605",
+        "title_raw": "Kerja Praktik (4 SKS)",
+        "pdf_page": 220,
+        "printed_page": 202,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 31,
+        "code": "PACS262530",
+        "title_raw": "Tren Penelitian Ilmu Komputer dan Elektronika (3 SKS)",
+        "pdf_page": 220,
+        "printed_page": 202,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 32,
+        "code": "PACS262419",
+        "title_raw": "Rekayasa Pengetahuan (3 SKS)",
+        "pdf_page": 221,
+        "printed_page": 203,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 33,
+        "code": "PACS262504",
+        "title_raw": "Data Sains (3 SKS)",
+        "pdf_page": 221,
+        "printed_page": 203,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 34,
+        "code": "PACS262526",
+        "title_raw": "Rekayasa Data (3 SKS)",
+        "pdf_page": 221,
+        "printed_page": 203,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 35,
+        "code": "PACS262527",
+        "title_raw": "Rekayasa Model Kecerdasan Artifisial (3 SKS)",
+        "pdf_page": 222,
+        "printed_page": 204,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 36,
+        "code": "PACS262008",
+        "title_raw": "Temu Balik Informasi (3 SKS)",
+        "pdf_page": 222,
+        "printed_page": 204,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 37,
+        "code": "PACS262508",
+        "title_raw": "Kapita Selekta Rekayasa Perangkat Lunak dan Data (3 SKS)",
+        "pdf_page": 222,
+        "printed_page": 204,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 38,
+        "code": "PACS262314",
+        "title_raw": "Teori Bahasa dan Otomata (3 SKS)",
+        "pdf_page": 223,
+        "printed_page": 205,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 39,
+        "code": "PACS262303",
+        "title_raw": "Grafika Komputer (3 SKS)",
+        "pdf_page": 223,
+        "printed_page": 205,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 40,
+        "code": "PACS262307",
+        "title_raw": "Konsep Bahasa Pemrograman (3 SKS)",
+        "pdf_page": 223,
+        "printed_page": 205,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 41,
+        "code": "PACS262310",
+        "title_raw": "Pengolahan Citra Digital (3 SKS)",
+        "pdf_page": 224,
+        "printed_page": 206,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 42,
+        "code": "PACS262417",
+        "title_raw": "Penglihatan Komputer dan Analisis Visual (3 SKS)",
+        "pdf_page": 224,
+        "printed_page": 206,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 43,
+        "code": "PACS262410",
+        "title_raw": "Metode Optimasi (3 SKS)",
+        "pdf_page": 224,
+        "printed_page": 206,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 44,
+        "code": "PACS262401",
+        "title_raw": "Algoritma Terdistribusi dan Pemrograman Paralel (3 SKS)",
+        "pdf_page": 225,
+        "printed_page": 207,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 45,
+        "code": "PACS262414",
+        "title_raw": "Pemrograman Kompetitif (3 SKS)",
+        "pdf_page": 225,
+        "printed_page": 207,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 46,
+        "code": "PACS262404",
+        "title_raw": "Desain Compiler (3 SKS)",
+        "pdf_page": 225,
+        "printed_page": 207,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 47,
+        "code": "PACS262402",
+        "title_raw": "Algoritma untuk Trading (3 SKS)",
+        "pdf_page": 226,
+        "printed_page": 208,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 48,
+        "code": "PACS262528",
+        "title_raw": "Sains Manajemen (3 SKS)",
+        "pdf_page": 226,
+        "printed_page": 208,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 49,
+        "code": "PACS262517",
+        "title_raw": "Pemodelan dan Simulasi (3 SKS)",
+        "pdf_page": 226,
+        "printed_page": 208,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 50,
+        "code": "PACS262408",
+        "title_raw": "Logika Fuzzy (3 SKS)",
+        "pdf_page": 227,
+        "printed_page": 209,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 51,
+        "code": "PACS262421",
+        "title_raw": "Sistem Pendukung Keputusan (3 SKS)",
+        "pdf_page": 227,
+        "printed_page": 209,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 52,
+        "code": "PACS262516",
+        "title_raw": "Pembelajaran Mesin Mendalam (3 SKS)",
+        "pdf_page": 227,
+        "printed_page": 209,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 53,
+        "code": "PACS262523",
+        "title_raw": "Pengenalan Pola (3 SKS)",
+        "pdf_page": 228,
+        "printed_page": 210,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 54,
+        "code": "PACS262420",
+        "title_raw": "Sistem Pakar (3 SKS)",
+        "pdf_page": 228,
+        "printed_page": 210,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 55,
+        "code": "PACS262518",
+        "title_raw": "Pemrosesan Bahasa Alami (3 SKS)",
+        "pdf_page": 228,
+        "printed_page": 210,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 56,
+        "code": "PACS262501",
+        "title_raw": "Algoritma Genetika (3 SKS)",
+        "pdf_page": 229,
+        "printed_page": 211,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 57,
+        "code": "PACS262503",
+        "title_raw": "Bioinformatika (3 SKS)",
+        "pdf_page": 229,
+        "printed_page": 211,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 58,
+        "code": "PACS262413",
+        "title_raw": "Pembelajaran Mesin (3 SKS)",
+        "pdf_page": 229,
+        "printed_page": 211,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 59,
+        "code": "PACS262416",
+        "title_raw": "Pengembangan UI/UX (3 SKS)",
+        "pdf_page": 230,
+        "printed_page": 212,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 60,
+        "code": "PACS262524",
+        "title_raw": "Penjaminan Kualitas Perangkat Lunak (3 SKS)",
+        "pdf_page": 230,
+        "printed_page": 212,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 61,
+        "code": "PACS262520",
+        "title_raw": "Pengembangan Perangkat Lunak Berbasis Platform (3 SKS)",
+        "pdf_page": 230,
+        "printed_page": 212,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 62,
+        "code": "PACS262521",
+        "title_raw": "Pengembangan Perangkat Lunak Scalable (3 SKS)",
+        "pdf_page": 231,
+        "printed_page": 213,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 63,
+        "code": "PACS262601",
+        "title_raw": "Audit Teknologi Informasi (3 SKS)",
+        "pdf_page": 231,
+        "printed_page": 213,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 64,
+        "code": "PACS262603",
+        "title_raw": "Industri Perangkat Lunak Adaptif berbasis Agentik (3 SKS)",
+        "pdf_page": 231,
+        "printed_page": 213,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 65,
+        "code": "PACS262406",
+        "title_raw": "Keamanan Sistem dan Siber (3 SKS)",
+        "pdf_page": 232,
+        "printed_page": 214,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 66,
+        "code": "PACS262407",
+        "title_raw": "Komputasi Awan (3 SKS)",
+        "pdf_page": 232,
+        "printed_page": 214,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 67,
+        "code": "PACS262502",
+        "title_raw": "Arsitektur dan Infrastruktur Berkinerja Tinggi (3 SKS)",
+        "pdf_page": 232,
+        "printed_page": 214,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 68,
+        "code": "PACS262522",
+        "title_raw": "Pengembangan Pusat Komputasi Data (3 SKS)",
+        "pdf_page": 232,
+        "printed_page": 214,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 69,
+        "code": "PACS262415",
+        "title_raw": "Pengantar Teknologi Blockchain (3 SKS)",
+        "pdf_page": 233,
+        "printed_page": 215,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 70,
+        "code": "PACS262519",
+        "title_raw": "Sistem Siber Fisik (Cyber Physical Systems) (3 SKS)",
+        "pdf_page": 233,
+        "printed_page": 215,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 71,
+        "code": "PACS262405",
+        "title_raw": "Ekosistem dan Platform Digital (3 SKS)",
+        "pdf_page": 233,
+        "printed_page": 215,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 72,
+        "code": "PACS262403",
+        "title_raw": "Analisis Produk untuk Pengusaha Digital (3 SKS)",
+        "pdf_page": 234,
+        "printed_page": 216,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 73,
+        "code": "PACS262515",
+        "title_raw": "Pemasaran dan Pelanggan Berbasis AI (3 SKS)",
+        "pdf_page": 234,
+        "printed_page": 216,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 74,
+        "code": "PACS262512",
+        "title_raw": "Keuangan dan Investasi Perusahaan Rintisan (3 SKS)",
+        "pdf_page": 234,
+        "printed_page": 216,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 75,
+        "code": "PACS262529",
+        "title_raw": "Strategi Bisnis Eksekutif CEO Digital (3 SKS)",
+        "pdf_page": 235,
+        "printed_page": 217,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 76,
+        "code": "PACS262610",
+        "title_raw": "Pengembangan Karier Cerdas dan Profesional (3 SKS)",
+        "pdf_page": 235,
+        "printed_page": 217,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 77,
+        "code": "PACS262506",
+        "title_raw": "Kapasitas Manusia dan Inovasi (3 SKS)",
+        "pdf_page": 235,
+        "printed_page": 217,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 78,
+        "code": "PACS262602",
+        "title_raw": "Hukum dan Tata Kelola Bisnis Digital (2 SKS)",
+        "pdf_page": 236,
+        "printed_page": 218,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 79,
+        "code": "PACS262511",
+        "title_raw": "Ketahanan Perusahaan dan Strategi Co-Intelligent (2 SKS)",
+        "pdf_page": 236,
+        "printed_page": 218,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 80,
+        "code": "PACS262510",
+        "title_raw": "Kepemimpinan Adaptif dan Organisasi Cerdas (2 SKS)",
+        "pdf_page": 237,
+        "printed_page": 219,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 81,
+        "code": "PACS262608",
+        "title_raw": "Magang Durasi Pendek (4 SKS)",
+        "pdf_page": 237,
+        "printed_page": 219,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 82,
+        "code": "PACS262606",
+        "title_raw": "Magang Durasi Menengah (8 SKS)",
+        "pdf_page": 237,
+        "printed_page": 219,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 83,
+        "code": "PACS262607",
+        "title_raw": "Magang Durasi Panjang (12 SKS)",
+        "pdf_page": 237,
+        "printed_page": 219,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 84,
+        "code": "PACS262609",
+        "title_raw": "Magang Semester Penuh (16 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 85,
+        "code": "PACS262612",
+        "title_raw": "Sertifikasi Kompetensi 1 (3 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 86,
+        "code": "PACS262613",
+        "title_raw": "Sertifikasi Kompetensi 2 (3 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 87,
+        "code": "PACS262305",
+        "title_raw": "Kompetisi Internasional (3 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 88,
+        "code": "PACS262306",
+        "title_raw": "Kompetisi Nasional (2 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      },
+      {
+        "ordinal": 89,
+        "code": "PACS262513",
+        "title_raw": "Kuliah Musim Panas/Dingin (3 SKS)",
+        "pdf_page": 238,
+        "printed_page": 220,
+        "status": "extracted"
+      }
+    ]
+  },
+  "coverage": {
+    "syllabus_codes": 106,
+    "table_course_codes": 108,
+    "table_codes_with_syllabi": 97,
+    "table_codes_without_syllabi": [
+      {
+        "code": "UNKU26000X",
+        "title": "Agama (dipilih sesuai agama masing- masing)",
+        "status": "selection_placeholder",
+        "source_candidates": []
+      },
+      {
+        "code": "UNKU260015",
+        "title": "Komunikasi Masyarakat**",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "UNKU260016",
+        "title": "Penerapan Manajemen Pengetahuan**",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262611",
+        "title": "Proposal Tugas Akhir",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262701",
+        "title": "Seminar Tugas Akhir",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262702",
+        "title": "Tugas Akhir",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262422",
+        "title": "Temu Balik Informasi",
+        "status": "source_code_conflict",
+        "source_candidates": [
+          {
+            "code": "PACS262008",
+            "pdf_page": 222,
+            "title_raw": "Temu Balik Informasi (3 SKS)"
+          }
+        ]
+      },
+      {
+        "code": "PACS262505",
+        "title": "Kajian Literatur",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262507",
+        "title": "Kapita Selekta Algoritma dan Komputasi",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262604",
+        "title": "Kapita Selekta Sistem Cerdas",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      },
+      {
+        "code": "PACS262509",
+        "title": "Kapita Selekta Sistem Komputer dan Jaringan",
+        "status": "no_heading_in_audited_ranges",
+        "source_candidates": []
+      }
+    ],
+    "source_credit_conflicts": [
+      {
+        "code": "UNKU260013",
+        "title": "Keterampilan Masa Depan Berkelanjutan",
+        "syllabus_credits": 2,
+        "table_credits": [3],
+        "syllabus_pdf_page": 42
+      }
+    ]
+  },
+  "limits": [
+    "89 counts numbered Ilkom source entries, not all table courses.",
+    "Code conflicts are reported, never automatically aliased by title.",
+    "No heading means absent from the audited syllabus ranges, not that a course has no official syllabus."
+  ]
+}

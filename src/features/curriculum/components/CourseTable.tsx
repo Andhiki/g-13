@@ -72,7 +72,14 @@ export function CourseTable({
               .join(" / ");
 
             return (
-              <AlignTable.Row key={course.id}>
+              <AlignTable.Row
+                key={course.id}
+                className="cursor-pointer"
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("button")) return;
+                  select(course.id);
+                }}
+              >
                 <AlignTable.Cell className="max-[640px]:hidden">
                   <Typography as="span" variant="caption" className="text-text-sub-600">
                     {course.code || "—"}

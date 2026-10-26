@@ -23,7 +23,8 @@
       "heading_raw": "3.3. PROGRAM STUDI ELEKTRONIKA DAN INSTRUMENTASI"
     },
     "raw_page_companion": "ugm-ilkom-2026-pages.json",
-    "syllabus_note": "Course descriptions/syllabi numbered 1-84 are retained as page text in the companion file; this file does not normalize their topics, CPL, or references."
+    "syllabus_note": "Course descriptions/syllabi numbered 1-89 are retained in the page-text companion and normalized in src/data/syllabi.json. The 89 entries contain 88 unique codes; see ugm-ilkom-2026-syllabus-audit.json.",
+    "interest_map_companion": "ugm-ilkom-2026-interest-maps.json"
   },
   "curriculum_summary": {
     "minimum_credits_total": 144,

@@ -139,15 +139,15 @@
       "title": "Kewarganegaraan (2 SKS)",
       "description": "Setelah mengikuti kuliah ini diharapkan mahasiswa mampu: memahami materi secara baik, memiliki kesadaran dan tanggung jawab sebagai warga Negara yang baik, mampu berpikir kritis dalam menghadapi masalah di masyarakat, memberikan pemikiran kreatif solutif dalam penyelesaian permasalahan bangsa dan bertindak sesuatu sebagai bukti melakukan bela Negara.",
       "syllabus": "Pengantar RPKPS, Fungsi PKN bagi sarjana dan professional, Fungsi Identitas Nasional bagi pembangunan bangsa dan karakter masyarakat, pentingnya Integrasi Nasional, Fungsi Nilai dan Norma-norma, Project Citizen I, Hak dan Kewajiban Negara dan Warga Negara Kenegaraan, Dinamika Praktik Demokrasi di Indonesia, Dinamika Penegakan Hukum di Indonesia, Urgensi Wawasan Nusantara sebagai Wawasan Kolektif Bangsa Tantangan Ketahanan Nasional dan Pentingnya Bela Negara dan Project Citizen II.",
+      "references": ["Pendidikan Kewarganegaraan, RISTEKDIKTI 2016.", "Bahasa Indonesia"],
+      "printedPage": 293,
+      "pdfPage": 308
+    },
+    "UNU222013": {
+      "title": "Bahasa Indonesia (2 SKS MKWK Sem: 4)",
+      "description": "Mahasiswa mampu meningkatkan kemampuan dan keterampilan dalam menggunakan bahasa Indonesia terutama dalam ragam tulis akademik dan mengorganisasikan karangan ilmiah sesuai dengan bidang ilmunya masing-masing.",
+      "syllabus": "1. Hakikat bahasa Indonesia sebagai bahasa persatuan dan bahasa negara; 2. Mengeksplorasi teks dalam kehidupan akademik (penanaman nilai dan hakikat bahasa Indonesia sebagai penghela ilmu pengetahuan); 3. Menjelajah dunia pustaka; 4. Mendesain proposal penelitian dan proposal kegiatan; 5. Melaporkan hasil penelitian dan hasil kegiatan; 6. mengaktualisasikan diri dalam artikel ilmiah.",
       "references": [
-        "Pendidikan Kewarganegaraan, RISTEKDIKTI 2016.",
-        "Bahasa Indonesia UNU22-2013 Bahasa Indonesia (2 SKS MKWK Sem: 4) Prasyarat: - Tujuan Instruksional/Arah Kompetensi: Mahasiswa mampu meningkatkan kemampuan dan keterampilan dalam menggunakan bahasa Indonesia terutama dalam ragam tulis akademik dan mengorganisasikan karangan ilmiah sesuai dengan bidang ilmunya masing-masing. Silabus:",
-        "Hakikat bahasa Indonesia sebagai bahasa persatuan dan bahasa negara;",
-        "Mengeksplorasi teks dalam kehidupan akademik (penanaman nilai dan hakikat bahasa Indonesia sebagai penghela ilmu pengetahuan);",
-        "Menjelajah dunia pustaka;",
-        "Mendesain proposal penelitian dan proposal kegiatan;",
-        "Melaporkan hasil penelitian dan hasil kegiatan;",
-        "mengaktualisasikan diri dalam artikel ilmiah. Buku Acuan:",
         "Bacaan Utama",
         "Akhadiah, Sabarti, Maidar G. Arsjad, dan Sakura H. Ridwan. 1992. Pembinaan Kemampuan Menulis Bahasa Indonesia. Jakarta: Erlangga.",
         "Arifin, E. Zaenal dan S. Amran Tasai. 2000. Cermat Berbahasa Indonesia untuk Perguruan Tinggi. Cetakan ke-4. Jakarta: Akademika Pressindo.",
@@ -208,38 +208,48 @@
         "Kusuma, A.B. 2004, Lahirnya Undang-Undang Dasar 1945: Menurut Salinan Dokumen Oetentik Badan Oentoek Menjelidiki Oesaha2 Persiapan Kemerdekaan, Badan Penerbit Fakultas Hukum UI, Jakarta.",
         "Latif, Yudi, 2011, Negara Paripurna: Historisitas, Rasionalitas, dan Aktualitas Pancasila, Gramedia Pustaka Utama, Jakarta.",
         "_________, 2014, Mata Air Keteladanan: Pancasila dalam Perbuatan, Mizan, Bandung.",
-        "Tim MKWU Pendidikan Pancasila Dikti, 2016, Buku Mata Kuliah Wajib Pendidikan Tinggi Pendidikan Pancasila, e-book, Kemenristek Dikti. II. Mata Kuliah Wajib Fakultas",
-        "Fisika Dasar 1 Basic Physics 1 MFF-1011 Fisika Dasar 1 (3 SKS) Prasyarat: - Silabus: Pengukuran dan Besaran Fisika, Vektor, Kinematika, Gaya, Usaha dan Energi, Momentum Linear, Pusat Massa, Rotasi, Torka, Momen Inersia, Momentum Sudut, Kesetimbangan dan Elastisitas, Gravitasi, Fluida, Getaran, Gelombang, Suhu, Kalor dan Hukum Termodinamika I, Teori Kinetik Gas, Entropi dan Hukum Termodinamika II. Buku Acuan:",
+        "Tim MKWU Pendidikan Pancasila Dikti, 2016, Buku Mata Kuliah Wajib Pendidikan Tinggi Pendidikan Pancasila, e-book, Kemenristek Dikti. II. Mata Kuliah Wajib Fakultas"
+      ],
+      "printedPage": 294,
+      "pdfPage": 309
+    },
+    "MFF1011": {
+      "title": "Fisika Dasar 1 (3 SKS)",
+      "description": "",
+      "syllabus": "Pengukuran dan Besaran Fisika, Vektor, Kinematika, Gaya, Usaha dan Energi, Momentum Linear, Pusat Massa, Rotasi, Torka, Momen Inersia, Momentum Sudut, Kesetimbangan dan Elastisitas, Gravitasi, Fluida, Getaran, Gelombang, Suhu, Kalor dan Hukum Termodinamika I, Teori Kinetik Gas, Entropi dan Hukum Termodinamika II.",
+      "references": [
         "Halliday, D., Resnick, R dan Walker, J., 2018, Fundamentals of Physics: Extended, tenth edition, John Wiley & Sons, Inc, USA.",
         "Tipler, P.A. Mosca, G., 2008, Physics for Scientists and Engineers, sixth edition, W. H. Freeman and Company, New York, USA.",
-        "Serway, R.S., dan Jewett, J.W., 2014, Physics for Scientists and Engineers, ninth edition, Brooks/Cole Cengage Learning, Singapore.",
-        "Kalkulus 1 Calculus 1 MMM-1101 Kalkulus 1 (3 SKS) Prasyarat: - Tujuan Pembelajaran:",
-        "Mahasiswa mampu dan mahir dalam menyelesaikan soal-soal yang berkaitan dengan sifat-sifat bilangan real, memahami pengertian fungsi. Mahasiswa mampu dan mahir dalam hitung limit dan derivatif, serta dapat mengaplikasikannya. Silabus:",
-        "Himpunan: pengertian, operasi aljabar, sifat-sifat.",
-        "Sistem bilangan real: sifat-sifat, pertidaksamaan, nilai mutlak.",
-        "Fungsi (satu variabel): pengertian, operasi aljabar, fungsi komposisi, fungsi invers. Sistem koordinat dan grafik fungsi.",
-        "Limit: pengertian dan sifat-sifat, limit searah, limit tak hingga, bilangan alam.",
-        "Kekontinuan: pengertian dan sifat-sifat kekontinuan.",
-        "Turunan (derivatif): pengertian, sifat-sifat, turunan fungsi komposisi, turunan fungsi invers, turunan fungsi parameter, turunan fungsi trigonometri, fungsi siklometri, fungsi hiperbolik, fungsi eksponensial, fungsi logaritma, turunan fungsi implisit, penurunan secara logaritmis, turunan tingkat tinggi. Arti geometris/fisis dari turunan.",
-        "Diferensial.",
-        "Aplikasi derivatif: maksimum/minimum, naik/turun, cembung/cekung, titik stasioner, ekstrem fungsi dan masalah ekstrem dalam kehidupan sehari-hari.",
-        "Deret Taylor/Mac Laurin dan aplikasinya. Buku Acuan:",
+        "Serway, R.S., dan Jewett, J.W., 2014, Physics for Scientists and Engineers, ninth edition, Brooks/Cole Cengage Learning, Singapore."
+      ],
+      "printedPage": 295,
+      "pdfPage": 310
+    },
+    "MMM1101": {
+      "title": "Kalkulus 1 (3 SKS)",
+      "description": "",
+      "syllabus": "1. Himpunan: pengertian, operasi aljabar, sifat-sifat. 2. Sistem bilangan real: sifat-sifat, pertidaksamaan, nilai mutlak. 3. Fungsi (satu variabel): pengertian, operasi aljabar, fungsi komposisi, fungsi invers. Sistem koordinat dan grafik fungsi. 4. Limit: pengertian dan sifat-sifat, limit searah, limit tak hingga, bilangan alam. 5. Kekontinuan: pengertian dan sifat-sifat kekontinuan. 6. Turunan (derivatif): pengertian, sifat-sifat, turunan fungsi komposisi, turunan fungsi invers, turunan fungsi parameter, turunan fungsi trigonometri, fungsi siklometri, fungsi hiperbolik, fungsi eksponensial, fungsi logaritma, turunan fungsi implisit, penurunan secara logaritmis, turunan tingkat tinggi. Arti geometris/fisis dari turunan. 7. Diferensial. 8. Aplikasi derivatif: maksimum/minimum, naik/turun, cembung/cekung, titik stasioner, ekstrem fungsi dan masalah ekstrem dalam kehidupan sehari-hari. 9. Deret Taylor/Mac Laurin dan aplikasinya.",
+      "references": [
         "Abe Mizrahi and Michael Sullivan, 1990, Calculus and Analytic Geometry, Wadsworth.",
         "James Stewart, 2015, Calculus: Early Transcendentals Single Variable 8th Ed., Willey, USA.",
         "Robert A. Adam and Christopher Essex, 2010, Calculus, A Complete Course, Pearson.",
         "James Stewart, 1999, Calculus, 4th edition, Brooks/Cole Pub. Comp.",
-        "Tim Pengajar Kalkulus, 2003, Diktat Kuliah Kalkulus I, FMIPA UGM.",
-        "Kimia Dasar 1 Basic Chemistry 1 MKK-1101 Kimia Dasar 1 (3 SKS) Prasyarat: - Silabus:",
-        "Pendahuluan, Molekul, Ion dan Rumus Kimia, Reaksi Kimia;",
-        "Reaksi dalam larutan,Perubahan energy dalam reaksi kimia;",
-        "Struktur Atom, Tabel Periodik;",
-        "Ikatan Ion vs ikatan Kovalen, Geometri Molekul dan model ikatan kovalen. Buku acuan:",
+        "Tim Pengajar Kalkulus, 2003, Diktat Kuliah Kalkulus I, FMIPA UGM."
+      ],
+      "printedPage": 295,
+      "pdfPage": 310
+    },
+    "MKK1101": {
+      "title": "Kimia Dasar 1 (3 SKS)",
+      "description": "",
+      "syllabus": "1. Pendahuluan, Molekul, Ion dan Rumus Kimia, Reaksi Kimia; 2. Reaksi dalam larutan,Perubahan energy dalam reaksi kimia; 3. Struktur Atom, Tabel Periodik; 4. Ikatan Ion vs ikatan Kovalen, Geometri Molekul dan model ikatan kovalen.",
+      "references": [
         "James E. Brady, Frederick A. Senese, 2009, Chemistry: The Study of Matter and Its Changes edisi-5.",
         "Raymond Chang, Kenneth A. Goldsby, 2012, Chemistry, Edisi-11.",
         "Ralph H. Petrucci, William S. Harwood, F. Geoffrey Herring, 2002, General Chemistry: Principles and Modern Applications, edisi-8. III. Mata Kuliah Program Studi Ilmu Komputer"
       ],
-      "printedPage": 294,
-      "pdfPage": 309
+      "printedPage": 295,
+      "pdfPage": 310
     },
     "MII211001": {
       "title": "Aljabar Linier Fundamental (2SKS)",
@@ -572,20 +582,16 @@
         "Anthony DeBarros, 2022, Practical SQL: A Beginner’s Guide to Storytelling with Data (2nd ed), William Pollock, ISBN-10: 1-59327-827-6, ISBN-13: 9781718501065",
         "Carlos Coronel and Steven Morris, 2022, Database Systems: Design, Implementation, & Management (14th Ed), Course Technology Inc, ISBN-10: 0357673034, ISBN-13 : 978-0357673034",
         "Avi Silberschatz, Henry F Korth and S Sudarshan, 2019, Database System Concepts (7th Ed), McGraw-Hill, New York, . ISBN 9780078022159",
-        "Ted Hills, 2016, NoSQL and SQL Data Modeling: Bringing Together Data, Semantics, and Software (1st ed), ISBN-13 978-1634621090",
-        "Praktikum Pemrograman Lab work in Programming MII21-1202 Praktikum Pemrograman Prasyarat: - Silabus:",
-        "Compiler vs interpreter dan cara kerjanya",
-        "Pengantar Computational Thinking dan Algoritma",
-        "Macam tipe data dan deklarasi variabel",
-        "Operasi aritmetik dan logika",
-        "Percabangan dan Perulangan",
-        "Struktur Data Dasar: array, struct, strings, pointer dan file",
-        "Pengantar Fungsi: definisi, variabel lokal dan global, parameter fungsi",
-        "Fungsi Rekursif",
-        "Algoritma Sorting Sederhana: Buble Sort, Insertion Sort, Selection Sort",
-        "Algoritma Sorting Lanjut: Quick Sort, Merge Sort",
-        "Algoritma Searching: Binary, Sequensial dan Hashing",
-        "Problem Solving. Buku acuan:",
+        "Ted Hills, 2016, NoSQL and SQL Data Modeling: Bringing Together Data, Semantics, and Software (1st ed), ISBN-13 978-1634621090"
+      ],
+      "printedPage": 306,
+      "pdfPage": 321
+    },
+    "MII211202": {
+      "title": "Praktikum Pemrograman",
+      "description": "",
+      "syllabus": "1. Compiler vs interpreter dan cara kerjanya 2. Pengantar Computational Thinking dan Algoritma 3. Macam tipe data dan deklarasi variabel 4. Operasi aritmetik dan logika 5. Percabangan dan Perulangan 6. Struktur Data Dasar: array, struct, strings, pointer dan file 7. Pengantar Fungsi: definisi, variabel lokal dan global, parameter fungsi 8. Fungsi Rekursif 9. Algoritma Sorting Sederhana: Buble Sort, Insertion Sort, Selection Sort 10. Algoritma Sorting Lanjut: Quick Sort, Merge Sort 11. Algoritma Searching: Binary, Sequensial dan Hashing 12. Problem Solving.",
+      "references": [
         "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein, 2022, Introduction to Algorithms, Fourth edition, The MIT Press, ISBN: 9780262046305",
         "Adam Drozdek, Data Structures and Algorithms in C ++, 2012, ISBN 0-534-37597-9.",
         "Mikael Olsson, 2020, C++20 Quick Syntax Reference, A Pocket Guide to the Language, APIs, and Library, 4th ed. Edition, Apress Berkeley, CA.",
@@ -996,8 +1002,16 @@
       "description": "",
       "syllabus": "1. Project & IT organization 2. Project proposal & procurement 3. Project tools & scheduling algorithms 4. Cash, budget estimation, & monitoring 5. Human resources allocation & promotion 6. project Monitoring 7. Project portfolio & risk management 8. Project certification.",
       "references": [
-        "Kathy Schwalbe, Information Technology Project Management, 2019, edisi 9. Cengage Learning Asia.",
-        "Pemodelan Jaringan Komunitas Digital Digital Society Network Modelling MMI-3511 Pemodelan Jaringan Komunitas Digital (3 SKS) Prasyarat: Algoritma dan Struktur Data Silabus: Digital Society, Web Graph, LDA, LSA, Social Network, Deteksi Komunitas, Topik Modelling, studi kasus. Buku acuan:",
+        "Kathy Schwalbe, Information Technology Project Management, 2019, edisi 9. Cengage Learning Asia."
+      ],
+      "printedPage": 318,
+      "pdfPage": 333
+    },
+    "MMI3511": {
+      "title": "Pemodelan Jaringan Komunitas Digital (3 SKS)",
+      "description": "",
+      "syllabus": "Digital Society, Web Graph, LDA, LSA, Social Network, Deteksi Komunitas, Topik Modelling, studi kasus.",
+      "references": [
         "Anthony Bonato, Pawel Pralat, Andrei, Algorithm and Models for the web Graph: 15th international workshop, Springer.",
         "KH Luke, Innovation for Community Services, 2019, SpringerLink."
       ],
@@ -1187,29 +1201,80 @@
       "description": "",
       "syllabus": "1. Telecommunication and industry: the development and telecommunication industry 2. The HCF Network 3. Data over cable service interface 4. Telephony and wireless 5. Development of 1 to 5 G: concept of 1G, concept of 2G, concept of 3G, concept of 4G, concept of 5G 6. Next generation Networks: NGN, NGN Services, NGN Society 7. Convergencies: Architecture, IMS service, Quality of services, Authentication, dan network service management 8. Data Driven Network.",
       "references": [
-        "Thomas Plevyak, Veli Sahin, April 2010, Next Generation Telecommunication Networks, services and management, Wiley. VIII. Kelompok Mata Kuliah Pilihan Lab Elektronika dan Instrumentasi",
-        "Mikrokontroler (3 SKS) Microcontroller MII-1307 Mikrokontroler (3 SKS) Prasyarat: Pemrograman I Silabus: Dalam kuliah ini akan diperkenalkan penggunaan dan pemrograman ARM Cortex M0, konsep I/O, Timer dan Counter, PWM, operasi interupsi, komunikasi serial, I2C dan SPI, pemanfatan internal ADC, antarmuka keypad, LCD serta EEPROM. Pada bagian akhir mata kuliah akan diperkenalkan beberapa studi kasus implementasi pemrograman mikrokontroller di berbagai bidang. Buku acuan:",
+        "Thomas Plevyak, Veli Sahin, April 2010, Next Generation Telecommunication Networks, services and management, Wiley. VIII. Kelompok Mata Kuliah Pilihan Lab Elektronika dan Instrumentasi"
+      ],
+      "printedPage": 324,
+      "pdfPage": 339
+    },
+    "MII1307": {
+      "title": "Mikrokontroler (3 SKS)",
+      "description": "",
+      "syllabus": "Dalam kuliah ini akan diperkenalkan penggunaan dan pemrograman ARM Cortex M0, konsep I/O, Timer dan Counter, PWM, operasi interupsi, komunikasi serial, I2C dan SPI, pemanfatan internal ADC, antarmuka keypad, LCD serta EEPROM. Pada bagian akhir mata kuliah akan diperkenalkan beberapa studi kasus implementasi pemrograman mikrokontroller di berbagai bidang.",
+      "references": [
         "Putra, A.E., 2010, Mudah Menguasai Pemrograman Mikrokontroler Atmel, Kelompok Riset DSP dan Embedded Intelligent System, Elektronika dan Instrumentasi, Universitas Gadjah Mada, Yogyakarta.",
         "Putra, A.E., 2012, Petunjuk Praktikum Mikrokontroler berbasis Nuvoton NUC140 ARM Cortex M0, Unit Layanan Elektronika dan Instrumentasi.",
         "Nuvoton, 2011, NuMicro NUC100 Series Training Material, Nuvoton Inc.",
         "Bates, M.P., Programming 8-bit PIC Microcontroller in C with Interactive Hardware Simulation, Newnes.",
-        "Balid, W., 2009, Designing A Novel Interactive Microcontroller Training Kit for Teaching Undergraduates Programming Embedded System Microcontroller Using Interaction Methodologies.",
-        "Praktikum Mikrokontroler (1 SKS) Microcontroller Lab MII-1308 Praktikum Mikrokontroler (1 SKS) Prasyarat: Mikrokontroler* Silabus: Mata kuliah praktek ini membahas pemrograman, konsep I/O, Timer dan Counter, PWM, operasi interupsi, operasi kanal serial, pemanfatan LCD dan ADC, I2C, SPI serta pemanfaatan aplikasi RTC dan EEPROM dengan Mikrokontroler AVR, PIC, dan Cortex-M0 Nuvoton dan beberapa kapita selekta untuk melengkapi dan menambah pengalaman praktis mahasiswa. Buku acuan:",
+        "Balid, W., 2009, Designing A Novel Interactive Microcontroller Training Kit for Teaching Undergraduates Programming Embedded System Microcontroller Using Interaction Methodologies."
+      ],
+      "printedPage": 325,
+      "pdfPage": 340
+    },
+    "MII1308": {
+      "title": "Praktikum Mikrokontroler (1 SKS)",
+      "description": "",
+      "syllabus": "Mata kuliah praktek ini membahas pemrograman, konsep I/O, Timer dan Counter, PWM, operasi interupsi, operasi kanal serial, pemanfatan LCD dan ADC, I2C, SPI serta pemanfaatan aplikasi RTC dan EEPROM dengan Mikrokontroler AVR, PIC, dan Cortex-M0 Nuvoton dan beberapa kapita selekta untuk melengkapi dan menambah pengalaman praktis mahasiswa.",
+      "references": [
         "Putra, A.E., 2010, Mudah Menguasai Pemrograman Mikrokontroler Atmel, Kelompok Riset DSP dan Embedded Intelligent System, Elektronika dan Instrumentasi, Universitas Gadjah Mada, Yogyakarta.",
         "Putra, A.E., 2012, Petunjuk Praktikum Mikrokontroler berbasis Nuvoton NUC140 ARM Cortex M0, Unit Layanan Elektronika dan Instrumentasi.",
         "Nuvoton, 2011, NuMicro NUC100 Series Training Material, Nuvoton Inc.",
         "Sumbodo, B.A.A., 2012, Petunjuk Eksperimen Mikrokontroler AVR dengan Menggunakan Code Vision, Unit Layanan Elektronika dan Instrumentasi.",
         "Bates, M.P., Programming 8-bit PIC Microcontroller in C with Interactive Hardware Simulation, Newnes.",
-        "Balid, W., 2009, Designing A Novel Interactive Microcontroller Training Kit for Teaching Undergraduates Programming Embedded System Microcontroller Using Interaction Methodologies.",
-        "Robotika (3 SKS) Robotics MII-2319 Robotika (3 SKS) Prasyarat: Silabus: Sistem konsep dasar robot, aktuator, tracking, motion planning, motion control, rotation matrix, quaternion, kinematika maju, kinematika balik. Buku acuan: Jazar, R. N., 2010, Theory of Applied Robotics Kinematics, Dynamics, and Control, 2nd ed, Elsevier.",
-        "Praktikum Robotika (1 SKS) Microcontroller Lab MII-2320 Praktikum Robotika (1 SKS) Prasyarat: Robotika* Silabus: Penguasaan pemrograman robot untuk memprogram gerak dasar robot, aktuator, tracking, motion planning, motion control, rotation matrix, quaternion, kinematika maju, kinematika balik menggunakan Robot Operating System (ROS). Buku acuan:",
-        "Yoonseok Pyo, Hancheol Cho, Leon Jung, Darby Lim, 2017, ROS Robot Programming (English), Seoul: ROBOTIS, Tautan: http://community.robotsource.org/t/download-the-ros-robot-programming-book-for-free/51.",
-        "Robotis, 2018, Tautan : http://emanual.robotis.com/docs/en/platform/turtlebot3/overview/",
-        "Programmable Logic Controller (2 SKS) Programmable Logic Controllers (PLC) MII-2313 Programmable Logic Controllers (2 SKS) Prasyarat: - Silabus: Kuliah PLC ini bertujuan untuk memberikan prinsip-prinsip dasar serta implementasi praktis dari PLC, yang mencakup pengenalan konsep sistem kontrol proses dan PLC, kaidah-kaidah pemrograman diagram tangga secara umum, PLC Omron ZEN dan Sysmac serta contoh-contoh aplikasinya. Buku acuan: Clark, Nathan, 2020, PLC Programming Using RSLogix 5000: Understanding Ladder Logic and the Studio 5000 Platform, Independently published (February 16, 2020), ISBN-13 : 979-8614581671",
-        "SCADA dan DCS (2 SKS) SCADA and DCS MII-3309 SCADA dan DCS (2 SKS) Prasyarat: PLC Silabus: Dalam mata kuliah dipelajari tentang latar belakang SCADA, sistem, perangkat keras dan firmware SCADA, perangkat lunak dan protokol sistem SCADA, sistem Jaringan, perancangan antarmuka dashboard, pelacakan kesalahan dan perawatan dan spesifikasi sistem. Juga dibahas tentang konsep dasar akuisisi data hingga pengelolaan basis data di industri. Buku acuan: Clarke, G., Reynders, D. dan Wright, E., 2004, Practical Modern SCADA Protocols: DNP3, 60870.5 and Related Systems. IX. Kelompok Mata Kuliah Pilihan Soft skill MBKM"
+        "Balid, W., 2009, Designing A Novel Interactive Microcontroller Training Kit for Teaching Undergraduates Programming Embedded System Microcontroller Using Interaction Methodologies."
       ],
-      "printedPage": 324,
-      "pdfPage": 339
+      "printedPage": 325,
+      "pdfPage": 340
+    },
+    "MII2319": {
+      "title": "Robotika (3 SKS)",
+      "description": "",
+      "syllabus": "Sistem konsep dasar robot, aktuator, tracking, motion planning, motion control, rotation matrix, quaternion, kinematika maju, kinematika balik.",
+      "references": [
+        "Jazar, R. N., 2010, Theory of Applied Robotics Kinematics, Dynamics, and Control, 2nd ed, Elsevier."
+      ],
+      "printedPage": 325,
+      "pdfPage": 340
+    },
+    "MII2320": {
+      "title": "Praktikum Robotika (1 SKS)",
+      "description": "",
+      "syllabus": "Penguasaan pemrograman robot untuk memprogram gerak dasar robot, aktuator, tracking, motion planning, motion control, rotation matrix, quaternion, kinematika maju, kinematika balik menggunakan Robot Operating System (ROS).",
+      "references": [
+        "Yoonseok Pyo, Hancheol Cho, Leon Jung, Darby Lim, 2017, ROS Robot Programming (English), Seoul: ROBOTIS, Tautan: http://community.robotsource.org/t/download-the-ros-robot-programming-book-for-free/51.",
+        "Robotis, 2018, Tautan : http://emanual.robotis.com/docs/en/platform/turtlebot3/overview/"
+      ],
+      "printedPage": 325,
+      "pdfPage": 340
+    },
+    "MII2313": {
+      "title": "Programmable Logic Controllers (2 SKS)",
+      "description": "",
+      "syllabus": "Kuliah PLC ini bertujuan untuk memberikan prinsip-prinsip dasar serta implementasi praktis dari PLC, yang mencakup pengenalan konsep sistem kontrol proses dan PLC, kaidah-kaidah pemrograman diagram tangga secara umum, PLC Omron ZEN dan Sysmac serta contoh-contoh aplikasinya.",
+      "references": [
+        "Clark, Nathan, 2020, PLC Programming Using RSLogix 5000: Understanding Ladder Logic and the Studio 5000 Platform, Independently published (February 16, 2020), ISBN-13 : 979-8614581671"
+      ],
+      "printedPage": 326,
+      "pdfPage": 341
+    },
+    "MII3309": {
+      "title": "SCADA dan DCS (2 SKS)",
+      "description": "",
+      "syllabus": "Dalam mata kuliah dipelajari tentang latar belakang SCADA, sistem, perangkat keras dan firmware SCADA, perangkat lunak dan protokol sistem SCADA, sistem Jaringan, perancangan antarmuka dashboard, pelacakan kesalahan dan perawatan dan spesifikasi sistem. Juga dibahas tentang konsep dasar akuisisi data hingga pengelolaan basis data di industri.",
+      "references": [
+        "Clarke, G., Reynders, D. dan Wright, E., 2004, Practical Modern SCADA Protocols: DNP3, 60870.5 and Related Systems. IX. Kelompok Mata Kuliah Pilihan Soft skill MBKM"
+      ],
+      "printedPage": 326,
+      "pdfPage": 341
     },
     "MII214010": {
       "title": "Soft skill: Kemampuan Berkomunikasi (2 SKS)",
@@ -1900,6 +1965,213 @@
     }
   },
   "2026": {
+    "PAKF262101": {
+      "title": "Sains dan Inovasi (2 SKS)",
+      "description": "",
+      "syllabus": "Sejarah dan filosofi sains, peran MIPA dalam pembangunan, kolaborasi lintas bidang, pemodelan dan abstraksi matematis dalam fenomena alam, peran data dalam pengambilan keputusan ilmiah, prinsip dasar instrumentasi dan pengukuran ilmiah, materi, energi dan dinamika bumi sebagai ilmiah, pemodelan numerik, simulasi dan AI dalam riset MIPA, energi, lingkungan, kesehatan atau finansial, Sains dalam industri 4.0, paten, dan kewirausahaan berbasis riset, penulisan laporan, komunikasi ilmiah efektif, Mini project lintas bidang, diskusi hasil proyek, refleksi pembelajaran dan etos ilmuwan.",
+      "references": [
+        "Kaku, M. (2012). Physics of the future: How science will shape human destiny and our daily lives by the year 2100. Vintage.",
+        "⁠Hermanto, A. (2025). Filsafat fisika. UGM Press",
+        "⁠Tidd, J., & Bessant, J. R. (2024). Managing innovation: Integrating technological, market and organizational change (8th ed.). Wiley."
+      ],
+      "printedPage": 21,
+      "pdfPage": 39
+    },
+    "UNKU260001": {
+      "title": "Agama Islam (2 SKS)",
+      "description": "",
+      "syllabus": "Tata tertib mencari kebenaran; Konsep ketuhanan dalam Islam, Aqidah, Tauhid; Iman Islam dan Ihsan pilar pembentuk karakter unggul; Hakikat manusia dalam pandangan Islam; Tidak ada ajaran agama untuk mendirikan negara Islam; Konservasi lingkungan dan upaya pencegahannya menurut Islam serta memakmurkan bumi; Kebudayaan dan peradaban Islam berbasis masjid sebagai pusat pengelolaan kehidupan umat serta pengembangan peradaban Islam; Metode hijrah merupakan asas segala sesuatu menjadi maju dan berkembang; Perjuangan Islami misi suci kenabian; solusi problem umat manusia; Jalan kebahagiaan, keselamatan kesuksesan manusia di dunia sementara dan akhirat selama-lamanya.",
+      "references": [
+        "Agustian, A. G. (2003). Rahasia sukses membangkitkan ESQ power: Sebuah inner journey melalui ihsan. Arga.",
+        "Al-Qur’an dan Tafsirnya.",
+        "Syaikh Shafiyurrahman Al-Mubarakfuri. (2006). Perjalanan hidup Rasul yang agung Muhammad SAW. Darus Haq."
+      ],
+      "printedPage": 22,
+      "pdfPage": 40
+    },
+    "UNKU260003": {
+      "title": "Agama Katolik (2 SKS)",
+      "description": "",
+      "syllabus": "Pengantar-Panggilan Hidup Manusia Menurut Kitab Suci, Relasi Manusia, Agama dan Iman dalam pluralitas, Gereja dan Iman yang Memasyarakat, Ajaran Sosial Gereja (ASG). Prinsip-prinsip yang diperjuangkan, Menalar Ajaran Sosial Gereja.",
+      "references": [
+        "Curran, C. E. (2002). Catholic social teaching 1891–present: Historical, theological and ethical analysis. Georgetown University Press.",
+        "DeBerri, E. P., & Hug, J. E. (2005). Catholic social teaching: Our best kept secret. Center of Concern.",
+        "Dewan Karya Pastoral Keuskupan Agung Semarang. (2014). Merajut persaudaraan sejati lintas iman. Kanisius."
+      ],
+      "printedPage": 22,
+      "pdfPage": 40
+    },
+    "UNKU260002": {
+      "title": "Agama Kristen (2 SKS)",
+      "description": "",
+      "syllabus": "Agama dan dimensionalitas agama; hakikat agama dan beragama dipandang dalam konteks Indonesia, akademik keilmuan studi agama-agama/teologis, dan Deklarasi Universal HAM PBB; realitas kontradiktif di dalam kehidupan manusia beragama; teks suci (kitab suci): teks dan konteks penafsiran serta alat-alat bantu untuk pemahamannya; kepribadian, iman, agama, serta perkembangan iman atau bentuk- bentuk penghayatan dan tingkah laku beragama; iman dan ilmu pengetahuan; kemajemukan hidup beragama dan perdamaian (memahami dan menghargai perbedaan agama, mengatasi prasangka antarumat beragama, serta melihat titik-titik temu nilai-nilai luhur kemanusiaan di antara agama-agama).",
+      "references": [
+        "Alkitab: Perjanjian Lama dan Perjanjian Baru. (1974). Lembaga Alkitab Indonesia.",
+        "Direktorat Jenderal Pembelajaran dan Kemahasiswaan Kemenristekdikti. (2016). Buku ajar MKWU pendidikan agama Kristen. Kementerian Riset, Teknologi, dan Pendidikan Tinggi.",
+        "Huston Smith. (2008). Agama-agama manusia. Yayasan Obor."
+      ],
+      "printedPage": 22,
+      "pdfPage": 40
+    },
+    "UNKU260004": {
+      "title": "Agama Hindu (2 SKS)",
+      "description": "",
+      "syllabus": "Brahma Widya (Teologi Hindu), Peran Studi Veda, Konsep Manusia Hindu Dalam membangun kepridanian Mahasiswa, Ajaran Susila Hindu dalam membangun Moralitas mahasiswa, Peran seni keagamaan dalam membentuk kepribadian yang estetis, Membangun Kerukunan Sesuai ajaran Hindu, Ruang Lingkup Ajaran Hindu, Catur Marga Yoga, Hukum dan HAM dalam menegakkan keadilan.",
+      "references": [
+        "Cassirer, E. (1987). Manusia dan kebudayaan: Sebuah esei tentang manusia (A. A. Nugroho, Trans.). Gramedia.",
+        "Dillistone, F. W. (2003). Daya kekuatan simbol: The power of symbols (A. Widyatmartaya, Trans.). Kanisius.",
+        "Tim Penyusun. (2014). Mata kuliah wajib umum (MKWU) pendidikan agama Hindu. Kementerian Pendidikan dan Kebudayaan Republik Indonesia."
+      ],
+      "printedPage": 23,
+      "pdfPage": 41
+    },
+    "UNKU260005": {
+      "title": "Agama Buddha (2 SKS)",
+      "description": "",
+      "syllabus": "Kitab suci Tripitaka, Agama dan Tujuan Hidup Umat Buddha, Tuhan Yang Maha Esa dan Ketuhanan, Moral Etika, Buddha (Sila), Iptek dan Seni, Kerukunan Antar Umat, Masyarakat Buddha, Budaya Buddha di Indonesia, Agama Buddha dan Politik, Hukum Universal Buddha, Bhavana, Karya Tulis bidang studi terkait dan Seminar.",
+      "references": [
+        "Arifin, H. M. (1990). Menguak misteri ajaran agama-agama besar. Golden Trayon Press.",
+        "Departemen Agama RI. (1991). Pengkajian dan pengembangan kerukunan hidup beragama di Indonesia. Balitbang Departemen Agama RI.",
+        "Saccako. (2005). Ketuhanan dalam agama Buddha. Dian Dharma."
+      ],
+      "printedPage": 23,
+      "pdfPage": 41
+    },
+    "UNKU260006": {
+      "title": "Agama Konghucu (2 SKS)",
+      "description": "",
+      "syllabus": "Dasar-dasar hukum kehidupan beragama dan pokok-pokok ajaran Khonghucu. Sejarah timbul dan perkembangannya, keimanan dan dasar-dasar moral etikanya. Berbagai pengetahuan tentang kitab-kitabnya, dan berbagai hal yang menyangkut pengamalan dan makna peribadatan dan upacara.",
+      "references": [
+        "Su Si: Kitab Suci Agama Khonghucu. (n.d.). Su Si: Kitab suci agama Khonghucu. Majelis Tinggi Agama Khonghucu Indonesia (MATAKIN)"
+      ],
+      "printedPage": 23,
+      "pdfPage": 41
+    },
+    "UNKU260008": {
+      "title": "Pancasila (2 SKS)",
+      "description": "",
+      "syllabus": "Pancasila dan Ke-UGM-an; Sejarah Pemikiran Pancasila: Masa Lalu, Masa Kini dan Masa Depan; Pancasila sebagai Dasar Negara; Pancasila sebagai Ideologi dan Pandangan Hidup; Pancasila sebagai Sistem Filsafat; Pancasila sebagai Sistem Etika Pancasila sebagai Dasar dan Orientasi Pengembangan Ilmu dan Kasus-Kasus Kepancasilaan.",
+      "references": [
+        "Kusuma, A. B. (2004). Lahirnya Undang-Undang Dasar 1945: Menurut salinan dokumen autentik Badan Oentoek Menjelidiki Oesaha2 Persiapan Kemerdekaan. Badan Penerbit Fakultas Hukum UI.",
+        "Soekarno. (1945). Pidato lahirnya Pancasila [Pidato pada Sidang BPUPK].",
+        "Tim MKWU Pendidikan Pancasila Dikti. (2016). Buku mata kuliah wajib pendidikan tinggi pendidikan Pancasila [E-book]. Kementerian Riset, Teknologi, dan Pendidikan Tinggi."
+      ],
+      "printedPage": 23,
+      "pdfPage": 41
+    },
+    "UNKU260010": {
+      "title": "Bahasa Indonesia (2 SKS)",
+      "description": "",
+      "syllabus": "Hakikat bahasa Indonesia sebagai bahasa persatuan dan bahasa negara; mengeksplorasi teks dalam kehidupan akademik (penanaman nilai dan hakikat bahasa Indonesia sebagai penghela ilmu pengetahuan); menjelajah dunia pustaka; mendesain proposal penelitian dan proposal kegiatan; melaporkan hasil penelitian dan hasil kegiatan; mengaktualisasikan diri dalam artikel ilmiah.",
+      "references": [
+        "Akhadiah, S., Arsjad, M. G., & Ridwan, S. H. (1992). Pembinaan kemampuan menulis bahasa Indonesia. Erlangga.",
+        "Tim Pengembang Pedoman Bahasa Indonesia. (2016). Pedoman umum ejaan bahasa Indonesia. Badan Pengembangan dan Pembinaan Bahasa.",
+        "Wibowo, R. M. (2009). Cermat menulis dalam bahasa Indonesia (Cetakan ke-3). Fokusahaja Press."
+      ],
+      "printedPage": 24,
+      "pdfPage": 42
+    },
+    "UNKU260012": {
+      "title": "Humaniora Digital (2 SKS)",
+      "description": "",
+      "syllabus": "Cara penggunaan teknologi dan alat digital untuk komunikasi dan kolaborasi yang efisien. Penyelesaian masalah kompleks, berpikir kritis, berperilaku baik di sosial media, dan penyusunan solusi digital yang inovatif dan inklusif bagi semua orang. Menjaga kesehatan mental dan bagaimana menggunakan kecerdasan buatan (AI) secara bijak. Bijak dalam bersikap dan memahami berbagai warisan budaya bangsa di era teknologi modern.",
+      "references": ["-"],
+      "printedPage": 24,
+      "pdfPage": 42
+    },
+    "UNKU260009": {
+      "title": "Kewarganegaraan (2 SKS)",
+      "description": "",
+      "syllabus": "Fungsi PKN bagi sarjana dan profesional, Fungsi Identitas Nasional bagi pembangunan bangsa dan karakter masyarakat, pentingnya Integrasi Nasional, Fungsi Nilai dan Norma-norma, Project Citizen I, Hak dan Kewajiban Negara dan Warga Negara Kenegaraan, Dinamika Praktik Demokrasi di Indonesia, Dinamika Penegakan Hukum di Indonesia, Urgensi Wawasan Nusantara sebagai Wawasan Kolektif Bangsa Tantangan Ketahanan Nasional dan Pentingnya Bela Negara dan Project Citizen II.",
+      "references": [
+        "Kementerian Riset, Teknologi, dan Pendidikan Tinggi. (2016). Pendidikan kewarganegaraan."
+      ],
+      "printedPage": 24,
+      "pdfPage": 42
+    },
+    "UNKU260013": {
+      "title": "Keterampilan Masa Depan Berkelanjutan (2 SKS)",
+      "description": "",
+      "syllabus": "Planet concerns, People leadership, Enabler skills dan Sustainability action. Environmental literacy, Concept of needs and resource management, dan Responsible consumption and production. Responsible leadership, Human interaction and collaboration, Cultural intelligence, dan Individual resilience. Growth mindset, Forward thinking, Critical and system thinking, Ethical and responsible decision making, dan Innovative and creative problem solving. Sustainable business model, dan Action oriented initiatives.",
+      "references": [
+        "Mata kuliah Keterampilan Masa Depan Berkelanjutan (KMDB) menggunakan berbagai acuan yang tidak kaku (rigid) namun selalu berkembang dan dapat diperkaya dari berbagai literatur, diantaranya.",
+        "Laman atau situs web ekonomisirkular.id Ekonomi Sirkular ID",
+        "Laman atau situs web sdgs.un.org | Sustainable Development (un.org)",
+        "Laman atau situs web unido.org What are green skills? | UNIDO",
+        "Laman atau situs web iucn.org Building sustainable future | IUCN",
+        "Modul pembelajaran dan studi kasus"
+      ],
+      "printedPage": 24,
+      "pdfPage": 42
+    },
+    "UNKU260014": {
+      "title": "Kuliah Kerja Nyata PPM (4 SKS)",
+      "description": "",
+      "syllabus": "Pembekalan Umum: Sejarah dan Filosofi KKN, Etika dan Tata Tertib KKN, Operasional dan Administrasi Pelaporan KKN, K3 dan Klaim Asuransi. Pembekalan Khusus: Materi Pembelajaran Pemberdayaan Masyarakat (sesuai tema), Materi Soft skill dan Kemampuan Komunikasi, Materi Pembuatan Rencana Kerja, Materi Operasional dan Administrasi Pelaporan Kegiatan, Materi Pembuatan Publikasi dan Dokumentasi. Bakti Kampus, Konsolidasi, General Test, Observasi dan Penyusunan Rencana Kegiatan, Pelaksanaan Program KKN, Laporan Pelaksanaan Kegiatan dan Pertanggungjawaban Kegiatan.",
+      "references": [
+        "Direktorat Pengabdian kepada Masyarakat Universitas Gadjah Mada. (2020). Buku pedoman kuliah kerja nyata pembelajaran pemberdayaan masyarakat (KKN- PPM) Universitas Gadjah Mada."
+      ],
+      "printedPage": 25,
+      "pdfPage": 43
+    },
+    "UNKU260011": {
+      "title": "Literasi Kesehatan (2 SKS)",
+      "description": "",
+      "syllabus": "Literasi Kesehatan 1: Preventing Stress Eating and Substance Abuse; Literasi Kesehatan 2: Kesehatan Seksual dan Reproduksi; Literasi Kesehatan 3: Pencegahan Kekerasan Seksual; Literasi Kesehatan 4: Kesehatan Jiwa.",
+      "references": [
+        "Universitas Gadjah Mada. (n.d.). Course literasi kesehatan–KKN. ELOK UGM. https: //elok.ugm.ac.id/"
+      ],
+      "printedPage": 25,
+      "pdfPage": 43
+    },
+    "PAKF262102": {
+      "title": "Fisika Dasar 1 (3 SKS)",
+      "description": "",
+      "syllabus": "Pengukuran dan Besaran Fisika, Vektor, Kinematika, Gaya, Usaha dan Energi, Momentum Linear, Pusat Massa, Rotasi, Torka, Momen Inersia, Momentum Sudut, Kesetimbangan dan Elastisitas, Gravitasi, Fluida, Getaran, Gelombang, Suhu, Kalor dan Hukum Termodinamika I, Teori Kinetik Gas, Entropi dan Hukum Termodinamika II.",
+      "references": [
+        "Halliday, D., Resnick, R & Walker, J.(2018). Fundamentals of Physics: Extended (10th ed.). USA: John Wiley & Sons, Inc.",
+        "Serway, R.S., & Jewett, J.W. (2014). Physics for Scientists and Engineers (9th ed.). Singapore: Brooks/Cole Cengage Learning.",
+        "Tipler, P.A., & Mosca, G. (2008). Physics for Scientists and Engineers (6th ed.). New York: W. H. Freeman and Company."
+      ],
+      "printedPage": 25,
+      "pdfPage": 43
+    },
+    "PAKF262103": {
+      "title": "Kalkulus I (3 SKS)",
+      "description": "",
+      "syllabus": "Sistem bilangan real: sifat-sifat aljabar R, bentuk pangkat, relasi urutan dan sifat- sifatnya, garis bilangan, interval, pertidaksamaan, nilai mutlak. Sistem koordinat: sistem koordinat kartesius, sistem koordinat kutub, hubungan sistem koordinat kartesius dan sistem koordinat kutub. Fungsi: pengertian relasi dan fungsi, aljabar fungsi, jenis-jenis fungsi, fungsi invers, komposisi fungsi, grafik fungsi di sistem koordinat kartesius, grafik fungsi di sistem koordinat kutub. Limit fungsi dan kekontinuan: definisi dan sifat-sifat limit, limit satu sisi, limit tak hingga, limit fungsi untuk x→∞ dan x→-∞, limit fungsi trigonometri, bilangan Euler, fungsi kontinu. Derivatif: definisi dan sifat-sifat derivatif, interpretasi geometris derivatif, diferensial, derivatif tingkat tinggi, Teorema Rolle, Teorema Nilai Rata-rata, aturan L’Hopital, masalah nilai ekstrem, aplikasi masalah nilai ekstrem, naik/turun, cembung/cekung, titik belok fungsi, menggambar grafik fungsi. Deret Taylor dan deret MacLaurin.",
+      "references": [
+        "Adams, R. A., & Essex, C. (2018). Calculus: A Complete Course (9th ed.). Pearson.",
+        "Mizrahi, A., & Sullivan, M. (1990). Calculus and Analytic Geometry (3rd ed.). Wadsworth Publishing Company.",
+        "Stewart, J., Clegg, D. K., & Watson, S. (2020). Calculus: Early Transcendentals (9th ed.). Cengage Learning."
+      ],
+      "printedPage": 26,
+      "pdfPage": 44
+    },
+    "PAKF262104": {
+      "title": "Kimia Dasar 1 (3 SKS)",
+      "description": "",
+      "syllabus": "Molekul, Ion dan Rumus Kimia, Reaksi Kimia; Reaksi dalam larutan, Perubahan energi dalam reaksi kimia; Struktur Atom, Tabel Periodik; Ikatan Ion vs ikatan Kovalen, Geometri Molekul dan model ikatan kovalen.",
+      "references": [
+        "Brady, J. E., & Senese, F. A. (2009). Chemistry: The study of matter and its changes (5th ed.).",
+        "Chang, R., & Goldsby, K. A. (2012). Chemistry (11th ed.).",
+        "Petrucci, R. H., Harwood, W. S., & Herring, F. G. (2002). General chemistry: Principles and modern applications (8th ed.)."
+      ],
+      "printedPage": 26,
+      "pdfPage": 44
+    },
+    "PAKF262105": {
+      "title": "Pemrograman (3 SKS)",
+      "description": "",
+      "syllabus": "Konsep pemrograman; Pengantar Computational Thinking dan algoritma; Jenis-jenis tipe data dan deklarasi variabel; Operasi aritmetika, relasional, dan logika; Struktur kendali (percabangan dan perulangan); Struktur data dasar: array, struct, string, pointer, dan file; Pengantar fungsi: definisi, variabel lokal dan global, serta parameter fungsi; Fungsi rekursif; Algoritma pengurutan sederhana: Bubble Sort, Insertion Sort, dan Selection Sort; Algoritma pengurutan lanjut: Quick Sort dan Merge Sort; Algoritma pencarian: Binary Search, Sequential Search, dan Hashing; Pemecahan masalah (problem solving).",
+      "references": [
+        "Cormen, T.H., & Leiserson, C.L. (2014). Introduction to Algorithms (3rd ed.).",
+        "Drozdek, A. (2012). Data Structures and Algorithms in C ++.",
+        "Kernighan, B.W., & Dennis M. (2006). The C Programming Language (2nd ed.). Ritchie. internasional ASIIN. Selain Audit Mutu Internal yang diselenggarakan oleh Satuan Penjaminan Mutu dan Reputasi Universitas (SPMRU) lembaga di tingkat universitas bersama Unit Jaminan Mutu dan Komite Kurikulum (UJMKK) di tingkat Fakultas, evaluasi program studi dilakukan pula oleh Gugus Jaminan Mutu dan Akreditasi (GJMA) di tingkat Departemen IKE bersama Tim Koordinasi Semester (TKS) di Tingkat Prodi. Evaluasi proses pembelajaran dimulai dengan melakukan kegiatan hearing dari perwakilan mahasiswa dari setiap angkatan, untuk mendapatkan umpan balik mengenai pelaksanaan proses pembelajaran, yang dilaksanakan minimal 2 kali dalam satu semester. Sedangkan pada akhir semester dilakukan survei ke mahasiswa tentang kegiatan belajar mengajar (KBM) selama satu semester. Melalui hearing session dan survei, dijaring keluhan-keluhan mahasiswa terkait layanan akademik dan layanan-layanan Program Studi lainnya. Berdasarkan evaluasi program studi oleh TKS dan GJMA, beberapa keluhan dan temuan yang disampaikan oleh mahasiswa dapat diselesaikan oleh Program Studi dan Departemen secara cepat. Segala temuan yang ada pada intinya akan ditindaklanjuti untuk perbaikan yang berkelanjutan. 3.2.14. Fast-Track Program ini dilaksanakan untuk memberikan kesempatan kepada mahasiswa Program Studi S1 Ilmu Komputer yang memiliki prestasi akademik yang baik dan bermotivasi melanjutkan studi ke jenjang master untuk mendapatkan gelar sarjana dan master di Departemen Ilmu Komputer dan Elektronika UGM dalam kurun waktu lima tahun. Pendaftaran dan proses seleksi program ini dilaksanakan pada semester 6. Selanjutnya program ini dimulai pada semester 7 pada program studi sarjana. Pada program ini, semester 7 dan 8 pada program sarjana beririsan dengan semester 1 dan 2 para program studi master. Mahasiswa yang mengikuti program ini diwajibkan telah menempuh sekurangnya 120 SKS, lulus sarjana pada semester 8, dan lulus magister maksimal pada semester 4, dengan total masa studi maksimal 10 semester. Teknis pelaksanaan program fast-track diatur dalam dokumen Panduan Program Fast-Track Sarjana-Magister. 3.2.15. Silabus Mata Kuliah Program Studi Ilmu Komputer MATA KULIAH WAJIB PROGRAM STUDI"
+      ],
+      "printedPage": 26,
+      "pdfPage": 44
+    },
     "PACS262101": {
       "title": "Aljabar Vektor dan Matriks (2 SKS)",
       "description": "",
@@ -2682,8 +2954,16 @@
       "description": "",
       "syllabus": "Sejarah dan motivasi blockchain, struktur blok dan rantai blok, kriptografi dasar untuk blockchain, arsitektur jaringan blockchain, masalah Byzantine dan solusi konsensus, Proof-of-Work, Proof-of-Authority, Proof-of-Stake dan variasinya, instalasi dan konfigurasi Geth, membuat dan menjalankan testnet Ethereum, dasar-dasar bahasa Solidity, menulis dan menguji smart contract, deploy smart contract ke testnet, dasar Web3 dan interaksi DApp, membangun aplikasi Web3 sederhana.",
       "references": [
-        "Kok, A. S. (2024). Hands-On Blockchain for Python Developers (2nd ed.). Packt Publishing.",
-        "PACS262519 Sistem Siber Fisik (Cyber Physical Systems) (3 SKS) Prasyarat: Jaringan Komputer Silabus: Pengantar Cyber Physical System; Arsitektur Cyber Physical System; Sensor dan Akuisisi Data; Aktuator dan Interaksi Sistem Fisik; Sistem Kendali pada CPS; Komputasi dan Jaringan pada CPS; Perancangan dan Presentasi Proposal CPS; Sistem Real-Time pada CPS; Keamanan Cyber Physical System; Integrasi Sensor–Aktuator ke Backend CPS; Monitoring dan Observabilitas CPS; Penanganan Kegagalan dengan Timeout dan Retry; Konfigurasi dan Update CPS Berjalan; Presentasi Proyek Akhir CPS. Referensi:",
+        "Kok, A. S. (2024). Hands-On Blockchain for Python Developers (2nd ed.). Packt Publishing."
+      ],
+      "printedPage": 215,
+      "pdfPage": 233
+    },
+    "PACS262519": {
+      "title": "Sistem Siber Fisik (Cyber Physical Systems) (3 SKS)",
+      "description": "",
+      "syllabus": "Pengantar Cyber Physical System; Arsitektur Cyber Physical System; Sensor dan Akuisisi Data; Aktuator dan Interaksi Sistem Fisik; Sistem Kendali pada CPS; Komputasi dan Jaringan pada CPS; Perancangan dan Presentasi Proposal CPS; Sistem Real-Time pada CPS; Keamanan Cyber Physical System; Integrasi Sensor–Aktuator ke Backend CPS; Monitoring dan Observabilitas CPS; Penanganan Kegagalan dengan Timeout dan Retry; Konfigurasi dan Update CPS Berjalan; Presentasi Proyek Akhir CPS.",
+      "references": [
         "Alur, R. (2015). Principles of Cyber-Physical Systems. MIT Press.",
         "Taha, W. M. (2021). Cyber-Physical Systems: A Model-Based Approach. Springer.",
         "Rajkumar, R. (2016). Cyber-Physical Systems. Addison-Wesley Professional. Minat Wirausaha Digital"

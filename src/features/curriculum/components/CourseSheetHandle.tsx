@@ -9,39 +9,112 @@ export function CourseSheetHandle({
   height: number;
   onChange: (height: number) => void;
 }) {
-  const drag = useRef<{
-    y: number;
-    height: number;
-    current: number;
-    viewport: number;
-    handle: HTMLButtonElement;
-  } | null>(null);
-  const frame = useRef<number | null>(null);
-  useEffect(
-    () => () => {
-      if (frame.current !== null) cancelAnimationFrame(frame.current);
-    },
-    [],
-  );
-  const preview = (handle: HTMLButtonElement, next: number) => {
-    handle
-      .closest<HTMLElement>('[role="dialog"]')
-      ?.style.setProperty("--course-sheet-height", `${next}dvh`);
-    handle.setAttribute("aria-valuenow", String(Math.round(next)));
-    handle.setAttribute("aria-valuetext", `${Math.round(next)}% layar`);
-  };
-  const snap = () => {
-    const active = drag.current;
-    if (!active) return;
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = null;
-    const next = heights.reduce((best, next) =>
-      Math.abs(next - active.current) < Math.abs(best - active.current) ? next : best,
-    );
-    preview(active.handle, next);
-    drag.current = null;
-    onChange(next);
-  };
+  const button = useRef<HTMLButtonElement>(null);
+  const suppressClick = useRef(false);
+  const change = useRef(onChange);
+  useEffect(() => {
+    change.current = onChange;
+  }, [onChange]);
+  useEffect(() => {
+    const handle = button.current!;
+    const sheet = handle.closest<HTMLElement>('[role="dialog"]')!;
+    let active: {
+      y: number;
+      current: number;
+      dragging: boolean;
+      scroll: HTMLElement | null;
+    } | null = null;
+    let frame: number | null = null;
+    const preview = (next: number) => {
+      sheet.style.setProperty("--course-sheet-height", `${next}dvh`);
+      handle.setAttribute("aria-valuenow", String(Math.round(next)));
+      handle.setAttribute("aria-valuetext", `${Math.round(next)}% layar`);
+    };
+    const start = (target: EventTarget | null, y: number) => {
+      if (!window.matchMedia("(max-width: 649px)").matches) return;
+      let scroll = target instanceof HTMLElement ? target : null;
+      while (scroll && scroll !== sheet && getComputedStyle(scroll).overflowY !== "auto") {
+        scroll = scroll.parentElement;
+      }
+      active = { y, current: height, dragging: false, scroll: scroll === sheet ? null : scroll };
+      suppressClick.current = false;
+    };
+    const move = (y: number, event: Event) => {
+      if (!active) return;
+      const delta = active.y - y;
+      if (!active.dragging) {
+        if (Math.abs(delta) < 8) return;
+        // Expanded content keeps native scrolling; dragging down takes over only at its top.
+        if ((delta > 0 && height === 75) || (delta < 0 && (active.scroll?.scrollTop ?? 0) > 0)) {
+          active = null;
+          return;
+        }
+        active.dragging = true;
+      }
+      event.preventDefault();
+      active.current = Math.max(30, Math.min(75, height + (delta / window.innerHeight) * 100));
+      if (frame === null)
+        frame = requestAnimationFrame(() => {
+          frame = null;
+          if (active) preview(active.current);
+        });
+    };
+    const finish = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+      if (active?.dragging) {
+        const next = heights.reduce((best, value) =>
+          Math.abs(value - active!.current) < Math.abs(best - active!.current) ? value : best,
+        );
+        preview(next);
+        suppressClick.current = true;
+        change.current(next);
+      }
+      active = null;
+    };
+    const touchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) start(event.target, event.touches[0].clientY);
+      else finish();
+    };
+    const touchMove = (event: TouchEvent) => {
+      if (event.touches.length === 1) move(event.touches[0].clientY, event);
+    };
+    const pointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      const target = event.target as HTMLElement;
+      if (target.closest("a, button, input, select, textarea") && !handle.contains(target)) return;
+      start(target, event.clientY);
+      if (active) event.preventDefault();
+    };
+    const pointerMove = (event: PointerEvent) => {
+      if (event.pointerType === "mouse") move(event.clientY, event);
+    };
+    const click = (event: MouseEvent) => {
+      if (!suppressClick.current || event.detail === 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      suppressClick.current = false;
+    };
+    sheet.addEventListener("touchstart", touchStart, { passive: true });
+    sheet.addEventListener("touchmove", touchMove, { passive: false });
+    sheet.addEventListener("touchend", finish);
+    sheet.addEventListener("touchcancel", finish);
+    sheet.addEventListener("pointerdown", pointerDown);
+    window.addEventListener("pointermove", pointerMove);
+    window.addEventListener("pointerup", finish);
+    sheet.addEventListener("click", click, true);
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      sheet.removeEventListener("touchstart", touchStart);
+      sheet.removeEventListener("touchmove", touchMove);
+      sheet.removeEventListener("touchend", finish);
+      sheet.removeEventListener("touchcancel", finish);
+      sheet.removeEventListener("pointerdown", pointerDown);
+      window.removeEventListener("pointermove", pointerMove);
+      window.removeEventListener("pointerup", finish);
+      sheet.removeEventListener("click", click, true);
+    };
+  }, [height]);
 
   return (
     <div className="flex shrink-0 justify-center min-[650px]:hidden">
@@ -54,41 +127,8 @@ export function CourseSheetHandle({
         aria-valuemax={75}
         aria-valuenow={Math.round(height)}
         aria-valuetext={`${Math.round(height)}% layar`}
-        className="flex h-5 w-24 touch-none items-center justify-center rounded-lg cursor-ns-resize focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-primary-base"
-        onPointerDown={(event) => {
-          if (event.button !== 0) return;
-          drag.current = {
-            y: event.clientY,
-            height,
-            current: height,
-            viewport: window.innerHeight,
-            handle: event.currentTarget,
-          };
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerMove={(event) => {
-          if (!drag.current) return;
-          drag.current.current = Math.max(
-            30,
-            Math.min(
-              75,
-              drag.current.height +
-                ((drag.current.y - event.clientY) / drag.current.viewport) * 100,
-            ),
-          );
-          // Keep pointer movement off the React tree; commit the snapped height on release.
-          if (frame.current === null)
-            frame.current = requestAnimationFrame(() => {
-              frame.current = null;
-              const active = drag.current;
-              if (active) preview(active.handle, active.current);
-            });
-        }}
-        onPointerUp={snap}
-        onPointerCancel={snap}
-        onLostPointerCapture={() => {
-          if (drag.current) snap();
-        }}
+        className="flex h-5 w-24 touch-none items-center justify-center rounded-lg cursor-ns-resize outline-none focus-visible:[&>span]:bg-primary-base select-none"
+        ref={button}
         onKeyDown={(event) => {
           const next =
             event.key === "ArrowUp"

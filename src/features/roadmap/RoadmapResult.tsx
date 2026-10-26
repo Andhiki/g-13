@@ -154,6 +154,7 @@ export function RoadmapResult({
         </AlignModal.Content>
       </AlignModal.Root>
       <CourseDetails
+        modal={false}
         course={selected?.course ?? data.all.find((course) => course.id === selectedId) ?? null}
         data={detailsData}
         relations={plan.relations}

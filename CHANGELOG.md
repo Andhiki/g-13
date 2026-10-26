@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Favicon diagram simpul dari Remix Icon, monokrom mengikuti tema sistem.
+- Transkripsi enam peta minat kurikulum 2026 (PDF 201–206), termasuk semester,
+  SKS, status WM/P, blok pilihan, dan perbedaannya dari tabel sumber.
 - Handle pada detail mata kuliah di mobile untuk mengatur tinggi panel ke 30%
   atau 75% layar melalui seret atau keyboard.
 - Pintasan `D` untuk mengganti tema terang/gelap.
@@ -31,6 +34,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Sheet detail mobile dapat diseret dari seluruh panel; konten tetap bisa digulir
+  pada tinggi 75%, dan seret turun dari posisi scroll teratas mengecilkan panel.
 - Kartu mata kuliah pilihan memakai permukaan solid bernuansa biru, border lebih
   jelas, dan teks tegas agar tetap berbeda dari mata kuliah utama.
 - Tombol "Tampilkan mata kuliah" dan "Tampilkan roadmap" dihapus karena filter
@@ -44,6 +49,15 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Seluruh baris mata kuliah pada tampilan daftar membuka detail saat diklik,
+  termasuk kode, SKS, kategori, dan ruang kosong di dalam baris.
+- Handle sheet tidak lagi menampilkan outline saat terfokus; navigasi keyboard
+  ditandai warna handle. Gesture drag tetap berjalan saat daftar memperbarui posisi scroll.
+- Detail mata kuliah di roadmap tidak lagi memburamkan dan menghalangi interaksi
+  dengan peta di belakangnya.
+- Ekstraksi silabus mencakup mata kuliah umum, kode pendek, judul dengan tanda
+  kurung, dan judul tanpa akhiran SKS. Seluruh 89 entri silabus Ilkom 2026 kini
+  terwakili; audit memisahkan 88 kode unik dari cakupan 108 kode matkul di tabel.
 - Silabus Pembelajaran Mesin 2026 kembali tersedia. Dua versi dalam PDF sumber
   dipertahankan dengan halaman masing-masing, alih-alih dihapus karena kode berulang.
 - Handle detail mata kuliah mengikuti gerakan drag tanpa me-render ulang peta

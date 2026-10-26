@@ -1,0 +1,996 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "file": "output/sources/fmipa-kurikulum-sarjana-2026.pdf",
+    "sha256": "ffa6d141c99228b79092d9da647f47e9b37d2966f6aca8ca9567de8b7a506520",
+    "pdf_pages": [200, 201, 202, 203, 204, 205, 206]
+  },
+  "method": "Manual visual transcription of the interest-specific course blocks in raster diagrams. Line wraps are collapsed and abbreviations retained.",
+  "code_mapping": "Diagrams contain names, not course codes. Codes are matched to names in Table 3.12; each mapped row retains the table source page.",
+  "scope": [
+    "Six interest-area course blocks, their WM/P classifications, semesters, credits, generic choice buckets and exposure slots.",
+    "Shared required-course nodes and arrow connections are not transcribed in this dataset; use the original figures for those details."
+  ],
+  "required_course_map": {
+    "figure": "3.7",
+    "pdf_page": 200,
+    "printed_page": 182,
+    "status": "reference_only"
+  },
+  "legend": {
+    "WM": "Green fill with red outline; required for the selected interest area.",
+    "P": "Green fill without red outline; elective.",
+    "university_required": "Blue fill.",
+    "faculty_required": "Purple fill.",
+    "program_required": "Cream fill.",
+    "international_exposure": "Dashed outline."
+  },
+  "semester_total_labels": [20, 20, 24, 24, 24, 24, 24, 24],
+  "shared_source_conflicts": [
+    {
+      "course_code": "UNKU260014",
+      "field": "credits",
+      "diagram_value": 8,
+      "table_value": 4,
+      "diagram_pdf_pages": [200, 201, 202, 203, 204, 205, 206],
+      "note": "Preserve the diagram label; application credits still follow the table. Repeated semester 6/7 placements are alternatives, not two credit awards."
+    }
+  ],
+  "interpretation_limits": [
+    "Diagram semesters are planned placements, not actual offering schedules.",
+    "Generic buckets and repeated final-project placements must not be added as extra mandatory courses.",
+    "Differences from the table are retained for review; this transcription does not change application rules.",
+    "A table course not named in a diagram is not thereby prohibited for that interest."
+  ],
+  "interest_maps": [
+    {
+      "interest_area": "Analisis Data",
+      "source": {
+        "figure": "3.8",
+        "pdf_page": 201,
+        "printed_page": 183
+      },
+      "courses": [
+        {
+          "course_code": "PACS262419",
+          "label_transcribed": "Rekayasa Pengetahuan",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262422",
+          "label_transcribed": "Temu Balik Informasi",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262504",
+          "label_transcribed": "Data Sains",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262526",
+          "label_transcribed": "Rekayasa Data",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262527",
+          "label_transcribed": "Rekayasa Model Kecerd. Artifisial",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262508",
+          "label_transcribed": "Kapita Selekta RPLD",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262530",
+          "label_transcribed": "Tren Penelitian Ilmu Komputer & Elektr.",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 3,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 5,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 6,
+          "label_transcribed": "Pilihan",
+          "credits": 6
+        },
+        {
+          "semester": 7,
+          "label_transcribed": "Pilihan",
+          "credits": 5
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 9,
+      "differences_from_table": [],
+      "table_courses_not_named_in_diagram": []
+    },
+    {
+      "interest_area": "Komputasi Cerdas",
+      "source": {
+        "figure": "3.9",
+        "pdf_page": 202,
+        "printed_page": 184
+      },
+      "courses": [
+        {
+          "course_code": "PACS262314",
+          "label_transcribed": "Teori Bahasa dan Automata",
+          "semester": 3,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262303",
+          "label_transcribed": "Grafika Komputer",
+          "semester": 3,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262307",
+          "label_transcribed": "Konsep Bahasa Pemrograman",
+          "semester": 3,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262310",
+          "label_transcribed": "Pengolahan Citra Digital",
+          "semester": 3,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262417",
+          "label_transcribed": "Penglihatan Komp. & Analisis Visual",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262410",
+          "label_transcribed": "Metode Optimasi",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262401",
+          "label_transcribed": "Alg. Terdistribusi & Pemrog. Paralel",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262414",
+          "label_transcribed": "Pemrograman Kompetitif",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262404",
+          "label_transcribed": "Desain Compiler",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262402",
+          "label_transcribed": "Algoritma untuk Trading",
+          "semester": 4,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262505",
+          "label_transcribed": "Kajian Literatur",
+          "semester": 5,
+          "credits": 1,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262516",
+          "label_transcribed": "Pembelajaran Mesin Mendalam",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262528",
+          "label_transcribed": "Sains Manajemen",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262517",
+          "label_transcribed": "Pemodelan & Simulasi",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        },
+        {
+          "course_code": "PACS262507",
+          "label_transcribed": "Kapita Selekta Algoritma & Komp.",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 5,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 6,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 8
+        },
+        {
+          "semester": 7,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 5
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 10,
+      "differences_from_table": [],
+      "table_courses_not_named_in_diagram": [
+        {
+          "course_code": "PACS262530",
+          "title": "Tren Penelitian Ilmu Komputer dan Elektronika",
+          "source_page": {
+            "printed_page": 171,
+            "pdf_page_1_based": 189
+          }
+        }
+      ],
+      "selection_notes": [
+        {
+          "semester": 3,
+          "credits": 3,
+          "note_transcribed": "Pilih 3 SKS, selainnya bisa diambil di Semester Gasal berikutnya.",
+          "course_codes": ["PACS262314", "PACS262303", "PACS262307", "PACS262310"]
+        },
+        {
+          "semester": 4,
+          "credits": 6,
+          "note_transcribed": "Pilih 6 SKS, selainnya bisa diambil di Semester Genap berikutnya.",
+          "course_codes": [
+            "PACS262417",
+            "PACS262410",
+            "PACS262401",
+            "PACS262414",
+            "PACS262404",
+            "PACS262402"
+          ]
+        }
+      ]
+    },
+    {
+      "interest_area": "Kecerdasan Artifisial",
+      "source": {
+        "figure": "3.10",
+        "pdf_page": 203,
+        "printed_page": 185
+      },
+      "courses": [
+        {
+          "course_code": "PACS262408",
+          "label_transcribed": "Logika Fuzzy",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262421",
+          "label_transcribed": "Sistem Pendukung Keputusan",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262516",
+          "label_transcribed": "Pembelajaran Mesin Mendalam",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262523",
+          "label_transcribed": "Pengenalan Pola",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262527",
+          "label_transcribed": "Rekayasa Model Kecerd. Artifisial",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262518",
+          "label_transcribed": "Pemrosesan Bahasa Alami",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262501",
+          "label_transcribed": "Algoritma Genetika",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262420",
+          "label_transcribed": "Sistem Pakar",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262604",
+          "label_transcribed": "Kapita Selekta Sistem Cerdas",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262503",
+          "label_transcribed": "Bioinformatika",
+          "semester": 7,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 3,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 6,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 2
+        },
+        {
+          "semester": 7,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 2
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 15,
+      "differences_from_table": [
+        {
+          "course_code": "PACS262420",
+          "field": "semester",
+          "diagram_value": 6,
+          "table_value": 4
+        },
+        {
+          "course_code": "PACS262503",
+          "field": "semester",
+          "diagram_value": 7,
+          "table_value": 5
+        }
+      ],
+      "table_courses_not_named_in_diagram": [
+        {
+          "course_code": "PACS262530",
+          "title": "Tren Penelitian Ilmu Komputer dan Elektronika",
+          "source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        }
+      ]
+    },
+    {
+      "interest_area": "Rekayasa Perangkat Lunak",
+      "source": {
+        "figure": "3.11",
+        "pdf_page": 204,
+        "printed_page": 186
+      },
+      "courses": [
+        {
+          "course_code": "PACS262416",
+          "label_transcribed": "Pengembangan UI/UX",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262524",
+          "label_transcribed": "Penjaminan Kualitas PL",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262520",
+          "label_transcribed": "Pengembangan PL berbasis Platform",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262521",
+          "label_transcribed": "Pengembangan PL Skalabel",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262527",
+          "label_transcribed": "Rekayasa Model Kecerd. Artifisial",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262601",
+          "label_transcribed": "Audit Teknologi Informasi",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262603",
+          "label_transcribed": "Industri PL Adaptif berbasis Agen",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 3,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 5,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 6,
+          "label_transcribed": "Pilihan",
+          "credits": 2
+        },
+        {
+          "semester": 7,
+          "label_transcribed": "Pilihan",
+          "credits": 5
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 12,
+      "differences_from_table": [],
+      "table_courses_not_named_in_diagram": [
+        {
+          "course_code": "PACS262530",
+          "title": "Tren Penelitian Ilmu Komputer dan Elektronika",
+          "source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        }
+      ]
+    },
+    {
+      "interest_area": "Infrastruktur Komputasi",
+      "source": {
+        "figure": "3.12",
+        "pdf_page": 205,
+        "printed_page": 187
+      },
+      "courses": [
+        {
+          "course_code": "PACS262406",
+          "label_transcribed": "Keamanan Sistem dan Siber",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262407",
+          "label_transcribed": "Komputasi Awan",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262502",
+          "label_transcribed": "Arsitektur dan Infr. Berkinerja Tinggi",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 172,
+            "pdf_page_1_based": 190
+          }
+        },
+        {
+          "course_code": "PACS262522",
+          "label_transcribed": "Pengembangan Pusat Komp. Data",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262519",
+          "label_transcribed": "Pengantar Cyberphysical Syst.",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262509",
+          "label_transcribed": "Kapita Selekta SKJ",
+          "semester": 5,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262415",
+          "label_transcribed": "Pengantar Tekn. Blockchain",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262530",
+          "label_transcribed": "Tren Penelitian Ilmu Komputer & Elektr.",
+          "semester": 7,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 3,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 5,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 6,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 5
+        },
+        {
+          "semester": 7,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 2
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 12,
+      "differences_from_table": [
+        {
+          "course_code": "PACS262415",
+          "field": "semester",
+          "diagram_value": 6,
+          "table_value": 4
+        },
+        {
+          "course_code": "PACS262530",
+          "field": "semester",
+          "diagram_value": 7,
+          "table_value": 6
+        }
+      ],
+      "table_courses_not_named_in_diagram": []
+    },
+    {
+      "interest_area": "Wirausaha Digital",
+      "source": {
+        "figure": "3.13",
+        "pdf_page": 206,
+        "printed_page": 188
+      },
+      "courses": [
+        {
+          "course_code": "PACS262405",
+          "label_transcribed": "Ekosistem dan Platform Digital",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262403",
+          "label_transcribed": "Analisis Produk untuk Pengusaha Digital",
+          "semester": 4,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262529",
+          "label_transcribed": "Strategi Bisnis Eksekutif CEO Dig.",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262512",
+          "label_transcribed": "Keuangan dan Investasi Per. Rintis.",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262515",
+          "label_transcribed": "Pemasaran dan Pelanggan Berbasis AI",
+          "semester": 5,
+          "credits": 3,
+          "role": "WM",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262506",
+          "label_transcribed": "Kapasitas Manusia dan Inovasi",
+          "semester": 5,
+          "credits": 2,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262610",
+          "label_transcribed": "Pengembangan Karir Cerdas dan Professional",
+          "semester": 6,
+          "credits": 3,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262602",
+          "label_transcribed": "Hukum dan Tata Kelola Bisnis Digital",
+          "semester": 6,
+          "credits": 2,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262511",
+          "label_transcribed": "Ketahanan Perusahaan dan Strategi Co-Intelligent",
+          "semester": 7,
+          "credits": 2,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262510",
+          "label_transcribed": "Kepemimpinan Adaptif & Organisasi Cerdas",
+          "semester": 7,
+          "credits": 2,
+          "role": "P",
+          "code_table_source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        }
+      ],
+      "generic_choice_buckets": [
+        {
+          "semester": 3,
+          "label_transcribed": "Pilihan",
+          "credits": 3
+        },
+        {
+          "semester": 5,
+          "label_transcribed": "Wajib Minat/Pilihan",
+          "credits": 4
+        }
+      ],
+      "international_exposure_slots": [6, 7, 8],
+      "required_interest_credits": 15,
+      "differences_from_table": [
+        {
+          "course_code": "PACS262506",
+          "field": "credits",
+          "diagram_value": 2,
+          "table_value": 3
+        },
+        {
+          "course_code": "PACS262511",
+          "field": "semester",
+          "diagram_value": 7,
+          "table_value": 5
+        },
+        {
+          "course_code": "PACS262510",
+          "field": "semester",
+          "diagram_value": 7,
+          "table_value": 5
+        }
+      ],
+      "table_courses_not_named_in_diagram": [
+        {
+          "course_code": "PACS262530",
+          "title": "Tren Penelitian Ilmu Komputer dan Elektronika",
+          "source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262603",
+          "title": "Industri Perangkat Lunak Adaptif berbasis Agentik",
+          "source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262415",
+          "title": "Pengantar Teknologi Blockchain",
+          "source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        },
+        {
+          "course_code": "PACS262402",
+          "title": "Algoritma untuk Trading",
+          "source_page": {
+            "printed_page": 173,
+            "pdf_page_1_based": 191
+          }
+        }
+      ]
+    }
+  ]
+}

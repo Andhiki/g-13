@@ -132,13 +132,30 @@ test("2021 syllabus and unavailable 2026 syllabus use the same disclosure", asyn
   await page.goto("/?kurikulum=2021&mk=MII21-1001");
   await page.getByRole("button", { name: "Silabus", exact: true }).click();
   await expect(page.getByText("Eliminasi Gauss-Jordan", { exact: false })).toBeVisible();
-  await page.goto("/?kurikulum=2026&mk=PAKF262105");
+  await page.goto("/?kurikulum=2026&mk=PACS262505");
   const trigger = page.getByRole("button", { name: "Silabus", exact: true });
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await trigger.click();
   await expect(
     page.getByText("Silabus mata kuliah ini belum tersedia dalam data kurikulum 2026."),
   ).toBeVisible();
+});
+
+test("shared and parenthesized-title 2026 syllabi are available in course details", async ({
+  page,
+}) => {
+  for (const [code, pdfPage] of [
+    ["PAKF262105", 44],
+    ["PACS262519", 233],
+  ] as const) {
+    await page.goto(`/?kurikulum=2026&mk=${code}`);
+    await page.getByRole("button", { name: "Silabus", exact: true }).click();
+    const source = page.getByText(new RegExp(`Sumber:.*halaman PDF ${pdfPage}\\)`));
+    await expect(source).toBeAttached();
+    await source.scrollIntoViewIfNeeded();
+    await expect(source).toBeVisible();
+    await expect(page.getByText(/Silabus mata kuliah ini belum tersedia/)).toHaveCount(0);
+  }
 });
 
 test("syllabus header scrolls with its content", async ({ page }) => {
