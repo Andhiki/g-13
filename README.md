@@ -11,6 +11,8 @@ dengan sumber resmi, dan usulan fitur dapat dikirim melalui
 [GitHub Issues](https://github.com/Andhiki/g-13/issues).
 Baca [aturan komunitas](CODE_OF_CONDUCT.md) dan [kebijakan keamanan](SECURITY.md).
 
+Lihat [changelog](CHANGELOG.md) untuk catatan perubahan.
+
 ## Cakupan
 
 - Kurikulum 2021 Revisi 2023 dan 2026 sejak MVP.

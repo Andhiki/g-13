@@ -23,6 +23,21 @@ aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
 Agent dapat memakai [skill PR body](.agents/skills/pr-body/SKILL.md) yang tersedia
 di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
 
+## Changelog
+
+Untuk perubahan yang berdampak pada pengguna, tambahkan ringkasan singkat dalam
+bahasa Indonesia ke bagian `Unreleased` di [CHANGELOG.md](CHANGELOG.md).
+Kelompokkan entri di bawah `### YYYY-MM-DD` berdasarkan tanggal perubahan dicatat,
+dengan tanggal terbaru di atas. Untuk tanggal yang sama, tambahkan poin ke bagian
+yang sudah ada; untuk tanggal berbeda, buat bagian baru. Gunakan subbagian
+`#### Added`, `#### Changed`, atau `#### Fixed` sesuai kebutuhan; fokus pada fitur, perilaku,
+dan koreksi kurikulum. Perubahan internal tanpa dampak pengguna tidak perlu entri.
+Untuk koreksi kurikulum atau prasyarat, sertakan tautan sumber resmi atau PR
+yang memuat buktinya. Setelah rilis terkonfirmasi, maintainer memindahkan kumpulan
+entri beserta kelompok tanggalnya ke bagian rilis berformat
+`## <versi> - <tanggal rilis>`, lalu mengosongkan `Unreleased` untuk perubahan
+berikutnya. Jangan menyalin ulang atau menghapus riwayat perubahan lama.
+
 ## Koreksi kurikulum
 
 Baca [CONTEXT.md](CONTEXT.md), [catatan 2021](docs/ilkom-2021-extraction.md), dan
