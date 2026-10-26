@@ -1,6 +1,7 @@
 """Extract course syllabi from the checked-in curriculum PDFs (requires pdfplumber)."""
 import json
 import re
+import sys
 from pathlib import Path
 
 import pdfplumber
@@ -16,6 +17,10 @@ def extract(year, filename, start, end, offset):
             text = pdf.pages[number - 1].extract_text() or ""
             text = re.sub(r"(?m)^(?:Halaman\s*\|\s*\d+|DEPARTEMEN ILMU KOMPUTER DAN ELEKTRONIKA|\d+)\s*$", "", text)
             pages.append((number, text))
+    return parse_pages(year, pages, offset)
+
+
+def parse_pages(year, pages, offset):
     combined = ""
     boundaries = []
     for number, text in pages:
@@ -36,9 +41,7 @@ def extract(year, filename, start, end, offset):
         page = next(number for position, number in reversed(boundaries) if position <= match.start())
         clean = lambda value: re.sub(r"\s+", " ", value).strip()
         code = match[1].replace("-", "")
-        if code in records:
-            conflicts.add(code)
-        records[code] = {
+        record = {
             "title": clean(match[2]),
             "description": clean(description[1]) if description else "",
             "syllabus": clean(syllabus[1]),
@@ -50,14 +53,26 @@ def extract(year, filename, start, end, offset):
             "printedPage": page - offset,
             "pdfPage": page,
         }
+        if code not in records:
+            records[code] = record
+        elif records[code]["title"].casefold() == record["title"].casefold():
+            records[code].setdefault("alternatives", []).append(record)
+        else:
+            conflicts.add(code)
+            print(
+                f"{year}: unresolved code {code}: {records[code]['title']} "
+                f"(PDF {records[code]['pdfPage']}) / {record['title']} (PDF {page})",
+                file=sys.stderr,
+            )
     for code in conflicts:
         del records[code]
     return records
 
 
-data = {
-    "2021": extract("2021", "fmipa-kurikulum-sarjana-2021-revisi-2023.pdf", 303, 358, 15),
-    "2026": extract("2026", "fmipa-kurikulum-sarjana-2026.pdf", 210, 238, 18),
-}
-(ROOT / "src/data/syllabi.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print({year: len(records) for year, records in data.items()})
+if __name__ == "__main__":
+    data = {
+        "2021": extract("2021", "fmipa-kurikulum-sarjana-2021-revisi-2023.pdf", 303, 358, 15),
+        "2026": extract("2026", "fmipa-kurikulum-sarjana-2026.pdf", 210, 238, 18),
+    }
+    (ROOT / "src/data/syllabi.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print({year: len(records) for year, records in data.items()})

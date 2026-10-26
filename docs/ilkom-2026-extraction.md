@@ -4,7 +4,24 @@
 
 This extraction uses only the uploaded PDF `30d5a973-d81a-4fa4-b942-2fc419f5811b-f99cecdf-5f27-4dca-827d-49dd2bd1404c-pdf.pdf` (SHA-256 `ffa6d141c99228b79092d9da647f47e9b37d2966f6aca8ca9567de8b7a506520`, 505 PDF pages). Chapter 3.2 runs from printed pages 154–220 (1-based PDF pages 172–238); section 3.3 begins on printed page 221 / PDF page 239.
 
-The extraction keeps required, interest-area, outside-program activity, equivalency, and transition table rows in structured form in `output/data/ugm-ilkom-2026.json`. The companion `output/data/ugm-ilkom-2026-pages.json` retains extracted text for all 67 chapter pages. Course descriptions and syllabi numbered 1–84, CPL text, references, and other chapter prose are available there as source text; they have not been normalized into individual syllabus records.
+The extraction keeps required, interest-area, outside-program activity, equivalency, and transition table rows in structured form in `output/data/ugm-ilkom-2026.json`. The companion `output/data/ugm-ilkom-2026-pages.json` retains extracted text for all 67 chapter pages. CPL text and other chapter prose remain available there. `scripts/extract-syllabi.py` extracts individual syllabus records from the source PDF into `src/data/syllabi.json` with printed/PDF page provenance.
+
+### Syllabus duplicate audit (2026-10-26)
+
+The syllabus range (PDF pp. 210–238) contains 88 coded headings with 87 unique codes.
+`PACS262413` Pembelajaran Mesin occurs twice: printed p. 199 / PDF p. 217 and
+printed p. 211 / PDF p. 229. The topic lists differ. Both source versions are kept:
+the first occurrence is the main record and the second is in `alternatives`.
+Their order follows the PDF and does not indicate authority or recency. The reader
+shows both versions with separate page references; no topics are merged or inferred.
+
+Re-extract with `python scripts/extract-syllabi.py`; format the generated JSON with
+`bunx oxfmt src/data/syllabi.json`. Validate parser behavior with
+`python -m unittest discover -s scripts -p test_extract_syllabi.py` and source records
+with `bun test src/data/syllabi.test.ts`. The extractor preserves repeated codes
+with matching titles, but reports and excludes codes reused for different titles.
+The 2021 source has such an unresolved collision at `MII213603` (PDF p. 338:
+Lingkungan Cerdas dan Intelijen / Pengantar Blockchain); that code remains excluded.
 
 ## Structured coverage and checks
 
@@ -27,4 +44,4 @@ The extraction keeps required, interest-area, outside-program activity, equivale
 
 ## Coverage limits
 
-The text companion retains extracted text, not page images. Printed pages 182–188 (PDF 200–206) contain curriculum-map diagrams with sparse extracted text; their captions are retained, but the diagram contents are not transcribed into the structured data. Tables 3.8–3.11, CPL mapping, course syllabi/topics, and references remain in the page-text companion rather than normalized fields. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.
+The text companion retains extracted text, not page images. Printed pages 182–188 (PDF 200–206) contain curriculum-map diagrams with sparse extracted text; their captions are retained, but the diagram contents are not transcribed into the structured data. Tables 3.8–3.11 and CPL mapping remain in the page-text companion rather than normalized fields. Syllabus topics and references are also available in `src/data/syllabi.json`; the duplicate audit above describes the unresolved source limits. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.

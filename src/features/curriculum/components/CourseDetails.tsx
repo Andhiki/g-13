@@ -11,6 +11,15 @@ import { normalizeCourseTitle, type Course, type Curriculum, type Relation } fro
 import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
 import { CourseSheetHandle } from "./CourseSheetHandle";
 
+type Syllabus = {
+  description: string;
+  syllabus: string;
+  references: string[];
+  printedPage: number;
+  pdfPage: number;
+  alternatives?: Syllabus[];
+};
+
 type CourseDetailsProps = {
   course: Course | null;
   data: Curriculum;
@@ -98,16 +107,8 @@ function CourseDetailsContent({
   const editionSyllabi = syllabi[data.id];
   const syllabus = editionSyllabi[
     course.code.replaceAll("-", "") as keyof typeof editionSyllabi
-  ] as
-    | {
-        description: string;
-        syllabus: string;
-        references: string[];
-        printedPage: number;
-        pdfPage: number;
-      }
-    | undefined;
-  const topics = syllabus ? syllabusPoints(syllabus.syllabus) : [];
+  ] as Syllabus | undefined;
+  const versions = syllabus ? [syllabus, ...(syllabus.alternatives ?? [])] : [];
   const curriculumLabel =
     data.edition === `Kurikulum ${data.id}`
       ? data.edition
@@ -191,68 +192,22 @@ function CourseDetailsContent({
                 <Accordion.Content>
                   {syllabus ? (
                     <>
-                      {syllabus.description && (
-                        <>
-                          <Typography as="h3" variant="label" className="mt-3 text-text-strong-950">
-                            Tujuan pembelajaran
-                          </Typography>
-                          <Typography
-                            as="p"
-                            variant="caption"
-                            className="mt-2 sm:text-[13px] sm:leading-5"
-                          >
-                            {syllabus.description}
-                          </Typography>
-                        </>
-                      )}
-                      {topics.length > 1 ? (
-                        <ul
-                          aria-label="Pokok bahasan"
-                          className="list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5"
-                        >
-                          {topics.map((topic, index) => (
-                            <li key={index}>{topic}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <Typography
-                          as="p"
-                          variant="caption"
-                          className="sm:text-[13px] sm:leading-5"
-                        >
-                          {syllabus.syllabus}
+                      {versions.length > 1 && (
+                        <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
+                          Dokumen kurikulum memuat {versions.length} versi silabus untuk kode ini.
+                          Keduanya ditampilkan sesuai halaman sumber.
                         </Typography>
                       )}
-                      {syllabus.references.length > 0 && (
-                        <>
-                          <Typography as="h3" variant="label" className="mt-4 text-text-strong-950">
-                            Referensi
-                          </Typography>
-                          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5">
-                            {syllabus.references.map((reference, index) => (
-                              <li key={index} className="pl-1">
-                                <a
-                                  href={`https://www.google.com/search?q=${encodeURIComponent(reference)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                                  aria-label={`${reference} (cari di Google, tab baru)`}
-                                >
-                                  {reference}{" "}
-                                  <RiArrowRightUpLine
-                                    className="inline-block size-3.5 align-text-bottom"
-                                    aria-hidden="true"
-                                  />
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )}
-                      <Typography as="p" variant="caption" className="mt-4 ">
-                        Sumber: {data.sourceTitle}, halaman cetak {syllabus.printedPage} (halaman
-                        PDF {syllabus.pdfPage}).
-                      </Typography>
+                      {versions.map((version) => (
+                        <div key={version.pdfPage}>
+                          {versions.length > 1 && (
+                            <Typography as="p" variant="label" className="mt-4">
+                              Versi sumber — halaman cetak {version.printedPage}
+                            </Typography>
+                          )}
+                          <SyllabusContent syllabus={version} sourceTitle={data.sourceTitle} />
+                        </div>
+                      ))}
                     </>
                   ) : (
                     <Typography as="p" variant="paragraph">
@@ -329,5 +284,67 @@ function CourseDetailsContent({
       </AlignDrawer.Body>
       {footer && <div className="shrink-0 border-t border-stroke-soft-200 p-4">{footer}</div>}
     </AlignDrawer.Content>
+  );
+}
+
+function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; sourceTitle: string }) {
+  const topics = syllabusPoints(syllabus.syllabus);
+  return (
+    <>
+      {syllabus.description && (
+        <>
+          <Typography as="h3" variant="label" className="mt-3 text-text-strong-950">
+            Tujuan pembelajaran
+          </Typography>
+          <Typography as="p" variant="caption" className="mt-2 sm:text-[13px] sm:leading-5">
+            {syllabus.description}
+          </Typography>
+        </>
+      )}
+      {topics.length > 1 ? (
+        <ul
+          aria-label="Pokok bahasan"
+          className="list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5"
+        >
+          {topics.map((topic, index) => (
+            <li key={index}>{topic}</li>
+          ))}
+        </ul>
+      ) : (
+        <Typography as="p" variant="caption" className="sm:text-[13px] sm:leading-5">
+          {syllabus.syllabus}
+        </Typography>
+      )}
+      {syllabus.references.length > 0 && (
+        <>
+          <Typography as="h3" variant="label" className="mt-4 text-text-strong-950">
+            Referensi
+          </Typography>
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-xs sm:text-[13px] sm:leading-5">
+            {syllabus.references.map((reference, index) => (
+              <li key={index} className="pl-1">
+                <a
+                  href={`https://www.google.com/search?q=${encodeURIComponent(reference)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                  aria-label={`${reference} (cari di Google, tab baru)`}
+                >
+                  {reference}{" "}
+                  <RiArrowRightUpLine
+                    className="inline-block size-3.5 align-text-bottom"
+                    aria-hidden="true"
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <Typography as="p" variant="caption" className="mt-4 ">
+        Sumber: {sourceTitle}, halaman cetak {syllabus.printedPage} (halaman PDF {syllabus.pdfPage}
+        ).
+      </Typography>
+    </>
   );
 }

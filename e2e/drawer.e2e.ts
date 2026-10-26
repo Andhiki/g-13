@@ -1,5 +1,24 @@
 import { expect, test } from "@playwright/test";
 
+test("2026 machine learning shows both source syllabi instead of missing content", async ({
+  page,
+}) => {
+  await page.goto("/?kurikulum=2026&mk=PACS262413");
+  await page.getByRole("button", { name: "Silabus", exact: true }).click();
+  await expect(page.getByText(/Dokumen kurikulum memuat 2 versi silabus/)).toBeVisible();
+  await expect(page.getByText("Versi sumber — halaman cetak 199", { exact: true })).toBeVisible();
+  await expect(page.getByText("Versi sumber — halaman cetak 211", { exact: true })).toBeAttached();
+  await expect(page.getByText(/Pengantar machine learning dan konsep dasar/)).toBeAttached();
+  const secondVersion = page.getByText(
+    /Konsep Pembelajaran Mesin dan tipe-tipe Pembelajaran Mesin/,
+  );
+  await secondVersion.scrollIntoViewIfNeeded();
+  await expect(secondVersion).toBeVisible();
+  await expect(page.getByText(/Sumber:.*halaman cetak 199 \(halaman PDF 217\)/)).toBeAttached();
+  await expect(page.getByText(/Sumber:.*halaman cetak 211 \(halaman PDF 229\)/)).toBeAttached();
+  await expect(page.getByText(/Silabus mata kuliah ini belum tersedia/)).toHaveCount(0);
+});
+
 test("list leaves room for the open course details", async ({ page, isMobile }) => {
   await page.goto("/?kurikulum=2026");
   await page.getByRole("button", { name: "Switch View", exact: true }).click();

@@ -42,6 +42,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Silabus Pembelajaran Mesin 2026 kembali tersedia. Dua versi dalam PDF sumber
+  dipertahankan dengan halaman masing-masing, alih-alih dihapus karena kode berulang.
 - Handle detail mata kuliah mengikuti gerakan drag tanpa me-render ulang peta
   atau mengubah ruang daftar pada setiap gerakan. Tinggi disimpan saat dilepas.
 - Posisi filter mobile dikunci ke bawah viewport selama animasi pembukaan.

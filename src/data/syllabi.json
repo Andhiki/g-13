@@ -2135,6 +2135,26 @@
       "printedPage": 199,
       "pdfPage": 217
     },
+    "PACS262413": {
+      "title": "Pembelajaran Mesin (3 SKS)",
+      "description": "",
+      "syllabus": "Pengantar machine learning dan konsep dasar (data, features, labels); Linear regression (simple dan multiple); Logistic regression dan classification metrics; K- nearest neighbors (KNN); Decision trees dan random forests; Support vector machines (SVM); Naive Bayes classifier; Model evaluation dan validation (cross-validation, bias- variance tradeoff); Unsupervised learning: K-means clustering; Unsupervised learning: hierarchical clustering; Dimensionality reduction: principal component analysis (PCA); Ensemble methods (bagging, boosting seperti AdaBoost/XGBoost); Introduction to neural networks (perceptron, MLP); Final project presentation atau case studies pembelajaran mesin.",
+      "references": ["Bishop, C. M. (2006). Pattern recognition and machine learning. Springer."],
+      "printedPage": 199,
+      "pdfPage": 217,
+      "alternatives": [
+        {
+          "title": "Pembelajaran Mesin (3 SKS)",
+          "description": "",
+          "syllabus": "Konsep Pembelajaran Mesin dan tipe-tipe Pembelajaran Mesin, Akuisisi dan eksplorasi data, Supervised Learning: k-Nearest Neighbour, Naive Bayes, Supervised Learning: Regresi Linear, Supervised Learning: Regresi Logistik, Supervised Learning: Decision Tree, Supervised Learning: Pemodelan dengan Support Vector Machine, Dimensionality Reduction, K-Means Clustering, Hierarchical Clustering, Unsupervised Learning, Pengenalan Reinforcement Learning, Studi kasus implementasi Reinforcement Learning, Mini Project.",
+          "references": [
+            "Bishop, C. M. (2006). Pattern Recognition and Machine Learning. Springer. Minat Rekayasa Perangkat Lunak"
+          ],
+          "printedPage": 211,
+          "pdfPage": 229
+        }
+      ]
+    },
     "PACS262411": {
       "title": "Metode Rekayasa Perangkat Lunak (2 SKS)",
       "description": "",
