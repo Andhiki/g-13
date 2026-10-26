@@ -26,7 +26,7 @@ html.theme-transition::view-transition-new(root) {
     mask-size: 24vmax;
   }
   100% {
-    mask-size: 400vmax;
+    mask-size: 500vmax;
   }
 }
 
