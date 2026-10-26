@@ -4,7 +4,7 @@ import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from
 import { SmartEdgeProvider, useSmartEdgePath } from "@tisoap/react-flow-smart-edge";
 
 // Leave a routing corridor in the 14px gap between course rows.
-const pathOptions = { nodePadding: 4, gridRatio: 4, borderRadius: 4 };
+const pathOptions = { nodePadding: 4, gridRatio: 4, borderRadius: 16 };
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const nodes = useStore(
@@ -14,7 +14,14 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
   );
   return (
     <SmartEdgeProvider
-      nodes={nodes.filter((node) => node.type !== "lane" && !node.hidden)}
+      nodes={nodes
+        .filter((node) => node.type !== "lane" && !node.hidden)
+        .map((node) => ({
+          ...node,
+          // Reserve horizontal room for the first bend without closing the gaps between rows.
+          position: { ...node.position, x: node.position.x - 40 },
+          measured: { ...node.measured, width: (node.measured?.width ?? 0) + 80 },
+        }))}
       options={{
         preset: "smoothstep",
         routeOnlyWhenBlocked: false,

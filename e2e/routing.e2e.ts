@@ -130,3 +130,19 @@ test("aligned prerequisite connection stays horizontal all the way to its target
   expect(deviation.endpoints).toBeLessThan(0.1);
   expect(deviation.path).toBeLessThan(0.1);
 });
+
+test("roadmap connections leave room before a rounded bend", async ({ page }) => {
+  await page.goto(
+    "/roadmap?kurikulum=2021&minat=Lab%20Rekayasa%20Perangkat%20Lunak%20dan%20Data&iup=tidak&magang=tidak&hasil=true&lulus=8",
+  );
+  const path = page.locator('g[data-id="MII21-1201->MII21-1203"] .react-flow__edge-path');
+  await expect(path).toBeAttached();
+  const start = await path.evaluate((element: SVGPathElement) => {
+    const origin = element.getPointAtLength(0);
+    const point = element.getPointAtLength(20);
+    return { dx: point.x - origin.x, dy: point.y - origin.y };
+  });
+  expect(start.dx).toBeGreaterThan(19.9);
+  expect(Math.abs(start.dy)).toBeLessThan(0.1);
+  await expect(path).toHaveAttribute("d", /Q/);
+});
