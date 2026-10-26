@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { animate } from "motion/react";
 import { useEffect, useMemo } from "react";
 import type { Course } from "../../../data";
@@ -71,9 +72,9 @@ export function CourseList({
 
   if (!sections.length) {
     return (
-      <p className="p-4 text-paragraph-sm text-text-sub-600" role="status">
+      <Typography as="p" variant="paragraph" className="p-4 text-text-sub-600" role="status">
         Tidak ada mata kuliah pada filter ini.
-      </p>
+      </Typography>
     );
   }
 

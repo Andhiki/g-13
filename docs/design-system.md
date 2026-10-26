@@ -182,3 +182,16 @@ to the visual inspector's gradient and page-margin rules.
 `src/ui/accordion.tsx` adapts the Accordion source from the pinned AlignUI starter above. Per the requested course-detail design, it uses plain section typography without a card background or border, with the disclosure icon on the right. This is an explicit exception to the default component styling policy. All course drawers share its single, collapsible behavior.
 
 The curriculum version filter uses the pinned AlignUI SegmentedControl source and useTabObserver hook with default styling. Its labels are 2021 Revisi 2023 and 2026; Radix Tabs handles keyboard navigation. Local class concatenation uses clsx to preserve custom typography tokens.
+
+## Typography
+
+Use `Typography` from `src/ui/typography.tsx` for application text. Its `variant`
+selects the shared style, while `as` selects the semantic HTML element and defaults
+to `p`. Native attributes and refs pass through to that element.
+
+Variants are `title`, `subtitle1`, `subtitle2`, `paragraph` (the default), `caption`,
+`label`, and `labelSmall`. They use the existing AlignUI tokens. `graphTitle` and
+`question` retain the responsive scale of the graph headings and roadmap quiz.
+Keep layout and contextual colors in `className`. For Radix drawer and modal
+titles and descriptions, use `asChild` with `Typography` to retain accessible names.
+Interactive controls retain their existing AlignUI typography.

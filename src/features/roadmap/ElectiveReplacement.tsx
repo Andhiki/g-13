@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useState } from "react";
 import { AlignButton } from "../../ui/button";
 import { AlignModal } from "../../ui/modal";
@@ -40,11 +41,15 @@ export function ElectiveReplacement({
       </AlignButton.Root>
       <AlignModal.Content>
         <div className="p-5">
-          <AlignModal.Title className="pr-8 text-label-lg">
-            Ganti mata kuliah pilihan
+          <AlignModal.Title asChild>
+            <Typography as="h2" variant="subtitle1" className="pr-8">
+              Ganti mata kuliah pilihan
+            </Typography>
           </AlignModal.Title>
-          <AlignModal.Description className="mb-5 mt-2 text-paragraph-sm text-text-sub-600">
-            Menggantikan {item.course.title}. Beban dan prasyarat rencana dihitung ulang.
+          <AlignModal.Description asChild>
+            <Typography as="p" variant="paragraph" className="mb-5 mt-2 text-text-sub-600">
+              Menggantikan {item.course.title}. Beban dan prasyarat rencana dihitung ulang.
+            </Typography>
           </AlignModal.Description>
           <AlignSelect.Root value={choice} onValueChange={setChoice}>
             <AlignSelect.Trigger aria-label="Mata kuliah pengganti">
@@ -60,15 +65,15 @@ export function ElectiveReplacement({
           </AlignSelect.Root>
           {course && (
             <div className="mt-4 text-paragraph-sm">
-              <p>
+              <Typography as="p" variant="paragraph">
                 {course.code} · {creditsFor(course)} SKS
-              </p>
-              <p>
+              </Typography>
+              <Typography as="p" variant="paragraph">
                 Prasyarat: {requirementText(course).join("; ") || "Tidak dinyatakan dalam tabel."}
-              </p>
-              <p className="text-paragraph-xs text-text-sub-600">
+              </Typography>
+              <Typography as="p" variant="caption" className="text-text-sub-600">
                 {sourceLocation(course).join("; ")}
-              </p>
+              </Typography>
             </div>
           )}
           <div className="mt-5 flex justify-end">

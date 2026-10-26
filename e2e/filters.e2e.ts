@@ -183,6 +183,7 @@ test("semester switcher finishes its entrance and navigates without filtering", 
 test("semester band follows map panning and zooming", async ({ page }) => {
   await page.goto("/?kurikulum=2026");
   const buttons = page.getByRole("group", { name: "Navigasi semester" }).getByRole("button");
+  await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
   const count = await page.locator(".react-flow__node-course").count();
   await page.getByRole("button", { name: "Semester 8", exact: true }).click();
   await expect(buttons.nth(7)).toHaveAttribute("aria-pressed", "true");

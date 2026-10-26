@@ -1,3 +1,4 @@
+import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
@@ -27,7 +28,9 @@ export const Route = createRootRoute({
   component: Outlet,
   notFoundComponent: () => (
     <main>
-      <h1>Halaman tidak ditemukan</h1>
+      <Typography as="h1" variant="title">
+        Halaman tidak ditemukan
+      </Typography>
       <Link to="/" search={{ kurikulum: "2026" }}>
         Kembali ke peta kurikulum
       </Link>

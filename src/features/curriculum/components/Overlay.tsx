@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
@@ -62,11 +63,15 @@ function FilterDrawer({ children, copy }: { children: ReactNode; copy: FilterCop
       </AlignDrawer.Trigger>
       <AlignDrawer.Content side="bottom">
         <div className="p-5">
-          <AlignDrawer.Title className="text-label-sm text-text-strong-950">
-            {copy.title}
+          <AlignDrawer.Title asChild>
+            <Typography as="h2" variant="label" className="text-text-strong-950">
+              {copy.title}
+            </Typography>
           </AlignDrawer.Title>
-          <AlignDrawer.Description className="mt-1 text-paragraph-xs text-text-sub-600">
-            {copy.description}
+          <AlignDrawer.Description asChild>
+            <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
+              {copy.description}
+            </Typography>
           </AlignDrawer.Description>
         </div>
         <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 pb-5">{children}</div>
@@ -163,7 +168,9 @@ function DesktopFilters({
         transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
         className="flex w-[300px] flex-col gap-3 p-4"
       >
-        <h2 className="m-0 pr-8 text-label-sm">Filter</h2>
+        <Typography as="h2" variant="label" className="m-0 pr-8">
+          Filter
+        </Typography>
         {children}
       </motion.div>
     </motion.section>

@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useEffect, useRef } from "react";
 import { useHotkey, useHotkeys } from "@tanstack/react-hotkeys";
 import { motion, useReducedMotion } from "motion/react";
@@ -71,20 +72,24 @@ export function RoadmapQuiz({
           variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
           transition={{ duration: reducedMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1
+          <Typography
+            as="h1"
+            variant="question"
             id="quiz-title"
             ref={heading}
             tabIndex={-1}
-            className="m-0 max-w-[680px] text-[26px] font-semibold leading-tight tracking-[-0.03em] outline-none sm:text-[32px]"
+            className="m-0 max-w-[680px] outline-none"
           >
             {question.title}
-          </h1>
-          <p
+          </Typography>
+          <Typography
+            as="p"
+            variant="paragraph"
             id="quiz-description"
-            className="mb-8 mt-3 max-w-[650px] text-paragraph-sm text-text-sub-600"
+            className="mb-8 mt-3 max-w-[650px] text-text-sub-600"
           >
             {question.description}
-          </p>
+          </Typography>
         </motion.div>
         <motion.div
           variants={{

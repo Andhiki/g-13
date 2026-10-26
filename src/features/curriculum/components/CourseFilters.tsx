@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import * as SegmentedControl from "../../../ui/segmented-control";
 import { AlignSelect } from "../../../ui/select";
 import type { Curriculum, CurriculumId } from "../../../data";
@@ -13,9 +14,14 @@ export function ChoiceGroupFilter({
 }) {
   return (
     <div className="relative flex min-w-0 flex-col gap-[5px]">
-      <label className="text-label-xs text-text-sub-600" htmlFor="course-group">
+      <Typography
+        as="label"
+        variant="labelSmall"
+        className="text-text-sub-600"
+        htmlFor="course-group"
+      >
         Kelompok pilihan
-      </label>
+      </Typography>
       <AlignSelect.Root value={group} onValueChange={onChange}>
         <AlignSelect.Trigger
           className="h-9 min-h-9 text-[14px]"
@@ -50,9 +56,14 @@ export function CurriculumVersionFilter({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-[5px]">
-      <p className="m-0 text-label-xs text-text-sub-600" id="curriculum-version-label">
+      <Typography
+        as="p"
+        variant="labelSmall"
+        className="m-0 text-text-sub-600"
+        id="curriculum-version-label"
+      >
         Versi kurikulum
-      </p>
+      </Typography>
       <SegmentedControl.Root value={curriculum} onValueChange={onChange}>
         <SegmentedControl.List aria-labelledby="curriculum-version-label">
           <SegmentedControl.Trigger value="2021">2021 Revisi 2023</SegmentedControl.Trigger>
