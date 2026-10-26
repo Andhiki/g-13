@@ -22,7 +22,11 @@ export function ChoiceGroupFilter({
           id="course-group"
           aria-label={`Kelompok pilihan: ${group === "__all__" ? "Semua mata kuliah" : group}`}
         >
-          <AlignSelect.Value>{group === "__all__" ? "Semua mata kuliah" : group}</AlignSelect.Value>
+          <span className="min-w-0 flex-1 truncate">
+            <AlignSelect.Value>
+              {group === "__all__" ? "Semua mata kuliah" : group}
+            </AlignSelect.Value>
+          </span>
         </AlignSelect.Trigger>
         <AlignSelect.Content align="end">
           <AlignSelect.Item value="__all__">Semua mata kuliah</AlignSelect.Item>
