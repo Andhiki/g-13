@@ -153,10 +153,34 @@ function ViewportFocus({
         return;
       }
       if (scope === "choices" || group !== "__all__") {
-        setCenter(LANE_X + 8 * LANE_STEP + 430, 350, {
-          zoom: 0.58,
-          duration: reducedMotion ? 0 : 1000,
-        });
+        const points = [...positions.values()].filter((point) => point.x >= LANE_X + 8 * LANE_STEP);
+        if (!points.length) return;
+        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
+        const compact = window.matchMedia("(width < 1100px)").matches;
+        const left = 16;
+        const top = compact ? 128 : 96;
+        const right = compact ? 16 : 332;
+        const minX = Math.min(...points.map((point) => point.x));
+        const minY = Math.min(...points.map((point) => point.y));
+        const viewport = getViewportForBounds(
+          {
+            x: minX,
+            y: minY,
+            width: Math.max(...points.map((point) => point.x)) - minX + 248,
+            height: Math.max(...points.map((point) => point.y)) - minY + 82,
+          },
+          Math.max(1, stage.width - left - right),
+          Math.max(1, stage.height - top - 72),
+          0.05,
+          0.88,
+          0.12,
+        );
+        setViewport(
+          { ...viewport, x: viewport.x + left, y: viewport.y + top },
+          {
+            duration: reducedMotion ? 0 : 1000,
+          },
+        );
         return;
       }
       if (scope !== "all") {
@@ -340,6 +364,16 @@ export function CurriculumMap({
           size={1.2}
         />
       </ReactFlow>
+      {!selectedId &&
+        (scope === "choices" || group !== "__all__") &&
+        ![...positions.values()].some((point) => point.x >= LANE_X + 8 * LANE_STEP) && (
+          <p
+            role="status"
+            className="pointer-events-none absolute inset-x-4 top-36 text-center text-paragraph-sm text-text-sub-600"
+          >
+            Tidak ada mata kuliah pilihan untuk filter ini.
+          </p>
+        )}
     </EdgeRouting>
   );
 }
