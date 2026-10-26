@@ -31,6 +31,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Kartu mata kuliah pilihan memakai permukaan solid bernuansa biru, border lebih
+  jelas, dan teks tegas agar tetap berbeda dari mata kuliah utama.
 - Tombol "Tampilkan mata kuliah" dan "Tampilkan roadmap" dihapus karena filter
   langsung diterapkan. Panel filter mobile ditutup lewat tombol silang di header.
 - Sudut atas drawer mobile menggunakan radius 10px, mengikuti tombol. Detail mata kuliah di roadmap mobile juga tampil sebagai panel bawah.

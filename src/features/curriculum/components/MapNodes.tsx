@@ -19,9 +19,10 @@ const courseStyles = tv({
     choice: {
       true: {
         surface:
-          "border-[color-mix(in_srgb,var(--color-stroke-soft-200)_65%,var(--color-bg-weak-25))] bg-bg-weak-50",
-        title: "text-text-sub-600",
-        credit: "bg-bg-weak-50",
+          "border-[color-mix(in_srgb,var(--color-blue-500)_30%,var(--color-stroke-soft-200))] bg-[color-mix(in_srgb,var(--color-blue-500)_8%,var(--color-bg-white-0))] group-hover:border-[color-mix(in_srgb,var(--color-blue-500)_50%,var(--color-stroke-sub-300))] group-hover:bg-[color-mix(in_srgb,var(--color-blue-500)_13%,var(--color-bg-white-0))]",
+        title: "text-text-strong-950",
+        credit:
+          "bg-[color-mix(in_srgb,var(--color-blue-500)_14%,var(--color-bg-white-0))] group-hover:bg-[color-mix(in_srgb,var(--color-blue-500)_18%,var(--color-bg-white-0))]",
       },
     },
     state: {
