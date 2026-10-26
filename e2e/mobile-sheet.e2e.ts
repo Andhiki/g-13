@@ -1,5 +1,50 @@
 import { expect, test } from "@playwright/test";
 
+test("mobile handle previews dragging without resizing the list until release", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?kurikulum=2026");
+  await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
+  await page.getByRole("button", { name: "Switch View", exact: true }).click();
+  const list = page.getByLabel("Daftar mata kuliah");
+  await expect(list).toBeVisible();
+  await page
+    .getByRole("button", { name: "Buka detail Algoritma dan Struktur Data", exact: true })
+    .click();
+  const handle = page.getByRole("slider", { name: "Tinggi detail mata kuliah" });
+  const sectionHeight = () =>
+    list.evaluate((el) => el.closest("section")!.style.getPropertyValue("--course-sheet-height"));
+  const bounds = (await handle.boundingBox())!;
+  const x = bounds.x + bounds.width / 2;
+  const y = bounds.y + bounds.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y - 200, { steps: 12 });
+  await expect
+    .poll(async () => Number(await handle.getAttribute("aria-valuenow")))
+    .toBeGreaterThan(50);
+  expect(await sectionHeight()).toBe("30dvh");
+  await page.mouse.up();
+  await expect(handle).toHaveAttribute("aria-valuenow", "75");
+  await expect.poll(sectionHeight).toBe("75dvh");
+
+  // Snapping to the current preset must also discard the temporary drag height.
+  const next = (await handle.boundingBox())!;
+  await page.mouse.move(x, next.y + next.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(x, next.y + next.height / 2 + 20);
+  await page.mouse.up();
+  await expect(handle).toHaveAttribute("aria-valuenow", "75");
+  expect(
+    await page
+      .getByRole("dialog")
+      .evaluate((el) => (el as HTMLElement).style.getPropertyValue("--course-sheet-height")),
+  ).toBe("75dvh");
+});
+
 test("mobile filter stays anchored to the bottom throughout opening", async ({
   page,
   isMobile,
@@ -30,7 +75,7 @@ test("mobile filter stays anchored to the bottom throughout opening", async ({
     expect(frames.length).toBeGreaterThan(2);
     expect(frames.every((frame) => frame.bottom >= frame.viewport - 1)).toBe(true);
     expect(frames.at(-1)!.bottom).toBeCloseTo(page.viewportSize()!.height, 0);
-    await page.getByRole("button", { name: "Tampilkan mata kuliah" }).click();
+    await page.getByRole("button", { name: "Tutup filter kurikulum" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
   }
 });
@@ -49,7 +94,7 @@ test("mobile course sheet snaps by touch and keyboard and reserves list space", 
     .click();
   const handle = page.getByRole("slider", { name: "Tinggi detail mata kuliah" });
   const dialog = page.getByRole("dialog");
-  await expect(handle).toHaveAttribute("aria-valuenow", "45");
+  await expect(handle).toHaveAttribute("aria-valuenow", "30");
   await dialog.evaluate(async (element) => {
     await Promise.all(element.getAnimations().map((animation) => animation.finished));
   });
@@ -65,12 +110,12 @@ test("mobile course sheet snaps by touch and keyboard and reserves list space", 
     });
   }
   await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  await expect(handle).toHaveAttribute("aria-valuenow", "85");
+  await expect(handle).toHaveAttribute("aria-valuenow", "75");
   await expect
     .poll(async () => (await dialog.boundingBox())!.height)
-    .toBeCloseTo(page.viewportSize()!.height * 0.85, 0);
+    .toBeCloseTo(page.viewportSize()!.height * 0.75, 0);
   await handle.press("ArrowDown");
-  await expect(handle).toHaveAttribute("aria-valuenow", "45");
+  await expect(handle).toHaveAttribute("aria-valuenow", "30");
   await handle.press("Home");
   await expect(handle).toHaveAttribute("aria-valuenow", "30");
   await handle.press("End");
@@ -90,7 +135,7 @@ test("mobile course sheet snaps by touch and keyboard and reserves list space", 
   await page
     .getByRole("button", { name: "Buka detail Algoritma dan Struktur Data", exact: true })
     .click();
-  await expect(handle).toHaveAttribute("aria-valuenow", "85");
+  await expect(handle).toHaveAttribute("aria-valuenow", "75");
   await page.setViewportSize({ width: 800, height: 900 });
   await expect(handle).toBeHidden();
   expect((await dialog.boundingBox())!.width).toBeCloseTo(400, 0);

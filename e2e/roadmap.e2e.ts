@@ -14,9 +14,7 @@ async function openFilters(page: Page) {
 }
 async function closeFilters(page: Page) {
   await expect(page.getByRole("listbox")).toHaveCount(0);
-  if ((page.viewportSize()?.width ?? 1440) >= 1100)
-    await page.getByRole("button", { name: "Tutup filter roadmap", exact: true }).click();
-  else await page.getByRole("button", { name: "Tampilkan roadmap", exact: true }).click();
+  await page.getByRole("button", { name: "Tutup filter roadmap", exact: true }).click();
 }
 async function chooseTarget(page: Page, target: number) {
   await openFilters(page);
@@ -24,6 +22,29 @@ async function chooseTarget(page: Page, target: number) {
   await page.getByRole("option", { name: `${target} semester`, exact: true }).click();
   await closeFilters(page);
 }
+
+test("roadmap filter applies immediately and closes from its header", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile);
+  await page.goto(
+    "/roadmap?kurikulum=2026&minat=Analisis%20Data&iup=tidak&magang=tidak&hasil=true",
+  );
+  await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
+  const trigger = page.getByRole("button", { name: "Buka filter roadmap", exact: true });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Filter roadmap" });
+  await expect(dialog).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tampilkan roadmap", exact: true })).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Target selesai", exact: true }).click();
+  await page.getByRole("option", { name: "7 semester", exact: true }).click();
+  await expect(page).toHaveURL(/lulus=7/);
+  await expect(dialog).toBeVisible();
+  await closeFilters(page);
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
 
 for (const curriculum of ["2026", "2021"])
   test(`${curriculum}: full-screen quiz, graph, history, replacement, and sharing`, async ({

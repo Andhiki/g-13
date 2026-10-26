@@ -12,7 +12,7 @@ test("choice groups fit their actual courses inside the unobstructed canvas", as
     await page.getByRole("combobox", { name: /Kelompok pilihan/ }).click();
     await page.getByRole("option", { name: new RegExp(`^${group}`) }).click();
     if (isMobile)
-      await page.getByRole("button", { name: "Tampilkan mata kuliah", exact: true }).click();
+      await page.getByRole("button", { name: "Tutup filter kurikulum", exact: true }).click();
     if (group === "Semua mata kuliah") continue;
     await expect
       .poll(async () =>

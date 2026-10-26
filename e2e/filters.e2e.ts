@@ -73,12 +73,18 @@ test("curriculum and interest filters persist between the drawer, list, and desk
   }
   await page.getByRole("tab", { name: "2021 Revisi 2023", exact: true }).click();
   await expect(page).toHaveURL(/2021/);
+  if (isMobile) {
+    await expect(page.getByRole("dialog", { name: "Filter kurikulum" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Tampilkan mata kuliah", exact: true }),
+    ).toHaveCount(0);
+  }
   await page.getByRole("combobox", { name: /Kelompok pilihan/ }).click();
   await expect(page.getByRole("option").first()).toHaveCSS("font-size", "14px");
   await expect(page.getByRole("option").first()).toHaveCSS("line-height", "20px");
   await page.getByRole("option", { name: /^Lab Sistem Komputer dan Jaringan/ }).click();
   if (isMobile) {
-    await page.getByRole("button", { name: "Tampilkan mata kuliah", exact: true }).click();
+    await page.getByRole("button", { name: "Tutup filter kurikulum", exact: true }).click();
     await expect(filterTrigger).toBeFocused();
   }
   await page.getByRole("button", { name: "Switch View", exact: true }).click();

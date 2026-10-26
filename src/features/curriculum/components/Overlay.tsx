@@ -40,11 +40,10 @@ function BrandLogo() {
   );
 }
 
-type FilterCopy = { title: string; description: string; action: string };
+type FilterCopy = { title: string; description: string };
 const defaultFilterCopy: FilterCopy = {
   title: "Filter kurikulum",
   description: "Pilih versi kurikulum dan kelompok mata kuliah.",
-  action: "Tampilkan mata kuliah",
 };
 
 function FilterDrawer({ children, copy }: { children: ReactNode; copy: FilterCopy }) {
@@ -62,26 +61,32 @@ function FilterDrawer({ children, copy }: { children: ReactNode; copy: FilterCop
         </AlignButton.Root>
       </AlignDrawer.Trigger>
       <AlignDrawer.Content side="bottom">
-        <div className="p-5">
-          <AlignDrawer.Title asChild>
-            <Typography as="h2" variant="label" className="text-text-strong-950">
-              {copy.title}
-            </Typography>
-          </AlignDrawer.Title>
-          <AlignDrawer.Description asChild>
-            <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
-              {copy.description}
-            </Typography>
-          </AlignDrawer.Description>
-        </div>
-        <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 pb-5">{children}</div>
-        <div className="grid border-t border-stroke-soft-200 p-5">
+        <div className="flex items-start gap-3 p-5">
+          <div className="min-w-0 flex-1">
+            <AlignDrawer.Title asChild>
+              <Typography as="h2" variant="label" className="text-text-strong-950">
+                {copy.title}
+              </Typography>
+            </AlignDrawer.Title>
+            <AlignDrawer.Description asChild>
+              <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
+                {copy.description}
+              </Typography>
+            </AlignDrawer.Description>
+          </div>
           <AlignDrawer.Close asChild>
-            <AlignButton.Root variant="neutral" mode="filled" size="medium">
-              {copy.action}
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              size="medium"
+              className="size-10 shrink-0 p-2.5"
+              aria-label={`Tutup ${copy.title.toLowerCase()}`}
+            >
+              <RiCloseLine className="size-5" aria-hidden="true" />
             </AlignButton.Root>
           </AlignDrawer.Close>
         </div>
+        <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 pb-5">{children}</div>
       </AlignDrawer.Content>
     </AlignDrawer.Root>
   );

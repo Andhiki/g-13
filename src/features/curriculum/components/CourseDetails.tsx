@@ -32,7 +32,7 @@ export function CourseDetails({
   footer,
   onHeightChange,
 }: CourseDetailsProps) {
-  const [height, setHeight] = useState(45);
+  const [height, setHeight] = useState(30);
   const selection = course ? { course, data, relations } : null;
   // Retain the content while Radix runs the close animation.
   const [lastSelection, setLastSelection] = useState(selection);

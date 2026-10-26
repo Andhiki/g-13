@@ -80,7 +80,6 @@ export function RoadmapResult({
         filterCopy={{
           title: "Filter roadmap",
           description: "Bandingkan target selesai dan waktu kegiatan.",
-          action: "Tampilkan roadmap",
         }}
         home={
           <Link

@@ -16,7 +16,7 @@ export function CurriculumPage() {
   const { curriculum, data, relations, visible, selected, group, scope, view, map } = explorer;
 
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
-  const [detailsHeight, setDetailsHeight] = useState(45);
+  const [detailsHeight, setDetailsHeight] = useState(30);
   const [semesterNavigation, setSemesterNavigation] = useState<{ semester: number } | null>(null);
   const reportSemesters = useCallback((next: number[]) => {
     setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
