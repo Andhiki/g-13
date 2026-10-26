@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Handle pada detail mata kuliah di mobile untuk mengatur tinggi panel ke 30%,
+  45%, atau 85% layar melalui seret atau keyboard.
 - Pintasan `D` untuk mengganti tema terang/gelap.
   ([1e2f331](https://github.com/Andhiki/g-13/commit/1e2f331f1e37247b1b96f0cc583c27be7e5da734))
 - Silabus dan referensi bersumber pada detail mata kuliah, dengan bagian yang
@@ -29,6 +31,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Sudut atas drawer mobile menggunakan radius 10px, mengikuti tombol. Detail mata kuliah di roadmap mobile juga tampil sebagai panel bawah.
 - Pemilihan versi kurikulum menggunakan tab, dengan tipografi pilihan filter
   yang lebih konsisten.
   ([1da33de](https://github.com/Andhiki/g-13/commit/1da33de0c5fc3c6e6e04bc3e3f0bf9816ca6b315))
@@ -37,6 +40,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Posisi filter mobile dikunci ke bawah viewport selama animasi pembukaan.
+- Ruang bawah daftar mata kuliah mengikuti tinggi panel detail yang dipilih.
 - Fokus peta menyesuaikan mata kuliah pilihan yang cocok dengan filter, serta
   menampilkan pesan ketika tidak ada mata kuliah pilihan yang cocok.
   ([aef607a](https://github.com/Andhiki/g-13/commit/aef607ad34c21983ba42a185334e21592d64e28b))

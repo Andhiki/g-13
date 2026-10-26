@@ -1,5 +1,5 @@
 import { Typography } from "../../ui/typography";
-import { useCallback, useState } from "react";
+import { useCallback, useState, type CSSProperties } from "react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { CourseDetails } from "./components/CourseDetails";
 import { ChoiceGroupFilter, CurriculumVersionFilter } from "./components/CourseFilters";
@@ -16,6 +16,7 @@ export function CurriculumPage() {
   const { curriculum, data, relations, visible, selected, group, scope, view, map } = explorer;
 
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
+  const [detailsHeight, setDetailsHeight] = useState(45);
   const [semesterNavigation, setSemesterNavigation] = useState<{ semester: number } | null>(null);
   const reportSemesters = useCallback((next: number[]) => {
     setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
@@ -92,7 +93,8 @@ export function CurriculumPage() {
           />
         ) : (
           <section
-            className={`bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-[116px] ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(45dvh+76px)]" : ""}`}
+            style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
+            className={`bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-[116px] ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
             <div className="mx-auto max-w-5xl">
               <div className="mb-3 flex items-baseline justify-between gap-4">
@@ -119,6 +121,7 @@ export function CurriculumPage() {
           </section>
         )}
         <CourseDetails
+          onHeightChange={setDetailsHeight}
           modal={false}
           course={selected}
           data={data}

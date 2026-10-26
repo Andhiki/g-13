@@ -1,5 +1,5 @@
 import { Typography } from "../../../ui/typography";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -9,6 +9,7 @@ import syllabi from "../../../data/syllabi.json";
 import { CompactButton } from "../../../ui/compact-button";
 import { normalizeCourseTitle, type Course, type Curriculum, type Relation } from "../../../data";
 import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
+import { CourseSheetHandle } from "./CourseSheetHandle";
 
 type CourseDetailsProps = {
   course: Course | null;
@@ -18,6 +19,7 @@ type CourseDetailsProps = {
   close: () => void;
   modal?: boolean;
   footer?: ReactNode;
+  onHeightChange?: (height: number) => void;
 };
 
 export function CourseDetails({
@@ -28,7 +30,9 @@ export function CourseDetails({
   close,
   modal = true,
   footer,
+  onHeightChange,
 }: CourseDetailsProps) {
+  const [height, setHeight] = useState(45);
   const selection = course ? { course, data, relations } : null;
   // Retain the content while Radix runs the close animation.
   const [lastSelection, setLastSelection] = useState(selection);
@@ -49,7 +53,17 @@ export function CourseDetails({
       onOpenChange={(open) => !open && close()}
     >
       {content && (
-        <CourseDetailsContent {...content} select={select} modal={modal} footer={footer} />
+        <CourseDetailsContent
+          {...content}
+          select={select}
+          modal={modal}
+          footer={footer}
+          height={height}
+          onHeightChange={(next) => {
+            setHeight(next);
+            onHeightChange?.(next);
+          }}
+        />
       )}
     </AlignDrawer.Root>
   );
@@ -62,7 +76,9 @@ function CourseDetailsContent({
   select,
   modal,
   footer,
-}: Omit<CourseDetailsProps, "course" | "close"> & { course: Course }) {
+  onHeightChange,
+  height,
+}: Omit<CourseDetailsProps, "course" | "close"> & { course: Course; height: number }) {
   const byId = useMemo(() => new Map(data.all.map((item) => [item.id, item])), [data]);
   const prereqs = relations
     .filter((item) => item.target === course.id)
@@ -99,15 +115,13 @@ function CourseDetailsContent({
   return (
     <AlignDrawer.Content
       modal={modal}
-      className={
-        modal
-          ? undefined
-          : "max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:h-[45dvh] max-[650px]:max-w-none max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
-      }
+      style={{ "--course-sheet-height": `${height}dvh` } as CSSProperties}
+      className="max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
       onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
       aria-label={`Detail ${course.title}`}
     >
-      <AlignDrawer.Header className="shrink-0 items-start gap-4 border-b p-4 sm:p-5">
+      <CourseSheetHandle height={height} onChange={(next) => onHeightChange?.(next)} />
+      <AlignDrawer.Header className="shrink-0 items-start gap-4 border-b p-4 pt-0 sm:p-5">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
             {curriculumLabel} · {course.code || "Mata kuliah pilihan"}

@@ -52,7 +52,8 @@ function Content({
             bottom
               ? "data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full"
               : "data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
-            bottom && "h-auto max-h-[85dvh] max-w-none rounded-t-20 border-t border-r-0",
+            bottom &&
+              "fixed inset-x-0 bottom-0 h-auto max-h-[85dvh] max-w-none rounded-t-10 border-t border-r-0",
             className,
           )}
           {...props}
