@@ -1,4 +1,5 @@
 import { useTheme } from "next-themes";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { RiMoonLine, RiSunLine } from "@remixicon/react";
@@ -47,6 +48,12 @@ export function ThemeSwitch() {
     });
   };
 
+  useHotkey("D", () => changeTheme(isDark ? "light" : "dark"), {
+    enabled: mounted,
+    ignoreInputs: true,
+    requireReset: true,
+  });
+
   return (
     <AlignButton.Root
       type="button"
@@ -55,7 +62,8 @@ export function ThemeSwitch() {
       size="medium"
       className="size-10 p-2.5"
       aria-label={label}
-      title={label}
+      title={`${label} (D)`}
+      aria-keyshortcuts="D"
       disabled={!mounted}
       onClick={() => changeTheme(isDark ? "light" : "dark")}
     >
