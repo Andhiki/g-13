@@ -33,6 +33,7 @@ export function CurriculumPage() {
       }
     >
       <Overlay
+        filtersInToolbar={view === "list"}
         controlsLabel="Filter peta kurikulum"
         navigation={
           <SemesterFilter
@@ -89,7 +90,9 @@ export function CurriculumPage() {
             positions={map.positions}
           />
         ) : (
-          <section className="bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 min-[1100px]:pr-[348px] max-[1100px]:pt-[116px]">
+          <section
+            className={`bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-[116px] ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(45dvh+76px)]" : ""}`}
+          >
             <div className="mx-auto max-w-5xl">
               <div className="mb-3 flex items-baseline justify-between gap-4">
                 <h1 className="m-0 text-label-md text-text-strong-950">Mata kuliah</h1>

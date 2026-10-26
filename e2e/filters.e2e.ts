@@ -1,5 +1,36 @@
 import { expect, test } from "@playwright/test";
 
+test("desktop filter moves continuously between views and keeps its open state", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile);
+  await page.goto("/?kurikulum=2026");
+  const toggle = page.getByRole("button", { name: "Buka filter kurikulum" });
+  await toggle.click();
+  for (const destination of [14, 66]) {
+    const positions = await page
+      .getByRole("button", { name: "Switch View", exact: true })
+      .evaluate(async (button) => {
+        const filter = document.querySelector('[aria-controls="desktop-filters"]')!;
+        const positions = [filter.getBoundingClientRect().top];
+        (button as HTMLButtonElement).click();
+        const start = performance.now();
+        while (performance.now() - start < 600) {
+          await new Promise(requestAnimationFrame);
+          positions.push(filter.getBoundingClientRect().top);
+        }
+        return positions;
+      });
+    expect(positions.some((top) => top > 18 && top < 62)).toBe(true);
+    expect(positions.at(-1)).toBeCloseTo(destination, 0);
+    await expect(page.getByRole("button", { name: "Tutup filter kurikulum" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+  }
+});
+
 test("curriculum and interest filters persist between the drawer, list, and desktop panel", async ({
   page,
   isMobile,

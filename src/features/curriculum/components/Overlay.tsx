@@ -86,10 +86,12 @@ function DesktopFilters({
   children,
   label,
   copy,
+  toolbar = false,
 }: {
   children: ReactNode;
   label: string;
   copy: FilterCopy;
+  toolbar?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -99,21 +101,24 @@ function DesktopFilters({
     if (!open) return;
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key !== "Escape" || event.defaultPrevented) return;
+      if (event.target instanceof Element && event.target.closest('[role="listbox"]')) return;
+      event.preventDefault();
+      event.stopPropagation();
       setOpen(false);
       toggle.current?.focus();
     }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", closeOnEscape, true);
+    return () => window.removeEventListener("keydown", closeOnEscape, true);
   }, [open]);
 
   return (
     <motion.section
       initial={false}
-      animate={{ width: open ? 300 : 40, height: open ? "auto" : 40 }}
+      animate={{ width: open ? 300 : 40, height: open ? "auto" : 40, y: toolbar ? 0 : 52 }}
       transition={
         reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
       }
-      className="pointer-events-auto relative overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
+      className="pointer-events-auto absolute right-0 top-0 z-20 overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
       aria-label={label}
     >
       <AlignButton.Root
@@ -174,6 +179,7 @@ export function Overlay({
   controlsLabel,
   home,
   filterCopy = defaultFilterCopy,
+  filtersInToolbar = false,
 }: {
   navigation: ReactNode;
   appearance: ReactNode;
@@ -183,6 +189,7 @@ export function Overlay({
   controlsLabel: string;
   home?: ReactNode;
   filterCopy?: FilterCopy;
+  filtersInToolbar?: boolean;
 }) {
   const compact = useSyncExternalStore(
     subscribeToCompactControls,
@@ -201,17 +208,22 @@ export function Overlay({
         <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
           {navigation}
         </div>
-        <div className="flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
-          <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
+        <div className="relative flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
+          <div
+            className={`flex min-h-10 items-center gap-2 transition-[width] duration-300 ease-out motion-reduce:transition-none max-[1100px]:order-1 max-[1100px]:w-full ${filtersInToolbar ? "w-[396px]" : "w-[348px]"}`}
+          >
             {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             <div className="pointer-events-auto shrink-0">{appearance}</div>
+            {filtersInToolbar && !compact && (
+              <div className="order-3 size-10 shrink-0" aria-hidden="true" />
+            )}
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
               {compact && <FilterDrawer copy={filterCopy}>{children}</FilterDrawer>}
             </div>
           </div>
           {!compact && (
-            <DesktopFilters label={controlsLabel} copy={filterCopy}>
+            <DesktopFilters label={controlsLabel} copy={filterCopy} toolbar={filtersInToolbar}>
               {children}
             </DesktopFilters>
           )}

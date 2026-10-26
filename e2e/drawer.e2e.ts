@@ -1,5 +1,46 @@
 import { expect, test } from "@playwright/test";
 
+test("list leaves room for the open course details", async ({ page, isMobile }) => {
+  await page.goto("/?kurikulum=2026");
+  await page.getByRole("button", { name: "Switch View", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buka detail Algoritma dan Struktur Data", exact: true })
+    .click();
+  const drawer = page.getByRole("dialog");
+  await expect(drawer).toBeVisible();
+  const list = page.getByLabel("Daftar mata kuliah");
+  await list.evaluate(async () => {
+    await Promise.all(
+      document.getAnimations().map((animation) => animation.finished.catch(() => {})),
+    );
+  });
+  if (isMobile) {
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const listBounds = await list.boundingBox();
+    const drawerBounds = await drawer.boundingBox();
+    expect(listBounds!.y + listBounds!.height).toBeLessThanOrEqual(drawerBounds!.y);
+  } else {
+    for (const width of [1708, 1440, 1138, 800, 650]) {
+      await page.setViewportSize({ width, height: 900 });
+      const drawerBounds = await drawer.boundingBox();
+      const listBounds = await list.boundingBox();
+      expect(listBounds!.x).toBeGreaterThanOrEqual(drawerBounds!.x + drawerBounds!.width);
+      if (width === 1138) {
+        expect(listBounds!.width).toBeGreaterThan(680);
+        const filter = page.getByRole("button", { name: "Buka filter kurikulum" });
+        expect((await filter.boundingBox())!.y).toBeLessThan(30);
+        await filter.click();
+        await expect(page.getByRole("tablist", { name: "Versi kurikulum" })).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(filter).toBeFocused();
+      }
+    }
+    await page.getByRole("button", { name: "Tutup detail mata kuliah" }).click();
+    await expect(drawer).toHaveCount(0);
+    expect((await list.boundingBox())!.x).toBeLessThan(400);
+  }
+});
+
 test("syllabus closing does not rebound before content unmounts", async ({ page }) => {
   await page.goto("/?kurikulum=2026&mk=PACS262201");
   const trigger = page.getByRole("button", { name: "Silabus", exact: true });
