@@ -39,17 +39,14 @@ async function expectClearRoutes(page: Page) {
 }
 
 for (const curriculum of ["2021", "2026"]) {
-  test(`${curriculum}: focused curriculum routes avoid other cards and keep arrowheads`, async ({
+  test(`${curriculum}: focused curriculum routes avoid other cards and have no arrowheads`, async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     const course = curriculum === "2021" ? "MII21-1203" : "PACS262201";
     await page.goto(`/?kurikulum=${curriculum}&mk=${course}`);
     await expectClearRoutes(page);
-    await expect(page.locator(".react-flow__edge-path").first()).toHaveAttribute(
-      "marker-end",
-      /url\(/,
-    );
+    await expect(page.locator(".react-flow__edge-path").first()).not.toHaveAttribute("marker-end");
   });
 
   test(`${curriculum}: roadmap routes avoid courses and annotations after a graduation change`, async ({
@@ -65,5 +62,50 @@ for (const curriculum of ["2021", "2026"]) {
     await page.getByRole("option", { name: "7 semester", exact: true }).click();
     await expect(page).toHaveURL(/lulus=7/);
     await expectClearRoutes(page);
+  });
+}
+
+for (const route of ["/", "/roadmap"]) {
+  test(`${route}: prerequisites finish before unlocked connections animate`, async ({ page }) => {
+    await page.goto(
+      route === "/"
+        ? "/?kurikulum=2026"
+        : "/roadmap?kurikulum=2026&minat=Analisis%20Data&iup=tidak&magang=tidak&hasil=true&lulus=8",
+    );
+    await page.locator('[data-id="PACS262201"] button').click();
+    const frames = await page.evaluate(async () => {
+      const frames: { incoming: number[]; outgoing: number[] }[] = [];
+      const start = performance.now();
+      await new Promise<void>((resolve) => {
+        const sample = () => {
+          const progress = (selector: string) =>
+            Array.from(document.querySelectorAll<SVGPathElement>(selector)).map(
+              (path) => 1 - Number(path.style.strokeDashoffset),
+            );
+          frames.push({
+            incoming: progress('g[data-id$="->PACS262201"] .react-flow__edge-path'),
+            outgoing: progress('g[data-id^="PACS262201->"] .react-flow__edge-path'),
+          });
+          if (performance.now() - start < 2600) requestAnimationFrame(sample);
+          else resolve();
+        };
+        requestAnimationFrame(sample);
+      });
+      return frames;
+    });
+    expect(frames.some((frame) => frame.incoming.some((value) => value > 0 && value < 1))).toBe(
+      true,
+    );
+    expect(frames.some((frame) => frame.outgoing.some((value) => value > 0 && value < 1))).toBe(
+      true,
+    );
+    expect(
+      frames
+        .filter((frame) => frame.outgoing.some((value) => value > 0))
+        .every(
+          (frame) => frame.incoming.length > 0 && frame.incoming.every((value) => value === 1),
+        ),
+    ).toBe(true);
+    await expect(page.locator(".react-flow__edge-path[marker-end]")).toHaveCount(0);
   });
 }

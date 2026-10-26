@@ -14,7 +14,7 @@ import {
 } from "@xyflow/react";
 import type { CurriculumId } from "../../../data";
 import { buttonVariants } from "../../../ui/button";
-import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
+import { EdgeRouting, routedEdgeTypes, useConnectionReveal } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import type { Scope } from "../scope";
@@ -31,7 +31,7 @@ function withOpacity(node: MapNode, opacity: number): MapNode {
 }
 
 function useCourseReveal(nodes: MapNode[]) {
-  const [displayed, setDisplayed] = useState({ nodes, edgeProgress: 0 });
+  const [displayed, setDisplayed] = useState({ nodes });
   const current = useRef(nodes);
 
   useLayoutEffect(() => {
@@ -62,7 +62,6 @@ function useCourseReveal(nodes: MapNode[]) {
       current.current = frame;
       setDisplayed({
         nodes: frame,
-        edgeProgress: Math.min(1, Math.max(0, (seconds - 0.95) / 0.35)),
       });
     };
     if (!selected || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -269,10 +268,16 @@ export function CurriculumMap({
 }) {
   const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
   const reveal = useCourseReveal(nodes);
-  const revealedEdges =
-    reveal.edgeProgress > 0
-      ? edges.map((edge) => ({ ...edge, type: "routed", data: { progress: reveal.edgeProgress } }))
-      : [];
+  const progress = useConnectionReveal(
+    selectedId,
+    edges.some((edge) => edge.target === selectedId),
+    0.95,
+  );
+  const revealedEdges = edges.map((edge) => ({
+    ...edge,
+    type: "routed",
+    data: { progress: edge.target === selectedId ? progress.incoming : progress.outgoing },
+  }));
   return (
     <EdgeRouting>
       <ReactFlow<MapNode, Edge>

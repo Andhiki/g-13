@@ -24,7 +24,7 @@ for (const curriculum of [
     );
     await expect(incoming).toBeAttached();
     await expect(incoming).toHaveAttribute("d", /^M.+[LQ]/);
-    await expect(incoming).toHaveAttribute("marker-end", /url\(.+\)/);
+    await expect(incoming).not.toHaveAttribute("marker-end");
     await expect(incoming).toHaveCSS("stroke-width", "2.2px");
     await expect(page.locator("[data-course-state=dependent]").first()).toBeAttached();
     await expect(details.getByRole("heading", { name: "Lokasi sumber" })).toHaveCount(0);

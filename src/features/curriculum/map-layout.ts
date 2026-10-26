@@ -1,4 +1,4 @@
-import { MarkerType, type Edge, type Node } from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react";
 import type { Course, Curriculum, Relation } from "../../data";
 import { mapCourseState, type MapCourseState } from "./map-state";
 import { assignedCoreSemester, isCore } from "./course-utils";
@@ -179,7 +179,6 @@ export function buildMap(
 
   const edges: Edge[] = focusedRelations.map((relation) => {
     const isPrerequisite = relation.target === selectedId;
-    const color = isPrerequisite ? "var(--color-warning-dark)" : "var(--color-feature-dark)";
     return {
       id: relation.source + "->" + relation.target,
       source: relation.source,
@@ -188,7 +187,6 @@ export function buildMap(
       targetHandle: "in:" + relation.source,
       type: "default",
       zIndex: 3,
-      markerEnd: { type: MarkerType.ArrowClosed, color },
       className: isPrerequisite
         ? "[&>path:first-child]:stroke-warning-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]"
         : "[&>path:first-child]:stroke-feature-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]",

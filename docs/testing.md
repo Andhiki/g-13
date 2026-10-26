@@ -27,8 +27,8 @@ open search with `/` without inserting it into the query, type normally in the
 search field, dismiss empty results, select search results, switch to the list,
 filter semesters, and persist the dark theme. Filter-drawer tests also check
 curriculum and interest selection, retained required courses, dismissal and focus
-return, and preserving filter values when resizing to the desktop panel. They verify rendered arrow paths
-and arrowheads as well as course selection. Drawer tests verify opening and closing
+return, and preserving filter values when resizing to the desktop panel. They verify rendered connector paths
+and course selection. Drawer tests verify opening and closing
 animation events and dismissal in both map and list views. Traces are retained for failures in
 `test-results/`.
 
@@ -53,3 +53,6 @@ both viewport sizes. The fallback must disappear when the displayed plan changes
 `e2e/routing.e2e.ts` checks both curricula at desktop and phone sizes. It samples
 rendered SVG paths against unrelated node bounds, checks that every edge renders,
 and repeats the roadmap check after changing the graduation target.
+
+The routing tests also sample animation frames on both maps to verify that
+prerequisite connections finish before outgoing connections begin.

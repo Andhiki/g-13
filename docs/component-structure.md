@@ -73,4 +73,5 @@ roadmap feature. `ElectiveReplacement` owns replacement selection and source pre
 `EdgeRouting` supplies both maps with measured React Flow nodes and rounded
 orthogonal paths from `@tisoap/react-flow-smart-edge`. Course cards, activity
 cards, and title nodes are obstacles; semester lane headers are excluded.
-The shared edge renderer preserves arrowheads and the curriculum reveal animation.
+Connectors have no arrowheads. On selection, prerequisite connections finish before
+unlocked-course connections begin. Reduced motion skips both stages.

@@ -3,13 +3,16 @@ import {
   Background,
   BackgroundVariant,
   ReactFlow,
-  MarkerType,
   type ReactFlowInstance,
   type Node,
   type NodeProps,
   type Edge,
 } from "@xyflow/react";
-import { EdgeRouting, routedEdgeTypes } from "../curriculum/components/EdgeRouting";
+import {
+  EdgeRouting,
+  routedEdgeTypes,
+  useConnectionReveal,
+} from "../curriculum/components/EdgeRouting";
 import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
 import { mapCourseState } from "../curriculum/map-state";
 import { creditsFor } from "../curriculum/course-utils";
@@ -158,12 +161,26 @@ export function RoadmapGraph({
           strokeWidth: focused ? 2 : 1,
           opacity: selectedId && !focused ? 0.15 : 0.65,
         },
-        markerEnd: { type: MarkerType.ArrowClosed, color },
         zIndex: focused ? 3 : 0,
       };
     });
     return { nodes, edges };
   }, [plan, target, selectedId, choose]);
+  const progress = useConnectionReveal(
+    selectedId,
+    edges.some((edge) => edge.target === selectedId),
+  );
+  const revealedEdges = edges.map((edge) => ({
+    ...edge,
+    data: {
+      progress:
+        edge.target === selectedId
+          ? progress.incoming
+          : edge.source === selectedId
+            ? progress.outgoing
+            : 1,
+    },
+  }));
   return (
     <section
       ref={stage}
@@ -175,7 +192,7 @@ export function RoadmapGraph({
           className="absolute! inset-0"
           key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
           nodes={nodes}
-          edges={edges}
+          edges={revealedEdges}
           nodeTypes={nodeTypes}
           edgeTypes={routedEdgeTypes}
           onInit={(instance) => {
