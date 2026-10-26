@@ -1,5 +1,5 @@
 import { Typography } from "../../../ui/typography";
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -10,6 +10,8 @@ import { CompactButton } from "../../../ui/compact-button";
 import { normalizeCourseTitle, type Course, type Curriculum, type Relation } from "../../../data";
 import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
 import { CourseSheetHandle } from "./CourseSheetHandle";
+import { SemesterIndicator } from "./SemesterIndicator";
+import { CopyCourseButton } from "./CopyCourseButton";
 
 type Syllabus = {
   description: string;
@@ -88,6 +90,7 @@ function CourseDetailsContent({
   onHeightChange,
   height,
 }: Omit<CourseDetailsProps, "course" | "close"> & { course: Course; height: number }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
   const byId = useMemo(() => new Map(data.all.map((item) => [item.id, item])), [data]);
   const prereqs = relations
     .filter((item) => item.target === course.id)
@@ -109,49 +112,41 @@ function CourseDetailsContent({
     course.code.replaceAll("-", "") as keyof typeof editionSyllabi
   ] as Syllabus | undefined;
   const versions = syllabus ? [syllabus, ...(syllabus.alternatives ?? [])] : [];
-  const curriculumLabel =
-    data.edition === `Kurikulum ${data.id}`
-      ? data.edition
-      : `Kurikulum ${data.id} · ${data.edition}`;
   return (
     <AlignDrawer.Content
       modal={modal}
       style={{ "--course-sheet-height": `${height}dvh` } as CSSProperties}
       className="max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
+      onOpenAutoFocus={(event) => {
+        event.preventDefault();
+        closeButton.current?.focus();
+      }}
       onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
       aria-label={`Detail ${course.title}`}
     >
       <CourseSheetHandle height={height} onChange={(next) => onHeightChange?.(next)} />
-      <AlignDrawer.Header className="shrink-0 items-start gap-4 border-b p-4 pt-0 sm:p-5">
+      <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 sm:p-5">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
-            {curriculumLabel} · {course.code || "Mata kuliah pilihan"}
+            {course.code || "Mata kuliah pilihan"}
           </Typography>
-          <AlignDrawer.Title asChild>
-            <Typography as="h2" variant="subtitle1" className="mt-1 text-text-strong-950">
-              {course.title}
-            </Typography>
-          </AlignDrawer.Title>
-          {course.englishTitle && (
-            <Typography as="p" variant="paragraph" className="mb-0 mt-1 text-text-sub-600">
-              {course.englishTitle}
-            </Typography>
-          )}
-        </div>
-        <AlignDrawer.Close asChild>
-          <CompactButton aria-label="Tutup detail mata kuliah">
-            <RiCloseLine aria-hidden="true" />
-          </CompactButton>
-        </AlignDrawer.Close>
-      </AlignDrawer.Header>
-      <AlignDrawer.Description asChild>
-        <Typography as="p" variant="caption" className="sr-only">
-          Informasi akademik mata kuliah {course.title}.
-        </Typography>
-      </AlignDrawer.Description>
-      <AlignDrawer.Body className="min-h-0 overflow-y-auto">
-        <div className="p-4 sm:p-5">
-          <div className="flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
+          <div className="mt-2 flex items-center gap-3">
+            {credit !== null && (
+              <span
+                role="img"
+                aria-label={`${credit} SKS`}
+                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 text-label-sm text-text-strong-950"
+              >
+                <span aria-hidden="true">{credit}</span>
+              </span>
+            )}
+            <AlignDrawer.Title asChild>
+              <Typography as="h2" variant="subtitle1" className="m-0 min-w-0 text-text-strong-950">
+                {course.title}
+              </Typography>
+            </AlignDrawer.Title>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
             {labels.map((label) => (
               <AlignBadge.Root
                 variant="light"
@@ -162,24 +157,34 @@ function CourseDetailsContent({
               </AlignBadge.Root>
             ))}
           </div>
-          <dl className="mt-4 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
-            <div className="pr-3">
-              <Typography as="dt" variant="caption" className="text-text-sub-600">
-                Semester panduan
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <CopyCourseButton key={course.id} courseId={course.id} />
+          <AlignDrawer.Close asChild>
+            <CompactButton ref={closeButton} aria-label="Tutup detail mata kuliah">
+              <RiCloseLine className="size-5" aria-hidden="true" />
+            </CompactButton>
+          </AlignDrawer.Close>
+        </div>
+      </AlignDrawer.Header>
+      <AlignDrawer.Description asChild>
+        <Typography as="p" variant="caption" className="sr-only">
+          Informasi akademik mata kuliah {course.title}.
+        </Typography>
+      </AlignDrawer.Description>
+      <AlignDrawer.Body className="min-h-0 overflow-y-auto">
+        <div className="p-4 sm:p-5">
+          <div className="mb-6">
+            <Typography as="p" variant="caption" className="m-0 mt-1 text-text-sub-600">
+              Semester anjuran
+            </Typography>
+            {credit === null && (
+              <Typography as="p" variant="caption" className="mt-2 text-text-sub-600">
+                SKS belum dinyatakan
               </Typography>
-              <Typography as="dd" variant="label" className="m-0 mt-1 text-text-strong-950">
-                {semesterLabel(course).replace("Semester ", "")}
-              </Typography>
-            </div>
-            <div className="pl-3">
-              <Typography as="dt" variant="caption" className="text-text-sub-600">
-                Beban
-              </Typography>
-              <Typography as="dd" variant="label" className="m-0 mt-1 text-text-strong-950">
-                {credit === null ? "—" : credit + " SKS"}
-              </Typography>
-            </div>
-          </dl>
+            )}
+            <SemesterIndicator label={semesterLabel(course)} />
+          </div>
           <div className="mt-2">
             <Accordion.Root key={`${data.id}-${course.id}`} type="single" collapsible>
               <Accordion.Item value="syllabus">

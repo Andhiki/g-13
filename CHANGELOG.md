@@ -16,6 +16,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Tombol salin ID mata kuliah di samping tombol tutup detail, dengan tooltip dan
+  animasi centang setelah berhasil disalin. Kedua tombol dan ikonnya menggunakan
+  ukuran yang sama.
+
 - Favicon diagram simpul dari Remix Icon, monokrom mengikuti tema sistem.
 - Transkripsi enam peta minat kurikulum 2026 (PDF 201–206), termasuk semester,
   SKS, status WM/P, blok pilihan, dan perbedaannya dari tabel sumber.
@@ -33,6 +37,12 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   pengguna.
 
 #### Changed
+
+- Detail mata kuliah menampilkan kredit sebagai angka dalam lingkaran di samping
+  judul, dengan kategori di bawahnya dan tanpa terjemahan bahasa Inggris.
+  Semester anjuran selalu terlihat sebagai garis delapan titik dengan label
+  penunjuk semester, tanpa garis pemisah tambahan. Label versi kurikulum di header
+  dihapus; kode mata kuliah tetap ditampilkan.
 
 - Sheet detail mobile dapat diseret dari seluruh panel; konten tetap bisa digulir
   pada tinggi 75%, dan seret turun dari posisi scroll teratas mengecilkan panel.

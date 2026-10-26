@@ -195,3 +195,8 @@ Variants are `title`, `subtitle1`, `subtitle2`, `paragraph` (the default), `capt
 Keep layout and contextual colors in `className`. For Radix drawer and modal
 titles and descriptions, use `asChild` with `Typography` to retain accessible names.
 Interactive controls retain their existing AlignUI typography.
+
+Course drawer actions use a flex row of CompactButtons. Copying a course ID uses
+`src/ui/tooltip.tsx`, adapted from [AlignUI Tooltip v1.2](https://www.alignui.com/docs/v1.2/ui/tooltip)
+with its default variants and Radix behavior. The copy icon changes to a checked
+box after a successful clipboard write; reduced motion removes the animation.
