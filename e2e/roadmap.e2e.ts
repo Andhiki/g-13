@@ -231,6 +231,7 @@ test("quiz keyboard choices, boundaries, conditional steps, and completion", asy
   const title = page.getByRole("heading", { level: 1 });
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
   await expect(title).toHaveText("Kurikulum mana yang kamu ikuti?");
   await page.keyboard.press("1");
   await expect(page.getByRole("button", { name: "2026", exact: true })).toHaveAttribute(
@@ -240,7 +241,7 @@ test("quiz keyboard choices, boundaries, conditional steps, and completion", asy
   await page.keyboard.press("ArrowRight");
   await expect(title).toHaveText("Kamu mahasiswa IUP?");
   await page.keyboard.press("1");
-  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
   await expect(title).toHaveText("Exposure apa yang kamu inginkan?");
   await page.keyboard.press("7");
   await expect(page.getByRole("button", { name: "Belum menentukan", exact: true })).toHaveAttribute(
@@ -260,7 +261,7 @@ test("quiz keyboard choices, boundaries, conditional steps, and completion", asy
   await page.keyboard.press("ArrowRight");
   await expect(title).toHaveText("Mau mengambil Magang?");
   await page.keyboard.press("2");
-  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
   await expect(page.getByRole("region", { name: "Grafik roadmap kuliah" })).toBeVisible();
 });
 
