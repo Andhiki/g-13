@@ -40,12 +40,37 @@ function RoutedEdge(props: EdgeProps<Edge<{ progress?: number }>>) {
     preset: "smoothstep",
     options: pathOptions,
   });
+  const straight = useStore((state) => {
+    if (Math.abs(props.sourceY - props.targetY) > 0.01 || props.targetX <= props.sourceX)
+      return false;
+    return !Array.from(state.nodeLookup.values()).some((node) => {
+      if (
+        node.id === props.source ||
+        node.id === props.target ||
+        node.type === "lane" ||
+        node.hidden
+      )
+        return false;
+      const { x, y } = node.internals.positionAbsolute;
+      const { width = 0, height = 0 } = node.measured;
+      return (
+        x - pathOptions.nodePadding < props.targetX &&
+        x + width + pathOptions.nodePadding > props.sourceX &&
+        y - pathOptions.nodePadding < props.sourceY &&
+        y + height + pathOptions.nodePadding > props.sourceY
+      );
+    });
+  });
   if (route?.kind !== "routed") return null;
   const progress = props.data?.progress ?? 1;
   return (
     <BaseEdge
       id={props.id}
-      path={route.svgPathString}
+      path={
+        straight
+          ? `M ${props.sourceX},${props.sourceY} L ${props.targetX},${props.targetY}`
+          : route.svgPathString
+      }
       pathLength={1}
       interactionWidth={props.interactionWidth}
       data-routed="true"

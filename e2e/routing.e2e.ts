@@ -109,3 +109,24 @@ for (const route of ["/", "/roadmap"]) {
     await expect(page.locator(".react-flow__edge-path[marker-end]")).toHaveCount(0);
   });
 }
+
+test("aligned prerequisite connection stays horizontal all the way to its target", async ({
+  page,
+}) => {
+  await page.goto("/?kurikulum=2026&mk=PACS262207");
+  const path = page.locator('g[data-id$="->PACS262207"] .react-flow__edge-path').first();
+  await expect(path).toBeAttached();
+  await expect(path).toHaveCSS("stroke-dashoffset", "0px");
+  const deviation = await path.evaluate((element: SVGPathElement) => {
+    const length = element.getTotalLength();
+    const start = element.getPointAtLength(0);
+    const end = element.getPointAtLength(length);
+    const ys = Array.from(
+      { length: 101 },
+      (_, i) => element.getPointAtLength((length * i) / 100).y,
+    );
+    return { endpoints: Math.abs(end.y - start.y), path: Math.max(...ys) - Math.min(...ys) };
+  });
+  expect(deviation.endpoints).toBeLessThan(0.1);
+  expect(deviation.path).toBeLessThan(0.1);
+});
