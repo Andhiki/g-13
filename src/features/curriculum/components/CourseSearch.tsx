@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useMemo, useRef, useState } from "react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { AlignButton } from "../../../ui/button";
@@ -102,13 +103,21 @@ export function CourseSearch({
                     <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-0.5">
                       <span>{course.title}</span>
                       {course.code && (
-                        <span className="whitespace-nowrap text-label-xs text-text-sub-600">
+                        <Typography
+                          as="span"
+                          variant="labelSmall"
+                          className="whitespace-nowrap text-text-sub-600"
+                        >
                           {course.code}
-                        </span>
+                        </Typography>
                       )}
-                      <small className="col-start-1 text-label-xs text-text-sub-600">
+                      <Typography
+                        as="small"
+                        variant="labelSmall"
+                        className="col-start-1 text-text-sub-600"
+                      >
                         {semesterLabel(course)}
-                      </small>
+                      </Typography>
                     </span>
                   </AlignCommandMenu.Item>
                 ))}

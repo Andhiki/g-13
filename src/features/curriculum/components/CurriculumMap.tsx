@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate } from "motion/react";
 import { Link } from "@tanstack/react-router";
@@ -315,9 +316,13 @@ export function CurriculumMap({
               className="absolute -top-[72px] flex flex-col items-start gap-4 max-[650px]:-top-8"
               style={{ left: LANE_X + 12 }}
             >
-              <h1 className="m-0 whitespace-nowrap text-[72px] font-semibold tracking-[-0.03em] text-text-strong-950 max-[650px]:text-[30px]">
+              <Typography
+                as="h1"
+                variant="graphTitle"
+                className="m-0 whitespace-nowrap text-text-strong-950"
+              >
                 CS UGM Roadmap (Alpha)
-              </h1>
+              </Typography>
               <Link
                 to="/roadmap"
                 search={{ lulus: 8, semesterPaparan: 6 }}

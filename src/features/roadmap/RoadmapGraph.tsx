@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useEffect, useMemo, useRef } from "react";
 import {
   Background,
@@ -25,17 +26,23 @@ type RoadmapNode = MapNode | ActivityNode | TitleNode;
 
 function RoadmapTitle({ data }: NodeProps<TitleNode>) {
   return (
-    <h1 className="m-0 whitespace-nowrap text-[72px] font-semibold tracking-[-0.03em] text-text-strong-950 max-[650px]:text-[30px]">
+    <Typography as="h1" variant="graphTitle" className="m-0 whitespace-nowrap text-text-strong-950">
       {data.title}
-    </h1>
+    </Typography>
   );
 }
 function ActivityCard({ data }: NodeProps<ActivityNode>) {
   return (
     <div className="w-[246px] rounded-lg border border-primary-base bg-bg-white-0 p-4 text-text-strong-950">
-      <p className="m-0 text-paragraph-xs text-primary-base">Kegiatan</p>
-      <h3 className="mb-1 mt-1 text-label-sm">{data.activity.title}</h3>
-      <p className="m-0 text-paragraph-xs text-text-sub-600">{data.activity.detail}</p>
+      <Typography as="p" variant="caption" className="m-0 text-primary-base">
+        Kegiatan
+      </Typography>
+      <Typography as="h3" variant="label" className="mb-1 mt-1">
+        {data.activity.title}
+      </Typography>
+      <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
+        {data.activity.detail}
+      </Typography>
     </div>
   );
 }

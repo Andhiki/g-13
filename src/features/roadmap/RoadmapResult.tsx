@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiShareLine } from "@remixicon/react";
@@ -133,9 +134,15 @@ export function RoadmapResult({
       >
         <AlignModal.Content>
           <div className="p-5">
-            <AlignModal.Title className="pr-8 text-label-lg">Bagikan roadmap</AlignModal.Title>
-            <AlignModal.Description className="mt-2 text-paragraph-sm text-text-sub-600">
-              Salin tautan ini untuk membuka rencana yang sama.
+            <AlignModal.Title asChild>
+              <Typography as="h2" variant="subtitle1" className="pr-8">
+                Bagikan roadmap
+              </Typography>
+            </AlignModal.Title>
+            <AlignModal.Description asChild>
+              <Typography as="p" variant="paragraph" className="mt-2 text-text-sub-600">
+                Salin tautan ini untuk membuka rencana yang sama.
+              </Typography>
             </AlignModal.Description>
             <input
               aria-label="Tautan roadmap"
@@ -156,9 +163,9 @@ export function RoadmapResult({
         footer={
           selected && (
             <div className="space-y-3">
-              <p className="m-0 text-paragraph-sm">
+              <Typography as="p" variant="paragraph" className="m-0">
                 {kinds[selected.kind]} · Rencana semester {selected.semester}
-              </p>
+              </Typography>
               {selected.kind === "elective" && (
                 <ElectiveReplacement
                   key={selected.course.id}

@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useCallback, useState } from "react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { CourseDetails } from "./components/CourseDetails";
@@ -92,10 +93,17 @@ export function CurriculumPage() {
           <section className="bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 min-[1100px]:pr-[348px] max-[1100px]:pt-[116px]">
             <div className="mx-auto max-w-5xl">
               <div className="mb-3 flex items-baseline justify-between gap-4">
-                <h1 className="m-0 text-label-md text-text-strong-950">Mata kuliah</h1>
-                <span className="text-paragraph-xs text-text-sub-600" aria-live="polite">
+                <Typography as="h1" variant="subtitle2" className="m-0 text-text-strong-950">
+                  Mata kuliah
+                </Typography>
+                <Typography
+                  as="span"
+                  variant="caption"
+                  className="text-text-sub-600"
+                  aria-live="polite"
+                >
                   {visible.length} mata kuliah
-                </span>
+                </Typography>
               </div>
               <CourseList
                 navigation={semesterNavigation}

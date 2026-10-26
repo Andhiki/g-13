@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useMemo, useState, type ReactNode } from "react";
 import { RiArrowRightLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
@@ -92,14 +93,18 @@ function CourseDetailsContent({
     >
       <AlignDrawer.Header className="shrink-0 items-start gap-4 border-b p-4 sm:p-5">
         <div className="min-w-0 flex-1">
-          <p className="m-0 text-paragraph-xs text-text-sub-600">
+          <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
             {curriculumLabel} · {course.code || "Mata kuliah pilihan"}
-          </p>
-          <AlignDrawer.Title className="mt-1 text-label-lg text-text-strong-950">
-            {course.title}
+          </Typography>
+          <AlignDrawer.Title asChild>
+            <Typography as="h2" variant="subtitle1" className="mt-1 text-text-strong-950">
+              {course.title}
+            </Typography>
           </AlignDrawer.Title>
           {course.englishTitle && (
-            <p className="mb-0 mt-1 text-paragraph-sm text-text-sub-600">{course.englishTitle}</p>
+            <Typography as="p" variant="paragraph" className="mb-0 mt-1 text-text-sub-600">
+              {course.englishTitle}
+            </Typography>
           )}
         </div>
         <AlignDrawer.Close asChild>
@@ -108,8 +113,10 @@ function CourseDetailsContent({
           </CompactButton>
         </AlignDrawer.Close>
       </AlignDrawer.Header>
-      <AlignDrawer.Description className="sr-only">
-        Informasi akademik mata kuliah {course.title}.
+      <AlignDrawer.Description asChild>
+        <Typography as="p" variant="caption" className="sr-only">
+          Informasi akademik mata kuliah {course.title}.
+        </Typography>
       </AlignDrawer.Description>
       <AlignDrawer.Body className="min-h-0 overflow-y-auto p-4 sm:p-5">
         <div className="flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
@@ -125,21 +132,27 @@ function CourseDetailsContent({
         </div>
         <dl className="mt-4 grid grid-cols-2 divide-x divide-stroke-soft-200 border-y border-stroke-soft-200 py-3">
           <div className="pr-3">
-            <dt className="text-paragraph-xs text-text-sub-600">Semester panduan</dt>
-            <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
+            <Typography as="dt" variant="caption" className="text-text-sub-600">
+              Semester panduan
+            </Typography>
+            <Typography as="dd" variant="label" className="m-0 mt-1 text-text-strong-950">
               {semesterLabel(course).replace("Semester ", "")}
-            </dd>
+            </Typography>
           </div>
           <div className="pl-3">
-            <dt className="text-paragraph-xs text-text-sub-600">Beban</dt>
-            <dd className="m-0 mt-1 text-label-sm text-text-strong-950">
+            <Typography as="dt" variant="caption" className="text-text-sub-600">
+              Beban
+            </Typography>
+            <Typography as="dd" variant="label" className="m-0 mt-1 text-text-strong-950">
               {credit === null ? "—" : credit + " SKS"}
-            </dd>
+            </Typography>
           </div>
         </dl>
         {(prereqs.length > 0 || requirements.length > 0) && (
           <section className="mt-5">
-            <h3 className="m-0 text-label-sm text-text-strong-950">Prasyarat</h3>
+            <Typography as="h3" variant="label" className="m-0 text-text-strong-950">
+              Prasyarat
+            </Typography>
             {prereqs.length > 0 && (
               <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
                 {prereqs.map((item) => (
@@ -161,15 +174,22 @@ function CourseDetailsContent({
               </ul>
             )}
             {requirements.map((item) => (
-              <p key={item} className="mb-0 mt-2 text-paragraph-sm text-text-sub-600">
+              <Typography
+                as="p"
+                variant="paragraph"
+                key={item}
+                className="mb-0 mt-2 text-text-sub-600"
+              >
                 {item}
-              </p>
+              </Typography>
             ))}
           </section>
         )}
         {next.length > 0 && (
           <section className="mt-5">
-            <h3 className="m-0 text-label-sm text-text-strong-950">Menjadi prasyarat untuk</h3>
+            <Typography as="h3" variant="label" className="m-0 text-text-strong-950">
+              Menjadi prasyarat untuk
+            </Typography>
             <ul className="-mx-2 mt-1 divide-y divide-stroke-soft-200">
               {next.map((item) => (
                 <li key={item.id}>

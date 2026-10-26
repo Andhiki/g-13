@@ -9,10 +9,11 @@ const Root = DialogPrimitive.Root;
 const Title = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
+>(({ className, asChild, ...props }, ref) => (
   <DialogPrimitive.Title
+    asChild={asChild}
     ref={ref}
-    className={twMerge("text-label-sm text-text-strong-950", className)}
+    className={twMerge(!asChild && "text-label-sm text-text-strong-950", className)}
     {...props}
   />
 ));
@@ -21,10 +22,11 @@ Title.displayName = "ModalTitle";
 const Description = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
+>(({ className, asChild, ...props }, ref) => (
   <DialogPrimitive.Description
+    asChild={asChild}
     ref={ref}
-    className={twMerge("text-paragraph-xs text-text-sub-600", className)}
+    className={twMerge(!asChild && "text-paragraph-xs text-text-sub-600", className)}
     {...props}
   />
 ));

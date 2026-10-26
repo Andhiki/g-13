@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useId } from "react";
 import { AlignButton } from "../../../ui/button";
 import { AlignTable } from "../../../ui/table";
@@ -22,12 +23,12 @@ export function CourseTable({
       aria-labelledby={headingId}
     >
       <div className="mb-3 flex items-baseline justify-between gap-4">
-        <h2 id={headingId} className="m-0 text-label-md text-text-strong-950">
+        <Typography as="h2" variant="subtitle2" id={headingId} className="m-0 text-text-strong-950">
           {section.title}
-        </h2>
-        <span className="text-paragraph-xs text-text-sub-600">
+        </Typography>
+        <Typography as="span" variant="caption" className="text-text-sub-600">
           {section.courses.length} mata kuliah
-        </span>
+        </Typography>
       </div>
       <AlignTable.Root aria-labelledby={headingId}>
         <AlignTable.Header>
@@ -73,7 +74,9 @@ export function CourseTable({
             return (
               <AlignTable.Row key={course.id}>
                 <AlignTable.Cell className="max-[640px]:hidden">
-                  <span className="text-paragraph-xs text-text-sub-600">{course.code || "—"}</span>
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    {course.code || "—"}
+                  </Typography>
                 </AlignTable.Cell>
                 <AlignTable.Cell>
                   <AlignButton.Root
@@ -85,26 +88,44 @@ export function CourseTable({
                     aria-pressed={selectedId === course.id}
                     onClick={() => select(course.id)}
                   >
-                    <span className="text-label-sm text-text-strong-950">{course.title}</span>
+                    <Typography as="span" variant="label" className="text-text-strong-950">
+                      {course.title}
+                    </Typography>
                   </AlignButton.Root>
-                  <span className="mb-1 block text-paragraph-xs text-text-sub-600 min-[640px]:hidden">
+                  <Typography
+                    as="span"
+                    variant="caption"
+                    className="mb-1 block text-text-sub-600 min-[640px]:hidden"
+                  >
                     {[course.code, categories, groups].filter(Boolean).join(" · ")}
-                  </span>
+                  </Typography>
                   {showSemesters && (
-                    <span className="mb-1 block text-paragraph-xs text-text-sub-600">
+                    <Typography
+                      as="span"
+                      variant="caption"
+                      className="mb-1 block text-text-sub-600"
+                    >
                       {semesterLabel(course)}
-                    </span>
+                    </Typography>
                   )}
                 </AlignTable.Cell>
                 <AlignTable.Cell className="text-right">
-                  <span className="text-paragraph-sm text-text-sub-600 tabular-nums">
+                  <Typography
+                    as="span"
+                    variant="paragraph"
+                    className="text-text-sub-600 tabular-nums"
+                  >
                     {credits || "—"}
-                  </span>
+                  </Typography>
                 </AlignTable.Cell>
                 <AlignTable.Cell className="max-[640px]:hidden">
-                  <span className="block text-paragraph-xs text-text-sub-600">{categories}</span>
+                  <Typography as="span" variant="caption" className="block text-text-sub-600">
+                    {categories}
+                  </Typography>
                   {groups && (
-                    <span className="block text-paragraph-xs text-text-sub-600">{groups}</span>
+                    <Typography as="span" variant="caption" className="block text-text-sub-600">
+                      {groups}
+                    </Typography>
                   )}
                 </AlignTable.Cell>
               </AlignTable.Row>

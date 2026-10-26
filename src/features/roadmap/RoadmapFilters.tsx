@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { AlignButton } from "../../ui/button";
 import { AlignSelect } from "../../ui/select";
 import type { RoadmapSearch } from "./search";
@@ -15,14 +16,19 @@ export function RoadmapFilters({
 }) {
   return (
     <>
-      <p className="m-0 text-paragraph-sm text-text-sub-600">
+      <Typography as="p" variant="paragraph" className="m-0 text-text-sub-600">
         Kurikulum {answers.kurikulum} · {answers.minat?.replace(/^Lab /, "")} · {totalCredits} SKS
         direncanakan
-      </p>
+      </Typography>
       <div className="flex flex-col gap-[5px]">
-        <label htmlFor="roadmap-target" className="text-label-xs text-text-sub-600">
+        <Typography
+          as="label"
+          variant="labelSmall"
+          htmlFor="roadmap-target"
+          className="text-text-sub-600"
+        >
           Target selesai
-        </label>
+        </Typography>
         <AlignSelect.Root
           value={String(answers.lulus)}
           onValueChange={(value) => update({ ...answers, lulus: value === "7" ? 7 : 8 })}
@@ -38,9 +44,14 @@ export function RoadmapFilters({
       </div>
       {answers.iup === "ya" && ["exchange", "internship"].includes(answers.paparan ?? "") && (
         <div className="flex flex-col gap-[5px]">
-          <label htmlFor="roadmap-exposure" className="text-label-xs text-text-sub-600">
+          <Typography
+            as="label"
+            variant="labelSmall"
+            htmlFor="roadmap-exposure"
+            className="text-text-sub-600"
+          >
             Semester exposure
-          </label>
+          </Typography>
           <AlignSelect.Root
             value={String(answers.semesterPaparan)}
             onValueChange={(value) =>

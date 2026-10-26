@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { AlignSelect } from "../../../ui/select";
 import type { Curriculum, CurriculumId } from "../../../data";
 
@@ -12,9 +13,14 @@ export function ChoiceGroupFilter({
 }) {
   return (
     <div className="relative flex min-w-0 flex-col gap-[5px]">
-      <label className="text-label-xs text-text-sub-600" htmlFor="course-group">
+      <Typography
+        as="label"
+        variant="labelSmall"
+        className="text-text-sub-600"
+        htmlFor="course-group"
+      >
         Kelompok pilihan
-      </label>
+      </Typography>
       <AlignSelect.Root value={group} onValueChange={onChange}>
         <AlignSelect.Trigger
           className="h-9 min-h-9 text-[14px]"
@@ -45,9 +51,14 @@ export function CurriculumVersionFilter({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-[5px]">
-      <label className="text-label-xs text-text-sub-600" htmlFor="curriculum-version">
+      <Typography
+        as="label"
+        variant="labelSmall"
+        className="text-text-sub-600"
+        htmlFor="curriculum-version"
+      >
         Versi kurikulum
-      </label>
+      </Typography>
       <AlignSelect.Root variant="compact" value={curriculum} onValueChange={onChange}>
         <AlignSelect.Trigger
           className="h-9 min-h-9 text-[14px]"

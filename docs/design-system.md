@@ -176,3 +176,16 @@ in the semester control when work extends beyond the target.
 The shared map overlay retains its navigation fade, and the pannable graph clips
 course nodes at viewport edges. These existing map behaviors are intentional exceptions
 to the visual inspector's gradient and page-margin rules.
+
+## Typography
+
+Use `Typography` from `src/ui/typography.tsx` for application text. Its `variant`
+selects the shared style, while `as` selects the semantic HTML element and defaults
+to `p`. Native attributes and refs pass through to that element.
+
+Variants are `title`, `subtitle1`, `subtitle2`, `paragraph` (the default), `caption`,
+`label`, and `labelSmall`. They use the existing AlignUI tokens. `graphTitle` and
+`question` retain the responsive scale of the graph headings and roadmap quiz.
+Keep layout and contextual colors in `className`. For Radix drawer and modal
+titles and descriptions, use `asChild` with `Typography` to retain accessible names.
+Interactive controls retain their existing AlignUI typography.
