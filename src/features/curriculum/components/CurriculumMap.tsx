@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate } from "motion/react";
+import { Link } from "@tanstack/react-router";
 import {
   getViewportForBounds,
-  getBezierPath,
-  BaseEdge,
-  type EdgeProps,
   Background,
   BackgroundVariant,
   ReactFlow,
+  ViewportPortal,
   useReactFlow,
   useOnViewportChange,
   type Edge,
   type NodeTypes,
 } from "@xyflow/react";
 import type { CurriculumId } from "../../../data";
+import { buttonVariants } from "../../../ui/button";
+import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import type { Scope } from "../scope";
@@ -75,22 +76,6 @@ function useCourseReveal(nodes: MapNode[]) {
 
   return displayed;
 }
-
-function RevealingEdge(props: EdgeProps<Edge<{ progress: number }>>) {
-  const [path] = getBezierPath(props);
-  const progress = props.data!.progress;
-  return (
-    <BaseEdge
-      id={props.id}
-      path={path}
-      pathLength={1}
-      markerEnd={progress === 1 ? props.markerEnd : undefined}
-      style={{ strokeDasharray: 1, strokeDashoffset: 1 - progress }}
-    />
-  );
-}
-
-const edgeTypes = { reveal: RevealingEdge };
 
 function ViewportFocus({
   navigation,
@@ -286,45 +271,71 @@ export function CurriculumMap({
   const reveal = useCourseReveal(nodes);
   const revealedEdges =
     reveal.edgeProgress > 0
-      ? edges.map((edge) => ({ ...edge, type: "reveal", data: { progress: reveal.edgeProgress } }))
+      ? edges.map((edge) => ({ ...edge, type: "routed", data: { progress: reveal.edgeProgress } }))
       : [];
   return (
-    <ReactFlow<MapNode, Edge>
-      key={curriculum}
-      className="absolute! inset-0 z-0 bg-transparent!"
-      proOptions={{ hideAttribution: true }}
-      onPaneClick={close}
-      nodes={reveal.nodes}
-      edges={revealedEdges}
-      edgeTypes={edgeTypes}
-      nodeTypes={nodeTypes}
-      defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
-      minZoom={0.05}
-      maxZoom={1.35}
-      nodesDraggable={false}
-      nodesConnectable={false}
-      elementsSelectable={false}
-      zoomOnDoubleClick={false}
-      fitView={false}
-      aria-label="Peta kurikulum Ilmu Komputer UGM"
-    >
-      <ViewportFocus
-        navigation={navigation}
-        focusKey={focusKey}
-        focusTarget={curriculum}
-        scope={scope}
-        group={group}
-        selectedId={selectedId}
-        positions={positions}
-      />
-      <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
-      <Background
-        className="bg-bg-weak-25"
-        variant={BackgroundVariant.Dots}
-        color="var(--color-stroke-sub-300)"
-        gap={24}
-        size={1.2}
-      />
-    </ReactFlow>
+    <EdgeRouting>
+      <ReactFlow<MapNode, Edge>
+        key={curriculum}
+        className="absolute! inset-0 z-0 bg-transparent!"
+        proOptions={{ hideAttribution: true }}
+        onPaneClick={close}
+        nodes={reveal.nodes}
+        edges={revealedEdges}
+        edgeTypes={routedEdgeTypes}
+        nodeTypes={nodeTypes}
+        defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
+        minZoom={0.05}
+        maxZoom={1.35}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        zoomOnDoubleClick={false}
+        fitView={false}
+        aria-label="Peta kurikulum Ilmu Komputer UGM"
+      >
+        <ViewportFocus
+          navigation={navigation}
+          focusKey={focusKey}
+          focusTarget={curriculum}
+          scope={scope}
+          group={group}
+          selectedId={selectedId}
+          positions={positions}
+        />
+        <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
+        <ViewportPortal>
+          <div
+            className="absolute -top-[72px] flex flex-col items-start gap-4 max-[650px]:-top-8"
+            style={{ left: LANE_X + 12 }}
+          >
+            <h1
+              hidden={selectedId !== null}
+              className="m-0 whitespace-nowrap text-[72px] font-semibold tracking-[-0.03em] text-text-strong-950 max-[650px]:text-[30px]"
+            >
+              CS UGM Roadmap (Alpha)
+            </h1>
+            <Link
+              to="/roadmap"
+              search={{ lulus: 8, semesterPaparan: 6 }}
+              className={buttonVariants({
+                variant: "neutral",
+                mode: "filled",
+                className: "pointer-events-auto nodrag nopan",
+              })}
+            >
+              Buat roadmap kuliah
+            </Link>
+          </div>
+        </ViewportPortal>
+        <Background
+          className="bg-bg-weak-25"
+          variant={BackgroundVariant.Dots}
+          color="var(--color-stroke-sub-300)"
+          gap={24}
+          size={1.2}
+        />
+      </ReactFlow>
+    </EdgeRouting>
   );
 }

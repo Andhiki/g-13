@@ -2,15 +2,16 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { AlignButton } from "../../../ui/button";
 
-const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
-
 export function SemesterFilter({
   visible,
   onNavigate,
+  lastSemester = 8,
 }: {
   visible: number[];
   onNavigate: (semester: number) => void;
+  lastSemester?: number;
 }) {
+  const semesters = Array.from({ length: lastSemester }, (_, i) => String(i + 1));
   const reducedMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
 
@@ -44,14 +45,17 @@ export function SemesterFilter({
         }
         className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:w-full"
       >
-        <div className="relative grid w-full grid-cols-8 gap-0.5">
+        <div
+          className="relative grid w-full gap-0.5"
+          style={{ gridTemplateColumns: `repeat(${lastSemester}, minmax(0, 1fr))` }}
+        >
           <motion.div
             aria-hidden="true"
             data-semester-band=""
             initial={false}
             animate={{
-              left: `${((visible[0] ?? 1) - 1) * 12.5}%`,
-              width: `${visible.length ? (visible[visible.length - 1]! - visible[0]! + 1) * 12.5 : 0}%`,
+              left: `${((visible[0] ?? 1) - 1) * (100 / lastSemester)}%`,
+              width: `${visible.length ? (visible[visible.length - 1]! - visible[0]! + 1) * (100 / lastSemester) : 0}%`,
               opacity: visible.length ? 1 : 0,
             }}
             transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}

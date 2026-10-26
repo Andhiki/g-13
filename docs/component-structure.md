@@ -63,7 +63,14 @@ shared elective eligibility filter.
 placements, and unresolved conditions. These functions operate on source data and
 return a suggested plan, not academic eligibility.
 
-`RoadmapGraph` reuses the curriculum's course and semester nodes. `RoadmapResult`
-composes result controls, conflict notes, sharing, and the existing course drawer.
+`RoadmapGraph` reuses the curriculum's course and semester nodes on a full-screen canvas.
+`RoadmapResult` composes the shared Overlay and SemesterFilter, sharing, and course drawer.
+`RoadmapFilters` supplies AlignUI Select controls to the shared expandable filter panel.
+`RoadmapNotes` keeps conflict notes and source assumptions in an AlignUI Drawer.
 The drawer's optional footer hosts roadmap-specific actions without importing the
 roadmap feature. `ElectiveReplacement` owns replacement selection and source preview.
+
+`EdgeRouting` supplies both maps with measured React Flow nodes and rounded
+orthogonal paths from `@tisoap/react-flow-smart-edge`. Course cards, activity
+cards, and title nodes are obstacles; semester lane headers are excluded.
+The shared edge renderer preserves arrowheads and the curriculum reveal animation.

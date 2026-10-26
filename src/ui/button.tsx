@@ -2,7 +2,7 @@
 import type { ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
-const buttonVariants = tv({
+export const buttonVariants = tv({
   base: [
     "group relative inline-flex items-center justify-center whitespace-nowrap outline-none",
     "transition duration-200 ease-out focus:outline-none",

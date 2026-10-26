@@ -12,6 +12,8 @@ for (const curriculum of [
     await page.goto(`/?kurikulum=${curriculum.edition}`);
     const selected = page.locator(`[data-id="${curriculum.selected}"] button`);
     await selected.click();
+    const title = page.getByRole("heading", { name: "CS UGM Roadmap (Alpha)", exact: true });
+    await expect(title).toBeHidden();
     const details = page.getByRole("dialog");
     await expect(
       details.getByRole("heading", { name: "Algoritma dan Struktur Data", exact: true }),
@@ -21,7 +23,7 @@ for (const curriculum of [
       `[data-testid="rf__edge-${curriculum.prerequisite}->${curriculum.selected}"] .react-flow__edge-path`,
     );
     await expect(incoming).toBeAttached();
-    await expect(incoming).toHaveAttribute("d", /^M.+C/);
+    await expect(incoming).toHaveAttribute("d", /^M.+[LQ]/);
     await expect(incoming).toHaveAttribute("marker-end", /url\(.+\)/);
     await expect(incoming).toHaveCSS("stroke-width", "2.2px");
     await expect(page.locator("[data-course-state=dependent]").first()).toBeAttached();
@@ -37,6 +39,7 @@ for (const curriculum of [
     ).toBeVisible();
     await page.getByRole("button", { name: "Tutup detail mata kuliah" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(title).toBeVisible();
     await expect(page.locator(".react-flow__edge-path")).toHaveCount(0);
     expect(errors).toEqual([]);
   });

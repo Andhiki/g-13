@@ -49,3 +49,7 @@ source prerequisite conflicts, protected courses, and edited-plan restoration.
 `e2e/roadmap.e2e.ts` covers the full-screen quiz, conditional follow-ups, Back,
 browser history, course replacement, exposure controls, and clipboard fallback at
 both viewport sizes. The fallback must disappear when the displayed plan changes.
+
+`e2e/routing.e2e.ts` checks both curricula at desktop and phone sizes. It samples
+rendered SVG paths against unrelated node bounds, checks that every edge renders,
+and repeats the roadmap check after changing the graduation target.

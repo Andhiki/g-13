@@ -4,7 +4,7 @@
 
 Build `/roadmap` as a full-screen quiz that produces a graph of the student's college journey. Always assume the student starts in semester 1.
 
-Match the existing app's typography, colors, theme support, and house controls. Show one question per screen, large answer choices, progress, Back, and an explicit Continue action. Preserve answers when moving backward. Use conditional follow-ups rather than a long form. There are no timers or scores.
+Match the existing app's typography, colors, theme support, and house controls. Show one question per screen, AlignUI answer buttons, Back, and an explicit Continue action. Preserve answers when moving backward. Use conditional follow-ups rather than a long form. There are no progress bars, timers, scores, or extra page titles.
 
 The quiz collects:
 
@@ -13,7 +13,7 @@ The quiz collects:
 - IUP status. An IUP answer reveals an international-exposure question, including an undecided choice.
 - Whether the student wants optional Magang. A yes answer reveals a duration question appropriate to that curriculum.
 
-The result shows every planned course individually in semester lanes, including prerequisite connections and relevant activities. Reuse the current graph's course appearance, navigation conventions, and course details. Include all required courses, deduplicate repeated semester placements, and preselect electives relevant to the chosen peminatan. Users can replace electives in the result.
+The result uses full-screen React Flow with the same overlay and expandable filter control as the main curriculum page. Every planned course appears individually in semester lanes, including prerequisite connections and relevant activities. Graduation and exposure settings use AlignUI Select controls in the expandable panel; conflict notes open in a drawer. Reuse the current graph's course appearance, navigation conventions, and course details. Include all required courses, deduplicate repeated semester placements, and preselect electives relevant to the chosen peminatan. Users can replace electives in the result.
 
 Put graduation targets of 7 and 8 semesters in the result, not in the quiz. For an IUP exchange or international internship, also allow switching the exposure semester between 6 and 7. Short exposure activities do not reserve a whole semester.
 

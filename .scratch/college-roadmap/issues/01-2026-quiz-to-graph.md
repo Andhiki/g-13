@@ -9,7 +9,7 @@
 ## Acceptance criteria
 
 - [x] `/roadmap` is reachable from the existing app and links back to the peta kurikulum.
-- [x] Show one question per screen with progress, large choices, explicit Continue, and Back. Preserve answers when revisiting a step and require an answer before continuing.
+- [x] Show one question per screen with AlignUI answer buttons, explicit Continue, and Back. Omit the progress bar and extra page title. Preserve answers when revisiting a step and require an answer before continuing.
 - [x] Match existing app typography, colors, house controls, focus behavior, and light and dark themes. Support keyboard selection and mobile screens without horizontal page overflow.
 - [x] Offer all six source-backed 2026 peminatan. Keep source naming differences understandable.
 - [x] For the regular-class, no-optional-Magang path, render every planned course individually in semester lanes with prerequisite connections and course details. Keep compulsory Kerja Praktik.

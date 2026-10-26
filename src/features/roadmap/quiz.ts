@@ -13,12 +13,12 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
       choices: [
         {
           value: "2026",
-          label: "Kurikulum 2026",
+          label: "2026",
           detail: "Enam peminatan, wajib minat, dan Kerja Praktik.",
         },
         {
           value: "2021",
-          label: "Kurikulum 2021",
+          label: "2021",
           detail: "Revisi 2023. Pilihan dari empat laboratorium.",
         },
       ],
@@ -30,12 +30,12 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
       choices: [
         {
           value: "ya",
-          label: "Ya, kelas internasional",
+          label: "IUP",
           detail: "Tambahkan kegiatan international exposure.",
         },
         {
           value: "tidak",
-          label: "Bukan, kelas reguler",
+          label: "Reguler",
           detail: "Lanjut ke pilihan bidang yang kamu minati.",
         },
       ],
@@ -75,7 +75,7 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
     choices: [
       {
         value: "ya",
-        label: "Ya, ingin Magang",
+        label: "Ya",
         detail:
           answers.paparan === "internship"
             ? "Rencanakan sebagai kegiatan yang sama dengan Magang internasional."
@@ -83,7 +83,7 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
       },
       {
         value: "tidak",
-        label: "Tidak mengambil Magang tambahan",
+        label: "Tidak",
         detail:
           curriculum === "2026"
             ? "Tetap ada Kerja Praktik antar semester."

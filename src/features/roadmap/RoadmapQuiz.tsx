@@ -1,5 +1,8 @@
 import { useEffect, useRef } from "react";
+import { useHotkey, useHotkeys } from "@tanstack/react-hotkeys";
+import { motion, useReducedMotion } from "motion/react";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
+import { AlignKbd } from "../../ui/kbd";
 import { AlignButton } from "../../ui/button";
 import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
@@ -11,6 +14,7 @@ export function RoadmapQuiz({
   answers: RoadmapSearch;
   update: (next: RoadmapSearch) => void;
 }) {
+  const reducedMotion = useReducedMotion();
   const questions = quizQuestions(answers);
   const index = Math.max(
     0,
@@ -28,94 +32,123 @@ export function RoadmapQuiz({
     const next = questions[index + 1];
     update({ ...answers, langkah: next?.key, hasil: next ? undefined : true });
   };
+  const choose = (value: string) =>
+    update(
+      validateRoadmapSearch({
+        ...answerQuestion(answers, question.key, value),
+        langkah: question.key,
+      }),
+    );
+  const back = () => update({ ...answers, langkah: questions[index - 1].key });
+  const canAdvance = question.choices.some((choice) => choice.value === selected);
+  useHotkeys(
+    question.choices.map((choice, choiceIndex) => ({
+      hotkey: { key: String(choiceIndex + 1) },
+      callback: () => choose(choice.value),
+    })),
+    { ignoreInputs: true, requireReset: true },
+  );
+  useHotkey("ArrowLeft", back, {
+    enabled: index > 0,
+    ignoreInputs: true,
+    requireReset: true,
+  });
+  useHotkey("ArrowRight", advance, {
+    enabled: canAdvance,
+    ignoreInputs: true,
+    requireReset: true,
+  });
   return (
     <main className="mx-auto flex w-full max-w-[960px] flex-1 flex-col px-5 py-6 sm:px-10 sm:py-10">
-      <div className="mb-8 flex items-center justify-between text-paragraph-sm text-text-sub-600">
-        <span>Roadmap kuliah</span>
-        <span aria-live="polite">
-          Pertanyaan {index + 1} dari {questions.length}
-        </span>
-      </div>
-      <div
-        role="progressbar"
-        aria-label="Progres kuis"
-        aria-valuenow={index + 1}
-        aria-valuemin={0}
-        aria-valuemax={questions.length}
-        className="mb-10 h-1 overflow-hidden rounded-full bg-bg-soft-200"
+      <motion.section
+        key={question.key}
+        initial={reducedMotion ? false : "hidden"}
+        animate="visible"
+        className="my-auto py-2 sm:py-5"
+        aria-labelledby="quiz-title"
       >
-        <div
-          className="h-full bg-text-strong-950 transition-[width] motion-reduce:transition-none"
-          style={{ width: `${((index + 1) / questions.length) * 100}%` }}
-        />
-      </div>
-      <section className="my-auto py-2 sm:py-5" aria-labelledby="quiz-title">
-        <h1
-          id="quiz-title"
-          ref={heading}
-          tabIndex={-1}
-          className="m-0 max-w-[680px] text-[26px] font-semibold leading-tight tracking-[-0.03em] outline-none sm:text-[32px]"
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+          transition={{ duration: reducedMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
         >
-          {question.title}
-        </h1>
-        <p
-          id="quiz-description"
-          className="mb-8 mt-3 max-w-[650px] text-paragraph-sm text-text-sub-600"
-        >
-          {question.description}
-        </p>
-        <fieldset
-          className="m-0 grid min-w-0 grid-cols-1 gap-3 border-0 p-0 sm:grid-cols-2"
+          <h1
+            id="quiz-title"
+            ref={heading}
+            tabIndex={-1}
+            className="m-0 max-w-[680px] text-[26px] font-semibold leading-tight tracking-[-0.03em] outline-none sm:text-[32px]"
+          >
+            {question.title}
+          </h1>
+          <p
+            id="quiz-description"
+            className="mb-8 mt-3 max-w-[650px] text-paragraph-sm text-text-sub-600"
+          >
+            {question.description}
+          </p>
+        </motion.div>
+        <motion.div
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                delayChildren: reducedMotion ? 0 : 0.36,
+                staggerChildren: reducedMotion ? 0 : 0.07,
+              },
+            },
+          }}
+          className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4"
+          role="group"
+          aria-label="Pilihan jawaban"
           aria-describedby="quiz-description"
         >
-          <legend className="sr-only">{question.title}</legend>
-          {question.choices.map((choice) => (
-            <label
+          {question.choices.map((choice, choiceIndex) => (
+            <motion.div
               key={choice.value}
-              className="group relative flex cursor-pointer items-start gap-4 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-5 transition-colors hover:bg-bg-weak-50 has-[:checked]:border-text-strong-950 has-[:checked]:bg-bg-weak-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-primary-base"
+              variants={{
+                hidden: { opacity: 0, y: 20, scale: 0.98 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="min-w-0"
             >
-              <input
-                type="radio"
-                name={question.key}
-                value={choice.value}
-                checked={selected === choice.value}
-                onChange={() =>
-                  update(
-                    validateRoadmapSearch({
-                      ...answerQuestion(answers, question.key, choice.value),
-                      langkah: question.key,
-                    }),
-                  )
-                }
-                className="mt-1 size-4 shrink-0 accent-text-strong-950"
-              />
-              <span className="min-w-0">
-                <span className="block text-label-md">{choice.label}</span>
-                <span className="mt-1 block text-paragraph-sm text-text-sub-600">
-                  {choice.detail}
-                </span>
-              </span>
-            </label>
+              <AlignButton.Root
+                variant={selected === choice.value ? "primary" : "neutral"}
+                mode={selected === choice.value ? "lighter" : "stroke"}
+                aria-pressed={selected === choice.value}
+                className="min-h-24 h-auto w-full whitespace-normal px-5 py-6 text-label-lg sm:min-h-32 sm:px-6 sm:py-8"
+                aria-keyshortcuts={String(choiceIndex + 1)}
+                onClick={() => choose(choice.value)}
+              >
+                <AlignKbd.Root aria-hidden="true" className="shrink-0">
+                  {choiceIndex + 1}
+                </AlignKbd.Root>
+                <span>{choice.label}</span>
+              </AlignButton.Root>
+            </motion.div>
           ))}
-        </fieldset>
-      </section>
+        </motion.div>
+      </motion.section>
       <footer className="mt-10 flex items-center justify-between gap-4 pb-3 pt-4">
         <AlignButton.Root
           variant="neutral"
           mode="ghost"
           disabled={index === 0}
-          onClick={() => update({ ...answers, langkah: questions[index - 1].key })}
+          aria-keyshortcuts="ArrowLeft"
+          onClick={back}
         >
           <RiArrowLeftLine className="size-5" aria-hidden="true" /> Kembali
+          <AlignKbd.Root aria-hidden="true">←</AlignKbd.Root>
         </AlignButton.Root>
         <AlignButton.Root
           variant="neutral"
           mode="filled"
-          disabled={!question.choices.some((x) => x.value === selected)}
+          disabled={!canAdvance}
+          aria-keyshortcuts="ArrowRight"
           onClick={advance}
         >
           {index === questions.length - 1 ? "Lihat roadmap" : "Lanjut"}{" "}
           <RiArrowRightLine className="size-5" aria-hidden="true" />
+          <AlignKbd.Root aria-hidden="true">→</AlignKbd.Root>
         </AlignButton.Root>
       </footer>
     </main>

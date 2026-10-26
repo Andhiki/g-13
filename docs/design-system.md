@@ -151,16 +151,28 @@ closes. Removing that root when selection clears skips Radix's exit animation.
 Course selection and the URL still clear immediately; Radix handles removing the
 panel after the animation. The existing reduced-motion rule suppresses movement.
 
-## Roadmap quiz controls
+## Roadmap controls
 
-The roadmap uses native radio inputs inside large answer labels for its full-screen,
-one-question-at-a-time interaction. The local AlignUI set has no radio-group
-component. The labels use the app's tokens, checked state, and visible keyboard focus.
-The clipboard fallback is a native read-only input that selects its complete URL on
-focus. It uses the same tokens and introduces no general-purpose input component.
-All standard buttons, selects, modals, and course details reuse the existing controls.
+The full-screen quiz uses the existing AlignUI Button variants for its answers and
+navigation. Answer cards contain only their label and expose `aria-pressed`. Their
+quiz-specific sizing is at least 96px tall on phones and 128px on larger screens;
+colors, focus, and selected states retain the AlignUI variants. The question enters
+first, followed by staggered answers. Reduced motion skips the entrance sequence.
+The quiz has no progress bar or extra page title.
 
-The roadmap reuses the curriculum course nodes. The initial view fits every semester;
-semester navigation and zoom reveal the labels at reading size. The 12px source-code
-and credit tabs retain the existing graph's typography rather than changing shared
-course nodes for this page.
+The result uses the same full-screen React Flow canvas, Overlay, SemesterFilter,
+expandable desktop filters, and mobile filter drawer as the curriculum page. Graduation
+target and exposure semester use the existing AlignUI Select. Notes use AlignUI Drawer,
+and clipboard fallback uses AlignUI Modal. There is no local toggle-group component.
+
+The clipboard fallback is a native read-only input that selects its URL on focus.
+It uses the app tokens and introduces no general-purpose input component.
+
+The roadmap title is a text-only React Flow node above the semester lanes, so it pans
+and zooms with the graph. The roadmap reuses the curriculum course nodes and its initial zoom. Semester
+navigation and gestures move through the entire plan. Extra semesters remain available
+in the semester control when work extends beyond the target.
+
+The shared map overlay retains its navigation fade, and the pannable graph clips
+course nodes at viewport edges. These existing map behaviors are intentional exceptions
+to the visual inspector's gradient and page-margin rules.
