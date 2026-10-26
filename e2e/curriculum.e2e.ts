@@ -106,3 +106,84 @@ for (const curriculum of [
     await expect(page.locator("html")).toHaveClass(/light/);
   });
 }
+
+test("course drawer groups credits with its title and shows the semester track", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/?kurikulum=2026&mk=PACS262411");
+  const drawer = page.getByRole("dialog");
+  const title = drawer.getByRole("heading", {
+    name: "Metode Rekayasa Perangkat Lunak",
+    exact: true,
+  });
+  await expect(title).toBeVisible();
+  await expect(drawer.getByRole("button", { name: "Tutup detail mata kuliah" })).toBeFocused();
+  const credits = drawer.getByRole("img", { name: "2 SKS", exact: true });
+  await expect(credits).toHaveText("2");
+  await expect(drawer.getByText("Software Engineering Methods", { exact: true })).toHaveCount(0);
+  const titleBox = await title.boundingBox();
+  const creditBox = await credits.boundingBox();
+  expect(creditBox!.x + creditBox!.width).toBeLessThan(titleBox!.x);
+  expect(
+    Math.abs(creditBox!.y + creditBox!.height / 2 - titleBox!.y - titleBox!.height / 2),
+  ).toBeLessThan(2);
+  const category = drawer.getByLabel("Kategori mata kuliah");
+  expect((await category.boundingBox())!.x).toBeLessThan(creditBox!.x + 1);
+  const indicator = drawer.getByRole("img", { name: "Semester anjuran 4 dari 8 semester" });
+  if (isMobile) {
+    const handle = drawer.getByRole("slider");
+    await handle.focus();
+    await page.keyboard.press("ArrowUp");
+  }
+  await expect(indicator).toBeVisible();
+  await expect(drawer.getByText("Posisi dalam 8 semester", { exact: true })).toHaveCount(0);
+});
+
+test("course ID copy reports clipboard success and failure", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          document.documentElement.dataset.copiedCourse = text;
+        },
+      },
+    });
+  });
+  await page.goto("/?kurikulum=2026&mk=PACS262411");
+  const drawer = page.getByRole("dialog");
+  const copy = drawer.getByRole("button", { name: "Salin ID mata kuliah", exact: true });
+  await copy.hover();
+  await expect(page.getByRole("tooltip")).toContainText("Salin ID mata kuliah");
+  const close = drawer.getByRole("button", { name: "Tutup detail mata kuliah" });
+  const copyBox = await copy.boundingBox();
+  const closeBox = await close.boundingBox();
+  expect(copyBox!.x + copyBox!.width).toBeLessThan(closeBox!.x);
+  expect(copyBox!.y).toBe(closeBox!.y);
+  expect(copyBox!.width).toBe(closeBox!.width);
+  expect(copyBox!.height).toBe(closeBox!.height);
+  await expect(copy.locator("svg")).toHaveCSS("width", "20px");
+  await expect(close.locator("svg")).toHaveCSS("width", "20px");
+  await copy.click();
+  await expect(page.locator("html")).toHaveAttribute("data-copied-course", "PACS262411");
+  await expect(
+    drawer.getByRole("button", { name: "ID mata kuliah disalin", exact: true }),
+  ).toBeVisible();
+  await expect(drawer.getByRole("status")).toHaveText("ID mata kuliah disalin");
+  await expect(copy).toBeVisible({ timeout: 4000 });
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: async () => {
+          throw new Error("Clipboard denied");
+        },
+      },
+    });
+  });
+  await copy.click();
+  await expect(
+    drawer.getByRole("button", { name: "Gagal menyalin. Coba lagi.", exact: true }),
+  ).toBeVisible();
+  await expect(drawer.getByRole("status")).toHaveText("Gagal menyalin. Coba lagi.");
+});
