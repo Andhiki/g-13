@@ -67,6 +67,7 @@ for (const curriculum of ["2021", "2026"]) {
 
 for (const route of ["/", "/roadmap"]) {
   test(`${route}: prerequisites finish before unlocked connections animate`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto(
       route === "/"
         ? "/?kurikulum=2026"

@@ -48,7 +48,8 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
-      - run: bunx playwright install --with-deps chromium
+      # The hosted Ubuntu runner already includes Chromium system libraries.
+      - run: bunx playwright install --only-shell chromium
       - run: bun run test:browser --forbid-only --reporter=line,html --global-timeout=900000
       - name: Upload browser report and failure traces
         if: ${{ !cancelled() }}

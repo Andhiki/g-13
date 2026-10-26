@@ -183,6 +183,7 @@ test("IUP follow-up, full-semester Magang, exposure controls, and invalid direct
 test("quiz entrances show the question before large label-only answers and respect reduced motion", async ({
   page,
 }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/roadmap");
   const choice = page.getByRole("button", { name: "2026", exact: true });
   await expect(choice).toHaveText("12026");

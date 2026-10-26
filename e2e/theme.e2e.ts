@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("theme reveal switches both ways and persists the selected theme", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
   const root = page.locator("html");

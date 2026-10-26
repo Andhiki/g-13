@@ -4,6 +4,7 @@ test("desktop filter moves continuously between views and keeps its open state",
   page,
   isMobile,
 }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   test.skip(isMobile);
   await page.goto("/?kurikulum=2026");
   const toggle = page.getByRole("button", { name: "Buka filter kurikulum" });
@@ -35,6 +36,7 @@ test("curriculum and interest filters persist between the drawer, list, and desk
   page,
   isMobile,
 }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?kurikulum=2026");
   await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
   const filterTrigger = page.getByRole("button", { name: "Buka filter kurikulum" });
@@ -151,6 +153,7 @@ test("semester switcher finishes its entrance and navigates without filtering", 
   page,
   isMobile,
 }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.addInitScript(() => {
     new MutationObserver((records) => {
       for (const { target } of records) {

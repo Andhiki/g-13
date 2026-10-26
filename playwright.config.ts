@@ -3,11 +3,12 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.e2e.ts",
-  workers: 1,
+  workers: 2,
   timeout: 30_000,
   use: {
     baseURL: "http://[::1]:5180",
     trace: "retain-on-failure",
+    reducedMotion: "reduce",
   },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 900 } } },

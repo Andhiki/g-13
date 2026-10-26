@@ -49,6 +49,7 @@ test("mobile filter stays anchored to the bottom throughout opening", async ({
   page,
   isMobile,
 }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   test.skip(!isMobile);
   await page.goto("/?kurikulum=2026");
   const trigger = page.getByRole("button", { name: "Buka filter kurikulum" });

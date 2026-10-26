@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("following an unlocked course keeps its position through the reveal", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?kurikulum=2026&mk=PACS262201");
   await expect(page.locator('[data-id="PACS262302"] button')).toBeVisible();
   await page.waitForTimeout(1400);
@@ -35,6 +36,7 @@ test("following an unlocked course keeps its position through the reveal", async
 });
 
 test("opening a course fades out, reveals connections, then draws arrows", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?kurikulum=2026");
   await expect(page.locator('[data-id="PACS262201"] button')).toBeVisible();
   const samples = await page.evaluate(async () => {
@@ -105,6 +107,7 @@ test("reduced motion reveals the final connections immediately", async ({ page }
 });
 
 test("switching and closing during the reveal cancels the previous sequence", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?kurikulum=2026");
   const courses = page.locator(".react-flow__node-course");
   await expect(courses.first()).toBeAttached();

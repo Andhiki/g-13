@@ -61,6 +61,7 @@ test("list leaves room for the open course details", async ({ page, isMobile }) 
 });
 
 test("syllabus closing does not rebound before content unmounts", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?kurikulum=2026&mk=PACS262201");
   const trigger = page.getByRole("button", { name: "Silabus", exact: true });
   await trigger.click();
@@ -209,6 +210,7 @@ declare global {
 
 for (const view of ["map", "list"] as const) {
   test(`${view}: course drawer animates when opening and closing`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.addInitScript(() => {
       window.drawerAnimations = [];
       document.addEventListener("animationstart", (event) => {
