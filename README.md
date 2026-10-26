@@ -1,6 +1,15 @@
 # g-13
 
-Peta kurikulum S1 Ilmu Komputer UGM, proyek komunitas publik yang dikerjakan pengguna bersama tim teman-temannya.
+Peta kurikulum dan roadmap kuliah S1 Ilmu Komputer UGM. Proyek komunitas untuk
+membantu mahasiswa memahami mata kuliah, prasyarat, dan pilihan perjalanan kuliah.
+Proyek ini bukan layanan resmi atau pengesahan dari UGM, prodi, maupun Himakom.
+
+## Berkontribusi
+
+Mulai dari [panduan kontribusi](CONTRIBUTING.md). Laporan bug, koreksi kurikulum
+dengan sumber resmi, dan usulan fitur dapat dikirim melalui
+[GitHub Issues](https://github.com/Andhiki/g-13/issues).
+Baca [aturan komunitas](CODE_OF_CONDUCT.md) dan [kebijakan keamanan](SECURITY.md).
 
 ## Cakupan
 
@@ -69,6 +78,26 @@ Commit `bun.lock` saat mengubah dependensi.
 - CONTEXT.md — glosarium
 - docs/ilkom-2021-extraction.md dan docs/ilkom-2026-extraction.md — catatan ekstraksi
 
-Dataset ada di output/data/; sumber PDF dan snapshot halaman ada di output/sources/. UI memakai JSON ekstraksi, mempertahankan teks prasyarat, dan hanya menggambar hubungan ketika nama mata kuliah cocok persis. Prototipe belum melalui audit aturan akademik atau pilot mahasiswa.
+Data aplikasi ada di `src/data/`, hasil ekstraksi di `output/data/`, serta sumber
+PDF dan snapshot halaman di `output/sources/`. Catatan ekstraksi menjelaskan
+provenance dan ambiguitasnya. Proyek belum melalui audit aturan akademik atau
+pilot mahasiswa. Konfirmasikan keputusan KRS dengan ketentuan resmi prodi.
 
-Folder kerja: C:\.Projects\g-13.
+## Inspirasi dan kredit
+
+Konsep eksplorasi peta kurikulum terinspirasi oleh
+[Peta Kurikulum Fasilkom UI — course.csui.dev](https://course.csui.dev/).
+Komponen dan token UI mengadaptasi AlignUI; notice lisensinya dipertahankan di
+[docs/licenses/alignui.txt](docs/licenses/alignui.txt).
+
+Dokumen UGM, logo OmahTI, GIF Sonic, dan dependensi mempunyai hak dan ketentuan
+masing-masing. Lihat [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Persiapan publik dan pengaturan maintainer dicatat di
+[docs/open-source-readiness.md](docs/open-source-readiness.md).
+
+## Lisensi
+
+Kode dan dokumentasi asli proyek dilisensikan dengan [MIT](LICENSE).
+Materi pihak ketiga tetap mengikuti hak dan lisensinya masing-masing, termasuk
+data/dokumen UGM, logo OmahTI, dan GIF Sonic; lihat
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

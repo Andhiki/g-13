@@ -19,6 +19,11 @@ node <playwright-script>.mjs
 
 ## Agent skills
 
+### Pull request descriptions
+
+Before writing or updating a PR title/body, read `.agents/skills/pr-body/SKILL.md`
+and use the repository PR template.
+
 ### Issue tracker
 
 Local Markdown tickets. Read `docs/agents/issue-tracker.md` before creating or updating tickets.

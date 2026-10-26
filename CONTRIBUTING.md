@@ -1,0 +1,57 @@
+# Berkontribusi ke g-13
+
+Kontribusi dalam bahasa Indonesia atau Inggris diterima: koreksi data, laporan bug,
+aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
+[aturan komunitas](CODE_OF_CONDUCT.md) sebelum mulai.
+
+## Alur kontribusi
+
+1. Cari issue atau PR serupa. Untuk perubahan besar, diskusikan pendekatannya di
+   GitHub Issues terlebih dahulu. Koreksi kecil boleh langsung melalui PR.
+2. Fork repo, clone fork, dan buat branch dari `main` terbaru.
+3. Jalankan `bun install --frozen-lockfile`, lalu `bun run dev`.
+   Gunakan versi Bun di `package.json` dan Node.js 22.12+.
+4. Buat perubahan dengan scope jelas; jangan sertakan hasil tes, kredensial,
+   atau perubahan format yang tidak berkaitan.
+5. Jalankan `bun run check` dan `bun run build`. Untuk perubahan interaksi UI,
+   instal Chromium dengan `bunx playwright install chromium`, lalu jalankan
+   `bun run test:browser`. Jelaskan pemeriksaan yang belum dijalankan.
+6. Buka PR ke `main` dengan alasan perubahan, cara verifikasi, dan screenshot
+   bila tampilan berubah. Maintainer meninjau sebelum merge; tidak ada jaminan
+   waktu respons.
+
+Agent dapat memakai [skill PR body](.agents/skills/pr-body/SKILL.md) yang tersedia
+di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
+
+## Koreksi kurikulum
+
+Baca [CONTEXT.md](CONTEXT.md), [catatan 2021](docs/ilkom-2021-extraction.md), dan
+[catatan 2026](docs/ilkom-2026-extraction.md). Sertakan versi kurikulum, kode mata
+kuliah, sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi.
+Jangan menyamakan semester anjuran dengan jadwal penawaran atau menebak aturan
+akademik yang ambigu. Pertahankan asal data dan tambahkan tes yang relevan.
+
+## Struktur dan kebiasaan kode
+
+- `src/routes/`: routing; `src/features/`: fitur; `src/ui/`: komponen bersama.
+- `src/data/` dan `output/data/`: data dan hasil ekstraksi; `output/sources/`:
+  dokumen sumber. Perubahan sumber harus menyertakan provenance.
+- `*.test.ts`: tes Bun; `e2e/`: tes Playwright.
+- Ikuti gaya kode di sekitar perubahan. Gunakan `bun run fmt` dan
+  `bun run lint:fix` seperlunya. Jangan edit `src/routeTree.gen.ts` manual.
+- Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru
+  untuk sesuatu yang sudah tersedia di proyek.
+
+GitHub Issues adalah pintu masuk kontributor publik. Tiket Markdown `.scratch/`
+tetap dipakai untuk rencana implementasi lokal sesuai
+[panduan agent](docs/agents/issue-tracker.md); kontributor tidak wajib membuatnya.
+
+## Hak cipta dan keamanan
+
+Hanya kirim materi yang kamu berhak kontribusikan.
+Kontribusi kode dan dokumentasi asli diberikan dengan [lisensi MIT](LICENSE)
+yang sama dengan proyek.
+Sertakan sumber dan lisensi kode/aset pihak ketiga; jangan mengasumsikan dokumen yang dapat diunduh bebas
+otomatis berlisensi terbuka. Lihat [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Jangan unggah transkrip, data pribadi mahasiswa, atau token.
+Laporkan celah keamanan melalui [SECURITY.md](SECURITY.md).

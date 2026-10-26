@@ -1,5 +1,21 @@
 # Testing
 
+## GitHub CI
+
+`.github/workflows/ci.yml` runs on pull requests, pushes to `main`, and manual
+dispatch. `Quality checks` runs the local check command and production build.
+`Browser tests` runs independently with Chromium at desktop and mobile sizes;
+Playwright's web-server command builds its own production preview. Focused
+`.only` tests fail CI. The browser suite has a 15-minute global timeout within
+a 20-minute job so reports can finish uploading.
+
+Download `playwright-results` from the workflow run for the HTML report and
+failure traces (retained for seven days). These artifacts may contain rendered
+page content; use synthetic/public data in tests. Neither job uses deployment
+secrets. Require both job checks in the `main` ruleset after the first run.
+
+## Local checks
+
 `e2e/theme.e2e.ts` checks the theme reveal in both directions, saved preference
 updates, persistence, focus return, reduced motion, and missing View Transitions
 support on desktop and phone sizes.
