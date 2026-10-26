@@ -59,7 +59,7 @@ export function RoadmapQuiz({
     requireReset: true,
   });
   return (
-    <main className="mx-auto flex w-full max-w-[960px] flex-1 flex-col px-5 py-6 sm:px-10 sm:py-10">
+    <main className="mx-auto flex w-full max-w-[960px] flex-1 flex-col px-5 pt-6 pb-28 sm:px-10 sm:py-10">
       <motion.section
         key={question.key}
         initial={reducedMotion ? false : "hidden"}
@@ -115,11 +115,11 @@ export function RoadmapQuiz({
                 variant={selected === choice.value ? "primary" : "neutral"}
                 mode={selected === choice.value ? "lighter" : "stroke"}
                 aria-pressed={selected === choice.value}
-                className="min-h-24 h-auto w-full whitespace-normal px-5 py-6 text-label-lg sm:min-h-32 sm:px-6 sm:py-8"
+                className="min-h-24 h-auto w-full whitespace-normal px-10 pt-10 pb-6 text-label-lg sm:min-h-32 sm:px-12 sm:pt-10 sm:pb-8"
                 aria-keyshortcuts={String(choiceIndex + 1)}
                 onClick={() => choose(choice.value)}
               >
-                <AlignKbd.Root aria-hidden="true" className="shrink-0">
+                <AlignKbd.Root aria-hidden="true" className="absolute left-3 top-3">
                   {choiceIndex + 1}
                 </AlignKbd.Root>
                 <span>{choice.label}</span>
@@ -128,7 +128,7 @@ export function RoadmapQuiz({
           ))}
         </motion.div>
       </motion.section>
-      <footer className="mt-10 flex items-center justify-between gap-4 pb-3 pt-4">
+      <footer className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-4 border-t border-stroke-soft-200 bg-bg-white-0 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:mt-10 sm:border-0 sm:bg-transparent sm:px-0 sm:pb-3">
         <AlignButton.Root
           variant="neutral"
           mode="ghost"

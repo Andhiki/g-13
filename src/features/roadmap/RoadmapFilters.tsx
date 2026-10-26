@@ -6,7 +6,9 @@ export function RoadmapFilters({
   answers,
   totalCredits,
   update,
+  restart,
 }: {
+  restart: () => void;
   answers: RoadmapSearch;
   totalCredits: number;
   update: (next: RoadmapSearch) => void;
@@ -61,6 +63,9 @@ export function RoadmapFilters({
         onClick={() => update({ ...answers, hasil: undefined, langkah: "kurikulum" })}
       >
         Ubah jawaban
+      </AlignButton.Root>
+      <AlignButton.Root variant="neutral" mode="ghost" onClick={restart}>
+        Mulai lagi
       </AlignButton.Root>
     </>
   );

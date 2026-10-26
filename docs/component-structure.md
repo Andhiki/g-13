@@ -75,3 +75,8 @@ orthogonal paths from `@tisoap/react-flow-smart-edge`. Course cards, activity
 cards, and title nodes are obstacles; semester lane headers are excluded.
 Connectors have no arrowheads. On selection, prerequisite connections finish before
 unlocked-course connections begin. Reduced motion skips both stages.
+
+`RoadmapPage` saves validated URL answers to `cs-courses:roadmap` in localStorage.
+Opening the quiz without a curriculum resumes the saved step or result. Explicit
+curriculum links take priority. "Mulai lagi" clears the saved answers; "Ubah jawaban"
+keeps them for editing. Storage failures leave the URL-based quiz usable.

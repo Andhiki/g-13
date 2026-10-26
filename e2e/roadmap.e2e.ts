@@ -242,3 +242,63 @@ test("quiz keyboard choices, boundaries, conditional steps, and completion", asy
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("region", { name: "Grafik roadmap kuliah" })).toBeVisible();
 });
+
+test("quiz layout, saved answers, shared links, and deliberate restart", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/roadmap");
+  await expect(page.getByText("Peta kurikulum", { exact: true })).toHaveCount(0);
+  const answer = page.getByRole("button", { name: "2026", exact: true });
+  await expect(answer).toBeVisible();
+  const badge = answer.locator('[aria-hidden="true"]');
+  const cardBox = await answer.boundingBox();
+  const badgeBox = await badge.boundingBox();
+  expect(badgeBox!.x - cardBox!.x).toBeLessThan(20);
+  expect(badgeBox!.y - cardBox!.y).toBeLessThan(20);
+  if ((page.viewportSize()?.width ?? 1440) < 640) {
+    await expect(page.locator("main footer")).toHaveCSS("position", "fixed");
+    const bar = await page.locator("main footer").boundingBox();
+    expect(bar!.y + bar!.height).toBe(await page.evaluate(() => innerHeight));
+  }
+  await advance(page, /^2026$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kamu mahasiswa IUP?");
+  const returning = await context.newPage();
+  await returning.goto("/roadmap");
+  await expect(returning.getByRole("heading", { level: 1 })).toHaveText("Kamu mahasiswa IUP?");
+  await returning.close();
+  await advance(page, /^Reguler$/);
+  await advance(page, /Analisis Data/);
+  await advance(page, /^Tidak$/);
+  await chooseTarget(page, 7);
+  const savedUrl = page.url();
+  await page.goto("/roadmap");
+  await expect(page.getByRole("region", { name: "Grafik roadmap kuliah" })).toBeVisible();
+  await expect(page).toHaveURL(savedUrl);
+  await expect(
+    page.getByRole("button", { name: "Bagikan", exact: true }).locator("svg"),
+  ).toHaveCount(1);
+  await page.goto(
+    "/roadmap?kurikulum=2021&minat=Lab%20Rekayasa%20Perangkat%20Lunak%20dan%20Data&iup=tidak&magang=tidak&hasil=true&lulus=8",
+  );
+  await expect(page).toHaveURL(/kurikulum=(?:%22)?2021/);
+  await openFilters(page);
+  await page.getByRole("button", { name: "Mulai lagi", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Lanjut", exact: true })).toBeDisabled();
+  await page.goto("/roadmap");
+  await expect(page.getByRole("button", { name: "Lanjut", exact: true })).toBeDisabled();
+  expect(await page.evaluate(() => localStorage.getItem("cs-courses:roadmap"))).toBeNull();
+});
+
+test("quiz works with invalid or unavailable storage", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("cs-courses:roadmap", "broken json"));
+  await page.goto("/roadmap");
+  await expect(page.getByRole("button", { name: "Lanjut", exact: true })).toBeDisabled();
+  await page.evaluate(() => {
+    Storage.prototype.setItem = () => {
+      throw new Error("Storage blocked");
+    };
+  });
+  await advance(page, /^2026$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kamu mahasiswa IUP?");
+});

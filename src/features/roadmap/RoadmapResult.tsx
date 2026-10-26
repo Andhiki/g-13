@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiShareLine } from "@remixicon/react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { AlignModal } from "../../ui/modal";
 import { Overlay } from "../curriculum/components/Overlay";
@@ -24,7 +24,9 @@ const kinds = {
 export function RoadmapResult({
   answers,
   update,
+  restart,
 }: {
+  restart: () => void;
   answers: RoadmapSearch;
   update: (next: RoadmapSearch) => void;
 }) {
@@ -104,6 +106,7 @@ export function RoadmapResult({
         search={
           <div className="flex justify-end">
             <AlignButton.Root variant="neutral" mode="stroke" onClick={copyLink}>
+              <RiShareLine className="size-5" aria-hidden="true" />
               {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
             </AlignButton.Root>
           </div>
@@ -112,7 +115,12 @@ export function RoadmapResult({
           <RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={data.sourceTitle} />
         }
       >
-        <RoadmapFilters answers={answers} totalCredits={plan.totalCredits} update={update} />
+        <RoadmapFilters
+          answers={answers}
+          totalCredits={plan.totalCredits}
+          update={update}
+          restart={restart}
+        />
       </Overlay>
       <span className="sr-only" role="status">
         {share === "copied" && sharedPlan === answers ? "Tautan roadmap disalin." : ""}
