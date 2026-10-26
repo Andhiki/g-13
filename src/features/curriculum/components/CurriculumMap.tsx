@@ -310,28 +310,27 @@ export function CurriculumMap({
         />
         <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
         <ViewportPortal>
-          <div
-            className="absolute -top-[72px] flex flex-col items-start gap-4 max-[650px]:-top-8"
-            style={{ left: LANE_X + 12 }}
-          >
-            <h1
-              hidden={selectedId !== null}
-              className="m-0 whitespace-nowrap text-[72px] font-semibold tracking-[-0.03em] text-text-strong-950 max-[650px]:text-[30px]"
+          {selectedId === null && (
+            <div
+              className="absolute -top-[72px] flex flex-col items-start gap-4 max-[650px]:-top-8"
+              style={{ left: LANE_X + 12 }}
             >
-              CS UGM Roadmap (Alpha)
-            </h1>
-            <Link
-              to="/roadmap"
-              search={{ lulus: 8, semesterPaparan: 6 }}
-              className={buttonVariants({
-                variant: "neutral",
-                mode: "filled",
-                className: "pointer-events-auto nodrag nopan",
-              })}
-            >
-              Buat roadmap kuliah
-            </Link>
-          </div>
+              <h1 className="m-0 whitespace-nowrap text-[72px] font-semibold tracking-[-0.03em] text-text-strong-950 max-[650px]:text-[30px]">
+                CS UGM Roadmap (Alpha)
+              </h1>
+              <Link
+                to="/roadmap"
+                search={{ lulus: 8, semesterPaparan: 6 }}
+                className={buttonVariants({
+                  variant: "neutral",
+                  mode: "filled",
+                  className: "pointer-events-auto nodrag nopan",
+                })}
+              >
+                Buat roadmap kuliah
+              </Link>
+            </div>
+          )}
         </ViewportPortal>
         <Background
           className="bg-bg-weak-25"

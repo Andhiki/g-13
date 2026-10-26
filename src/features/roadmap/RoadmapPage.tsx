@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { AlignButton } from "../../ui/button";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { Route } from "../../routes/roadmap";
 import { firstUnanswered } from "./quiz";
@@ -40,10 +39,7 @@ export function RoadmapPage() {
   if (result) return <RoadmapResult answers={answers} update={update} restart={restart} />;
   return (
     <div className="flex min-h-dvh flex-col bg-bg-white-0 text-text-strong-950">
-      <header className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
-        <AlignButton.Root variant="neutral" mode="ghost" onClick={restart}>
-          Mulai lagi
-        </AlignButton.Root>
+      <header className="flex items-center justify-end px-5 py-4 sm:px-6">
         <ThemeSwitch />
       </header>
       <RoadmapQuiz answers={answers} update={update} />

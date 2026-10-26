@@ -14,6 +14,8 @@ for (const curriculum of [
     await selected.click();
     const title = page.getByRole("heading", { name: "CS UGM Roadmap (Alpha)", exact: true });
     await expect(title).toBeHidden();
+    const cta = page.getByRole("link", { name: "Buat roadmap kuliah", exact: true });
+    await expect(cta).toBeHidden();
     const details = page.getByRole("dialog");
     await expect(
       details.getByRole("heading", { name: "Algoritma dan Struktur Data", exact: true }),
@@ -40,6 +42,7 @@ for (const curriculum of [
     await page.getByRole("button", { name: "Tutup detail mata kuliah" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(title).toBeVisible();
+    await expect(cta).toBeVisible();
     await expect(page.locator(".react-flow__edge-path")).toHaveCount(0);
     expect(errors).toEqual([]);
   });
