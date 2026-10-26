@@ -1,3 +1,4 @@
+import * as SegmentedControl from "../../../ui/segmented-control";
 import { AlignSelect } from "../../../ui/select";
 import type { Curriculum, CurriculumId } from "../../../data";
 
@@ -45,24 +46,15 @@ export function CurriculumVersionFilter({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-[5px]">
-      <label className="text-label-xs text-text-sub-600" htmlFor="curriculum-version">
+      <p className="m-0 text-label-xs text-text-sub-600" id="curriculum-version-label">
         Versi kurikulum
-      </label>
-      <AlignSelect.Root variant="compact" value={curriculum} onValueChange={onChange}>
-        <AlignSelect.Trigger
-          className="h-9 min-h-9 text-[14px]"
-          id="curriculum-version"
-          aria-label={`Versi kurikulum: ${curriculum === "2021" ? "2021, Revisi 2023" : "2026"}`}
-        >
-          <AlignSelect.Value>
-            {`Kurikulum ${curriculum === "2021" ? "2021 · Revisi 2023" : "2026"}`}
-          </AlignSelect.Value>
-        </AlignSelect.Trigger>
-        <AlignSelect.Content align="end">
-          <AlignSelect.Item value="2021">2021 · Revisi 2023</AlignSelect.Item>
-          <AlignSelect.Item value="2026">2026</AlignSelect.Item>
-        </AlignSelect.Content>
-      </AlignSelect.Root>
+      </p>
+      <SegmentedControl.Root value={curriculum} onValueChange={onChange}>
+        <SegmentedControl.List aria-labelledby="curriculum-version-label">
+          <SegmentedControl.Trigger value="2021">2021 Revisi 2023</SegmentedControl.Trigger>
+          <SegmentedControl.Trigger value="2026">2026</SegmentedControl.Trigger>
+        </SegmentedControl.List>
+      </SegmentedControl.Root>
     </div>
   );
 }

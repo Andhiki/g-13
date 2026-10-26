@@ -2,8 +2,12 @@
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { RiArrowDownSLine, RiCheckLine } from "@remixicon/react";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
 import { createContext, useContext, type ComponentProps } from "react";
+
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": ["text-paragraph-sm"] } },
+});
 
 type SelectVariant = "default" | "compact";
 const SelectContext = createContext<SelectVariant>("default");

@@ -8,7 +8,7 @@ test("curriculum and interest filters persist between the drawer, list, and desk
   await expect(page.locator(".react-flow__node-course").first()).toBeVisible();
   const filterTrigger = page.getByRole("button", { name: "Buka filter kurikulum" });
   if (isMobile) {
-    await expect(page.getByRole("combobox", { name: /Versi kurikulum/ })).toHaveCount(0);
+    await expect(page.getByRole("tablist", { name: "Versi kurikulum" })).toHaveCount(0);
     await page.evaluate(() => {
       document.addEventListener("animationstart", (event) => {
         if (
@@ -37,13 +37,14 @@ test("curriculum and interest filters persist between the drawer, list, and desk
     expect(bounds!.width).toBe(page.viewportSize()!.width);
   } else {
     await expect(filterTrigger).toHaveAttribute("aria-expanded", "false");
-    await expect(page.getByRole("combobox", { name: /Versi kurikulum/ })).toHaveCount(0);
+    await expect(page.getByRole("tablist", { name: "Versi kurikulum" })).toHaveCount(0);
     await filterTrigger.click();
   }
-  await page.getByRole("combobox", { name: /Versi kurikulum/ }).click();
-  await page.getByRole("option", { name: "2021 · Revisi 2023", exact: true }).click();
+  await page.getByRole("tab", { name: "2021 Revisi 2023", exact: true }).click();
   await expect(page).toHaveURL(/2021/);
   await page.getByRole("combobox", { name: /Kelompok pilihan/ }).click();
+  await expect(page.getByRole("option").first()).toHaveCSS("font-size", "14px");
+  await expect(page.getByRole("option").first()).toHaveCSS("line-height", "20px");
   await page.getByRole("option", { name: /^Lab Sistem Komputer dan Jaringan/ }).click();
   if (isMobile) {
     await page.getByRole("button", { name: "Tampilkan mata kuliah", exact: true }).click();
@@ -62,7 +63,7 @@ test("curriculum and interest filters persist between the drawer, list, and desk
   ).toHaveCount(0);
   if (isMobile) {
     await filterTrigger.click();
-    await expect(page.getByRole("combobox", { name: /Versi kurikulum/ })).toContainText("2021");
+    await expect(page.getByRole("tablist", { name: "Versi kurikulum" })).toContainText("2021");
     await expect(page.getByRole("combobox", { name: /Kelompok pilihan/ })).toContainText(
       "Lab Sistem Komputer dan Jaringan",
     );
@@ -84,14 +85,17 @@ test("desktop filter toggles, keeps choices, and closes with Escape", async ({
   await page.goto("/?kurikulum=2026");
   const toggle = page.getByRole("button", { name: /filter kurikulum/ });
   await toggle.click();
-  const version = page.getByRole("combobox", { name: /Versi kurikulum/ });
+  const version = page.getByRole("tablist", { name: "Versi kurikulum" });
   await expect(version).toBeVisible();
   await expect(toggle.locator("span").nth(1)).toHaveCSS("opacity", "1");
   await expect(toggle.locator("span").nth(0)).toHaveCSS("opacity", "0");
-  expect(await version.evaluate((el) => getComputedStyle(el).fontSize)).toBe("14px");
+  expect(
+    await page
+      .getByRole("tab", { name: "2026", exact: true })
+      .evaluate((el) => getComputedStyle(el).fontSize),
+  ).toBe("14px");
   expect(await version.evaluate((el) => getComputedStyle(el).height)).toBe("36px");
-  await version.click();
-  await page.getByRole("option", { name: "2021 · Revisi 2023", exact: true }).click();
+  await page.getByRole("tab", { name: "2021 Revisi 2023", exact: true }).click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await page.locator("main").click({ position: { x: 20, y: 300 } });
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
