@@ -1,0 +1,82 @@
+import { getAcademicRules, defaultCurriculumId, type Relation } from "@g13/curriculum";
+import { creditsFor } from "../curriculum/course-utils";
+import type { PlannedCourse } from "./planner";
+import type { RoadmapSearch } from "./search";
+
+export const planningLimit = 24;
+
+export function scheduleCourses(
+  courses: PlannedCourse[],
+  relations: Relation[],
+  answers: RoadmapSearch,
+  blocked: Set<number>,
+) {
+  const rules = getAcademicRules(answers.kurikulum ?? defaultCurriculumId).scheduling;
+  const endIds = rules.graduationIds;
+  const proposalId = rules.proposalId;
+  const internshipSemester = answers.paparan === "internship" ? answers.semesterPaparan : 6;
+  for (const item of courses) {
+    const early = rules.beforeDoubleDegree.find((rule) => rule.courseId === item.course.id);
+    if (early && answers.paparan !== "double") item.semester = early.semester;
+    if (endIds.includes(item.course.id)) item.semester = answers.lulus;
+    if (item.course.id === proposalId && rules.proposalAfterRequirements)
+      item.semester = answers.lulus - 1;
+    if (item.kind === "internship" || item.course.id === rules.practicalWorkId)
+      item.semester = answers.magang === "ya" ? internshipSemester : 6;
+    if (
+      item.kind === "required" &&
+      !endIds.includes(item.course.id) &&
+      !(item.course.id === rules.practicalWorkId && answers.magang === "ya")
+    ) {
+      while (blocked.has(item.semester)) item.semester++;
+    }
+  }
+  const fixedSixthTermCredits = courses
+    .filter((x) => x.semester === 6 && (x.kind === "required" || x.kind === "internship"))
+    .reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
+  if (fixedSixthTermCredits > planningLimit) {
+    const kknIds = rules.overflowCourseIds;
+    for (const item of courses.filter((x) => kknIds.includes(x.course.id) && x.semester === 6)) {
+      item.semester = 7;
+      while (blocked.has(item.semester)) item.semester++;
+    }
+  }
+  const placed = courses.filter((x) => x.kind === "required" || x.kind === "internship");
+  const load = (term: number) =>
+    placed
+      .filter((x) => x.semester === term)
+      .reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
+  // shortcut: source guidance and resolved course links only; use an academic rules engine when complete offering and equivalency data exist.
+  for (const item of courses.filter((x) => x.kind === "interest" || x.kind === "elective")) {
+    const prereqs = relations
+      .filter((r) => r.target === item.course.id)
+      .map((r) => courses.find((x) => x.course.id === r.source))
+      .filter((x) => x !== undefined);
+    let term = item.semester;
+    while (
+      term < 14 &&
+      (blocked.has(term) ||
+        load(term) + (creditsFor(item.course) ?? 0) > planningLimit ||
+        prereqs.some((x) => x.semester >= term))
+    )
+      term += rules.electiveSemesterStep;
+    item.semester = term;
+    placed.push(item);
+  }
+  const proposal = courses.find((x) => x.course.id === proposalId);
+  if (proposal && rules.proposalAfterRequirements) {
+    const requirements = courses.filter(
+      (x) =>
+        (x.kind === "required" || x.kind === "interest") &&
+        !endIds.includes(x.course.id) &&
+        x !== proposal,
+    );
+    proposal.semester = Math.max(proposal.semester, ...requirements.map((x) => x.semester));
+    while (blocked.has(proposal.semester)) proposal.semester++;
+    for (const item of courses.filter((x) => endIds.includes(x.course.id)))
+      item.semester = Math.max(item.semester, proposal.semester + 1);
+  }
+  for (const item of courses.filter((x) => endIds.includes(x.course.id))) {
+    while (blocked.has(item.semester)) item.semester++;
+  }
+}

@@ -48,12 +48,14 @@ akademik yang ambigu. Pertahankan asal data dan tambahkan tes yang relevan.
 
 ## Struktur dan kebiasaan kode
 
-- `src/routes/`: routing; `src/features/`: fitur; `src/ui/`: komponen bersama.
-- `src/data/` dan `output/data/`: data dan hasil ekstraksi; `output/sources/`:
-  dokumen sumber. Perubahan sumber harus menyertakan provenance.
-- `*.test.ts`: tes Bun; `e2e/`: tes Playwright.
+- `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: komponen bersama.
+- `packages/curriculum/src/curricula/<id>/`: JSON runtime, normalizer, dan aturan
+  per kurikulum. `output/data/` menyimpan bukti audit; `output/sources/` menyimpan
+  dokumen sumber. Ikuti [panduan impor](docs/curriculum-import.md); jangan simpan
+  skrip ekstraksi PDF sekali pakai. Perubahan sumber harus menyertakan provenance.
+- `*.test.ts`: tes Bun; `apps/web/e2e/`: tes Playwright.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run fmt` dan
-  `bun run lint:fix` seperlunya. Jangan edit `src/routeTree.gen.ts` manual.
+  `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru
   untuk sesuatu yang sudah tersedia di proyek.
 

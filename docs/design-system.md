@@ -9,12 +9,12 @@ AlignUI publishes components as source to copy into the app, not as a runtime co
 Its components use Radix for behavior and Tailwind for their default styling. Use those upstream
 component sources and defaults for standard controls. Do not rebuild them from raw Radix primitives
 or restyle them through local variants or caller `className` values. Keep app data, callbacks, and
-domain-specific logic in the app. `src/ui/select.tsx`, `src/ui/dropdown.tsx`, `src/ui/button.tsx`,
-`src/ui/badge.tsx`, `src/ui/drawer.tsx`, `src/ui/modal.tsx`, `src/ui/kbd.tsx`, and
-`src/ui/command-menu.tsx` use
+domain-specific logic in the app. `apps/web/src/ui/select.tsx`, `apps/web/src/ui/dropdown.tsx`, `apps/web/src/ui/button.tsx`,
+`apps/web/src/ui/badge.tsx`, `apps/web/src/ui/drawer.tsx`, `apps/web/src/ui/modal.tsx`, `apps/web/src/ui/kbd.tsx`, and
+`apps/web/src/ui/command-menu.tsx` use
 AlignUI v1.2 source and variants for Select, Dropdown, Button, Badge, Drawer, Modal, Kbd, and
 Command Menu. The existing
-[`CompactButton`](../src/ui/compact-button.tsx) source is from the pinned AlignUI starter. The
+[`CompactButton`](../apps/web/src/ui/compact-button.tsx) source is from the pinned AlignUI starter. The
 license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt). See the upstream
 [Button](https://www.alignui.com/docs/v1.2/ui/button),
 [Badge](https://www.alignui.com/docs/v1.2/ui/badge),
@@ -25,7 +25,7 @@ license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt).
 [Dropdown](https://www.alignui.com/docs/v1.2/ui/dropdown),
 [Select](https://www.alignui.com/docs/v1.2/ui/select) documentation.
 
-The token stylesheet `src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
+The token stylesheet `apps/web/src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
 Project surfaces and controls use these tokens. The React Flow canvas, semester lanes, course nodes,
 and relationship edges use Tailwind utilities in their owning components and map definitions.
 
@@ -39,7 +39,7 @@ Use custom controls only where AlignUI has no matching component, such as the cu
 course nodes and relationship visualization. Keep their custom behavior domain-specific and document
 the exception. Token declarations, font imports, and framework imports remain stylesheet setup.
 Use Tailwind for app component styling. Keep global view-transition pseudo-elements, custom
-theme-reveal keyframes, and the reduced-motion safety rule in `src/styles.css`; retain React Flow's
+theme-reveal keyframes, and the reduced-motion safety rule in `apps/web/src/styles.css`; retain React Flow's
 required vendor stylesheet. The Select viewport's inline `overflowY: undefined` is a Radix
 compatibility override, not component appearance styling.
 Tailwind Preflight and AlignUI provide standard control typography and focus styling. Link focus
@@ -114,7 +114,7 @@ nonmodal drawer, opening from the bottom below 650px and from the left on deskto
 
 The Daftar view uses the Table primitives from the AlignUI v1.2
 [Data Table source](https://alignui.com/docs/v1.2/ui/data-table), adapted in
-`src/ui/table.tsx`. It does not require TanStack Table for static grouped rows.
+`apps/web/src/ui/table.tsx`. It does not require TanStack Table for static grouped rows.
 Only the primitives needed by this view are included. Column headings use 12px
 text to keep metadata smaller than the 14px course titles.
 
@@ -179,13 +179,13 @@ to the visual inspector's gradient and page-margin rules.
 
 ## Course syllabus disclosure
 
-`src/ui/accordion.tsx` adapts the Accordion source from the pinned AlignUI starter above. Per the requested course-detail design, it uses plain section typography without a card background or border, with the disclosure icon on the right. This is an explicit exception to the default component styling policy. All course drawers share its single, collapsible behavior.
+`apps/web/src/ui/accordion.tsx` adapts the Accordion source from the pinned AlignUI starter above. Per the requested course-detail design, it uses plain section typography without a card background or border, with the disclosure icon on the right. This is an explicit exception to the default component styling policy. All course drawers share its single, collapsible behavior.
 
 The curriculum version filter uses the pinned AlignUI SegmentedControl source and useTabObserver hook with default styling. Its labels are 2021 Revisi 2023 and 2026; Radix Tabs handles keyboard navigation. Local class concatenation uses clsx to preserve custom typography tokens.
 
 ## Typography
 
-Use `Typography` from `src/ui/typography.tsx` for application text. Its `variant`
+Use `Typography` from `apps/web/src/ui/typography.tsx` for application text. Its `variant`
 selects the shared style, while `as` selects the semantic HTML element and defaults
 to `p`. Native attributes and refs pass through to that element.
 
@@ -197,13 +197,13 @@ titles and descriptions, use `asChild` with `Typography` to retain accessible na
 Interactive controls retain their existing AlignUI typography.
 
 Course drawer actions use a flex row of CompactButtons. Copying a course ID uses
-`src/ui/tooltip.tsx`, adapted from [AlignUI Tooltip v1.2](https://www.alignui.com/docs/v1.2/ui/tooltip)
+`apps/web/src/ui/tooltip.tsx`, adapted from [AlignUI Tooltip v1.2](https://www.alignui.com/docs/v1.2/ui/tooltip)
 with the xsmall variant and Radix behavior. The 16px copy icon changes to a check
 after a successful clipboard write; reduced motion removes the animation.
 Graph titles and quiz questions use the AlignUI title scale. Typography accepts
 `className` for layout, contextual colors, and size overrides. Roadmap notes use
 the shared AlignUI modal.
 
-The main "Buat roadmap kuliah" CTA uses `src/ui/fancy-button.tsx`, adapted from
+The main "Buat roadmap kuliah" CTA uses `apps/web/src/ui/fancy-button.tsx`, adapted from
 [AlignUI FancyButton](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/fancy-button.tsx).
 It keeps the upstream medium primary styling and uses Radix Slot to preserve link semantics.

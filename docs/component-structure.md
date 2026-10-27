@@ -1,6 +1,6 @@
 # Component structure
 
-The curriculum page is organized as a feature under `src/features/curriculum/`.
+The curriculum page is organized as a feature under `apps/web/src/features/curriculum/`.
 Keep files under roughly 300 lines by default; larger files need a clear reason.
 
 ## Curriculum feature
@@ -43,7 +43,7 @@ Keep page-specific headers, sidebars, overlays, and other components colocated
 with their owning feature. A general component name does not imply global
 ownership. Promote a feature component into a shared folder only when another
 feature actually needs it. Retain the existing shared AlignUI controls in
-`src/ui/`; do not create shared abstractions for hypothetical pages.
+`apps/web/src/ui/`; do not create shared abstractions for hypothetical pages.
 
 ## Refactor constraints
 

@@ -71,13 +71,14 @@ Perbedaan umum lain: label KKN di diagram adalah 8 SKS, sementara tabel memakai 
 
 ## Mengulang pemeriksaan
 
-```powershell
-python scripts/extract-syllabi.py
-bunx oxfmt src/data/syllabi.json
-python scripts/audit-syllabi-2026.py
-bunx oxfmt output/data/ugm-ilkom-2026-syllabus-audit.json
-python -m unittest discover -s scripts -p test_extract_syllabi.py
-bun test src/data/syllabi.test.ts src/data/interest-maps-2026.test.ts
+```sh
+bun run check
 ```
+
+Pemeriksaan sumber dan silabus berada di
+`packages/curriculum/src/curricula/2026/`. Laporan audit tersimpan sebagai bukti
+independen; skrip ekstraksi dan audit khusus format PDF lama telah dihapus.
+Ikuti [panduan impor](curriculum-import.md) untuk mengubah data atau mengaudit
+ulang dokumen dengan format baru.
 
 Transkripsi diagram bersifat manual; ulangi pemeriksaan visual jika PDF sumber berubah.

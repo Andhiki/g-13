@@ -4,7 +4,7 @@
 
 This extraction uses only the uploaded PDF `30d5a973-d81a-4fa4-b942-2fc419f5811b-f99cecdf-5f27-4dca-827d-49dd2bd1404c-pdf.pdf` (SHA-256 `ffa6d141c99228b79092d9da647f47e9b37d2966f6aca8ca9567de8b7a506520`, 505 PDF pages). Chapter 3.2 runs from printed pages 154–220 (1-based PDF pages 172–238); section 3.3 begins on printed page 221 / PDF page 239.
 
-The extraction keeps required, interest-area, outside-program activity, equivalency, and transition table rows in structured form in `output/data/ugm-ilkom-2026.json`. The companion `output/data/ugm-ilkom-2026-pages.json` retains extracted text for all 67 chapter pages. CPL text and other chapter prose remain available there. `scripts/extract-syllabi.py` extracts individual syllabus records from the source PDF into `src/data/syllabi.json` with printed/PDF page provenance.
+The extraction keeps required, interest-area, outside-program activity, equivalency, and transition table rows in structured form in `packages/curriculum/src/curricula/2026/source.json`. The companion `output/data/ugm-ilkom-2026-pages.json` retains extracted text for all 67 chapter pages. CPL text and other chapter prose remain available there. Individual syllabus records live in each curriculum slice as `syllabi.json`, with printed/PDF page provenance. See [the import guide](curriculum-import.md) for the output contract.
 
 ### Syllabus duplicate audit (2026-10-26)
 
@@ -18,12 +18,7 @@ the first occurrence is the main record and the second is in `alternatives`.
 Their order follows the PDF and does not indicate authority or recency. The reader
 shows both versions with separate page references; no topics are merged or inferred.
 
-Re-extract with `python scripts/extract-syllabi.py`; format the generated JSON with
-`bunx oxfmt src/data/syllabi.json`. Validate parser behavior with
-`python -m unittest discover -s scripts -p test_extract_syllabi.py` and source records
-with `bun test src/data/syllabi.test.ts`. Rebuild the independent 1–89 reconciliation
-with `python scripts/audit-syllabi-2026.py` and format its JSON output. The extractor preserves repeated codes
-with matching titles, but reports and excludes codes reused for different titles.
+PDF-specific extraction scripts have been retired because document layouts change. Follow [the import guide](curriculum-import.md), preserve matching-title duplicate versions, and leave codes reused for different titles unresolved. Validate with `bun run check`.
 The 2021 source has such an unresolved collision at `MII213603` (PDF p. 338:
 Lingkungan Cerdas dan Intelijen / Pengantar Blockchain); that code remains excluded.
 
@@ -52,4 +47,4 @@ The text companion retains extracted text, not page images. Printed pages 182–
 into `output/data/ugm-ilkom-2026-interest-maps.json`. This includes 57 named placements,
 WM/P roles, credits, semesters, generic choice buckets and selection notes. The shared
 required-course nodes and arrow connections remain untranscribed. Diagram/table
-differences are retained separately; the application continues to use its existing table data. Tables 3.8–3.11 and CPL mapping remain in the page-text companion rather than normalized fields. Syllabus topics and references are also available in `src/data/syllabi.json`; the duplicate audit above describes the unresolved source limits. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.
+differences are retained separately; the application continues to use its existing table data. Tables 3.8–3.11 and CPL mapping remain in the page-text companion rather than normalized fields. Syllabus topics and references are also available in `packages/curriculum/src/curricula/2026/syllabi.json`; the duplicate audit above describes the unresolved source limits. English titles and source spelling are kept as printed, including wording that may look incomplete or inconsistent.

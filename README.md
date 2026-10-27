@@ -28,6 +28,11 @@ Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
     bun install --frozen-lockfile
     bun run dev
 
+Workspace Bun dikoordinasikan oleh Turborepo. Aplikasi ada di `apps/web/`;
+`packages/curriculum/` menyediakan data dan DAL bertipe yang dibangun dengan tsdown.
+`bun run dev` membangun paket terlebih dahulu dan memantau perubahan; aplikasi
+selalu memakai JavaScript dan deklarasi dari `dist`, termasuk saat pengembangan.
+
 Aplikasi memakai TanStack Start dan TanStack Router untuk routing berbasis file,
 validasi parameter pencarian, dan server-side rendering. Tailwind CSS diproses
 melalui plugin Vite. React Flow tetap menangani peta interaktif. Vite memakai
@@ -40,22 +45,22 @@ Build dan preview lokal:
 
 ## Deploy ke Cloudflare Workers
 
-`wrangler.jsonc` menyetel entrypoint TanStack Start dan kompatibilitas runtime
+`apps/web/wrangler.jsonc` menyetel entrypoint TanStack Start dan kompatibilitas runtime
 Workers. Deploy lokal setelah build:
 
     bun run build
     bun run deploy
 
 Untuk deploy otomatis dari GitHub, hubungkan repository melalui **Workers & Pages**
-di dashboard Cloudflare. Nama Worker harus sama dengan `name` di `wrangler.jsonc`.
+di dashboard Cloudflare. Nama Worker harus sama dengan `name` di `apps/web/wrangler.jsonc`.
 Gunakan `bun run build` sebagai build command, `bun run deploy` sebagai deploy
-command, dan `bunx wrangler preview` sebagai preview command. Pilih branch
+command, dan `bun run preview` sebagai preview command. Tetapkan root directory ke root repository agar seluruh workspace ikut dibangun. Pilih branch
 produksi, biasanya `main`. Aktifkan preview builds untuk branch dan pull request
 lain.
 
-Rute berada di `src/routes/`, dokumen HTML dan metadata di `src/routes/__root.tsx`,
-dan konfigurasi router di `src/router.tsx`. Parameter `kurikulum` dan `mk` tetap
-mendukung tautan langsung. `src/routeTree.gen.ts` dibuat otomatis saat menjalankan
+Rute berada di `apps/web/src/routes/`, dokumen HTML dan metadata di `apps/web/src/routes/__root.tsx`,
+dan konfigurasi router di `apps/web/src/router.tsx`. Parameter `kurikulum` dan `mk` tetap
+mendukung tautan langsung. `apps/web/src/routeTree.gen.ts` dibuat otomatis saat menjalankan
 server pengembangan atau build; file ini disimpan di Git dan tidak diformat manual.
 
 Pemeriksaan lokal:
@@ -69,7 +74,7 @@ dengan `bunx playwright install chromium` terlebih dahulu. Cakupan dan cara
 menjalankannya ada di [docs/testing.md](docs/testing.md).
 Gunakan `bun run fmt` untuk memformat kode dan konfigurasi aplikasi, atau
 `bun run lint:fix` untuk menerapkan perbaikan lint otomatis.
-Dataset dan dokumen sumber tidak termasuk dalam cakupan formatter.
+Dataset, dokumen sumber, dan laporan audit tidak termasuk dalam cakupan formatter.
 Commit `bun.lock` saat mengubah dependensi.
 
 ## Dokumen dan data
@@ -80,8 +85,10 @@ Commit `bun.lock` saat mengubah dependensi.
 - CONTEXT.md — glosarium
 - docs/ilkom-2021-extraction.md dan docs/ilkom-2026-extraction.md — catatan ekstraksi
 
-Data aplikasi ada di `src/data/`, hasil ekstraksi di `output/data/`, serta sumber
-PDF dan snapshot halaman di `output/sources/`. Catatan ekstraksi menjelaskan
+Data runtime dimiliki tiap slice di `packages/curriculum/src/curricula/<id>/`;
+manifest dan laporan audit ada di `output/data/`, serta sumber
+PDF dan snapshot halaman di `output/sources/`. [Panduan impor kurikulum](docs/curriculum-import.md) menjelaskan kontrak JSON dan
+cara menambah atau menghapus edisi tanpa skrip migrasi PDF permanen. Catatan ekstraksi menjelaskan
 provenance dan ambiguitasnya. Proyek belum melalui audit aturan akademik atau
 pilot mahasiswa. Konfirmasikan keputusan KRS dengan ketentuan resmi prodi.
 
