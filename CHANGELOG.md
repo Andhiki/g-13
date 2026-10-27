@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Tombol utama "Buat roadmap kuliah" menggunakan AlignUI FancyButton berwarna primer
+  agar lebih menonjol.
+
 - Label kategori mata kuliah "Wajib program studi" disingkat menjadi "Wajib".
 
 ### 2026-10-26

@@ -203,3 +203,7 @@ after a successful clipboard write; reduced motion removes the animation.
 Graph titles and quiz questions use the AlignUI title scale. Typography accepts
 `className` for layout, contextual colors, and size overrides. Roadmap notes use
 the shared AlignUI modal.
+
+The main "Buat roadmap kuliah" CTA uses `src/ui/fancy-button.tsx`, adapted from
+[AlignUI FancyButton](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/fancy-button.tsx).
+It keeps the upstream medium primary styling and uses Radix Slot to preserve link semantics.

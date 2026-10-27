@@ -14,7 +14,7 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 import type { CurriculumId } from "../../../data";
-import { buttonVariants } from "../../../ui/button";
+import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes, useConnectionReveal } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
@@ -354,17 +354,11 @@ export function CurriculumMap({
               >
                 CS UGM Roadmap (Alpha)
               </Typography>
-              <Link
-                to="/roadmap"
-                search={{ lulus: 8, semesterPaparan: 6 }}
-                className={buttonVariants({
-                  variant: "neutral",
-                  mode: "filled",
-                  className: "pointer-events-auto nodrag nopan",
-                })}
-              >
-                Buat roadmap kuliah
-              </Link>
+              <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
+                <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+                  Buat roadmap kuliah
+                </Link>
+              </AlignFancyButton.Root>
             </div>
           )}
         </ViewportPortal>
