@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-10-27
+
+#### Changed
+
+- Label kategori mata kuliah "Wajib program studi" disingkat menjadi "Wajib".
+
 ### 2026-10-26
 
 #### Added

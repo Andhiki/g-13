@@ -28,7 +28,7 @@ export function adaptCurriculum2026(source: Raw): Curriculum {
       englishTitle: text(row.course_title_en_raw),
       placement: makePlacement(
         "core",
-        "Wajib program studi",
+        "Wajib",
         "",
         row.semester_guidance_raw,
         row.credits_total,

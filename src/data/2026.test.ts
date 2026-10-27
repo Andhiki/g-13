@@ -12,7 +12,7 @@ describe("2026 curriculum source adapter", () => {
       placements: [
         {
           section: "core",
-          label: "Wajib program studi",
+          label: "Wajib",
           semester: 1,
           credits: 2,
           prerequisiteRaw: "-",
