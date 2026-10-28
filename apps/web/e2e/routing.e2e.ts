@@ -80,7 +80,7 @@ for (const route of ["/", "/roadmap"]) {
         const sample = () => {
           const progress = (selector: string) =>
             Array.from(document.querySelectorAll<SVGPathElement>(selector)).map(
-              (path) => 1 - Number(path.style.strokeDashoffset),
+              (path) => 1 - parseFloat(getComputedStyle(path).strokeDashoffset),
             );
           frames.push({
             incoming: progress('g[data-id$="->PACS262201"] .react-flow__edge-path'),

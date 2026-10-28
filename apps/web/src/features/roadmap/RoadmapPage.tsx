@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { Route } from "../../routes/roadmap";
 import { firstUnanswered } from "./quiz";
 import { RoadmapQuiz } from "./RoadmapQuiz";
-import { RoadmapResult } from "./RoadmapResult";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
+
+const RoadmapResult = lazy(() =>
+  import("./RoadmapResult").then((module) => ({ default: module.RoadmapResult })),
+);
 
 export function RoadmapPage() {
   const answers = Route.useSearch();
@@ -36,7 +39,18 @@ export function RoadmapPage() {
     void navigate({ search: next, replace: !next.hasil && !answers.hasil, resetScroll: false });
   };
   const restart = () => update(validateRoadmapSearch({}));
-  if (result) return <RoadmapResult answers={answers} update={update} restart={restart} />;
+  if (result)
+    return (
+      <Suspense
+        fallback={
+          <p role="status" className="p-5">
+            Memuat roadmap…
+          </p>
+        }
+      >
+        <RoadmapResult answers={answers} update={update} restart={restart} />
+      </Suspense>
+    );
   return (
     <div className="flex min-h-dvh flex-col bg-bg-white-0 text-text-strong-950">
       <header className="flex items-center justify-end px-5 py-4 sm:px-6">

@@ -1,6 +1,6 @@
 # Built curriculum package in a Bun and Turborepo workspace
 
-Move the web app to `apps/web` and retain Bun, with Turborepo coordinating workspace tasks. A shared curriculum package owns datasets, normalization, and a synchronous, type-safe data access layer for browser and server consumers. It provides curriculum, course, syllabus, and prerequisite queries; rendering and roadmap planning remain in the web app. This boundary replaces direct application imports of raw datasets without introducing a database or HTTP service.
+Move the web app to `apps/web` and retain Bun, with Turborepo coordinating workspace tasks. A shared curriculum package owns datasets, normalization, and a type-safe data access layer with synchronous curriculum queries and asynchronous syllabus queries for browser and server consumers. It provides curriculum, course, syllabus, and prerequisite queries; rendering and roadmap planning remain in the web app. This boundary replaces direct application imports of raw datasets without introducing a database or HTTP service.
 
 Build shared packages with tsdown. Development and production consumers must resolve JavaScript and declarations from built output, with no source aliases or declaration maps leading back into package source. This deliberately adds a package build step to keep deeply nested dataset types out of consumers' TypeScript language-server work.
 
@@ -11,3 +11,10 @@ Prefer explicit public domain contracts and query return types over inferred dat
 Curriculum slices also own curriculum-specific academic rules and capabilities, exposed through typed contracts. The web app retains the planning algorithm, quiz presentation, and rendering. Selectors and URL validation use the registry, which defines one explicit default curriculum, rather than assuming a fixed pair of editions or treating future editions as 2026.
 
 Each slice physically owns the JSON it ships. Keep source PDFs and audit evidence at repository level. Retire document-specific extraction scripts and their parser tests; preserve source/data validation tests and document the output contracts and import process in `docs/curriculum-import.md`, since PDF layouts change between editions.
+
+Precompute normalized curriculum data during the package build. Emit shared course
+references once, keeping `all`, `core`, and `electives` consistent without shipping
+raw audit data or adapters to the browser. Load syllabus datasets by curriculum
+only when requested; the UI handles loading and download failures independently
+of course metadata. This reduces startup downloads at the cost of a first-use
+syllabus request.

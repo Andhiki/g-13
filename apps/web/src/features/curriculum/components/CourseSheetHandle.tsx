@@ -81,6 +81,7 @@ export function CourseSheetHandle({
     };
     const pointerDown = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
+      suppressClick.current = false;
       const target = event.target as HTMLElement;
       if (target.closest("a, button, input, select, textarea") && !handle.contains(target)) return;
       start(target, event.clientY);

@@ -64,7 +64,14 @@ for (const theme of ["light", "dark"] as const) {
     await expect(core).toHaveCSS("width", "246px");
     await expect(choice).toHaveCSS("opacity", "1");
     const coreTitle = await core.locator("strong").evaluate((node) => getComputedStyle(node).color);
-    await expect(choice.locator("strong")).not.toHaveCSS("color", coreTitle);
+    const coreBorder = await core
+      .locator("button > div > span")
+      .first()
+      .evaluate((node) => getComputedStyle(node).borderColor);
+    await expect(choice.locator("button > div > span").first()).not.toHaveCSS(
+      "border-color",
+      coreBorder,
+    );
     await core.getByRole("button").click();
     const incoming = page.locator('[data-testid="rf__edge-PAKF262105->PACS262201"] path').first();
     await expect(incoming).toHaveCSS("stroke-width", "2.2px");

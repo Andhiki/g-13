@@ -1,5 +1,4 @@
 import source from "./source.json";
-import syllabi from "./syllabi.json";
 import { adaptCurriculum2021 } from "./normalize";
 import type { CurriculumSlice } from "../../contracts/rules";
 
@@ -7,7 +6,6 @@ const curriculum = adaptCurriculum2021(source);
 
 export const curriculum2021: CurriculumSlice = {
   curriculum,
-  syllabi,
   rules: {
     choiceDetail: "Revisi 2023. Pilihan dari empat laboratorium.",
     interestMode: "laboratory",

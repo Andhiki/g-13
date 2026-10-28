@@ -1,5 +1,5 @@
 import { useTheme } from "next-themes";
-import { useHotkey } from "@tanstack/react-hotkeys";
+import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { RiMoonLine, RiSunLine } from "@remixicon/react";
@@ -48,11 +48,7 @@ export function ThemeSwitch() {
     });
   };
 
-  useHotkey("D", () => changeTheme(isDark ? "light" : "dark"), {
-    enabled: mounted,
-    ignoreInputs: true,
-    requireReset: true,
-  });
+  useKeyboardShortcuts(mounted ? { d: () => changeTheme(isDark ? "light" : "dark") } : {});
 
   return (
     <AlignButton.Root

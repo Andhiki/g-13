@@ -1,6 +1,6 @@
 import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
 import { AlignButton } from "../../../ui/button";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -122,7 +122,7 @@ function DesktopFilters({
   }, [open]);
 
   return (
-    <motion.section
+    <m.section
       initial={false}
       animate={{ width: open ? 300 : 40, height: open ? "auto" : 40, y: toolbar ? 0 : 52 }}
       transition={
@@ -146,7 +146,7 @@ function DesktopFilters({
           { Icon: RiFilter3Line, name: "filter", active: !open },
           { Icon: RiCloseLine, name: "close", active: open },
         ].map(({ Icon, name, active }) => (
-          <motion.span
+          <m.span
             key={name}
             initial={false}
             animate={{
@@ -161,10 +161,10 @@ function DesktopFilters({
             aria-hidden="true"
           >
             <Icon className="size-5" />
-          </motion.span>
+          </m.span>
         ))}
       </AlignButton.Root>
-      <motion.div
+      <m.div
         id="desktop-filters"
         inert={!open}
         aria-hidden={!open}
@@ -177,8 +177,8 @@ function DesktopFilters({
           Filter
         </Typography>
         {children}
-      </motion.div>
-    </motion.section>
+      </m.div>
+    </m.section>
   );
 }
 

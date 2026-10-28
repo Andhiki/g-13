@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Typography } from "../../../ui/typography";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
@@ -51,7 +52,9 @@ const courseStyles = tv({
 
 const tab = "h-[25px] truncate rounded-t-lg border-b-0 px-3 pt-[3px] text-text-sub-600";
 
-export function CourseNode({ data }: NodeProps<Node<CourseNodeData, "course">>) {
+export const CourseNode = memo(function CourseNode({
+  data,
+}: NodeProps<Node<CourseNodeData, "course">>) {
   const course = data.course;
   const credit = creditsFor(course);
   const choice = !isCore(course);
@@ -118,9 +121,9 @@ export function CourseNode({ data }: NodeProps<Node<CourseNodeData, "course">>) 
       ))}
     </div>
   );
-}
+});
 
-export function LaneNode({ data }: NodeProps<Node<LaneNodeData, "lane">>) {
+export const LaneNode = memo(function LaneNode({ data }: NodeProps<Node<LaneNodeData, "lane">>) {
   return (
     <div
       data-map-lane
@@ -134,4 +137,4 @@ export function LaneNode({ data }: NodeProps<Node<LaneNodeData, "lane">>) {
       </Typography>
     </div>
   );
-}
+});

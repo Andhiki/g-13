@@ -1,8 +1,8 @@
 import { RiArrowLeftLine, RiCornerDownLeftLine } from "@remixicon/react";
 import { Typography } from "../../ui/typography";
 import { useEffect, useRef } from "react";
-import { useHotkey, useHotkeys } from "@tanstack/react-hotkeys";
-import { motion, useReducedMotion } from "motion/react";
+import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
+import { m, useReducedMotion } from "motion/react";
 import { AlignKbd } from "../../ui/kbd";
 import { AlignButton } from "../../ui/button";
 import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
@@ -42,32 +42,23 @@ export function RoadmapQuiz({
     );
   const back = () => update({ ...answers, langkah: questions[index - 1].key });
   const canAdvance = question.choices.some((choice) => choice.value === selected);
-  useHotkeys(
-    question.choices.map((choice, choiceIndex) => ({
-      hotkey: { key: String(choiceIndex + 1) },
-      callback: () => choose(choice.value),
-    })),
-    { ignoreInputs: true, requireReset: true },
-  );
-  useHotkey("ArrowLeft", back, {
-    enabled: index > 0,
-    ignoreInputs: true,
-    requireReset: true,
+  useKeyboardShortcuts({
+    ...Object.fromEntries(
+      question.choices.map((choice, index) => [String(index + 1), () => choose(choice.value)]),
+    ),
+    ...(index > 0 ? { arrowleft: back } : {}),
+    ...(canAdvance ? { arrowright: advance, enter: advance } : {}),
   });
-  useHotkeys(
-    ["ArrowRight", "Enter"].map((key) => ({ hotkey: { key }, callback: advance })),
-    { enabled: canAdvance, ignoreInputs: true, requireReset: true },
-  );
   return (
     <main className="mx-auto flex w-full max-w-[960px] flex-1 flex-col px-5 pt-6 pb-28 sm:px-10 sm:py-10">
-      <motion.section
+      <m.section
         key={question.key}
         initial={reducedMotion ? false : "hidden"}
         animate="visible"
         className="my-auto py-2 sm:py-5"
         aria-labelledby="quiz-title"
       >
-        <motion.div
+        <m.div
           variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
           transition={{ duration: reducedMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
         >
@@ -89,8 +80,8 @@ export function RoadmapQuiz({
           >
             {question.description}
           </Typography>
-        </motion.div>
-        <motion.div
+        </m.div>
+        <m.div
           variants={{
             hidden: {},
             visible: {
@@ -106,7 +97,7 @@ export function RoadmapQuiz({
           aria-describedby="quiz-description"
         >
           {question.choices.map((choice, choiceIndex) => (
-            <motion.div
+            <m.div
               key={choice.value}
               variants={{
                 hidden: { opacity: 0, y: 20, scale: 0.98 },
@@ -128,10 +119,10 @@ export function RoadmapQuiz({
                 </AlignKbd.Root>
                 <span>{choice.label}</span>
               </AlignButton.Root>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
-      </motion.section>
+        </m.div>
+      </m.section>
       <footer className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-4 border-t border-stroke-soft-200 bg-bg-white-0 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:mt-10 sm:border-0 sm:bg-transparent sm:px-0 sm:pb-3">
         <AlignButton.Root
           variant="neutral"

@@ -1,33 +1,44 @@
-import { useLayoutEffect, useState, type ReactNode } from "react";
-import { animate } from "motion/react";
+import { useLayoutEffect, type ReactNode } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { SmartEdgeProvider, useSmartEdgePath } from "@tisoap/react-flow-smart-edge";
 
 // Leave a routing corridor in the 14px gap between course rows.
 const pathOptions = { nodePadding: 4, gridRatio: 4, borderRadius: 16 };
+const routingOptions = {
+  preset: "smoothstep",
+  routeOnlyWhenBlocked: false,
+  ...pathOptions,
+} as const;
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const nodes = useStore(
-    (state) => Array.from(state.nodeLookup.values()),
-    (previous, next) =>
-      previous.length === next.length && previous.every((node, index) => node === next[index]),
-  );
-  return (
-    <SmartEdgeProvider
-      nodes={nodes
+    (state) =>
+      Array.from(state.nodeLookup.values())
         .filter((node) => node.type !== "lane" && !node.hidden)
         .map((node) => ({
-          ...node,
-          // Reserve horizontal room for the first bend without closing the gaps between rows.
-          position: { ...node.position, x: node.position.x - 40 },
-          measured: { ...node.measured, width: (node.measured?.width ?? 0) + 80 },
-        }))}
-      options={{
-        preset: "smoothstep",
-        routeOnlyWhenBlocked: false,
-        ...pathOptions,
-      }}
-    >
+          id: node.id,
+          data: {},
+          position: {
+            x: node.internals.positionAbsolute.x - 40,
+            y: node.internals.positionAbsolute.y,
+          },
+          measured: { width: (node.measured.width ?? 0) + 80, height: node.measured.height ?? 0 },
+        })),
+    (previous, next) =>
+      previous.length === next.length &&
+      previous.every((node, index) => {
+        const other = next[index];
+        return (
+          node.id === other.id &&
+          node.position.x === other.position.x &&
+          node.position.y === other.position.y &&
+          node.measured.width === other.measured.width &&
+          node.measured.height === other.measured.height
+        );
+      }),
+  );
+  return (
+    <SmartEdgeProvider nodes={nodes} options={routingOptions}>
       {children}
     </SmartEdgeProvider>
   );
@@ -41,7 +52,9 @@ export function EdgeRouting({ children }: { children: ReactNode }) {
   );
 }
 
-function RoutedEdge(props: EdgeProps<Edge<{ progress?: number }>>) {
+function RoutedEdge(
+  props: EdgeProps<Edge<{ reveal?: number; animationKey?: string | null; startedAt?: number }>>,
+) {
   const { route } = useSmartEdgePath({
     ...props,
     preset: "smoothstep",
@@ -68,10 +81,32 @@ function RoutedEdge(props: EdgeProps<Edge<{ progress?: number }>>) {
       );
     });
   });
+  const routed = route?.kind === "routed";
+  const delay = props.data?.reveal;
+  const startedAt = props.data?.startedAt;
+  useLayoutEffect(() => {
+    if (
+      !routed ||
+      delay === undefined ||
+      startedAt === undefined ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const path = document.getElementById(props.id);
+    if (!path) return;
+    const animation = path.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+      duration: 450,
+      delay: delay * 1000,
+      easing: "cubic-bezier(0.333333, 0, 0.666667, 1)",
+      fill: "both",
+    });
+    animation.startTime = startedAt;
+    return () => animation.cancel();
+  }, [routed, props.id, props.data?.animationKey, delay, startedAt]);
   if (route?.kind !== "routed") return null;
-  const progress = props.data?.progress ?? 1;
   return (
     <BaseEdge
+      key={props.data?.animationKey}
       id={props.id}
       path={
         straight
@@ -81,37 +116,17 @@ function RoutedEdge(props: EdgeProps<Edge<{ progress?: number }>>) {
       pathLength={1}
       interactionWidth={props.interactionWidth}
       data-routed="true"
-      style={{ ...props.style, strokeDasharray: 1, strokeDashoffset: 1 - progress }}
+      style={{ ...props.style, strokeDasharray: 1, strokeDashoffset: 0 }}
     />
   );
 }
 
 export const routedEdgeTypes = { routed: RoutedEdge };
 
-export function useConnectionReveal(
-  selectedId: string | null,
-  hasPrerequisites: boolean,
-  delay = 0,
-) {
-  const [phase, setPhase] = useState(2);
-  useLayoutEffect(() => {
-    if (!selectedId || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPhase(2);
-      return;
-    }
-    const start = hasPrerequisites ? 0 : 1;
-    setPhase(start);
-    const animation = animate(start, 2, {
-      duration: (2 - start) * 0.45,
-      delay,
-      ease: "linear",
-      onUpdate: setPhase,
-    });
-    return () => animation.stop();
-  }, [selectedId, hasPrerequisites, delay]);
-  const smooth = (value: number) => {
-    const t = Math.min(1, Math.max(0, value));
-    return t * t * (3 - 2 * t);
+export function connectionReveal(hasPrerequisites: boolean, delay = 0) {
+  return {
+    startedAt: performance.now(),
+    incoming: delay,
+    outgoing: delay + (hasPrerequisites ? 0.45 : 0),
   };
-  return { incoming: smooth(phase), outgoing: smooth(phase - 1) };
 }
