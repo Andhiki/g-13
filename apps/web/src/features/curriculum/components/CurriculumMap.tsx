@@ -98,7 +98,6 @@ function useCourseReveal(nodes: MapNode[]) {
 function ViewportFocus({
   navigation,
   focusKey,
-  focusTarget,
   scope,
   group,
   selectedId,
@@ -106,7 +105,6 @@ function ViewportFocus({
 }: {
   navigation: { semester: number } | null;
   focusKey: string;
-  focusTarget: CurriculumId;
   scope: Scope;
   group: string;
   selectedId: string | null;
@@ -196,13 +194,11 @@ function ViewportFocus({
       const phone = window.matchMedia("(width < 650px)").matches;
       const title = document.querySelector<HTMLElement>("[data-map-title]")!;
       const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-      const zoom = Math.min(
-        phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
-        (stage.width - 32) / title.offsetWidth,
-      );
+      const left = Math.max(24, stage.width * 0.075);
+      const zoom = Math.min(phone ? 0.8 : 1.2, (stage.width - left - 24) / title.offsetWidth);
       setViewport(
         {
-          x: 16 - (LANE_X + 12) * zoom,
+          x: left - (LANE_X + 12) * zoom,
           y: stage.height / 3 - title.offsetTop * zoom,
           zoom,
         },
@@ -212,17 +208,7 @@ function ViewportFocus({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [
-    navigation,
-    focusKey,
-    focusTarget,
-    scope,
-    group,
-    selectedId,
-    positions,
-    setCenter,
-    setViewport,
-  ]);
+  }, [navigation, focusKey, scope, group, selectedId, positions, setCenter, setViewport]);
   return null;
 }
 
@@ -348,7 +334,6 @@ export function CurriculumMap({
         <ViewportFocus
           navigation={navigation}
           focusKey={focusKey}
-          focusTarget={curriculum}
           scope={scope}
           group={group}
           selectedId={selectedId}

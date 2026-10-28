@@ -34,7 +34,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Changed
 
 - Posisi awal judul dan tombol CS UGM Roadmap pada peta rata kiri di sepertiga
-  atas layar.
+  atas layar, dengan margin kiri lebih lapang dan tampilan awal diperbesar.
 
 - Hasil kuis roadmap diawali layar pemuatan dengan animasi rute mata kuliah
   minimal 500 ms; preferensi pengurangan gerakan menampilkan ilustrasi statis.
