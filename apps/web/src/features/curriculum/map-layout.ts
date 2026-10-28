@@ -24,7 +24,7 @@ export const LANE_X = 48;
 export const LANE_STEP = 360;
 export const LANE_WIDTH = 270;
 const CHOICE_COLUMNS = 3;
-const ROW_STEP = 96;
+const ROW_STEP = 120;
 const COURSE_X_OFFSET = 12;
 const COURSE_Y_START = 156;
 
@@ -144,9 +144,10 @@ export function buildMap(
       });
     }
   }
+  const connections = selectedId ? focusedRelations : availableRelations;
   const incoming = new Map<string, string[]>();
   const outgoing = new Map<string, string[]>();
-  for (const relation of focusedRelations) {
+  for (const relation of connections) {
     outgoing.set(relation.source, [...(outgoing.get(relation.source) ?? []), relation.target]);
     incoming.set(relation.target, [...(incoming.get(relation.target) ?? []), relation.source]);
   }
@@ -177,19 +178,28 @@ export function buildMap(
     });
   }
 
-  const edges: Edge[] = focusedRelations.map((relation) => {
+  const coreIds = new Set(data.all.filter(isCore).map((course) => course.id));
+  const edges: Edge[] = connections.map((relation) => {
     const isPrerequisite = relation.target === selectedId;
     return {
       id: relation.source + "->" + relation.target,
       source: relation.source,
-      sourceHandle: "out:" + relation.target,
+      sourceHandle: "out",
       target: relation.target,
-      targetHandle: "in:" + relation.source,
+      targetHandle: "in",
       type: "default",
       zIndex: 3,
-      className: isPrerequisite
-        ? "[&>path:first-child]:stroke-warning-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]"
-        : "[&>path:first-child]:stroke-feature-dark! [&>path:first-child]:stroke-[2.2]! [&>path:first-child]:[stroke-linecap:round]",
+      data: {
+        optional: !coreIds.has(relation.source) || !coreIds.has(relation.target),
+      },
+      style: {
+        stroke: selectedId
+          ? isPrerequisite
+            ? "var(--color-warning-dark)"
+            : "var(--color-feature-dark)"
+          : "var(--color-text-soft-400)",
+        strokeWidth: selectedId ? 2.2 : 1.2,
+      },
     };
   });
   return { nodes, edges, positions, relationCount: availableRelations.length };

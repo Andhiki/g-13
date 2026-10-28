@@ -5,6 +5,14 @@ import { adaptCurriculum2026 } from "./normalize";
 const curriculum = adaptCurriculum2026(source);
 
 describe("2026 curriculum source adapter", () => {
+  test("uses a concise Agama title while retaining the original source label", () => {
+    expect(curriculum.all.find((item) => item.id === "UNKU26000X")?.title).toBe("Agama");
+    expect(
+      source.course_schedule.required_program_rows.find(
+        (row) => row.course_code_raw === "UNKU26000X",
+      )?.course_title_id_raw,
+    ).toContain("dipilih sesuai agama");
+  });
   test("preserves required course details and source pages", () => {
     const course = curriculum.all.find((item) => item.id === "PACS262101");
     expect(course).toMatchObject({

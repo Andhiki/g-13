@@ -17,7 +17,7 @@ export function adaptCurriculum2026(source: typeof sourceData): Curriculum {
     rows.push({
       id: code || "2026-core-" + slug(title) + "-" + index,
       code,
-      title,
+      title: code === "UNKU26000X" ? "Agama" : title,
       englishTitle: text(row.course_title_en_raw),
       placement: makePlacement(
         "core",
