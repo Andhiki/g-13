@@ -30,7 +30,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
   dan pengalih tema. Kedua logo berada dalam satu tautan beranda.
   Tautan navigasi memakai warna teks redup. Kontrol peta tetap
-  berada di overlay di bawah header.
+  berada di overlay di bawah header. Pada layar seluler, tombol menu membuka
+  navigasi layar penuh ke kurikulum, arsip ujian, roadmap, dan FAQ dengan pengalih
+  tema di bawah; menu mendukung Escape, pengelolaan fokus, dan penguncian gulir.
 
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
@@ -54,7 +56,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Mata kuliah pilihan pada peta utama dikelompokkan menurut kelompok pilihan,
   dengan kelompok Miscellaneous untuk mata kuliah tanpa kelompok. Bagian pilihan
-  dipindahkan ke bawah semester dan disusun selebar delapan kolom semester.
+  dipindahkan ke bawah semester dan disusun selebar delapan kolom semester,
+  dengan judul bagian yang lebih besar untuk membedakannya dari nama kelompok.
+  Setiap kelompok dibatasi enam mata kuliah per kolom; kelompok besar otomatis
+  memakai kolom tambahan dan membungkus ke bawah dalam lebar delapan kolom.
 
 - Kolom Semester 8 dan tombol navigasinya disembunyikan saat kosong.
 - Slot pilihan kurikulum 2021 memakai nama “Mata Kuliah Pilihan” tanpa nomor,
@@ -142,6 +147,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   pemuatan detail ditutup saat pilihan mata kuliah dibatalkan.
 
 #### Fixed
+
+- Menutup detail mata kuliah mengembalikan posisi dan zoom peta sebelum mata
+  kuliah dibuka, termasuk setelah berpindah ke mata kuliah terhubung.
 
 - Mata kuliah prasyarat dan lanjutan muncul bersamaan dengan koneksinya saat
   memilih mata kuliah di peta; jeda animasi node yang terpisah dihapus.

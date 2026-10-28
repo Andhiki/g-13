@@ -53,11 +53,11 @@ const questions = [
   },
 ];
 
-export function Faq() {
+export function Faq({ className }: { className?: string }) {
   return (
     <AlignModal.Root>
       <AlignModal.Trigger asChild>
-        <AlignLinkButton.Root>FAQ</AlignLinkButton.Root>
+        <AlignLinkButton.Root className={className}>FAQ</AlignLinkButton.Root>
       </AlignModal.Trigger>
       <AlignModal.Content className="max-h-[85dvh] max-w-[560px] overflow-y-auto p-5">
         <AlignModal.Title asChild>

@@ -131,7 +131,11 @@ export const CourseNode = memo(function CourseNode({
   );
 });
 
-export const LaneNode = memo(function LaneNode({ data }: NodeProps<Node<LaneNodeData, "lane">>) {
+export const LaneNode = memo(function LaneNode({
+  id,
+  data,
+}: NodeProps<Node<LaneNodeData, "lane">>) {
+  const section = id === "lane-choices";
   return (
     <div
       data-map-lane
@@ -140,7 +144,11 @@ export const LaneNode = memo(function LaneNode({ data }: NodeProps<Node<LaneNode
         (data.active ? "text-primary-base" : "text-text-sub-600")
       }
     >
-      <Typography as="strong" variant="label">
+      <Typography
+        as={section ? "h2" : "strong"}
+        variant={section ? "title" : "label"}
+        className={section ? "m-0 text-text-strong-950" : undefined}
+      >
         {data.title}
       </Typography>
     </div>

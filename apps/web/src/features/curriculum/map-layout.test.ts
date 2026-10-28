@@ -70,7 +70,11 @@ for (const { id } of listCurricula()) {
       const heading = map.nodes.find(
         (node) => node.data.kind === "lane" && node.data.title === group,
       )!;
-      expect(node.position.x).toBe(heading.position.x + 12);
+      expect(node.position.x).toBeGreaterThanOrEqual(heading.position.x + 12);
+      expect(node.position.x + 246).toBeLessThanOrEqual(
+        heading.position.x + Number(heading.style!.width),
+      );
+      expect(node.position.y).toBeLessThan(heading.position.y + 72 + 6 * 120);
       expect(node.position.y).toBeGreaterThan(heading.position.y + 56);
       expect(node.position.x).toBeLessThan(48 + 8 * 360);
     }
@@ -114,3 +118,34 @@ test("ungrouped electives appear under Miscellaneous and extra groups wrap below
   expect(filtered.positions.get("choice-9")).toEqual(map.positions.get("choice-9"));
   expect(filtered.nodes.filter((node) => node.id.startsWith("lane-choice-group-")).length).toBe(1);
 });
+
+for (const count of [6, 7, 48, 49]) {
+  test(`an elective category with ${count} courses caps columns at six rows and wraps within eight columns`, () => {
+    const data = getCurriculum("2026");
+    const template = data.electives.find((course) => !isCore(course))!;
+    const electives = Array.from({ length: count }, (_, index) => ({
+      ...template,
+      id: `choice-${index}`,
+      title: `Course ${String(index).padStart(2, "0")}`,
+      placements: template.placements.map((placement) => ({ ...placement, group: "Test group" })),
+    }));
+    const fixture = { ...data, all: [...data.core, ...electives], electives };
+    const map = buildMap(fixture, fixture.all, [], null, () => {});
+    const positions = electives.map((course) => map.positions.get(course.id)!);
+    expect(new Set(positions.map(({ x, y }) => `${x}:${y}`)).size).toBe(count);
+    const first = positions[0];
+    expect(positions[5].y).toBe(first.y + 5 * 120);
+    if (count > 6) {
+      expect(positions[6]).toEqual({ x: first.x + 360, y: first.y });
+    }
+    for (const position of positions) {
+      expect(position.x).toBeLessThan(48 + 8 * 360);
+    }
+    if (count <= 48) {
+      expect(Math.max(...positions.map((position) => position.y))).toBe(first.y + 5 * 120);
+    } else {
+      expect(positions[48].x).toBe(first.x);
+      expect(positions[48].y).toBeGreaterThan(first.y + 6 * 120);
+    }
+  });
+}

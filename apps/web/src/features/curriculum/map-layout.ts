@@ -24,6 +24,7 @@ export const LANE_X = 48;
 export const LANE_STEP = 360;
 export const LANE_WIDTH = 270;
 const CHOICE_COLUMNS = 8;
+const CHOICE_ROWS = 6;
 const ROW_STEP = 120;
 const COURSE_X_OFFSET = 12;
 const COURSE_Y_START = 156;
@@ -127,16 +128,25 @@ export function buildMap(
     connectable: false,
   });
   let groupY = choiceStartY + 64;
-  for (let offset = 0; offset < groups.length; offset += CHOICE_COLUMNS) {
-    const row = groups.slice(offset, offset + CHOICE_COLUMNS);
-    row.forEach(([group, courses], column) => {
+  let column = 0;
+  let rowHeight = 0;
+  for (const [group, courses] of groups) {
+    courses.sort((a, b) => a.title.localeCompare(b.title, "id"));
+    for (let offset = 0; offset < courses.length; offset += CHOICE_COLUMNS * CHOICE_ROWS) {
+      const chunk = courses.slice(offset, offset + CHOICE_COLUMNS * CHOICE_ROWS);
+      const columns = Math.ceil(chunk.length / CHOICE_ROWS);
+      if (column + columns > CHOICE_COLUMNS) {
+        groupY += 72 + rowHeight * ROW_STEP + 64;
+        column = 0;
+        rowHeight = 0;
+      }
       const x = LANE_X + column * LANE_STEP;
-      if (courses.some((course) => visibleIds.has(course.id))) {
+      if (chunk.some((course) => visibleIds.has(course.id))) {
         nodes.push({
-          id: `lane-choice-group-${group}`,
+          id: `lane-choice-group-${group}${offset ? `-${offset}` : ""}`,
           type: "lane",
           position: { x, y: groupY },
-          style: { width: LANE_WIDTH, height: 56 },
+          style: { width: (columns - 1) * LANE_STEP + LANE_WIDTH, height: 56 },
           zIndex: -1,
           data: { kind: "lane", title: group, active: false },
           selectable: false,
@@ -144,17 +154,16 @@ export function buildMap(
           connectable: false,
         });
       }
-      courses
-        .sort((a, b) => a.title.localeCompare(b.title, "id"))
-        .forEach((course, index) => {
-          if (!visibleIds.has(course.id)) return;
-          positions.set(course.id, {
-            x: x + COURSE_X_OFFSET,
-            y: groupY + 72 + index * ROW_STEP,
-          });
+      chunk.forEach((course, index) => {
+        if (!visibleIds.has(course.id)) return;
+        positions.set(course.id, {
+          x: x + COURSE_X_OFFSET + Math.floor(index / CHOICE_ROWS) * LANE_STEP,
+          y: groupY + 72 + (index % CHOICE_ROWS) * ROW_STEP,
         });
-    });
-    groupY += 72 + Math.max(...row.map(([, courses]) => courses.length)) * ROW_STEP + 64;
+      });
+      column += columns;
+      rowHeight = Math.max(rowHeight, Math.min(CHOICE_ROWS, chunk.length));
+    }
   }
 
   const availableRelations = graphRelations.filter(
