@@ -34,7 +34,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   tampilan awal, serta persentase zoom yang mengikuti posisi peta.
 
 - Pintasan keyboard pada peta untuk berpindah semester, membuka atau menutup filter,
-  mengganti tampilan, mencari mata kuliah, dan mengganti tema ditampilkan di atas kontrol zoom.
+  mengganti tampilan, mencari mata kuliah, dan mengganti tema ditampilkan di atas kontrol zoom;
+  ukuran teks label pintasan disesuaikan dengan tombolnya.
 
 - Ringkasan singkat jawaban kuis di bawah judul hasil roadmap, berisi kurikulum,
   peminatan, target selesai, kegiatan, dan arahan untuk memeriksa catatan rencana.
