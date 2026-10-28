@@ -1,112 +1,112 @@
-# g-13
+# g-13 — UGM Computer Science Course Map
 
-Peta kurikulum dan roadmap kuliah S1 Ilmu Komputer UGM. Proyek open source komunitas untuk
-membantu mahasiswa memahami mata kuliah, prasyarat, dan pilihan perjalanan kuliah.
-Proyek ini bukan layanan resmi atau pengesahan dari UGM, prodi, maupun Himakom.
+A community-built, open-source guide to UGM Computer Science courses. Explore the
+curriculum, see which courses depend on others, and sketch a semester-by-semester
+study plan. A prerequisite is a course you need to take first.
 
-## Berkontribusi
+![The g-13 course map showing courses and prerequisite links](docs/images/peta-kurikulum-preview.png)
 
-Mulai dari [panduan kontribusi](CONTRIBUTING.md). Laporan bug, koreksi kurikulum
-dengan sumber resmi, dan usulan fitur dapat dikirim melalui
-[GitHub Issues](https://github.com/Andhiki/g-13/issues).
-Baca [aturan komunitas](CODE_OF_CONDUCT.md) dan [kebijakan keamanan](SECURITY.md).
+Use the course map, search for a course, open its details, or try the roadmap. This
+is a community project. It is **not an official UGM or department service**, and
+the roadmap does not replace department rules.
 
-Lihat [changelog](CHANGELOG.md) untuk catatan perubahan.
+## Run the project on your computer
 
-## Cakupan
+You’ll need [Git](https://git-scm.com/downloads),
+[Bun 1.4.3](https://bun.sh/docs/installation), and Node.js 22.12 or newer. Some
+of the tools used to run and build the website need Node.js.
 
-- Kurikulum 2021 Revisi 2023 dan 2026 sejak MVP.
-- Peta relasi, daftar, pencarian, detail, teks prasyarat, dan pengelompokan mata kuliah pilihan.
-- Tidak meminta transkrip atau menghitung kelayakan KRS pribadi.
-- Tidak mengasumsikan afiliasi Himakom atau pengesahan prodi.
+1. Download the project and enter its folder:
 
-## Menjalankan aplikasi
+   ```sh
+   git clone https://github.com/Andhiki/g-13.git
+   cd g-13
+   ```
 
-Bun 1.4.3 digunakan untuk mengelola dependensi dan menjalankan skrip.
-Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
+2. Install the project’s dependencies:
 
-    bun install --frozen-lockfile
-    bun run build:packages
-    bun run dev
+   ```sh
+   bun install --frozen-lockfile
+   ```
 
-Workspace Bun dikoordinasikan oleh Turborepo. Aplikasi ada di `apps/web/`;
-`packages/curriculum/` menyediakan data dan DAL bertipe yang dibangun dengan tsdown.
-`bun run dev` hanya menjalankan server pengembangan aplikasi. Jalankan
-`bun run build:packages` secara terpisah sebelum memulai dan setelah mengubah paket;
-aplikasi memakai JavaScript dan deklarasi dari `dist`, termasuk saat pengembangan.
+3. Build the curriculum package:
 
-Aplikasi memakai TanStack Start dan TanStack Router untuk routing berbasis file,
-validasi parameter pencarian, dan server-side rendering. Tailwind CSS diproses
-melalui plugin Vite. React Flow tetap menangani peta interaktif. Vite memakai
-Cloudflare plugin untuk menjalankan SSR pada runtime Workers.
+   ```sh
+   bun run build:packages
+   ```
 
-Build dan preview lokal:
+   The website uses this package. Build it once before starting the site, and
+   again whenever you change its source files.
 
-    bun run build
-    bun run preview
+4. Start the website:
 
-## Deploy ke Cloudflare Workers
+   ```sh
+   bun run dev
+   ```
 
-`apps/web/wrangler.jsonc` menyetel entrypoint TanStack Start dan kompatibilitas runtime
-Workers. Deploy lokal setelah build:
+   Open the local address printed in your terminal. It is usually
+   `http://localhost:5173`.
 
-    bun run build
-    bun run deploy
+Press `Ctrl+C` in the terminal to stop the website.
 
-Untuk deploy otomatis dari GitHub, hubungkan repository melalui **Workers & Pages**
-di dashboard Cloudflare. Nama Worker harus sama dengan `name` di `apps/web/wrangler.jsonc`.
-Gunakan `bun run build` sebagai build command, `bun run deploy` sebagai deploy
-command, dan `bun run preview` sebagai preview command. Tetapkan root directory ke root repository agar seluruh workspace ikut dibangun. Pilih branch
-produksi, biasanya `main`. Aktifkan preview builds untuk branch dan pull request
-lain.
+## How the project is put together
 
-Rute berada di `apps/web/src/routes/`, dokumen HTML dan metadata di `apps/web/src/routes/__root.tsx`,
-dan konfigurasi router di `apps/web/src/router.tsx`. Parameter `kurikulum` dan `mk` tetap
-mendukung tautan langsung. `apps/web/src/routeTree.gen.ts` dibuat otomatis saat menjalankan
-server pengembangan atau build; file ini disimpan di Git dan tidak diformat manual.
+Bun installs dependencies and runs commands. Turborepo coordinates commands
+across the website and curriculum package in this repository.
 
-Pemeriksaan lokal:
+```mermaid
+flowchart LR
+    command["You run a Bun command"] --> turbo["Turborepo coordinates tasks"]
+    source["packages/curriculum/src<br/>Course data and rules"] --> build["Build the package"]
+    turbo --> build
+    build --> dist["packages/curriculum/dist<br/>JavaScript and types"]
+    dist --> app["apps/web<br/>Imports @g13/curriculum"]
+    app --> site["Course map website"]
+```
 
-    bun run check
+Each curriculum’s data and rules live in `packages/curriculum/`. Building that
+package produces JavaScript and TypeScript declarations in `dist/`. The website
+in `apps/web/` imports the built package as `@g13/curriculum` to show the map,
+course details, and roadmap.
 
-`check` menjalankan Oxlint, pemeriksaan format Oxfmt, TypeScript, dan tes Bun.
-Gunakan `bun run test` untuk menjalankan tes data dan perilaku kurikulum.
-Rincian cakupan tes ada di [docs/testing.md](docs/testing.md).
-Gunakan `bun run fmt` untuk memformat kode dan konfigurasi aplikasi, atau
-`bun run lint:fix` untuk menerapkan perbaikan lint otomatis.
-Dataset, dokumen sumber, dan laporan audit tidak termasuk dalam cakupan formatter.
-Commit `bun.lock` saat mengubah dependensi.
+When you run `bun run build`, Turborepo builds the packages the website needs
+first. Before `bun run dev`, build the curriculum package once with
+`bun run build:packages`.
 
-## Dokumen dan data
+## Where to find things
 
-- docs/build-plan.md — rencana implementasi dan kebutuhan sumber daya
-- docs/discovery.md — temuan, sumber, keputusan, dan pertanyaan
-- docs/verification.md — pemeriksaan ekstraksi dan batas verifikasi
-- CONTEXT.md — glosarium
-- docs/ilkom-2021-extraction.md dan docs/ilkom-2026-extraction.md — catatan ekstraksi
+- `apps/web/src/features/` — website features, including the course map,
+  roadmap, and exam archive.
+- `apps/web/src/ui/` — shared buttons, dialogs, and other interface pieces.
+- `packages/curriculum/src/curricula/` — data and rules for each curriculum.
+- `packages/curriculum/src/contracts/` — shared descriptions of the data’s shape.
+- `docs/` — project guides and notes.
 
-Data runtime dimiliki tiap slice di `packages/curriculum/src/curricula/<id>/`;
-manifest dan laporan audit ada di `output/data/`, serta sumber
-PDF dan snapshot halaman di `output/sources/`. [Panduan impor kurikulum](docs/curriculum-import.md) menjelaskan kontrak JSON dan
-cara menambah atau menghapus edisi tanpa skrip migrasi PDF permanen. Catatan ekstraksi menjelaskan
-provenance dan ambiguitasnya. Proyek belum melalui audit aturan akademik atau
-pilot mahasiswa. Konfirmasikan keputusan KRS dengan ketentuan resmi prodi.
+For website changes, start in `apps/web/`. For curriculum changes, start in
+`packages/curriculum/` and include an official source. Read the
+[curriculum import guide](docs/curriculum-import.md) before changing curriculum
+data.
 
-## Inspirasi dan kredit
+## Want to contribute?
 
-Konsep eksplorasi peta kurikulum terinspirasi oleh
-[Peta Kurikulum Fasilkom UI — course.csui.dev](https://course.csui.dev/).
-Komponen dan token UI mengadaptasi AlignUI; notice lisensinya dipertahankan di
-[docs/licenses/alignui.txt](docs/licenses/alignui.txt).
+Everyone is welcome, including people who are new to programming.
 
-Dokumen UGM, logo OmahTI, GIF Sonic, dan dependensi mempunyai hak dan ketentuan
-masing-masing. Lihat [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-Persiapan publik dan pengaturan maintainer dicatat di
-[docs/open-source-readiness.md](docs/open-source-readiness.md).
+- Have an idea or found a problem? [Open an issue](https://github.com/Andhiki/g-13/issues).
+- Have a code or writing change ready? [Send a pull request](https://github.com/Andhiki/g-13/pulls).
+- Before contributing, read the [contribution guide](CONTRIBUTING.md) and
+  [community guidelines](CODE_OF_CONDUCT.md).
 
-## Lisensi
+Before sending a code change, run:
 
-Kode dan dokumentasi asli proyek dilisensikan dengan [MIT](LICENSE).
-Materi pihak ketiga tetap mengikuti hak dan lisensinya masing-masing, termasuk
-data/dokumen UGM, logo OmahTI, dan GIF Sonic; lihat
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+```sh
+bun run check
+```
+
+This checks code style, formatting, TypeScript types, and tests. Fix any reported
+problems, then run the command again.
+
+## License and sources
+
+Original code and documentation are available under the [MIT license](LICENSE).
+Data, documents, logos, and other third-party materials have their own terms;
+see [Third-Party Notices](THIRD_PARTY_NOTICES.md).

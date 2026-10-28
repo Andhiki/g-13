@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { RiMenuLine, RiCloseLine, RiGithubFill } from "@remixicon/react";
+import { m, useReducedMotion } from "motion/react";
+import { RiGithubFill } from "@remixicon/react";
 import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
@@ -8,6 +9,49 @@ import { Faq } from "./faq";
 import { ThemeSwitch } from "./theme-switch";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
+
+function MenuIcon({ open }: { open: boolean }) {
+  const reducedMotion = useReducedMotion();
+  const transition = reducedMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, duration: 0.3, bounce: 0 };
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="size-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    >
+      <m.line
+        x1="4"
+        y1="7"
+        x2="20"
+        y2="7"
+        animate={open ? { x1: 6, y1: 6, x2: 18, y2: 18 } : { x1: 4, y1: 7, x2: 20, y2: 7 }}
+        transition={transition}
+      />
+      <m.line
+        x1="4"
+        y1="12"
+        x2="20"
+        y2="12"
+        animate={open ? { x1: 12, x2: 12, opacity: 0 } : { x1: 4, x2: 20, opacity: 1 }}
+        transition={transition}
+      />
+      <m.line
+        x1="4"
+        y1="17"
+        x2="20"
+        y2="17"
+        animate={open ? { x1: 18, y1: 6, x2: 6, y2: 18 } : { x1: 4, y1: 17, x2: 20, y2: 17 }}
+        transition={transition}
+      />
+    </svg>
+  );
+}
 
 function BrandLogo({ onClick }: { onClick?: () => void }) {
   return (
@@ -99,6 +143,17 @@ export function AppHeader() {
               Arsip Ujian
             </Link>
           </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild>
+            <Link
+              to="/alumni"
+              activeProps={{
+                className: "decoration-current",
+                "aria-current": "page",
+              }}
+            >
+              Alumni
+            </Link>
+          </AlignLinkButton.Root>
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
@@ -121,9 +176,10 @@ export function AppHeader() {
             variant="neutral"
             mode="ghost"
             className="ml-auto size-11 p-2.5 sm:hidden"
-            aria-label="Buka navigasi"
+            aria-label={menuOpen ? "Tutup navigasi" : "Buka navigasi"}
+            aria-expanded={menuOpen}
           >
-            <RiMenuLine aria-hidden="true" className="size-6" />
+            <MenuIcon open={menuOpen} />
           </AlignButton.Root>
         </AlignModal.Trigger>
       </header>
@@ -143,7 +199,7 @@ export function AppHeader() {
               className="size-11 p-2.5"
               aria-label="Tutup navigasi"
             >
-              <RiCloseLine aria-hidden="true" className="size-6" />
+              <MenuIcon open={menuOpen} />
             </AlignButton.Root>
           </AlignModal.Close>
         </div>
@@ -168,6 +224,15 @@ export function AppHeader() {
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
               Arsip Ujian
+            </Link>
+          </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
+            <Link
+              to="/alumni"
+              onClick={() => setMenuOpen(false)}
+              activeProps={{ "aria-current": "page", className: "decoration-current" }}
+            >
+              Meet Our Alumni
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">

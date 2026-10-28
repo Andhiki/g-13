@@ -50,6 +50,7 @@ type TextElement =
   | "label"
   | "small"
   | "strong"
+  | "time"
   | "dt"
   | "dd";
 type TypographyProps<T extends TextElement> = ComponentPropsWithRef<T> &

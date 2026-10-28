@@ -16,8 +16,15 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Ikon hamburger menu seluler bertransisi menjadi tanda X saat navigasi dibuka
+  dan kembali menjadi hamburger saat ditutup. Animasi mengikuti preferensi reduced motion.
+
+- Halaman Meet Our Alumni menampilkan foto, angkatan, pengalaman terpilih, dan
+  pencapaian alumni Ilmu Komputer UGM, dengan tautan ke profil LinkedIn.
+
 - Waktu pembaruan terakhir arsip ujian ditampilkan bersama atribusi Himakom UGM,
-  dengan metadata terpusat yang diperbarui saat data arsip diadopsi.
+  dengan metadata terpusat yang diperbarui saat data arsip diadopsi. Pencarian mata
+  kuliah juga menemukan nama dengan satu kesalahan ketik pada kata yang dicari.
 
 - Kontrol zoom peta utama memakai tombol ikon perkecil, perbesar, dan reset ke
   tampilan awal, serta persentase zoom yang mengikuti posisi peta.
@@ -97,7 +104,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Tampilan awal hasil kuis roadmap rata kiri mengikuti posisi dan skala awal peta utama.
 
 - Halaman Arsip Ujian menampilkan atribusi “Provided by Himakom UGM” dengan
-  tautan situs Himakom di bawah judul.
+  tautan situs Himakom dan waktu pembaruan data di bawah judul. Penjelajah folder
+  memenuhi lebar layar pada ponsel tanpa padding luar.
 
 - Judul beranda diperbarui menjadi “Everything CS UGM” dan teks tombol utama
   menjadi “Buat roadmap sendiri”.
@@ -155,6 +163,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   pemuatan detail ditutup saat pilihan mata kuliah dibatalkan.
 
 #### Fixed
+
+- Membuka atau menutup detail mata kuliah dari daftar mempertahankan posisi
+  gulir.
 
 - Menutup detail mata kuliah mengembalikan posisi dan zoom peta sebelum mata
   kuliah dibuka, termasuk setelah berpindah ke mata kuliah terhubung.

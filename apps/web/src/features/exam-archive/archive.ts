@@ -2,6 +2,52 @@ import { archiveSource, examArchive } from "./catalog";
 import type { ArchiveLocation, ExamCourse, ExamPaper } from "./contracts";
 import type { ArchiveSearch } from "./search";
 
+function oneTypoApart(query: string, title: string) {
+  const left = [...query];
+  const right = [...title];
+  if (Math.abs(left.length - right.length) > 1) return false;
+
+  let i = 0;
+  let j = 0;
+  let edits = 0;
+  while (i < left.length && j < right.length) {
+    if (left[i] === right[j]) {
+      i++;
+      j++;
+    } else {
+      if (edits === 1) return false;
+      edits = 1;
+      if (left[i] === right[j + 1] && left[i + 1] === right[j]) {
+        i += 2;
+        j += 2;
+      } else if (left.length === right.length) {
+        i++;
+        j++;
+      } else if (left.length < right.length) {
+        j++;
+      } else {
+        i++;
+      }
+    }
+  }
+  return edits + left.length - i + right.length - j <= 1;
+}
+
+function matchesCourseName(name: string, query: string) {
+  const words = query.split(/\s+/);
+  if (name.includes(query)) return true;
+  const titleWords = name.match(/[\p{L}\p{N}]+/gu) ?? [];
+  return words.every((word) => {
+    const match = titleWords.findIndex(
+      (titleWord) =>
+        titleWord.includes(word) || (word.length >= 4 && oneTypoApart(word, titleWord)),
+    );
+    if (match === -1) return false;
+    titleWords.splice(match, 1);
+    return true;
+  });
+}
+
 type ArchiveEntry =
   | {
       kind: "folder";
@@ -29,7 +75,7 @@ export function browseArchive({
   if (!course) {
     const search = query.trim().toLocaleLowerCase("id");
     entries = catalog
-      .filter((entry) => entry.name.toLocaleLowerCase("id").includes(search))
+      .filter((entry) => matchesCourseName(entry.name.toLocaleLowerCase("id"), search))
       .map((entry) => ({
         kind: "folder",
         id: entry.id,

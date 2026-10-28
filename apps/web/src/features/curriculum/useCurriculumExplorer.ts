@@ -17,7 +17,11 @@ export function useCurriculumExplorer() {
 
   const updateUrl = useCallback(
     (version: CurriculumId, id: string | null) => {
-      void navigate({ search: { kurikulum: version, mk: id ?? undefined }, replace: true });
+      void navigate({
+        search: { kurikulum: version, mk: id ?? undefined },
+        replace: true,
+        resetScroll: false,
+      });
     },
     [navigate],
   );

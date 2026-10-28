@@ -81,8 +81,8 @@ export function ExamArchivePage() {
   }
 
   return (
-    <main className="mx-auto flex h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-4 py-5 text-text-strong-950 sm:px-8 sm:py-8">
-      <header className="shrink-0 space-y-2">
+    <main className="mx-auto flex h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-0 py-5 text-text-strong-950 sm:px-8 sm:py-8">
+      <header className="shrink-0 space-y-2 px-4 sm:px-0">
         <Typography as="h1" variant="title">
           Arsip Ujian
         </Typography>
@@ -98,7 +98,7 @@ export function ExamArchivePage() {
         </Typography>
       </header>
       <section className="flex min-h-0 flex-1 flex-col" aria-label="Penjelajah arsip ujian">
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-200">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y border-stroke-soft-200 sm:rounded-xl sm:border">
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-2">
             <AlignBreadcrumb.Root asChild>
               <nav aria-label="Lokasi folder" className="min-w-0">
