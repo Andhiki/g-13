@@ -244,7 +244,7 @@ export function Overlay({
       </header>
       <nav
         aria-label="Navigasi aplikasi"
-        className="fixed bottom-4 left-4 z-10 max-[1100px]:bottom-3 max-[1100px]:left-3"
+        className="fixed top-[72px] left-4 z-10 max-[1100px]:top-[102px] max-[1100px]:left-3"
       >
         <Link
           to="/exam"
