@@ -123,6 +123,7 @@ const Item = React.forwardRef<React.ComponentRef<typeof Command.Item>, ItemProps
 Item.displayName = "CommandItem";
 
 export const AlignCommandMenu = {
+  Root: Command,
   Dialog,
   DialogTitle,
   DialogDescription,

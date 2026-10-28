@@ -1,0 +1,302 @@
+{
+  "source": "https://himakom.ugm.ac.id/exam/",
+  "importedAt": "2026-10-28T05:10:46.891Z",
+  "courses": 102,
+  "folders": 297,
+  "files": 1613,
+  "writable": true,
+  "diagnostics": [
+    {
+      "source": "1bhoBDZXdoCB_FrKJZTIhGmerfSkH_YRI",
+      "message": "Review year: IMG-20120418-00091.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1bhoBDZXdoCB_FrKJZTIhGmerfSkH_YRI",
+      "message": "Review exam label: IMG-20120418-00091.jpg → unknown"
+    },
+    {
+      "source": "1Hi9s0WOTiSisNzRiMecXLGY2nW_Hp9t4",
+      "message": "Review year: IMG-20120418-00093.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1Hi9s0WOTiSisNzRiMecXLGY2nW_Hp9t4",
+      "message": "Review exam label: IMG-20120418-00093.jpg → unknown"
+    },
+    {
+      "source": "1tSKprG578xRdHHUk799WNlyqMayUU9b2",
+      "message": "Review year: UAS_Deep Learning2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1tSKprG578xRdHHUk799WNlyqMayUU9b2",
+      "message": "Review exam label: UAS_Deep Learning2.jpg → UAS"
+    },
+    {
+      "source": "1h0JH7D49jKkMhuf--yPnoLsSFKjvFXY2",
+      "message": "Review year: UAS_Deep Learning3.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1h0JH7D49jKkMhuf--yPnoLsSFKjvFXY2",
+      "message": "Review exam label: UAS_Deep Learning3.jpg → UAS"
+    },
+    {
+      "source": "1dMpL5aNSlWJfz58gwbErfCKu-j_AUETL",
+      "message": "Review exam label: Etika dan Profesi Bisnis - UAS - 2014.jpg → UAS"
+    },
+    {
+      "source": "1fuGCiUK97nHvsGKV1uoG_6DxvgMGkbpO",
+      "message": "Review exam label: Etika dan Profesi Bisnis - UAS - 2014(1).JPG → UAS"
+    },
+    {
+      "source": "1rNbaGUKA1V6YFIOW4LghScmflqEhEI1m",
+      "message": "Review exam label: Etika dan Profesi Bisnis - UAS - 2015.JPG → UAS"
+    },
+    {
+      "source": "12AowMs0YGMq9iy8DjQlQbsMfG1xTiA5w",
+      "message": "Review exam label: Etika dan Profesi Bisnis - UAS - 2016.jpg → UAS"
+    },
+    {
+      "source": "1jWLQF9d5ofIuozzXBlW8X9bvxRUDtC2s",
+      "message": "Review exam label: Etika dan Profesi Bisnis - UAS - 2018.jpg → UAS"
+    },
+    {
+      "source": "1D3VjG2POSsaQGBbcpynszIZK17XUbXVK",
+      "message": "Review year: Jaringan Komputer - UAS - 206 - IUP.JPG → Tanpa tahun"
+    },
+    {
+      "source": "1cLvum5K3g9-V2yBlacRebd-tPqXDC7PV",
+      "message": "Review year: Jaringan Komputer - UAS.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1XarrWNTEAE4lGqteE5mVCjNZ1CRydigL",
+      "message": "Review year: Jaringan Komputer - UAS(2).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1iffETa5Vd6lxbkfqkJIvlpJtyfijWmgU",
+      "message": "Review year: UAS jarkom.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1u2Ad3DLXMBFCCnHXUlBsWi2mEyLyZR7M",
+      "message": "Review year: Integral dan persamaan differensial KOM.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1qL2Q8gdIAMB02GzjBv5cW9L2GF0CQkax",
+      "message": "Review exam label: PEMROGRAMAN 2 - UTS - 2019 - REG B.pdf → UTS"
+    },
+    {
+      "source": "13FVE40SYQRGobBJsr-ZZk_4ekG1Y7vKP",
+      "message": "Review year: UAS Probabilitas dan Stokastika.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1JjT6d913uZFZSg1Lj0kAViccYsKTMxKz",
+      "message": "Review year: UTS Probabilitas dan Stokastika.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1lti2XHrDHMa_WBjqrSqy8h6pYiJXgAos",
+      "message": "Review exam label: SOAL + JAWABAN 2009-2011.pdf → unknown"
+    },
+    {
+      "source": "1TVo1ebjh9fzNNw7X9hzPGKSMr8yKTrEC",
+      "message": "Review year: ADA2 UAS 13 HAL. 1.jpg → Tanpa tahun"
+    },
+    {
+      "source": "15ZM47EleCeT5F9EOvIMhvVSk1ybAIvLv",
+      "message": "Review year: ADA2 UAS 13 HAL. 2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1PzYxfHv9LApvdM_7A66WYpUdEaCahSZD",
+      "message": "Review year: ADA2 UAS 13 HAL. 2(1).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1-bMBgWo3mZrGD40yUXtYckybp3pGiaNA",
+      "message": "Review year: ADA2 UAS 15.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1FQOLd1QcJcfuoSyhemwLNdsw6g04VV81",
+      "message": "Review year: ADA2 UAS 15.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1mvhLJYBfyAdAVTZhsiYRI2ac6jR2BAg6",
+      "message": "Review year: Audit dan Kontrol IT - UAS.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1aHdJrNXqdn1mYFYJNwf2xZtyYWhT8eBH",
+      "message": "Review year: Audit dan Kontrol IT - UAS.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1S-AxZlbqcmIIgCnQPpY2PLAEFcIw7qQP",
+      "message": "Review year: Audit dan Kontrol IT - UAS(1).pdf → Tanpa tahun"
+    },
+    {
+      "source": "1WoIclpF03MSV7bvsdOA-k-3JmZ6zeIgv",
+      "message": "Review year: Audit dan Kontrol IT - UTS.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1rQhpetKh7MwDC3GVktFlbHjSRWTs3ufY",
+      "message": "Review year: Audit dan Kontrol IT - UTS(2).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1_hu0hiHSZBbxMnqitEqk62cdiPDqFqjB",
+      "message": "Review year: Audit dan Kontrol IT - UTS(3).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1pj2fXE3z_VbpfIAG2EGZ4L5CHxAz8TUa",
+      "message": "Review year: Audit dan kontrol it.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1ZLmqLiRweXxJBcNYkiR-ntvH78qQih2B",
+      "message": "Review year: AUDIT UTS- MARDANI (1).JPG → Tanpa tahun"
+    },
+    {
+      "source": "1bE4MUSLgmA_UaQKcx6tgZDbO3ykDlFV5",
+      "message": "Review year: AUDIT UTS- MARDANI (2).JPG → Tanpa tahun"
+    },
+    {
+      "source": "1JIvOTdwwM9QGBaQExbLe5w6679Gct7vA",
+      "message": "Review year: AUDIT UTS- MARDANI (3).JPG → Tanpa tahun"
+    },
+    {
+      "source": "1O3yzBJqYoeuDe8CSZo126ImUfym56nGN",
+      "message": "Review year: UAS AAK.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1P3m4XqGuy7DJ4fiQrRVuZS7ngz7ih9lw",
+      "message": "Review year: ADA UTS 14.JPG → Tanpa tahun"
+    },
+    {
+      "source": "1pCb7TWfszyEQaBGs6Iysm87G9Ozrmv1z",
+      "message": "Review year: UAS KIMIA CSA.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1J6dbX_6aB0LbX5YWk9Ub7jC9lNb-lBQh",
+      "message": "Review year: UAS_Metopen2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1op92QQufx9kDkFVtMaZk92FL9nQGCK42",
+      "message": "Review year: UTS_Metopen.jpg → Tanpa tahun"
+    },
+    {
+      "source": "14eXLzrh-OFfMWEve5x4heKWp45fOmUOW",
+      "message": "Review year: Pengembangan Perangkat Lunak Scalable_UTS_KOMA.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1kKufmSuGE8DgkJniQhW47egxuWZ4ma66",
+      "message": "Review exam label: STBI-UTS_UAS-2014.pdf → UTS"
+    },
+    {
+      "source": "1XieM30YYrL-Opz_ihDn5IO5uM7CoHYzH",
+      "message": "Review year: Kriptografi Keamanan Informasi_UTS_KOMA.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1Dk5AFW8kPYgIvAdS5F-TB9QkJkbeW0Og",
+      "message": "Review year: UAS_MRPL1.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1zu_nZHYFEd2F85DlE8HL4w_BTsK74xQm",
+      "message": "Review year: UAS_MRPL2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1paNSiPYOOK6bTJDWvqcnJA7o_A8HhgAR",
+      "message": "Review year: UAS_MRPL3.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1sba-u3mPWiMvA_zNnizGkBDCYKnxEh81",
+      "message": "Review year: Metode Rekayasa Perangkat Lunak - UTS - KOMA.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1MusgCrUhxeBKhWkGm2SemF8VUgbFyVm-",
+      "message": "Review exam label: Pembelajaran Mesin - UTS - 2020 - REG B.pdf → UTS"
+    },
+    {
+      "source": "11iHQH0nssnhPlXtzjIJy3SJDEV2UH7go",
+      "message": "Review year: Pengembangan Perangkat Lunak - UTS_UAS - 2010_2011.pdf → Tanpa tahun"
+    },
+    {
+      "source": "11iHQH0nssnhPlXtzjIJy3SJDEV2UH7go",
+      "message": "Review exam label: Pengembangan Perangkat Lunak - UTS_UAS - 2010_2011.pdf → UTS"
+    },
+    {
+      "source": "1zFeZ8SuJ50RFONjYrBtofzhLdy8_jN2n",
+      "message": "Review year: UAS_PPOLA.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1VMmf0EkAkx1zI6x7ULMbuqAMB2EO7PSS",
+      "message": "Review year: UAS_PRPL1.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1u6QeWGNZM2rlQ-mz_ouphPibP4Kogaqc",
+      "message": "Review year: UAS_PRPL2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1U0qG9x2iIYweIBJeJj_lcdV4DntWKuyL",
+      "message": "Review year: UAS_WRPL1.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1PD5QjWcNSYaq-2oYSerqc479LbBNPzin",
+      "message": "Review year: UAS_WRPL2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1GiEWbeJc9yN_7YdTP0ayApK1Q2ydU_xa",
+      "message": "Review year: WIRPL_UTS_KOMA.pdf → Tanpa tahun"
+    },
+    {
+      "source": "14DfGnThT2u1d9mZspimXCEso-nBQj8AG",
+      "message": "Review year: IMK UAS-16 (2).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1oXwWV4k-YK6MCPgw4xVoU4ES6nuUUCEf",
+      "message": "Review year: IMK UAS-16 (3).jpg → Tanpa tahun"
+    },
+    {
+      "source": "1Rylld7Lt9u5IF76Q1fcQWdz3RI_vMx3v",
+      "message": "Review year: UAS AI.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1m4XcqI-7VMqskrjTSkvJEuBxVuiqT-Hn",
+      "message": "Review year: Komputasi Awan_UTS_KOM (1).pdf → Tanpa tahun"
+    },
+    {
+      "source": "1kQIYrJkPMd9cbYkMSYdPGk9NP1lZIJdr",
+      "message": "Review year: UAS_LCI.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1kQIYrJkPMd9cbYkMSYdPGk9NP1lZIJdr",
+      "message": "Review exam label: UAS_LCI.jpg → UAS"
+    },
+    {
+      "source": "1hpaDgXLDm9NA7sUI0KwJJSiOom2QoTbc",
+      "message": "Review year: UAS_LCI2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1hpaDgXLDm9NA7sUI0KwJJSiOom2QoTbc",
+      "message": "Review exam label: UAS_LCI2.jpg → UAS"
+    },
+    {
+      "source": "1Nm-49l_KiYbo4cNZd8fZ8ZVqkLEGGH8b",
+      "message": "Review exam label: PEldig-UK-2014.pdf → unknown"
+    },
+    {
+      "source": "1I7PEhpIDcytZTC76ryC3URYbYbgFbJ3j",
+      "message": "Review year: UAS_PPKD.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1SoBw3AwQBMBO-EL-Jx_UZZ3MsTpCKA0N",
+      "message": "Review year: Jawaban UTS SI.pdf → Tanpa tahun"
+    },
+    {
+      "source": "1RbtZrK6sgt4d8D5P98GrqNc-PpfKo1y-",
+      "message": "Review year: UAS_BO.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1OSr-kqcDEO9-wQvgbwCBbMOWLmtUp9n6",
+      "message": "Review year: UAS_BO2.jpg → Tanpa tahun"
+    },
+    {
+      "source": "1cY5BnILK8ptjH9RYof9S2Uoe3IzRtPPH",
+      "message": "Review year: UAS_BO3.jpg → Tanpa tahun"
+    },
+    {
+      "source": "141dKY6f5CX7Uvsmbi6peyV85BLOCMdpu",
+      "message": "Review year: Bahasa Otomata_UTS_KOMA.pdf → Tanpa tahun"
+    }
+  ]
+}

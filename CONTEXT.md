@@ -4,6 +4,12 @@ Proyek komunitas publik untuk membantu mahasiswa S1 Ilmu Komputer UGM memahami a
 
 ## Language
 
+**Arsip ujian**:
+Kumpulan berkas ujian dari arsip Himakom yang dikelompokkan berdasarkan mata kuliah, lalu tahun, dengan berkas UTS dan UAS di dalamnya. Arsip ini berlaku lintas versi kurikulum dan mempertahankan nama mata kuliah serta label tahun dari sumber.
+
+**UTS / UAS**:
+Ujian Tengah Semester dan Ujian Akhir Semester; jenis ujian yang membedakan berkas dalam arsip ujian.
+
 **Roadmap kuliah**:
 Rencana perjalanan kuliah per semester berdasarkan versi kurikulum, peminatan, status kelas internasional, dan pilihan kegiatan mahasiswa. Setiap mata kuliah ditampilkan secara individual beserta hubungan prasyaratnya, dengan pilihan target selesai 7 atau 8 semester.
 _Avoid_: Peta kurikulum, KRS
