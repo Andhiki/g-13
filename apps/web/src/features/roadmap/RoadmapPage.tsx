@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, useEffect, useRef } from "react";
+import { DeferredContent } from "../../ui/deferred-content";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { Route } from "../../routes/roadmap";
 import { firstUnanswered } from "./quiz";
@@ -41,7 +42,7 @@ export function RoadmapPage() {
   const restart = () => update(validateRoadmapSearch({}));
   if (result)
     return (
-      <Suspense
+      <DeferredContent
         fallback={
           <p role="status" className="p-5">
             Memuat roadmap…
@@ -49,7 +50,7 @@ export function RoadmapPage() {
         }
       >
         <RoadmapResult answers={answers} update={update} restart={restart} />
-      </Suspense>
+      </DeferredContent>
     );
   return (
     <div className="flex min-h-dvh flex-col bg-bg-white-0 text-text-strong-950">

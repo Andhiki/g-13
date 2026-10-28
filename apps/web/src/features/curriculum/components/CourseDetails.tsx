@@ -1,23 +1,31 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, useEffect, useState } from "react";
+import { DeferredContent } from "../../../ui/deferred-content";
 import type { CourseDetailsProps } from "./CourseDetailsPanel";
 
 const CourseDetailsPanel = lazy(() =>
-  import("./CourseDetailsPanel").then((module) => ({ default: module.CourseDetailsPanel })),
+  import("./CourseDetailsPanel").then((module) => ({
+    default: function LoadedDetails({
+      onLoaded,
+      ...props
+    }: CourseDetailsProps & { onLoaded: (loaded: boolean) => void }) {
+      useEffect(() => onLoaded(true), [onLoaded]);
+      return <module.CourseDetailsPanel {...props} />;
+    },
+  })),
 );
 
 export function CourseDetails(props: CourseDetailsProps) {
-  const [opened, setOpened] = useState(false);
-  if (props.course && !opened) setOpened(true);
-  if (!props.course && !opened) return null;
+  const [loaded, setLoaded] = useState(false);
+  if (!props.course && !loaded) return null;
   return (
-    <Suspense
+    <DeferredContent
       fallback={
         <p role="status" className="fixed bottom-4 left-4 z-50 rounded-lg bg-bg-white-0 p-4">
           Memuat detail mata kuliah…
         </p>
       }
     >
-      <CourseDetailsPanel {...props} />
-    </Suspense>
+      <CourseDetailsPanel {...props} onLoaded={setLoaded} />
+    </DeferredContent>
   );
 }

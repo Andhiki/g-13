@@ -9,6 +9,7 @@ export function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
+      (event.shiftKey && event.key !== "/") ||
       (event.target instanceof Element &&
         event.target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'))
     )
