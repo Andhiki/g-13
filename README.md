@@ -26,12 +26,14 @@ Bun 1.4.3 digunakan untuk mengelola dependensi dan menjalankan skrip.
 Node.js 22.12+ diperlukan oleh toolchain TanStack Start.
 
     bun install --frozen-lockfile
+    bun run build:packages
     bun run dev
 
 Workspace Bun dikoordinasikan oleh Turborepo. Aplikasi ada di `apps/web/`;
 `packages/curriculum/` menyediakan data dan DAL bertipe yang dibangun dengan tsdown.
-`bun run dev` membangun paket terlebih dahulu dan memantau perubahan; aplikasi
-selalu memakai JavaScript dan deklarasi dari `dist`, termasuk saat pengembangan.
+`bun run dev` hanya menjalankan server pengembangan aplikasi. Jalankan
+`bun run build:packages` secara terpisah sebelum memulai dan setelah mengubah paket;
+aplikasi memakai JavaScript dan deklarasi dari `dist`, termasuk saat pengembangan.
 
 Aplikasi memakai TanStack Start dan TanStack Router untuk routing berbasis file,
 validasi parameter pencarian, dan server-side rendering. Tailwind CSS diproses

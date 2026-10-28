@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "./alignui.css";
 
+:root {
+  --app-header-height: 64px;
+}
+
 /* Sonic mask reveal adapted from portfolio-magic's ModeToggle. */
 html.theme-transition::view-transition-old(root),
 html.theme-transition::view-transition-new(root) {

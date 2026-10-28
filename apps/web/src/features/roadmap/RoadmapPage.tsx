@@ -58,7 +58,7 @@ export function RoadmapPage() {
       </DeferredContent>
     );
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-white-0 text-text-strong-950">
+    <div className="flex min-h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950">
       <header className="flex items-center justify-end px-5 py-4 sm:px-6">
         <ThemeSwitch />
       </header>

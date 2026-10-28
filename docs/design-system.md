@@ -222,3 +222,9 @@ the shared AlignUI modal.
 The main "Buat roadmap kuliah" CTA uses `apps/web/src/ui/fancy-button.tsx`, adapted from
 [AlignUI FancyButton](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/fancy-button.tsx).
 It keeps the upstream medium primary styling and uses Radix Slot to preserve link semantics.
+
+The shared fixed app header lives in `ui/app-header.tsx`, mounted by the root route.
+Its height is `--app-header-height`; graph stages and overlays start below it.
+Navigation uses [AlignUI Link Button](https://www.alignui.com/docs/v1.2/ui/link-button)
+in `ui/link-button.tsx`, preserving default variants and Slot composition. Unused Icon
+and recursive child cloning are omitted. The roadmap quiz action uses AlignUI Button.

@@ -162,15 +162,15 @@ kept. Run the same checks as for an addition.
 
 ## Build boundary
 
-Run commands from the repository root. `bun run dev` uses Turbo watch to build
-package dependencies before starting Vite and rebuilds them before restarting the
-app after package changes. Production builds use the same tsdown output. Both
+Run commands from the repository root. `bun run build:packages` builds packages
+separately; run it before starting development and after changing package source.
+`bun run dev` only starts app development servers and does not build or watch packages.
+Production builds use the same tsdown output. Both
 JavaScript and TypeScript exports resolve to `dist`; generated artifacts are
 ignored by Git. Declaration generation uses isolated declarations with Oxc because
 the installed TypeScript 7 compiler does not provide the classic compiler API.
 
-See the official [Turbo task configuration](https://turborepo.dev/docs/reference/configuration),
-[Turbo watch documentation](https://turborepo.dev/docs/reference/watch), and
+See the official [Turbo task configuration](https://turborepo.dev/docs/reference/configuration) and
 [tsdown declaration documentation](https://tsdown.dev/options/dts).
 
 The package build's `precompute-curricula` plugin normalizes runtime curriculum

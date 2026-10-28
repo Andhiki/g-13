@@ -9,7 +9,7 @@ aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
 1. Cari issue atau PR serupa. Untuk perubahan besar, diskusikan pendekatannya di
    GitHub Issues terlebih dahulu. Koreksi kecil boleh langsung melalui PR.
 2. Fork repo, clone fork, dan buat branch dari `main` terbaru.
-3. Jalankan `bun install --frozen-lockfile`, lalu `bun run dev`.
+3. Jalankan `bun install --frozen-lockfile`, `bun run build:packages`, lalu `bun run dev`.
    Gunakan versi Bun di `package.json` dan Node.js 22.12+.
 4. Buat perubahan dengan scope jelas; jangan sertakan hasil tes, kredensial,
    atau perubahan format yang tidak berkaitan.

@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Header tetap di seluruh aplikasi dengan logo OmahTI, tautan peta dan Arsip Ujian,
+  serta tombol Kuis roadmap. Kontrol peta tetap berada di overlay di bawah header.
+
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
   memuat seluruh 102 mata kuliah dan 1.613 entri berkas dari arsip Himakom UGM,

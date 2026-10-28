@@ -8,7 +8,7 @@ export function RoadmapLoading() {
   return (
     <main
       role="status"
-      className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-bg-white-0 px-5 text-center text-text-strong-950"
+      className="flex min-h-[calc(100dvh-var(--app-header-height))] flex-col items-center justify-center gap-4 bg-bg-white-0 px-5 text-center text-text-strong-950"
     >
       <svg viewBox="0 0 240 152" className="w-60 max-w-full" aria-hidden="true">
         <path

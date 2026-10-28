@@ -30,8 +30,8 @@ export function CurriculumPage() {
     <div
       className={
         view === "map"
-          ? "flex h-dvh w-full flex-col overflow-hidden bg-bg-white-0"
-          : "min-h-dvh w-full bg-bg-white-0"
+          ? "flex h-[calc(100dvh-var(--app-header-height))] w-full flex-col overflow-hidden bg-bg-white-0"
+          : "min-h-[calc(100dvh-var(--app-header-height))] w-full bg-bg-white-0"
       }
     >
       <Overlay
@@ -74,8 +74,8 @@ export function CurriculumPage() {
         data-map-stage={view === "map" ? "" : undefined}
         className={
           view === "map"
-            ? "fixed inset-0 min-h-dvh overflow-hidden bg-bg-weak-25 text-text-strong-950"
-            : "min-h-dvh text-text-strong-950"
+            ? "fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden bg-bg-weak-25 text-text-strong-950"
+            : "min-h-[calc(100dvh-var(--app-header-height))] text-text-strong-950"
         }
       >
         {view === "map" ? (

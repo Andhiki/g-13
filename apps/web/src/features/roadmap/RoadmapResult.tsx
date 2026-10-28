@@ -71,8 +71,8 @@ export function RoadmapResult({
     }
   }
   return (
-    <div className="h-dvh w-full overflow-hidden bg-bg-weak-25 text-text-strong-950">
-      <main className="fixed inset-0 overflow-hidden">
+    <div className="h-[calc(100dvh-var(--app-header-height))] w-full overflow-hidden bg-bg-weak-25 text-text-strong-950">
+      <main className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden">
         <RoadmapGraph
           plan={plan}
           target={answers.lulus}

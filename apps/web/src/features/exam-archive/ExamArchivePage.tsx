@@ -1,8 +1,6 @@
 import { Fragment, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { defaultCurriculumId } from "@g13/curriculum";
 import {
-  RiArrowLeftLine,
   RiArrowUpLine,
   RiCheckLine,
   RiCloseLine,
@@ -75,16 +73,10 @@ export function ExamArchivePage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-5xl flex-col gap-6 px-4 py-5 text-text-strong-950 sm:px-8 sm:py-8">
-      <header className="flex items-center justify-between gap-4">
-        <AlignButton.Root asChild variant="neutral" mode="stroke" size="medium">
-          <Link to="/" search={{ kurikulum: defaultCurriculumId }}>
-            <RiArrowLeftLine className="size-4" aria-hidden="true" />
-            Peta kurikulum
-          </Link>
-        </AlignButton.Root>
+    <main className="mx-auto flex min-h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-4 py-5 text-text-strong-950 sm:px-8 sm:py-8">
+      <div className="flex justify-end">
         <ThemeSwitch />
-      </header>
+      </div>
       <Typography as="h1" variant="title">
         Arsip Ujian
       </Typography>

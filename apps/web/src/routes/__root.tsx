@@ -1,4 +1,5 @@
 import { defaultCurriculumId } from "@g13/curriculum";
+import { AppHeader } from "../ui/app-header";
 import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -27,7 +28,7 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
-  component: Outlet,
+  component: AppLayout,
   notFoundComponent: () => (
     <main>
       <Typography as="h1" variant="title">
@@ -39,6 +40,15 @@ export const Route = createRootRoute({
     </main>
   ),
 });
+
+function AppLayout() {
+  return (
+    <div className="min-h-dvh pt-[var(--app-header-height)]">
+      <AppHeader />
+      <Outlet />
+    </div>
+  );
+}
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (

@@ -208,7 +208,7 @@ export function RoadmapGraph({
   return (
     <section
       ref={stage}
-      className="fixed inset-0 h-dvh overflow-hidden bg-bg-weak-25"
+      className="absolute inset-0 overflow-hidden bg-bg-weak-25"
       aria-label="Grafik roadmap kuliah"
     >
       <EdgeRouting>

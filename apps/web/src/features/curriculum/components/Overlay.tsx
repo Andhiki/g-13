@@ -2,8 +2,7 @@ import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
-import { AlignButton, buttonVariants } from "../../../ui/button";
-import { Link } from "@tanstack/react-router";
+import { AlignButton } from "../../../ui/button";
 import { AlignDrawer } from "../../../ui/drawer";
 
 const compactQuery = "(width < 1100px)";
@@ -12,33 +11,6 @@ function subscribeToCompactControls(onChange: () => void) {
   const query = window.matchMedia(compactQuery);
   query.addEventListener("change", onChange);
   return () => query.removeEventListener("change", onChange);
-}
-
-function BrandLogo() {
-  return (
-    <a
-      href="https://www.omahti.web.id/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="OmahTI, pembuat peta kurikulum"
-      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
-    >
-      <img
-        src="/brand/omahti-light.svg"
-        alt="OmahTI"
-        width={54}
-        height={21}
-        className="h-[21px] w-auto dark:hidden"
-      />
-      <img
-        src="/brand/omahti-dark.svg"
-        alt="OmahTI"
-        width={54}
-        height={21}
-        className="hidden h-[21px] w-auto dark:block"
-      />
-    </a>
-  );
 }
 
 type FilterCopy = { title: string; description: string };
@@ -214,10 +186,10 @@ export function Overlay({
     <>
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-[9] h-28 bg-linear-to-b from-bg-white-0 from-40% via-bg-white-0/90 via-60% to-transparent max-[1100px]:h-32"
+        className="pointer-events-none fixed inset-x-0 top-[var(--app-header-height)] z-[9] h-28 bg-linear-to-b from-bg-white-0 from-40% via-bg-white-0/90 via-60% to-transparent max-[1100px]:h-32"
       />
-      <header className="pointer-events-none fixed inset-x-4 top-[14px] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-3 max-[1100px]:flex-col max-[1100px]:gap-2">
-        <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">{home ?? <BrandLogo />}</div>
+      <div className="pointer-events-none fixed inset-x-4 top-[calc(var(--app-header-height)+14px)] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-[calc(var(--app-header-height)+12px)] max-[1100px]:flex-col max-[1100px]:gap-2">
+        <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">{home}</div>
         <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
           {navigation}
         </div>
@@ -241,18 +213,7 @@ export function Overlay({
             </DesktopFilters>
           )}
         </div>
-      </header>
-      <nav
-        aria-label="Navigasi aplikasi"
-        className="fixed top-[72px] left-4 z-10 max-[1100px]:top-[102px] max-[1100px]:left-3"
-      >
-        <Link
-          to="/exam"
-          className={buttonVariants({ variant: "neutral", mode: "stroke", size: "medium" })}
-        >
-          Arsip Ujian
-        </Link>
-      </nav>
+      </div>
       <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">
         {viewControl}
       </div>
