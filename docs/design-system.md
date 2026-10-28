@@ -76,10 +76,9 @@ the academic prerequisite-to-dependent direction.
 
 ## Verification
 
-See [Testing](testing.md) for the current Bun and browser suites. Historical migration tickets
-and their temporary verification blockers were removed after implementation. Browser tests cover
-both curricula on desktop and phones, including course clicks, relationships, search, list navigation,
-and saved themes. The production build retains bundle-size and sourcemap warnings.
+See [Testing](testing.md) for the current Bun suite. Historical migration tickets
+and their temporary verification blockers were removed after implementation. The
+production build retains bundle-size and sourcemap warnings.
 
 ## Overlay control refinements
 

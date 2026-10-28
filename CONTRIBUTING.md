@@ -13,9 +13,8 @@ aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
    Gunakan versi Bun di `package.json` dan Node.js 22.12+.
 4. Buat perubahan dengan scope jelas; jangan sertakan hasil tes, kredensial,
    atau perubahan format yang tidak berkaitan.
-5. Jalankan `bun run check` dan `bun run build`. Untuk perubahan interaksi UI,
-   instal Chromium dengan `bunx playwright install chromium`, lalu jalankan
-   `bun run test:browser`. Jelaskan pemeriksaan yang belum dijalankan.
+5. Jalankan `bun run check` dan `bun run build`. Jelaskan pemeriksaan yang
+   belum dijalankan.
 6. Buka PR ke `main` dengan alasan perubahan, cara verifikasi, dan screenshot
    bila tampilan berubah. Maintainer meninjau sebelum merge; tidak ada jaminan
    waktu respons.
@@ -53,7 +52,7 @@ akademik yang ambigu. Pertahankan asal data dan tambahkan tes yang relevan.
   per kurikulum. `output/data/` menyimpan bukti audit; `output/sources/` menyimpan
   dokumen sumber. Ikuti [panduan impor](docs/curriculum-import.md); jangan simpan
   skrip ekstraksi PDF sekali pakai. Perubahan sumber harus menyertakan provenance.
-- `*.test.ts`: tes Bun; `apps/web/e2e/`: tes Playwright.
+- `*.test.ts`: tes Bun untuk perilaku data dan logika aplikasi.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run fmt` dan
   `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru

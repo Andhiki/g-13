@@ -1,4 +1,4 @@
-import { chromium } from "@playwright/test";
+import { chromium } from "playwright";
 
 const ports = process.argv.slice(2).map(Number);
 if (

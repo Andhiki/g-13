@@ -145,16 +145,16 @@ strings and absent course/syllabus lookups return `undefined`.
    `defaultCurriculumId` only when deliberately selecting the default edition.
 4. Keep all web imports at `@g13/curriculum`. Do not add source aliases, TypeScript
    paths into package source, development source exports, or declaration maps.
-5. Run `bun run check`, `bun run build`, and `bun run test:browser`. Inspect both
-   curriculum exploration and roadmap results, including source warnings.
+5. Run `bun run check` and `bun run build`. Inspect both curriculum exploration
+   and roadmap results, including source warnings.
 6. Update extraction notes and add a sourced `CHANGELOG.md` entry for new editions
    or academic corrections. Do not ship temporary extraction scripts.
 
 ## Remove an edition
 
 Remove its registry type/value entries and delete its slice. If it was the default,
-choose another registered edition. Delete or update edition-specific app/browser
-fixtures and any visual calibration for that edition. Keep historical sources and
+choose another registered edition. Delete or update edition-specific app fixtures
+and any visual calibration for that edition. Keep historical sources and
 audit evidence unless removal is explicitly requested. Registry-driven selectors
 stop offering the removed edition; invalid explorer URLs fall back to the default,
 and invalid roadmap URLs resume curriculum selection. No compatibility alias is

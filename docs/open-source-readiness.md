@@ -9,7 +9,7 @@ atau audit keamanan lengkap. Perubahan lokal belum otomatis mengubah repo GitHub
 - Lisensi MIT untuk kode/dokumentasi asli, beserta metadata paket dan aturan
   kontribusi yang selaras. Pemilik proyek memilih MIT pada 26 Oktober 2026.
 - Template issue bug/koreksi data/usulan fitur dan template PR.
-- CI untuk lint, format, tipe, unit test, build, dan browser test. Menggunakan
+- CI untuk lint, format, tipe, unit test, dan build. Menggunakan
   `pull_request`, token baca saja, tanpa kredensial deploy, dengan actions yang
   dipin ke commit. CI harus berhasil di GitHub sebelum dijadikan required check.
 - Dependabot mingguan untuk GitHub Actions. Pembaruan paket Bun tetap dilakukan
@@ -48,9 +48,8 @@ atau audit keamanan lengkap. Perubahan lokal belum otomatis mengubah repo GitHub
    Dependabot alerts/security updates. Tinjau temuan secret scanning yang ada.
    Lihat [panduan keamanan GitHub](https://docs.github.com/en/code-security/getting-started/quickstart-for-securing-your-repository).
 5. **Settings → Rules → Rulesets:** lindungi `main` dari force push dan penghapusan,
-   wajibkan PR, diskusi terselesaikan, dan check `Quality checks` serta
-   `Browser tests` setelah CI pertama
-   muncul. Jika ada maintainer kedua, wajibkan satu approval dan batalkan approval
+   wajibkan PR, diskusi terselesaikan, dan check `Quality checks` setelah CI
+   pertama muncul. Jika ada maintainer kedua, wajibkan satu approval dan batalkan approval
    lama saat kode berubah. Pilih aturan review yang tetap memungkinkan maintainer
    tunggal mengelola proyek. Batasi bypass ke kebutuhan nyata.
    [Panduan GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches).
@@ -77,8 +76,8 @@ kontak privat tetap memerlukan pemilik proyek.
 - `bun run check` berhenti di formatter: 66 file di luar perubahan persiapan ini
   dilaporkan bermasalah. Tidak dilakukan pemformatan massal.
 - YAML konfigurasi baru berhasil diparse; tautan dokumen lokal baru diperiksa.
-- Browser test dan eksekusi GitHub Actions belum dijalankan. Build masih memberi
-  warning ukuran chunk dan sourcemap CSS.
+- Pada tanggal audit, browser test dan eksekusi GitHub Actions belum dijalankan.
+  Build masih memberi warning ukuran chunk dan sourcemap CSS.
 - Runtime Bun lokal melaporkan `1.4.0-canary.1`, sedangkan `packageManager`
   menetapkan `1.4.3`; hasil lokal tidak membuktikan eksekusi dengan versi CI.
 - Audit seluruh riwayat secret, audit lisensi seluruh dependensi, izin materi

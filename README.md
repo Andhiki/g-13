@@ -69,9 +69,7 @@ Pemeriksaan lokal:
 
 `check` menjalankan Oxlint, pemeriksaan format Oxfmt, TypeScript, dan tes Bun.
 Gunakan `bun run test` untuk menjalankan tes data dan perilaku kurikulum.
-Gunakan `bun run test:browser` untuk tes interaksi browser; instal Chromium
-dengan `bunx playwright install chromium` terlebih dahulu. Cakupan dan cara
-menjalankannya ada di [docs/testing.md](docs/testing.md).
+Rincian cakupan tes ada di [docs/testing.md](docs/testing.md).
 Gunakan `bun run fmt` untuk memformat kode dan konfigurasi aplikasi, atau
 `bun run lint:fix` untuk menerapkan perbaikan lint otomatis.
 Dataset, dokumen sumber, dan laporan audit tidak termasuk dalam cakupan formatter.

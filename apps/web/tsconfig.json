@@ -13,5 +13,5 @@
     "jsx": "react-jsx",
     "strict": true
   },
-  "include": ["src", "scripts", "vite.config.ts", "e2e", "playwright.config.ts"]
+  "include": ["src", "scripts", "vite.config.ts"]
 }

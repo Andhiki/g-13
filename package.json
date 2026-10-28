@@ -18,8 +18,7 @@
     "fmt": "turbo run fmt",
     "fmt:check": "turbo run fmt:check",
     "check": "turbo run lint fmt:check typecheck test",
-    "test": "turbo run test",
-    "test:browser": "turbo run test:browser --filter=@g13/web --"
+    "test": "turbo run test"
   },
   "devDependencies": {
     "turbo": "^2.11.10"
