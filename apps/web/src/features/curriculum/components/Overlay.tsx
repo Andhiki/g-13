@@ -157,7 +157,6 @@ function DesktopFilters({
 
 export function Overlay({
   navigation,
-  appearance,
   search,
   viewControl,
   children,
@@ -167,7 +166,6 @@ export function Overlay({
   filtersInToolbar = false,
 }: {
   navigation: ReactNode;
-  appearance: ReactNode;
   search: ReactNode;
   viewControl: ReactNode;
   children: ReactNode;
@@ -199,7 +197,6 @@ export function Overlay({
           >
             {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
-            <div className="pointer-events-auto shrink-0">{appearance}</div>
             {filtersInToolbar && !compact && (
               <div className="order-3 size-10 shrink-0" aria-hidden="true" />
             )}

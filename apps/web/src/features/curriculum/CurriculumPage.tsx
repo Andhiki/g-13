@@ -1,6 +1,5 @@
 import { Typography } from "../../ui/typography";
 import { useCallback, useState, type CSSProperties } from "react";
-import { ThemeSwitch } from "../../ui/theme-switch";
 import { CourseDetails } from "./components/CourseDetails";
 import { ChoiceGroupFilter, CurriculumVersionFilter } from "./components/CourseFilters";
 import { CourseList } from "./components/CourseList";
@@ -44,7 +43,6 @@ export function CurriculumPage() {
           />
         }
         viewControl={<ViewSwitch view={view} onViewChange={explorer.setView} />}
-        appearance={<ThemeSwitch />}
         search={
           <CourseSearch
             key={curriculum}

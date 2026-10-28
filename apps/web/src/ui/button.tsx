@@ -10,7 +10,7 @@ export const buttonVariants = tv({
     "disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:ring-transparent",
   ],
   variants: {
-    variant: { primary: "", neutral: "", error: "" },
+    variant: { primary: "", neutral: "", "neutral-inverse": "", error: "" },
     mode: {
       filled: "",
       stroke: "ring-1 ring-inset",
@@ -54,6 +54,12 @@ export const buttonVariants = tv({
       mode: "filled",
       class:
         "bg-bg-strong-950 text-text-white-0 hover:bg-bg-surface-800 focus-visible:shadow-button-important-focus",
+    },
+    {
+      variant: "neutral-inverse",
+      mode: "filled",
+      class:
+        "bg-static-white text-static-black hover:bg-neutral-100 focus-visible:shadow-button-important-focus",
     },
     {
       variant: "neutral",

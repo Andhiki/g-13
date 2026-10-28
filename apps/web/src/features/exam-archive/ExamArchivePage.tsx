@@ -18,7 +18,6 @@ import { AlignBadge } from "../../ui/badge";
 import { AlignButton, buttonVariants } from "../../ui/button";
 import { AlignCommandMenu } from "../../ui/command-menu";
 import { AlignModal } from "../../ui/modal";
-import { ThemeSwitch } from "../../ui/theme-switch";
 import { Typography } from "../../ui/typography";
 import { browseArchive, paperLinks, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
@@ -74,9 +73,6 @@ export function ExamArchivePage() {
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-4 py-5 text-text-strong-950 sm:px-8 sm:py-8">
-      <div className="flex justify-end">
-        <ThemeSwitch />
-      </div>
       <Typography as="h1" variant="title">
         Arsip Ujian
       </Typography>

@@ -4,7 +4,6 @@ import { Typography } from "../../ui/typography";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiShareLine, RiCheckLine, RiRestartLine } from "@remixicon/react";
-import { ThemeSwitch } from "../../ui/theme-switch";
 import { AlignModal } from "../../ui/modal";
 import { Overlay } from "../curriculum/components/Overlay";
 import { SemesterFilter } from "../curriculum/components/SemesterFilter";
@@ -123,10 +122,8 @@ export function RoadmapResult({
             lastSemester={Math.max(answers.lulus, ...plan.courses.map((x) => x.semester))}
           />
         }
-        appearance={null}
         search={
           <div className="flex items-center justify-end gap-2">
-            <ThemeSwitch />
             <AlignButton.Root
               variant="neutral"
               mode="stroke"

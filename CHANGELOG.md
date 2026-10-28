@@ -16,8 +16,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
-- Header tetap di seluruh aplikasi dengan logo OmahTI, tautan peta dan Arsip Ujian,
-  serta tombol Kuis roadmap. Kontrol peta tetap berada di overlay di bawah header.
+- Header tetap di seluruh aplikasi dengan logo OmahTI dan HIMAKOM UGM yang
+  mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
+  dan pengalih tema. Tautan navigasi memakai warna teks redup. Kontrol peta tetap
+  berada di overlay di bawah header.
 
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
@@ -35,6 +37,12 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   aplikasi dengan animasi konfirmasi, buka di Drive, dan tutup modal.
 
 #### Changed
+
+- Teks tombol utama roadmap memakai warna gelap pada tema gelap agar kontras
+  dengan latar jingga yang terang.
+
+- Gambar logo header memakai `@unpic/react` dengan ukuran tetap agar ruangnya
+  tersedia sebelum gambar selesai dimuat dan tata letak tidak bergeser.
 
 - Posisi awal judul dan tombol CS UGM Roadmap pada peta rata kiri di sepertiga
   atas layar, dengan margin kiri lebih lapang dan tampilan awal diperbesar.

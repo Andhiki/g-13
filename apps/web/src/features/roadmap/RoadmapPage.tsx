@@ -1,6 +1,5 @@
 import { lazy, useEffect, useRef, useState } from "react";
 import { DeferredContent } from "../../ui/deferred-content";
-import { ThemeSwitch } from "../../ui/theme-switch";
 import { Route } from "../../routes/roadmap";
 import { firstUnanswered } from "./quiz";
 import { RoadmapQuiz } from "./RoadmapQuiz";
@@ -59,9 +58,6 @@ export function RoadmapPage() {
     );
   return (
     <div className="flex min-h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950">
-      <header className="flex items-center justify-end px-5 py-4 sm:px-6">
-        <ThemeSwitch />
-      </header>
       <RoadmapQuiz answers={answers} update={update} />
     </div>
   );

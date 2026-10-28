@@ -7,7 +7,7 @@ const fancyButton = tv({
   base: [
     "group relative inline-flex items-center justify-center whitespace-nowrap text-label-sm outline-none",
     "h-10 gap-3 rounded-10 px-3.5 transition duration-200 ease-out",
-    "bg-primary-base text-static-white shadow-fancy-buttons-primary focus-visible:shadow-button-primary-focus",
+    "bg-primary-base text-static-white dark:text-static-black shadow-fancy-buttons-primary focus-visible:shadow-button-primary-focus",
     "disabled:pointer-events-none disabled:text-text-disabled-300",
     "disabled:bg-bg-weak-50 disabled:bg-none disabled:shadow-none disabled:before:hidden disabled:after:hidden",
     "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit]",

@@ -222,9 +222,14 @@ the shared AlignUI modal.
 The main "Buat roadmap kuliah" CTA uses `apps/web/src/ui/fancy-button.tsx`, adapted from
 [AlignUI FancyButton](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/fancy-button.tsx).
 It keeps the upstream medium primary styling and uses Radix Slot to preserve link semantics.
+In dark mode, its label uses static black for contrast against the lighter primary background.
 
 The shared fixed app header lives in `ui/app-header.tsx`, mounted by the root route.
 Its height is `--app-header-height`; graph stages and overlays start below it.
 Navigation uses [AlignUI Link Button](https://www.alignui.com/docs/v1.2/ui/link-button)
 in `ui/link-button.tsx`, preserving default variants and Slot composition. Unused Icon
-and recursive child cloning are omitted. The roadmap quiz action uses AlignUI Button.
+and recursive child cloning are omitted. The Roadmap header action uses the filled `neutral-inverse` AlignUI Button variant:
+static white background and static black text in both themes.
+OmahTI and HIMAKOM UGM logos both link to the app home page, replacing the Peta text link.
+
+The header owns the single theme toggle; navigation uses muted text in both themes.
