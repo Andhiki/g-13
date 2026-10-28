@@ -1,7 +1,7 @@
 import { Typography } from "../../ui/typography";
 import { useCallback, useState, type CSSProperties } from "react";
 import { CourseDetails } from "./components/CourseDetails";
-import { ChoiceGroupFilter, CurriculumVersionFilter } from "./components/CourseFilters";
+import { CurriculumVersionFilter } from "./components/CourseFilters";
 import { CourseList } from "./components/CourseList";
 import { CourseSearch } from "./components/CourseSearch";
 import { CurriculumMap } from "./components/CurriculumMap";
@@ -12,7 +12,7 @@ import { useCurriculumExplorer } from "./useCurriculumExplorer";
 
 export function CurriculumPage() {
   const explorer = useCurriculumExplorer();
-  const { curriculum, data, relations, visible, selected, group, scope, view, map } = explorer;
+  const { curriculum, data, relations, selected, view, map } = explorer;
 
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [detailsHeight, setDetailsHeight] = useState(30);
@@ -43,7 +43,7 @@ export function CurriculumPage() {
             lastSemester={map.lastSemester}
           />
         }
-        viewControl={<ViewSwitch view={view} onViewChange={explorer.setView} />}
+        searchLeading={<ViewSwitch view={view} onViewChange={explorer.setView} />}
         search={
           <CourseSearch
             key={curriculum}
@@ -57,14 +57,6 @@ export function CurriculumPage() {
           onChange={(value) => {
             setSemesterNavigation(null);
             explorer.changeVersion(value);
-          }}
-        />
-        <ChoiceGroupFilter
-          data={data}
-          group={group}
-          onChange={(value) => {
-            setSemesterNavigation(null);
-            explorer.setGroup(value);
           }}
         />
       </Overlay>
@@ -83,13 +75,10 @@ export function CurriculumPage() {
             onVisibleSemesters={reportSemesters}
             close={explorer.closeDetails}
             curriculum={curriculum}
-            scope={scope}
-            group={group}
             selectedId={selected?.id ?? null}
             nodes={map.nodes}
             edges={map.edges}
             positions={map.positions}
-            lastSemester={map.lastSemester}
           />
         ) : (
           <section
@@ -103,7 +92,7 @@ export function CurriculumPage() {
               <CourseList
                 navigation={semesterNavigation}
                 onVisibleSemesters={reportSemesters}
-                courses={visible}
+                courses={data.all}
                 selectedId={selected?.id ?? null}
                 select={explorer.selectCourse}
               />

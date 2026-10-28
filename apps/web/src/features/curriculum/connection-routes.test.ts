@@ -66,7 +66,7 @@ function verifyRoutes(nodes: RoutingNode[], edges: Edge[]) {
 for (const { id } of listCurricula()) {
   test(`${id}: overview and every optional hover keep orthogonal, obstacle-free, separate vertical lanes`, () => {
     const data = getCurriculum(id);
-    const map = buildMap(data, data.all, getRelations(id), null, "all", () => {});
+    const map = buildMap(data, data.all, getRelations(id), null, () => {});
     const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
     const overview = verifyRoutes(nodes, mapConnections(map.edges, null, null));
     const optionalEndpoints = new Set(
@@ -84,7 +84,7 @@ for (const { id } of listCurricula()) {
     for (const selected of new Set(
       relations.flatMap((relation) => [relation.source, relation.target]),
     )) {
-      const map = buildMap(data, data.all, relations, selected, "all", () => {});
+      const map = buildMap(data, data.all, relations, selected, () => {});
       verifyRoutes(
         routingNodes(map.nodes.filter((node) => node.type === "course")),
         mapConnections(map.edges, selected, null),
@@ -139,7 +139,7 @@ for (const { id } of listCurricula()) {
 
 test("Jaringan Komputer reaches its practicum through a row gap without detouring above the column", () => {
   const data = getCurriculum("2026");
-  const map = buildMap(data, data.all, getRelations("2026"), null, "all", () => {});
+  const map = buildMap(data, data.all, getRelations("2026"), null, () => {});
   const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
   const source = nodes.find((node) => node.id === "PACS262202")!;
   const target = nodes.find((node) => node.id === "PACS262418")!;

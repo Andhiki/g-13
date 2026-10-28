@@ -8,23 +8,21 @@ Keep files under roughly 300 lines by default; larger files need a clear reason.
 - The `/` route renders `CurriculumPage` directly.
 - `CurriculumPage` composes the page controls, map or list, and course detail drawer.
 - `useCurriculumExplorer` owns URL-backed curriculum and selected-course state,
-  plus shared filters and map/list view. Components receive values and callbacks
+  plus map/list view. Components receive values and callbacks
   through props.
 - `Overlay` owns the fixed navigation and controls placement, including the
   responsive positioning of its children. It receives navigation and controls
   from the page and does not import curriculum controls.
 - On desktop, equal flex regions leave the left side empty and center the semester
   button group. Theme and search sit at the top right, with search furthest right.
-  A filter card below contains labeled curriculum version and choice group controls. Search and the card have equal widths. Map captions and explanatory
+  A filter card below contains the curriculum version control. Search and the card have equal widths. Map captions and explanatory
   footer text are omitted.
   Below 1100px, controls stack into separate rows to avoid overlap.
 - `SemesterFilter`, `CourseSearch`, and the filters in `CourseFilters.tsx` own their UI.
   Search owns its query and dialog-open state; it is keyed by curriculum so a
-  curriculum change clears an active search. Selecting a result resets filters
-  and updates the selected course URL.
-- `SemesterFilter` renders buttons 1–8. Selecting a semester applies the existing
-  scope filter; selecting it again clears the filter. Highlights reflect selection,
-  not the map viewport. Viewport-driven highlighting is deferred.
+  curriculum change clears an active search. Selecting a result updates the selected course URL.
+- `SemesterFilter` renders buttons through the last occupied semester. Selecting a
+  semester navigates to it; highlights reflect the visible semesters.
 - `ViewSwitch` is one bottom-right button labeled "Switch View" that toggles
   between map and list. Its icon shows the destination view. The minimap and the former two-button view toggle are removed.
 - `CourseDetails` owns the course detail drawer. `CourseList` groups required
@@ -34,9 +32,9 @@ Keep files under roughly 300 lines by default; larger files need a clear reason.
   with the overlay controls fixed above it. `CurriculumMap` owns React Flow setup
   and viewport focus; `MapNodes` renders course and semester lane nodes. Zoom-in,
   zoom-out, and fit-view buttons are omitted; map navigation uses gestures.
-- `course-utils.ts`, `scope.ts`, `map-state.ts`, and `map-layout.ts` contain
-  feature-local course helpers, filtering, relationship state, and graph layout.
-  Filtering and real-data curriculum exploration have colocated tests. Relationship
+- `course-utils.ts`, `map-state.ts`, and `map-layout.ts` contain
+  feature-local course helpers, relationship state, and graph layout.
+  Graph layout and real-data curriculum exploration have colocated tests. Relationship
   states are verified through exploration rather than isolated helper tests.
 
 Keep page-specific headers, sidebars, overlays, and other components colocated

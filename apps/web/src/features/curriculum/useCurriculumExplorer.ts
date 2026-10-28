@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { getCurriculum, getRelations, isCurriculumId, type CurriculumId } from "@g13/curriculum";
-import { coursesForScope, type Scope } from "./scope";
 import { buildMap } from "./map-layout";
 
 const route = getRouteApi("/");
@@ -9,15 +8,9 @@ const route = getRouteApi("/");
 export function useCurriculumExplorer() {
   const { kurikulum: curriculum, mk: courseId } = route.useSearch();
   const navigate = route.useNavigate();
-  const [group, setGroup] = useState("__all__");
-  const scope: Scope = "all";
   const [view, setView] = useState<"map" | "list">("map");
   const data = getCurriculum(curriculum);
   const relations = useMemo(() => getRelations(data.id), [data]);
-  const visible = useMemo(
-    () => coursesForScope(data, relations, group, scope),
-    [data, relations, group, scope],
-  );
   const selected = data.all.find((course) => course.id === courseId) ?? null;
   const positions = useRef(new Map<string, { x: number; y: number }>());
   const anchor = useRef<{ x: number; y: number } | undefined>(undefined);
@@ -39,7 +32,6 @@ export function useCurriculumExplorer() {
   const navigateToCourse = useCallback(
     (id: string) => {
       anchor.current = undefined;
-      setGroup("__all__");
       updateUrl(curriculum, id);
     },
     [curriculum, updateUrl],
@@ -48,16 +40,14 @@ export function useCurriculumExplorer() {
     (value: string) => {
       if (!isCurriculumId(value)) return;
       anchor.current = undefined;
-      setGroup("__all__");
       updateUrl(value, null);
     },
     [updateUrl],
   );
   const closeDetails = useCallback(() => updateUrl(curriculum, null), [curriculum, updateUrl]);
   const map = useMemo(
-    () =>
-      buildMap(data, visible, relations, selected?.id ?? null, scope, selectCourse, anchor.current),
-    [data, visible, relations, selected?.id, scope, selectCourse],
+    () => buildMap(data, data.all, relations, selected?.id ?? null, selectCourse, anchor.current),
+    [data, relations, selected?.id, selectCourse],
   );
 
   useEffect(() => {
@@ -68,16 +58,9 @@ export function useCurriculumExplorer() {
     curriculum,
     data,
     relations,
-    visible,
     selected,
-    group,
-    scope,
     view,
     map,
-    setGroup: (value: string) => {
-      setGroup(value);
-      closeDetails();
-    },
     setView,
     changeVersion,
     selectCourse,

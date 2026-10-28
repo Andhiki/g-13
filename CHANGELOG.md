@@ -20,13 +20,16 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   peminatan, target selesai, kegiatan, dan arahan untuk memeriksa catatan rencana.
 
 - Tombol FAQ di samping Arsip Ujian membuka modal dengan jawaban dalam accordion
-  tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian. Kedua tautan
+  tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian. FAQ menonjolkan
+  sifat open source proyek dan mengajak kontribusi melalui issue atau pull request
+  dengan tautan repositori GitHub. Kedua tautan
   navbar memakai komponen dan warna teks redup yang sama, dengan ukuran teks
   dan warna pada LinkButton tidak saling menimpa.
 
 - Header tetap di seluruh aplikasi dengan logo OmahTI dan HIMAKOM UGM yang
   mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
-  dan pengalih tema. Tautan navigasi memakai warna teks redup. Kontrol peta tetap
+  dan pengalih tema. Kedua logo berada dalam satu tautan beranda.
+  Tautan navigasi memakai warna teks redup. Kontrol peta tetap
   berada di overlay di bawah header.
 
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
@@ -46,8 +49,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
-- Kolom Semester 8 dan tombol navigasinya disembunyikan saat kosong; kolom pilihan
-  langsung mengikuti semester terakhir yang berisi mata kuliah.
+- Filter kelompok pilihan dihapus; seluruh mata kuliah tetap tampil dengan
+  pengelompokan pilihan pada peta dan pemilih versi kurikulum tetap tersedia.
+
+- Mata kuliah pilihan pada peta utama dikelompokkan menurut kelompok pilihan,
+  dengan kelompok Miscellaneous untuk mata kuliah tanpa kelompok. Bagian pilihan
+  dipindahkan ke bawah semester dan disusun selebar delapan kolom semester.
+
+- Kolom Semester 8 dan tombol navigasinya disembunyikan saat kosong.
 - Slot pilihan kurikulum 2021 memakai nama “Mata Kuliah Pilihan” tanpa nomor,
   dan label versi di UI disingkat menjadi “2021 (rev. 2023)”.
 
@@ -80,7 +89,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Judul beranda diperbarui menjadi “Everything CS UGM” dan teks tombol utama
   menjadi “Buat roadmap sendiri”.
 
-- Tombol ganti tampilan peta/daftar menampilkan tooltip AlignUI untuk tampilan
+- Tombol ganti tampilan peta/daftar berada di sebelah kiri pencarian pada desktop
+  dan seluler, menampilkan tooltip AlignUI untuk tampilan
   tujuan dan memakai ikon tampilan tujuan yang berputar
   saat ditekan; preferensi pengurangan gerakan menonaktifkan putaran.
 

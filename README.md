@@ -1,6 +1,6 @@
 # g-13
 
-Peta kurikulum dan roadmap kuliah S1 Ilmu Komputer UGM. Proyek komunitas untuk
+Peta kurikulum dan roadmap kuliah S1 Ilmu Komputer UGM. Proyek open source komunitas untuk
 membantu mahasiswa memahami mata kuliah, prasyarat, dan pilihan perjalanan kuliah.
 Proyek ini bukan layanan resmi atau pengesahan dari UGM, prodi, maupun Himakom.
 
@@ -16,7 +16,7 @@ Lihat [changelog](CHANGELOG.md) untuk catatan perubahan.
 ## Cakupan
 
 - Kurikulum 2021 Revisi 2023 dan 2026 sejak MVP.
-- Peta relasi, daftar, pencarian, detail, teks prasyarat, dan filter minat/kelompok pilihan.
+- Peta relasi, daftar, pencarian, detail, teks prasyarat, dan pengelompokan mata kuliah pilihan.
 - Tidak meminta transkrip atau menghitung kelayakan KRS pribadi.
 - Tidak mengasumsikan afiliasi Himakom atau pengesahan prodi.
 

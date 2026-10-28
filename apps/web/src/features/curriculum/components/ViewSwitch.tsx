@@ -43,7 +43,7 @@ export function ViewSwitch({
             </m.span>
           </AlignButton.Root>
         </AlignTooltip.Trigger>
-        <AlignTooltip.Content size="xsmall" side="left">
+        <AlignTooltip.Content size="xsmall" side="bottom">
           {label}
         </AlignTooltip.Content>
       </AlignTooltip.Root>

@@ -7,7 +7,7 @@ for (const { id } of listCurricula()) {
   test(`${id}: overview connections retain endpoint relations and identify optional courses`, () => {
     const data = getCurriculum(id);
     const relations = getRelations(id);
-    const map = buildMap(data, data.all, relations, null, "all", () => {});
+    const map = buildMap(data, data.all, relations, null, () => {});
     const semesters = new Map(data.all.map((course) => [course.id, assignedCoreSemester(course)]));
     const sameSemester = relations.filter(
       (relation) =>
@@ -22,7 +22,7 @@ for (const { id } of listCurricula()) {
           (edge) => edge.source === relation.source && edge.target === relation.target,
         ),
       ).toBe(false);
-      const focused = buildMap(data, data.all, relations, relation.target, "all", () => {});
+      const focused = buildMap(data, data.all, relations, relation.target, () => {});
       expect(focused.edges.some((edge) => edge.source === relation.source)).toBe(false);
     }
     for (const edge of map.edges) {
@@ -35,7 +35,7 @@ for (const { id } of listCurricula()) {
       expect(edge.data?.optional).toBe(!isCore(source.data.course) || !isCore(target.data.course));
     }
     const selected = map.edges[0].target;
-    const focused = buildMap(data, data.all, relations, selected, "all", () => {});
+    const focused = buildMap(data, data.all, relations, selected, () => {});
     expect(focused.edges.length).toBeGreaterThan(0);
     expect(
       focused.edges.every((edge) => edge.source === selected || edge.target === selected),
@@ -44,23 +44,73 @@ for (const { id } of listCurricula()) {
 }
 
 for (const { id } of listCurricula()) {
-  test(`${id}: empty trailing semester is omitted and electives follow the last occupied semester`, () => {
+  test(`${id}: empty trailing semester is omitted and electives sit below every semester`, () => {
     const data = getCurriculum(id);
-    const map = buildMap(data, data.all, getRelations(id), null, "all", () => {});
+    const map = buildMap(data, data.all, getRelations(id), null, () => {});
     expect(map.nodes.some((node) => node.id === "lane-semester-8")).toBe(false);
     expect(map.lastSemester).toBe(7);
-    const seventh = map.nodes.find((node) => node.id === "lane-semester-7")!;
     const choices = map.nodes.find((node) => node.id === "lane-choices")!;
-    expect(choices.position.x - seventh.position.x).toBe(360);
+    const coreNodes = map.nodes.filter(
+      (node) => node.type === "course" && isCore(node.data.course),
+    );
+    expect(choices.position.x).toBe(48);
+    expect(choices.position.y).toBeGreaterThan(
+      Math.max(...coreNodes.map((node) => node.position.y + 82)),
+    );
+    const electives = map.nodes.filter(
+      (node) => node.type === "course" && !isCore(node.data.course),
+    );
+    expect(electives.length).toBe(data.all.filter((course) => !isCore(course)).length);
+    expect(new Set(electives.map((node) => node.id)).size).toBe(electives.length);
+    for (const node of electives) {
+      if (node.type !== "course") throw new Error("Expected elective course node");
+      const group = node.data.course.placements.find(
+        (placement) => placement.section !== "core",
+      )!.group;
+      const heading = map.nodes.find(
+        (node) => node.data.kind === "lane" && node.data.title === group,
+      )!;
+      expect(node.position.x).toBe(heading.position.x + 12);
+      expect(node.position.y).toBeGreaterThan(heading.position.y + 56);
+      expect(node.position.x).toBeLessThan(48 + 8 * 360);
+    }
     const eighth = {
       ...data.core[0],
       id: "semester-eight-course",
       placements: data.core[0].placements.map((placement) => ({ ...placement, semester: 8 })),
     };
     const populated = { ...data, all: [...data.all, eighth], core: [...data.core, eighth] };
-    const withEighth = buildMap(populated, populated.all, getRelations(id), null, "all", () => {});
+    const withEighth = buildMap(populated, populated.all, getRelations(id), null, () => {});
     expect(withEighth.lastSemester).toBe(8);
     expect(withEighth.nodes.some((node) => node.id === "lane-semester-8")).toBe(true);
     expect(withEighth.positions.has(eighth.id)).toBe(true);
   });
 }
+
+test("ungrouped electives appear under Miscellaneous and extra groups wrap below", () => {
+  const data = getCurriculum("2026");
+  const template = data.electives.find((course) => !isCore(course))!;
+  const electives = Array.from({ length: 10 }, (_, index) => ({
+    ...template,
+    id: `choice-${index}`,
+    placements: template.placements.map((placement) => ({
+      ...placement,
+      group: index === 9 ? "" : `Group ${index}`,
+    })),
+  }));
+  const fixture = { ...data, all: [...data.core, ...electives], electives };
+  const map = buildMap(fixture, fixture.all, [], null, () => {});
+  const first = map.positions.get("choice-0")!;
+  const wrapped = map.positions.get("choice-8")!;
+  expect(wrapped.x).toBe(first.x);
+  expect(wrapped.y).toBeGreaterThan(first.y + 82);
+  const fallback = map.nodes.find(
+    (node) => node.data.kind === "lane" && node.data.title === "Miscellaneous",
+  )!;
+  expect(fallback).toBeDefined();
+  expect(map.positions.get("choice-9")!.x).toBe(fallback.position.x + 12);
+  const filtered = buildMap(fixture, [electives[9]], [], null, () => {});
+  expect(filtered.positions.size).toBe(1);
+  expect(filtered.positions.get("choice-9")).toEqual(map.positions.get("choice-9"));
+  expect(filtered.nodes.filter((node) => node.id.startsWith("lane-choice-group-")).length).toBe(1);
+});

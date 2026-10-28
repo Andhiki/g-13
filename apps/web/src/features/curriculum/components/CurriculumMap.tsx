@@ -17,27 +17,21 @@ import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
+import { isCore } from "../course-utils";
 import { mapConnections } from "../map-connections";
-import type { Scope } from "../scope";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
 function ViewportFocus({
   navigation,
   focusKey,
-  scope,
-  group,
   selectedId,
   positions,
-  lastSemester,
 }: {
   navigation: { semester: number } | null;
   focusKey: string;
-  scope: Scope;
-  group: string;
   selectedId: string | null;
   positions: Map<string, { x: number; y: number }>;
-  lastSemester: number;
 }) {
   const { setCenter, setViewport } = useReactFlow();
   useEffect(() => {
@@ -81,47 +75,6 @@ function ViewportFocus({
         });
         return;
       }
-      if (scope === "choices" || group !== "__all__") {
-        const points = [...positions.values()].filter(
-          (point) => point.x >= LANE_X + lastSemester * LANE_STEP,
-        );
-        if (!points.length) return;
-        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-        const compact = window.matchMedia("(width < 1100px)").matches;
-        const left = 16;
-        const top = compact ? 128 : 96;
-        const right = compact ? 16 : 332;
-        const minX = Math.min(...points.map((point) => point.x));
-        const minY = Math.min(...points.map((point) => point.y));
-        const viewport = getViewportForBounds(
-          {
-            x: minX,
-            y: minY,
-            width: Math.max(...points.map((point) => point.x)) - minX + 248,
-            height: Math.max(...points.map((point) => point.y)) - minY + 82,
-          },
-          Math.max(1, stage.width - left - right),
-          Math.max(1, stage.height - top - 72),
-          0.05,
-          0.88,
-          0.12,
-        );
-        setViewport(
-          { ...viewport, x: viewport.x + left, y: viewport.y + top },
-          {
-            duration: reducedMotion ? 0 : 1000,
-          },
-        );
-        return;
-      }
-      if (scope !== "all") {
-        const term = Number(scope);
-        setCenter(LANE_X + (term - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
-          zoom: 0.72,
-          duration: reducedMotion ? 0 : 1000,
-        });
-        return;
-      }
       const phone = window.matchMedia("(width < 650px)").matches;
       const title = document.querySelector<HTMLElement>("[data-map-title]")!;
       const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
@@ -139,17 +92,7 @@ function ViewportFocus({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [
-    navigation,
-    focusKey,
-    scope,
-    group,
-    selectedId,
-    positions,
-    lastSemester,
-    setCenter,
-    setViewport,
-  ]);
+  }, [navigation, focusKey, selectedId, positions, setCenter, setViewport]);
   return null;
 }
 
@@ -160,7 +103,7 @@ function SemesterViewport({
   selectedId: string | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
-  const flow = useReactFlow();
+  const flow = useReactFlow<MapNode>();
   const update = useCallback(() => {
     if (selectedId) {
       onVisibleSemesters([]);
@@ -182,6 +125,7 @@ function SemesterViewport({
           .filter(
             (node) =>
               node.type === "course" &&
+              isCore(node.data.course) &&
               node.position.x >= laneX &&
               node.position.x < laneX + LANE_WIDTH,
           )
@@ -211,28 +155,22 @@ export function CurriculumMap({
   onVisibleSemesters,
   close,
   curriculum,
-  scope,
-  group,
   selectedId,
   nodes,
   edges,
   positions,
-  lastSemester,
 }: {
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
   close: () => void;
   curriculum: CurriculumId;
-  scope: Scope;
-  group: string;
   selectedId: string | null;
   nodes: MapNode[];
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
-  lastSemester: number;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
+  const focusKey = [curriculum, selectedId ?? ""].join(":");
   const revealedEdges = useMemo(
     () => mapConnections(edges, selectedId, hoveredId),
     [edges, selectedId, hoveredId],
@@ -260,6 +198,8 @@ export function CurriculumMap({
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
+        panOnScroll
+        zoomOnScroll={false}
         zoomOnDoubleClick={false}
         fitView={false}
         aria-label="Peta kurikulum Ilmu Komputer UGM"
@@ -267,11 +207,8 @@ export function CurriculumMap({
         <ViewportFocus
           navigation={navigation}
           focusKey={focusKey}
-          scope={scope}
-          group={group}
           selectedId={selectedId}
           positions={positions}
-          lastSemester={lastSemester}
         />
         <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
         <ViewportPortal>
@@ -308,16 +245,6 @@ export function CurriculumMap({
           size={1.2}
         />
       </ReactFlow>
-      {!selectedId &&
-        (scope === "choices" || group !== "__all__") &&
-        ![...positions.values()].some((point) => point.x >= LANE_X + lastSemester * LANE_STEP) && (
-          <p
-            role="status"
-            className="pointer-events-none absolute inset-x-4 top-36 text-center text-paragraph-sm text-text-sub-600"
-          >
-            Tidak ada mata kuliah pilihan untuk filter ini.
-          </p>
-        )}
     </EdgeRouting>
   );
 }

@@ -16,7 +16,7 @@ function subscribeToCompactControls(onChange: () => void) {
 type FilterCopy = { title: string; description: string };
 const defaultFilterCopy: FilterCopy = {
   title: "Filter kurikulum",
-  description: "Pilih versi kurikulum dan kelompok mata kuliah.",
+  description: "Pilih versi kurikulum.",
 };
 
 function FilterDrawer({ children, copy }: { children: ReactNode; copy: FilterCopy }) {
@@ -158,6 +158,7 @@ function DesktopFilters({
 export function Overlay({
   navigation,
   search,
+  searchLeading,
   viewControl,
   children,
   controlsLabel,
@@ -167,7 +168,8 @@ export function Overlay({
 }: {
   navigation: ReactNode;
   search: ReactNode;
-  viewControl: ReactNode;
+  searchLeading?: ReactNode;
+  viewControl?: ReactNode;
   children: ReactNode;
   controlsLabel: string;
   home?: ReactNode;
@@ -196,6 +198,7 @@ export function Overlay({
             className={`flex min-h-10 items-center gap-2 transition-[width] duration-300 ease-out motion-reduce:transition-none max-[1100px]:order-1 max-[1100px]:w-full ${filtersInToolbar ? "w-[396px]" : "w-[348px]"}`}
           >
             {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
+            {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             {filtersInToolbar && !compact && (
               <div className="order-3 size-10 shrink-0" aria-hidden="true" />
@@ -211,9 +214,11 @@ export function Overlay({
           )}
         </div>
       </div>
-      <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">
-        {viewControl}
-      </div>
+      {viewControl && (
+        <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">
+          {viewControl}
+        </div>
+      )}
     </>
   );
 }

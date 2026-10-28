@@ -3,7 +3,6 @@ import type { Course, Curriculum, Relation } from "@g13/curriculum";
 import { mapCourseState, type MapCourseState } from "./map-state";
 import { assignedCoreSemester, isCore } from "./course-utils";
 import { semesterRelations } from "./semester-relations";
-import type { Scope } from "./scope";
 
 type CourseNodeData = {
   kind: "course";
@@ -24,7 +23,7 @@ export type { CourseNodeData, LaneNodeData };
 export const LANE_X = 48;
 export const LANE_STEP = 360;
 export const LANE_WIDTH = 270;
-const CHOICE_COLUMNS = 3;
+const CHOICE_COLUMNS = 8;
 const ROW_STEP = 120;
 const COURSE_X_OFFSET = 12;
 const COURSE_Y_START = 156;
@@ -34,7 +33,6 @@ export function buildMap(
   visible: Course[],
   relations: Relation[],
   selectedId: string | null,
-  scope: Scope,
   choose: (id: string) => void,
   anchor?: { x: number; y: number },
 ): {
@@ -60,7 +58,6 @@ export function buildMap(
   const courses = selectedId ? data.all.filter((course) => focusedIds.has(course.id)) : visible;
   const visibleIds = new Set(courses.map((course) => course.id));
   const lastSemester = Math.max(1, ...data.core.map((course) => assignedCoreSemester(course) ?? 0));
-  const choiceStartX = LANE_X + lastSemester * LANE_STEP;
   const layoutCore = new Map<number, Course[]>();
   for (let term = 1; term <= lastSemester; term += 1) {
     const courses = data.all
@@ -68,13 +65,22 @@ export function buildMap(
       .sort((a, b) => a.title.localeCompare(b.title, "id"));
     layoutCore.set(term, courses);
   }
-  const choices = data.all
-    .filter((course) => !isCore(course))
-    .sort((a, b) => {
-      const aGroup = a.placements.find((item) => item.section !== "core")?.group ?? "";
-      const bGroup = b.placements.find((item) => item.section !== "core")?.group ?? "";
-      return aGroup.localeCompare(bGroup, "id") || a.title.localeCompare(b.title, "id");
-    });
+  const choiceGroups = new Map<string, Course[]>();
+  for (const course of data.all.filter((course) => !isCore(course))) {
+    const group =
+      course.placements.find((item) => item.section !== "core" && item.group.trim())?.group ??
+      "Miscellaneous";
+    const grouped = choiceGroups.get(group) ?? [];
+    grouped.push(course);
+    choiceGroups.set(group, grouped);
+  }
+  const groups = [...choiceGroups].sort(([a], [b]) =>
+    a === "Miscellaneous" ? 1 : b === "Miscellaneous" ? -1 : a.localeCompare(b, "id"),
+  );
+  const choiceStartY =
+    COURSE_Y_START +
+    Math.max(0, ...[...layoutCore.values()].map((courses) => courses.length)) * ROW_STEP +
+    80;
 
   const nodes: MapNode[] = [];
   const positions = new Map<string, { x: number; y: number }>();
@@ -89,7 +95,7 @@ export function buildMap(
       data: {
         kind: "lane",
         title: "Semester " + term,
-        active: scope === String(term),
+        active: false,
       },
       selectable: false,
       draggable: false,
@@ -108,28 +114,48 @@ export function buildMap(
   nodes.push({
     id: "lane-choices",
     type: "lane",
-    position: { x: choiceStartX, y: 100 },
-    className: "w-[990px]! h-10!",
+    position: { x: LANE_X, y: choiceStartY },
+    style: { width: (CHOICE_COLUMNS - 1) * LANE_STEP + LANE_WIDTH, height: 40 },
     zIndex: -1,
     data: {
       kind: "lane",
-      title: "Pilihan",
-      active: scope === "choices",
+      title: "Mata Kuliah Pilihan",
+      active: false,
     },
     selectable: false,
     draggable: false,
     connectable: false,
   });
-  choices.forEach((course, index) => {
-    if (!visibleIds.has(course.id)) return;
-    const column = index % CHOICE_COLUMNS;
-    const row = Math.floor(index / CHOICE_COLUMNS);
-    const position = {
-      x: choiceStartX + COURSE_X_OFFSET + column * LANE_STEP,
-      y: COURSE_Y_START + row * ROW_STEP,
-    };
-    positions.set(course.id, position);
-  });
+  let groupY = choiceStartY + 64;
+  for (let offset = 0; offset < groups.length; offset += CHOICE_COLUMNS) {
+    const row = groups.slice(offset, offset + CHOICE_COLUMNS);
+    row.forEach(([group, courses], column) => {
+      const x = LANE_X + column * LANE_STEP;
+      if (courses.some((course) => visibleIds.has(course.id))) {
+        nodes.push({
+          id: `lane-choice-group-${group}`,
+          type: "lane",
+          position: { x, y: groupY },
+          style: { width: LANE_WIDTH, height: 56 },
+          zIndex: -1,
+          data: { kind: "lane", title: group, active: false },
+          selectable: false,
+          draggable: false,
+          connectable: false,
+        });
+      }
+      courses
+        .sort((a, b) => a.title.localeCompare(b.title, "id"))
+        .forEach((course, index) => {
+          if (!visibleIds.has(course.id)) return;
+          positions.set(course.id, {
+            x: x + COURSE_X_OFFSET,
+            y: groupY + 72 + index * ROW_STEP,
+          });
+        });
+    });
+    groupY += 72 + Math.max(...row.map(([, courses]) => courses.length)) * ROW_STEP + 64;
+  }
 
   const availableRelations = graphRelations.filter(
     (relation) => visibleIds.has(relation.source) && visibleIds.has(relation.target),

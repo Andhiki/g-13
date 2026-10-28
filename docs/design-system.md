@@ -48,7 +48,7 @@ Tailwind Preflight and AlignUI provide standard control typography and focus sty
 styles are document-level Tailwind descendant variants, and graph buttons define their own
 focus utilities.
 
-Search uses AlignUI Command Menu, curriculum and interest filters use Select, and the theme toggle
+Search uses AlignUI Command Menu, curriculum selection uses Segmented Control, and the theme toggle
 uses Button. The app retains its course matching and routing behavior, and the search control
 has no magnifying-glass icon. The same component policy applies to lists, details, and graph controls.
 

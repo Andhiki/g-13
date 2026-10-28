@@ -11,8 +11,8 @@ function BrandLogo() {
     <Link
       to="/"
       search={{ kurikulum: defaultCurriculumId }}
-      aria-label="OmahTI — beranda"
-      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
+      aria-label="OmahTI dan HIMAKOM UGM — beranda"
+      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center gap-1 rounded sm:gap-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
     >
       <Image
         src="/brand/omahti-light.svg"
@@ -30,6 +30,23 @@ function BrandLogo() {
         height={21}
         className="hidden dark:block"
       />
+
+      <Image
+        src="/brand/himakom-light.png"
+        alt="HIMAKOM UGM"
+        layout="fixed"
+        width={25}
+        height={32}
+        className="object-contain dark:hidden"
+      />
+      <Image
+        src="/brand/himakom-dark.png"
+        alt="HIMAKOM UGM"
+        layout="fixed"
+        width={25}
+        height={32}
+        className="hidden object-contain dark:block"
+      />
     </Link>
   );
 }
@@ -37,32 +54,7 @@ function BrandLogo() {
 export function AppHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 px-1.5 text-text-strong-950 sm:gap-6 sm:px-6">
-      <div className="flex shrink-0 items-center gap-1 sm:gap-4">
-        <BrandLogo />
-        <Link
-          to="/"
-          search={{ kurikulum: defaultCurriculumId }}
-          aria-label="HIMAKOM UGM — beranda"
-          className="flex h-10 shrink-0 items-center rounded"
-        >
-          <Image
-            src="/brand/himakom-light.png"
-            alt="HIMAKOM UGM"
-            layout="fixed"
-            width={25}
-            height={32}
-            className="object-contain dark:hidden"
-          />
-          <Image
-            src="/brand/himakom-dark.png"
-            alt="HIMAKOM UGM"
-            layout="fixed"
-            width={25}
-            height={32}
-            className="hidden object-contain dark:block"
-          />
-        </Link>
-      </div>
+      <BrandLogo />
       <nav aria-label="Navigasi aplikasi" className="flex items-center gap-2 sm:gap-5">
         <AlignLinkButton.Root asChild>
           <Link

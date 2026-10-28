@@ -5,6 +5,33 @@ import { Typography } from "./typography";
 
 const questions = [
   {
+    question: "Bagaimana cara berkontribusi?",
+    answer: (
+      <>
+        Siapa pun bisa ikut mengembangkan g-13. Kode sumbernya terbuka di{" "}
+        <AlignLinkButton.Root asChild variant="primary" underline>
+          <a href="https://github.com/Andhiki/g-13" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+        </AlignLinkButton.Root>
+        . Punya ide, menemukan bug, atau ingin mengoreksi kurikulum? Langsung buat{" "}
+        <AlignLinkButton.Root asChild variant="primary" underline>
+          <a href="https://github.com/Andhiki/g-13/issues" target="_blank" rel="noreferrer">
+            issue
+          </a>
+        </AlignLinkButton.Root>{" "}
+        atau kirim{" "}
+        <AlignLinkButton.Root asChild variant="primary" underline>
+          <a href="https://github.com/Andhiki/g-13/pulls" target="_blank" rel="noreferrer">
+            pull request
+          </a>
+        </AlignLinkButton.Root>
+        . Kontribusi kecil juga berarti, termasuk perbaikan teks dan laporan masalah. Untuk koreksi
+        kurikulum, sertakan sumber resmi.
+      </>
+    ),
+  },
+  {
     question: "Bagaimana cara membaca peta kurikulum?",
     answer:
       "Mata kuliah dikelompokkan menurut semester. Garis menghubungkan prasyarat ke mata kuliah yang mensyaratkannya. Arahkan kursor atau fokuskan mata kuliah untuk menyorot koneksinya, lalu pilih untuk membuka detail. Gunakan tombol di kanan bawah untuk beralih ke daftar.",
@@ -12,7 +39,7 @@ const questions = [
   {
     question: "Bagaimana cara mengganti versi kurikulum?",
     answer:
-      "Buka tombol filter di samping pencarian, lalu pilih kurikulum 2021 atau 2026. Filter yang sama juga menyediakan pilihan peminatan atau kelompok mata kuliah.",
+      "Buka tombol filter di samping pencarian, lalu pilih kurikulum 2021 atau 2026. Mata kuliah pilihan dikelompokkan di bawah kolom semester.",
   },
   {
     question: "Apa perbedaan peta kurikulum dan roadmap kuliah?",
@@ -38,8 +65,11 @@ export function Faq() {
             FAQ
           </Typography>
         </AlignModal.Title>
-        <AlignModal.Description className="sr-only">
-          Pertanyaan umum tentang peta kurikulum, roadmap kuliah, dan arsip ujian.
+        <AlignModal.Description asChild>
+          <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
+            g-13 adalah proyek open source yang dibangun bersama komunitas. Siapa pun bisa memakai,
+            mempelajari, dan ikut memperbaikinya.
+          </Typography>
         </AlignModal.Description>
         <Accordion.Root type="single" collapsible className="mt-4 divide-y divide-stroke-soft-200">
           {questions.map(({ question, answer }) => (
