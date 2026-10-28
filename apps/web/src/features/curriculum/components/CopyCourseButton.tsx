@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
 import { CompactButton } from "../../../ui/compact-button";
 import { AlignTooltip } from "../../../ui/tooltip";
@@ -42,7 +42,7 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
           >
             <span className="grid size-4" aria-hidden="true">
               <AnimatePresence initial={false}>
-                <motion.span
+                <m.span
                   key={status === "copied" ? "copied" : "copy"}
                   className="col-start-1 row-start-1 flex items-center justify-center"
                   initial={hidden}
@@ -53,7 +53,7 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
                   }
                 >
                   <Icon className="size-4" />
-                </motion.span>
+                </m.span>
               </AnimatePresence>
             </span>
           </CompactButton>

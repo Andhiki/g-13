@@ -13,7 +13,7 @@ import {
 import {
   EdgeRouting,
   routedEdgeTypes,
-  useConnectionReveal,
+  connectionReveal,
 } from "../curriculum/components/EdgeRouting";
 import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
 import { mapCourseState } from "../curriculum/map-state";
@@ -188,19 +188,21 @@ export function RoadmapGraph({
     });
     return { nodes, edges };
   }, [plan, target, selectedId, choose]);
-  const progress = useConnectionReveal(
-    selectedId,
-    edges.some((edge) => edge.target === selectedId),
+  const progress = useMemo(
+    () => connectionReveal(edges.some((edge) => edge.target === selectedId)),
+    [edges, selectedId],
   );
   const revealedEdges = edges.map((edge) => ({
     ...edge,
     data: {
-      progress:
+      animationKey: selectedId,
+      startedAt: progress.startedAt,
+      reveal:
         edge.target === selectedId
           ? progress.incoming
           : edge.source === selectedId
             ? progress.outgoing
-            : 1,
+            : undefined,
     },
   }));
   return (

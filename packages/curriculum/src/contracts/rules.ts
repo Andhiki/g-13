@@ -42,6 +42,5 @@ export type AcademicRules = {
 
 export type CurriculumSlice = {
   curriculum: Curriculum;
-  syllabi: Record<string, Syllabus>;
   rules: AcademicRules;
 };

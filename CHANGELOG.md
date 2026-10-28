@@ -12,6 +12,24 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-10-28
+
+#### Changed
+
+- Pemuatan awal lebih ringan: data kurikulum dinormalisasi saat build, detail dan
+  silabus dimuat sesuai kebutuhan, serta hasil roadmap dimuat setelah kuis selesai.
+  Animasi peta mengurangi pembaruan React; aset bernama hash disimpan di cache
+  untuk kunjungan berikutnya. Pengunduhan detail, silabus, atau hasil roadmap yang
+  gagal menampilkan pilihan muat ulang tanpa menghilangkan halaman lain. Indikator
+  pemuatan detail ditutup saat pilihan mata kuliah dibatalkan.
+
+#### Fixed
+
+- Pintasan keyboard mengabaikan kombinasi Shift yang tidak ditetapkan.
+
+- Tombol pada detail mata kuliah merespons klik pertama setelah panel diseret
+  pada perangkat dengan input sentuh dan mouse.
+
 ### 2026-10-27
 
 #### Changed
