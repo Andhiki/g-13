@@ -25,6 +25,8 @@ license notice is retained in [docs/licenses/alignui.txt](licenses/alignui.txt).
 [Dropdown](https://www.alignui.com/docs/v1.2/ui/dropdown),
 [Select](https://www.alignui.com/docs/v1.2/ui/select) documentation.
 
+The Badge component adds information and warning color variants using project semantic tokens.
+
 The token stylesheet `apps/web/src/alignui.css` was generated from AlignUI CLI 0.0.19's blue/gray defaults.
 Project surfaces and controls use these tokens. The React Flow canvas, semester lanes, course nodes,
 and relationship edges use Tailwind utilities in their owning components and map definitions.

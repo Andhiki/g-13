@@ -20,14 +20,21 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
   memuat seluruh 102 mata kuliah dan 1.613 entri berkas dari arsip Himakom UGM,
   termasuk gambar dan dokumen Word. Daftar menampilkan tanggal dibuat dan jenis
-  folder/berkas dengan pemisah baris yang ringan. Berkas tanpa tahun eksplisit
-  dikelompokkan dalam “Tanpa tahun”; metadata yang meragukan dicatat untuk tinjauan
-  manusia.
+  folder/berkas dengan pemisah baris yang ringan dan tanggal relatif. Header tabel
+  diringkas, kolom tanggal, ujian, dan jenis disejajarkan ke tengah, jenis
+  folder/berkas ditampilkan sebagai badge, UTS dan UAS dibedakan dengan badge
+  berwarna di semua ukuran layar, dan ringkasan item serta tautan sumber di footer
+  dihapus.
+  Berkas tanpa tahun eksplisit dikelompokkan dalam “Tanpa tahun”; metadata yang
+  meragukan dicatat untuk tinjauan manusia.
 - Tautan folder dan berkas Arsip Ujian dapat dibagikan, dengan pemulihan lokasi
-  melalui Back/Forward. Modal berkas menyediakan unduh, salin tautan aplikasi,
-  serta buka sumber di Drive.
+  melalui Back/Forward. Modal berkas menyediakan aksi ikon untuk unduh, salin tautan
+  aplikasi dengan animasi konfirmasi, buka di Drive, dan tutup modal.
 
 #### Changed
+
+- Tombol kembali ke peta kurikulum memakai gaya netral berbingkai seperti toggle tema;
+  breadcrumb “Arsip Ujian” disembunyikan di folder root agar judul tidak berulang.
 
 - Pemuatan awal lebih ringan: data kurikulum dinormalisasi saat build, detail dan
   silabus dimuat sesuai kebutuhan, serta hasil roadmap dimuat setelah kuis selesai.

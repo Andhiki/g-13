@@ -1,5 +1,6 @@
 // Adapted from AlignUI Button v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
 import type { ComponentProps } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { tv, type VariantProps } from "tailwind-variants";
 
 export const buttonVariants = tv({
@@ -100,12 +101,13 @@ export const buttonVariants = tv({
   defaultVariants: { variant: "primary", mode: "filled", size: "medium" },
 });
 
-type ButtonProps = ComponentProps<"button"> & VariantProps<typeof buttonVariants>;
+type ButtonProps = ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & { asChild?: boolean };
 
-function Root({ className, variant, mode, size, type = "button", ...props }: ButtonProps) {
-  return (
-    <button className={buttonVariants({ variant, mode, size, className })} type={type} {...props} />
-  );
+function Root({ asChild, className, variant, mode, size, type = "button", ...props }: ButtonProps) {
+  const classes = buttonVariants({ variant, mode, size, className });
+  if (asChild) return <Slot className={classes} {...props} />;
+  return <button className={classes} type={type} {...props} />;
 }
 
 export const AlignButton = { Root };

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("long source course names fit in the folder breadcrumbs", async ({ page }) => {
   await page.goto("/exam");
+  await page.getByRole("combobox", { name: "Cari mata kuliah" }).fill("Tren Penelitian");
   await page
     .getByRole("option", { name: /Tren Penelitian Rekayasa Perangkat Lunak dan Data/ })
     .click();
@@ -54,7 +55,7 @@ test("file rows show type and available creation dates without an outer card", a
   await year.click();
   const paper = page.getByRole("option", { name: /2023 BasDat KOMA[.]pdf/ });
   await expect(paper).toContainText("Berkas");
-  await expect(paper).toContainText("2026");
+  await expect(paper).toContainText(/Dibuat .+ yang lalu/);
   const browser = page.getByRole("region", { name: "Penjelajah arsip ujian" });
   await expect(browser).not.toHaveClass(/border/);
 });

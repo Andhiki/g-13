@@ -76,7 +76,7 @@ test("copy shares the in-app modal URL and failed clipboard writes offer manual 
   await page.goto(paperUrl);
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: "Salin tautan" }).click();
-  await expect(dialog.getByRole("button", { name: "Tautan disalin" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Tautan berhasil disalin" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(page.url());
   await page.reload();
   await page.evaluate(() =>
@@ -86,9 +86,9 @@ test("copy shares the in-app modal URL and failed clipboard writes offer manual 
     }),
   );
   await dialog.getByRole("button", { name: "Salin tautan" }).click();
-  await expect(dialog.getByRole("status")).toHaveText(
-    "Gagal menyalin otomatis. Salin tautan berikut.",
-  );
+  await expect(
+    dialog.getByText("Gagal menyalin otomatis. Salin tautan berikut.", { exact: true }),
+  ).toBeVisible();
   const input = dialog.getByRole("textbox", { name: "Tautan berkas" });
   await expect(input).toHaveValue(page.url());
   await input.focus();
