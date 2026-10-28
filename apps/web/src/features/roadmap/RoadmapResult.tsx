@@ -1,5 +1,5 @@
 import { defaultCurriculumId, getCurriculum } from "@g13/curriculum";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { Typography } from "../../ui/typography";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -138,7 +138,7 @@ export function RoadmapResult({
                   { Icon: RiShareLine, active: share !== "copied" || sharedPlan !== answers },
                   { Icon: RiCheckLine, active: share === "copied" && sharedPlan === answers },
                 ].map(({ Icon, active }, index) => (
-                  <motion.span
+                  <m.span
                     key={index}
                     initial={false}
                     className="absolute inset-0"
@@ -152,7 +152,7 @@ export function RoadmapResult({
                     }
                   >
                     <Icon className="size-5" />
-                  </motion.span>
+                  </m.span>
                 ))}
               </span>
               <span className="max-[650px]:sr-only">

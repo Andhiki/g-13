@@ -18,7 +18,7 @@ test("consumers resolve the built package and unknown curriculum IDs fail valida
 });
 
 for (const curriculum of listCurricula()) {
-  test(`${curriculum.id} DAL preserves course identity and missing lookups`, () => {
+  test(`${curriculum.id} DAL preserves course identity and missing lookups`, async () => {
     expect(getCurriculum(curriculum.id)).toBe(curriculum);
     expect(curriculum.all.length).toBeGreaterThan(0);
     expect(new Set(curriculum.all.map((course) => course.id)).size).toBe(curriculum.all.length);
@@ -28,7 +28,7 @@ for (const curriculum of listCurricula()) {
     }
     expect(getCourse(curriculum.id, "missing")).toBeUndefined();
     for (const code of ["missing", "__proto__", "constructor"])
-      expect(getSyllabus(curriculum.id, code)).toBeUndefined();
+      expect(await getSyllabus(curriculum.id, code)).toBeUndefined();
     for (const relation of getRelations(curriculum.id)) {
       expect(getCourse(curriculum.id, relation.source)).toBeDefined();
       expect(getCourse(curriculum.id, relation.target)).toBeDefined();
@@ -62,3 +62,14 @@ for (const curriculum of listCurricula()) {
     expect(scheduling.electiveSemesterStep).toBeGreaterThan(0);
   });
 }
+
+test("precomputed runtime data matches source adapters and preserves shared course identity", async () => {
+  const { registry } = await import("./registry-data");
+  for (const curriculum of listCurricula()) {
+    expect(curriculum).toEqual(registry[curriculum.id].curriculum);
+    expect(getAcademicRules(curriculum.id)).toEqual(registry[curriculum.id].rules);
+    for (const course of [...curriculum.core, ...curriculum.electives]) {
+      expect(getCourse(curriculum.id, course.id)).toBe(course);
+    }
+  }
+});

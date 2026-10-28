@@ -172,3 +172,8 @@ the installed TypeScript 7 compiler does not provide the classic compiler API.
 See the official [Turbo task configuration](https://turborepo.dev/docs/reference/configuration),
 [Turbo watch documentation](https://turborepo.dev/docs/reference/watch), and
 [tsdown declaration documentation](https://tsdown.dev/options/dts).
+
+The package build's `precompute-curricula` plugin normalizes runtime curriculum
+data, so browsers download neither raw audit JSON nor the adapters.
+`getSyllabus` returns `Promise<Syllabus | undefined>` and loads syllabus data
+separately for each curriculum. Callers must handle download failures.

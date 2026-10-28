@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { AlignButton } from "../../../ui/button";
 
 export function SemesterFilter({
@@ -21,7 +21,7 @@ export function SemesterFilter({
       role="group"
       aria-label="Navigasi semester"
     >
-      <motion.span
+      <m.span
         initial={reducedMotion ? false : { x: "120%", opacity: 0 }}
         animate={{
           x: reducedMotion || entered ? "0%" : "120%",
@@ -35,8 +35,8 @@ export function SemesterFilter({
         className="relative z-0 text-label-sm max-[1100px]:sr-only"
       >
         Semester
-      </motion.span>
-      <motion.div
+      </m.span>
+      <m.div
         initial={reducedMotion ? false : { scaleX: 0, opacity: 0 }}
         animate={{ scaleX: 1, opacity: 1 }}
         onAnimationComplete={() => setEntered(true)}
@@ -49,7 +49,7 @@ export function SemesterFilter({
           className="relative grid w-full gap-0.5"
           style={{ gridTemplateColumns: `repeat(${lastSemester}, minmax(0, 1fr))` }}
         >
-          <motion.div
+          <m.div
             aria-hidden="true"
             data-semester-band=""
             initial={false}
@@ -77,7 +77,7 @@ export function SemesterFilter({
             </AlignButton.Root>
           ))}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

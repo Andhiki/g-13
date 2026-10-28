@@ -1,6 +1,5 @@
 import { Typography } from "../../../ui/typography";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate } from "motion/react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   getViewportForBounds,
@@ -15,7 +14,7 @@ import {
 } from "@xyflow/react";
 import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
-import { EdgeRouting, routedEdgeTypes, useConnectionReveal } from "./EdgeRouting";
+import { EdgeRouting, routedEdgeTypes, connectionReveal } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import type { Scope } from "../scope";
@@ -39,39 +38,58 @@ function useCourseReveal(nodes: MapNode[]) {
     const selected = nodes.find((node) => node.type === "course" && node.data.state === "selected");
     const previous = new Map(current.current.map((node) => [node.id, node]));
     const targetIds = new Set(nodes.map((node) => node.id));
-    const update = (seconds: number) => {
-      const outgoing = Math.max(0, 1 - seconds / 0.18);
-      const incoming = Math.min(1, Math.max(0, (seconds - 0.7) / 0.25));
-      const frame = nodes.map((node) => {
-        if (!selected || node.id === selected.id) return node;
-        const old = previous.get(node.id);
-        if (outgoing > 0 && old) {
-          return withOpacity(
-            { ...node, position: old.position },
-            outgoing * Number(old.style?.opacity ?? 1),
-          );
-        }
-        return withOpacity(node, incoming);
-      });
-      if (selected && outgoing > 0) {
-        for (const old of previous.values()) {
-          if (!targetIds.has(old.id)) {
-            frame.push(withOpacity(old, outgoing * Number(old.style?.opacity ?? 1)));
-          }
-        }
-      }
+    const show = (frame: MapNode[]) => {
       current.current = frame;
-      setDisplayed({
-        nodes: frame,
-      });
+      setDisplayed({ nodes: frame });
     };
     if (!selected || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      update(1.3);
+      show(nodes);
       return;
     }
-    update(0);
-    const animation = animate(0, 1.3, { duration: 1.3, ease: "linear", onUpdate: update });
-    return () => animation.stop();
+    const startedAt = performance.now();
+    const animations: Animation[] = [];
+    const fade = (element: HTMLElement, from: string, to: number, duration: number, delay = 0) => {
+      const animation = element.animate([{ opacity: from }, { opacity: to }], {
+        duration,
+        fill: "both",
+      });
+      animation.startTime = startedAt + delay;
+      animations.push(animation);
+    };
+    const outgoing = [...document.querySelectorAll<HTMLElement>(".react-flow__node")]
+      .filter((element) => element.dataset.id !== selected.id)
+      .map((element) => ({ element, opacity: getComputedStyle(element).opacity }));
+    for (const { element, opacity } of outgoing) fade(element, opacity, 0, 180);
+    show([
+      ...nodes.map((node) =>
+        node.id === selected.id
+          ? node
+          : withOpacity({ ...node, position: previous.get(node.id)?.position ?? node.position }, 0),
+      ),
+      ...[...previous.values()]
+        .filter((node) => !targetIds.has(node.id))
+        .map((node) => withOpacity(node, 0)),
+    ]);
+    const timers = [
+      window.setTimeout(
+        () => show(nodes.map((node) => (node.id === selected.id ? node : withOpacity(node, 0)))),
+        180,
+      ),
+      window.setTimeout(() => {
+        for (const node of nodes) {
+          if (node.id === selected.id) continue;
+          const element = document.querySelector<HTMLElement>(
+            `.react-flow__node[data-id="${CSS.escape(node.id)}"]`,
+          );
+          if (element) fade(element, "0", 1, 250, 700);
+        }
+      }, 700),
+      window.setTimeout(() => show(nodes), 950),
+    ];
+    return () => {
+      timers.forEach(window.clearTimeout);
+      animations.forEach((animation) => animation.cancel());
+    };
   }, [nodes]);
 
   return displayed;
@@ -97,8 +115,7 @@ function ViewportFocus({
   const { setCenter, setViewport } = useReactFlow();
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let cancelled = false;
-    const timer = window.setTimeout(async () => {
+    const timer = window.setTimeout(() => {
       if (selectedId) {
         const points = [...positions.values()];
         const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
@@ -123,24 +140,8 @@ function ViewportFocus({
           0.12,
         );
         const target = { ...viewport, x: viewport.x + left, y: viewport.y + top };
-        if (!reducedMotion) {
-          const selected = positions.get(selectedId)!;
-          const focused = getViewportForBounds(
-            { ...selected, width: 248, height: 82 },
-            width,
-            height,
-            0.05,
-            0.88,
-            0.12,
-          );
-          await setViewport(
-            { ...focused, x: focused.x + left, y: focused.y + top },
-            { duration: 650, ease: (t) => 1 - Math.pow(1 - t, 4), interpolate: "linear" },
-          );
-          if (cancelled) return;
-        }
         setViewport(target, {
-          duration: reducedMotion ? 0 : 250,
+          duration: reducedMotion ? 0 : 150,
           ease: (t) => 1 - Math.pow(1 - t, 4),
           interpolate: "linear",
         });
@@ -205,7 +206,6 @@ function ViewportFocus({
       });
     }, 30);
     return () => {
-      cancelled = true;
       window.clearTimeout(timer);
     };
   }, [
@@ -299,16 +299,27 @@ export function CurriculumMap({
 }) {
   const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
   const reveal = useCourseReveal(nodes);
-  const progress = useConnectionReveal(
-    selectedId,
-    edges.some((edge) => edge.target === selectedId),
-    0.95,
+  const progress = useMemo(
+    () =>
+      connectionReveal(
+        edges.some((edge) => edge.target === selectedId),
+        1.05,
+      ),
+    [edges, selectedId],
   );
-  const revealedEdges = edges.map((edge) => ({
-    ...edge,
-    type: "routed",
-    data: { progress: edge.target === selectedId ? progress.incoming : progress.outgoing },
-  }));
+  const revealedEdges = useMemo(
+    () =>
+      edges.map((edge) => ({
+        ...edge,
+        type: "routed",
+        data: {
+          reveal: edge.target === selectedId ? progress.incoming : progress.outgoing,
+          animationKey: selectedId,
+          startedAt: progress.startedAt,
+        },
+      })),
+    [edges, selectedId, progress.incoming, progress.outgoing],
+  );
   return (
     <EdgeRouting>
       <ReactFlow<MapNode, Edge>

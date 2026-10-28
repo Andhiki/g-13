@@ -51,10 +51,17 @@ test("mobile sheet drags from its content and retains expanded scrolling", async
   await swipe(160, 660, 300);
   await expect(handle).toHaveAttribute("aria-valuenow", "75");
   await page.getByRole("button", { name: "Silabus", exact: true }).click();
+  await expect(sheet.getByText(/Disjoint Set/)).toBeVisible();
   const body = sheet.locator("div.overflow-y-auto");
   await swipe(200, 650, 350);
   await expect.poll(() => body.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
   await expect(handle).toHaveAttribute("aria-valuenow", "75");
+  // Stop the previous fling before resetting the content for the downward drag.
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: 200, y: 650 }],
+  });
+  await session.send("Input.dispatchTouchEvent", { type: "touchCancel", touchPoints: [] });
   await body.evaluate((el) => {
     el.scrollTop = 0;
   });

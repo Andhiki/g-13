@@ -1,6 +1,6 @@
 import { Typography } from "../../../ui/typography";
 import { useMemo, useRef, useState } from "react";
-import { useHotkey } from "@tanstack/react-hotkeys";
+import { useKeyboardShortcuts } from "../../../ui/use-keyboard-shortcuts";
 import { AlignButton } from "../../../ui/button";
 import { AlignCommandMenu } from "../../../ui/command-menu";
 import { AlignKbd } from "../../../ui/kbd";
@@ -21,11 +21,7 @@ export function CourseSearch({
     setOpen(nextOpen);
     if (!nextOpen) setQuery("");
   };
-  useHotkey("/", () => setOpen(true), {
-    enabled: !open,
-    ignoreInputs: true,
-    requireReset: true,
-  });
+  useKeyboardShortcuts(open ? {} : { "/": () => setOpen(true) });
   const results = useMemo(
     () => (query.trim() ? data.all.filter((course) => matches(course, query)).slice(0, 8) : []),
     [data, query],

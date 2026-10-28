@@ -1,5 +1,4 @@
 // Adapted from AlignUI Select v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
-import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { RiArrowDownSLine, RiCheckLine } from "@remixicon/react";
 import { extendTailwindMerge } from "tailwind-merge";
@@ -64,19 +63,9 @@ function Content({
         collisionPadding={8}
         {...props}
       >
-        <ScrollArea.Root type="auto">
-          <SelectPrimitive.Viewport asChild>
-            <ScrollArea.Viewport
-              style={{ overflowY: undefined }}
-              className="max-h-[196px] w-full scroll-py-2 overflow-auto p-2"
-            >
-              {children}
-            </ScrollArea.Viewport>
-          </SelectPrimitive.Viewport>
-          <ScrollArea.Scrollbar orientation="vertical">
-            <ScrollArea.Thumb className="!w-1 rounded bg-bg-soft-200" />
-          </ScrollArea.Scrollbar>
-        </ScrollArea.Root>
+        <SelectPrimitive.Viewport className="max-h-[196px] w-full scroll-py-2 overflow-y-auto p-2">
+          {children}
+        </SelectPrimitive.Viewport>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   );

@@ -2,6 +2,7 @@ import { defaultCurriculumId } from "@g13/curriculum";
 import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { LazyMotion, domAnimation } from "motion/react";
 import { ThemeProvider } from "next-themes";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
@@ -21,7 +22,6 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "preload", href: "/theme/sonic-dancing.gif", as: "image" },
       { rel: "stylesheet", href: flowStyles },
       { rel: "stylesheet", href: appStyles },
     ],
@@ -52,9 +52,11 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-          <div id="root" className="m-0 h-full w-full min-w-80">
-            {children}
-          </div>
+          <LazyMotion features={domAnimation}>
+            <div id="root" className="m-0 h-full w-full min-w-80">
+              {children}
+            </div>
+          </LazyMotion>
         </ThemeProvider>
         <Scripts />
       </body>
