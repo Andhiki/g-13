@@ -65,10 +65,9 @@ for (const theme of ["light", "dark"] as const) {
     await expect(choice).toHaveCSS("opacity", "1");
     const coreTitle = await core.locator("strong").evaluate((node) => getComputedStyle(node).color);
     const coreBorder = await core
-      .locator("button > div > span")
-      .first()
+      .getByText("PACS262201", { exact: true })
       .evaluate((node) => getComputedStyle(node).borderColor);
-    await expect(choice.locator("button > div > span").first()).not.toHaveCSS(
+    await expect(choice.getByText("PACS262303", { exact: true })).not.toHaveCSS(
       "border-color",
       coreBorder,
     );
