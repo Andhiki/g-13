@@ -195,15 +195,19 @@ function ViewportFocus({
       }
       const phone = window.matchMedia("(width < 650px)").matches;
       const title = document.querySelector<HTMLElement>("[data-map-title]")!;
-      const heading = title.querySelector("h1")!;
       const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-      setCenter(LANE_X + 12 + title.offsetWidth / 2, title.offsetTop + heading.offsetHeight / 2, {
-        zoom: Math.min(
-          phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
-          (stage.width - 32) / title.offsetWidth,
-        ),
-        duration: reducedMotion ? 0 : 1000,
-      });
+      const zoom = Math.min(
+        phone ? 0.64 : focusTarget === "2021" ? 0.58 : 0.68,
+        (stage.width - 32) / title.offsetWidth,
+      );
+      setViewport(
+        {
+          x: 16 - (LANE_X + 12) * zoom,
+          y: stage.height / 3 - title.offsetTop * zoom,
+          zoom,
+        },
+        { duration: reducedMotion ? 0 : 1000 },
+      );
     }, 30);
     return () => {
       window.clearTimeout(timer);

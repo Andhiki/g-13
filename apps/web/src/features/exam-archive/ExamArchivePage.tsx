@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import {
@@ -15,6 +15,7 @@ import {
   RiSearchLine,
   RiDriveLine,
 } from "@remixicon/react";
+import { AlignBreadcrumb } from "../../ui/breadcrumb";
 import { AlignBadge } from "../../ui/badge";
 import { AlignButton, buttonVariants } from "../../ui/button";
 import { AlignCommandMenu } from "../../ui/command-menu";
@@ -90,49 +91,55 @@ export function ExamArchivePage() {
       <section className="flex min-h-[60dvh] flex-col" aria-label="Penjelajah arsip ujian">
         <AlignCommandMenu.Root
           shouldFilter={false}
+          disablePointerSelection
           tabIndex={location.length > 0 ? 0 : -1}
-          label={location.length === 0 ? "Cari mata kuliah" : "Berkas dan folder"}
+          label="Cari mata kuliah"
           className="flex min-h-0 flex-1 flex-col"
         >
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 py-2">
             {location.length > 0 && (
-              <nav
-                aria-label="Lokasi folder"
-                className="flex min-w-0 flex-wrap items-center gap-0.5"
-              >
-                {folder.breadcrumbs.map((crumb, index) => (
-                  <span key={crumb.name} className="flex min-w-0 max-w-full items-center gap-0.5">
-                    {index > 0 && (
-                      <RiArrowRightSLine
-                        className="size-3.5 shrink-0 text-text-soft-400"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <AlignButton.Root
-                      variant="neutral"
-                      mode="ghost"
-                      size="xxsmall"
-                      className="h-auto min-h-7 min-w-0 max-w-full whitespace-normal px-2 text-paragraph-xs text-left"
-                      aria-current={index === folder.breadcrumbs.length - 1 ? "page" : undefined}
-                      onClick={() => openFolder(crumb.location)}
-                    >
-                      {crumb.name}
-                    </AlignButton.Root>
-                  </span>
-                ))}
-              </nav>
+              <AlignBreadcrumb.Root asChild>
+                <nav aria-label="Lokasi folder" className="min-w-0">
+                  {folder.breadcrumbs.map((crumb, index) => (
+                    <Fragment key={crumb.name}>
+                      {index > 0 && (
+                        <AlignBreadcrumb.ArrowIcon asChild>
+                          <RiArrowRightSLine aria-hidden="true" />
+                        </AlignBreadcrumb.ArrowIcon>
+                      )}
+                      <AlignBreadcrumb.Item
+                        asChild
+                        active={index === folder.breadcrumbs.length - 1}
+                        className="min-w-0 max-w-full break-words"
+                      >
+                        <Link
+                          to="/exam"
+                          search={folderSearch(crumb.location)}
+                          resetScroll={false}
+                          aria-current={
+                            index === folder.breadcrumbs.length - 1 ? "page" : undefined
+                          }
+                        >
+                          {crumb.name}
+                        </Link>
+                      </AlignBreadcrumb.Item>
+                    </Fragment>
+                  ))}
+                </nav>
+              </AlignBreadcrumb.Root>
             )}
-            {location.length === 0 && (
-              <label className="flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
-                <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
-                <AlignCommandMenu.Input
-                  aria-label="Cari mata kuliah"
-                  placeholder="Cari mata kuliah…"
-                  value={query}
-                  onValueChange={setQuery}
-                />
-              </label>
-            )}
+            <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
+              <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
+              <AlignCommandMenu.Input
+                aria-label="Cari mata kuliah"
+                placeholder="Mata kuliah"
+                value={query}
+                onValueChange={(value) => {
+                  setQuery(value);
+                  if (location.length > 0) openFolder([]);
+                }}
+              />
+            </label>
           </div>
           <div
             className="grid grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-paragraph-xs text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
@@ -155,7 +162,7 @@ export function ExamArchivePage() {
                 key={entry.id}
                 value={entry.id}
                 size="medium"
-                className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
+                className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left hover:bg-bg-weak-50 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
                 onSelect={() => {
                   list.current?.focus();
                   if (entry.kind === "folder") openFolder(entry.location);

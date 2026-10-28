@@ -33,8 +33,18 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Posisi awal judul dan tombol CS UGM Roadmap pada peta rata kiri di sepertiga
+  atas layar.
+
+- Hasil kuis roadmap diawali layar pemuatan dengan animasi rute mata kuliah
+  minimal 500 ms; preferensi pengurangan gerakan menampilkan ilustrasi statis.
 - Tombol kembali ke peta kurikulum memakai gaya netral berbingkai seperti toggle tema;
   breadcrumb “Arsip Ujian” disembunyikan di folder root agar judul tidak berulang.
+  Navigasi folder memakai komponen Breadcrumb AlignUI dengan tautan folder.
+  Pencarian mata kuliah rata kanan dengan placeholder “Mata kuliah” dan tetap
+  tersedia di dalam folder; mengetik pencarian membuka hasil mata kuliah di root.
+- Warna hover baris Arsip Ujian memakai CSS Tailwind tanpa pembaruan seleksi
+  JavaScript saat pointer bergerak; navigasi keyboard tetap tersedia.
 
 - Pemuatan awal lebih ringan: data kurikulum dinormalisasi saat build, detail dan
   silabus dimuat sesuai kebutuhan, serta hasil roadmap dimuat setelah kuis selesai.

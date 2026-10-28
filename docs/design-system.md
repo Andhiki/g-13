@@ -189,7 +189,10 @@ The curriculum version filter uses the pinned AlignUI SegmentedControl source an
 The exam archive uses AlignUI Command Menu inline for its folder/file list and course-name search.
 Its rows show name, created date, and type, separated by light rules without an outer card. On phones,
 the created date moves under the name. Folders without source timestamps show a dash. Compact
-breadcrumbs wrap long course names. Action buttons use Remix icons. The PDF modal initially focuses
+breadcrumbs use the upstream [AlignUI Breadcrumb](https://www.alignui.com/docs/v1.2/ui/breadcrumb)
+source in `apps/web/src/ui/breadcrumb.tsx`, with default item styles and router links.
+Root and Item retain `asChild`; ArrowIcon uses the same Slot composition instead of the
+upstream polymorphic helper. Unused Icon is omitted. Layout utilities wrap long course names. Action buttons use Remix icons. The PDF modal initially focuses
 its filename heading so the embedded viewer does not capture keyboard focus on open; closing returns
 focus to the file list. The share action uses the same native read-only input fallback as roadmap
 sharing when clipboard access fails. Folder and paper selection live in the URL; the modal mounts

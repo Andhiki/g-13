@@ -1,9 +1,10 @@
-import { lazy, useEffect, useRef } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import { DeferredContent } from "../../ui/deferred-content";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { Route } from "../../routes/roadmap";
 import { firstUnanswered } from "./quiz";
 import { RoadmapQuiz } from "./RoadmapQuiz";
+import { RoadmapLoading } from "./RoadmapLoading";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
 
 const RoadmapResult = lazy(() =>
@@ -36,19 +37,23 @@ export function RoadmapPage() {
     }
   }, [answers, navigate]);
   const result = answers.hasil && !firstUnanswered(answers);
+  const [showResult, setShowResult] = useState(false);
+  useEffect(() => {
+    if (!result) {
+      setShowResult(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setShowResult(true), 500);
+    return () => window.clearTimeout(timer);
+  }, [result]);
   const update = (next: RoadmapSearch) => {
     void navigate({ search: next, replace: !next.hasil && !answers.hasil, resetScroll: false });
   };
   const restart = () => update(validateRoadmapSearch({}));
+  if (result && !showResult) return <RoadmapLoading />;
   if (result)
     return (
-      <DeferredContent
-        fallback={
-          <p role="status" className="p-5">
-            Memuat roadmap…
-          </p>
-        }
-      >
+      <DeferredContent fallback={<RoadmapLoading />}>
         <RoadmapResult answers={answers} update={update} restart={restart} />
       </DeferredContent>
     );
