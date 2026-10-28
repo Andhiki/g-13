@@ -4,7 +4,7 @@ import { examArchive, archiveSource } from "../src/features/exam-archive/catalog
 import type { ExamCourse, ExamPaper } from "../src/features/exam-archive/contracts";
 
 type SourceCourse = { name: string; folderId: string };
-type SourceFile = { id: string; name: string; mimeType: string };
+type SourceFile = { id: string; name: string; mimeType: string; createdAt: string | null };
 type Folder = { files: SourceFile[] } | { error: string };
 type Diagnostic = { source: string; message: string };
 const folderMime = "application/vnd.google-apps.folder";
@@ -93,7 +93,13 @@ export function parseFolder(html: string): SourceFile[] {
     ) {
       throw new Error("Invalid Drive entry; refusing a partial listing");
     }
-    return { id: row[0], name: row[2], mimeType: row[3] };
+    // Drive serializes createdTime as epoch milliseconds in listing field 10.
+    const timestamp = typeof row[10] === "number" ? row[10] : Number(row[10]);
+    const createdAt =
+      Number.isFinite(timestamp) && timestamp > 0 && timestamp <= 8.64e15
+        ? new Date(timestamp).toISOString()
+        : null;
+    return { id: row[0], name: row[2], mimeType: row[3], createdAt };
   });
 }
 
@@ -116,7 +122,7 @@ export function normalizeArchive({
   const catalog: ExamCourse[] = [];
   let writable = true;
   for (const source of courses) {
-    const years = new Map<string, Map<string, ExamPaper>>();
+    const years = new Map<string, { createdAt: string | null; papers: Map<string, ExamPaper> }>();
     let failed = false;
     function visit(id: string, ancestors: string[], visited: Set<string>) {
       if (visited.has(id)) {
@@ -137,10 +143,16 @@ export function normalizeArchive({
       const folderYear = folderYears.at(-1);
       if (!folder.files.length && ancestors.length) {
         const emptyYear = folderYear ?? "Tanpa tahun";
-        years.set(emptyYear, years.get(emptyYear) ?? new Map());
+        years.set(emptyYear, years.get(emptyYear) ?? { createdAt: null, papers: new Map() });
       }
       for (const file of folder.files) {
         if (file.mimeType === folderMime) {
+          const yearFolder = yearsIn(file.name).at(-1);
+          if (yearFolder) {
+            const year = years.get(yearFolder) ?? { createdAt: file.createdAt, papers: new Map() };
+            year.createdAt ??= file.createdAt;
+            years.set(yearFolder, year);
+          }
           visit(file.id, [...ancestors, file.name], visited);
           continue;
         }
@@ -171,14 +183,14 @@ export function normalizeArchive({
             message: `Review exam label: ${file.name} → ${exam ?? "unknown"}`,
           });
         }
-        const papers = years.get(year) ?? new Map<string, ExamPaper>();
-        if (papers.has(file.id))
+        const yearContents = years.get(year) ?? { createdAt: null, papers: new Map() };
+        if (yearContents.papers.has(file.id))
           diagnostics.push({
             source: file.id,
             message: "Duplicate paper in destination folder ignored",
           });
-        papers.set(file.id, { ...file, exam, sourceFolderId: id });
-        years.set(year, papers);
+        yearContents.papers.set(file.id, { ...file, exam, sourceFolderId: id });
+        years.set(year, yearContents);
       }
     }
     visit(source.folderId, [], new Set());
@@ -200,9 +212,11 @@ export function normalizeArchive({
       id: old?.id ?? `${source.folderId}:${source.name}`,
       name: source.name,
       sourceFolderId: source.folderId,
-      years: [...years].map(([name, papers]) => ({
+      createdAt: null,
+      years: [...years].map(([name, year]) => ({
         name,
-        papers: [...papers.values()].sort((a, b) =>
+        createdAt: year.createdAt,
+        papers: [...year.papers.values()].sort((a, b) =>
           a.name.localeCompare(b.name, "id", { numeric: true }),
         ),
       })),

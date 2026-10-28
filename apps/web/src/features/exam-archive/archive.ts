@@ -3,8 +3,14 @@ import type { ArchiveLocation, ExamCourse, ExamPaper } from "./contracts";
 import type { ArchiveSearch } from "./search";
 
 type ArchiveEntry =
-  | { kind: "folder"; id: string; name: string; location: ArchiveLocation }
-  | { kind: "paper"; id: string; name: string; paper: ExamPaper };
+  | {
+      kind: "folder";
+      id: string;
+      name: string;
+      location: ArchiveLocation;
+      createdAt: string | null;
+    }
+  | { kind: "paper"; id: string; name: string; paper: ExamPaper; createdAt: string | null };
 
 export function browseArchive({
   location,
@@ -29,6 +35,7 @@ export function browseArchive({
         id: entry.id,
         name: entry.name,
         location: [entry.id],
+        createdAt: entry.createdAt,
       }));
   } else {
     breadcrumbs.push({ name: course.name, location: [course.id] });
@@ -45,6 +52,7 @@ export function browseArchive({
           id: entry.name,
           name: entry.name,
           location: [course.id, entry.name],
+          createdAt: entry.createdAt,
         }));
       return { breadcrumbs, entries };
     }
@@ -54,6 +62,7 @@ export function browseArchive({
       id: paper.id,
       name: paper.name,
       paper,
+      createdAt: paper.createdAt,
     }));
   }
   return {

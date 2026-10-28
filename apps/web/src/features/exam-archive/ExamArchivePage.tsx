@@ -3,21 +3,45 @@ import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import {
   RiArrowLeftLine,
-  RiArrowRightUpLine,
+  RiArrowUpLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiDownloadLine,
+  RiFileCopyLine,
   RiFilePdf2Line,
   RiFileTextLine,
   RiFolder3Line,
   RiArrowRightSLine,
+  RiSearchLine,
+  RiDriveLine,
 } from "@remixicon/react";
+import { AlignBadge } from "../../ui/badge";
 import { AlignButton, buttonVariants } from "../../ui/button";
 import { AlignCommandMenu } from "../../ui/command-menu";
 import { AlignModal } from "../../ui/modal";
 import { ThemeSwitch } from "../../ui/theme-switch";
 import { Typography } from "../../ui/typography";
-import { archiveSource, browseArchive, paperLinks, resolveArchive } from "./archive";
+import { browseArchive, paperLinks, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
 import { Route } from "../../routes/exam";
 import type { ArchiveLocation } from "./contracts";
+
+function ExamBadge({ exam }: { exam: "UTS" | "UAS" }) {
+  return (
+    <AlignBadge.Root variant={exam === "UTS" ? "information" : "warning"} size="small">
+      {exam}
+    </AlignBadge.Root>
+  );
+}
+
+const relativeTimeFormatter = new Intl.RelativeTimeFormat("id-ID", { numeric: "auto" });
+const formatCreatedAt = (value: string | null) => {
+  if (!value) return "—";
+  const days = Math.round((Date.parse(value) - Date.now()) / 86_400_000);
+  if (Math.abs(days) >= 365) return relativeTimeFormatter.format(Math.round(days / 365), "year");
+  if (Math.abs(days) >= 30) return relativeTimeFormatter.format(Math.round(days / 30), "month");
+  return relativeTimeFormatter.format(days, "day");
+};
 
 export function ExamArchivePage() {
   const search = Route.useSearch();
@@ -52,74 +76,86 @@ export function ExamArchivePage() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-5xl flex-col gap-6 px-4 py-5 text-text-strong-950 sm:px-8 sm:py-8">
       <header className="flex items-center justify-between gap-4">
-        <Link
-          to="/"
-          search={{ kurikulum: defaultCurriculumId }}
-          className={buttonVariants({ variant: "neutral", mode: "ghost", size: "small" })}
-        >
-          <RiArrowLeftLine className="size-4" aria-hidden="true" />
-          Peta kurikulum
-        </Link>
+        <AlignButton.Root asChild variant="neutral" mode="stroke" size="medium">
+          <Link to="/" search={{ kurikulum: defaultCurriculumId }}>
+            <RiArrowLeftLine className="size-4" aria-hidden="true" />
+            Peta kurikulum
+          </Link>
+        </AlignButton.Root>
         <ThemeSwitch />
       </header>
       <Typography as="h1" variant="title">
         Arsip Ujian
       </Typography>
-      <section
-        className="flex min-h-[60dvh] flex-col overflow-hidden rounded-xl border border-stroke-soft-200"
-        aria-label="Penjelajah arsip ujian"
-      >
-        <nav
-          aria-label="Lokasi folder"
-          className="flex flex-wrap items-center gap-1 border-b border-stroke-soft-200 p-3"
-        >
-          {folder.breadcrumbs.map((crumb, index) => (
-            <span key={crumb.name} className="flex min-w-0 max-w-full items-center gap-1">
-              {index > 0 && (
-                <RiArrowRightSLine
-                  className="size-4 shrink-0 text-text-soft-400"
-                  aria-hidden="true"
-                />
-              )}
-              <AlignButton.Root
-                variant="neutral"
-                mode="ghost"
-                size="small"
-                className="h-auto min-h-9 min-w-0 whitespace-normal text-left"
-                aria-current={index === folder.breadcrumbs.length - 1 ? "page" : undefined}
-                onClick={() => openFolder(crumb.location)}
-              >
-                {crumb.name}
-              </AlignButton.Root>
-            </span>
-          ))}
-        </nav>
+      <section className="flex min-h-[60dvh] flex-col" aria-label="Penjelajah arsip ujian">
         <AlignCommandMenu.Root
           shouldFilter={false}
           tabIndex={location.length > 0 ? 0 : -1}
           label={location.length === 0 ? "Cari mata kuliah" : "Berkas dan folder"}
           className="flex min-h-0 flex-1 flex-col"
         >
-          {location.length === 0 && (
-            <div className="border-b border-stroke-soft-200 px-5 py-4">
-              <AlignCommandMenu.Input
-                aria-label="Cari mata kuliah"
-                placeholder="Cari mata kuliah…"
-                value={query}
-                onValueChange={setQuery}
-              />
-            </div>
-          )}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 py-2">
+            {location.length > 0 && (
+              <nav
+                aria-label="Lokasi folder"
+                className="flex min-w-0 flex-wrap items-center gap-0.5"
+              >
+                {folder.breadcrumbs.map((crumb, index) => (
+                  <span key={crumb.name} className="flex min-w-0 max-w-full items-center gap-0.5">
+                    {index > 0 && (
+                      <RiArrowRightSLine
+                        className="size-3.5 shrink-0 text-text-soft-400"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <AlignButton.Root
+                      variant="neutral"
+                      mode="ghost"
+                      size="xxsmall"
+                      className="h-auto min-h-7 min-w-0 max-w-full whitespace-normal px-2 text-paragraph-xs text-left"
+                      aria-current={index === folder.breadcrumbs.length - 1 ? "page" : undefined}
+                      onClick={() => openFolder(crumb.location)}
+                    >
+                      {crumb.name}
+                    </AlignButton.Root>
+                  </span>
+                ))}
+              </nav>
+            )}
+            {location.length === 0 && (
+              <label className="flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
+                <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
+                <AlignCommandMenu.Input
+                  aria-label="Cari mata kuliah"
+                  placeholder="Cari mata kuliah…"
+                  value={query}
+                  onValueChange={setQuery}
+                />
+              </label>
+            )}
+          </div>
+          <div
+            className="grid grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-paragraph-xs text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
+            aria-hidden="true"
+          >
+            <span className="flex items-center gap-1">
+              Nama <RiArrowUpLine className="size-3.5" aria-hidden="true" />
+            </span>
+            <span className="hidden text-center sm:block">Dibuat</span>
+            <span className="text-center">Ujian</span>
+            <span className="text-center">Jenis</span>
+          </div>
           <AlignCommandMenu.List
             ref={list}
             label="Isi folder"
-            className="max-h-none p-2 focus-visible:outline-2 focus-visible:outline-primary-base"
+            className="max-h-none p-0 focus-visible:outline-2 focus-visible:outline-primary-base"
           >
             {folder.entries.map((entry) => (
               <AlignCommandMenu.Item
                 key={entry.id}
                 value={entry.id}
                 size="medium"
+                className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
                 onSelect={() => {
                   list.current?.focus();
                   if (entry.kind === "folder") openFolder(entry.location);
@@ -132,27 +168,57 @@ export function ExamArchivePage() {
                   }
                 }}
               >
-                {entry.kind === "folder" ? (
-                  <RiFolder3Line className="size-5 shrink-0 text-warning-base" aria-hidden="true" />
-                ) : entry.paper.mimeType === "application/pdf" ? (
-                  <RiFilePdf2Line
-                    className="size-5 shrink-0 text-text-sub-600"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <RiFileTextLine
-                    className="size-5 shrink-0 text-text-sub-600"
-                    aria-hidden="true"
-                  />
-                )}
-                <Typography as="span" className="min-w-0 flex-1 break-words">
-                  {entry.name}
+                <span className="flex min-w-0 items-center gap-3">
+                  {entry.kind === "folder" ? (
+                    <RiFolder3Line
+                      className="size-5 shrink-0 text-warning-base"
+                      aria-hidden="true"
+                    />
+                  ) : entry.paper.mimeType === "application/pdf" ? (
+                    <RiFilePdf2Line
+                      className="size-5 shrink-0 text-text-sub-600"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <RiFileTextLine
+                      className="size-5 shrink-0 text-text-sub-600"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <Typography as="span" className="min-w-0 break-words">
+                      {entry.name}
+                    </Typography>
+                    <Typography
+                      as="span"
+                      variant="caption"
+                      className="text-text-soft-400 sm:hidden"
+                    >
+                      Dibuat {formatCreatedAt(entry.createdAt)}
+                    </Typography>
+                  </span>
+                </span>
+                <Typography
+                  as="span"
+                  variant="caption"
+                  className="hidden text-center text-text-sub-600 sm:block"
+                >
+                  {formatCreatedAt(entry.createdAt)}
                 </Typography>
-                {entry.kind === "paper" && entry.paper.exam && (
-                  <Typography as="span" variant="caption" className="shrink-0 text-text-sub-600">
-                    {entry.paper.exam}
-                  </Typography>
-                )}
+                <span className="flex justify-center text-paragraph-xs text-text-sub-600">
+                  {entry.kind === "paper" && entry.paper.exam ? (
+                    <ExamBadge exam={entry.paper.exam} />
+                  ) : (
+                    "—"
+                  )}
+                </span>
+                <AlignBadge.Root
+                  variant="light"
+                  size="small"
+                  className="w-fit justify-self-center rounded-md"
+                >
+                  {entry.kind === "folder" ? "Folder" : "Berkas"}
+                </AlignBadge.Root>
               </AlignCommandMenu.Item>
             ))}
             <AlignCommandMenu.Empty className="px-3 py-16 text-center text-paragraph-sm text-text-sub-600">
@@ -163,19 +229,6 @@ export function ExamArchivePage() {
           </AlignCommandMenu.List>
         </AlignCommandMenu.Root>
       </section>
-      <footer className="flex flex-wrap items-center justify-between gap-2">
-        <Typography variant="caption" className="text-text-sub-600">
-          {folder.entries.length} item
-        </Typography>
-        <a
-          href={archiveSource}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "neutral", mode: "ghost", size: "xsmall" })}
-        >
-          Sumber: Himakom UGM <RiArrowRightUpLine className="size-4" aria-hidden="true" />
-        </a>
-      </footer>
       <AlignModal.Root
         open={paper !== null}
         onOpenChange={(open) => {
@@ -184,6 +237,7 @@ export function ExamArchivePage() {
       >
         <AlignModal.Content
           className="flex h-[90dvh] max-w-5xl flex-col overflow-hidden"
+          showClose={false}
           aria-describedby={undefined}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
@@ -194,62 +248,108 @@ export function ExamArchivePage() {
             list.current?.focus();
           }}
         >
-          <div className="min-w-0 p-4 pr-14">
+          <div className="flex min-w-0 items-center justify-between gap-4 p-4">
             <AlignModal.Title asChild>
               <Typography
                 ref={modalTitle}
                 as="h2"
                 tabIndex={-1}
                 variant="label"
-                className="min-w-0 flex-1 break-words outline-none"
+                className="min-w-0 flex-1 truncate outline-none"
+                title={paper?.name}
               >
                 {paper?.name}
               </Typography>
             </AlignModal.Title>
+            {links && (
+              <div
+                className="flex shrink-0 items-center gap-1"
+                role="group"
+                aria-label="Aksi berkas"
+              >
+                <a
+                  href={links.download}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Unduh"
+                  title="Unduh"
+                  className={buttonVariants({
+                    variant: "neutral",
+                    mode: "ghost",
+                    size: "xsmall",
+                    className: "size-8 p-0",
+                  })}
+                >
+                  <RiDownloadLine className="size-4" aria-hidden="true" />
+                </a>
+                <AlignButton.Root
+                  variant="neutral"
+                  mode="ghost"
+                  size="xsmall"
+                  className="size-8 p-0"
+                  aria-label={
+                    share?.status === "copied" ? "Tautan berhasil disalin" : "Salin tautan"
+                  }
+                  title={share?.status === "copied" ? "Tautan disalin" : "Salin tautan"}
+                  onClick={() => {
+                    void copyLink();
+                  }}
+                >
+                  {share?.status === "copied" ? (
+                    <RiCheckLine
+                      key="copied"
+                      className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
+                  )}
+                </AlignButton.Root>
+                <a
+                  href={links.drive}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Buka di Drive"
+                  title="Buka di Drive"
+                  className={buttonVariants({
+                    variant: "neutral",
+                    mode: "ghost",
+                    size: "xsmall",
+                    className: "size-8 p-0",
+                  })}
+                >
+                  <RiDriveLine className="size-4" aria-hidden="true" />
+                </a>
+                <AlignModal.Close asChild>
+                  <AlignButton.Root
+                    variant="neutral"
+                    mode="ghost"
+                    size="xsmall"
+                    className="size-8 p-0"
+                    aria-label="Tutup dialog"
+                    title="Tutup"
+                  >
+                    <RiCloseLine className="size-4" aria-hidden="true" />
+                  </AlignButton.Root>
+                </AlignModal.Close>
+              </div>
+            )}
+            <span className="sr-only" role="status" aria-live="polite">
+              {share?.status === "copied" ? "Tautan berhasil disalin" : ""}
+            </span>
           </div>
-          {links && (
-            <div className="flex flex-wrap items-center gap-2 border-b border-stroke-soft-200 px-4 pb-3">
-              <a
-                href={links.download}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ variant: "neutral", mode: "stroke", size: "small" })}
-              >
-                Unduh
-              </a>
-              <AlignButton.Root
-                variant="neutral"
-                mode="stroke"
-                size="small"
-                onClick={() => {
-                  void copyLink();
-                }}
-                aria-live="polite"
-              >
-                {share?.status === "copied" ? "Tautan disalin" : "Salin tautan"}
-              </AlignButton.Root>
-              <a
-                href={links.drive}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ variant: "neutral", mode: "stroke", size: "small" })}
-              >
-                Buka di Drive <RiArrowRightUpLine className="size-4" aria-hidden="true" />
-              </a>
-              {share?.status === "manual" && (
-                <div className="w-full">
-                  <Typography variant="caption" role="status">
-                    Gagal menyalin otomatis. Salin tautan berikut.
-                  </Typography>
-                  <input
-                    aria-label="Tautan berkas"
-                    readOnly
-                    value={share.url}
-                    onFocus={(event) => event.currentTarget.select()}
-                    className="mt-2 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
-                  />
-                </div>
-              )}
+          {share?.status === "manual" && (
+            <div className="border-y border-stroke-soft-200 px-4 py-2">
+              <Typography variant="caption" role="status">
+                Gagal menyalin otomatis. Salin tautan berikut.
+              </Typography>
+              <input
+                aria-label="Tautan berkas"
+                readOnly
+                value={share.url}
+                onFocus={(event) => event.currentTarget.select()}
+                className="mt-2 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
+              />
             </div>
           )}
           {paper && links && (

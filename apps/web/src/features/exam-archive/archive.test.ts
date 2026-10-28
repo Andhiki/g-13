@@ -8,24 +8,27 @@ const catalog = [
     id: "basis-data",
     name: "Basis Data",
     sourceFolderId: "basis-data",
+    createdAt: null,
     years: [
-      { name: "2023", papers: [] },
+      { name: "2023", createdAt: null, papers: [] },
       {
         name: "2024",
+        createdAt: null,
         papers: [
           {
             id: "pdf-id",
             name: "UTS Basis Data.pdf",
             exam: "UTS",
             mimeType: "application/pdf",
+            createdAt: null,
             sourceFolderId: "uts-source",
           },
         ],
       },
-      { name: "Tanpa tahun", papers: [] },
+      { name: "Tanpa tahun", createdAt: null, papers: [] },
     ],
   },
-  { id: "agama", name: "Agama Hindu", sourceFolderId: "agama", years: [] },
+  { id: "agama", name: "Agama Hindu", sourceFolderId: "agama", createdAt: null, years: [] },
 ] satisfies ExamCourse[];
 
 test("course search ignores years and filenames and preserves empty courses", () => {

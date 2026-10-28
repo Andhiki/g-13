@@ -45,9 +45,9 @@ test("fresh folder and paper links restore their locations; closing a direct mod
 
 test("Back and Forward restore folders and preview without duplicate frames", async ({ page }) => {
   await page.goto("/exam");
-  await page.getByRole("option", { name: "Basis Data", exact: true }).click();
-  await page.getByRole("option", { name: "2023", exact: true }).click();
-  await page.getByRole("option", { name: `${filename} UAS`, exact: true }).click();
+  await page.getByRole("option", { name: /Basis Data/ }).click();
+  await page.getByRole("option", { name: /^2023/ }).click();
+  await page.getByRole("option", { name: /2023 BasDat KOMA[.]pdf/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.goBack();
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -76,7 +76,7 @@ test("copy shares the in-app modal URL and failed clipboard writes offer manual 
   await page.goto(paperUrl);
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: "Salin tautan" }).click();
-  await expect(dialog.getByRole("button", { name: "Tautan disalin" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Tautan berhasil disalin" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(page.url());
   await page.reload();
   await page.evaluate(() =>
@@ -86,9 +86,9 @@ test("copy shares the in-app modal URL and failed clipboard writes offer manual 
     }),
   );
   await dialog.getByRole("button", { name: "Salin tautan" }).click();
-  await expect(dialog.getByRole("status")).toHaveText(
-    "Gagal menyalin otomatis. Salin tautan berikut.",
-  );
+  await expect(
+    dialog.getByText("Gagal menyalin otomatis. Salin tautan berikut.", { exact: true }),
+  ).toBeVisible();
   const input = dialog.getByRole("textbox", { name: "Tautan berkas" });
   await expect(input).toHaveValue(page.url());
   await input.focus();
@@ -134,7 +134,7 @@ test("malformed or mismatched locations never open an unrelated paper", async ({
     await page.goto(url);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.locator("iframe")).toHaveCount(0);
-    await expect(page.getByRole("option", { name: "Basis Data", exact: true })).toBeVisible();
+    await expect(page.getByRole("option", { name: /Basis Data/ })).toBeVisible();
   }
   await page.goto(`/exam?course=${courseId}&year=2024&file=${paperId}`);
   await expect(page.getByRole("dialog")).toHaveCount(0);

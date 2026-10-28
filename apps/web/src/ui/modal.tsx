@@ -78,4 +78,11 @@ const Content = React.forwardRef<
 ));
 Content.displayName = "ModalContent";
 
-export const AlignModal = { Root, Trigger: DialogPrimitive.Trigger, Title, Description, Content };
+export const AlignModal = {
+  Root,
+  Trigger: DialogPrimitive.Trigger,
+  Close: DialogPrimitive.Close,
+  Title,
+  Description,
+  Content,
+};
