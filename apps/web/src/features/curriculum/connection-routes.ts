@@ -57,7 +57,11 @@ export function connectionRoutes(nodes: RoutingNode[], edges: Edge[]) {
       targetY: target.y,
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
-      options: { nodePadding: 20, gridRatio: 4, generatePath: pathfindingJumpPointNoDiagonal },
+      options: {
+        nodePadding: clearance,
+        gridRatio: 4,
+        generatePath: pathfindingJumpPointNoDiagonal,
+      },
     });
     if (route instanceof Error) continue;
     const points = connectionCorners(source, target, route.points);

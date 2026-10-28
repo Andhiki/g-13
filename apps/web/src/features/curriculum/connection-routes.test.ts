@@ -136,3 +136,21 @@ for (const { id } of listCurricula()) {
     }
   });
 }
+
+test("Jaringan Komputer reaches its practicum through a row gap without detouring above the column", () => {
+  const data = getCurriculum("2026");
+  const map = buildMap(data, data.all, getRelations("2026"), null, "all", () => {});
+  const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
+  const source = nodes.find((node) => node.id === "PACS262202")!;
+  const target = nodes.find((node) => node.id === "PACS262418")!;
+  const route = connectionRoutes(nodes, mapConnections(map.edges, null, null)).get(
+    `${source.id}->${target.id}`,
+  )!;
+  const length = route.points.slice(1).reduce((total, point, index) => {
+    const previous = route.points[index];
+    return total + Math.abs(point[0] - previous[0]) + Math.abs(point[1] - previous[1]);
+  }, 0);
+  expect(length).toBe(
+    Math.abs(target.target.x - source.source.x) + Math.abs(target.target.y - source.source.y),
+  );
+});

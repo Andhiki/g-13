@@ -83,12 +83,12 @@ export function CourseTable({
               >
                 <AlignTable.Cell className="h-10 max-[640px]:hidden">
                   <div className="flex items-center gap-1 whitespace-nowrap">
-                    <Typography as="span" variant="caption" className="text-text-sub-600">
-                      {course.code || "—"}
-                    </Typography>
                     {course.code && (
                       <CopyCourseButton value={course.code} label="kode mata kuliah" />
                     )}
+                    <Typography as="span" variant="caption" className="text-text-sub-600">
+                      {course.code || "—"}
+                    </Typography>
                   </div>
                 </AlignTable.Cell>
                 <AlignTable.Cell className="h-10">
@@ -112,8 +112,8 @@ export function CourseTable({
                   >
                     {course.code && (
                       <span className="inline-flex items-center gap-1">
-                        {course.code}
                         <CopyCourseButton value={course.code} label="kode mata kuliah" />
+                        {course.code}
                       </span>
                     )}
                     {[categories, groups].filter(Boolean).join(" · ")}

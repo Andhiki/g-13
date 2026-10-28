@@ -1,3 +1,4 @@
+import { AlignTooltip } from "../../ui/tooltip";
 import { Typography } from "../../ui/typography";
 import { RiInformationLine } from "@remixicon/react";
 import { AlignButton } from "../../ui/button";
@@ -15,16 +16,30 @@ export function RoadmapNotes({
 }) {
   return (
     <AlignModal.Root>
-      <AlignModal.Trigger asChild>
-        <AlignButton.Root variant="neutral" mode="stroke">
-          <RiInformationLine className="size-5" aria-hidden="true" />
-          Catatan{plan.conflicts.length ? ` · ${plan.conflicts.length}` : ""}
-        </AlignButton.Root>
-      </AlignModal.Trigger>
+      <AlignTooltip.Provider>
+        <AlignTooltip.Root>
+          <AlignTooltip.Trigger asChild>
+            <AlignModal.Trigger asChild>
+              <AlignButton.Root
+                variant="neutral"
+                mode="stroke"
+                className="size-10 p-0"
+                aria-label="Catatan roadmap"
+              >
+                <RiInformationLine className="size-5" aria-hidden="true" />
+              </AlignButton.Root>
+            </AlignModal.Trigger>
+          </AlignTooltip.Trigger>
+          <AlignTooltip.Content size="xsmall" side="left">
+            Catatan roadmap
+            {plan.conflicts.length ? ` · ${plan.conflicts.length} hal perlu diperiksa` : ""}
+          </AlignTooltip.Content>
+        </AlignTooltip.Root>
+      </AlignTooltip.Provider>
       <AlignModal.Content className="max-w-[560px] max-h-[85dvh] overflow-y-auto">
         <div className="p-5 pr-12">
           <AlignModal.Title asChild>
-            <Typography as="h2" variant="subtitle1" className="flex-1">
+            <Typography as="h2" variant="title" className="m-0">
               Catatan roadmap
             </Typography>
           </AlignModal.Title>
@@ -34,23 +49,27 @@ export function RoadmapNotes({
             Pemeriksaan rencana, asumsi, dan sumber kurikulum.
           </Typography>
         </AlignModal.Description>
-        <div className="space-y-6 overflow-y-auto p-5 pt-0 text-paragraph-sm">
-          <section>
-            <Typography as="h2" variant="label" className="m-0">
+        <div className="space-y-6 overflow-y-auto p-5 pt-0">
+          <section className="space-y-2">
+            <Typography as="h3" variant="subtitle2" className="m-0">
               {plan.conflicts.length
                 ? `${plan.conflicts.length} hal perlu diperiksa`
                 : "Pemeriksaan rencana"}
             </Typography>
             {target === 7 && plan.conflicts.length > 0 && (
-              <Typography as="p" variant="paragraph">
+              <Typography as="p" variant="paragraph" className="text-text-sub-600">
                 Bandingkan target 8 semester untuk mencari ruang tambahan. Skenario 8 semester juga
                 perlu diperiksa.
               </Typography>
             )}
             {plan.conflicts.length ? (
-              <ul className="space-y-3 pl-4 text-text-sub-600">
+              <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
                 {plan.conflicts.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>
+                    <Typography as="span" variant="paragraph">
+                      {text}
+                    </Typography>
+                  </li>
                 ))}
               </ul>
             ) : (
@@ -60,16 +79,20 @@ export function RoadmapNotes({
               </Typography>
             )}
           </section>
-          <section>
-            <Typography as="h2" variant="label" className="m-0">
+          <section className="space-y-2">
+            <Typography as="h3" variant="subtitle2" className="m-0">
               Asumsi dan sumber
             </Typography>
             <Typography variant="paragraph" className="text-text-sub-600">
               {sourceTitle}. Semester panduan bukan jadwal penawaran aktual.
             </Typography>
-            <ul className="space-y-3 pl-4 text-text-sub-600">
+            <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
               {plan.notes.map((text) => (
-                <li key={text}>{text}</li>
+                <li key={text}>
+                  <Typography as="span" variant="paragraph">
+                    {text}
+                  </Typography>
+                </li>
               ))}
             </ul>
           </section>

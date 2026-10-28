@@ -104,15 +104,24 @@ export function RoadmapResult({
               <RiArrowLeftLine className="size-5" aria-hidden="true" />
               Kembali
             </Link>
-            <AlignButton.Root
-              variant="neutral"
-              mode="stroke"
-              className="pointer-events-auto size-10 p-2.5"
-              aria-label="Mulai lagi"
-              onClick={restart}
-            >
-              <RiRestartLine className="size-5" aria-hidden="true" />
-            </AlignButton.Root>
+            <AlignTooltip.Provider>
+              <AlignTooltip.Root>
+                <AlignTooltip.Trigger asChild>
+                  <AlignButton.Root
+                    variant="neutral"
+                    mode="stroke"
+                    className="pointer-events-auto size-10 p-2.5"
+                    aria-label="Coba lagi"
+                    onClick={restart}
+                  >
+                    <RiRestartLine className="size-5" aria-hidden="true" />
+                  </AlignButton.Root>
+                </AlignTooltip.Trigger>
+                <AlignTooltip.Content size="xsmall" side="bottom">
+                  Coba lagi
+                </AlignTooltip.Content>
+              </AlignTooltip.Root>
+            </AlignTooltip.Provider>
           </div>
         }
         navigation={

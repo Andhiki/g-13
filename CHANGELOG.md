@@ -17,7 +17,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Added
 
 - Tombol FAQ di samping Arsip Ujian membuka modal dengan jawaban dalam accordion
-  tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian.
+  tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian. Kedua tautan
+  navbar memakai komponen dan warna teks redup yang sama, dengan ukuran teks
+  dan warna pada LinkButton tidak saling menimpa.
 
 - Header tetap di seluruh aplikasi dengan logo OmahTI dan HIMAKOM UGM yang
   mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
@@ -41,12 +43,15 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Hasil roadmap menampilkan tooltip pada tombol coba lagi dan catatan. Tombol
+  catatan hanya memakai ikon, dengan hierarki tipografi yang lebih jelas di modal.
+
 - Tampilan daftar kurikulum dibuat lebih sempit dan padat dengan tinggi baris
   standar 40 piksel, dengan jarak tambahan
   di bawah gradasi overlay agar judul tetap terbaca, termasuk saat navigasi semester.
   Judul halaman diperbesar, antarsemester dipisahkan dengan garis dan jarak,
   serta kolom SKS dipindahkan ke paling kanan. Jumlah keseluruhan mata kuliah
-  dihapus dan kode mata kuliah dapat disalin lewat tombol di sampingnya,
+  dihapus dan kode mata kuliah dapat disalin lewat tombol di sebelah kiri kode,
   dengan toast AlignUI saat penyalinan berhasil. Semua aksi salin, termasuk ID
   pada drawer mata kuliah, tautan roadmap, dan tautan arsip ujian, menampilkan
   toast keberhasilan yang sama. Tombol salin juga menampilkan tooltip AlignUI
@@ -117,6 +122,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   pemuatan detail ditutup saat pilihan mata kuliah dibatalkan.
 
 #### Fixed
+
+- Jalur koneksi grafik memakai jarak aman yang konsisten agar dapat melewati
+  celah antarbaris, termasuk koneksi Jaringan Komputer ke Praktikum Sistem Operasi
+  dan Jaringan yang sebelumnya memutar jauh di atas kolom.
 
 - Pintasan keyboard mengabaikan kombinasi Shift yang tidak ditetapkan.
 

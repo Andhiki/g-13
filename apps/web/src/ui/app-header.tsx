@@ -64,7 +64,7 @@ export function AppHeader() {
         </Link>
       </div>
       <nav aria-label="Navigasi aplikasi" className="flex items-center gap-2 sm:gap-5">
-        <AlignLinkButton.Root asChild className="text-text-sub-600">
+        <AlignLinkButton.Root asChild>
           <Link
             to="/exam"
             activeProps={{

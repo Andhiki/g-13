@@ -18,9 +18,10 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#171717", media: "(prefers-color-scheme: dark)" },
       {
         name: "description",
-        content: "Peta kurikulum dan prasyarat Program Studi Ilmu Komputer UGM.",
+        content:
+          "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap kuliah, dan arsip ujian S1 Ilmu Komputer UGM.",
       },
-      { title: "Peta Kurikulum Ilmu Komputer UGM" },
+      { title: "Everything CS UGM" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
