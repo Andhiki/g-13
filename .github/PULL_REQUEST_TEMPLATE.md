@@ -6,7 +6,6 @@
 
 - [ ] `bun run check`
 - [ ] `bun run build`
-- [ ] `bun run test:browser` untuk perubahan UI (atau jelaskan mengapa tidak relevan)
 
 <!-- Tuliskan hasil aktual, pemeriksaan yang belum dilakukan, dan screenshot untuk perubahan tampilan. -->
 

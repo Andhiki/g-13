@@ -37,8 +37,9 @@ Review the report before copying the candidate into the archive's `catalog.ts`:
   courses and year folders remain present. An empty source subfolder without a year maps
   to an empty “Tanpa tahun” folder.
 
-Run formatting, repository checks, a production build, and the archive browser tests after
-adopting the candidate. The catalog's `satisfies ExamCourse[]` checks manual edits, while
+After adopting the candidate, run formatting, repository checks, and a production build,
+then inspect the archive in the browser. The catalog's `satisfies ExamCourse[]` checks
+manual edits, while
 the explicit array annotation prevents the full dataset from expanding inferred types
 throughout callers. The production route keeps this catalog out of unrelated page loads.
 

@@ -26,10 +26,6 @@
     "lint:fix": {
       "cache": false
     },
-    "test:browser": {
-      "dependsOn": ["^build"],
-      "cache": false
-    },
     "@g13/curriculum#test": {
       "dependsOn": ["build"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/output/data/**"]
