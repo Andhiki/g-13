@@ -234,3 +234,10 @@ static white background and static black text in both themes.
 OmahTI and HIMAKOM UGM logos both link to the app home page, replacing the Peta text link.
 
 The header owns the single theme toggle; navigation uses muted text in both themes.
+
+## Copy notifications
+
+Copy success uses the [AlignUI Toast](https://alignui.com/docs/v1.2/ui/toast)
+Sonner adapter and the small stroke success Alert appearance in `ui/toast.tsx`.
+The Alert classes come from the pinned starter above; the toast adapter follows
+the v1.2 documentation. A single Toaster is mounted in the application layout.

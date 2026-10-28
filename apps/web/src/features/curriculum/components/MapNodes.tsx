@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Typography } from "../../../ui/typography";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import { Handle, Position, useStore, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
 import { creditsFor, isCore } from "../course-utils";
 import type { CourseNodeData, LaneNodeData } from "../map-layout";
@@ -12,7 +12,8 @@ const courseStyles = tv({
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:
       "m-0 line-clamp-2 text-text-strong-950 group-hover:text-text-strong-950 group-focus-within:text-text-strong-950",
-    handle: "size-[7px]! border! border-bg-white-0! bg-bg-sub-300! opacity-100!",
+    handle:
+      "size-[7px]! border! border-bg-white-0! bg-bg-sub-300! transition-opacity duration-150 motion-reduce:transition-none",
     credit:
       "bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-bg-white-0))] group-hover:bg-bg-weak-50",
   },
@@ -53,8 +54,15 @@ const courseStyles = tv({
 const tab = "h-[25px] truncate rounded-t-lg border-b-0 px-3 pt-[3px] text-text-sub-600";
 
 export const CourseNode = memo(function CourseNode({
+  id,
   data,
 }: NodeProps<Node<CourseNodeData, "course">>) {
+  const incomingVisible = useStore((state) =>
+    state.edges.some((edge) => edge.target === id && !edge.hidden && edge.data?.visible),
+  );
+  const outgoingVisible = useStore((state) =>
+    state.edges.some((edge) => edge.source === id && !edge.hidden && edge.data?.visible),
+  );
   const course = data.course;
   const credit = creditsFor(course);
   const choice = !isCore(course);
@@ -74,7 +82,12 @@ export const CourseNode = memo(function CourseNode({
         })}
       />
       {data.incoming.length > 0 && (
-        <Handle id="in" type="target" position={Position.Left} className={styles.handle()} />
+        <Handle
+          id="in"
+          type="target"
+          position={Position.Left}
+          className={styles.handle({ class: incomingVisible ? "opacity-100!" : "opacity-0!" })}
+        />
       )}
       <button
         data-course-button
@@ -107,7 +120,12 @@ export const CourseNode = memo(function CourseNode({
         </Typography>
       </button>
       {data.outgoing.length > 0 && (
-        <Handle id="out" type="source" position={Position.Right} className={styles.handle()} />
+        <Handle
+          id="out"
+          type="source"
+          position={Position.Right}
+          className={styles.handle({ class: outgoingVisible ? "opacity-100!" : "opacity-0!" })}
+        />
       )}
     </div>
   );

@@ -1,3 +1,5 @@
+import { AlignTooltip } from "../../ui/tooltip";
+import { toast, SuccessToast } from "../../ui/toast";
 import { defaultCurriculumId, getCurriculum } from "@g13/curriculum";
 import { m, useReducedMotion } from "motion/react";
 import { Typography } from "../../ui/typography";
@@ -63,6 +65,7 @@ export function RoadmapResult({
     setSharedPlan(answers);
     try {
       await navigator.clipboard.writeText(window.location.href);
+      toast.custom(() => <SuccessToast message="Tautan roadmap disalin" />);
       setShare("copied");
     } catch {
       setManualLink(window.location.href);
@@ -124,38 +127,51 @@ export function RoadmapResult({
         }
         search={
           <div className="flex items-center justify-end gap-2">
-            <AlignButton.Root
-              variant="neutral"
-              mode="stroke"
-              onClick={copyLink}
-              className="max-[650px]:size-10 max-[650px]:p-2.5"
-            >
-              <span className="relative size-5" aria-hidden="true">
-                {[
-                  { Icon: RiShareLine, active: share !== "copied" || sharedPlan !== answers },
-                  { Icon: RiCheckLine, active: share === "copied" && sharedPlan === answers },
-                ].map(({ Icon, active }, index) => (
-                  <m.span
-                    key={index}
-                    initial={false}
-                    className="absolute inset-0"
-                    animate={{
-                      opacity: active ? 1 : 0,
-                      scale: active || reducedMotion ? 1 : 0.25,
-                      filter: active || reducedMotion ? "blur(0px)" : "blur(4px)",
-                    }}
-                    transition={
-                      reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
-                    }
+            <AlignTooltip.Provider>
+              <AlignTooltip.Root>
+                <AlignTooltip.Trigger asChild>
+                  <AlignButton.Root
+                    variant="neutral"
+                    mode="stroke"
+                    onClick={copyLink}
+                    className="max-[650px]:size-10 max-[650px]:p-2.5"
                   >
-                    <Icon className="size-5" />
-                  </m.span>
-                ))}
-              </span>
-              <span className="max-[650px]:sr-only">
-                {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
-              </span>
-            </AlignButton.Root>
+                    <span className="relative size-5" aria-hidden="true">
+                      {[
+                        { Icon: RiShareLine, active: share !== "copied" || sharedPlan !== answers },
+                        { Icon: RiCheckLine, active: share === "copied" && sharedPlan === answers },
+                      ].map(({ Icon, active }, index) => (
+                        <m.span
+                          key={index}
+                          initial={false}
+                          className="absolute inset-0"
+                          animate={{
+                            opacity: active ? 1 : 0,
+                            scale: active || reducedMotion ? 1 : 0.25,
+                            filter: active || reducedMotion ? "blur(0px)" : "blur(4px)",
+                          }}
+                          transition={
+                            reducedMotion
+                              ? { duration: 0 }
+                              : { type: "spring", duration: 0.3, bounce: 0 }
+                          }
+                        >
+                          <Icon className="size-5" />
+                        </m.span>
+                      ))}
+                    </span>
+                    <span className="max-[650px]:sr-only">
+                      {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
+                    </span>
+                  </AlignButton.Root>
+                </AlignTooltip.Trigger>
+                <AlignTooltip.Content size="xsmall" side="bottom">
+                  {share === "copied" && sharedPlan === answers
+                    ? "Tautan disalin"
+                    : "Salin tautan roadmap"}
+                </AlignTooltip.Content>
+              </AlignTooltip.Root>
+            </AlignTooltip.Provider>
           </div>
         }
         viewControl={

@@ -1,31 +1,38 @@
-import { useLayoutEffect, type ReactNode } from "react";
+import { createContext, useContext, useLayoutEffect, useMemo, type ReactNode } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
-import { SmartEdgeProvider, useSmartEdgePath } from "@tisoap/react-flow-smart-edge";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
+import { connectionRoutes, type RoutingNode } from "../connection-routes";
 
-import { connectionPath } from "../connection-path";
-
-// Leave a routing corridor in the 14px gap between roadmap rows.
-const pathOptions = { nodePadding: 4, gridRatio: 4, borderRadius: 16 };
-const routingOptions = {
-  preset: "smoothstep",
-  routeOnlyWhenBlocked: false,
-  ...pathOptions,
-} as const;
+const Routes = createContext<ReturnType<typeof connectionRoutes>>(new Map());
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const nodes = useStore(
-    (state) =>
+    (state): RoutingNode[] =>
       Array.from(state.nodeLookup.values())
-        .filter((node) => node.type !== "lane" && !node.hidden)
-        .map((node) => ({
-          id: node.id,
-          data: {},
-          position: {
-            x: node.internals.positionAbsolute.x - 40,
-            y: node.internals.positionAbsolute.y,
-          },
-          measured: { width: (node.measured.width ?? 0) + 80, height: node.measured.height ?? 0 },
-        })),
+        .filter(
+          (node) =>
+            node.type !== "lane" && !node.hidden && node.measured.width && node.measured.height,
+        )
+        .map((node) => {
+          const position = node.internals.positionAbsolute;
+          const width = node.measured.width ?? 0;
+          const height = node.measured.height ?? 0;
+          const output = node.internals.handleBounds?.source?.find((handle) => handle.id === "out");
+          const input = node.internals.handleBounds?.target?.find((handle) => handle.id === "in");
+          return {
+            id: node.id,
+            position,
+            measured: { width, height },
+            source: {
+              x: position.x + (output ? output.x + output.width / 2 : width),
+              y: position.y + (output ? output.y + output.height / 2 : height / 2),
+            },
+            target: {
+              x: position.x + (input ? input.x + input.width / 2 : 0),
+              y: position.y + (input ? input.y + input.height / 2 : height / 2),
+            },
+          };
+        }),
     (previous, next) =>
       previous.length === next.length &&
       previous.every((node, index) => {
@@ -35,15 +42,29 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
           node.position.x === other.position.x &&
           node.position.y === other.position.y &&
           node.measured.width === other.measured.width &&
-          node.measured.height === other.measured.height
+          node.measured.height === other.measured.height &&
+          node.source.x === other.source.x &&
+          node.source.y === other.source.y &&
+          node.target.x === other.target.x &&
+          node.target.y === other.target.y
         );
       }),
   );
-  return (
-    <SmartEdgeProvider nodes={nodes} options={routingOptions}>
-      {children}
-    </SmartEdgeProvider>
+  const edges = useStore(
+    (state) => state.edges,
+    (previous, next) =>
+      previous.length === next.length &&
+      previous.every(
+        (edge, index) =>
+          edge.id === next[index].id &&
+          edge.source === next[index].source &&
+          edge.target === next[index].target &&
+          edge.hidden === next[index].hidden &&
+          edge.data?.visible === next[index].data?.visible,
+      ),
   );
+  const routes = useMemo(() => connectionRoutes(nodes, edges), [nodes, edges]);
+  return <Routes.Provider value={routes}>{children}</Routes.Provider>;
 }
 
 function ZoomDetail() {
@@ -70,110 +91,40 @@ export function EdgeRouting({ children }: { children: ReactNode }) {
   );
 }
 
-function RoutedEdge(
-  props: EdgeProps<
-    Edge<{
-      reveal?: number;
-      animationKey?: string | null;
-      startedAt?: number;
-      charging?: boolean;
-      traceOffset?: number;
-    }>
-  >,
-) {
-  const { route } = useSmartEdgePath({
-    ...props,
-    preset: "smoothstep",
-    options:
-      props.data?.traceOffset === undefined
-        ? pathOptions
-        : { ...pathOptions, nodePadding: 13, gridRatio: 2 },
-  });
-  const straight = useStore((state) => {
-    if (Math.abs(props.sourceY - props.targetY) > 0.01 || props.targetX <= props.sourceX)
-      return false;
-    return !Array.from(state.nodeLookup.values()).some((node) => {
-      if (
-        node.id === props.source ||
-        node.id === props.target ||
-        node.type === "lane" ||
-        node.hidden
-      )
-        return false;
-      const { x, y } = node.internals.positionAbsolute;
-      const { width = 0, height = 0 } = node.measured;
-      return (
-        x - pathOptions.nodePadding < props.targetX &&
-        x + width + pathOptions.nodePadding > props.sourceX &&
-        y - pathOptions.nodePadding < props.sourceY &&
-        y + height + pathOptions.nodePadding > props.sourceY
-      );
-    });
-  });
-  const routed = route?.kind === "routed";
-  const delay = props.data?.reveal;
-  const startedAt = props.data?.startedAt;
-  useLayoutEffect(() => {
-    if (
-      !routed ||
-      delay === undefined ||
-      startedAt === undefined ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    const path = document.getElementById(props.id);
-    if (!path) return;
-    const animation = path.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
-      duration: 450,
-      delay: delay * 1000,
-      easing: "cubic-bezier(0.333333, 0, 0.666667, 1)",
-      fill: "both",
-    });
-    animation.startTime = startedAt;
-    return () => animation.cancel();
-  }, [routed, props.id, props.data?.animationKey, delay, startedAt]);
-  if (route?.kind !== "routed") return null;
-  const offset = props.data?.traceOffset;
-  const path =
-    offset === undefined
-      ? straight
-        ? `M ${props.sourceX},${props.sourceY} L ${props.targetX},${props.targetY}`
-        : route.svgPathString
-      : connectionPath(
-          { x: props.sourceX, y: props.sourceY },
-          { x: props.targetX, y: props.targetY },
-          route.points,
-          offset,
-        );
+function RoutedEdge(props: EdgeProps<Edge<{ visible: boolean; charging: boolean }>>) {
+  const route = useContext(Routes).get(props.id);
+  const reducedMotion = useReducedMotion();
+  const { opacity = 1, ...style } = props.style ?? {};
   return (
-    <>
-      <BaseEdge
-        key={props.data?.animationKey}
-        id={props.id}
-        path={path}
-        pathLength={1}
-        interactionWidth={props.interactionWidth}
-        data-routed="true"
-        style={{ ...props.style, strokeDasharray: 1, strokeDashoffset: 0 }}
-      />
-      {props.data?.charging && (
-        <path
-          d={path}
-          pathLength={1}
-          className="course-connection-charge"
-          style={{ stroke: "var(--color-text-strong-950)" }}
-        />
+    <AnimatePresence>
+      {route && (
+        <m.g
+          key={props.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reducedMotion ? 0 : 0.15, ease: "easeOut" }}
+        >
+          <BaseEdge
+            id={props.id}
+            path={route.path}
+            interactionWidth={props.interactionWidth}
+            data-routed="true"
+            className="transition-[stroke,stroke-width] duration-150 motion-reduce:transition-none"
+            style={style}
+          />
+          {props.data?.charging && (
+            <path
+              d={route.path}
+              pathLength={1}
+              className="course-connection-charge"
+              style={{ stroke: "var(--color-text-strong-950)" }}
+            />
+          )}
+        </m.g>
       )}
-    </>
+    </AnimatePresence>
   );
 }
 
 export const routedEdgeTypes = { routed: RoutedEdge };
-
-export function connectionReveal(hasPrerequisites: boolean, delay = 0) {
-  return {
-    startedAt: performance.now(),
-    incoming: delay,
-    outgoing: delay + (hasPrerequisites ? 0.45 : 0),
-  };
-}

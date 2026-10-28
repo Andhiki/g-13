@@ -10,13 +10,10 @@ import {
   type NodeProps,
   type Edge,
 } from "@xyflow/react";
-import {
-  EdgeRouting,
-  routedEdgeTypes,
-  connectionReveal,
-} from "../curriculum/components/EdgeRouting";
+import { EdgeRouting, routedEdgeTypes } from "../curriculum/components/EdgeRouting";
 import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
 import { mapCourseState } from "../curriculum/map-state";
+import { semesterRelations } from "../curriculum/semester-relations";
 import { mapConnections } from "../curriculum/map-connections";
 import { creditsFor, isCore } from "../curriculum/course-utils";
 import { LANE_X, LANE_STEP, type MapNode } from "../curriculum/map-layout";
@@ -116,7 +113,10 @@ export function RoadmapGraph({
       },
     ];
     const ids = new Set(plan.courses.map((x) => x.course.id));
-    const relations = plan.relations.filter((x) => ids.has(x.source) && ids.has(x.target));
+    const relations = semesterRelations(
+      plan.relations.filter((x) => ids.has(x.source) && ids.has(x.target)),
+      new Map(plan.courses.map((item) => [item.course.id, item.semester])),
+    );
     for (const semester of semesters) {
       const list = plan.courses.filter((x) => x.semester === semester);
       const credit = list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
@@ -201,24 +201,7 @@ export function RoadmapGraph({
     });
     return { nodes, edges };
   }, [plan, target, selectedId, choose]);
-  const progress = useMemo(
-    () => connectionReveal(edges.some((edge) => edge.target === selectedId)),
-    [edges, selectedId],
-  );
-  const revealedEdges = mapConnections(edges, selectedId, hoveredId).map((edge) => ({
-    ...edge,
-    data: {
-      ...edge.data,
-      animationKey: selectedId,
-      startedAt: progress.startedAt,
-      reveal:
-        edge.target === selectedId
-          ? progress.incoming
-          : edge.source === selectedId
-            ? progress.outgoing
-            : undefined,
-    },
-  }));
+  const revealedEdges = mapConnections(edges, selectedId, hoveredId);
   return (
     <section
       ref={stage}

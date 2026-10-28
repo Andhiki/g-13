@@ -2,6 +2,7 @@ import type { Edge, Node } from "@xyflow/react";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
 import { mapCourseState, type MapCourseState } from "./map-state";
 import { assignedCoreSemester, isCore } from "./course-utils";
+import { semesterRelations } from "./semester-relations";
 import type { Scope } from "./scope";
 
 type CourseNodeData = {
@@ -42,8 +43,12 @@ export function buildMap(
   positions: Map<string, { x: number; y: number }>;
   relationCount: number;
 } {
+  const graphRelations = semesterRelations(
+    relations,
+    new Map(data.all.map((course) => [course.id, assignedCoreSemester(course)])),
+  );
   const focusedRelations = selectedId
-    ? relations.filter(
+    ? graphRelations.filter(
         (relation) => relation.source === selectedId || relation.target === selectedId,
       )
     : [];
@@ -124,7 +129,7 @@ export function buildMap(
     positions.set(course.id, position);
   });
 
-  const availableRelations = relations.filter(
+  const availableRelations = graphRelations.filter(
     (relation) => visibleIds.has(relation.source) && visibleIds.has(relation.target),
   );
   if (selectedId) {

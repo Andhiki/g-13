@@ -1,3 +1,5 @@
+import { AlignTooltip } from "../../ui/tooltip";
+import { toast, SuccessToast } from "../../ui/toast";
 import { Fragment, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -64,6 +66,7 @@ export function ExamArchivePage() {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
+      toast.custom(() => <SuccessToast message="Tautan arsip ujian disalin" />);
       setShared({ selection, url, status: "copied" });
     } catch {
       setShared({ selection, url, status: "manual" });
@@ -284,29 +287,37 @@ export function ExamArchivePage() {
                 >
                   <RiDownloadLine className="size-4" aria-hidden="true" />
                 </a>
-                <AlignButton.Root
-                  variant="neutral"
-                  mode="ghost"
-                  size="xsmall"
-                  className="size-8 p-0"
-                  aria-label={
-                    share?.status === "copied" ? "Tautan berhasil disalin" : "Salin tautan"
-                  }
-                  title={share?.status === "copied" ? "Tautan disalin" : "Salin tautan"}
-                  onClick={() => {
-                    void copyLink();
-                  }}
-                >
-                  {share?.status === "copied" ? (
-                    <RiCheckLine
-                      key="copied"
-                      className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
-                  )}
-                </AlignButton.Root>
+                <AlignTooltip.Provider>
+                  <AlignTooltip.Root>
+                    <AlignTooltip.Trigger asChild>
+                      <AlignButton.Root
+                        variant="neutral"
+                        mode="ghost"
+                        size="xsmall"
+                        className="size-8 p-0"
+                        aria-label={
+                          share?.status === "copied" ? "Tautan berhasil disalin" : "Salin tautan"
+                        }
+                        onClick={() => {
+                          void copyLink();
+                        }}
+                      >
+                        {share?.status === "copied" ? (
+                          <RiCheckLine
+                            key="copied"
+                            className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
+                        )}
+                      </AlignButton.Root>
+                    </AlignTooltip.Trigger>
+                    <AlignTooltip.Content size="xsmall" side="bottom">
+                      {share?.status === "copied" ? "Tautan disalin" : "Salin tautan"}
+                    </AlignTooltip.Content>
+                  </AlignTooltip.Root>
+                </AlignTooltip.Provider>
                 <a
                   href={links.drive}
                   target="_blank"

@@ -1,15 +1,13 @@
 import type { Edge } from "@xyflow/react";
 
 export function mapConnections(edges: Edge[], selectedId: string | null, hoveredId: string | null) {
-  const core = edges.filter((edge) => !edge.data?.optional);
-  return edges.map((edge, index) => {
+  return edges.map((edge) => {
     const emphasized = edge.source === hoveredId || edge.target === hoveredId;
     const selected = edge.source === selectedId || edge.target === selectedId;
-    const coreIndex = core.indexOf(edge);
     return {
       ...edge,
       type: "routed",
-      hidden: !!edge.data?.optional && !selected && !emphasized,
+      hidden: false,
       zIndex: emphasized ? 4 : 1,
       style: {
         ...edge.style,
@@ -18,11 +16,8 @@ export function mapConnections(edges: Edge[], selectedId: string | null, hovered
       },
       data: {
         ...edge.data,
+        visible: !edge.data?.optional || selected || emphasized,
         charging: emphasized,
-        traceOffset:
-          coreIndex >= 0
-            ? ((coreIndex + 1) / (core.length + 1) - 0.5) * 24
-            : ((index + 1) / (edges.length + 1) - 0.5) * 23,
       },
     };
   });

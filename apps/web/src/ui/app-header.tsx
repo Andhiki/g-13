@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Image } from "@unpic/react";
+import { Faq } from "./faq";
 import { ThemeSwitch } from "./theme-switch";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
@@ -62,7 +63,7 @@ export function AppHeader() {
           />
         </Link>
       </div>
-      <nav aria-label="Navigasi aplikasi" className="flex items-center gap-3 sm:gap-5">
+      <nav aria-label="Navigasi aplikasi" className="flex items-center gap-2 sm:gap-5">
         <AlignLinkButton.Root asChild className="text-text-sub-600">
           <Link
             to="/exam"
@@ -74,6 +75,7 @@ export function AppHeader() {
             Arsip Ujian
           </Link>
         </AlignLinkButton.Root>
+        <Faq />
       </nav>
       <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
         <ThemeSwitch />

@@ -1,20 +1,25 @@
-import { svgDrawSmoothLinePath, type XYPosition } from "@tisoap/react-flow-smart-edge";
+import { svgDrawSmoothStepLinePath, type XYPosition } from "@tisoap/react-flow-smart-edge";
 
-export function connectionPath(
-  source: XYPosition,
-  target: XYPosition,
-  points: number[][],
-  offset: number,
-) {
-  // Keep the node approaches horizontal; offset only the route between them.
-  const shifted = points.map(([x, y]) => [x + offset, y + offset]);
-  const start = shifted.findIndex(([x]) => x >= source.x + 24);
-  let end = shifted.length - 1;
-  while (end >= 0 && shifted[end][0] > target.x - 24) end--;
-  const interior = start >= 0 && end >= start ? shifted.slice(start, end + 1) : [];
-  return svgDrawSmoothLinePath(source, target, [
-    [source.x + 16, source.y],
-    ...interior,
-    [target.x - 16, target.y],
-  ]);
+const roundedPath = svgDrawSmoothStepLinePath({ borderRadius: 12 });
+
+export function connectionCorners(source: XYPosition, target: XYPosition, points: number[][]) {
+  const corners: number[][] = [];
+  for (const point of [[source.x, source.y], ...points, [target.x, target.y]]) {
+    const last = corners.at(-1);
+    if (last && last[0] === point[0] && last[1] === point[1]) continue;
+    const previous = corners.at(-2);
+    if (
+      previous &&
+      last &&
+      ((previous[0] === last[0] && last[0] === point[0]) ||
+        (previous[1] === last[1] && last[1] === point[1]))
+    )
+      corners.pop();
+    corners.push(point);
+  }
+  return corners;
+}
+
+export function connectionPath(source: XYPosition, target: XYPosition, points: number[][]) {
+  return roundedPath(source, target, connectionCorners(source, target, points));
 }

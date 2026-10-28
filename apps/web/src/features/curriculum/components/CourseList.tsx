@@ -45,7 +45,10 @@ export function CourseList({
     if (!navigation) return;
     const section = document.getElementById(`semester-${navigation.semester}`);
     if (!section) return;
-    const top = window.matchMedia("(width < 1100px)").matches ? 128 : 96;
+    const headerHeight = Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--app-header-height"),
+    );
+    const top = headerHeight + (window.matchMedia("(width < 1100px)").matches ? 144 : 128);
     const target = Math.max(
       0,
       Math.min(
@@ -79,7 +82,10 @@ export function CourseList({
   }
 
   return (
-    <div className="space-y-8" aria-label="Daftar mata kuliah">
+    <div
+      className="space-y-10 [&>section+section]:border-t [&>section+section]:border-stroke-soft-200 [&>section+section]:pt-6"
+      aria-label="Daftar mata kuliah"
+    >
       {sections.map((section) => (
         <CourseTable key={section.id} section={section} selectedId={selectedId} select={select} />
       ))}

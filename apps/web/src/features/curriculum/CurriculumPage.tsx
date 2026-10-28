@@ -92,22 +92,12 @@ export function CurriculumPage() {
         ) : (
           <section
             style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
-            className={`bg-bg-white-0 px-4 pb-[76px] pt-[76px] text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-[116px] ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
+            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
-            <div className="mx-auto max-w-5xl">
-              <div className="mb-3 flex items-baseline justify-between gap-4">
-                <Typography as="h1" variant="subtitle2" className="m-0 text-text-strong-950">
-                  Mata kuliah
-                </Typography>
-                <Typography
-                  as="span"
-                  variant="caption"
-                  className="text-text-sub-600"
-                  aria-live="polite"
-                >
-                  {visible.length} mata kuliah
-                </Typography>
-              </div>
+            <div className="mx-auto max-w-3xl">
+              <Typography as="h1" variant="title" className="m-0 mb-8 text-text-strong-950">
+                Mata kuliah
+              </Typography>
               <CourseList
                 navigation={semesterNavigation}
                 onVisibleSemesters={reportSemesters}

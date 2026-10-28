@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Tombol FAQ di samping Arsip Ujian membuka modal dengan jawaban dalam accordion
+  tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian.
+
 - Header tetap di seluruh aplikasi dengan logo OmahTI dan HIMAKOM UGM yang
   mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
   dan pengalih tema. Tautan navigasi memakai warna teks redup. Kontrol peta tetap
@@ -38,6 +41,17 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Tampilan daftar kurikulum dibuat lebih sempit dan padat dengan tinggi baris
+  standar 40 piksel, dengan jarak tambahan
+  di bawah gradasi overlay agar judul tetap terbaca, termasuk saat navigasi semester.
+  Judul halaman diperbesar, antarsemester dipisahkan dengan garis dan jarak,
+  serta kolom SKS dipindahkan ke paling kanan. Jumlah keseluruhan mata kuliah
+  dihapus dan kode mata kuliah dapat disalin lewat tombol di sampingnya,
+  dengan toast AlignUI saat penyalinan berhasil. Semua aksi salin, termasuk ID
+  pada drawer mata kuliah, tautan roadmap, dan tautan arsip ujian, menampilkan
+  toast keberhasilan yang sama. Tombol salin juga menampilkan tooltip AlignUI
+  saat diarahkan atau difokuskan.
+
 - Nama tampilan mata kuliah Agama 2026 disingkat menjadi “Agama” tanpa keterangan dalam kurung.
 
 - Node mata kuliah di peta dan hasil kuis roadmap menjadi kartu sederhana dengan
@@ -48,16 +62,25 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Halaman Arsip Ujian menampilkan atribusi “Provided by Himakom UGM” dengan
   tautan situs Himakom di bawah judul.
 
-- Judul beranda diperbarui menjadi “Everything CS UGM”.
+- Judul beranda diperbarui menjadi “Everything CS UGM” dan teks tombol utama
+  menjadi “Buat roadmap sendiri”.
 
-- Tombol ganti tampilan peta/daftar memakai ikon tampilan tujuan yang berputar
+- Tombol ganti tampilan peta/daftar menampilkan tooltip AlignUI untuk tampilan
+  tujuan dan memakai ikon tampilan tujuan yang berputar
   saat ditekan; preferensi pengurangan gerakan menonaktifkan putaran.
 
-- Peta kurikulum dan hasil kuis roadmap menampilkan koneksi wajib secara default melalui jalur melengkung
-  dengan satu titik sambungan tetap di setiap sisi node dan pendekatan garis yang mulus;
-  segmen horizontal dan vertikal diberi jarak agar tidak menumpuk.
-  Hover atau fokus keyboard mempertegas koneksi dengan animasi
-  aliran; koneksi pilihan muncul saat disorot. Animasi mengikuti preferensi pengurangan gerak.
+- Peta kurikulum dan hasil kuis roadmap menampilkan koneksi wajib secara default
+  melalui segmen lurus dengan sudut membulat seragam dan satu titik sambungan
+  tetap di setiap sisi node. Jalur vertikal yang rentangnya bertumpang tindih
+  memakai lajur terpisah dengan jarak minimal 6 piksel dan tetap menghindari kartu.
+  Koneksi antar mata kuliah pada semester yang sama disembunyikan dari kedua
+  grafik, termasuk saat mata kuliah dipilih; informasi prasyarat tetap tersedia
+  di detail mata kuliah.
+  Hover atau fokus keyboard mempertegas semua koneksi terkait secara bersamaan
+  dengan fade masuk/keluar singkat, termasuk koneksi pilihan. Hover menampilkan
+  aliran renggang tiga partikel per koneksi. Titik sambungan hanya tampil ketika
+  ada garis yang terlihat pada sisi tersebut, termasuk saat hover. Animasi mengikuti preferensi
+  pengurangan gerak.
 
 - Tabel Arsip Ujian diberi bingkai dan tinggi mengikuti ruang layar, dengan gulir
   di dalam daftar; breadcrumb root selalu tampil sebagai `~` (direktori home),

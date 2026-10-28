@@ -58,27 +58,6 @@ html.theme-transition::view-transition-new(root) {
   src: url("@fontsource-variable/geist/files/geist-latin-wght-normal.woff2") format("woff2");
 }
 
-.course-connection-charge {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-dasharray: 0.012 0.075;
-  pointer-events: none;
-  animation: course-connection-charge 1.5s linear infinite;
-}
-
-@keyframes course-connection-charge {
-  to {
-    stroke-dashoffset: -0.174;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .course-connection-charge {
-    display: none;
-  }
-}
-
 .react-flow[data-compact-nodes="true"] [data-course-surface] {
   top: 0;
   border-radius: 8px;
@@ -98,4 +77,25 @@ html.theme-transition::view-transition-new(root) {
   font-size: 20px;
   line-height: 22px;
   -webkit-line-clamp: 3;
+}
+
+.course-connection-charge {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.012 0.321333;
+  pointer-events: none;
+  animation: course-connection-charge 3s linear infinite;
+}
+
+@keyframes course-connection-charge {
+  to {
+    stroke-dashoffset: -0.333333;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-connection-charge {
+    display: none;
+  }
 }

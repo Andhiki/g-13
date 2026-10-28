@@ -1,3 +1,4 @@
+import { CopyCourseButton } from "./CopyCourseButton";
 import { Typography } from "../../../ui/typography";
 import { useId } from "react";
 import { AlignButton } from "../../../ui/button";
@@ -33,15 +34,15 @@ export function CourseTable({
       <AlignTable.Root aria-labelledby={headingId}>
         <AlignTable.Header>
           <AlignTable.Row>
-            <AlignTable.Head scope="col" className="w-28 max-[640px]:hidden">
+            <AlignTable.Head scope="col" className="w-40 max-[640px]:hidden">
               Kode
             </AlignTable.Head>
             <AlignTable.Head scope="col">Mata kuliah</AlignTable.Head>
-            <AlignTable.Head scope="col" className="w-16 text-right">
-              SKS
-            </AlignTable.Head>
             <AlignTable.Head scope="col" className="w-44 max-[640px]:hidden">
               Kategori
+            </AlignTable.Head>
+            <AlignTable.Head scope="col" className="w-16 text-right">
+              SKS
             </AlignTable.Head>
           </AlignTable.Row>
         </AlignTable.Header>
@@ -80,12 +81,17 @@ export function CourseTable({
                   select(course.id);
                 }}
               >
-                <AlignTable.Cell className="max-[640px]:hidden">
-                  <Typography as="span" variant="caption" className="text-text-sub-600">
-                    {course.code || "—"}
-                  </Typography>
+                <AlignTable.Cell className="h-10 max-[640px]:hidden">
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <Typography as="span" variant="caption" className="text-text-sub-600">
+                      {course.code || "—"}
+                    </Typography>
+                    {course.code && (
+                      <CopyCourseButton value={course.code} label="kode mata kuliah" />
+                    )}
+                  </div>
                 </AlignTable.Cell>
-                <AlignTable.Cell>
+                <AlignTable.Cell className="h-10">
                   <AlignButton.Root
                     variant="neutral"
                     mode="ghost"
@@ -102,9 +108,15 @@ export function CourseTable({
                   <Typography
                     as="span"
                     variant="caption"
-                    className="mb-1 block text-text-sub-600 min-[640px]:hidden"
+                    className="mb-1 flex flex-wrap items-center gap-1 text-text-sub-600 min-[640px]:hidden"
                   >
-                    {[course.code, categories, groups].filter(Boolean).join(" · ")}
+                    {course.code && (
+                      <span className="inline-flex items-center gap-1">
+                        {course.code}
+                        <CopyCourseButton value={course.code} label="kode mata kuliah" />
+                      </span>
+                    )}
+                    {[categories, groups].filter(Boolean).join(" · ")}
                   </Typography>
                   {showSemesters && (
                     <Typography
@@ -116,16 +128,7 @@ export function CourseTable({
                     </Typography>
                   )}
                 </AlignTable.Cell>
-                <AlignTable.Cell className="text-right">
-                  <Typography
-                    as="span"
-                    variant="paragraph"
-                    className="text-text-sub-600 tabular-nums"
-                  >
-                    {credits || "—"}
-                  </Typography>
-                </AlignTable.Cell>
-                <AlignTable.Cell className="max-[640px]:hidden">
+                <AlignTable.Cell className="h-10 max-[640px]:hidden">
                   <Typography as="span" variant="caption" className="block text-text-sub-600">
                     {categories}
                   </Typography>
@@ -134,6 +137,15 @@ export function CourseTable({
                       {groups}
                     </Typography>
                   )}
+                </AlignTable.Cell>
+                <AlignTable.Cell className="h-10 text-right">
+                  <Typography
+                    as="span"
+                    variant="paragraph"
+                    className="text-text-sub-600 tabular-nums"
+                  >
+                    {credits || "—"}
+                  </Typography>
                 </AlignTable.Cell>
               </AlignTable.Row>
             );

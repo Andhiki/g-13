@@ -1,4 +1,5 @@
 import { defaultCurriculumId } from "@g13/curriculum";
+import { Toaster } from "../ui/toast";
 import { AppHeader } from "../ui/app-header";
 import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
@@ -46,6 +47,7 @@ function AppLayout() {
     <div className="min-h-dvh pt-[var(--app-header-height)]">
       <AppHeader />
       <Outlet />
+      <Toaster />
     </div>
   );
 }

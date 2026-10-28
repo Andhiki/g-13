@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
+import { toast, SuccessToast } from "../../../ui/toast";
 import { CompactButton } from "../../../ui/compact-button";
 import { AlignTooltip } from "../../../ui/tooltip";
 
-export function CopyCourseButton({ courseId }: { courseId: string }) {
+export function CopyCourseButton({ value, label }: { value: string; label: string }) {
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   const reducedMotion = useReducedMotion();
   useEffect(() => {
@@ -13,12 +14,12 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
     return () => window.clearTimeout(timer);
   }, [status]);
 
-  const label =
+  const statusLabel =
     status === "copied"
-      ? "ID mata kuliah disalin"
+      ? `${label} disalin`
       : status === "error"
         ? "Gagal menyalin. Coba lagi."
-        : "Salin ID mata kuliah";
+        : `Salin ${label}`;
   const Icon = status === "copied" ? RiCheckLine : RiFileCopyLine;
   const hidden = {
     opacity: 0,
@@ -30,11 +31,12 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
       <AlignTooltip.Root>
         <AlignTooltip.Trigger asChild>
           <CompactButton
-            aria-label={label}
+            aria-label={statusLabel}
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(courseId);
+                await navigator.clipboard.writeText(value);
                 setStatus("copied");
+                toast.custom(() => <SuccessToast message={`${label} disalin`} />);
               } catch {
                 setStatus("error");
               }
@@ -59,11 +61,11 @@ export function CopyCourseButton({ courseId }: { courseId: string }) {
           </CompactButton>
         </AlignTooltip.Trigger>
         <AlignTooltip.Content size="xsmall" side="bottom">
-          {label}
+          {statusLabel}
         </AlignTooltip.Content>
       </AlignTooltip.Root>
       <span role="status" className="sr-only">
-        {status === "idle" ? "" : label}
+        {status === "idle" ? "" : statusLabel}
       </span>
     </AlignTooltip.Provider>
   );

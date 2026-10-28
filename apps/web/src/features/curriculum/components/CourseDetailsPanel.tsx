@@ -151,7 +151,7 @@ function CourseDetailsContent({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <CopyCourseButton key={course.id} courseId={course.id} />
+          <CopyCourseButton key={course.id} value={course.id} label="ID mata kuliah" />
           <AlignDrawer.Close asChild>
             <CompactButton ref={closeButton} aria-label="Tutup detail mata kuliah">
               <RiCloseLine className="size-5" aria-hidden="true" />

@@ -14,7 +14,7 @@ import {
 } from "@xyflow/react";
 import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
-import { EdgeRouting, routedEdgeTypes, connectionReveal } from "./EdgeRouting";
+import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import { mapConnections } from "../map-connections";
@@ -291,30 +291,9 @@ export function CurriculumMap({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
   const reveal = useCourseReveal(nodes);
-  const progress = useMemo(
-    () =>
-      connectionReveal(
-        edges.some((edge) => edge.target === selectedId),
-        1.05,
-      ),
-    [edges, selectedId],
-  );
   const revealedEdges = useMemo(
-    () =>
-      mapConnections(edges, selectedId, hoveredId).map((edge) => ({
-        ...edge,
-        data: {
-          ...edge.data,
-          reveal: selectedId
-            ? edge.target === selectedId
-              ? progress.incoming
-              : progress.outgoing
-            : undefined,
-          animationKey: selectedId,
-          startedAt: progress.startedAt,
-        },
-      })),
-    [edges, selectedId, hoveredId, progress],
+    () => mapConnections(edges, selectedId, hoveredId),
+    [edges, selectedId, hoveredId],
   );
   return (
     <EdgeRouting>
@@ -368,7 +347,7 @@ export function CurriculumMap({
               </Typography>
               <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
                 <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-                  Buat roadmap kuliah
+                  Buat roadmap sendiri
                 </Link>
               </AlignFancyButton.Root>
             </div>
