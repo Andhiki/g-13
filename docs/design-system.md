@@ -186,12 +186,13 @@ The curriculum version filter uses the pinned AlignUI SegmentedControl source an
 ## Exam archive
 
 The exam archive uses AlignUI Command Menu inline for its folder/file list and course-name search.
-Its root is exported alongside the existing dialog primitives, retaining cmdk selection and keyboard
-behavior. The PDF modal initially focuses its filename heading so the embedded viewer does not
-capture keyboard focus on open; closing returns focus to the file list.
-Breadcrumb buttons wrap long source course names on phones. The share action uses the
-same native read-only input fallback as roadmap sharing when clipboard access fails.
-Folder and paper selection live in the URL; the modal mounts only the selected Drive preview.
+Its rows show name, created date, and type, separated by light rules without an outer card. On phones,
+the created date moves under the name. Folders without source timestamps show a dash. Compact
+breadcrumbs wrap long course names. Action buttons use Remix icons. The PDF modal initially focuses
+its filename heading so the embedded viewer does not capture keyboard focus on open; closing returns
+focus to the file list. The share action uses the same native read-only input fallback as roadmap
+sharing when clipboard access fails. Folder and paper selection live in the URL; the modal mounts
+only the selected Drive preview.
 
 ## Typography
 

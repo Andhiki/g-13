@@ -19,8 +19,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
   memuat seluruh 102 mata kuliah dan 1.613 entri berkas dari arsip Himakom UGM,
-  termasuk gambar dan dokumen Word. Berkas tanpa tahun eksplisit dikelompokkan
-  dalam “Tanpa tahun”; metadata yang meragukan dicatat untuk tinjauan manusia.
+  termasuk gambar dan dokumen Word. Daftar menampilkan tanggal dibuat dan jenis
+  folder/berkas dengan pemisah baris yang ringan. Berkas tanpa tahun eksplisit
+  dikelompokkan dalam “Tanpa tahun”; metadata yang meragukan dicatat untuk tinjauan
+  manusia.
 - Tautan folder dan berkas Arsip Ujian dapat dibagikan, dengan pemulihan lokasi
   melalui Back/Forward. Modal berkas menyediakan unduh, salin tautan aplikasi,
   serta buka sumber di Drive.

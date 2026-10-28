@@ -31,6 +31,8 @@ Review the report before copying the candidate into the archive's `catalog.ts`:
   unknown; conflicts appear in the report. Review the paper itself before correcting them.
 - PDFs, JPEGs, and Word documents are kept with their MIME types. The Drive viewer handles
   previews; access and format support remain subject to Drive.
+- Creation timestamps are retained from Drive listings for files and explicit year folders.
+  Course roots and filename-derived years without source folder dates keep a null timestamp.
 - Repeated paper IDs are deduplicated within each destination year folder. Confirmed empty
   courses and year folders remain present. An empty source subfolder without a year maps
   to an empty “Tanpa tahun” folder.

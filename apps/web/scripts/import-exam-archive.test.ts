@@ -2,11 +2,17 @@ import { expect, test } from "bun:test";
 import { normalizeArchive, parseCourses, parseFolder } from "./import-exam-archive";
 import type { ExamCourse } from "../src/features/exam-archive/contracts";
 
-const pdf = (id: string, name: string) => ({ id, name, mimeType: "application/pdf" });
+const pdf = (id: string, name: string) => ({
+  id,
+  name,
+  mimeType: "application/pdf",
+  createdAt: null,
+});
 const folder = (id: string, name: string) => ({
   id,
   name,
   mimeType: "application/vnd.google-apps.folder",
+  createdAt: null,
 });
 const courses = [{ name: "Basis Data", folderId: "root" }];
 
@@ -26,6 +32,22 @@ test("Drive parsing distinguishes empty from unreadable, malformed and paginated
   expect(
     parseFolder(html([[["pdf", [], "It's an exam.pdf", "application/pdf"]], null, null, null])),
   ).toEqual([pdf("pdf", "It's an exam.pdf")]);
+  const dated = [
+    "pdf",
+    [],
+    "Dated.pdf",
+    "application/pdf",
+    0,
+    null,
+    0,
+    0,
+    0,
+    0,
+    Date.UTC(2024, 8, 3),
+  ];
+  expect(parseFolder(html([[dated], null, null, null]))[0]?.createdAt).toBe(
+    "2024-09-03T00:00:00.000Z",
+  );
   expect(() => parseFolder("Sign in")).toThrow("listing missing");
   expect(() => parseFolder(html([[null], null, null, null]))).toThrow("Invalid Drive entry");
   expect(() => parseFolder(html([[], "next-page", null, null]))).toThrow("paginated");
@@ -37,7 +59,13 @@ test("normalization handles years, non-PDFs, duplicates, empty years, and unknow
     folders: new Map([
       [
         "root",
-        { files: [folder("uts", "UTS"), folder("year", "2023–2024"), folder("empty", "2022")] },
+        {
+          files: [
+            folder("uts", "UTS"),
+            { ...folder("year", "2023–2024"), createdAt: "2023-05-01T00:00:00.000Z" },
+            folder("empty", "2022"),
+          ],
+        },
       ],
       [
         "uts",
@@ -45,7 +73,12 @@ test("normalization handles years, non-PDFs, duplicates, empty years, and unknow
           files: [
             pdf("one", "UTS - 2024.pdf"),
             pdf("one", "UTS - 2024.pdf"),
-            { id: "image", name: "UAS_Deep Learning2.jpg", mimeType: "image/jpeg" },
+            {
+              id: "image",
+              name: "UAS_Deep Learning2.jpg",
+              mimeType: "image/jpeg",
+              createdAt: null,
+            },
             pdf("ambiguous", "UAS - 2018 copy 2019.pdf"),
           ],
         },
@@ -57,6 +90,9 @@ test("normalization handles years, non-PDFs, duplicates, empty years, and unknow
   expect(result.writable).toBe(true);
   const years = result.catalog[0].years;
   expect(years.find((year) => year.name === "2024")?.papers).toHaveLength(1);
+  expect(years.find((year) => year.name === "2023–2024")?.createdAt).toBe(
+    "2023-05-01T00:00:00.000Z",
+  );
   expect(years.find((year) => year.name === "2022")?.papers).toEqual([]);
   expect(years.find((year) => year.name === "2023–2024")?.papers[0].id).toBe("two");
   expect(years.find((year) => year.name === "Tanpa tahun")?.papers).toHaveLength(2);
@@ -75,9 +111,11 @@ test("failed descendants preserve the whole previous course and new unreadable c
       id: "stable-id",
       name: "Basis Data",
       sourceFolderId: "root",
+      createdAt: null,
       years: [
         {
           name: "2024",
+          createdAt: null,
           papers: [{ ...pdf("old", "Old.pdf"), exam: null, sourceFolderId: "child" }],
         },
       ],
