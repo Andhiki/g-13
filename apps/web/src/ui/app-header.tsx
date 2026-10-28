@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RiMenuLine, RiCloseLine } from "@remixicon/react";
+import { RiMenuLine, RiCloseLine, RiGithubFill } from "@remixicon/react";
 import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
@@ -55,6 +55,22 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
   );
 }
 
+function GitHubButton() {
+  return (
+    <AlignButton.Root asChild variant="neutral" mode="stroke" className="size-10 p-2.5">
+      <a
+        href="https://github.com/Andhiki/g-13"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Buka repositori GitHub (tab baru)"
+        title="GitHub"
+      >
+        <RiGithubFill aria-hidden="true" className="size-5" />
+      </a>
+    </AlignButton.Root>
+  );
+}
+
 export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -86,6 +102,7 @@ export function AppHeader() {
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
+          <GitHubButton />
           <ThemeSwitch />
           <AlignButton.Root
             asChild
@@ -165,7 +182,8 @@ export function AppHeader() {
           </AlignLinkButton.Root>
           <Faq className="h-14 justify-start text-lg" />
         </nav>
-        <div className="mx-6 mt-auto flex justify-end border-t border-stroke-soft-200 py-5">
+        <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
+          <GitHubButton />
           <ThemeSwitch />
         </div>
       </AlignModal.Content>

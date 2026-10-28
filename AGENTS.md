@@ -12,6 +12,14 @@ entry when refining the same change. Internal refactors, tests, tooling, and
 documentation edits without user-facing impact need no entry. Keep entries under
 `Unreleased` until a release is confirmed.
 
+## Exam archive freshness
+
+When updating the exam catalog or running a script that scrapes Himakom's Drive,
+update `archiveUpdatedAt` in `apps/web/src/features/exam-archive/metadata.ts` when
+adopting the reviewed data. Use the successful import report's `importedAt` ISO
+timestamp (or the verification time for manual updates). Failed or discarded
+imports leave the timestamp unchanged. The Arsip Ujian attribution displays this value.
+
 ## Local browser preview fallback
 
 When Playwright's cached Chromium fails to start because Linux shared libraries such as `libatk-1.0.so.0` are missing, use the libraries bundled with the local JetBrains RemoteDev/WebStorm runtime.

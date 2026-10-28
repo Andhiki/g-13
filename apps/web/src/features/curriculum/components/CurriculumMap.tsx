@@ -17,6 +17,7 @@ import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
+import { ZoomControls } from "./ZoomControls";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import { isCore } from "../course-utils";
 import { mapConnections } from "../map-connections";
@@ -26,23 +27,29 @@ const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 function ViewportFocus({
   navigation,
   focusKey,
+  resetVersion,
   selectedId,
   positions,
 }: {
   navigation: { semester: number } | null;
   focusKey: string;
+  resetVersion: number;
   selectedId: string | null;
   positions: Map<string, { x: number; y: number }>;
 }) {
   const { getViewport, setCenter, setViewport } = useReactFlow();
   const previousSelection = useRef(selectedId);
-  const overview = useRef<{ viewport: Viewport; navigation: typeof navigation } | null>(null);
+  const overview = useRef<{
+    viewport: Viewport;
+    navigation: typeof navigation;
+    resetVersion: number;
+  } | null>(null);
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timer = window.setTimeout(() => {
       if (selectedId) {
         if (previousSelection.current === null) {
-          overview.current = { viewport: getViewport(), navigation };
+          overview.current = { viewport: getViewport(), navigation, resetVersion };
         }
         previousSelection.current = selectedId;
         const points = [...positions.values()];
@@ -78,7 +85,7 @@ function ViewportFocus({
       previousSelection.current = null;
       const saved = overview.current;
       overview.current = null;
-      if (saved && saved.navigation === navigation) {
+      if (saved && saved.navigation === navigation && saved.resetVersion === resetVersion) {
         setViewport(saved.viewport, { duration: reducedMotion ? 0 : 150 });
         return;
       }
@@ -106,7 +113,16 @@ function ViewportFocus({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [navigation, focusKey, selectedId, positions, getViewport, setCenter, setViewport]);
+  }, [
+    navigation,
+    focusKey,
+    resetVersion,
+    selectedId,
+    positions,
+    getViewport,
+    setCenter,
+    setViewport,
+  ]);
   return null;
 }
 
@@ -166,6 +182,8 @@ function SemesterViewport({
 
 export function CurriculumMap({
   navigation,
+  resetVersion,
+  onReset,
   onVisibleSemesters,
   close,
   curriculum,
@@ -175,6 +193,8 @@ export function CurriculumMap({
   positions,
 }: {
   navigation: { semester: number } | null;
+  resetVersion: number;
+  onReset: () => void;
   onVisibleSemesters: (semesters: number[]) => void;
   close: () => void;
   curriculum: CurriculumId;
@@ -221,9 +241,11 @@ export function CurriculumMap({
         <ViewportFocus
           navigation={navigation}
           focusKey={focusKey}
+          resetVersion={resetVersion}
           selectedId={selectedId}
           positions={positions}
         />
+        <ZoomControls onReset={onReset} selected={selectedId !== null} />
         <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
         <ViewportPortal>
           {selectedId === null && (

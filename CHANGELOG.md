@@ -16,6 +16,12 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Waktu pembaruan terakhir arsip ujian ditampilkan bersama atribusi Himakom UGM,
+  dengan metadata terpusat yang diperbarui saat data arsip diadopsi.
+
+- Kontrol zoom peta utama memakai tombol ikon perkecil, perbesar, dan reset ke
+  tampilan awal, serta persentase zoom yang mengikuti posisi peta.
+
 - Ringkasan singkat jawaban kuis di bawah judul hasil roadmap, berisi kurikulum,
   peminatan, target selesai, kegiatan, dan arahan untuk memeriksa catatan rencana.
 
@@ -33,6 +39,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   berada di overlay di bawah header. Pada layar seluler, tombol menu membuka
   navigasi layar penuh ke kurikulum, arsip ujian, roadmap, dan FAQ dengan pengalih
   tema di bawah; menu mendukung Escape, pengelolaan fokus, dan penguncian gulir.
+  Tombol ikon GitHub di samping pengalih tema pada desktop dan menu seluler
+  membuka repositori proyek di tab baru.
 
 - Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
   mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal

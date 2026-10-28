@@ -14,6 +14,7 @@ export function CurriculumPage() {
   const explorer = useCurriculumExplorer();
   const { curriculum, data, relations, selected, view, map } = explorer;
 
+  const [resetVersion, setResetVersion] = useState(0);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [detailsHeight, setDetailsHeight] = useState(30);
   const [semesterNavigation, setSemesterNavigation] = useState<{ semester: number } | null>(null);
@@ -62,6 +63,7 @@ export function CurriculumPage() {
       </Overlay>
 
       <main
+        style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
         data-map-stage={view === "map" ? "" : undefined}
         className={
           view === "map"
@@ -72,6 +74,12 @@ export function CurriculumPage() {
         {view === "map" ? (
           <CurriculumMap
             navigation={semesterNavigation}
+            resetVersion={resetVersion}
+            onReset={() => {
+              setSemesterNavigation(null);
+              explorer.closeDetails();
+              setResetVersion((version) => version + 1);
+            }}
             onVisibleSemesters={reportSemesters}
             close={explorer.closeDetails}
             curriculum={curriculum}
@@ -82,7 +90,6 @@ export function CurriculumPage() {
           />
         ) : (
           <section
-            style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
             className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
             <div className="mx-auto max-w-3xl">

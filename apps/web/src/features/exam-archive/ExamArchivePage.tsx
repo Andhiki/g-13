@@ -22,6 +22,7 @@ import { AlignModal } from "../../ui/modal";
 import { Typography } from "../../ui/typography";
 import { browseArchive, paperLinks, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
+import { archiveUpdatedAt } from "./metadata";
 import { Route } from "../../routes/exam";
 import type { ArchiveLocation } from "./contracts";
 
@@ -32,6 +33,12 @@ function ExamBadge({ exam }: { exam: "UTS" | "UAS" }) {
     </AlignBadge.Root>
   );
 }
+
+const archiveUpdatedLabel = new Intl.DateTimeFormat("id-ID", {
+  dateStyle: "long",
+  timeStyle: "short",
+  timeZone: "Asia/Jakarta",
+}).format(new Date(archiveUpdatedAt));
 
 const relativeTimeFormatter = new Intl.RelativeTimeFormat("id-ID", { numeric: "auto" });
 const formatCreatedAt = (value: string | null) => {
@@ -87,6 +94,7 @@ export function ExamArchivePage() {
           >
             Himakom UGM
           </a>
+          . Last updated at <time dateTime={archiveUpdatedAt}>{archiveUpdatedLabel} WIB</time>.
         </Typography>
       </header>
       <section className="flex min-h-0 flex-1 flex-col" aria-label="Penjelajah arsip ujian">

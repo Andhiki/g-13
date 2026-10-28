@@ -30,8 +30,9 @@ Keep files under roughly 300 lines by default; larger files need a clear reason.
   primitives. `list-groups.ts` owns grouping and has coverage for both curricula,
   repeated placements, and missing semesters. The list uses document scrolling,
   with the overlay controls fixed above it. `CurriculumMap` owns React Flow setup
-  and viewport focus; `MapNodes` renders course and semester lane nodes. Zoom-in,
-  zoom-out, and fit-view buttons are omitted; map navigation uses gestures.
+  and viewport focus; `MapNodes` renders course and semester lane nodes.
+  `ZoomControls` uses shared buttons for zoom-out, zoom-in, and reset to the
+  starting view, alongside the current zoom percentage. Gestures remain available.
 - `course-utils.ts`, `map-state.ts`, and `map-layout.ts` contain
   feature-local course helpers, relationship state, and graph layout.
   Graph layout and real-data curriculum exploration have colocated tests. Relationship
