@@ -43,7 +43,7 @@ export function RoadmapPage() {
       setShowResult(false);
       return;
     }
-    const timer = window.setTimeout(() => setShowResult(true), 500);
+    const timer = window.setTimeout(() => setShowResult(true), 1500);
     return () => window.clearTimeout(timer);
   }, [result]);
   const update = (next: RoadmapSearch) => {

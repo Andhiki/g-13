@@ -37,7 +37,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   atas layar, dengan margin kiri lebih lapang dan tampilan awal diperbesar.
 
 - Hasil kuis roadmap diawali layar pemuatan dengan animasi rute mata kuliah
-  minimal 500 ms; preferensi pengurangan gerakan menampilkan ilustrasi statis.
+  minimal 1,5 detik; preferensi pengurangan gerakan menampilkan ilustrasi statis.
 - Tombol kembali ke peta kurikulum memakai gaya netral berbingkai seperti toggle tema;
   breadcrumb “Arsip Ujian” disembunyikan di folder root agar judul tidak berulang.
   Navigasi folder memakai komponen Breadcrumb AlignUI dengan tautan folder.
