@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { m, useReducedMotion } from "motion/react";
-import { RiGithubFill } from "@remixicon/react";
+import { RiGithubFill, RiRouteLine } from "@remixicon/react";
 import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
@@ -154,6 +154,17 @@ export function AppHeader() {
               Alumni
             </Link>
           </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild>
+            <Link
+              to="/resources"
+              activeProps={{
+                className: "decoration-current",
+                "aria-current": "page",
+              }}
+            >
+              Resources
+            </Link>
+          </AlignLinkButton.Root>
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
@@ -167,6 +178,7 @@ export function AppHeader() {
             className="px-2 sm:px-3"
           >
             <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+              <RiRouteLine aria-hidden="true" className="size-4" />
               Roadmap
             </Link>
           </AlignButton.Root>
@@ -233,6 +245,15 @@ export function AppHeader() {
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
               Meet Our Alumni
+            </Link>
+          </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
+            <Link
+              to="/resources"
+              onClick={() => setMenuOpen(false)}
+              activeProps={{ "aria-current": "page", className: "decoration-current" }}
+            >
+              Helpful Resources
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">

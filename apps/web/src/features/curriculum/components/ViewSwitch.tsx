@@ -26,6 +26,7 @@ export function ViewSwitch({
             size="medium"
             className="size-10 rounded-full p-0"
             aria-pressed={view === "list"}
+            aria-keyshortcuts="V"
             aria-label={label}
             onClick={() => {
               setTurns((value) => value + 1);

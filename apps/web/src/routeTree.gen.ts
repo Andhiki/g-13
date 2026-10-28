@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const ExamRoute = ExamRouteImport.update({
   path: '/exam',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alumni' | '/exam' | '/roadmap'
+  fullPaths: '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alumni' | '/exam' | '/roadmap'
-  id: '__root__' | '/' | '/alumni' | '/exam' | '/roadmap'
+  to: '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
+  id: '__root__' | '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
+  ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roadmap': {
       id: '/roadmap'
       path: '/roadmap'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
+  ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
 }
 export const routeTree = rootRouteImport

@@ -9,6 +9,7 @@ import { SemesterFilter } from "./components/SemesterFilter";
 import { ViewSwitch } from "./components/ViewSwitch";
 import { Overlay } from "./components/Overlay";
 import { useCurriculumExplorer } from "./useCurriculumExplorer";
+import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
 
 export function CurriculumPage() {
   const explorer = useCurriculumExplorer();
@@ -22,9 +23,21 @@ export function CurriculumPage() {
     setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
   }, []);
   const navigateToSemester = (semester: number) => {
+    if (semester > map.lastSemester) return;
     explorer.closeDetails();
     setSemesterNavigation({ semester });
   };
+  useKeyboardShortcuts({
+    "1": () => navigateToSemester(1),
+    "2": () => navigateToSemester(2),
+    "3": () => navigateToSemester(3),
+    "4": () => navigateToSemester(4),
+    "5": () => navigateToSemester(5),
+    "6": () => navigateToSemester(6),
+    "7": () => navigateToSemester(7),
+    "8": () => navigateToSemester(8),
+    v: () => explorer.setView((current) => (current === "map" ? "list" : "map")),
+  });
 
   return (
     <div
@@ -87,6 +100,7 @@ export function CurriculumPage() {
             nodes={map.nodes}
             edges={map.edges}
             positions={map.positions}
+            lastSemester={map.lastSemester}
           />
         ) : (
           <section

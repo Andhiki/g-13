@@ -22,12 +22,19 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Halaman Meet Our Alumni menampilkan foto, angkatan, pengalaman terpilih, dan
   pencapaian alumni Ilmu Komputer UGM, dengan tautan ke profil LinkedIn.
 
+- Halaman Helpful Resources menyajikan tautan belajar CS50, template skripsi,
+  dan sumber arsip ujian Himakom UGM dalam daftar editorial berpemisah garis;
+  tautan dapat dibuka di tab baru.
+
 - Waktu pembaruan terakhir arsip ujian ditampilkan bersama atribusi Himakom UGM,
   dengan metadata terpusat yang diperbarui saat data arsip diadopsi. Pencarian mata
   kuliah juga menemukan nama dengan satu kesalahan ketik pada kata yang dicari.
 
 - Kontrol zoom peta utama memakai tombol ikon perkecil, perbesar, dan reset ke
   tampilan awal, serta persentase zoom yang mengikuti posisi peta.
+
+- Pintasan keyboard pada peta untuk berpindah semester, membuka atau menutup filter,
+  mengganti tampilan, mencari mata kuliah, dan mengganti tema ditampilkan di atas kontrol zoom.
 
 - Ringkasan singkat jawaban kuis di bawah judul hasil roadmap, berisi kurikulum,
   peminatan, target selesai, kegiatan, dan arahan untuk memeriksa catatan rencana.
@@ -40,8 +47,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   dan warna pada LinkButton tidak saling menimpa.
 
 - Header tetap di seluruh aplikasi dengan logo OmahTI dan HIMAKOM UGM yang
-  mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap,
-  dan pengalih tema. Kedua logo berada dalam satu tautan beranda.
+  mengarah ke beranda, tautan Arsip Ujian, tombol Roadmap berlatar putih dengan teks gelap
+  dan ikon rute, serta pengalih tema. Kedua logo berada dalam satu tautan beranda.
   Tautan navigasi memakai warna teks redup. Kontrol peta tetap
   berada di overlay di bawah header. Pada layar seluler, tombol menu membuka
   navigasi layar penuh ke kurikulum, arsip ujian, roadmap, dan FAQ dengan pengalih

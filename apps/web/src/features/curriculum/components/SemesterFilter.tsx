@@ -70,6 +70,7 @@ export function SemesterFilter({
               className="hover:bg-primary-alpha-16 hover:text-primary-base hover:ring-transparent max-[1100px]:min-w-0 max-[1100px]:px-0"
               aria-label={`Semester ${semester}`}
               aria-pressed={visible.includes(Number(semester))}
+              aria-keyshortcuts={semester}
               title={`Ke semester ${semester}`}
               onClick={() => onNavigate(Number(semester))}
             >

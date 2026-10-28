@@ -191,6 +191,7 @@ export function CurriculumMap({
   nodes,
   edges,
   positions,
+  lastSemester,
 }: {
   navigation: { semester: number } | null;
   resetVersion: number;
@@ -202,6 +203,7 @@ export function CurriculumMap({
   nodes: MapNode[];
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
+  lastSemester: number;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const focusKey = [curriculum, selectedId ?? ""].join(":");
@@ -245,7 +247,11 @@ export function CurriculumMap({
           selectedId={selectedId}
           positions={positions}
         />
-        <ZoomControls onReset={onReset} selected={selectedId !== null} />
+        <ZoomControls
+          onReset={onReset}
+          selected={selectedId !== null}
+          lastSemester={lastSemester}
+        />
         <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
         <ViewportPortal>
           {selectedId === null && (

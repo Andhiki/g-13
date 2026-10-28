@@ -4,6 +4,7 @@ import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
 import { AlignButton } from "../../../ui/button";
 import { AlignDrawer } from "../../../ui/drawer";
+import { useKeyboardShortcuts } from "../../../ui/use-keyboard-shortcuts";
 
 const compactQuery = "(width < 1100px)";
 
@@ -19,16 +20,28 @@ const defaultFilterCopy: FilterCopy = {
   description: "Pilih versi kurikulum.",
 };
 
-function FilterDrawer({ children, copy }: { children: ReactNode; copy: FilterCopy }) {
+function FilterDrawer({
+  children,
+  copy,
+  open,
+  onOpenChange,
+}: {
+  children: ReactNode;
+  copy: FilterCopy;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   return (
-    <AlignDrawer.Root>
+    <AlignDrawer.Root open={open} onOpenChange={onOpenChange}>
       <AlignDrawer.Trigger asChild>
         <AlignButton.Root
           variant="neutral"
           mode="stroke"
           size="medium"
           className="size-10 p-2.5"
-          aria-label={`Buka ${copy.title.toLowerCase()}`}
+          aria-label={`${open ? "Tutup" : "Buka"} ${copy.title.toLowerCase()}`}
+          aria-expanded={open}
+          aria-keyshortcuts="F"
         >
           <RiFilter3Line className="size-5" aria-hidden="true" />
         </AlignButton.Root>
@@ -69,14 +82,17 @@ function DesktopFilters({
   children,
   label,
   copy,
+  open,
+  onOpenChange,
   toolbar = false,
 }: {
   children: ReactNode;
   label: string;
   copy: FilterCopy;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   toolbar?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
 
@@ -87,12 +103,12 @@ function DesktopFilters({
       if (event.target instanceof Element && event.target.closest('[role="listbox"]')) return;
       event.preventDefault();
       event.stopPropagation();
-      setOpen(false);
+      onOpenChange(false);
       toggle.current?.focus();
     }
     window.addEventListener("keydown", closeOnEscape, true);
     return () => window.removeEventListener("keydown", closeOnEscape, true);
-  }, [open]);
+  }, [open, onOpenChange]);
 
   return (
     <m.section
@@ -113,7 +129,8 @@ function DesktopFilters({
         aria-label={`${open ? "Tutup" : "Buka"} ${copy.title.toLowerCase()}`}
         aria-expanded={open}
         aria-controls="desktop-filters"
-        onClick={() => setOpen(!open)}
+        aria-keyshortcuts="F"
+        onClick={() => onOpenChange(!open)}
       >
         {[
           { Icon: RiFilter3Line, name: "filter", active: !open },
@@ -176,6 +193,9 @@ export function Overlay({
   filterCopy?: FilterCopy;
   filtersInToolbar?: boolean;
 }) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  useKeyboardShortcuts({ f: () => setFiltersOpen((open) => !open) });
+
   const compact = useSyncExternalStore(
     subscribeToCompactControls,
     () => window.matchMedia(compactQuery).matches,
@@ -204,11 +224,21 @@ export function Overlay({
               <div className="order-3 size-10 shrink-0" aria-hidden="true" />
             )}
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
-              {compact && <FilterDrawer copy={filterCopy}>{children}</FilterDrawer>}
+              {compact && (
+                <FilterDrawer copy={filterCopy} open={filtersOpen} onOpenChange={setFiltersOpen}>
+                  {children}
+                </FilterDrawer>
+              )}
             </div>
           </div>
           {!compact && (
-            <DesktopFilters label={controlsLabel} copy={filterCopy} toolbar={filtersInToolbar}>
+            <DesktopFilters
+              label={controlsLabel}
+              copy={filterCopy}
+              open={filtersOpen}
+              onOpenChange={setFiltersOpen}
+              toolbar={filtersInToolbar}
+            >
               {children}
             </DesktopFilters>
           )}
