@@ -41,6 +41,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Teks tombol utama roadmap memakai warna gelap pada tema gelap agar kontras
   dengan latar jingga yang terang.
 
+- Bagian Silabus pada drawer mata kuliah terbuka secara default dan tetap dapat
+  ditutup.
+
 - Gambar logo header memakai `@unpic/react` dengan ukuran tetap agar ruangnya
   tersedia sebelum gambar selesai dimuat dan tata letak tidak bergeser.
 

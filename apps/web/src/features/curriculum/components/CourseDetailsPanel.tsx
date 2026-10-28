@@ -175,7 +175,12 @@ function CourseDetailsContent({
             <SemesterIndicator label={semesterLabel(course)} />
           </div>
           <div className="mt-2">
-            <Accordion.Root key={`${data.id}-${course.id}`} type="single" collapsible>
+            <Accordion.Root
+              key={`${data.id}-${course.id}`}
+              type="single"
+              collapsible
+              defaultValue="syllabus"
+            >
               <Accordion.Item value="syllabus">
                 <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
                   <Accordion.Trigger>
