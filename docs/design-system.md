@@ -186,8 +186,9 @@ The curriculum version filter uses the pinned AlignUI SegmentedControl source an
 
 ## Exam archive
 
-The exam archive uses AlignUI Command Menu inline for its folder/file list and course-name search.
-Its rows show name, created date, and type, separated by light rules without an outer card. On phones,
+The exam archive uses native buttons for folder/file rows and a search input.
+Hover and keyboard focus are styled with CSS; rows have no command-menu selection state.
+Its rows show name, created date, and type, separated by light rules inside a bounded, scrollable panel. On phones,
 the created date moves under the name. Folders without source timestamps show a dash. Compact
 breadcrumbs use the upstream [AlignUI Breadcrumb](https://www.alignui.com/docs/v1.2/ui/breadcrumb)
 source in `apps/web/src/ui/breadcrumb.tsx`, with default item styles and router links.

@@ -2,7 +2,9 @@ import { useLayoutEffect, type ReactNode } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { SmartEdgeProvider, useSmartEdgePath } from "@tisoap/react-flow-smart-edge";
 
-// Leave a routing corridor in the 14px gap between course rows.
+import { connectionPath } from "../connection-path";
+
+// Leave a routing corridor in the 14px gap between roadmap rows.
 const pathOptions = { nodePadding: 4, gridRatio: 4, borderRadius: 16 };
 const routingOptions = {
   preset: "smoothstep",
@@ -44,21 +46,48 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
   );
 }
 
+function ZoomDetail() {
+  const compact = useStore((state) => state.transform[2] < 0.7);
+  const element = useStore((state) => state.domNode);
+  useLayoutEffect(() => {
+    if (!element) return;
+    element.dataset.compactNodes = String(compact);
+    return () => {
+      delete element.dataset.compactNodes;
+    };
+  }, [element, compact]);
+  return null;
+}
+
 export function EdgeRouting({ children }: { children: ReactNode }) {
   return (
     <ReactFlowProvider>
-      <MeasuredRouting>{children}</MeasuredRouting>
+      <MeasuredRouting>
+        <ZoomDetail />
+        {children}
+      </MeasuredRouting>
     </ReactFlowProvider>
   );
 }
 
 function RoutedEdge(
-  props: EdgeProps<Edge<{ reveal?: number; animationKey?: string | null; startedAt?: number }>>,
+  props: EdgeProps<
+    Edge<{
+      reveal?: number;
+      animationKey?: string | null;
+      startedAt?: number;
+      charging?: boolean;
+      traceOffset?: number;
+    }>
+  >,
 ) {
   const { route } = useSmartEdgePath({
     ...props,
     preset: "smoothstep",
-    options: pathOptions,
+    options:
+      props.data?.traceOffset === undefined
+        ? pathOptions
+        : { ...pathOptions, nodePadding: 13, gridRatio: 2 },
   });
   const straight = useStore((state) => {
     if (Math.abs(props.sourceY - props.targetY) > 0.01 || props.targetX <= props.sourceX)
@@ -104,20 +133,38 @@ function RoutedEdge(
     return () => animation.cancel();
   }, [routed, props.id, props.data?.animationKey, delay, startedAt]);
   if (route?.kind !== "routed") return null;
+  const offset = props.data?.traceOffset;
+  const path =
+    offset === undefined
+      ? straight
+        ? `M ${props.sourceX},${props.sourceY} L ${props.targetX},${props.targetY}`
+        : route.svgPathString
+      : connectionPath(
+          { x: props.sourceX, y: props.sourceY },
+          { x: props.targetX, y: props.targetY },
+          route.points,
+          offset,
+        );
   return (
-    <BaseEdge
-      key={props.data?.animationKey}
-      id={props.id}
-      path={
-        straight
-          ? `M ${props.sourceX},${props.sourceY} L ${props.targetX},${props.targetY}`
-          : route.svgPathString
-      }
-      pathLength={1}
-      interactionWidth={props.interactionWidth}
-      data-routed="true"
-      style={{ ...props.style, strokeDasharray: 1, strokeDashoffset: 0 }}
-    />
+    <>
+      <BaseEdge
+        key={props.data?.animationKey}
+        id={props.id}
+        path={path}
+        pathLength={1}
+        interactionWidth={props.interactionWidth}
+        data-routed="true"
+        style={{ ...props.style, strokeDasharray: 1, strokeDashoffset: 0 }}
+      />
+      {props.data?.charging && (
+        <path
+          d={path}
+          pathLength={1}
+          className="course-connection-charge"
+          style={{ stroke: "var(--color-text-strong-950)" }}
+        />
+      )}
+    </>
   );
 }
 

@@ -17,6 +17,7 @@ import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes, connectionReveal } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
+import { mapConnections } from "../map-connections";
 import type { Scope } from "../scope";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
@@ -287,6 +288,7 @@ export function CurriculumMap({
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
 }) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
   const reveal = useCourseReveal(nodes);
   const progress = useMemo(
@@ -299,16 +301,20 @@ export function CurriculumMap({
   );
   const revealedEdges = useMemo(
     () =>
-      edges.map((edge) => ({
+      mapConnections(edges, selectedId, hoveredId).map((edge) => ({
         ...edge,
-        type: "routed",
         data: {
-          reveal: edge.target === selectedId ? progress.incoming : progress.outgoing,
+          ...edge.data,
+          reveal: selectedId
+            ? edge.target === selectedId
+              ? progress.incoming
+              : progress.outgoing
+            : undefined,
           animationKey: selectedId,
           startedAt: progress.startedAt,
         },
       })),
-    [edges, selectedId, progress.incoming, progress.outgoing],
+    [edges, selectedId, hoveredId, progress],
   );
   return (
     <EdgeRouting>
@@ -317,6 +323,12 @@ export function CurriculumMap({
         className="absolute! inset-0 z-0 bg-transparent!"
         proOptions={{ hideAttribution: true }}
         onPaneClick={close}
+        onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
+        onNodeMouseLeave={() => setHoveredId(null)}
+        onFocusCapture={(event) =>
+          setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)
+        }
+        onBlurCapture={() => setHoveredId(null)}
         nodes={reveal.nodes}
         edges={revealedEdges}
         edgeTypes={routedEdgeTypes}
@@ -352,7 +364,7 @@ export function CurriculumMap({
                 variant="graphTitle"
                 className="m-0 whitespace-nowrap text-text-strong-950"
               >
-                CS UGM Roadmap (Alpha)
+                Everything CS UGM
               </Typography>
               <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
                 <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>

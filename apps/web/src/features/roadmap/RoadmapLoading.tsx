@@ -22,12 +22,16 @@ export function RoadmapLoading() {
           d={route}
           fill="none"
           stroke="currentColor"
-          strokeWidth="3"
+          strokeWidth="5"
           strokeLinecap="round"
           className="text-primary-base"
           initial={false}
-          animate={reducedMotion ? { pathLength: 1 } : { pathLength: [0, 1, 1] }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          animate={
+            reducedMotion
+              ? { pathLength: 1, pathOffset: 0 }
+              : { pathLength: [0, 0.5, 0], pathOffset: [0, 0.5, 1] }
+          }
+          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
         />
         {[
           [32, 112],
@@ -38,8 +42,8 @@ export function RoadmapLoading() {
           <m.g
             key={x}
             initial={false}
-            animate={reducedMotion ? { y: 0 } : { y: [0, -8, 0] }}
-            transition={{ duration: 0.7, delay: index * 0.12, repeat: Infinity, repeatDelay: 0.3 }}
+            animate={reducedMotion ? { y: 0, scale: 1 } : { y: [0, -12, 0], scale: [1, 1.15, 1] }}
+            transition={{ duration: 0.8, delay: index * 0.15, repeat: Infinity, ease: "easeInOut" }}
           >
             <rect
               x={x - 10}
@@ -62,7 +66,7 @@ export function RoadmapLoading() {
           </m.g>
         ))}
       </svg>
-      <Typography as="h1" variant="subtitle1">
+      <Typography as="h1" variant="subtitle1" className="motion-safe:animate-pulse">
         Lagi merakit roadmapmu
       </Typography>
     </main>

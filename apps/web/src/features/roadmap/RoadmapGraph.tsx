@@ -1,5 +1,5 @@
 import { Typography } from "../../ui/typography";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -17,7 +17,8 @@ import {
 } from "../curriculum/components/EdgeRouting";
 import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
 import { mapCourseState } from "../curriculum/map-state";
-import { creditsFor } from "../curriculum/course-utils";
+import { mapConnections } from "../curriculum/map-connections";
+import { creditsFor, isCore } from "../curriculum/course-utils";
 import { LANE_X, LANE_STEP, type MapNode } from "../curriculum/map-layout";
 import type { Activity, Roadmap } from "./planner";
 
@@ -27,14 +28,22 @@ type RoadmapNode = MapNode | ActivityNode | TitleNode;
 
 function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<TitleNode>) {
   const heading = useRef<HTMLHeadingElement>(null);
-  const { setCenter, viewportInitialized } = useReactFlow();
+  const { setViewport, viewportInitialized } = useReactFlow();
   useEffect(() => {
     if (!viewportInitialized || !heading.current) return;
-    const { offsetWidth: width, offsetHeight: height } = heading.current;
-    void setCenter(positionAbsoluteX + width / 2, positionAbsoluteY + height / 2, {
-      zoom: Math.min(0.8, (window.innerWidth - 32) / width),
+    const stage = heading.current.closest(".react-flow")!.getBoundingClientRect();
+    const phone = window.matchMedia("(width < 650px)").matches;
+    const left = Math.max(24, stage.width * 0.075);
+    const zoom = Math.min(
+      phone ? 0.8 : 1.2,
+      (stage.width - left - 24) / heading.current.offsetWidth,
+    );
+    void setViewport({
+      x: left - positionAbsoluteX * zoom,
+      y: stage.height / 3 - positionAbsoluteY * zoom,
+      zoom,
     });
-  }, [viewportInitialized, setCenter, positionAbsoluteX, positionAbsoluteY]);
+  }, [viewportInitialized, setViewport, positionAbsoluteX, positionAbsoluteY]);
   return (
     <Typography
       ref={heading}
@@ -83,6 +92,7 @@ export function RoadmapGraph({
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const flow = useRef<ReactFlowInstance<RoadmapNode, Edge>>(null);
   const stage = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -129,7 +139,7 @@ export function RoadmapGraph({
         nodes.push({
           id: item.course.id,
           type: "course",
-          position: { x: x + 12, y: 220 + index * 96 },
+          position: { x: x + 12, y: 220 + index * 120 },
           data: {
             kind: "course",
             course: item.course,
@@ -162,26 +172,29 @@ export function RoadmapGraph({
         nodes.push({
           id: `${activity.id}-${semester}`,
           type: "activity",
-          position: { x: x + 12, y: 220 + list.length * 96 + index * 190 },
+          position: { x: x + 12, y: 220 + list.length * 120 + index * 190 },
           data: { activity },
           zIndex: 2,
         }),
       );
     }
+    const coreIds = new Set(
+      plan.courses.filter((item) => isCore(item.course)).map((item) => item.course.id),
+    );
     const edges: Edge[] = relations.map((relation) => {
       const focused = selectedId === relation.source || selectedId === relation.target;
-      const color = focused ? "var(--color-primary-base)" : "var(--color-stroke-sub-300)";
+      const color = focused ? "var(--color-primary-base)" : "var(--color-text-soft-400)";
       return {
         id: `${relation.source}->${relation.target}`,
         type: "routed",
         source: relation.source,
         target: relation.target,
-        sourceHandle: `out:${relation.target}`,
-        targetHandle: `in:${relation.source}`,
+        sourceHandle: "out",
+        targetHandle: "in",
+        data: { optional: !coreIds.has(relation.source) || !coreIds.has(relation.target) },
         style: {
           stroke: color,
-          strokeWidth: focused ? 2 : 1,
-          opacity: selectedId && !focused ? 0.15 : 0.65,
+          strokeWidth: focused ? 2.2 : 1.2,
         },
         zIndex: focused ? 3 : 0,
       };
@@ -192,9 +205,10 @@ export function RoadmapGraph({
     () => connectionReveal(edges.some((edge) => edge.target === selectedId)),
     [edges, selectedId],
   );
-  const revealedEdges = edges.map((edge) => ({
+  const revealedEdges = mapConnections(edges, selectedId, hoveredId).map((edge) => ({
     ...edge,
     data: {
+      ...edge.data,
       animationKey: selectedId,
       startedAt: progress.startedAt,
       reveal:
@@ -219,6 +233,12 @@ export function RoadmapGraph({
           edges={revealedEdges}
           nodeTypes={nodeTypes}
           edgeTypes={routedEdgeTypes}
+          onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
+          onNodeMouseLeave={() => setHoveredId(null)}
+          onFocusCapture={(event) =>
+            setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)
+          }
+          onBlurCapture={() => setHoveredId(null)}
           onInit={(instance) => {
             flow.current = instance;
           }}

@@ -38,6 +38,31 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Nama tampilan mata kuliah Agama 2026 disingkat menjadi “Agama” tanpa keterangan dalam kurung.
+
+- Node mata kuliah di peta dan hasil kuis roadmap menjadi kartu sederhana dengan
+  judul lebih besar tanpa kode dan SKS saat zoom di bawah 70%.
+
+- Tampilan awal hasil kuis roadmap rata kiri mengikuti posisi dan skala awal peta utama.
+
+- Halaman Arsip Ujian menampilkan atribusi “Provided by Himakom UGM” dengan
+  tautan situs Himakom di bawah judul.
+
+- Judul beranda diperbarui menjadi “Everything CS UGM”.
+
+- Tombol ganti tampilan peta/daftar memakai ikon tampilan tujuan yang berputar
+  saat ditekan; preferensi pengurangan gerakan menonaktifkan putaran.
+
+- Peta kurikulum dan hasil kuis roadmap menampilkan koneksi wajib secara default melalui jalur melengkung
+  dengan satu titik sambungan tetap di setiap sisi node dan pendekatan garis yang mulus;
+  segmen horizontal dan vertikal diberi jarak agar tidak menumpuk.
+  Hover atau fokus keyboard mempertegas koneksi dengan animasi
+  aliran; koneksi pilihan muncul saat disorot. Animasi mengikuti preferensi pengurangan gerak.
+
+- Tabel Arsip Ujian diberi bingkai dan tinggi mengikuti ruang layar, dengan gulir
+  di dalam daftar; breadcrumb root selalu tampil sebagai `~` (direktori home),
+  dan ikon folder memakai warna abu-abu redup.
+
 - Teks tombol utama roadmap memakai warna gelap pada tema gelap agar kontras
   dengan latar jingga yang terang.
 
@@ -50,15 +75,16 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Posisi awal judul dan tombol CS UGM Roadmap pada peta rata kiri di sepertiga
   atas layar, dengan margin kiri lebih lapang dan tampilan awal diperbesar.
 
-- Hasil kuis roadmap diawali layar pemuatan dengan animasi rute mata kuliah
-  minimal 1,5 detik; preferensi pengurangan gerakan menampilkan ilustrasi statis.
+- Hasil kuis roadmap menampilkan layar pemuatan hanya selama hasil dimuat, tanpa
+  jeda minimum. Animasi rute bergerak berulang, simpul memantul, dan teks berdenyut;
+  preferensi pengurangan gerakan menampilkan ilustrasi dan teks statis.
 - Tombol kembali ke peta kurikulum memakai gaya netral berbingkai seperti toggle tema;
   breadcrumb “Arsip Ujian” disembunyikan di folder root agar judul tidak berulang.
   Navigasi folder memakai komponen Breadcrumb AlignUI dengan tautan folder.
   Pencarian mata kuliah rata kanan dengan placeholder “Mata kuliah” dan tetap
   tersedia di dalam folder; mengetik pencarian membuka hasil mata kuliah di root.
-- Warna hover baris Arsip Ujian memakai CSS Tailwind tanpa pembaruan seleksi
-  JavaScript saat pointer bergerak; navigasi keyboard tetap tersedia.
+- Baris Arsip Ujian memakai tombol native dengan hover dan fokus keyboard melalui
+  CSS, tanpa seleksi baris otomatis atau pembaruan gaya melalui JavaScript.
 
 - Pemuatan awal lebih ringan: data kurikulum dinormalisasi saat build, detail dan
   silabus dimuat sesuai kebutuhan, serta hasil roadmap dimuat setelah kuis selesai.
