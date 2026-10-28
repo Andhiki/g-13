@@ -78,6 +78,7 @@ export function RoadmapResult({
         <RoadmapGraph
           plan={plan}
           target={answers.lulus}
+          summary={`Kurikulum ${data.id}, ${answers.minat?.replace(/^Lab /, "").replace("tanpa-minat", "tanpa peminatan") ?? "tanpa peminatan"}, dengan target selesai ${answers.lulus} semester. ${plan.activities.map((activity) => activity.title).join(", ") || "Tanpa kegiatan tambahan"}. ${plan.conflicts.length ? `Ada ${plan.conflicts.length} hal yang perlu kamu periksa di catatan roadmap.` : "Cek catatan roadmap sebelum menyusun KRS."}`}
           selectedId={selectedId}
           choose={choose}
           navigation={navigation}
@@ -131,7 +132,11 @@ export function RoadmapResult({
               setSelectedId(null);
               setNavigation({ semester });
             }}
-            lastSemester={Math.max(answers.lulus, ...plan.courses.map((x) => x.semester))}
+            lastSemester={Math.max(
+              1,
+              ...plan.courses.map((x) => x.semester),
+              ...plan.activities.map((x) => x.semester),
+            )}
           />
         }
         search={

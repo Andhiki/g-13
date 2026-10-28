@@ -20,7 +20,7 @@ import { LANE_X, LANE_STEP, type MapNode } from "../curriculum/map-layout";
 import type { Activity, Roadmap } from "./planner";
 
 type ActivityNode = Node<{ activity: Activity }, "activity">;
-type TitleNode = Node<{ title: string }, "title">;
+type TitleNode = Node<{ title: string; summary: string }, "title">;
 type RoadmapNode = MapNode | ActivityNode | TitleNode;
 
 function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<TitleNode>) {
@@ -42,14 +42,19 @@ function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<
     });
   }, [viewportInitialized, setViewport, positionAbsoluteX, positionAbsoluteY]);
   return (
-    <Typography
-      ref={heading}
-      as="h1"
-      variant="graphTitle"
-      className="m-0 whitespace-nowrap text-text-strong-950"
-    >
-      {data.title}
-    </Typography>
+    <div className="w-[540px]">
+      <Typography
+        ref={heading}
+        as="h1"
+        variant="graphTitle"
+        className="m-0 whitespace-nowrap text-text-strong-950"
+      >
+        {data.title}
+      </Typography>
+      <Typography as="p" variant="paragraph" className="mb-0 mt-3 text-text-sub-600">
+        {data.summary}
+      </Typography>
+    </div>
   );
 }
 function ActivityCard({ data }: NodeProps<ActivityNode>) {
@@ -77,6 +82,7 @@ const nodeTypes = {
 export function RoadmapGraph({
   plan,
   target,
+  summary,
   selectedId,
   choose,
   navigation,
@@ -84,6 +90,7 @@ export function RoadmapGraph({
 }: {
   plan: Roadmap;
   target: number;
+  summary: string;
   selectedId: string | null;
   choose: (id: string) => void;
   navigation: { semester: number } | null;
@@ -99,7 +106,11 @@ export function RoadmapGraph({
         duration: 0,
       });
   }, [navigation]);
-  const last = Math.max(target, ...plan.courses.map((x) => x.semester));
+  const last = Math.max(
+    1,
+    ...plan.courses.map((x) => x.semester),
+    ...plan.activities.map((x) => x.semester),
+  );
   const semesters = Array.from({ length: last }, (_, i) => i + 1);
   const { nodes, edges } = useMemo(() => {
     const nodes: RoadmapNode[] = [
@@ -108,7 +119,7 @@ export function RoadmapGraph({
         type: "title",
         hidden: selectedId !== null,
         position: { x: LANE_X + 12, y: 12 },
-        data: { title: "Roadmap kuliah" },
+        data: { title: "Roadmap kuliah", summary },
         selectable: false,
       },
     ];
@@ -124,7 +135,7 @@ export function RoadmapGraph({
       nodes.push({
         id: `semester-${semester}`,
         type: "lane",
-        position: { x, y: 164 },
+        position: { x, y: 228 },
         style: { width: 270, height: 40 },
         data: {
           kind: "lane",
@@ -139,7 +150,7 @@ export function RoadmapGraph({
         nodes.push({
           id: item.course.id,
           type: "course",
-          position: { x: x + 12, y: 220 + index * 120 },
+          position: { x: x + 12, y: 284 + index * 120 },
           data: {
             kind: "course",
             course: item.course,
@@ -172,7 +183,7 @@ export function RoadmapGraph({
         nodes.push({
           id: `${activity.id}-${semester}`,
           type: "activity",
-          position: { x: x + 12, y: 220 + list.length * 120 + index * 190 },
+          position: { x: x + 12, y: 284 + list.length * 120 + index * 190 },
           data: { activity },
           zIndex: 2,
         }),
@@ -200,7 +211,7 @@ export function RoadmapGraph({
       };
     });
     return { nodes, edges };
-  }, [plan, target, selectedId, choose]);
+  }, [plan, target, summary, selectedId, choose]);
   const revealedEdges = mapConnections(edges, selectedId, hoveredId);
   return (
     <section

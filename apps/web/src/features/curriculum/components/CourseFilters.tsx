@@ -68,7 +68,7 @@ export function CurriculumVersionFilter({
         <SegmentedControl.List aria-labelledby="curriculum-version-label">
           {listCurricula().map((item) => (
             <SegmentedControl.Trigger key={item.id} value={item.id}>
-              {item.id} {item.edition.startsWith("Revisi") ? item.edition : ""}
+              {item.id === "2021" ? "2021 (rev. 2023)" : item.id}
             </SegmentedControl.Trigger>
           ))}
         </SegmentedControl.List>

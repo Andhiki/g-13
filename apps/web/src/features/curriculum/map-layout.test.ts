@@ -42,3 +42,25 @@ for (const { id } of listCurricula()) {
     ).toBe(true);
   });
 }
+
+for (const { id } of listCurricula()) {
+  test(`${id}: empty trailing semester is omitted and electives follow the last occupied semester`, () => {
+    const data = getCurriculum(id);
+    const map = buildMap(data, data.all, getRelations(id), null, "all", () => {});
+    expect(map.nodes.some((node) => node.id === "lane-semester-8")).toBe(false);
+    expect(map.lastSemester).toBe(7);
+    const seventh = map.nodes.find((node) => node.id === "lane-semester-7")!;
+    const choices = map.nodes.find((node) => node.id === "lane-choices")!;
+    expect(choices.position.x - seventh.position.x).toBe(360);
+    const eighth = {
+      ...data.core[0],
+      id: "semester-eight-course",
+      placements: data.core[0].placements.map((placement) => ({ ...placement, semester: 8 })),
+    };
+    const populated = { ...data, all: [...data.all, eighth], core: [...data.core, eighth] };
+    const withEighth = buildMap(populated, populated.all, getRelations(id), null, "all", () => {});
+    expect(withEighth.lastSemester).toBe(8);
+    expect(withEighth.nodes.some((node) => node.id === "lane-semester-8")).toBe(true);
+    expect(withEighth.positions.has(eighth.id)).toBe(true);
+  });
+}

@@ -1,5 +1,5 @@
 import { Typography } from "../../../ui/typography";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   getViewportForBounds,
@@ -22,80 +22,6 @@ import type { Scope } from "../scope";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
-function withOpacity(node: MapNode, opacity: number): MapNode {
-  if (opacity === 1) return node;
-  return {
-    ...node,
-    style: { ...node.style, opacity },
-    domAttributes: { ...node.domAttributes, inert: true },
-  };
-}
-
-function useCourseReveal(nodes: MapNode[]) {
-  const [displayed, setDisplayed] = useState({ nodes });
-  const current = useRef(nodes);
-
-  useLayoutEffect(() => {
-    const selected = nodes.find((node) => node.type === "course" && node.data.state === "selected");
-    const previous = new Map(current.current.map((node) => [node.id, node]));
-    const targetIds = new Set(nodes.map((node) => node.id));
-    const show = (frame: MapNode[]) => {
-      current.current = frame;
-      setDisplayed({ nodes: frame });
-    };
-    if (!selected || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      show(nodes);
-      return;
-    }
-    const startedAt = performance.now();
-    const animations: Animation[] = [];
-    const fade = (element: HTMLElement, from: string, to: number, duration: number, delay = 0) => {
-      const animation = element.animate([{ opacity: from }, { opacity: to }], {
-        duration,
-        fill: "both",
-      });
-      animation.startTime = startedAt + delay;
-      animations.push(animation);
-    };
-    const outgoing = [...document.querySelectorAll<HTMLElement>(".react-flow__node")]
-      .filter((element) => element.dataset.id !== selected.id)
-      .map((element) => ({ element, opacity: getComputedStyle(element).opacity }));
-    for (const { element, opacity } of outgoing) fade(element, opacity, 0, 180);
-    show([
-      ...nodes.map((node) =>
-        node.id === selected.id
-          ? node
-          : withOpacity({ ...node, position: previous.get(node.id)?.position ?? node.position }, 0),
-      ),
-      ...[...previous.values()]
-        .filter((node) => !targetIds.has(node.id))
-        .map((node) => withOpacity(node, 0)),
-    ]);
-    const timers = [
-      window.setTimeout(
-        () => show(nodes.map((node) => (node.id === selected.id ? node : withOpacity(node, 0)))),
-        180,
-      ),
-      window.setTimeout(() => {
-        for (const node of nodes) {
-          if (node.id === selected.id) continue;
-          const element = document.querySelector<HTMLElement>(
-            `.react-flow__node[data-id="${CSS.escape(node.id)}"]`,
-          );
-          if (element) fade(element, "0", 1, 250, 700);
-        }
-      }, 700),
-      window.setTimeout(() => show(nodes), 950),
-    ];
-    return () => {
-      timers.forEach(window.clearTimeout);
-      animations.forEach((animation) => animation.cancel());
-    };
-  }, [nodes]);
-
-  return displayed;
-}
-
 function ViewportFocus({
   navigation,
   focusKey,
@@ -103,6 +29,7 @@ function ViewportFocus({
   group,
   selectedId,
   positions,
+  lastSemester,
 }: {
   navigation: { semester: number } | null;
   focusKey: string;
@@ -110,6 +37,7 @@ function ViewportFocus({
   group: string;
   selectedId: string | null;
   positions: Map<string, { x: number; y: number }>;
+  lastSemester: number;
 }) {
   const { setCenter, setViewport } = useReactFlow();
   useEffect(() => {
@@ -154,7 +82,9 @@ function ViewportFocus({
         return;
       }
       if (scope === "choices" || group !== "__all__") {
-        const points = [...positions.values()].filter((point) => point.x >= LANE_X + 8 * LANE_STEP);
+        const points = [...positions.values()].filter(
+          (point) => point.x >= LANE_X + lastSemester * LANE_STEP,
+        );
         if (!points.length) return;
         const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
         const compact = window.matchMedia("(width < 1100px)").matches;
@@ -209,7 +139,17 @@ function ViewportFocus({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [navigation, focusKey, scope, group, selectedId, positions, setCenter, setViewport]);
+  }, [
+    navigation,
+    focusKey,
+    scope,
+    group,
+    selectedId,
+    positions,
+    lastSemester,
+    setCenter,
+    setViewport,
+  ]);
   return null;
 }
 
@@ -232,6 +172,7 @@ function SemesterViewport({
     const nodes = flow.getNodes();
     const top = window.matchMedia("(width < 1100px)").matches ? 116 : 76;
     for (let semester = 1; semester <= 8; semester++) {
+      if (!nodes.some((node) => node.id === `lane-semester-${semester}`)) continue;
       const laneX = LANE_X + (semester - 1) * LANE_STEP;
       const left = viewport.x + laneX * viewport.zoom;
       const width = LANE_WIDTH * viewport.zoom;
@@ -276,6 +217,7 @@ export function CurriculumMap({
   nodes,
   edges,
   positions,
+  lastSemester,
 }: {
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
@@ -287,10 +229,10 @@ export function CurriculumMap({
   nodes: MapNode[];
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
+  lastSemester: number;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const focusKey = [curriculum, scope, group, selectedId ?? ""].join(":");
-  const reveal = useCourseReveal(nodes);
   const revealedEdges = useMemo(
     () => mapConnections(edges, selectedId, hoveredId),
     [edges, selectedId, hoveredId],
@@ -308,7 +250,7 @@ export function CurriculumMap({
           setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)
         }
         onBlurCapture={() => setHoveredId(null)}
-        nodes={reveal.nodes}
+        nodes={nodes}
         edges={revealedEdges}
         edgeTypes={routedEdgeTypes}
         nodeTypes={nodeTypes}
@@ -329,6 +271,7 @@ export function CurriculumMap({
           group={group}
           selectedId={selectedId}
           positions={positions}
+          lastSemester={lastSemester}
         />
         <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
         <ViewportPortal>
@@ -344,6 +287,10 @@ export function CurriculumMap({
                 className="m-0 whitespace-nowrap text-text-strong-950"
               >
                 Everything CS UGM
+              </Typography>
+              <Typography as="p" variant="paragraph" className="m-0 max-w-xl text-text-sub-600">
+                Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu
+                Komputer UGM.
               </Typography>
               <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
                 <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
@@ -363,7 +310,7 @@ export function CurriculumMap({
       </ReactFlow>
       {!selectedId &&
         (scope === "choices" || group !== "__all__") &&
-        ![...positions.values()].some((point) => point.x >= LANE_X + 8 * LANE_STEP) && (
+        ![...positions.values()].some((point) => point.x >= LANE_X + lastSemester * LANE_STEP) && (
           <p
             role="status"
             className="pointer-events-none absolute inset-x-4 top-36 text-center text-paragraph-sm text-text-sub-600"

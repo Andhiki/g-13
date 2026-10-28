@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Ringkasan singkat jawaban kuis di bawah judul hasil roadmap, berisi kurikulum,
+  peminatan, target selesai, kegiatan, dan arahan untuk memeriksa catatan rencana.
+
 - Tombol FAQ di samping Arsip Ujian membuka modal dengan jawaban dalam accordion
   tentang peta kurikulum, filter, roadmap kuliah, dan arsip ujian. Kedua tautan
   navbar memakai komponen dan warna teks redup yang sama, dengan ukuran teks
@@ -42,6 +45,13 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   aplikasi dengan animasi konfirmasi, buka di Drive, dan tutup modal.
 
 #### Changed
+
+- Kolom Semester 8 dan tombol navigasinya disembunyikan saat kosong; kolom pilihan
+  langsung mengikuti semester terakhir yang berisi mata kuliah.
+- Slot pilihan kurikulum 2021 memakai nama “Mata Kuliah Pilihan” tanpa nomor,
+  dan label versi di UI disingkat menjadi “2021 (rev. 2023)”.
+
+- Paragraf pengantar singkat ditampilkan di bawah judul utama peta kurikulum.
 
 - Hasil roadmap menampilkan tooltip pada tombol coba lagi dan catatan. Tombol
   catatan hanya memakai ikon, dengan hierarki tipografi yang lebih jelas di modal.
@@ -122,6 +132,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   pemuatan detail ditutup saat pilihan mata kuliah dibatalkan.
 
 #### Fixed
+
+- Mata kuliah prasyarat dan lanjutan muncul bersamaan dengan koneksinya saat
+  memilih mata kuliah di peta; jeda animasi node yang terpisah dihapus.
+
+- Simbol font PDF yang tidak terbaca dihapus dari nama tampilan mata kuliah
+  Indonesia dan Inggris, termasuk Skripsi, KKN, dan slot sertifikasi pada
+  kurikulum 2021; teks sumber tetap disimpan.
+  Sumber: [Kurikulum 2021 Revisi 2023, Tabel 3.26](https://simpan.ugm.ac.id/s/3LLHypTUeGoVDGH/download).
 
 - Jalur koneksi grafik memakai jarak aman yang konsisten agar dapat melewati
   celah antarbaris, termasuk koneksi Jaringan Komputer ke Praktikum Sistem Operasi

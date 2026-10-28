@@ -29,7 +29,7 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
     rows.push({
       id,
       code: code === "MII21-" ? "" : code,
-      title,
+      title: slot ? "Mata Kuliah Pilihan" : title,
       englishTitle: text(row.name_en),
       placement: makePlacement(
         "core",

@@ -7,7 +7,7 @@ import type { CourseNodeData, LaneNodeData } from "../map-layout";
 
 const courseStyles = tv({
   slots: {
-    root: "group relative w-[246px] transition-opacity duration-[140ms]",
+    root: "group relative w-[246px] animate-in fade-in-0 transition-opacity duration-150 motion-reduce:animate-none",
     surface:
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:

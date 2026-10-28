@@ -62,8 +62,8 @@ export function merge(
       map.set(row.id, {
         id: row.id,
         code: row.code,
-        title: row.title,
-        englishTitle: row.englishTitle,
+        title: text(row.title.replace(/\p{Co}/gu, "")),
+        englishTitle: text(row.englishTitle.replace(/\p{Co}/gu, "")),
         placements: [row.placement],
       });
     else if (

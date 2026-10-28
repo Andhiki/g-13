@@ -42,6 +42,7 @@ export function buildMap(
   edges: Edge[];
   positions: Map<string, { x: number; y: number }>;
   relationCount: number;
+  lastSemester: number;
 } {
   const graphRelations = semesterRelations(
     relations,
@@ -58,9 +59,10 @@ export function buildMap(
   ]);
   const courses = selectedId ? data.all.filter((course) => focusedIds.has(course.id)) : visible;
   const visibleIds = new Set(courses.map((course) => course.id));
-  const choiceStartX = LANE_X + 8 * LANE_STEP;
+  const lastSemester = Math.max(1, ...data.core.map((course) => assignedCoreSemester(course) ?? 0));
+  const choiceStartX = LANE_X + lastSemester * LANE_STEP;
   const layoutCore = new Map<number, Course[]>();
-  for (let term = 1; term <= 8; term += 1) {
+  for (let term = 1; term <= lastSemester; term += 1) {
     const courses = data.all
       .filter((course) => assignedCoreSemester(course) === term)
       .sort((a, b) => a.title.localeCompare(b.title, "id"));
@@ -76,7 +78,7 @@ export function buildMap(
 
   const nodes: MapNode[] = [];
   const positions = new Map<string, { x: number; y: number }>();
-  for (let term = 1; term <= 8; term += 1) {
+  for (let term = 1; term <= lastSemester; term += 1) {
     const courses = layoutCore.get(term) ?? [];
     nodes.push({
       id: "lane-semester-" + term,
@@ -207,5 +209,5 @@ export function buildMap(
       },
     };
   });
-  return { nodes, edges, positions, relationCount: availableRelations.length };
+  return { nodes, edges, positions, relationCount: availableRelations.length, lastSemester };
 }

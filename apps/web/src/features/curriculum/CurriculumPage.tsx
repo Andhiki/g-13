@@ -40,6 +40,7 @@ export function CurriculumPage() {
           <SemesterFilter
             visible={view === "map" && selected ? [] : visibleSemesters}
             onNavigate={navigateToSemester}
+            lastSemester={map.lastSemester}
           />
         }
         viewControl={<ViewSwitch view={view} onViewChange={explorer.setView} />}
@@ -88,6 +89,7 @@ export function CurriculumPage() {
             nodes={map.nodes}
             edges={map.edges}
             positions={map.positions}
+            lastSemester={map.lastSemester}
           />
         ) : (
           <section
