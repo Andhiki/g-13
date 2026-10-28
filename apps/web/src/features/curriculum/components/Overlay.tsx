@@ -2,7 +2,8 @@ import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
+import { AlignButton, buttonVariants } from "../../../ui/button";
+import { Link } from "@tanstack/react-router";
 import { AlignDrawer } from "../../../ui/drawer";
 
 const compactQuery = "(width < 1100px)";
@@ -241,6 +242,17 @@ export function Overlay({
           )}
         </div>
       </header>
+      <nav
+        aria-label="Navigasi aplikasi"
+        className="fixed bottom-4 left-4 z-10 max-[1100px]:bottom-3 max-[1100px]:left-3"
+      >
+        <Link
+          to="/exam"
+          className={buttonVariants({ variant: "neutral", mode: "stroke", size: "medium" })}
+        >
+          Arsip Ujian
+        </Link>
+      </nav>
       <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">
         {viewControl}
       </div>

@@ -183,6 +183,16 @@ to the visual inspector's gradient and page-margin rules.
 
 The curriculum version filter uses the pinned AlignUI SegmentedControl source and useTabObserver hook with default styling. Its labels are 2021 Revisi 2023 and 2026; Radix Tabs handles keyboard navigation. Local class concatenation uses clsx to preserve custom typography tokens.
 
+## Exam archive
+
+The exam archive uses AlignUI Command Menu inline for its folder/file list and course-name search.
+Its root is exported alongside the existing dialog primitives, retaining cmdk selection and keyboard
+behavior. The PDF modal initially focuses its filename heading so the embedded viewer does not
+capture keyboard focus on open; closing returns focus to the file list.
+Breadcrumb buttons wrap long source course names on phones. The share action uses the
+same native read-only input fallback as roadmap sharing when clipboard access fails.
+Folder and paper selection live in the URL; the modal mounts only the selected Drive preview.
+
 ## Typography
 
 Use `Typography` from `apps/web/src/ui/typography.tsx` for application text. Its `variant`

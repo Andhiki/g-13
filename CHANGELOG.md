@@ -12,6 +12,19 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-10-28
+
+#### Added
+
+- Halaman Arsip Ujian dengan navigasi folder mata kuliah dan tahun, pencarian nama
+  mata kuliah, serta pratinjau PDF Google Drive dalam modal AlignUI. Koleksi awal
+  memuat seluruh 102 mata kuliah dan 1.613 entri berkas dari arsip Himakom UGM,
+  termasuk gambar dan dokumen Word. Berkas tanpa tahun eksplisit dikelompokkan
+  dalam “Tanpa tahun”; metadata yang meragukan dicatat untuk tinjauan manusia.
+- Tautan folder dan berkas Arsip Ujian dapat dibagikan, dengan pemulihan lokasi
+  melalui Back/Forward. Modal berkas menyediakan unduh, salin tautan aplikasi,
+  serta buka sumber di Drive.
+
 ### 2026-10-27
 
 #### Changed
