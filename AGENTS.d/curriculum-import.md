@@ -4,7 +4,9 @@ PDF layouts change between editions. Inspect the new official document and produ
 reviewable JSON; there is deliberately no permanent PDF migration or extraction
 script. Temporary extraction tools may help with one document, but do not commit
 them as a reusable importer. The contracts below describe the output, not a PDF
-parser. Existing extraction notes record historical evidence and unresolved limits.
+parser. Retained PDFs live in `output/sources/`; page manifests and audit data
+live in `output/data/`. Keep source facts and unresolved ambiguity with the
+edition's structured data rather than separate history documents.
 
 ## Ownership
 
@@ -123,8 +125,8 @@ Populate every field in `AcademicRules` from supported source evidence, includin
 interest grouping and exemptions, elective recommendations, internship choices
 and recognized course IDs, graduation/proposal placement, practical work,
 community-service constraints, and starred-prerequisite semantics. Unsupported
-recognition stays explicit in notes. Document source pages in the extraction notes
-and test every special rule. Future rules may require extending the common
+recognition stays explicit in `readingNotes`. Keep source pages in the structured
+records and test every special rule. Future rules may require extending the common
 contract and planning algorithm; never silently treat a new edition as 2026.
 
 The web app owns scheduling algorithms, quiz presentation, and map rendering.
@@ -135,27 +137,29 @@ strings and absent course/syllabus lookups return `undefined`.
 
 ## Add an edition
 
-1. Read `CONTEXT.md` and relevant extraction notes. Inspect the official PDF and
-   record its URL or local source path, SHA-256, edition, and page ranges.
+1. Read `CONTEXT.md` and relevant ADRs. Inspect the official PDF and record its
+   URL or local source path, SHA-256, edition, and page ranges in source data.
 2. Create the slice and its JSON, normalizer, academic rules, and source tests.
    Check totals independently, unique IDs, repeated placements, ambiguous codes,
    and syllabus coverage. A syllabus count is not course-table coverage.
-3. Register the slice in `packages/curriculum/src/registry.ts` (both the explicit
-   registry type and value). `CurriculumId` derives from its keys. Change
-   `defaultCurriculumId` only when deliberately selecting the default edition.
+3. Register the slice in `packages/curriculum/src/registry-data.ts` (both the
+   explicit registry type and value). `registry.ts` derives `CurriculumId` from
+   those keys. Change `defaultCurriculumId` there only when deliberately selecting
+   the default edition.
 4. Keep all web imports at `@g13/curriculum`. Do not add source aliases, TypeScript
    paths into package source, development source exports, or declaration maps.
 5. Run `bun run check` and `bun run build`. Inspect both curriculum exploration
    and roadmap results, including source warnings.
-6. Update extraction notes and add a sourced `CHANGELOG.md` entry for new editions
-   or academic corrections. Do not ship temporary extraction scripts.
+6. Keep provenance and unresolved ambiguity in source data or structured audit
+   evidence. Add a sourced `CHANGELOG.md` entry for new editions or academic
+   corrections. Do not ship temporary extraction scripts.
 
 ## Remove an edition
 
 Remove its registry type/value entries and delete its slice. If it was the default,
 choose another registered edition. Delete or update edition-specific app fixtures
-and any visual calibration for that edition. Keep historical sources and
-audit evidence unless removal is explicitly requested. Registry-driven selectors
+and any visual calibration for that edition. Keep retained source PDFs and audit
+evidence unless removal is explicitly requested. Registry-driven selectors
 stop offering the removed edition; invalid explorer URLs fall back to the default,
 and invalid roadmap URLs resume curriculum selection. No compatibility alias is
 kept. Run the same checks as for an addition.

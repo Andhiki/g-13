@@ -1,4 +1,4 @@
-// Adapted from AlignUI LinkButton v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
+// Adapted from AlignUI LinkButton v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
 import type { ComponentProps } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { tv, type VariantProps } from "tailwind-variants";

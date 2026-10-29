@@ -4,7 +4,7 @@ A community-built, open-source guide to UGM Computer Science courses. Explore th
 curriculum, see which courses depend on others, and sketch a semester-by-semester
 study plan. A prerequisite is a course you need to take first.
 
-![The g-13 course map showing courses and prerequisite links](docs/images/peta-kurikulum-preview.png)
+![The g-13 course map showing courses and prerequisite links](assets/readme/peta-kurikulum-preview.png)
 
 Use the course map, search for a course, open its details, or try the roadmap. This
 is a community project. It is **not an official UGM or department service**, and
@@ -80,12 +80,13 @@ first. Before `bun run dev`, build the curriculum package once with
 - `apps/web/src/ui/` — shared buttons, dialogs, and other interface pieces.
 - `packages/curriculum/src/curricula/` — data and rules for each curriculum.
 - `packages/curriculum/src/contracts/` — shared descriptions of the data’s shape.
-- `docs/` — project guides and notes.
+- `docs/adr/` — important technical decisions.
+- `AGENTS.d/` — contributor and agent workflows.
 
 For website changes, start in `apps/web/`. For curriculum changes, start in
 `packages/curriculum/` and include an official source. Read the
-[curriculum import guide](docs/curriculum-import.md) before changing curriculum
-data.
+[curriculum import guide](AGENTS.d/curriculum-import.md) before changing
+curriculum data.
 
 ## Want to contribute?
 
@@ -93,8 +94,8 @@ Everyone is welcome, including people who are new to programming.
 
 - Have an idea or found a problem? [Open an issue](https://github.com/Andhiki/g-13/issues).
 - Have a code or writing change ready? [Send a pull request](https://github.com/Andhiki/g-13/pulls).
-- Before contributing, read the [contribution guide](CONTRIBUTING.md) and
-  [community guidelines](CODE_OF_CONDUCT.md).
+- Before contributing, read the [contribution guide](CONTRIBUTING.md),
+  [AGENTS.d](AGENTS.d/README.md), and [community guidelines](CODE_OF_CONDUCT.md).
 
 Before sending a code change, run:
 

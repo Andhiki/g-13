@@ -2,7 +2,8 @@
 
 Kontribusi dalam bahasa Indonesia atau Inggris diterima: koreksi data, laporan bug,
 aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
-[aturan komunitas](CODE_OF_CONDUCT.md) sebelum mulai.
+[aturan komunitas](CODE_OF_CONDUCT.md) sebelum mulai. Panduan workflow agent dan
+skill proyek tersedia di [AGENTS.d](AGENTS.d/README.md).
 
 ## Alur kontribusi
 
@@ -39,18 +40,18 @@ berikutnya. Jangan menyalin ulang atau menghapus riwayat perubahan lama.
 
 ## Koreksi kurikulum
 
-Baca [CONTEXT.md](CONTEXT.md), [catatan 2021](docs/ilkom-2021-extraction.md), dan
-[catatan 2026](docs/ilkom-2026-extraction.md). Sertakan versi kurikulum, kode mata
-kuliah, sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi.
-Jangan menyamakan semester anjuran dengan jadwal penawaran atau menebak aturan
-akademik yang ambigu. Pertahankan asal data dan tambahkan tes yang relevan.
+Baca [CONTEXT.md](CONTEXT.md), [panduan impor](AGENTS.d/curriculum-import.md),
+dan PDF resmi di `output/sources/`. Sertakan versi kurikulum, kode mata kuliah,
+sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi. Jangan
+menyamakan semester anjuran dengan jadwal penawaran atau menebak aturan akademik
+yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang relevan.
 
 ## Struktur dan kebiasaan kode
 
 - `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: komponen bersama.
 - `packages/curriculum/src/curricula/<id>/`: JSON runtime, normalizer, dan aturan
   per kurikulum. `output/data/` menyimpan bukti audit; `output/sources/` menyimpan
-  dokumen sumber. Ikuti [panduan impor](docs/curriculum-import.md); jangan simpan
+  dokumen sumber. Ikuti [panduan impor](AGENTS.d/curriculum-import.md); jangan simpan
   skrip ekstraksi PDF sekali pakai. Perubahan sumber harus menyertakan provenance.
 - `*.test.ts`: tes Bun untuk perilaku data dan logika aplikasi.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run fmt` dan
@@ -60,7 +61,7 @@ akademik yang ambigu. Pertahankan asal data dan tambahkan tes yang relevan.
 
 GitHub Issues adalah pintu masuk kontributor publik. Tiket Markdown `.scratch/`
 tetap dipakai untuk rencana implementasi lokal sesuai
-[panduan agent](docs/agents/issue-tracker.md); kontributor tidak wajib membuatnya.
+[panduan agent](AGENTS.d/issue-tracker.md); kontributor tidak wajib membuatnya.
 
 ## Hak cipta dan keamanan
 

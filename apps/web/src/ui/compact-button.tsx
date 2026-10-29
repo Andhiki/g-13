@@ -1,4 +1,4 @@
-// Adapted from AlignUI CompactButton v0.0.0. See docs/design-system.md and docs/licenses/alignui.txt.
+// Adapted from AlignUI CompactButton v0.0.0. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
 import type { ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 

@@ -35,6 +35,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   template skripsi DIKE UGM yang diperbarui. Nama kursus CS50 tetap dalam bahasa
   Inggris pada kedua pilihan bahasa.
 
+- Catatan roadmap 2021 kini menyebut bahwa perbedaan sumber lama tetap dicatat
+  bersama data sumber.
+
 #### Fixed
 
 - Pergantian bahasa mempertahankan halaman saat kamus gagal diunduh dan tetap

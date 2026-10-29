@@ -93,7 +93,7 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
     readingNotes: [
       "Tanda * berarti mata kuliah prasyarat boleh diambil bersamaan. Tanpa tanda *, mata kuliah prasyarat harus sudah diikuti sampai ujian akhir sebelum mata kuliah terkait diambil (PDF hlm. 273).",
       "Agama dipilih sesuai keyakinan. Makna penanda pilihan, MBKM, KKN, dan sertifikasi mengikuti catatan di tabel sumber.",
-      "PDF Revisi 2023 menjadi sumber utama dataset 2021; halaman web departemen yang lebih lama memiliki perbedaan yang dicatat di dokumen ekstraksi.",
+      "PDF Revisi 2023 menjadi sumber utama dataset 2021; perbedaan dengan laman departemen yang lebih lama tetap dicatat di data sumber.",
     ],
   };
 }

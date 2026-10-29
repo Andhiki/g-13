@@ -1,4 +1,4 @@
-// Adapted from AlignUI CommandMenu v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
+// Adapted from AlignUI CommandMenu v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
 import * as React from "react";
 import { Command } from "cmdk";
 import type { DialogContentProps, DialogProps } from "@radix-ui/react-dialog";

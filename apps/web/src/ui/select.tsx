@@ -1,4 +1,4 @@
-// Adapted from AlignUI Select v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
+// Adapted from AlignUI Select v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { RiArrowDownSLine, RiCheckLine } from "@remixicon/react";
 import { extendTailwindMerge } from "tailwind-merge";
