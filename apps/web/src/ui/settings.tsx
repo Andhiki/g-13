@@ -77,7 +77,7 @@ export function Settings() {
             </div>
           </section>
         </div>
-        <div className="border-t border-stroke-soft-200 px-4 py-3">
+        <div className="flex items-center border-t border-stroke-soft-200 px-4 py-3">
           <AlignLinkButton.Root
             asChild
             variant="gray"

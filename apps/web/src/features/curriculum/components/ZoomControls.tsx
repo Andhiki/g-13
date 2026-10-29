@@ -40,19 +40,19 @@ export function ZoomControls({
             open={shortcutsOpen}
             onOpenChange={setShortcutsOpen}
           >
-            <dl className="m-0 grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
+            <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
               <div className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
-                <dt className="flex items-center gap-1">
+                <dt>
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    {text("Ke semester")}
+                  </Typography>
+                </dt>
+                <dd className="m-0 flex items-center justify-end gap-1">
                   <AlignKbd.Root>1</AlignKbd.Root>
                   <Typography as="span" variant="caption" className="text-text-sub-600">
                     -
                   </Typography>
                   <AlignKbd.Root>{lastSemester}</AlignKbd.Root>
-                </dt>
-                <dd className="m-0">
-                  <Typography as="span" variant="caption" className="text-text-sub-600">
-                    {text("Ke semester")}
-                  </Typography>
                 </dd>
               </div>
               {[
@@ -63,12 +63,12 @@ export function ZoomControls({
               ].map(({ key, description }) => (
                 <div key={key} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
                   <dt>
-                    <AlignKbd.Root>{key}</AlignKbd.Root>
-                  </dt>
-                  <dd className="m-0">
                     <Typography as="span" variant="caption" className="text-text-sub-600">
                       {text(description)}
                     </Typography>
+                  </dt>
+                  <dd className="m-0 justify-self-end">
+                    <AlignKbd.Root>{key}</AlignKbd.Root>
                   </dd>
                 </div>
               ))}
