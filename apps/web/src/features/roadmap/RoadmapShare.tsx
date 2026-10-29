@@ -14,7 +14,7 @@ export function RoadmapShare({ selection }: { selection: string }) {
   const reducedMotion = useReducedMotion();
   async function sharePlan() {
     if (await copyLink())
-      toast.custom(() => <SuccessToast message={text("Tautan roadmap disalin")} />);
+      toast.custom(() => <SuccessToast message={text("Tautan roadmap disalin.")} />);
   }
   return (
     <>
@@ -26,7 +26,7 @@ export function RoadmapShare({ selection }: { selection: string }) {
                 variant="neutral"
                 mode="stroke"
                 onClick={() => void sharePlan()}
-                className="max-[650px]:size-10 max-[650px]:p-2.5"
+                className="nodrag nopan pointer-events-auto"
               >
                 <span className="relative size-5" aria-hidden="true">
                   {[
@@ -52,9 +52,7 @@ export function RoadmapShare({ selection }: { selection: string }) {
                     </m.span>
                   ))}
                 </span>
-                <span className="max-[650px]:sr-only">
-                  {share?.status === "copied" ? text("Tautan disalin") : text("Bagikan")}
-                </span>
+                <span>{share?.status === "copied" ? text("Tautan disalin") : text("Bagikan")}</span>
               </AlignButton.Root>
             </AlignTooltip.Trigger>
             <AlignTooltip.Content size="xsmall" side="bottom">

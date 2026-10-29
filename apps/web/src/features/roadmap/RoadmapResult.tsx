@@ -60,6 +60,7 @@ export function RoadmapResult({
         <RoadmapGraph
           plan={plan}
           restart={restart}
+          shareLink={<RoadmapShare selection={JSON.stringify(answers)} />}
           target={answers.lulus}
           summary={text("roadmapSummary", {
             curriculum: data.id,
@@ -116,7 +117,7 @@ export function RoadmapResult({
             )}
           />
         }
-        search={<RoadmapShare selection={JSON.stringify(answers)} />}
+        search={null}
         viewControl={
           <RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={data.sourceTitle} />
         }

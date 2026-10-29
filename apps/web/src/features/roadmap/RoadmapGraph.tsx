@@ -2,7 +2,15 @@ import { mapCourseState } from "../../graph/map-state";
 import { useLocale } from "../../useLocale";
 import { AlignButton } from "../../ui/button";
 import { Typography } from "../../ui/typography";
-import { createContext, useContext, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+  type ReactNode,
+} from "react";
 import {
   Background,
   BackgroundVariant,
@@ -28,6 +36,7 @@ import {
 const RoadmapTitleContext = createContext<{
   heading: RefObject<HTMLHeadingElement | null>;
   restart: () => void;
+  shareLink: ReactNode;
 } | null>(null);
 
 function RoadmapTitle({ data }: NodeProps<TitleNode>) {
@@ -47,14 +56,17 @@ function RoadmapTitle({ data }: NodeProps<TitleNode>) {
       <Typography as="p" variant="paragraph" className="mb-0 mt-3 text-text-sub-600">
         {data.summary}
       </Typography>
-      <AlignButton.Root
-        variant="primary"
-        mode="filled"
-        className="nodrag nopan pointer-events-auto mt-4"
-        onClick={title?.restart}
-      >
-        {text("Coba lagi")}
-      </AlignButton.Root>
+      <div className="nodrag nopan mt-4 flex items-center gap-3">
+        <AlignButton.Root
+          variant="primary"
+          mode="filled"
+          className="pointer-events-auto"
+          onClick={title?.restart}
+        >
+          {text("Coba lagi")}
+        </AlignButton.Root>
+        {title?.shareLink}
+      </div>
     </div>
   );
 }
@@ -127,6 +139,7 @@ const nodeTypes = {
 export function RoadmapGraph({
   plan,
   restart,
+  shareLink,
   target,
   summary,
   selectedId,
@@ -136,6 +149,7 @@ export function RoadmapGraph({
 }: {
   plan: Roadmap;
   restart: () => void;
+  shareLink: ReactNode;
   target: number;
   summary: string;
   selectedId: string | null;
@@ -191,7 +205,7 @@ export function RoadmapGraph({
       className="absolute inset-0 overflow-hidden bg-bg-weak-25"
       aria-label={text("Grafik roadmap personal")}
     >
-      <RoadmapTitleContext.Provider value={{ heading, restart }}>
+      <RoadmapTitleContext.Provider value={{ heading, restart, shareLink }}>
         <EdgeRouting>
           <ReactFlow<RoadmapNode, Edge>
             className="absolute! inset-0"
