@@ -1,9 +1,11 @@
 import source from "./source.json";
+import syllabi from "./syllabi.json";
 import { adaptCurriculum2026 } from "./normalize";
 import type { CurriculumSlice } from "../../contracts/rules";
 
 export const curriculum2026: CurriculumSlice = {
   curriculum: adaptCurriculum2026(source),
+  syllabi,
   rules: {
     choiceDetail: "Enam peminatan, wajib minat, dan Kerja Praktik.",
     interestMode: "specialization",
@@ -23,30 +25,35 @@ export const curriculum2026: CurriculumSlice = {
     internship: {
       kind: "credited",
       options: [
-        { value: "pendek", label: "Durasi pendek", detail: "4 SKS Magang + 4 SKS Kerja Praktik." },
+        {
+          value: "pendek",
+          fullSemester: false,
+          courseId: "PACS262608",
+          label: "Durasi pendek",
+          detail: "4 SKS Magang + 4 SKS Kerja Praktik.",
+        },
         {
           value: "menengah",
+          fullSemester: false,
+          courseId: "PACS262606",
           label: "Durasi menengah",
           detail: "8 SKS Magang + 4 SKS Kerja Praktik.",
         },
         {
           value: "panjang",
+          fullSemester: false,
+          courseId: "PACS262607",
           label: "Durasi panjang",
           detail: "12 SKS Magang + 4 SKS Kerja Praktik.",
         },
         {
           value: "penuh",
+          fullSemester: true,
+          courseId: "PACS262609",
           label: "Satu semester penuh",
           detail: "16 SKS Magang + 4 SKS Kerja Praktik.",
         },
       ],
-      courseIds: {
-        pendek: "PACS262608",
-        menengah: "PACS262606",
-        panjang: "PACS262607",
-        penuh: "PACS262609",
-      },
-      fullSemesterOption: "penuh",
       note: "Tier SKS Magang 2026 mengikuti tabel sumber. Konversi durasi kalender harus dikonfirmasi melalui panduan Magang prodi.",
       noInternshipNote:
         "Kerja Praktik 4 SKS tetap wajib. Rencanakan antar semester setelah semester 5, dengan klaim SKS mengikuti semester penempatannya.",

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { buildRoadmap } from "./planner.test-support";
+import { buildRoadmap, conflictMessages } from "./planner.test-support";
 import { validateRoadmapSearch } from "./search";
 
 const baseline = { kurikulum: "2026", minat: "Analisis Data", iup: "tidak", magang: "tidak" };
@@ -98,7 +98,7 @@ test("short exposure does not reserve a semester; an undecided exposure stays un
   const undecided = buildRoadmap(
     validateRoadmapSearch({ ...baseline, iup: "ya", paparan: "undecided" }),
   );
-  expect(undecided.conflicts).toContain("International exposure IUP belum ditentukan.");
+  expect(conflictMessages(undecided)).toContain("International exposure IUP belum ditentukan.");
 });
 
 test("double degree can omit 2026 minat and never pretends a host plan is verified", () => {
@@ -106,7 +106,7 @@ test("double degree can omit 2026 minat and never pretends a host plan is verifi
     validateRoadmapSearch({ ...baseline, iup: "ya", paparan: "double", minat: "tanpa-minat" }),
   );
   expect(plan.courses.filter((x) => x.kind === "interest")).toHaveLength(0);
-  expect(plan.conflicts.join(" ")).toContain("kampus mitra");
+  expect(conflictMessages(plan).join(" ")).toContain("kampus mitra");
   expect(plan.activities[0].fullSemester).toBe(true);
 });
 
@@ -121,14 +121,16 @@ test("a blocked seven-semester scenario keeps work after the target visible", ()
     }),
   );
   expect(plan.courses.some((x) => x.semester > 7)).toBe(true);
-  expect(plan.conflicts.join(" ")).toContain("setelah semester 7");
+  expect(conflictMessages(plan).join(" ")).toContain("setelah semester 7");
 });
 
 test("the regular 2026 plan fits eight semesters while preserving source prerequisite ambiguities", () => {
   const plan = buildRoadmap(validateRoadmapSearch(baseline));
-  expect(plan.conflicts.some((text) => text.includes("belum ada dalam rencana"))).toBe(false);
+  expect(conflictMessages(plan).some((text) => text.includes("belum ada dalam rencana"))).toBe(
+    false,
+  );
   expect(
-    plan.conflicts.some(
+    conflictMessages(plan).some(
       (text) => text.includes("Praktikum Pemrograman") && text.includes("Pemrograman"),
     ),
   ).toBe(true);
@@ -144,7 +146,7 @@ test("unstarred same-semester prerequisites on required courses remain visible a
     }),
   );
   expect(
-    plan.conflicts.some(
+    conflictMessages(plan).some(
       (text) => text.includes("Sistem Digital") && text.includes("Algoritma dan Struktur Data"),
     ),
   ).toBe(true);
@@ -155,7 +157,7 @@ test("a long 2026 internship moves the KKN group to its alternative semester bef
     validateRoadmapSearch({ ...baseline, magang: "ya", durasi: "panjang", lulus: 8 }),
   );
   expect(plan.courses.find((x) => x.course.id === "UNKU260014")?.semester).toBe(7);
-  expect(plan.conflicts.some((text) => text.includes("melebihi batas"))).toBe(false);
+  expect(conflictMessages(plan).some((text) => text.includes("melebihi batas"))).toBe(false);
 });
 
 test("both graduation targets retain unique required courses for every minat and exposure semester", async () => {

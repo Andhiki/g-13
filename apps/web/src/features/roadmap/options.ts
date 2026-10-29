@@ -1,13 +1,14 @@
-import { getCurriculum, getAcademicRules, type CurriculumId } from "@g13/curriculum";
+import {
+  getCurriculum,
+  getAcademicRules,
+  type AcademicOption,
+  type CurriculumId,
+} from "@g13/curriculum";
 
-export type Choice = { value: string; label: string; detail: string };
+export type Choice = AcademicOption;
 export const interests = (curriculum: CurriculumId): Choice[] =>
   getCurriculum(curriculum)
-    .groups.filter((group) =>
-      getAcademicRules(curriculum).interestMode === "laboratory"
-        ? group.name.startsWith("Lab ")
-        : !["Pilihan bebas", "Aktivitas di luar program studi"].includes(group.name),
-    )
+    .groups.filter((group) => group.kind === "interest")
     .map((group) => ({
       value: group.name,
       label: group.name.replace(/^Lab /, ""),
@@ -17,10 +18,16 @@ export const interests = (curriculum: CurriculumId): Choice[] =>
           : "Termasuk mata kuliah wajib minat.",
     }));
 
-export const internshipOptions = (curriculum: CurriculumId): Choice[] =>
-  getAcademicRules(curriculum).internship.options;
+export type Exposure =
+  | "exchange"
+  | "internship"
+  | "course"
+  | "competition"
+  | "conference"
+  | "double"
+  | "undecided";
 
-export function exposureOptions(curriculum: CurriculumId): Choice[] {
+export function exposureOptions(curriculum: CurriculumId) {
   return [
     {
       value: "exchange",
@@ -57,13 +64,13 @@ export function exposureOptions(curriculum: CurriculumId): Choice[] {
       label: "Belum menentukan",
       detail: "Tetap tampil sebagai kegiatan yang perlu direncanakan.",
     },
-  ];
+  ] satisfies (Choice & { value: Exposure })[];
 }
 
 export function electiveOptions(curriculum: CurriculumId) {
   return getCurriculum(curriculum).electives.filter(
     (course) =>
       course.code &&
-      course.placements.some((p) => p.group.startsWith("Lab ") || p.group === "Pilihan bebas"),
+      course.placements.some((p) => p.groupKind === "interest" || p.groupKind === "elective"),
   );
 }

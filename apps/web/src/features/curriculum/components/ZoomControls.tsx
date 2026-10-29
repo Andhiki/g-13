@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapControlPanel } from "./Overlay";
+import { MapControlPanel } from "../../../graph/Overlay";
 import { useLocale } from "../../../useLocale";
 import { Panel, useReactFlow, useViewport } from "@xyflow/react";
 import { RiAddLine, RiSubtractLine, RiFocus3Line, RiKeyboardLine } from "@remixicon/react";

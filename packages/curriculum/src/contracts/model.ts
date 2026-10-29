@@ -1,11 +1,13 @@
 import type { CurriculumId } from "../registry";
 export type { CurriculumId } from "../registry";
+export type GroupKind = "interest" | "elective" | "activity" | "other" | "none";
 type Section = "core" | "interest" | "elective";
 
 export type Placement = {
   section: Section;
   label: string;
   group: string;
+  groupKind: GroupKind;
   semester: number | null;
   semesterLabel: string;
   credits: number | null;
@@ -28,7 +30,7 @@ export type Curriculum = {
   all: Course[];
   core: Course[];
   electives: Course[];
-  groups: { name: string; count: number }[];
+  groups: { name: string; count: number; kind: GroupKind }[];
   requiredCredits: number;
   totalCredits: number;
   summary: string;

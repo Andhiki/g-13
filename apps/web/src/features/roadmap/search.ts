@@ -1,11 +1,11 @@
 import { getAcademicRules, isCurriculumId, type CurriculumId } from "@g13/curriculum";
-import { internshipOptions, electiveOptions, exposureOptions, interests } from "./options";
+import { electiveOptions, exposureOptions, interests, type Exposure } from "./options";
 
 export type RoadmapSearch = {
   kurikulum?: CurriculumId;
   minat?: string;
   iup?: "ya" | "tidak";
-  paparan?: string;
+  paparan?: Exposure;
   magang?: "ya" | "tidak";
   durasi?: string;
   lulus: 7 | 8;
@@ -21,8 +21,8 @@ export function validateRoadmapSearch(input: Record<string, unknown>): RoadmapSe
   const iup = yesNo(input.iup);
   const magang = yesNo(input.magang);
   const paparan =
-    kurikulum && iup === "ya" && exposureOptions(kurikulum).some((x) => x.value === input.paparan)
-      ? String(input.paparan)
+    kurikulum && iup === "ya"
+      ? exposureOptions(kurikulum).find((x) => x.value === input.paparan)?.value
       : undefined;
   const minat =
     kurikulum &&
@@ -32,7 +32,7 @@ export function validateRoadmapSearch(input: Record<string, unknown>): RoadmapSe
         input.minat === "tanpa-minat"))
       ? String(input.minat)
       : undefined;
-  const durations = kurikulum ? internshipOptions(kurikulum) : [];
+  const durations = kurikulum ? getAcademicRules(kurikulum).internship.options : [];
   const durasi =
     magang === "ya" && durations.some((x) => x.value === input.durasi)
       ? String(input.durasi)

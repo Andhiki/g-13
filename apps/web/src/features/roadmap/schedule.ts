@@ -1,32 +1,32 @@
-import { getAcademicRules, defaultCurriculumId, type Relation } from "@g13/curriculum";
-import { creditsFor } from "../curriculum/course-utils";
+import { getAcademicRules, type Relation } from "@g13/curriculum";
+import { creditsFor } from "../../courses/course-utils";
 import type { PlannedCourse } from "./planner";
-import type { RoadmapSearch } from "./search";
+import type { PlanningInput } from "./planning-input";
 
 export const planningLimit = 24;
 
 export function scheduleCourses(
   courses: PlannedCourse[],
   relations: Relation[],
-  answers: RoadmapSearch,
+  answers: PlanningInput,
   blocked: Set<number>,
 ) {
-  const rules = getAcademicRules(answers.kurikulum ?? defaultCurriculumId).scheduling;
+  const rules = getAcademicRules(answers.kurikulum).scheduling;
   const endIds = rules.graduationIds;
   const proposalId = rules.proposalId;
-  const internshipSemester = answers.paparan === "internship" ? answers.semesterPaparan : 6;
+  const internshipSemester = answers.exposure.kind === "internship" ? answers.semesterPaparan : 6;
   for (const item of courses) {
     const early = rules.beforeDoubleDegree.find((rule) => rule.courseId === item.course.id);
-    if (early && answers.paparan !== "double") item.semester = early.semester;
+    if (early && answers.exposure.kind !== "double") item.semester = early.semester;
     if (endIds.includes(item.course.id)) item.semester = answers.lulus;
     if (item.course.id === proposalId && rules.proposalAfterRequirements)
       item.semester = answers.lulus - 1;
     if (item.kind === "internship" || item.course.id === rules.practicalWorkId)
-      item.semester = answers.magang === "ya" ? internshipSemester : 6;
+      item.semester = answers.internship.kind !== "none" ? internshipSemester : 6;
     if (
       item.kind === "required" &&
       !endIds.includes(item.course.id) &&
-      !(item.course.id === rules.practicalWorkId && answers.magang === "ya")
+      !(item.course.id === rules.practicalWorkId && answers.internship.kind !== "none")
     ) {
       while (blocked.has(item.semester)) item.semester++;
     }
@@ -50,14 +50,18 @@ export function scheduleCourses(
   for (const item of courses.filter((x) => x.kind === "interest" || x.kind === "elective")) {
     const prereqs = relations
       .filter((r) => r.target === item.course.id)
-      .map((r) => courses.find((x) => x.course.id === r.source))
-      .filter((x) => x !== undefined);
+      .flatMap((r) => {
+        const course = courses.find((x) => x.course.id === r.source);
+        return course ? [{ course, timing: r.timing }] : [];
+      });
     let term = item.semester;
     while (
       term < 14 &&
       (blocked.has(term) ||
         load(term) + (creditsFor(item.course) ?? 0) > planningLimit ||
-        prereqs.some((x) => x.semester >= term))
+        prereqs.some(({ course, timing }) =>
+          timing === "concurrent" ? course.semester > term : course.semester >= term,
+        ))
     )
       term += rules.electiveSemesterStep;
     item.semester = term;

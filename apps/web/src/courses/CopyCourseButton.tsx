@@ -1,10 +1,10 @@
-import { useLocale } from "../../../useLocale";
+import { useLocale } from "../useLocale";
 import { useEffect, useState } from "react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
-import { toast, SuccessToast } from "../../../ui/toast";
-import { CompactButton } from "../../../ui/compact-button";
-import { AlignTooltip } from "../../../ui/tooltip";
+import { toast, SuccessToast } from "../ui/toast";
+import { CompactButton } from "../ui/compact-button";
+import { AlignTooltip } from "../ui/tooltip";
 
 export function CopyCourseButton({ value, label }: { value: string; label: string }) {
   const { text } = useLocale();

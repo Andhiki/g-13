@@ -1,7 +1,7 @@
-import { mapCourseState } from "../curriculum/map-state";
+import { mapCourseState } from "../../graph/map-state";
 import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
-import { useMemo, useRef, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState, type RefObject } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -10,11 +10,12 @@ import {
   type NodeProps,
   type Edge,
 } from "@xyflow/react";
-import { GraphFocus } from "../../ui/graph-focus";
-import { EdgeRouting, routedEdgeTypes } from "../curriculum/components/EdgeRouting";
-import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
-import { mapConnections } from "../curriculum/map-connections";
-import { LANE_X, LANE_STEP } from "../curriculum/map-layout";
+import { GraphFocus } from "../../graph/GraphFocus";
+import { EdgeRouting, routedEdgeTypes } from "../../graph/EdgeRouting";
+import { CourseNode, LaneNode } from "../../graph/MapNodes";
+import { mapConnections } from "../../graph/map-connections";
+import { LANE_X, LANE_STEP, LANE_WIDTH } from "../../graph/model";
+import { courseLayout } from "../../courses/layout";
 import type { Roadmap } from "./planner";
 import {
   getRoadmapGraph,
@@ -23,11 +24,15 @@ import {
   type RoadmapNode,
 } from "./graph-layout";
 
+const TitleElement = createContext<RefObject<HTMLHeadingElement | null> | null>(null);
+
 function RoadmapTitle({ data }: NodeProps<TitleNode>) {
   const { text } = useLocale("roadmap");
+  const title = useContext(TitleElement);
   return (
     <div className="w-[540px]">
       <Typography
+        ref={title}
         data-roadmap-title
         as="h1"
         variant="graphTitle"
@@ -44,7 +49,11 @@ function RoadmapTitle({ data }: NodeProps<TitleNode>) {
 function RoadmapFocus({
   selectedId,
   navigation,
+  heading,
+  stage,
 }: {
+  heading: RefObject<HTMLHeadingElement | null>;
+  stage: RefObject<HTMLElement | null>;
   selectedId: string | null;
   navigation: { semester: number } | null;
 }) {
@@ -55,18 +64,24 @@ function RoadmapFocus({
       navigation={navigation}
       resetKey="roadmap"
       onSemester={(semester) => {
-        void setCenter(LANE_X + (semester - 1) * LANE_STEP + 135, 420, { zoom: 0.8, duration: 0 });
+        void setCenter(LANE_X + (semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
+          zoom: 0.8,
+          duration: 0,
+        });
       }}
       onOverview={() => {
-        const heading = document.querySelector<HTMLElement>("[data-roadmap-title]")!;
-        const stage = heading.closest(".react-flow")!.getBoundingClientRect();
+        const titleElement = heading.current!;
+        const bounds = stage.current!.getBoundingClientRect();
         const title = getNode("roadmap-title")!;
-        const phone = window.matchMedia("(width < 650px)").matches;
-        const left = Math.max(24, stage.width * 0.075);
-        const zoom = Math.min(phone ? 0.8 : 1.2, (stage.width - left - 24) / heading.offsetWidth);
+        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
+        const left = Math.max(24, bounds.width * 0.075);
+        const zoom = Math.min(
+          phone ? 0.8 : 1.2,
+          (bounds.width - left - 24) / titleElement.offsetWidth,
+        );
         void setViewport({
           x: left - title.position.x * zoom,
-          y: stage.height / 3 - title.position.y * zoom,
+          y: bounds.height / 3 - title.position.y * zoom,
           zoom,
         });
       }}
@@ -117,6 +132,7 @@ export function RoadmapGraph({
   const { text, language } = useLocale("roadmap");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const stage = useRef<HTMLElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const graph = useMemo(
     () => getRoadmapGraph({ plan, target, summary, text }, language),
     [plan, target, summary, text, language],
@@ -161,49 +177,58 @@ export function RoadmapGraph({
       className="absolute inset-0 overflow-hidden bg-bg-weak-25"
       aria-label={text("Grafik roadmap kuliah")}
     >
-      <EdgeRouting>
-        <ReactFlow<RoadmapNode, Edge>
-          className="absolute! inset-0"
-          key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
-          nodes={nodes}
-          edges={revealedEdges}
-          nodeTypes={nodeTypes}
-          edgeTypes={routedEdgeTypes}
-          onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
-          onNodeMouseLeave={() => setHoveredId(null)}
-          onFocusCapture={(event) =>
-            setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)
-          }
-          onBlurCapture={() => setHoveredId(null)}
-          defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
-          onMoveEnd={(_, viewport) => {
-            const width = stage.current?.clientWidth ?? 0;
-            onVisibleSemesters(
-              semesters.filter((term) => {
-                const left = viewport.x + (LANE_X + (term - 1) * LANE_STEP) * viewport.zoom;
-                const laneWidth = 270 * viewport.zoom;
-                return Math.min(width, left + laneWidth) - Math.max(0, left) >= laneWidth / 2;
-              }),
-            );
-          }}
-          minZoom={0.08}
-          maxZoom={1.5}
-          nodesDraggable={false}
-          nodesConnectable={false}
-          elementsSelectable={false}
-          zoomOnDoubleClick={false}
-          proOptions={{ hideAttribution: true }}
-          aria-label={text("Roadmap mata kuliah per semester")}
-        >
-          <RoadmapFocus selectedId={selectedId} navigation={navigation} />
-          <Background
-            variant={BackgroundVariant.Dots}
-            color="var(--color-stroke-sub-300)"
-            gap={24}
-            size={1}
-          />
-        </ReactFlow>
-      </EdgeRouting>
+      <TitleElement.Provider value={heading}>
+        <EdgeRouting>
+          <ReactFlow<RoadmapNode, Edge>
+            className="absolute! inset-0"
+            key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
+            nodes={nodes}
+            edges={revealedEdges}
+            nodeTypes={nodeTypes}
+            edgeTypes={routedEdgeTypes}
+            onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
+            onNodeMouseLeave={() => setHoveredId(null)}
+            onFocusCapture={(event) =>
+              setHoveredId(
+                event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null,
+              )
+            }
+            onBlurCapture={() => setHoveredId(null)}
+            defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
+            onMoveEnd={(_, viewport) => {
+              const width = stage.current?.clientWidth ?? 0;
+              onVisibleSemesters(
+                semesters.filter((term) => {
+                  const left = viewport.x + (LANE_X + (term - 1) * LANE_STEP) * viewport.zoom;
+                  const laneWidth = LANE_WIDTH * viewport.zoom;
+                  return Math.min(width, left + laneWidth) - Math.max(0, left) >= laneWidth / 2;
+                }),
+              );
+            }}
+            minZoom={0.08}
+            maxZoom={1.5}
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={false}
+            zoomOnDoubleClick={false}
+            proOptions={{ hideAttribution: true }}
+            aria-label={text("Roadmap mata kuliah per semester")}
+          >
+            <RoadmapFocus
+              heading={heading}
+              stage={stage}
+              selectedId={selectedId}
+              navigation={navigation}
+            />
+            <Background
+              variant={BackgroundVariant.Dots}
+              color="var(--color-stroke-sub-300)"
+              gap={24}
+              size={1}
+            />
+          </ReactFlow>
+        </EdgeRouting>
+      </TitleElement.Provider>
     </section>
   );
 }

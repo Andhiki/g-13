@@ -1,11 +1,11 @@
-import { useLocale } from "../../../useLocale";
-import { Typography } from "../../../ui/typography";
+import { useLocale } from "../useLocale";
+import { Typography } from "../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
-import { AlignDrawer } from "../../../ui/drawer";
-import { useKeyboardShortcuts } from "../../../ui/use-keyboard-shortcuts";
+import { AlignButton } from "../ui/button";
+import { AlignDrawer } from "../ui/drawer";
+import { useKeyboardShortcuts } from "../ui/use-keyboard-shortcuts";
 
 const compactQuery = "(width < 1100px)";
 

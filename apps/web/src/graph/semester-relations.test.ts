@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import { semesterRelations } from "./semester-relations";
 
 test("graph connections omit same-semester prerequisites without changing the source relations", () => {
-  const relations = [
-    { source: "a", target: "b" },
-    { source: "a", target: "c" },
-    { source: "a", target: "elective" },
-    { source: "elective", target: "unscheduled" },
+  const relations: import("@g13/curriculum").Relation[] = [
+    { source: "a", target: "b", timing: "before" },
+    { source: "a", target: "c", timing: "before" },
+    { source: "a", target: "elective", timing: "before" },
+    { source: "elective", target: "unscheduled", timing: "before" },
   ];
   const semesters = new Map([
     ["a", 2],

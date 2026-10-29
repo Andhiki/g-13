@@ -4,6 +4,7 @@ import { Typography } from "../../ui/typography";
 import { RiInformationLine } from "@remixicon/react";
 import { AlignButton } from "../../ui/button";
 import { AlignModal } from "../../ui/modal";
+import { formatConflict } from "./conflict-format";
 import type { Roadmap } from "./planner";
 
 export function RoadmapNotes({
@@ -15,7 +16,7 @@ export function RoadmapNotes({
   target: number;
   sourceTitle: string;
 }) {
-  const { text } = useLocale("roadmap");
+  const { text, courseName } = useLocale("roadmap");
   return (
     <AlignModal.Root>
       <AlignTooltip.Provider>
@@ -70,9 +71,9 @@ export function RoadmapNotes({
             {plan.conflicts.length ? (
               <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
                 {plan.conflicts.map((note) => (
-                  <li key={note}>
+                  <li key={JSON.stringify(note)}>
                     <Typography as="span" variant="paragraph">
-                      {note}
+                      {formatConflict(note, { text, courseName })}
                     </Typography>
                   </li>
                 ))}
@@ -95,7 +96,7 @@ export function RoadmapNotes({
             </Typography>
             <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
               {plan.notes.map((note) => (
-                <li key={note}>
+                <li key={JSON.stringify(note)}>
                   <Typography as="span" variant="paragraph">
                     {text(note)}
                   </Typography>

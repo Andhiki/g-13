@@ -1,7 +1,7 @@
 import { lazy, useEffect, useRef } from "react";
 import { DeferredContent } from "../../ui/deferred-content";
 import { Route } from "../../routes/roadmap";
-import { firstUnanswered } from "./quiz";
+import { planningInput } from "./planning-input";
 import { RoadmapQuiz } from "./RoadmapQuiz";
 import { RoadmapLoading } from "./RoadmapLoading";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
@@ -35,15 +35,15 @@ export function RoadmapPage() {
       // Browsing still works when storage is unavailable or its contents are invalid.
     }
   }, [answers, navigate]);
-  const result = answers.hasil && !firstUnanswered(answers);
+  const input = answers.hasil ? planningInput(answers) : null;
   const update = (next: RoadmapSearch) => {
     void navigate({ search: next, replace: !next.hasil && !answers.hasil, resetScroll: false });
   };
   const restart = () => update(validateRoadmapSearch({}));
-  if (result)
+  if (input)
     return (
       <DeferredContent fallback={<RoadmapLoading />}>
-        <RoadmapResult answers={answers} update={update} restart={restart} />
+        <RoadmapResult input={input} answers={answers} update={update} restart={restart} />
       </DeferredContent>
     );
   return (

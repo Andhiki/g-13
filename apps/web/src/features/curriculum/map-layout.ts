@@ -1,28 +1,10 @@
-import type { Edge, Node } from "@xyflow/react";
+import type { Edge } from "@xyflow/react";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
-import { mapCourseState, type MapCourseState } from "./map-state";
-import { assignedCoreSemester, isCore } from "./course-utils";
-import { semesterRelations } from "./semester-relations";
+import { mapCourseState } from "../../graph/map-state";
+import { assignedCoreSemester, isCore } from "../../courses/course-utils";
+import { semesterRelations } from "../../graph/semester-relations";
 
-type CourseNodeData = {
-  kind: "course";
-  course: Course;
-  state: MapCourseState;
-  incoming: string[];
-  outgoing: string[];
-  choose: (id: string) => void;
-};
-type LaneNodeData = {
-  kind: "lane";
-  title: string;
-  active: boolean;
-};
-export type MapNode = Node<CourseNodeData, "course"> | Node<LaneNodeData, "lane">;
-export type { CourseNodeData, LaneNodeData };
-
-export const LANE_X = 48;
-export const LANE_STEP = 360;
-export const LANE_WIDTH = 270;
+import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../graph/model";
 const CHOICE_COLUMNS = 8;
 const CHOICE_ROWS = 6;
 const ROW_STEP = 120;

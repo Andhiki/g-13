@@ -9,9 +9,9 @@ import {
 } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import type { RoutingNode } from "../connection-routes";
-import type { RoutingResult } from "../connection-routing.worker";
-import { getConnectionRoutes, routingRequest } from "../routing-cache";
+import type { RoutingNode } from "./connection-routes";
+import type { RoutingResult } from "./connection-routing.worker";
+import { getConnectionRoutes, routingRequest } from "./routing-cache";
 
 const emptyRoutes: RoutingResult = new Map();
 const Routes = createContext(emptyRoutes);

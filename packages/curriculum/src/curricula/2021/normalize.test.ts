@@ -49,8 +49,8 @@ describe("2021 Revisi 2023 source adapter", () => {
       requiredCredits: 104,
       totalCredits: 144,
       groups: expect.arrayContaining([
-        { name: "Kegiatan MBKM", count: 46 },
-        { name: "Lab Sistem Komputer dan Jaringan", count: 11 },
+        { name: "Kegiatan MBKM", count: 46, kind: "other" },
+        { name: "Lab Sistem Komputer dan Jaringan", count: 11, kind: "interest" },
       ]),
     });
   });

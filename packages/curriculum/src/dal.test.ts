@@ -43,7 +43,9 @@ for (const curriculum of listCurricula()) {
       ...rules.excludedCoreIds,
       ...rules.religionChoiceIds,
       ...Object.values(rules.preferredElectives).flat(),
-      ...Object.values(rules.internship.courseIds),
+      ...(rules.internship.kind === "credited"
+        ? rules.internship.options.map((option) => option.courseId)
+        : []),
       ...scheduling.graduationIds,
       scheduling.proposalId,
       ...scheduling.overflowCourseIds,
@@ -52,13 +54,6 @@ for (const curriculum of listCurricula()) {
       ...(scheduling.communityService?.companionIds ?? []),
     ];
     for (const id of ids) expect(getCourse(curriculum.id, id)).toBeDefined();
-    expect(
-      rules.internship.options.some(
-        (option) => option.value === rules.internship.fullSemesterOption,
-      ),
-    ).toBe(true);
-    for (const option of Object.keys(rules.internship.courseIds))
-      expect(rules.internship.options.some((choice) => choice.value === option)).toBe(true);
     expect(scheduling.electiveSemesterStep).toBeGreaterThan(0);
   });
 }

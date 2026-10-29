@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 import type { Edge, XYPosition } from "@xyflow/react";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap, createMapLayout } from "./map-layout";
+import { buildMap, createMapLayout } from "../features/curriculum/map-layout";
 import { mapConnections } from "./map-connections";
 import { connectionRoutes, type RoutingNode } from "./connection-routes";
-import { buildRoadmap } from "../roadmap/planner.test-support";
-import { buildRoadmapGraph } from "../roadmap/graph-layout";
-import { validateRoadmapSearch } from "../roadmap/search";
+import { buildRoadmap } from "../features/roadmap/planner.test-support";
+import { buildRoadmapGraph } from "../features/roadmap/graph-layout";
+import { validateRoadmapSearch } from "../features/roadmap/search";
 
 function routingNodes(nodes: { id: string; position: XYPosition; type?: string }[]): RoutingNode[] {
   return nodes.map((node) => {
@@ -109,6 +109,7 @@ for (const { id } of listCurricula()) {
             iup: withActivities ? "ya" : "tidak",
             paparan: withActivities ? "double" : undefined,
             magang: withActivities ? "ya" : "tidak",
+            durasi: withActivities ? (id === "2021" ? "semester" : "penuh") : undefined,
             lulus,
           }),
         );

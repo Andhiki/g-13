@@ -1,28 +1,19 @@
-import { useSharedLink } from "../../ui/use-shared-link";
+import { PaperPreview } from "./PaperPreview";
 import { useLocale } from "../../useLocale";
-import { AlignTooltip } from "../../ui/tooltip";
-import { toast, SuccessToast } from "../../ui/toast";
 import { Fragment, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   RiArrowUpLine,
-  RiCheckLine,
-  RiCloseLine,
-  RiDownloadLine,
-  RiFileCopyLine,
   RiFilePdf2Line,
   RiFileTextLine,
   RiFolder3Line,
   RiArrowRightSLine,
   RiSearchLine,
-  RiDriveLine,
 } from "@remixicon/react";
 import { AlignBreadcrumb } from "../../ui/breadcrumb";
 import { AlignBadge } from "../../ui/badge";
-import { AlignButton, buttonVariants } from "../../ui/button";
-import { AlignModal } from "../../ui/modal";
 import { Typography } from "../../ui/typography";
-import { browseArchive, paperLinks, resolveArchive } from "./archive";
+import { browseArchive, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
 import { archiveUpdatedAt } from "./metadata";
 import { Route } from "../../routes/exam";
@@ -64,10 +55,7 @@ export function ExamArchivePage() {
   const navigate = Route.useNavigate();
   const { location, paper } = resolveArchive(search);
   const [query, setQuery] = useState("");
-  const selection = JSON.stringify([...location, paper?.id]);
-  const { share, copyLink } = useSharedLink({ selection });
   const list = useRef<HTMLDivElement>(null);
-  const modalTitle = useRef<HTMLHeadingElement>(null);
   const folder = browseArchive({
     location,
     query,
@@ -75,15 +63,9 @@ export function ExamArchivePage() {
     locale: language,
   });
   const parent = folder.breadcrumbs.at(-2);
-  const links = paper ? paperLinks(paper) : null;
   const openFolder = (next: ArchiveLocation) => {
     void navigate({ search: folderSearch(next), resetScroll: false });
   };
-  async function sharePaper() {
-    if (await copyLink()) {
-      toast.custom(() => <SuccessToast message={text("Tautan arsip ujian disalin")} />);
-    }
-  }
 
   return (
     <main className="mx-auto flex h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-0 py-5 text-text-strong-950 sm:px-8 sm:py-8">
@@ -267,149 +249,12 @@ export function ExamArchivePage() {
           </div>
         </div>
       </section>
-      <AlignModal.Root
-        open={paper !== null}
-        onOpenChange={(open) => {
-          if (!open) openFolder(location);
-        }}
-      >
-        <AlignModal.Content
-          className="flex h-[90dvh] max-w-5xl flex-col overflow-hidden"
-          showClose={false}
-          aria-describedby={undefined}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            modalTitle.current?.focus();
-          }}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            list.current?.focus();
-          }}
-        >
-          <div className="flex min-w-0 items-center justify-between gap-4 p-4">
-            <AlignModal.Title asChild>
-              <Typography
-                ref={modalTitle}
-                as="h2"
-                tabIndex={-1}
-                variant="label"
-                className="min-w-0 flex-1 truncate outline-none"
-                title={paper?.name}
-              >
-                {paper?.name}
-              </Typography>
-            </AlignModal.Title>
-            {links && (
-              <div
-                className="flex shrink-0 items-center gap-1"
-                role="group"
-                aria-label={text("Aksi berkas")}
-              >
-                <a
-                  href={links.download}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={text("Unduh")}
-                  title={text("Unduh")}
-                  className={buttonVariants({
-                    variant: "neutral",
-                    mode: "ghost",
-                    size: "xsmall",
-                    className: "size-8 p-0",
-                  })}
-                >
-                  <RiDownloadLine className="size-4" aria-hidden="true" />
-                </a>
-                <AlignTooltip.Provider>
-                  <AlignTooltip.Root>
-                    <AlignTooltip.Trigger asChild>
-                      <AlignButton.Root
-                        variant="neutral"
-                        mode="ghost"
-                        size="xsmall"
-                        className="size-8 p-0"
-                        aria-label={
-                          share?.status === "copied"
-                            ? text("Tautan berhasil disalin")
-                            : text("Salin tautan")
-                        }
-                        onClick={() => {
-                          void sharePaper();
-                        }}
-                      >
-                        {share?.status === "copied" ? (
-                          <RiCheckLine
-                            key="copied"
-                            className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
-                        )}
-                      </AlignButton.Root>
-                    </AlignTooltip.Trigger>
-                    <AlignTooltip.Content size="xsmall" side="bottom">
-                      {share?.status === "copied" ? text("Tautan disalin") : text("Salin tautan")}
-                    </AlignTooltip.Content>
-                  </AlignTooltip.Root>
-                </AlignTooltip.Provider>
-                <a
-                  href={links.drive}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={text("Buka di Drive")}
-                  title={text("Buka di Drive")}
-                  className={buttonVariants({
-                    variant: "neutral",
-                    mode: "ghost",
-                    size: "xsmall",
-                    className: "size-8 p-0",
-                  })}
-                >
-                  <RiDriveLine className="size-4" aria-hidden="true" />
-                </a>
-                <AlignModal.Close asChild>
-                  <AlignButton.Root
-                    variant="neutral"
-                    mode="ghost"
-                    size="xsmall"
-                    className="size-8 p-0"
-                    aria-label={text("Tutup dialog")}
-                    title={text("Tutup")}
-                  >
-                    <RiCloseLine className="size-4" aria-hidden="true" />
-                  </AlignButton.Root>
-                </AlignModal.Close>
-              </div>
-            )}
-            <span className="sr-only" role="status" aria-live="polite">
-              {share?.status === "copied" ? text("Tautan berhasil disalin") : ""}
-            </span>
-          </div>
-          {share?.status === "manual" && (
-            <div className="border-y border-stroke-soft-200 px-4 py-2">
-              <Typography variant="caption" role="status">
-                {text("Gagal menyalin otomatis. Salin tautan berikut.")}
-              </Typography>
-              <input
-                aria-label={text("Tautan berkas")}
-                readOnly
-                value={share.url}
-                onFocus={(event) => event.currentTarget.select()}
-                className="mt-2 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
-              />
-            </div>
-          )}
-          {paper && links && (
-            <iframe
-              title={paper.name}
-              src={links.preview}
-              className="min-h-0 w-full flex-1 border-0"
-              allow="fullscreen"
-            />
-          )}
-        </AlignModal.Content>
-      </AlignModal.Root>
+      <PaperPreview
+        paper={paper}
+        location={location}
+        list={list}
+        onClose={() => openFolder(location)}
+      />
     </main>
   );
 }

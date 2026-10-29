@@ -55,6 +55,10 @@ test("illustrated cards and connections match curriculum 2026", () => {
     expect(course?.placements.some((placement) => placement.credits === card.credits)).toBe(true);
   }
   const relations = getRelations("2026");
-  expect(relations).toContainEqual({ source: programming.code, target: algorithms.code });
-  expect(relations).toContainEqual({ source: algorithms.code, target: analysis.code });
+  expect(relations).toContainEqual(
+    expect.objectContaining({ source: programming.code, target: algorithms.code }),
+  );
+  expect(relations).toContainEqual(
+    expect.objectContaining({ source: algorithms.code, target: analysis.code }),
+  );
 });

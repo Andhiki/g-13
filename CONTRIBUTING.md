@@ -48,7 +48,10 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
 
 ## Struktur dan kebiasaan kode
 
-- `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: komponen bersama.
+- `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: primitif UI.
+- `apps/web/src/graph/` dan `apps/web/src/courses/`: perilaku graf dan komponen mata
+  kuliah yang dipakai bersama oleh peta kurikulum dan roadmap. Modul bersama tidak
+  mengimpor implementasi fitur.
 - `packages/curriculum/src/curricula/<id>/`: JSON runtime, normalizer, dan aturan
   per kurikulum. `output/data/` menyimpan bukti audit; `output/sources/` menyimpan
   dokumen sumber. Ikuti [panduan impor](AGENTS.d/curriculum-import.md); jangan simpan

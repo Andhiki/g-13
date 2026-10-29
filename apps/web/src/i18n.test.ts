@@ -3,6 +3,8 @@ import { getCurriculum } from "@g13/curriculum";
 import { courseTitle } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
 import { createI18n, messageNamespace } from "./i18n";
+import { planningInput } from "./features/roadmap/planning-input";
+import { formatConflict } from "./features/roadmap/conflict-format";
 import { buildRoadmap } from "./features/roadmap/planner";
 import { validateRoadmapSearch } from "./features/roadmap/search";
 import { examArchive } from "./features/exam-archive/catalog";
@@ -16,19 +18,25 @@ const text = (key: string, values?: Record<string, unknown>) =>
 
 test("English roadmap messages preserve planning results and localize course names", () => {
   const plan = buildRoadmap(
-    validateRoadmapSearch({
-      kurikulum: "2026",
-      minat: "Analisis Data",
-      iup: "ya",
-      paparan: "double",
-      magang: "tidak",
-      lulus: 7,
-    }),
-    { text, courseName: (course) => courseTitle(course, "en") },
+    planningInput(
+      validateRoadmapSearch({
+        kurikulum: "2026",
+        minat: "Analisis Data",
+        iup: "ya",
+        paparan: "double",
+        magang: "tidak",
+        lulus: 7,
+      }),
+    )!,
   );
   expect(plan.totalCredits).toBeGreaterThanOrEqual(144);
-  expect(plan.conflicts.join(" ")).toContain("partner university");
-  expect(plan.conflicts.join(" ")).not.toContain("mata kuliah");
+  const conflicts = plan.conflicts
+    .map((conflict) =>
+      formatConflict(conflict, { text, courseName: (course) => courseTitle(course, "en") }),
+    )
+    .join(" ");
+  expect(conflicts).toContain("partner university");
+  expect(conflicts).not.toContain("mata kuliah");
   expect(
     text("roadmapSummary", {
       curriculum: "2026",

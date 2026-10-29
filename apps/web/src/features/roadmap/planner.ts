@@ -1,17 +1,16 @@
 import {
-  defaultCurriculumId,
   getCurriculum,
   getAcademicRules,
   getRelations,
   type Course,
   type Relation,
 } from "@g13/curriculum";
-import { assignedCoreSemester, creditsFor } from "../curriculum/course-utils";
-import { type RoadmapSearch } from "./search";
+import { assignedCoreSemester, creditsFor } from "../../courses/course-utils";
+import { type PlanningInput } from "./planning-input";
 import { electiveOptions } from "./options";
 import { planActivities } from "./activities";
 import { scheduleCourses } from "./schedule";
-import { findConflicts } from "./conflicts";
+import { findConflicts, type Conflict } from "./conflicts";
 
 export type PlannedCourse = {
   course: Course;
@@ -25,6 +24,7 @@ export type Activity = {
   semester: number;
   detail: string;
   fullSemester: boolean;
+  endSemester: number;
 };
 export type Roadmap = {
   courses: PlannedCourse[];
@@ -32,15 +32,12 @@ export type Roadmap = {
   relations: Relation[];
   requiredCredits: number;
   totalCredits: number;
-  conflicts: string[];
+  conflicts: Conflict[];
   notes: string[];
 };
 
-export function buildRoadmap(
-  answers: RoadmapSearch,
-  localize: Parameters<typeof findConflicts>[3],
-): Roadmap {
-  const data = getCurriculum(answers.kurikulum ?? defaultCurriculumId);
+export function buildRoadmap(answers: PlanningInput): Roadmap {
+  const data = getCurriculum(answers.kurikulum);
   const rules = getAcademicRules(data.id);
   const courses: PlannedCourse[] = data.core
     .filter(
@@ -75,12 +72,11 @@ export function buildRoadmap(
       originalId: course.id,
     });
   }
-  if (rules.internship.kind === "credited" && answers.magang === "ya" && answers.durasi) {
-    const code = rules.internship.courseIds[answers.durasi];
-    const course = data.all.find((x) => x.id === code);
-    if (course) courses.push({ course, semester: 6, kind: "internship", originalId: course.id });
+  if (answers.internship.kind === "credited") {
+    const course = answers.internship.course;
+    courses.push({ course, semester: 6, kind: "internship", originalId: course.id });
   }
-  const preferred = new Set(rules.preferredElectives[answers.minat ?? ""] ?? []);
+  const preferred = new Set(rules.preferredElectives[answers.minat] ?? []);
   const candidates = electiveOptions(data.id).sort((a, b) => {
     const rank = (course: Course) =>
       rules.interestMode === "specialization"
@@ -114,7 +110,7 @@ export function buildRoadmap(
   }
   const used = new Set(courses.map((x) => x.course.id));
   for (const item of courses) {
-    const replacement = answers.ganti?.[item.originalId];
+    const replacement = answers.ganti[item.originalId];
     if (item.kind !== "elective" || !replacement || used.has(replacement)) continue;
     const course = electiveOptions(data.id).find((x) => x.id === replacement);
     if (
@@ -144,6 +140,6 @@ export function buildRoadmap(
       ...data.readingNotes,
     ],
   };
-  plan.conflicts = findConflicts(plan, answers, blocked, localize);
+  plan.conflicts = findConflicts(plan, answers, blocked);
   return plan;
 }

@@ -1,14 +1,15 @@
 import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
-import { useCallback, useState, type CSSProperties } from "react";
-import { CourseDetails } from "./components/CourseDetails";
+import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { courseLayout } from "../../courses/layout";
+import { CourseDetails } from "../../courses/CourseDetails";
 import { CurriculumVersionFilter } from "./components/CourseFilters";
 import { CourseList } from "./components/CourseList";
 import { CourseSearch } from "./components/CourseSearch";
 import { CurriculumMap } from "./components/CurriculumMap";
-import { SemesterFilter } from "./components/SemesterFilter";
+import { SemesterFilter } from "../../graph/SemesterFilter";
 import { ViewSwitch } from "./components/ViewSwitch";
-import { Overlay } from "./components/Overlay";
+import { Overlay } from "../../graph/Overlay";
 import { useCurriculumExplorer } from "./useCurriculumExplorer";
 import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
 
@@ -19,7 +20,8 @@ export function CurriculumPage() {
 
   const [resetVersion, setResetVersion] = useState(0);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
-  const [detailsHeight, setDetailsHeight] = useState(30);
+  const [detailsHeight, setDetailsHeight] = useState(courseLayout.sheetHeights[0]);
+  const stage = useRef<HTMLDivElement>(null);
   const [semesterNavigation, setSemesterNavigation] = useState<{ semester: number } | null>(null);
   const reportSemesters = useCallback((next: number[]) => {
     setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
@@ -77,7 +79,12 @@ export function CurriculumPage() {
       </Overlay>
 
       <main
-        style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
+        style={
+          {
+            "--course-sheet-height": `${detailsHeight}dvh`,
+            "--course-details-width": `${courseLayout.detailsWidth}px`,
+          } as CSSProperties
+        }
         className={
           view === "map"
             ? "fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden bg-bg-weak-25 text-text-strong-950"
@@ -85,6 +92,7 @@ export function CurriculumPage() {
         }
       >
         <div
+          ref={stage}
           data-map-stage
           aria-hidden={view !== "map"}
           inert={view !== "map"}
@@ -92,6 +100,7 @@ export function CurriculumPage() {
           style={{ opacity: view === "map" ? 1 : 0 }}
         >
           <CurriculumMap
+            stage={stage}
             active={view === "map"}
             navigation={semesterNavigation}
             resetVersion={resetVersion}
@@ -112,7 +121,7 @@ export function CurriculumPage() {
         </div>
         {view === "list" && (
           <section
-            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
+            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
             <div className="mx-auto max-w-3xl">
               <Typography as="h1" variant="title" className="m-0 mb-8 text-text-strong-950">

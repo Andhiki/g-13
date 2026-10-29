@@ -96,6 +96,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- SKS yang tidak dinyatakan tetap ditampilkan sebagai data belum tersedia, bukan 0 SKS.
+- Penjadwalan dan pemeriksaan roadmap memakai aturan prasyarat bersamaan yang sama;
+  rencana hanya dihitung setelah jawaban yang diperlukan lengkap.
+
 - Tampilan daftar tidak lagi tertimpa node peta. Pergantian tampilan tetap memakai
   node, posisi, dan jalur peta yang sudah disimpan tanpa menghitung ulang.
 

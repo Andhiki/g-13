@@ -35,6 +35,7 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
         "core",
         label,
         "",
+        "none",
         row.semester,
         row.sks,
         row.prerequisite_raw,
@@ -63,6 +64,11 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
           "elective",
           "Mata kuliah pilihan",
           text(row.group_context) || "Pilihan bebas / lainnya",
+          text(row.group_context).startsWith("Lab ")
+            ? "interest"
+            : text(row.group_context) === "Pilihan bebas"
+              ? "elective"
+              : "other",
           sem,
           row.sks,
           row.prerequisite_raw,

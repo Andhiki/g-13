@@ -1,5 +1,5 @@
-import { Typography } from "../../../ui/typography";
-import { useLocale } from "../../../useLocale";
+import { Typography } from "../ui/typography";
+import { useLocale } from "../useLocale";
 export function SemesterIndicator({ label }: { label: string }) {
   const { text } = useLocale();
   const match = /^Semester ([1-8])$/.exec(label);

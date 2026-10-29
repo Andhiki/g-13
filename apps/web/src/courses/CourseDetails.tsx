@@ -1,12 +1,24 @@
-import { Typography } from "../../../ui/typography";
-import { useLocale } from "../../../useLocale";
-import { lazy, useRef, useState, type CSSProperties } from "react";
-import { DeferredContent } from "../../../ui/deferred-content";
-import { AlignDrawer } from "../../../ui/drawer";
-import { CompactButton } from "../../../ui/compact-button";
+import { Typography } from "../ui/typography";
+import { useLocale } from "../useLocale";
+import { lazy, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { DeferredContent } from "../ui/deferred-content";
+import { AlignDrawer } from "../ui/drawer";
+import { CompactButton } from "../ui/compact-button";
 import { RiCloseLine } from "@remixicon/react";
 import { CourseSheetHandle } from "./CourseSheetHandle";
-import type { CourseDetailsProps } from "./CourseDetailsPanel";
+import type { Course, Curriculum, Relation } from "@g13/curriculum";
+import { courseLayout } from "./layout";
+
+export type CourseDetailsProps = {
+  course: Course | null;
+  data: Curriculum;
+  relations: Relation[];
+  select: (id: string) => void;
+  close: () => void;
+  modal?: boolean;
+  footer?: ReactNode;
+  onHeightChange?: (height: number) => void;
+};
 
 const CourseDetailsPanel = lazy(() =>
   import("./CourseDetailsPanel").then((module) => ({ default: module.CourseDetailsPanel })),
@@ -24,7 +36,8 @@ export function CourseDetails({
 }: CourseDetailsProps) {
   const { text, courseName } = useLocale();
   const closeButton = useRef<HTMLButtonElement>(null);
-  const [height, setHeight] = useState(30);
+  const [height, setHeight] = useState(courseLayout.sheetHeights[0]);
+  const sheet = useRef<HTMLDivElement>(null);
   const selection = course ? { course, data, relations } : null;
   // Retain the content while Radix runs the close animation.
   const [lastSelection, setLastSelection] = useState(selection);
@@ -46,6 +59,7 @@ export function CourseDetails({
     >
       {content && (
         <AlignDrawer.Content
+          ref={sheet}
           modal={modal}
           aria-describedby={undefined}
           aria-label={text("Detail {{v0}}", { v0: courseName(content.course) })}
@@ -54,10 +68,16 @@ export function CourseDetails({
             closeButton.current?.focus();
           }}
           onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
-          style={{ "--course-sheet-height": `${height}dvh` } as CSSProperties}
-          className="min-[650px]:top-[var(--app-header-height)] max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
+          style={
+            {
+              "--course-sheet-height": `${height}dvh`,
+              "--course-details-width": `${courseLayout.detailsWidth}px`,
+            } as CSSProperties
+          }
+          className="max-w-[var(--course-details-width)] min-[650px]:top-[var(--app-header-height)] max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
         >
           <CourseSheetHandle
+            sheet={sheet}
             height={height}
             onChange={(next) => {
               setHeight(next);

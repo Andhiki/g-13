@@ -6,7 +6,7 @@ import { AlignButton } from "../../../ui/button";
 import { AlignCommandMenu } from "../../../ui/command-menu";
 import { AlignKbd } from "../../../ui/kbd";
 import type { Course, Curriculum } from "@g13/curriculum";
-import { matches, semesterLabel } from "../course-utils";
+import { matches, semesterLabel } from "../../../courses/course-utils";
 
 export function CourseSearch({
   data,

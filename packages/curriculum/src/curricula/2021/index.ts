@@ -1,4 +1,5 @@
 import source from "./source.json";
+import syllabi from "./syllabi.json";
 import { adaptCurriculum2021 } from "./normalize";
 import type { CurriculumSlice } from "../../contracts/rules";
 
@@ -6,6 +7,7 @@ const curriculum = adaptCurriculum2021(source);
 
 export const curriculum2021: CurriculumSlice = {
   curriculum,
+  syllabi,
   rules: {
     choiceDetail: "Revisi 2023. Pilihan dari empat laboratorium.",
     interestMode: "laboratory",
@@ -22,17 +24,17 @@ export const curriculum2021: CurriculumSlice = {
       options: [
         {
           value: "singkat",
+          fullSemester: false,
           label: "Kurang dari satu semester",
           detail: "Durasi rencana. Konversi SKS perlu persetujuan prodi.",
         },
         {
           value: "semester",
+          fullSemester: true,
           label: "Satu semester",
           detail: "Semester 6 disiapkan untuk Magang. Konversi SKS belum ditentukan.",
         },
       ],
-      courseIds: {},
-      fullSemesterOption: "semester",
       note: "Konversi durasi Magang 2021 ke modul dan SKS belum terverifikasi. Kegiatan ini belum menambah SKS pilihan.",
       noInternshipNote: null,
     },

@@ -19,13 +19,15 @@ export type AcademicRules = {
   religionChoiceIds: string[];
   preferredElectives: Record<string, string[]>;
   internship: {
-    kind: "activity" | "credited";
-    options: AcademicOption[];
-    courseIds: Record<string, string>;
-    fullSemesterOption: string;
     note: string;
     noInternshipNote: string | null;
-  };
+  } & (
+    | { kind: "activity"; options: (AcademicOption & { fullSemester: boolean })[] }
+    | {
+        kind: "credited";
+        options: (AcademicOption & { fullSemester: boolean; courseId: string })[];
+      }
+  );
   exposure: { internshipDetail: string; doubleDegreeDetail: string };
   scheduling: {
     graduationIds: string[];
@@ -43,4 +45,5 @@ export type AcademicRules = {
 export type CurriculumSlice = {
   curriculum: Curriculum;
   rules: AcademicRules;
+  syllabi: Record<string, Syllabus>;
 };

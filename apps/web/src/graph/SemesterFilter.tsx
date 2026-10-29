@@ -1,8 +1,8 @@
-import { Typography } from "../../../ui/typography";
-import { useLocale } from "../../../useLocale";
+import { Typography } from "../ui/typography";
+import { useLocale } from "../useLocale";
 import { useState } from "react";
 import { m, useReducedMotion } from "motion/react";
-import { AlignButton } from "../../../ui/button";
+import { AlignButton } from "../ui/button";
 
 export function SemesterFilter({
   visible,

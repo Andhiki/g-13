@@ -1,4 +1,4 @@
-import type { Course, Placement } from "./contracts/model";
+import type { Course, Curriculum, Placement } from "./contracts/model";
 type Section = Placement["section"];
 
 type SourceReference = {
@@ -30,6 +30,7 @@ export function makePlacement(
   section: Section,
   label: string,
   group: string,
+  groupKind: Placement["groupKind"],
   sem: unknown,
   credits: unknown,
   prereq: unknown,
@@ -43,9 +44,16 @@ export function makePlacement(
     section,
     label,
     group,
+    groupKind,
     semester: s.number,
     semesterLabel: s.label,
-    credits: Number.isFinite(Number(credits)) ? Number(credits) : null,
+    credits:
+      (typeof credits !== "number" && typeof credits !== "string") ||
+      (typeof credits === "string" && !credits.trim())
+        ? null
+        : Number.isFinite(Number(credits)) && Number(credits) >= 0
+          ? Number(credits)
+          : null,
     prerequisiteRaw: text(prereq),
     printedPage: ref.printed_page ?? null,
     pdfPage: ref.pdf_page ?? ref.pdf_page_1_based ?? null,
@@ -79,16 +87,16 @@ export function merge(
   );
 }
 
-export function groupsFor(courses: Course[]): { name: string; count: number }[] {
-  const map = new Map<string, Set<string>>();
+export function groupsFor(courses: Course[]): Curriculum["groups"] {
+  const map = new Map<string, { ids: Set<string>; kind: Placement["groupKind"] }>();
   for (const course of courses)
     for (const item of course.placements) {
       if (item.section === "core") continue;
-      const ids = map.get(item.group) ?? new Set<string>();
-      ids.add(course.id);
-      map.set(item.group, ids);
+      const group = map.get(item.group) ?? { ids: new Set<string>(), kind: item.groupKind };
+      group.ids.add(course.id);
+      map.set(item.group, group);
     }
   return [...map]
-    .map(([name, ids]) => ({ name, count: ids.size }))
+    .map(([name, { ids, kind }]) => ({ name, count: ids.size, kind }))
     .sort((a, b) => a.name.localeCompare(b.name, "id"));
 }

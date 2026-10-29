@@ -1,14 +1,15 @@
-import { useLocale } from "../../../useLocale";
+import { useLocale } from "../useLocale";
 import { memo } from "react";
-import { Typography } from "../../../ui/typography";
+import { Typography } from "../ui/typography";
 import { Handle, Position, useStore, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
-import { creditsFor, isCore } from "../course-utils";
-import type { CourseNodeData, LaneNodeData } from "../map-layout";
+import { courseLayout } from "../courses/layout";
+import { creditsFor, isCore } from "../courses/course-utils";
+import type { CourseNodeData, LaneNodeData } from "./model";
 
 const courseStyles = tv({
   slots: {
-    root: "group relative w-[246px] animate-in fade-in-0 transition-opacity duration-150 motion-reduce:animate-none",
+    root: "group relative animate-in fade-in-0 transition-opacity duration-150 motion-reduce:animate-none",
     surface:
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:
@@ -71,6 +72,7 @@ export const CourseNode = memo(function CourseNode({
   const styles = courseStyles({ choice, state: data.state ?? undefined });
   return (
     <div
+      style={{ width: courseLayout.cardWidth }}
       className={styles.root()}
       data-course={course.id}
       data-course-kind={choice ? "choice" : "core"}
@@ -94,7 +96,8 @@ export const CourseNode = memo(function CourseNode({
       <button
         data-course-button
         type="button"
-        className="relative flex h-[82px] w-full cursor-pointer flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
+        style={{ height: courseLayout.cardHeight }}
+        className="relative flex w-full cursor-pointer flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
         onClick={() => data.choose(course.id)}
         aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}

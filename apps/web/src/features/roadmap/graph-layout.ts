@@ -1,9 +1,9 @@
 import type { Language } from "@g13/i18n";
 import type { Edge, Node } from "@xyflow/react";
-import { mapCourseState } from "../curriculum/map-state";
-import { semesterRelations } from "../curriculum/semester-relations";
-import { creditsFor, isCore } from "../curriculum/course-utils";
-import { LANE_X, LANE_STEP, type MapNode } from "../curriculum/map-layout";
+import { mapCourseState } from "../../graph/map-state";
+import { semesterRelations } from "../../graph/semester-relations";
+import { creditsFor, isCore } from "../../courses/course-utils";
+import { LANE_X, LANE_STEP, type MapNode } from "../../graph/model";
 import type { Activity, Roadmap } from "./planner";
 
 export type ActivityNode = Node<{ activity: Activity }, "activity">;
@@ -86,18 +86,14 @@ export function buildRoadmapGraph({
       });
     });
     const activities = plan.activities.filter(
-      (a) =>
-        a.semester === semester ||
-        (a.id === "exposure" &&
-          a.title === "Double degree" &&
-          semester > a.semester &&
-          semester <= 8),
+      (a) => a.semester === semester || (semester > a.semester && semester <= a.endSemester),
     );
     if (semester === target)
       activities.push({
         id: "graduation",
         title: text("Target selesai {{v0}} semester", { v0: target }),
         semester,
+        endSemester: semester,
         detail: text("Selesaikan semua persyaratan dan periksa catatan rencana."),
         fullSemester: false,
       });

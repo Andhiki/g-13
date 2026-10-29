@@ -1,33 +1,23 @@
-import { useLocale } from "../../../useLocale";
-import { Typography } from "../../../ui/typography";
-import { useMemo, type ReactNode } from "react";
+import { useLocale } from "../useLocale";
+import { Typography } from "../ui/typography";
+import { useMemo } from "react";
 import { RiArrowRightLine, RiArrowRightUpLine } from "@remixicon/react";
-import { AlignBadge } from "../../../ui/badge";
-import { AlignDrawer } from "../../../ui/drawer";
-import { syllabusPoints } from "../syllabus-format";
-import * as Accordion from "../../../ui/accordion";
+import { AlignBadge } from "../ui/badge";
+import { AlignDrawer } from "../ui/drawer";
+import { syllabusPoints } from "./syllabus-format";
+import * as Accordion from "../ui/accordion";
 import {
   getSyllabus,
   type Syllabus,
-  normalizeCourseTitle,
+  getPrerequisites,
   type Course,
   type Curriculum,
-  type Relation,
 } from "@g13/curriculum";
-import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
+import { courseLabels, creditsFor, semesterLabel } from "./course-utils";
 import { SemesterIndicator } from "./SemesterIndicator";
 import { CopyCourseButton } from "./CopyCourseButton";
 
-export type CourseDetailsProps = {
-  course: Course | null;
-  data: Curriculum;
-  relations: Relation[];
-  select: (id: string) => void;
-  close: () => void;
-  modal?: boolean;
-  footer?: ReactNode;
-  onHeightChange?: (height: number) => void;
-};
+import type { CourseDetailsProps } from "./CourseDetails";
 
 export function CourseDetailsPanel({
   course,
@@ -47,11 +37,7 @@ export function CourseDetailsPanel({
     .map((item) => byId.get(item.target))
     .filter((item): item is Course => Boolean(item));
   const labels = courseLabels(course);
-  const linkedPrerequisites = new Set(prereqs.map((item) => normalizeCourseTitle(item.title)));
-  const requirements = requirementText(course)
-    .flatMap((item) => item.split(/[,\n;]+/))
-    .map((item) => item.trim())
-    .filter((item) => item && !linkedPrerequisites.has(normalizeCourseTitle(item)));
+  const requirements = getPrerequisites(data.id, course).unresolved;
   const credit = creditsFor(course);
   return (
     <>

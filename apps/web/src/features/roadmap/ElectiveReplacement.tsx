@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AlignButton } from "../../ui/button";
 import { AlignModal } from "../../ui/modal";
 import { AlignSelect } from "../../ui/select";
-import { creditsFor, requirementText, sourceLocation } from "../curriculum/course-utils";
+import { creditsFor, requirementText, sourceLocation } from "../../courses/course-utils";
 import type { PlannedCourse, Roadmap } from "./planner";
 import { electiveOptions } from "./options";
 import type { RoadmapSearch } from "./search";

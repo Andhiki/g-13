@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
 import { buildMap, createMapLayout, anchorMap } from "./map-layout";
-import { assignedCoreSemester, isCore } from "./course-utils";
+import { assignedCoreSemester, isCore } from "../../courses/course-utils";
 
 for (const { id } of listCurricula()) {
   test(`${id}: overview connections retain endpoint relations and identify optional courses`, () => {

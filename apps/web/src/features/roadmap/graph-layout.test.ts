@@ -96,6 +96,7 @@ const plan = buildRoadmap(
     iup: "ya",
     paparan: "double",
     magang: "ya",
+    durasi: "pendek",
     lulus: 8,
   }),
 );
@@ -172,4 +173,15 @@ test("roadmap graph preparation is reused across visits and separated by locale 
   expect(getRoadmapGraph({ ...input }, "id")).toBe(graph);
   expect(getRoadmapGraph(input, "en")).not.toBe(graph);
   expect(getRoadmapGraph({ ...input, target: 7 }, "id")).not.toBe(graph);
+});
+
+test("activity spans survive display-title changes", () => {
+  const renamed = {
+    ...plan,
+    activities: plan.activities.map((activity) => ({ ...activity, title: "Different copy" })),
+  };
+  const graph = buildRoadmapGraph({ ...input, plan: renamed });
+  for (const semester of [5, 6, 7, 8]) {
+    expect(graph.nodes.some((node) => node.id === `exposure-${semester}`)).toBe(true);
+  }
 });

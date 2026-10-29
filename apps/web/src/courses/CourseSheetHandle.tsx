@@ -1,13 +1,18 @@
-import { useLocale } from "../../../useLocale";
-import { useEffect, useRef } from "react";
+import { useLocale } from "../useLocale";
+import { useEffect, useRef, type RefObject } from "react";
 
-const heights = [30, 75];
+import { courseLayout } from "./layout";
+
+const heights = courseLayout.sheetHeights;
+const [minimum, maximum] = heights;
 
 export function CourseSheetHandle({
   height,
   onChange,
+  sheet: sheetRef,
 }: {
   height: number;
+  sheet: RefObject<HTMLDivElement | null>;
   onChange: (height: number) => void;
 }) {
   const { text } = useLocale();
@@ -19,7 +24,7 @@ export function CourseSheetHandle({
   }, [onChange]);
   useEffect(() => {
     const handle = button.current!;
-    const sheet = handle.closest<HTMLElement>('[role="dialog"]')!;
+    const sheet = sheetRef.current!;
     let active: {
       y: number;
       current: number;
@@ -33,7 +38,7 @@ export function CourseSheetHandle({
       handle.setAttribute("aria-valuetext", text("screenHeight", { percent: Math.round(next) }));
     };
     const start = (target: EventTarget | null, y: number) => {
-      if (!window.matchMedia("(max-width: 649px)").matches) return;
+      if (!window.matchMedia(courseLayout.phoneQuery).matches) return;
       let scroll = target instanceof HTMLElement ? target : null;
       while (scroll && scroll !== sheet && getComputedStyle(scroll).overflowY !== "auto") {
         scroll = scroll.parentElement;
@@ -47,14 +52,20 @@ export function CourseSheetHandle({
       if (!active.dragging) {
         if (Math.abs(delta) < 8) return;
         // Expanded content keeps native scrolling; dragging down takes over only at its top.
-        if ((delta > 0 && height === 75) || (delta < 0 && (active.scroll?.scrollTop ?? 0) > 0)) {
+        if (
+          (delta > 0 && height === maximum) ||
+          (delta < 0 && (active.scroll?.scrollTop ?? 0) > 0)
+        ) {
           active = null;
           return;
         }
         active.dragging = true;
       }
       event.preventDefault();
-      active.current = Math.max(30, Math.min(75, height + (delta / window.innerHeight) * 100));
+      active.current = Math.max(
+        minimum,
+        Math.min(maximum, height + (delta / window.innerHeight) * 100),
+      );
       if (frame === null)
         frame = requestAnimationFrame(() => {
           frame = null;
@@ -84,7 +95,8 @@ export function CourseSheetHandle({
     const pointerDown = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
       suppressClick.current = false;
-      const target = event.target as HTMLElement;
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
       if (target.closest("a, button, input, select, textarea") && !handle.contains(target)) return;
       start(target, event.clientY);
       if (active) event.preventDefault();
@@ -117,7 +129,7 @@ export function CourseSheetHandle({
       window.removeEventListener("pointerup", finish);
       sheet.removeEventListener("click", click, true);
     };
-  }, [height, text]);
+  }, [height, text, sheetRef]);
 
   return (
     <div className="flex shrink-0 justify-center min-[650px]:hidden">
@@ -126,8 +138,8 @@ export function CourseSheetHandle({
         role="slider"
         aria-label={text("Tinggi detail mata kuliah")}
         aria-orientation="vertical"
-        aria-valuemin={30}
-        aria-valuemax={75}
+        aria-valuemin={minimum}
+        aria-valuemax={maximum}
         aria-valuenow={Math.round(height)}
         aria-valuetext={text("screenHeight", { percent: Math.round(height) })}
         className="flex h-5 w-24 touch-none items-center justify-center rounded-lg cursor-ns-resize outline-none focus-visible:[&>span]:bg-primary-base select-none"
@@ -135,13 +147,13 @@ export function CourseSheetHandle({
         onKeyDown={(event) => {
           const next =
             event.key === "ArrowUp"
-              ? (heights.find((value) => value > height) ?? 75)
+              ? (heights.find((value) => value > height) ?? maximum)
               : event.key === "ArrowDown"
-                ? ([...heights].reverse().find((value) => value < height) ?? 30)
+                ? ([...heights].reverse().find((value) => value < height) ?? minimum)
                 : event.key === "Home"
-                  ? 30
+                  ? minimum
                   : event.key === "End"
-                    ? 75
+                    ? maximum
                     : undefined;
           if (next === undefined) return;
           event.preventDefault();

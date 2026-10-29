@@ -1,23 +1,21 @@
-import { useSharedLink } from "../../ui/use-shared-link";
+import { RoadmapShare } from "./RoadmapShare";
 import { useLocale } from "../../useLocale";
 import { AlignTooltip } from "../../ui/tooltip";
-import { toast, SuccessToast } from "../../ui/toast";
-import { defaultCurriculumId, getCurriculum } from "@g13/curriculum";
-import { m, useReducedMotion } from "motion/react";
+import { getCurriculum } from "@g13/curriculum";
 import { Typography } from "../../ui/typography";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine, RiShareLine, RiCheckLine, RiRestartLine } from "@remixicon/react";
-import { AlignModal } from "../../ui/modal";
-import { Overlay } from "../curriculum/components/Overlay";
-import { SemesterFilter } from "../curriculum/components/SemesterFilter";
+import { RiArrowLeftLine, RiRestartLine } from "@remixicon/react";
+import { Overlay } from "../../graph/Overlay";
+import { SemesterFilter } from "../../graph/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
 import { AlignButton, buttonVariants } from "../../ui/button";
-import { CourseDetails } from "../curriculum/components/CourseDetails";
+import { CourseDetails } from "../../courses/CourseDetails";
 import { getRoadmap } from "./roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
 import { ElectiveReplacement } from "./ElectiveReplacement";
+import type { PlanningInput } from "./planning-input";
 import type { RoadmapSearch } from "./search";
 
 const kinds = {
@@ -28,29 +26,23 @@ const kinds = {
 };
 export function RoadmapResult({
   answers,
+  input,
   update,
   restart,
 }: {
   restart: () => void;
   answers: RoadmapSearch;
+  input: PlanningInput;
   update: (next: RoadmapSearch) => void;
 }) {
-  const { text, courseName, language } = useLocale("roadmap");
-  const plan = useMemo(
-    () => getRoadmap(answers, language, { text, courseName }),
-    [answers, language, text, courseName],
-  );
+  const { text } = useLocale("roadmap");
+  const plan = useMemo(() => getRoadmap(input), [input]);
   const [navigation, setNavigation] = useState<{ semester: number } | null>(null);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
-  const { share, copyLink, dismiss } = useSharedLink({
-    selection: JSON.stringify(answers),
-    copiedDuration: 2000,
-  });
-  const reducedMotion = useReducedMotion();
   const selected = plan.courses.find((x) => x.course.id === selectedId);
-  const data = getCurriculum(answers.kurikulum ?? defaultCurriculumId);
+  const data = getCurriculum(input.kurikulum);
   const detailsData = useMemo(
     () => ({
       ...data,
@@ -63,11 +55,6 @@ export function RoadmapResult({
     }),
     [data, plan],
   );
-  async function sharePlan() {
-    if (await copyLink()) {
-      toast.custom(() => <SuccessToast message={text("Tautan roadmap disalin")} />);
-    }
-  }
   return (
     <div className="h-[calc(100dvh-var(--app-header-height))] w-full overflow-hidden bg-bg-weak-25 text-text-strong-950">
       <main className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden">
@@ -105,7 +92,7 @@ export function RoadmapResult({
           <div className="flex items-center gap-2">
             <Link
               to="/"
-              search={{ kurikulum: answers.kurikulum ?? defaultCurriculumId }}
+              search={{ kurikulum: input.kurikulum }}
               className={buttonVariants({
                 variant: "neutral",
                 mode: "stroke",
@@ -149,92 +136,13 @@ export function RoadmapResult({
             )}
           />
         }
-        search={
-          <div className="flex items-center justify-end gap-2">
-            <AlignTooltip.Provider>
-              <AlignTooltip.Root>
-                <AlignTooltip.Trigger asChild>
-                  <AlignButton.Root
-                    variant="neutral"
-                    mode="stroke"
-                    onClick={() => void sharePlan()}
-                    className="max-[650px]:size-10 max-[650px]:p-2.5"
-                  >
-                    <span className="relative size-5" aria-hidden="true">
-                      {[
-                        { Icon: RiShareLine, active: share?.status !== "copied" },
-                        { Icon: RiCheckLine, active: share?.status === "copied" },
-                      ].map(({ Icon, active }, index) => (
-                        <m.span
-                          key={index}
-                          initial={false}
-                          className="absolute inset-0"
-                          animate={{
-                            opacity: active ? 1 : 0,
-                            scale: active || reducedMotion ? 1 : 0.25,
-                            filter: active || reducedMotion ? "blur(0px)" : "blur(4px)",
-                          }}
-                          transition={
-                            reducedMotion
-                              ? { duration: 0 }
-                              : { type: "spring", duration: 0.3, bounce: 0 }
-                          }
-                        >
-                          <Icon className="size-5" />
-                        </m.span>
-                      ))}
-                    </span>
-                    <span className="max-[650px]:sr-only">
-                      {share?.status === "copied" ? text("Tautan disalin") : text("Bagikan")}
-                    </span>
-                  </AlignButton.Root>
-                </AlignTooltip.Trigger>
-                <AlignTooltip.Content size="xsmall" side="bottom">
-                  {share?.status === "copied"
-                    ? text("Tautan disalin")
-                    : text("Salin tautan roadmap")}
-                </AlignTooltip.Content>
-              </AlignTooltip.Root>
-            </AlignTooltip.Provider>
-          </div>
-        }
+        search={<RoadmapShare selection={JSON.stringify(answers)} />}
         viewControl={
           <RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={data.sourceTitle} />
         }
       >
         <RoadmapFilters answers={answers} update={update} />
       </Overlay>
-      <span className="sr-only" role="status">
-        {share?.status === "copied" ? text("Tautan roadmap disalin.") : ""}
-      </span>
-      <AlignModal.Root
-        open={share?.status === "manual"}
-        onOpenChange={(open) => {
-          if (!open) dismiss();
-        }}
-      >
-        <AlignModal.Content>
-          <div className="p-5">
-            <AlignModal.Title asChild>
-              <Typography as="h2" variant="subtitle1" className="pr-8">
-                {text("Bagikan roadmap")}
-              </Typography>
-            </AlignModal.Title>
-            <AlignModal.Description asChild>
-              <Typography as="p" variant="paragraph" className="mt-2 text-text-sub-600">
-                {text("Salin tautan ini untuk membuka rencana yang sama.")}
-              </Typography>
-            </AlignModal.Description>
-            <input
-              aria-label={text("Tautan roadmap")}
-              readOnly
-              value={share?.url ?? ""}
-              onFocus={(event) => event.currentTarget.select()}
-              className="mt-4 block w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
-            />
-          </div>
-        </AlignModal.Content>
-      </AlignModal.Root>
       <CourseDetails
         modal={false}
         course={selected?.course ?? data.all.find((course) => course.id === selectedId) ?? null}

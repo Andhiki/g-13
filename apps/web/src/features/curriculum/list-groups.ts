@@ -1,6 +1,6 @@
 import { courseTitle, type Language } from "@g13/i18n";
 import type { Course } from "@g13/curriculum";
-import { assignedCoreSemester, isCore } from "./course-utils";
+import { assignedCoreSemester, isCore } from "../../courses/course-utils";
 
 export type CourseSection = {
   id: string;

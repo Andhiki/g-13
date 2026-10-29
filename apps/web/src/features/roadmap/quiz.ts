@@ -1,5 +1,5 @@
 import { getAcademicRules, listCurricula, defaultCurriculumId } from "@g13/curriculum";
-import { internshipOptions, exposureOptions, interests, type Choice } from "./options";
+import { exposureOptions, interests, type Choice } from "./options";
 import type { RoadmapSearch } from "./search";
 
 type AnswerKey = "kurikulum" | "minat" | "iup" | "paparan" | "magang" | "durasi";
@@ -98,7 +98,7 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
         rules.internship.kind === "credited"
           ? "Pilih tier beban Magang. Durasi kalender mengikuti panduan prodi, bukan konversi bulan otomatis."
           : "Ini preferensi durasi, bukan keputusan konversi SKS. Modul yang diakui ditentukan bersama prodi.",
-      choices: internshipOptions(curriculum),
+      choices: rules.internship.options,
     });
   return questions;
 }

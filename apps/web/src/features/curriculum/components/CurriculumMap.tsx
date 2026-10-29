@@ -1,6 +1,6 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   getViewportForBounds,
@@ -15,13 +15,14 @@ import {
 } from "@xyflow/react";
 import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
-import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
-import { CourseNode, LaneNode } from "./MapNodes";
-import { GraphFocus } from "../../../ui/graph-focus";
+import { EdgeRouting, routedEdgeTypes } from "../../../graph/EdgeRouting";
+import { CourseNode, LaneNode } from "../../../graph/MapNodes";
+import { GraphFocus } from "../../../graph/GraphFocus";
 import { ZoomControls } from "./ZoomControls";
-import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
-import { isCore } from "../course-utils";
-import { mapConnections } from "../map-connections";
+import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../../graph/model";
+import { courseLayout } from "../../../courses/layout";
+import { isCore } from "../../../courses/course-utils";
+import { mapConnections } from "../../../graph/map-connections";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
@@ -31,12 +32,16 @@ function ViewportFocus({
   resetVersion,
   selectedId,
   positions,
+  stage,
+  title,
 }: {
   navigation: { semester: number } | null;
   curriculum: CurriculumId;
   resetVersion: number;
   selectedId: string | null;
   positions: Map<string, { x: number; y: number }>;
+  stage: RefObject<HTMLDivElement | null>;
+  title: RefObject<HTMLDivElement | null>;
 }) {
   const { setCenter, setViewport } = useReactFlow();
   return (
@@ -47,20 +52,20 @@ function ViewportFocus({
       onCourse={() => {
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const points = [...positions.values()];
-        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-        const phone = window.matchMedia("(width < 650px)").matches;
-        const left = phone ? 16 : 424;
+        const bounds = stage.current!.getBoundingClientRect();
+        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
+        const left = phone ? 16 : courseLayout.detailsWidth + 24;
         const top = phone ? 128 : 96;
-        const width = stage.width - left - 16;
-        const height = stage.height * (phone ? 0.55 : 1) - top - 24;
+        const width = bounds.width - left - 16;
+        const height = bounds.height * (phone ? 0.55 : 1) - top - 24;
         const minX = Math.min(...points.map((point) => point.x));
         const minY = Math.min(...points.map((point) => point.y));
         const viewport = getViewportForBounds(
           {
             x: minX,
             y: minY,
-            width: Math.max(...points.map((point) => point.x)) - minX + 248,
-            height: Math.max(...points.map((point) => point.y)) - minY + 82,
+            width: Math.max(...points.map((point) => point.x)) - minX + courseLayout.cardWidth + 2,
+            height: Math.max(...points.map((point) => point.y)) - minY + courseLayout.cardHeight,
           },
           width,
           height,
@@ -86,15 +91,15 @@ function ViewportFocus({
       }}
       onOverview={() => {
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const phone = window.matchMedia("(width < 650px)").matches;
-        const title = document.querySelector<HTMLElement>("[data-map-title]")!;
-        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-        const left = Math.max(24, stage.width * 0.075);
-        const zoom = Math.min(phone ? 0.8 : 1.2, (stage.width - left - 24) / title.offsetWidth);
+        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
+        const heading = title.current!;
+        const bounds = stage.current!.getBoundingClientRect();
+        const left = Math.max(24, bounds.width * 0.075);
+        const zoom = Math.min(phone ? 0.8 : 1.2, (bounds.width - left - 24) / heading.offsetWidth);
         void setViewport(
           {
             x: left - (LANE_X + 12) * zoom,
-            y: stage.height / 3 - title.offsetTop * zoom,
+            y: bounds.height / 3 - heading.offsetTop * zoom,
             zoom,
           },
           { duration: reducedMotion ? 0 : 1000 },
@@ -105,10 +110,12 @@ function ViewportFocus({
 }
 
 function SemesterViewport({
+  stage,
   active,
   selectedId,
   onVisibleSemesters,
 }: {
+  stage: RefObject<HTMLDivElement | null>;
   active: boolean;
   selectedId: string | null;
   onVisibleSemesters: (semesters: number[]) => void;
@@ -120,7 +127,7 @@ function SemesterViewport({
       onVisibleSemesters([]);
       return;
     }
-    const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
+    const bounds = stage.current!.getBoundingClientRect();
     const viewport = flow.getViewport();
     const semesters: number[] = [];
     const nodes = flow.getNodes();
@@ -140,18 +147,18 @@ function SemesterViewport({
               node.position.x >= laneX &&
               node.position.x < laneX + LANE_WIDTH,
           )
-          .map((node) => node.position.y + 82),
+          .map((node) => node.position.y + courseLayout.cardHeight),
       );
       if (
-        Math.min(stage.width, left + width) - Math.max(0, left) >= width / 2 &&
+        Math.min(bounds.width, left + width) - Math.max(0, left) >= width / 2 &&
         viewport.y + bottom * viewport.zoom > top &&
-        viewport.y + 100 * viewport.zoom < stage.height
+        viewport.y + 100 * viewport.zoom < bounds.height
       ) {
         semesters.push(semester);
       }
     }
     onVisibleSemesters(semesters);
-  }, [active, flow, selectedId, onVisibleSemesters]);
+  }, [active, flow, selectedId, onVisibleSemesters, stage]);
   useOnViewportChange({ onChange: update });
   useEffect(() => {
     update();
@@ -162,6 +169,7 @@ function SemesterViewport({
 }
 
 export function CurriculumMap({
+  stage,
   active,
   navigation,
   resetVersion,
@@ -175,6 +183,7 @@ export function CurriculumMap({
   positions,
   lastSemester,
 }: {
+  stage: RefObject<HTMLDivElement | null>;
   active: boolean;
   navigation: { semester: number } | null;
   resetVersion: number;
@@ -189,6 +198,7 @@ export function CurriculumMap({
   lastSemester: number;
 }) {
   const { text } = useLocale();
+  const title = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const revealedEdges = useMemo(
     () => mapConnections(edges, selectedId, hoveredId),
@@ -224,6 +234,8 @@ export function CurriculumMap({
         aria-label={text("Peta kurikulum Ilmu Komputer UGM")}
       >
         <ViewportFocus
+          stage={stage}
+          title={title}
           navigation={navigation}
           curriculum={curriculum}
           resetVersion={resetVersion}
@@ -236,6 +248,7 @@ export function CurriculumMap({
           lastSemester={lastSemester}
         />
         <SemesterViewport
+          stage={stage}
           active={active}
           selectedId={selectedId}
           onVisibleSemesters={onVisibleSemesters}
@@ -243,6 +256,7 @@ export function CurriculumMap({
         <ViewportPortal>
           {selectedId === null && (
             <div
+              ref={title}
               data-map-title
               className="absolute -top-[144px] flex flex-col items-start gap-4 max-[650px]:-top-[104px]"
               style={{ left: LANE_X + 12 }}
