@@ -2,34 +2,31 @@ import { defaultCurriculumId } from "@g13/curriculum";
 import { Toaster } from "../ui/toast";
 import { AppHeader } from "../ui/app-header";
 import { Typography } from "../ui/typography";
-import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+  Link,
+} from "@tanstack/react-router";
 import { useMemo, type ReactNode } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { ThemeProvider } from "next-themes";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
-import { createI18n } from "../i18n";
+import { createI18n, messageNamespace } from "../i18n";
 import { readLanguage } from "../language";
-import { loadMessages, type MessageNamespace } from "@g13/i18n/messages";
+import { loadMessages } from "@g13/i18n/messages";
+import type { Language } from "@g13/i18n";
 
-export const Route = createRootRoute({
-  beforeLoad: async () => {
-    const language = readLanguage();
+export const Route = createRootRouteWithContext<{ language?: Language }>()({
+  beforeLoad: async ({ context }) => {
+    const language = context.language ?? readLanguage();
     return { language, common: await loadMessages(language, "common") };
   },
   loader: async ({ context, location }) => {
-    const pathname = location.pathname.replace(/\/+$/, "");
-    const namespace: MessageNamespace =
-      pathname === "/roadmap"
-        ? "roadmap"
-        : pathname === "/exam"
-          ? "exam"
-          : pathname === "/resources"
-            ? "resources"
-            : pathname === "/alumni"
-              ? "alumni"
-              : "common";
+    const namespace = messageNamespace(location.pathname);
     return {
       language: context.language,
       namespace,

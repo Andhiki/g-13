@@ -8,10 +8,15 @@ export const readLanguage = createIsomorphicFn()
     return resolveLanguage(getCookie("g13-language"), getRequestHeader("accept-language"));
   })
   .client(() => {
-    const cookie = document.cookie
-      .split(";")
-      .map((part) => part.trim())
-      .find((part) => part.startsWith("g13-language="))
-      ?.slice("g13-language=".length);
+    let cookie: string | undefined;
+    try {
+      cookie = document.cookie
+        .split(";")
+        .map((part) => part.trim())
+        .find((part) => part.startsWith("g13-language="))
+        ?.slice("g13-language=".length);
+    } catch {
+      // Language selection still works when the browser denies cookie access.
+    }
     return resolveLanguage(cookie, navigator.languages.join(","));
   });

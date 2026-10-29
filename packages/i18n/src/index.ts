@@ -26,6 +26,8 @@ const resourcesData = {
       },
       language: {
         switchTo: "Beralih ke bahasa Inggris",
+        loadFailed: "Bahasa gagal dimuat. Periksa koneksi dan muat ulang untuk mencoba lagi.",
+        reload: "Muat ulang",
       },
     },
   },
@@ -50,6 +52,9 @@ const resourcesData = {
       },
       language: {
         switchTo: "Switch to Indonesian",
+        loadFailed:
+          "The language could not be loaded. Check your connection and reload to try again.",
+        reload: "Reload",
       },
     },
   },

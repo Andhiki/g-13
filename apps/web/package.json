@@ -15,7 +15,8 @@
     "fmt": "oxfmt src scripts vite.config.ts package.json tsconfig.json",
     "fmt:check": "oxfmt --check src scripts vite.config.ts package.json tsconfig.json",
     "check": "bun run lint && bun run fmt:check && bun run typecheck && bun run test",
-    "test": "bun test"
+    "test": "bun test",
+    "test:i18n-browser": "node --test scripts/verify-i18n.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

@@ -31,6 +31,12 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Halaman Helpful Resources berbicara langsung kepada pembaca dan menautkan
   template skripsi DIKE UGM yang diperbarui.
 
+#### Fixed
+
+- Pergantian bahasa mempertahankan halaman saat kamus gagal diunduh dan tetap
+  berfungsi tanpa akses cookie. Alamat halaman dengan huruf besar/kecil yang
+  berbeda memuat kamus terjemahan yang sesuai.
+
 ### 2026-10-28
 
 #### Added

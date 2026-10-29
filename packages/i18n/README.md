@@ -32,7 +32,14 @@ const message = instance.t("navigation.examArchive");
 
 The web app resolves language from a cookie, then weighted `Accept-Language`
 preferences, with Indonesian as fallback. The initial language and loaded messages
-are included in route data for hydration. Switching language updates the cookie
-and reloads route data. Course display names use `englishTitle` in English and
+are included in route data for hydration. Switching language loads the target
+dictionaries before updating the cookie
+and route data. A failed download leaves the current language and page intact,
+with a reload action. When cookies are unavailable, the router retains the
+selection in the current tab until reload. Course display names use
+`englishTitle` in English and
 `title` in Indonesian; source records and identifiers retain their original text.
 Syllabus quotations and original archive filenames remain as published.
+
+Browser regressions: build the app, start `bun run --cwd apps/web preview --host 127.0.0.1 --port 4173`, then run `bun run --cwd apps/web test:i18n-browser`. Set `I18N_TEST_URL` when
+using a different address.

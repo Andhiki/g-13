@@ -24,3 +24,18 @@ export function createI18n({
   });
   return instance;
 }
+
+export function messageNamespace(pathname: string): MessageNamespace {
+  switch (pathname.replace(/\/+$/, "").toLowerCase()) {
+    case "/roadmap":
+      return "roadmap";
+    case "/exam":
+      return "exam";
+    case "/resources":
+      return "resources";
+    case "/alumni":
+      return "alumni";
+    default:
+      return "common";
+  }
+}

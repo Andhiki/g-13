@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { getCurriculum } from "@g13/curriculum";
 import { courseTitle } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
-import { createI18n } from "./i18n";
+import { createI18n, messageNamespace } from "./i18n";
 import { buildRoadmap } from "./features/roadmap/planner";
 import { validateRoadmapSearch } from "./features/roadmap/search";
 import { examArchive } from "./features/exam-archive/catalog";
@@ -101,4 +101,13 @@ test("literal UI translation keys exist in their page or shared namespace", asyn
       ).toBeDefined();
     }
   }
+});
+
+test("namespace selection follows case-insensitive routes and trailing slashes", () => {
+  for (const namespace of ["roadmap", "exam", "resources", "alumni"] as const) {
+    expect(messageNamespace(`/${namespace}`)).toBe(namespace);
+    expect(messageNamespace(`/${namespace.toUpperCase()}/`)).toBe(namespace);
+  }
+  expect(messageNamespace("/")).toBe("common");
+  expect(messageNamespace("/missing-route")).toBe("common");
 });
