@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Animasi jalur prasyarat menampilkan satu ion per koneksi agar peta dan roadmap
+  lebih tenang dan tidak mengganggu perhatian.
+
 - Perhitungan peta, roadmap, dan jalur prasyarat serta pemuatan terjemahan
   disimpan untuk dipakai kembali saat membuka tampilan yang sama.
 

@@ -83,14 +83,14 @@ html.theme-transition::view-transition-new(root) {
   fill: none;
   stroke-width: 3;
   stroke-linecap: round;
-  stroke-dasharray: 0.012 0.321333;
+  stroke-dasharray: 0.012 0.988;
   pointer-events: none;
-  animation: course-connection-charge 3s linear infinite;
+  animation: course-connection-charge 9s linear infinite;
 }
 
 @keyframes course-connection-charge {
   to {
-    stroke-dashoffset: -0.333333;
+    stroke-dashoffset: -1;
   }
 }
 
