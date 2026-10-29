@@ -26,7 +26,7 @@ export function ViewSwitch({
             variant="neutral"
             mode="stroke"
             size="medium"
-            className="size-10 rounded-full p-0"
+            className="size-10 p-0"
             aria-pressed={view === "list"}
             aria-keyshortcuts="V"
             aria-label={text(label)}

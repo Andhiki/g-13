@@ -59,16 +59,19 @@ function verifyRoutes(nodes: RoutingNode[], edges: Edge[]) {
       const a = vertical[i],
         b = vertical[j];
       if (a.id === b.id || a.top >= b.bottom || b.top >= a.bottom) continue;
+      const edgeA = edges.find((edge) => edge.id === a.id)!;
+      const edgeB = edges.find((edge) => edge.id === b.id)!;
+      if (a.x === b.x && (edgeA.source === edgeB.source || edgeA.target === edgeB.target)) continue;
       expect(
         Math.abs(a.x - b.x),
         `${a.id} and ${b.id} share a vertical lane`,
-      ).toBeGreaterThanOrEqual(6);
+      ).toBeGreaterThanOrEqual(4);
     }
   return routes;
 }
 
 for (const { id } of listCurricula()) {
-  test(`${id}: overview and every optional hover keep orthogonal, obstacle-free, separate vertical lanes`, () => {
+  test(`${id}: overview and every optional hover keep orthogonal, obstacle-free, spaced or converging vertical lanes`, () => {
     const data = getCurriculum(id);
     const map = buildMap(data, data.all, getRelations(id), null, () => {});
     const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
@@ -157,4 +160,29 @@ test("pre-routing optional connections preserves base routes and includes every 
   expect(prepared.size).toBe(edges.filter((edge) => !edge.hidden).length);
   expect(prepared.size).toBeGreaterThan(visible.size);
   for (const [id, route] of visible) expect(prepared.get(id)?.path).toBe(route.path);
+});
+
+test("aligned prerequisites converge symmetrically at the center of the gap", () => {
+  const nodes = routingNodes([
+    { id: "upper", position: { x: 0, y: 0 } },
+    { id: "lower", position: { x: 0, y: 240 } },
+    { id: "target", position: { x: 360, y: 120 } },
+  ]);
+  const edges = [
+    { id: "upper-target", source: "upper", target: "target" },
+    { id: "lower-target", source: "lower", target: "target" },
+  ];
+  const routes = verifyRoutes(nodes, edges);
+  expect(routes.get("upper-target")!.points).toEqual([
+    [246, 41],
+    [303, 41],
+    [303, 161],
+    [360, 161],
+  ]);
+  expect(routes.get("lower-target")!.points).toEqual([
+    [246, 281],
+    [303, 281],
+    [303, 161],
+    [360, 161],
+  ]);
 });

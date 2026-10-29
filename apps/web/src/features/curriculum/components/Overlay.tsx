@@ -84,20 +84,30 @@ function FilterDrawer({
   );
 }
 
-function DesktopFilters({
+export function MapControlPanel({
   children,
   label,
-  copy,
+  title,
+  toggleName = title,
+  icon: Icon,
+  controlsId,
+  shortcut,
+  width = 300,
+  className,
   open,
   onOpenChange,
-  toolbar = false,
 }: {
   children: ReactNode;
   label: string;
-  copy: FilterCopy;
+  title: string;
+  toggleName?: string;
+  icon: typeof RiFilter3Line;
+  controlsId: string;
+  shortcut?: string;
+  width?: number;
+  className: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  toolbar?: boolean;
 }) {
   const { text, language } = useLocale();
   const toggle = useRef<HTMLButtonElement>(null);
@@ -120,11 +130,11 @@ function DesktopFilters({
   return (
     <m.section
       initial={false}
-      animate={{ width: open ? 300 : 40, height: open ? "auto" : 40, y: toolbar ? 0 : 52 }}
+      animate={{ width: open ? width : 40, height: open ? "auto" : 40 }}
       transition={
         reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
       }
-      className="pointer-events-auto absolute right-0 top-0 z-20 overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
+      className={`pointer-events-auto absolute right-0 z-20 overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 ${className}`}
       aria-label={text(label)}
     >
       <AlignButton.Root
@@ -134,15 +144,15 @@ function DesktopFilters({
         size="medium"
         className="absolute right-0 top-0 z-10 size-10 p-2.5"
         aria-label={text(open ? "closeFilter" : "openFilter", {
-          name: text(copy.title).toLocaleLowerCase(language),
+          name: text(toggleName).toLocaleLowerCase(language),
         })}
         aria-expanded={open}
-        aria-controls="desktop-filters"
-        aria-keyshortcuts="F"
+        aria-controls={controlsId}
+        aria-keyshortcuts={shortcut}
         onClick={() => onOpenChange(!open)}
       >
         {[
-          { Icon: RiFilter3Line, name: "filter", active: !open },
+          { Icon, name: "toggle", active: !open },
           { Icon: RiCloseLine, name: "close", active: open },
         ].map(({ Icon, name, active }) => (
           <m.span
@@ -164,16 +174,17 @@ function DesktopFilters({
         ))}
       </AlignButton.Root>
       <m.div
-        id="desktop-filters"
+        id={controlsId}
         inert={!open}
         aria-hidden={!open}
         initial={false}
         animate={{ opacity: open ? 1 : 0 }}
         transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
-        className="flex w-[300px] flex-col gap-3 p-4"
+        className="flex flex-col gap-3 p-4"
+        style={{ width }}
       >
         <Typography as="h2" variant="label" className="m-0 pr-8">
-          {text("Filter")}
+          {text(title)}
         </Typography>
         {children}
       </m.div>
@@ -241,15 +252,19 @@ export function Overlay({
             </div>
           </div>
           {!compact && (
-            <DesktopFilters
+            <MapControlPanel
               label={controlsLabel}
-              copy={filterCopy}
+              title="Filter"
+              toggleName={filterCopy.title}
+              icon={RiFilter3Line}
+              controlsId="desktop-filters"
+              shortcut="F"
+              className={filtersInToolbar ? "top-0" : "top-[52px]"}
               open={filtersOpen}
               onOpenChange={setFiltersOpen}
-              toolbar={filtersInToolbar}
             >
               {children}
-            </DesktopFilters>
+            </MapControlPanel>
           )}
         </div>
       </div>

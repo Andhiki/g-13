@@ -44,6 +44,11 @@ export function GraphFocus({
     const saved =
       previous.current.selectedId !== null && selectedId === null ? overview.current : null;
     previous.current = { selectedId, navigation, resetKey };
+    if (selectedId === null && saved) {
+      apply(saved);
+      overview.current = null;
+      return;
+    }
     // Let React Flow lay out the updated nodes before moving the viewport.
     const timer = window.setTimeout(() => {
       apply(saved);

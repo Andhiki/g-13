@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
   type ReactNode,
 } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
@@ -74,17 +75,23 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
           edge.data?.optional === next[index].data?.optional,
       ),
   );
+  const cache = useRef(new Map<string, RoutingResult>());
+  const routingKey = useMemo(() => JSON.stringify([nodes, edges]), [nodes, edges]);
   const [result, setResult] = useState<{
     nodes: RoutingNode[];
     edges: Edge[];
     routes: RoutingResult;
   }>();
   useEffect(() => {
+    if (cache.current.has(routingKey)) return;
     const worker = new Worker(new URL("../connection-routing.worker.ts", import.meta.url), {
       type: "module",
     });
-    worker.onmessage = ({ data }: MessageEvent<RoutingResult>) =>
+    worker.onmessage = ({ data }: MessageEvent<RoutingResult>) => {
+      cache.current.set(routingKey, data);
+      if (cache.current.size > 8) cache.current.delete(cache.current.keys().next().value!);
       setResult({ nodes, edges, routes: data });
+    };
     worker.postMessage({
       nodes,
       edges: edges.map(({ id, source, target, hidden, data }) => ({
@@ -96,8 +103,10 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
       })),
     });
     return () => worker.terminate();
-  }, [nodes, edges]);
-  const routes = result?.nodes === nodes && result.edges === edges ? result.routes : new Map();
+  }, [nodes, edges, routingKey]);
+  const routes =
+    cache.current.get(routingKey) ??
+    (result?.nodes === nodes && result.edges === edges ? result.routes : new Map());
   return <Routes.Provider value={routes}>{children}</Routes.Provider>;
 }
 

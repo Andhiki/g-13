@@ -27,6 +27,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Kontrol zoom lebih ringkas dan disembunyikan saat detail mata kuliah terbuka;
+  pintasan keyboard dapat dilipat lewat tombol keyboard dengan animasi seperti filter.
+  Tombol ganti tampilan mengikuti sudut tombol lainnya.
+
+- Jalur prasyarat lebih rapat dan simetris, dengan pertemuan jalur yang menuju
+  atau berasal dari mata kuliah yang sama. Tampilan peta dipulihkan tanpa jeda
+  tambahan saat detail ditutup.
+
 - Perhitungan jalur koneksi peta kurikulum dan roadmap berjalan di latar belakang
   agar interaksi tetap responsif saat grafik disiapkan.
 

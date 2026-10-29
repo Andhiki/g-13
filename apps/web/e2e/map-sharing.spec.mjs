@@ -117,6 +117,8 @@ for (const width of [1440, 390]) {
       await expectViewport(page, semesterView);
       if (path === "/") {
         await chooseVisibleCourse(page);
+        await expect(page.getByRole("group", { name: "Kontrol zoom", exact: true })).toHaveCount(0);
+        await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
         await page.getByRole("button", { name: "Kembali ke tampilan awal", exact: true }).click();
         await expectViewport(page, initial);
       }
@@ -205,3 +207,30 @@ for (const feature of ["roadmap", "archive"]) {
     assert.deepEqual(errors, []);
   });
 }
+
+test("map controls stay compact and shortcuts collapse like filters", async ({ page }) => {
+  await open(page, "/");
+  await settled(page);
+  const zoom = page.getByRole("group", { name: "Kontrol zoom", exact: true });
+  await expect(zoom).toBeVisible();
+  expect((await zoom.boundingBox()).width).toBeLessThan(160);
+  const keyboard = page.locator('[aria-controls="map-keyboard-shortcuts"]');
+  await expect(keyboard).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#map-keyboard-shortcuts")).toHaveAttribute("inert", "");
+  await keyboard.click();
+  await expect(keyboard).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByText("Ke semester", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(keyboard).toHaveAttribute("aria-expanded", "false");
+  await expect(keyboard).toBeFocused();
+  const view = page.getByRole("button", { name: "Tampilkan daftar", exact: true });
+  const filter = page.locator('[aria-controls="desktop-filters"]');
+  expect(await view.evaluate((element) => getComputedStyle(element).borderRadius)).toBe(
+    await filter.evaluate((element) => getComputedStyle(element).borderRadius),
+  );
+  await chooseVisibleCourse(page, true);
+  await expect(zoom).toHaveCount(0);
+  await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
+  await expect(zoom).toBeVisible();
+  await expect(page.locator('[data-routed="true"]').first()).toBeVisible();
+});

@@ -9,9 +9,9 @@ export type RoutingNode = {
   source: XYPosition;
   target: XYPosition;
 };
-type Vertical = { x: number; top: number; bottom: number };
+type Vertical = { x: number; top: number; bottom: number; source: string; target: string };
 const clearance = 12;
-const spacing = 6;
+const spacing = 4;
 
 function blocked(a: number[], b: number[], nodes: RoutingNode[]) {
   return nodes.some(
@@ -30,6 +30,7 @@ export function connectionRoutes(
 ) {
   const routes = new Map<string, { path: string; points: number[][] }>();
   const occupied: Vertical[] = [];
+  const centered = new Map<string, number[][]>();
   const obstacles = nodes.map((node) => ({ ...node, data: {} }));
   const routable = edges
     .filter((edge) => !edge.hidden && (options.includeUnrevealed || edge.data?.visible !== false))
@@ -51,6 +52,20 @@ export function connectionRoutes(
           [target.x, target.y],
         ],
       });
+      return [];
+    }
+    const middle = (source.x + target.x) / 2;
+    const points = [
+      [source.x, source.y],
+      [middle, source.y],
+      [middle, target.y],
+      [target.x, target.y],
+    ];
+    if (
+      target.x > source.x &&
+      points.slice(1).every((point, index) => !blocked(points[index], point, otherNodes))
+    ) {
+      centered.set(edge.id, points);
       return [];
     }
     return [
@@ -77,11 +92,12 @@ export function connectionRoutes(
     if (!source || !target) continue;
     const otherNodes = nodes.filter((node) => node.id !== edge.source && node.id !== edge.target);
     const route = batch[edge.id];
-    if (!route || route.kind !== "routed") continue;
+    const rawPoints = centered.get(edge.id) ?? (route?.kind === "routed" ? route.points : null);
+    if (!rawPoints) continue;
     const points = connectionCorners(
       source,
       target,
-      route.points.map((point) => [...point]),
+      rawPoints.map((point) => [...point]),
     );
     for (let index = 1; index < points.length - 2; index++) {
       const a = points[index];
@@ -117,6 +133,10 @@ export function connectionRoutes(
         if (
           occupied.some(
             (run) =>
+              !(
+                run.x === candidate &&
+                (run.source === edge.source || run.target === edge.target)
+              ) &&
               Math.abs(run.x - candidate) < spacing &&
               run.top < bottom + clearance &&
               run.bottom > top - clearance,
@@ -132,7 +152,7 @@ export function connectionRoutes(
         );
       });
       if (x !== undefined) a[0] = b[0] = x;
-      occupied.push({ x: a[0], top, bottom });
+      occupied.push({ x: a[0], top, bottom, source: edge.source, target: edge.target });
     }
     routes.set(edge.id, { path: connectionPath(source, target, points), points });
   }
