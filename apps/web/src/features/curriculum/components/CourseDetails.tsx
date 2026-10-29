@@ -22,9 +22,19 @@ export function CourseDetails(props: CourseDetailsProps) {
   return (
     <DeferredContent
       fallback={
-        <p role="status" className="fixed bottom-4 left-4 z-50 rounded-lg bg-bg-white-0 p-4">
-          {text("Memuat detail mata kuliah…")}
-        </p>
+        <div
+          role="status"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-bg-white-0/90 text-primary-base"
+        >
+          <span
+            aria-hidden="true"
+            className="size-24 bg-current [mask:url('/theme/sonic-dancing.gif')_center/contain_no-repeat]"
+          />
+          <p className="m-0 animate-pulse text-label-md motion-reduce:animate-none">
+            {text("Biar kami masak dulu…")}
+          </p>
+          <span className="sr-only">{text("Memuat detail mata kuliah…")}</span>
+        </div>
       }
     >
       <CourseDetailsPanel {...props} onLoaded={setLoaded} />

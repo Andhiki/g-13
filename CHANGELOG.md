@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Status pemuatan detail mata kuliah menampilkan Sonic berwarna oranye dan teks
+  berdenyut sambil menunggu panel siap.
+
 - Rentang pintasan semester ditampilkan sebagai dua tombol keyboard terpisah
   dengan tanda hubung di antaranya.
 
