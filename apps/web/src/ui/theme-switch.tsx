@@ -47,6 +47,7 @@ export function ThemeSwitch() {
 
   return (
     <SegmentedControl.Root
+      className="w-28 shrink-0"
       value={mounted ? theme : "system"}
       onValueChange={(value) => {
         if (value === "system" || value === "light" || value === "dark") changeTheme(value);
@@ -55,27 +56,30 @@ export function ThemeSwitch() {
       <SegmentedControl.List aria-label={t("settings.theme")}>
         <SegmentedControl.Trigger
           value="system"
+          aria-label={t("settings.system")}
+          title={t("settings.system")}
           disabled={!mounted}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
           <RiComputerLine className="size-4" aria-hidden="true" />
-          {t("settings.system")}
         </SegmentedControl.Trigger>
         <SegmentedControl.Trigger
           value="dark"
+          aria-label={t("settings.dark")}
+          title={t("settings.dark")}
           disabled={!mounted}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
           <RiMoonLine className="size-4" aria-hidden="true" />
-          {t("settings.dark")}
         </SegmentedControl.Trigger>
         <SegmentedControl.Trigger
           value="light"
+          aria-label={t("settings.light")}
+          title={t("settings.light")}
           disabled={!mounted}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
           <RiSunLine className="size-4" aria-hidden="true" />
-          {t("settings.light")}
         </SegmentedControl.Trigger>
       </SegmentedControl.List>
     </SegmentedControl.Root>

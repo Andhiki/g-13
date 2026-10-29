@@ -6,7 +6,7 @@ import { LanguageSwitch } from "./language-switch";
 import { AlignLinkButton } from "./link-button";
 import { AlignModal } from "./modal";
 import { ThemeSwitch } from "./theme-switch";
-import * as SegmentedControl from "./segmented-control";
+import * as Switch from "./switch";
 import { useCursorPreference } from "./cursor-preference";
 import { Typography } from "./typography";
 
@@ -37,47 +37,38 @@ export function Settings() {
             </Typography>
           </AlignModal.Title>
         </div>
-        <div className="space-y-6 p-5">
-          <div className="space-y-3">
+        <div className="space-y-5 p-5">
+          <div className="flex items-center justify-between gap-4">
             <Typography variant="label">{t("settings.language")}</Typography>
             <LanguageSwitch />
           </div>
-          <div className="space-y-3">
+          <div className="flex items-center justify-between gap-4">
             <Typography variant="label">{t("settings.theme")}</Typography>
             <ThemeSwitch />
           </div>
-          <div className="space-y-3">
-            <Typography variant="label">{t("settings.behaviour")}</Typography>
-            <SegmentedControl.Root
-              value={cursor}
-              onValueChange={(value) => {
-                if (value === "default" || value === "pointer") setCursor(value);
-              }}
-            >
-              <SegmentedControl.List aria-label={t("settings.cursor")}>
-                <SegmentedControl.Trigger
-                  value="default"
-                  className="focus-visible:ring-2 focus-visible:ring-primary-base"
-                >
-                  {t("settings.normalCursor")}
-                </SegmentedControl.Trigger>
-                <SegmentedControl.Trigger
-                  value="pointer"
-                  className="focus-visible:ring-2 focus-visible:ring-primary-base"
-                >
-                  {t("settings.pointerCursor")}
-                </SegmentedControl.Trigger>
-              </SegmentedControl.List>
-            </SegmentedControl.Root>
+          <div className="flex items-center justify-between gap-4">
+            <Typography as="label" htmlFor="pointer-cursor" variant="label">
+              {t("settings.pointerCursor")}
+            </Typography>
+            <Switch.Root
+              id="pointer-cursor"
+              checked={cursor === "pointer"}
+              onCheckedChange={(checked) => setCursor(checked ? "pointer" : "default")}
+            />
           </div>
         </div>
-        <div className="space-y-1 border-t border-stroke-soft-200 p-5">
-          <Typography variant="paragraph" className="text-text-sub-600">
-            {t("settings.contribute")}
-          </Typography>
-          <AlignLinkButton.Root asChild variant="primary" underline>
+        <div className="border-t border-stroke-soft-200 p-5">
+          <AlignLinkButton.Root
+            asChild
+            variant="gray"
+            size="small"
+            underline
+            className="h-auto whitespace-normal text-left"
+          >
             <a href="https://github.com/Andhiki/g-13" target="_blank" rel="noopener noreferrer">
-              {t("settings.contributeLink")}
+              <Typography as="span" variant="caption">
+                {t("settings.contributeLink")}
+              </Typography>
             </a>
           </AlignLinkButton.Root>
         </div>

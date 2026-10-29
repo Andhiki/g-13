@@ -41,6 +41,7 @@ export function LanguageSwitch() {
 
   return (
     <SegmentedControl.Root
+      className="w-28 shrink-0"
       activationMode="manual"
       value={language}
       onValueChange={(value) => {
@@ -49,20 +50,22 @@ export function LanguageSwitch() {
     >
       <SegmentedControl.List aria-label={t("settings.language")} aria-busy={pending}>
         <SegmentedControl.Trigger
-          value="id"
-          lang="id"
-          disabled={pending}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
-        >
-          Bahasa Indonesia
-        </SegmentedControl.Trigger>
-        <SegmentedControl.Trigger
           value="en"
           lang="en"
+          aria-label="English"
           disabled={pending}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
-          English
+          EN
+        </SegmentedControl.Trigger>
+        <SegmentedControl.Trigger
+          value="id"
+          lang="id"
+          aria-label="Bahasa Indonesia"
+          disabled={pending}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          ID
         </SegmentedControl.Trigger>
       </SegmentedControl.List>
     </SegmentedControl.Root>
