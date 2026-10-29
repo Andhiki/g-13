@@ -30,6 +30,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Jarak keterangan bahasa asli pada silabus diperjelas, dengan tipografi konsisten
   untuk pokok bahasan dan referensi.
 
+- Tikungan jalur prasyarat pada peta kurikulum dan roadmap lebih lebar dan halus,
+  menyesuaikan ruang di sekitar kartu mata kuliah.
+
 - Silabus dimuat bersama data kurikulum agar accordion langsung mengukur isi
   lengkap dan tidak melompat dari tinggi pesan pemuatan saat dibuka kembali.
 

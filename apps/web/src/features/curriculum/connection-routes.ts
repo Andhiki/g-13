@@ -154,7 +154,7 @@ export function connectionRoutes(
       if (x !== undefined) a[0] = b[0] = x;
       occupied.push({ x: a[0], top, bottom, source: edge.source, target: edge.target });
     }
-    routes.set(edge.id, { path: connectionPath(source, target, points), points });
+    routes.set(edge.id, { path: connectionPath(source, target, points, nodes), points });
   }
   return routes;
 }
