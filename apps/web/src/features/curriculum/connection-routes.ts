@@ -13,9 +13,17 @@ type Vertical = { x: number; top: number; bottom: number };
 const clearance = 12;
 const spacing = 6;
 
-function blocked(a: number[], b: number[], nodes: RoutingNode[]) {
+function blocked(
+  a: number[],
+  b: number[],
+  nodes: RoutingNode[],
+  sourceId?: string,
+  targetId?: string,
+) {
   return nodes.some(
-    ({ position: { x, y }, measured: { width, height } }) =>
+    ({ id, position: { x, y }, measured: { width, height } }) =>
+      id !== sourceId &&
+      id !== targetId &&
       Math.max(a[0], b[0]) > x - clearance &&
       Math.min(a[0], b[0]) < x + width + clearance &&
       Math.max(a[1], b[1]) > y - clearance &&
@@ -23,22 +31,26 @@ function blocked(a: number[], b: number[], nodes: RoutingNode[]) {
   );
 }
 
-export function connectionRoutes(nodes: RoutingNode[], edges: Edge[]) {
+export function connectionRoutes(
+  nodes: RoutingNode[],
+  edges: Edge[],
+  options: { includeUnrevealed?: boolean } = {},
+) {
   const routes = new Map<string, { path: string; points: number[][] }>();
   const occupied: Vertical[] = [];
+  const nodesById = new Map(nodes.map((node) => [node.id, node]));
   const obstacles = nodes.map((node) => ({ ...node, data: {} }));
-  const visible = edges
-    .filter((edge) => !edge.hidden && edge.data?.visible !== false)
+  const routable = edges
+    .filter((edge) => !edge.hidden && (options.includeUnrevealed || edge.data?.visible !== false))
     .sort((a, b) => Number(!!a.data?.optional) - Number(!!b.data?.optional));
-  for (const edge of visible) {
-    const source = nodes.find((node) => node.id === edge.source)?.source;
-    const target = nodes.find((node) => node.id === edge.target)?.target;
+  for (const edge of routable) {
+    const source = nodesById.get(edge.source)?.source;
+    const target = nodesById.get(edge.target)?.target;
     if (!source || !target) continue;
-    const otherNodes = nodes.filter((node) => node.id !== edge.source && node.id !== edge.target);
     if (
       source.y === target.y &&
       target.x > source.x &&
-      !blocked([source.x, source.y], [target.x, target.y], otherNodes)
+      !blocked([source.x, source.y], [target.x, target.y], nodes, edge.source, edge.target)
     ) {
       routes.set(edge.id, {
         path: `M ${source.x},${source.y} L ${target.x},${target.y}`,
@@ -109,8 +121,8 @@ export function connectionRoutes(nodes: RoutingNode[], edges: Edge[]) {
         const end = [candidate, b[1]];
         return (
           !blocked(start, end, nodes) &&
-          !blocked(points[index - 1], start, otherNodes) &&
-          !blocked(end, points[index + 2], otherNodes)
+          !blocked(points[index - 1], start, nodes, edge.source, edge.target) &&
+          !blocked(end, points[index + 2], nodes, edge.source, edge.target)
         );
       });
       if (x !== undefined) a[0] = b[0] = x;

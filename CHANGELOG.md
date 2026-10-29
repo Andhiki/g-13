@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Peta kurikulum dan roadmap menyiapkan jalur mata kuliah pilihan saat grafik
+  dimuat, sehingga hover tidak menghitung ulang jalur koneksi.
+
 - Judul tautan roadmap komputer di Helpful Resources kini menggunakan nama
   `roadmap.sh`, dan deskripsi sumber belajar kini berbicara lebih langsung
   kepada pembaca.

@@ -6,49 +6,51 @@ import { connectionRoutes, type RoutingNode } from "../connection-routes";
 const Routes = createContext<ReturnType<typeof connectionRoutes>>(new Map());
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
-  const nodes = useStore(
-    (state): RoutingNode[] =>
-      Array.from(state.nodeLookup.values())
-        .filter(
-          (node) =>
-            node.type !== "lane" && !node.hidden && node.measured.width && node.measured.height,
-        )
-        .map((node) => {
-          const position = node.internals.positionAbsolute;
-          const width = node.measured.width ?? 0;
-          const height = node.measured.height ?? 0;
-          const output = node.internals.handleBounds?.source?.find((handle) => handle.id === "out");
-          const input = node.internals.handleBounds?.target?.find((handle) => handle.id === "in");
-          return {
-            id: node.id,
-            position,
-            measured: { width, height },
-            source: {
-              x: position.x + (output ? output.x + output.width / 2 : width),
-              y: position.y + (output ? output.y + output.height / 2 : height / 2),
-            },
-            target: {
-              x: position.x + (input ? input.x + input.width / 2 : 0),
-              y: position.y + (input ? input.y + input.height / 2 : height / 2),
-            },
-          };
-        }),
+  const measuredNodes = useStore(
+    (state) =>
+      Array.from(state.nodeLookup.values()).filter(
+        (node) =>
+          node.type !== "lane" && !node.hidden && node.measured.width && node.measured.height,
+      ),
     (previous, next) =>
       previous.length === next.length &&
       previous.every((node, index) => {
         const other = next[index];
+        const position = node.internals.positionAbsolute;
+        const otherPosition = other.internals.positionAbsolute;
         return (
           node.id === other.id &&
-          node.position.x === other.position.x &&
-          node.position.y === other.position.y &&
+          position.x === otherPosition.x &&
+          position.y === otherPosition.y &&
           node.measured.width === other.measured.width &&
           node.measured.height === other.measured.height &&
-          node.source.x === other.source.x &&
-          node.source.y === other.source.y &&
-          node.target.x === other.target.x &&
-          node.target.y === other.target.y
+          node.internals.handleBounds === other.internals.handleBounds
         );
       }),
+  );
+  const nodes = useMemo(
+    () =>
+      measuredNodes.map((node): RoutingNode => {
+        const position = node.internals.positionAbsolute;
+        const width = node.measured.width ?? 0;
+        const height = node.measured.height ?? 0;
+        const output = node.internals.handleBounds?.source?.find((handle) => handle.id === "out");
+        const input = node.internals.handleBounds?.target?.find((handle) => handle.id === "in");
+        return {
+          id: node.id,
+          position,
+          measured: { width, height },
+          source: {
+            x: position.x + (output ? output.x + output.width / 2 : width),
+            y: position.y + (output ? output.y + output.height / 2 : height / 2),
+          },
+          target: {
+            x: position.x + (input ? input.x + input.width / 2 : 0),
+            y: position.y + (input ? input.y + input.height / 2 : height / 2),
+          },
+        };
+      }),
+    [measuredNodes],
   );
   const edges = useStore(
     (state) => state.edges,
@@ -60,10 +62,13 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
           edge.source === next[index].source &&
           edge.target === next[index].target &&
           edge.hidden === next[index].hidden &&
-          edge.data?.visible === next[index].data?.visible,
+          edge.data?.optional === next[index].data?.optional,
       ),
   );
-  const routes = useMemo(() => connectionRoutes(nodes, edges), [nodes, edges]);
+  const routes = useMemo(
+    () => connectionRoutes(nodes, edges, { includeUnrevealed: true }),
+    [nodes, edges],
+  );
   return <Routes.Provider value={routes}>{children}</Routes.Provider>;
 }
 
@@ -97,7 +102,7 @@ function RoutedEdge(props: EdgeProps<Edge<{ visible: boolean; charging: boolean 
   const { opacity = 1, ...style } = props.style ?? {};
   return (
     <AnimatePresence>
-      {route && (
+      {route && props.data?.visible !== false && (
         <m.g
           key={props.id}
           initial={{ opacity: 0 }}
