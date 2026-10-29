@@ -1,0 +1,37 @@
+{
+  "name": "@g13/trailer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trailer g-13",
+  "license": "MIT",
+  "scripts": {
+    "studio": "remotionb studio",
+    "build": "remotionb bundle --out-dir=dist",
+    "render": "remotionb render G13Trailer out/g13-cinematic.mp4",
+    "typecheck": "tsc",
+    "lint": "oxlint --deny-warnings src remotion.config.ts",
+    "fmt": "oxfmt src remotion.config.ts package.json tsconfig.json",
+    "fmt:check": "oxfmt --check src remotion.config.ts package.json tsconfig.json",
+    "test": "bun test",
+    "audio": "python3 scripts/make-soundtrack.py"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "@remotion/media": "4.0.539",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.539",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@g13/curriculum": "workspace:*",
+    "@types/react": "^19.3.0",
+    "@types/web": "0.0.166",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  }
+}
