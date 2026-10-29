@@ -21,7 +21,7 @@ export function mapConnections(edges: Edge[], selectedId: string | null, hovered
       data: {
         ...edge.data,
         visible: !edge.data?.optional || selected || emphasized,
-        charging: emphasized,
+        charging: selected || emphasized,
       },
     };
   });

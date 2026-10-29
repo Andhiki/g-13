@@ -34,3 +34,10 @@ test("optional edges remain mounted so hover can fade them out", () => {
   expect(hovered.every((edge) => !edge.hidden)).toBe(true);
   expect(resting.map((edge) => edge.id)).toEqual(hovered.map((edge) => edge.id));
 });
+
+test("selected course connections keep charging after the pointer leaves", () => {
+  const selected = mapConnections(edges, "a", null);
+  expect(selected.map((edge) => edge.data.charging)).toEqual([true, true, false]);
+  expect(selected[1].style.opacity).toBe(0.65);
+  expect(mapConnections(edges, null, null).every((edge) => !edge.data.charging)).toBe(true);
+});

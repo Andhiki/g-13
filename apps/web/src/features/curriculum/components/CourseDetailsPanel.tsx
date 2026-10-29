@@ -1,7 +1,7 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
+import { useMemo, type ReactNode } from "react";
+import { RiArrowRightLine, RiArrowRightUpLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
 import { syllabusPoints } from "../syllabus-format";
@@ -14,9 +14,7 @@ import {
   type Curriculum,
   type Relation,
 } from "@g13/curriculum";
-import { CompactButton } from "../../../ui/compact-button";
 import { courseLabels, creditsFor, requirementText, semesterLabel } from "../course-utils";
-import { CourseSheetHandle } from "./CourseSheetHandle";
 import { SemesterIndicator } from "./SemesterIndicator";
 import { CopyCourseButton } from "./CopyCourseButton";
 
@@ -36,60 +34,9 @@ export function CourseDetailsPanel({
   data,
   relations,
   select,
-  close,
-  modal = true,
   footer,
-  onHeightChange,
-}: CourseDetailsProps) {
-  const [height, setHeight] = useState(30);
-  const selection = course ? { course, data, relations } : null;
-  // Retain the content while Radix runs the close animation.
-  const [lastSelection, setLastSelection] = useState(selection);
-  if (
-    selection &&
-    (course !== lastSelection?.course ||
-      data !== lastSelection.data ||
-      relations !== lastSelection.relations)
-  ) {
-    setLastSelection(selection);
-  }
-  const content = selection ?? lastSelection;
-
-  return (
-    <AlignDrawer.Root
-      modal={modal}
-      open={course !== null}
-      onOpenChange={(open) => !open && close()}
-    >
-      {content && (
-        <CourseDetailsContent
-          {...content}
-          select={select}
-          modal={modal}
-          footer={footer}
-          height={height}
-          onHeightChange={(next) => {
-            setHeight(next);
-            onHeightChange?.(next);
-          }}
-        />
-      )}
-    </AlignDrawer.Root>
-  );
-}
-
-function CourseDetailsContent({
-  course,
-  data,
-  relations,
-  select,
-  modal,
-  footer,
-  onHeightChange,
-  height,
-}: Omit<CourseDetailsProps, "course" | "close"> & { course: Course; height: number }) {
+}: Pick<CourseDetailsProps, "data" | "relations" | "select" | "footer"> & { course: Course }) {
   const { text, courseName } = useLocale();
-  const closeButton = useRef<HTMLButtonElement>(null);
   const byId = useMemo(() => new Map(data.all.map((item) => [item.id, item])), [data]);
   const prereqs = relations
     .filter((item) => item.target === course.id)
@@ -107,18 +54,7 @@ function CourseDetailsContent({
     .filter((item) => item && !linkedPrerequisites.has(normalizeCourseTitle(item)));
   const credit = creditsFor(course);
   return (
-    <AlignDrawer.Content
-      modal={modal}
-      style={{ "--course-sheet-height": `${height}dvh` } as CSSProperties}
-      className="min-[650px]:top-[var(--app-header-height)] max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
-      onOpenAutoFocus={(event) => {
-        event.preventDefault();
-        closeButton.current?.focus();
-      }}
-      onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
-      aria-label={text("Detail {{v0}}", { v0: courseName(course) })}
-    >
-      <CourseSheetHandle height={height} onChange={(next) => onHeightChange?.(next)} />
+    <>
       <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 sm:p-5">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
@@ -154,13 +90,8 @@ function CourseDetailsContent({
             ))}
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 pr-8">
           <CopyCourseButton key={course.id} value={course.id} label={text("ID mata kuliah")} />
-          <AlignDrawer.Close asChild>
-            <CompactButton ref={closeButton} aria-label={text("Tutup detail mata kuliah")}>
-              <RiCloseLine className="size-5" aria-hidden="true" />
-            </CompactButton>
-          </AlignDrawer.Close>
         </div>
       </AlignDrawer.Header>
       <AlignDrawer.Description asChild>
@@ -273,7 +204,7 @@ function CourseDetailsContent({
         </div>
       </AlignDrawer.Body>
       {footer && <div className="shrink-0 border-t border-stroke-soft-200 p-4">{footer}</div>}
-    </AlignDrawer.Content>
+    </>
   );
 }
 

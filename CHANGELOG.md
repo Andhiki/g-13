@@ -27,6 +27,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Animasi muatan pada jalur prasyarat tetap berjalan selama detail mata kuliah
+  terbuka. Drawer tetap terpasang saat pemuatan selesai agar animasi buka tidak
+  terulang.
+
 - Jalur prasyarat mata kuliah pilihan ditampilkan lebih redup saat disorot agar
   mudah dibedakan dari jalur mata kuliah wajib.
 

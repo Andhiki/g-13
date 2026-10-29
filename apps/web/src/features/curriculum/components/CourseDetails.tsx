@@ -1,75 +1,106 @@
 import { Typography } from "../../../ui/typography";
 import { useLocale } from "../../../useLocale";
-import { lazy, useEffect, useState } from "react";
+import { lazy, useRef, useState, type CSSProperties } from "react";
 import { DeferredContent } from "../../../ui/deferred-content";
 import { AlignDrawer } from "../../../ui/drawer";
 import { CompactButton } from "../../../ui/compact-button";
 import { RiCloseLine } from "@remixicon/react";
+import { CourseSheetHandle } from "./CourseSheetHandle";
 import type { CourseDetailsProps } from "./CourseDetailsPanel";
 
 const CourseDetailsPanel = lazy(() =>
-  import("./CourseDetailsPanel").then((module) => ({
-    default: function LoadedDetails({
-      onLoaded,
-      ...props
-    }: CourseDetailsProps & { onLoaded: (loaded: boolean) => void }) {
-      useEffect(() => onLoaded(true), [onLoaded]);
-      return <module.CourseDetailsPanel {...props} />;
-    },
-  })),
+  import("./CourseDetailsPanel").then((module) => ({ default: module.CourseDetailsPanel })),
 );
 
-export function CourseDetails(props: CourseDetailsProps) {
-  const { text } = useLocale();
-  const [loaded, setLoaded] = useState(false);
-  if (!props.course && !loaded) return null;
+export function CourseDetails({
+  course,
+  data,
+  relations,
+  select,
+  close,
+  modal = true,
+  footer,
+  onHeightChange,
+}: CourseDetailsProps) {
+  const { text, courseName } = useLocale();
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const [height, setHeight] = useState(30);
+  const selection = course ? { course, data, relations } : null;
+  // Retain the content while Radix runs the close animation.
+  const [lastSelection, setLastSelection] = useState(selection);
+  if (
+    selection &&
+    (course !== lastSelection?.course ||
+      data !== lastSelection.data ||
+      relations !== lastSelection.relations)
+  ) {
+    setLastSelection(selection);
+  }
+  const content = selection ?? lastSelection;
+
   return (
-    <DeferredContent
-      fallback={
-        <AlignDrawer.Root
-          modal={props.modal ?? true}
-          open={props.course !== null}
-          onOpenChange={(open) => !open && props.close()}
-        >
-          <AlignDrawer.Content
-            modal={props.modal ?? true}
-            aria-describedby={undefined}
-            onInteractOutside={
-              props.modal === false ? (event) => event.preventDefault() : undefined
-            }
-            className="min-[650px]:top-[var(--app-header-height)] max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[30dvh] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
-          >
-            <AlignDrawer.Title className="sr-only">
-              {text("Memuat detail mata kuliah…")}
-            </AlignDrawer.Title>
-            <AlignDrawer.Close asChild>
-              <CompactButton
-                className="absolute right-4 top-4"
-                aria-label={text("Tutup detail mata kuliah")}
-              >
-                <RiCloseLine className="size-5" aria-hidden="true" />
-              </CompactButton>
-            </AlignDrawer.Close>
-            <div
-              role="status"
-              className="flex flex-1 flex-col items-center justify-center gap-4 text-primary-base"
-            >
-              <span
-                aria-hidden="true"
-                className="size-24 bg-current [mask:url('/theme/sonic-dancing.gif')_center/contain_no-repeat]"
-              />
-              <Typography
-                variant="subtitle2"
-                className="m-0 animate-pulse font-sans motion-reduce:animate-none"
-              >
-                {text("Biar kami masak dulu…")}
-              </Typography>
-            </div>
-          </AlignDrawer.Content>
-        </AlignDrawer.Root>
-      }
+    <AlignDrawer.Root
+      modal={modal}
+      open={course !== null}
+      onOpenChange={(open) => !open && close()}
     >
-      <CourseDetailsPanel {...props} onLoaded={setLoaded} />
-    </DeferredContent>
+      {content && (
+        <AlignDrawer.Content
+          modal={modal}
+          aria-describedby={undefined}
+          aria-label={text("Detail {{v0}}", { v0: courseName(content.course) })}
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            closeButton.current?.focus();
+          }}
+          onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
+          style={{ "--course-sheet-height": `${height}dvh` } as CSSProperties}
+          className="min-[650px]:top-[var(--app-header-height)] max-[650px]:fixed max-[650px]:inset-x-0 max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:h-[var(--course-sheet-height)] max-[650px]:max-w-none max-[650px]:rounded-t-10 max-[650px]:border-r-0 max-[650px]:border-t max-[650px]:data-[state=open]:slide-in-from-bottom-full max-[650px]:data-[state=closed]:slide-out-to-bottom-full max-[650px]:data-[state=open]:[--tw-enter-translate-x:0%] max-[650px]:data-[state=closed]:[--tw-exit-translate-x:0%]"
+        >
+          <CourseSheetHandle
+            height={height}
+            onChange={(next) => {
+              setHeight(next);
+              onHeightChange?.(next);
+            }}
+          />
+          <AlignDrawer.Close asChild>
+            <CompactButton
+              ref={closeButton}
+              className="absolute right-4 top-4 z-10 sm:right-5 sm:top-5"
+              aria-label={text("Tutup detail mata kuliah")}
+            >
+              <RiCloseLine className="size-5" aria-hidden="true" />
+            </CompactButton>
+          </AlignDrawer.Close>
+          <DeferredContent
+            fallback={
+              <>
+                <AlignDrawer.Title className="sr-only">
+                  {text("Memuat detail mata kuliah…")}
+                </AlignDrawer.Title>
+                <div
+                  role="status"
+                  className="flex flex-1 flex-col items-center justify-center gap-4 text-primary-base"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="size-24 bg-current [mask:url('/theme/sonic-dancing.gif')_center/contain_no-repeat]"
+                  />
+                  <Typography
+                    variant="subtitle2"
+                    className="m-0 animate-pulse font-sans motion-reduce:animate-none"
+                  >
+                    {text("Biar kami masak dulu…")}
+                  </Typography>
+                </div>
+              </>
+            }
+          >
+            <CourseDetailsPanel {...content} select={select} footer={footer} />
+          </DeferredContent>
+        </AlignDrawer.Content>
+      )}
+    </AlignDrawer.Root>
   );
 }
