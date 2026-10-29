@@ -1,9 +1,18 @@
-import { createContext, useContext, useLayoutEffect, useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useLayoutEffect,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import { connectionRoutes, type RoutingNode } from "../connection-routes";
+import type { RoutingNode } from "../connection-routes";
+import type { RoutingResult } from "../connection-routing.worker";
 
-const Routes = createContext<ReturnType<typeof connectionRoutes>>(new Map());
+const Routes = createContext<RoutingResult>(new Map());
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const measuredNodes = useStore(
@@ -65,10 +74,30 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
           edge.data?.optional === next[index].data?.optional,
       ),
   );
-  const routes = useMemo(
-    () => connectionRoutes(nodes, edges, { includeUnrevealed: true }),
-    [nodes, edges],
-  );
+  const [result, setResult] = useState<{
+    nodes: RoutingNode[];
+    edges: Edge[];
+    routes: RoutingResult;
+  }>();
+  useEffect(() => {
+    const worker = new Worker(new URL("../connection-routing.worker.ts", import.meta.url), {
+      type: "module",
+    });
+    worker.onmessage = ({ data }: MessageEvent<RoutingResult>) =>
+      setResult({ nodes, edges, routes: data });
+    worker.postMessage({
+      nodes,
+      edges: edges.map(({ id, source, target, hidden, data }) => ({
+        id,
+        source,
+        target,
+        hidden,
+        data: { optional: data?.optional },
+      })),
+    });
+    return () => worker.terminate();
+  }, [nodes, edges]);
+  const routes = result?.nodes === nodes && result.edges === edges ? result.routes : new Map();
   return <Routes.Provider value={routes}>{children}</Routes.Provider>;
 }
 

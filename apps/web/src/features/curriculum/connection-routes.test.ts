@@ -146,3 +146,15 @@ test("Jaringan Komputer reaches its practicum through a row gap without detourin
     Math.abs(target.target.x - source.source.x) + Math.abs(target.target.y - source.source.y),
   );
 });
+
+test("pre-routing optional connections preserves base routes and includes every unrevealed edge", () => {
+  const data = getCurriculum("2026");
+  const map = buildMap(data, data.all, getRelations("2026"), null, () => {});
+  const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
+  const edges = mapConnections(map.edges, null, null);
+  const visible = connectionRoutes(nodes, edges);
+  const prepared = connectionRoutes(nodes, edges, { includeUnrevealed: true });
+  expect(prepared.size).toBe(edges.filter((edge) => !edge.hidden).length);
+  expect(prepared.size).toBeGreaterThan(visible.size);
+  for (const [id, route] of visible) expect(prepared.get(id)?.path).toBe(route.path);
+});

@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Perhitungan jalur koneksi peta kurikulum dan roadmap berjalan di latar belakang
+  agar interaksi tetap responsif saat grafik disiapkan.
+
 - Peta kurikulum dan roadmap menyiapkan jalur mata kuliah pilihan saat grafik
   dimuat, sehingga hover tidak menghitung ulang jalur koneksi.
 

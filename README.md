@@ -106,6 +106,18 @@ bun run check
 This checks code style, formatting, TypeScript types, and tests. Fix any reported
 problems, then run the command again.
 
+Browser checks use Playwright Test against the production build:
+
+```sh
+bun run build
+cd apps/web
+bunx playwright install chromium
+bun run test:browser
+```
+
+The runner starts the preview server and saves traces and screenshots for failed tests
+in `apps/web/test-results/`. CI runs these browser checks after every build.
+
 ## Acknowledgements
 
 - [course.csui.dev](https://course.csui.dev) inspired this project.

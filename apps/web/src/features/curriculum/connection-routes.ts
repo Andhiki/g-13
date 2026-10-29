@@ -1,5 +1,5 @@
 import { Position, type Edge, type XYPosition } from "@xyflow/react";
-import { getSmartEdge, pathfindingJumpPointNoDiagonal } from "@tisoap/react-flow-smart-edge";
+import { routeSmartEdgeBatch, type SmartEdgeBatchItem } from "@tisoap/react-flow-smart-edge";
 import { connectionCorners, connectionPath } from "./connection-path";
 
 export type RoutingNode = {
@@ -34,10 +34,10 @@ export function connectionRoutes(
   const routable = edges
     .filter((edge) => !edge.hidden && (options.includeUnrevealed || edge.data?.visible !== false))
     .sort((a, b) => Number(!!a.data?.optional) - Number(!!b.data?.optional));
-  for (const edge of routable) {
+  const requests = routable.flatMap((edge): SmartEdgeBatchItem[] => {
     const source = nodes.find((node) => node.id === edge.source)?.source;
     const target = nodes.find((node) => node.id === edge.target)?.target;
-    if (!source || !target) continue;
+    if (!source || !target) return [];
     const otherNodes = nodes.filter((node) => node.id !== edge.source && node.id !== edge.target);
     if (
       source.y === target.y &&
@@ -51,24 +51,38 @@ export function connectionRoutes(
           [target.x, target.y],
         ],
       });
-      continue;
+      return [];
     }
-    const route = getSmartEdge({
-      nodes: obstacles,
-      sourceX: source.x,
-      sourceY: source.y,
-      targetX: target.x,
-      targetY: target.y,
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
-      options: {
-        nodePadding: clearance,
-        gridRatio: 4,
-        generatePath: pathfindingJumpPointNoDiagonal,
+    return [
+      {
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        sourceX: source.x,
+        sourceY: source.y,
+        targetX: target.x,
+        targetY: target.y,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        preset: "smoothstep",
+        options: { nodePadding: clearance, gridRatio: 4 },
       },
-    });
-    if (route instanceof Error) continue;
-    const points = connectionCorners(source, target, route.points);
+    ];
+  });
+  const batch = routeSmartEdgeBatch(obstacles, requests);
+  for (const edge of routable) {
+    if (routes.has(edge.id)) continue;
+    const source = nodes.find((node) => node.id === edge.source)?.source;
+    const target = nodes.find((node) => node.id === edge.target)?.target;
+    if (!source || !target) continue;
+    const otherNodes = nodes.filter((node) => node.id !== edge.source && node.id !== edge.target);
+    const route = batch[edge.id];
+    if (!route || route.kind !== "routed") continue;
+    const points = connectionCorners(
+      source,
+      target,
+      route.points.map((point) => [...point]),
+    );
     for (let index = 1; index < points.length - 2; index++) {
       const a = points[index];
       const b = points[index + 1];

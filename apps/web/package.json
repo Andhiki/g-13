@@ -10,14 +10,15 @@
     "preview": "vite preview",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --deny-warnings src scripts vite.config.ts",
-    "lint:fix": "oxlint --fix src scripts vite.config.ts",
-    "fmt": "oxfmt src scripts vite.config.ts package.json tsconfig.json",
-    "fmt:check": "oxfmt --check src scripts vite.config.ts package.json tsconfig.json",
+    "lint": "oxlint --deny-warnings src scripts e2e vite.config.ts playwright.config.ts",
+    "lint:fix": "oxlint --fix src scripts e2e vite.config.ts playwright.config.ts",
+    "fmt": "oxfmt src scripts e2e vite.config.ts playwright.config.ts package.json tsconfig.json",
+    "fmt:check": "oxfmt --check src scripts e2e vite.config.ts playwright.config.ts package.json tsconfig.json",
     "check": "bun run lint && bun run fmt:check && bun run typecheck && bun run test",
-    "test": "bun test",
-    "test:interactions-browser": "node --test scripts/verify-map-sharing.mjs",
-    "test:i18n-browser": "node --test scripts/verify-i18n.mjs"
+    "test": "bun test src",
+    "test:interactions-browser": "playwright test map-sharing",
+    "test:i18n-browser": "playwright test i18n",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
@@ -41,7 +42,7 @@
     "cmdk": "^1.1.1",
     "i18next": "^26.5.11",
     "merge-refs": "^2.0.0",
-    "motion": "^14.6.0",
+    "motion": "^14.7.1",
     "next-themes": "^0.4.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -51,20 +52,20 @@
     "tailwind-variants": "^3.3.1"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.64.0",
+    "@cloudflare/vite-plugin": "^1.66.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.4",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "playwright": "^1.64.1",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
     "tailwindcss": "^4.3.3",
     "tw-animate-css": "^1.4.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
-    "wrangler": "^4.151.0"
+    "wrangler": "^4.155.0"
   }
 }
