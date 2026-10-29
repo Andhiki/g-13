@@ -81,11 +81,13 @@ for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.emulateMedia({ reducedMotion: width === 1440 ? "no-preference" : "reduce" });
       const errors = [];
+      const startedWorkers = [];
       page.on("pageerror", (error) => errors.push(error.message));
+      page.on("worker", (worker) => startedWorkers.push(worker));
       await open(page, path);
       await page.locator("[data-course-button]").first().waitFor();
       await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
-      expect(page.workers().length).toBeGreaterThan(0);
+      expect(startedWorkers.length).toBeGreaterThan(0);
       await settled(page);
       const initial = await viewport(page);
       await page.mouse.move(width - 70, 550);
