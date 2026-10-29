@@ -22,7 +22,14 @@ const resourcesData = {
       },
       notFound: {
         title: "Halaman tidak ditemukan",
-        home: "Kembali ke peta kurikulum",
+        description:
+          "Belok kiri, belok kanan… sepertinya kita tersesat. Yuk, kembali ke peta kurikulum.",
+        home: "Kembali",
+      },
+      error: {
+        title: "Ada yang tidak beres",
+        description: "Ada sambungan yang putus. Kita coba hubungkan lagi, yuk.",
+        retry: "Coba lagi",
       },
       language: {
         switchTo: "Beralih ke bahasa Inggris",
@@ -48,7 +55,14 @@ const resourcesData = {
       },
       notFound: {
         title: "Page not found",
-        home: "Back to the curriculum map",
+        description:
+          "Left turn, right turn… looks like we’re lost. Let’s head back to the curriculum map.",
+        home: "Back",
+      },
+      error: {
+        title: "Something went wrong",
+        description: "A connection came loose. Let’s try putting it back together.",
+        retry: "Try again",
       },
       language: {
         switchTo: "Switch to Indonesian",

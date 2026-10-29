@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Halaman kesalahan dan halaman tidak ditemukan dengan ilustrasi dan tombol navigasi.
+
 - Helpful Resources menambahkan roadmap Computer Science dari roadmap.sh dan
   KKN Automation untuk presensi harian serta presensi proker melalui GitHub Actions.
 
