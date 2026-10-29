@@ -84,7 +84,7 @@ for (const width of [1440, 390]) {
       page.on("pageerror", (error) => errors.push(error.message));
       await open(page, path);
       await page.locator("[data-course-button]").first().waitFor();
-      await expect(page.locator('[data-routed="true"]').first()).toBeVisible();
+      await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
       expect(page.workers().length).toBeGreaterThan(0);
       await settled(page);
       const initial = await viewport(page);
@@ -232,5 +232,5 @@ test("map controls stay compact and shortcuts collapse like filters", async ({ p
   await expect(zoom).toHaveCount(0);
   await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
   await expect(zoom).toBeVisible();
-  await expect(page.locator('[data-routed="true"]').first()).toBeVisible();
+  await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
 });

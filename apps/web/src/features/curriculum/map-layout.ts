@@ -29,6 +29,49 @@ const ROW_STEP = 120;
 const COURSE_X_OFFSET = 12;
 const COURSE_Y_START = 156;
 
+function shortenConnections(semesters: Map<number, Course[]>, relations: Relation[]) {
+  const rows = new Map<string, number>();
+  for (const courses of semesters.values())
+    courses.forEach((course, row) => rows.set(course.id, row));
+  const neighbors = new Map<string, string[]>();
+  for (const { source, target } of relations) {
+    if (!rows.has(source) || !rows.has(target)) continue;
+    neighbors.set(source, [...(neighbors.get(source) ?? []), target]);
+    neighbors.set(target, [...(neighbors.get(target) ?? []), source]);
+  }
+  for (const courses of semesters.values()) {
+    courses.sort((a, b) => Number(neighbors.has(b.id)) - Number(neighbors.has(a.id)));
+    courses.forEach((course, row) => rows.set(course.id, row));
+  }
+  const distance = (id: string, row: number) =>
+    (neighbors.get(id) ?? []).reduce(
+      (sum, neighbor) => sum + Math.abs(row - rows.get(neighbor)!),
+      0,
+    );
+  let improved = true;
+  while (improved) {
+    improved = false;
+    for (const courses of semesters.values()) {
+      for (let a = 0; a < courses.length; a++) {
+        for (let b = a + 1; b < courses.length; b++) {
+          const first = courses[a],
+            second = courses[b];
+          if (
+            distance(first.id, b) + distance(second.id, a) >=
+            distance(first.id, a) + distance(second.id, b)
+          )
+            continue;
+          courses[a] = second;
+          courses[b] = first;
+          rows.set(first.id, b);
+          rows.set(second.id, a);
+          improved = true;
+        }
+      }
+    }
+  }
+}
+
 export function buildMap(
   data: Curriculum,
   visible: Course[],
@@ -66,6 +109,7 @@ export function buildMap(
       .sort((a, b) => a.title.localeCompare(b.title, "id"));
     layoutCore.set(term, courses);
   }
+  shortenConnections(layoutCore, graphRelations);
   const choiceGroups = new Map<string, Course[]>();
   for (const course of data.all.filter((course) => !isCore(course))) {
     const group =

@@ -149,3 +149,41 @@ for (const count of [6, 7, 48, 49]) {
     }
   });
 }
+
+for (const { id } of listCurricula()) {
+  test(`${id}: semester rows shorten prerequisite connections and stay stable when filtered`, () => {
+    const data = getCurriculum(id);
+    const relations = getRelations(id);
+    const map = buildMap(data, data.all, relations, null, () => {});
+    const alphabetical = new Map<string, number>();
+    for (let term = 1; term <= map.lastSemester; term++) {
+      const courses = data.all
+        .filter((course) => assignedCoreSemester(course) === term)
+        .sort((a, b) => a.title.localeCompare(b.title, "id"));
+      courses.forEach((course, row) => alphabetical.set(course.id, 156 + row * 120));
+      const positions = courses.map((course) => map.positions.get(course.id)!);
+      expect(new Set(positions.map(({ x }) => x)).size).toBe(courses.length ? 1 : 0);
+      expect(new Set(positions.map(({ y }) => y)).size).toBe(courses.length);
+      for (const position of positions) expect(position.x).toBe(60 + (term - 1) * 360);
+    }
+    const connections = map.edges.filter(
+      (edge) => alphabetical.has(edge.source) && alphabetical.has(edge.target),
+    );
+    const before = connections.reduce(
+      (sum, edge) =>
+        sum + Math.abs(alphabetical.get(edge.source)! - alphabetical.get(edge.target)!),
+      0,
+    );
+    const after = connections.reduce(
+      (sum, edge) =>
+        sum + Math.abs(map.positions.get(edge.source)!.y - map.positions.get(edge.target)!.y),
+      0,
+    );
+    expect(after).toBeLessThan(before);
+    const subset = data.core.slice(0, 5);
+    const filtered = buildMap(data, subset, relations, null, () => {});
+    for (const course of subset)
+      expect(filtered.positions.get(course.id)).toEqual(map.positions.get(course.id));
+    expect(buildMap(data, data.all, relations, null, () => {}).positions).toEqual(map.positions);
+  });
+}

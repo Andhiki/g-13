@@ -27,6 +27,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Urutan mata kuliah dalam setiap kolom semester mendekatkan mata kuliah yang
+  terhubung agar jalur prasyarat lebih pendek, tanpa mengubah semester atau
+  pengelompokan mata kuliah pilihan.
+
 - Kontrol zoom lebih ringkas dan disembunyikan saat detail mata kuliah terbuka;
   pintasan keyboard dapat dilipat lewat tombol keyboard dengan animasi seperti filter.
   Tombol ganti tampilan mengikuti sudut tombol lainnya.

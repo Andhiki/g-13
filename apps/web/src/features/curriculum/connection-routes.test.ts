@@ -132,15 +132,19 @@ for (const { id } of listCurricula()) {
   }
 }
 
-test("Jaringan Komputer reaches its practicum through a row gap without detouring above the column", () => {
-  const data = getCurriculum("2026");
-  const map = buildMap(data, data.all, getRelations("2026"), null, () => {});
-  const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
-  const source = nodes.find((node) => node.id === "PACS262202")!;
-  const target = nodes.find((node) => node.id === "PACS262418")!;
-  const route = connectionRoutes(nodes, mapConnections(map.edges, null, null)).get(
-    `${source.id}->${target.id}`,
-  )!;
+test("connections cross an intervening column through a row gap without detouring above it", () => {
+  const nodes = routingNodes([
+    { id: "source", position: { x: 0, y: 0 } },
+    { id: "middle-top", position: { x: 360, y: 0 } },
+    { id: "middle-center", position: { x: 360, y: 120 } },
+    { id: "middle-bottom", position: { x: 360, y: 240 } },
+    { id: "target", position: { x: 720, y: 240 } },
+  ]);
+  const source = nodes[0];
+  const target = nodes[4];
+  const route = connectionRoutes(nodes, [
+    { id: "source-target", source: source.id, target: target.id },
+  ]).get("source-target")!;
   const length = route.points.slice(1).reduce((total, point, index) => {
     const previous = route.points[index];
     return total + Math.abs(point[0] - previous[0]) + Math.abs(point[1] - previous[1]);
