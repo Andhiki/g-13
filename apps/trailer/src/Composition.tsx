@@ -1,7 +1,7 @@
 import { Audio } from "@remotion/media";
 import type { ReactNode } from "react";
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { appear, ink, muted, orange, tween, violet } from "./motion";
+import { appear, cursorMove, ink, muted, orange, tween, violet } from "./motion";
 import { algorithms, analysis, CourseCard, Icon, Pointer, programming, Surface, Tag } from "./UI";
 
 function useTime() {
@@ -44,9 +44,22 @@ function SearchShot() {
           transform: `translateY(calc(-50% + ${tween(t, 2.8, 3.3, 0, -40)}px))`,
         }}
       >
-        Maba CS UGM,
-        <br />
-        tapi bingung mulai dari mana?
+        {[
+          ["Maba", "CS", "UGM,"],
+          ["tapi", "bingung", "mulai", "dari", "mana?"],
+        ].map((words, line) => (
+          <div key={line}>
+            {words.map((word, index) => {
+              const start = 0.25 + (index + line * 3) * 0.22;
+              return (
+                <span key={word} style={{ opacity: tween(t, start, start + 0.08) }}>
+                  {word}
+                  {index < words.length - 1 ? " " : ""}
+                </span>
+              );
+            })}
+          </div>
+        ))}
       </div>
       <div
         style={{
@@ -127,10 +140,10 @@ function SearchShot() {
         </Surface>
       </div>
       <Pointer
-        x={tween(t, 5.75, 6.7, 1480, 920)}
-        y={tween(t, 5.75, 6.7, 800, 467)}
+        {...cursorMove(t, 5.75, 6.7, [1480, 800], [920, 467])}
         opacity={appear(t, 5.6, 7.7)}
-        press={appear(t, 6.8, 7.2)}
+        time={t}
+        clicks={[6.85]}
       />
     </Stage>
   );
@@ -147,8 +160,8 @@ function GraphShot() {
           position: "absolute",
           inset: 0,
           scale: tween(t, 0, 1.2, 1.08, 1) - detail * 0.24,
-          translate: `${detail * 210}px ${detail * 90}px`,
-          transformOrigin: "60% 50%",
+          translate: `${detail * 267}px 0`,
+          transformOrigin: "50% 50%",
           rotate: `${tween(t, 0, 1.1, -2, 0)}deg`,
         }}
       >
@@ -158,7 +171,7 @@ function GraphShot() {
           style={{ position: "absolute", inset: 0, overflow: "visible" }}
         >
           <path
-            d="M565 594H750"
+            d="M565 562H750"
             stroke={orange}
             strokeWidth="3"
             fill="none"
@@ -166,31 +179,29 @@ function GraphShot() {
             strokeDasharray="1"
             strokeDashoffset={1 - draw}
           />
-          <path
-            d="M1170 594H1245Q1268 594 1268 571V355Q1268 332 1291 332H1390"
-            stroke={violet}
-            strokeWidth="3"
-            fill="none"
-            pathLength="1"
-            strokeDasharray="1"
-            strokeDashoffset={1 - tween(t, 1.1, 2.4)}
-          />
-          <path
-            d="M1170 594H1245Q1268 594 1268 617V737Q1268 760 1291 760H1390"
-            stroke={violet}
-            strokeWidth="3"
-            fill="none"
-            pathLength="1"
-            strokeDasharray="1"
-            strokeDashoffset={1 - tween(t, 1.25, 2.55)}
-          />
+          {[-1, 1].map((direction, index) => {
+            const targetY = 562 + direction * 210;
+            const corner = direction * 23;
+            return (
+              <path
+                key={direction}
+                d={`M1170 562H1245Q1268 562 1268 ${562 + corner}V${targetY - corner}Q1268 ${targetY} 1291 ${targetY}H1390`}
+                stroke={violet}
+                strokeWidth="3"
+                fill="none"
+                pathLength="1"
+                strokeDasharray="1"
+                strokeDashoffset={1 - tween(t, 1.1 + index * 0.15, 2.4 + index * 0.15)}
+              />
+            );
+          })}
         </svg>
         <CourseCard
           course={programming}
           state="prerequisite"
           style={{
             left: 145,
-            top: 500,
+            top: 455,
             opacity: tween(t, 0.4, 1),
             translate: `${tween(t, 0.4, 1.2, 40, 0)}px 0`,
           }}
@@ -200,7 +211,7 @@ function GraphShot() {
           state="selected"
           style={{
             left: 750,
-            top: 500,
+            top: 455,
             scale: tween(t, 0, 0.8, 0.94, 1),
             boxShadow: "0 30px 60px -35px #db9c6077",
           }}
@@ -208,19 +219,19 @@ function GraphShot() {
         <CourseCard
           course={analysis}
           state="dependent"
-          style={{ left: 1390, top: 238, opacity: tween(t, 1, 1.6) }}
+          style={{ left: 1390, top: 245, opacity: tween(t, 1, 1.6) }}
         />
         <CourseCard
           course={{ code: "PACS262307", title: "Konsep Bahasa Pemrograman", credits: 3 }}
           state="dependent"
-          style={{ left: 1390, top: 666, opacity: tween(t, 1.3, 1.9) }}
+          style={{ left: 1390, top: 665, opacity: tween(t, 1.3, 1.9) }}
         />
       </div>
       <Pointer
-        x={tween(t, 2.3, 3.35, 1200, 960)}
-        y={tween(t, 2.3, 3.35, 860, 585)}
+        {...cursorMove(t, 2.3, 3.2, [1200, 860], [960, 550], -35)}
         opacity={appear(t, 2.3, 3.9)}
-        press={appear(t, 3.25, 3.6)}
+        time={t}
+        clicks={[3.3]}
       />
       <Surface
         style={{
@@ -429,10 +440,12 @@ function PlannerShot() {
           Lanjut　↵
         </div>
         <Pointer
-          x={tween(t, 0.8, 1.5, 1250, 690) + tween(t, 2.1, 2.8, 0, 660)}
-          y={tween(t, 0.8, 1.5, 800, 435) + tween(t, 2.1, 2.8, 0, 450)}
+          {...(t < 2.1
+            ? cursorMove(t, 0.8, 1.5, [1250, 800], [690, 435])
+            : cursorMove(t, 2.1, 2.8, [690, 435], [1350, 885], -60))}
           opacity={appear(t, 0.7, 3.3)}
-          press={appear(t, 1.5, 1.9) + appear(t, 2.8, 3.15)}
+          time={t}
+          clicks={[1.55, 2.9]}
         />
       </div>
       <div
@@ -465,7 +478,7 @@ function PlannerShot() {
         </div>
         <svg width="1920" height="1080" style={{ position: "absolute" }}>
           <path
-            d="M580 594H750 M1170 594H1340"
+            d="M580 607H750 M1170 607H1340"
             stroke={orange}
             strokeWidth="3"
             fill="none"
@@ -611,10 +624,10 @@ function ArchiveShot() {
         ))}
       </Surface>
       <Pointer
-        x={tween(t, 0.8, 1.55, 1280, 640)}
-        y={tween(t, 0.8, 1.55, 850, 545)}
+        {...cursorMove(t, 0.8, 1.55, [1280, 850], [640, 545])}
         opacity={appear(t, 0.75, 2.5)}
-        press={appear(t, 1.55, 1.95)}
+        time={t}
+        clicks={[1.65]}
       />
     </Stage>
   );

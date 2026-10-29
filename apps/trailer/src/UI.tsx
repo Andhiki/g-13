@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { ink, muted, orange, violet } from "./motion";
+import { clickScale, ink, muted, orange, violet } from "./motion";
 
 export function Icon({
   kind,
@@ -36,12 +36,16 @@ export function Pointer({
   x,
   y,
   opacity = 1,
-  press = 0,
+  rotate = 0,
+  time,
+  clicks,
 }: {
   x: number;
   y: number;
   opacity?: number;
-  press?: number;
+  rotate?: number;
+  time: number;
+  clicks: readonly number[];
 }) {
   return (
     <div
@@ -50,7 +54,9 @@ export function Pointer({
         left: x,
         top: y,
         opacity,
-        scale: 1 - press * 0.15,
+        scale: clickScale(time, clicks),
+        rotate: `${rotate}deg`,
+        transformOrigin: "4px 3px",
         zIndex: 20,
         filter: "drop-shadow(0 3px 3px #0003)",
       }}
@@ -118,7 +124,7 @@ export function CourseCard({
     fontSize: 20,
   };
   return (
-    <div style={{ position: "absolute", width: 420, height: 156, ...style }}>
+    <div style={{ position: "absolute", width: 420, height: 170, ...style }}>
       <div style={{ display: "flex", height: 44 }}>
         <span style={tab}>{course.code}</span>
         <span
@@ -135,7 +141,9 @@ export function CourseCard({
         style={{
           position: "relative",
           padding: "25px 24px",
-          minHeight: 110,
+          height: 126,
+          display: "flex",
+          alignItems: "center",
           background: fill,
           border: `1.5px solid ${color}`,
           borderRadius: "0 13px 13px 13px",
@@ -152,7 +160,8 @@ export function CourseCard({
               style={{
                 position: "absolute",
                 left: -6,
-                top: 45,
+                top: "50%",
+                translate: "0 -50%",
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
@@ -164,7 +173,8 @@ export function CourseCard({
               style={{
                 position: "absolute",
                 right: -6,
-                top: 45,
+                top: "50%",
+                translate: "0 -50%",
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
