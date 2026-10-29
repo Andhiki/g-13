@@ -1,16 +1,16 @@
 {
   "CS50’s Introduction to Computer Science": "CS50’s Introduction to Computer Science",
-  "CS50 is one of the best ways to get started with computer science. Work through its 12-part lecture series in your spare time and build your fundamentals along the way.": "CS50 adalah salah satu cara terbaik untuk mulai belajar ilmu komputer. Ikuti rangkaian 12 kuliahnya di waktu luang dan bangun pemahaman dasarmu.",
+  "We recommend CS50 as your starting point as a computer science student. You’ll learn data types, data structures, loops, recursion, APIs, and problem solving. You’ll also get that amazing feeling of copying and pasting commands into your terminal.": "Kami merekomendasikan CS50 sebagai titik awalmu sebagai mahasiswa ilmu komputer. Kamu akan belajar tipe data, struktur data, perulangan, rekursi, API, dan pemecahan masalah. Kamu juga akan merasakan serunya menyalin dan menempel perintah ke terminalmu.",
   "DIKE UGM Skripsi LaTeX template": "Template LaTeX Skripsi DIKE UGM",
-  "Starting your proposal or skripsi? Use this LaTeX template as your starting point, then fill it with your own research.": "Mulai menulis proposal atau skripsi? Gunakan template LaTeX ini sebagai titik awal, lalu isi dengan penelitianmu sendiri.",
+  "We made this ready-to-use proposal and skripsi template for you. It works well with coding agents, even if you’ve never used LaTeX.": "Kami menyiapkan template proposal dan skripsi yang langsung bisa kamu pakai. Template ini cocok dipakai bersama coding agent, meski kamu belum pernah menggunakan LaTeX.",
   "HIMAKOM UGM exam archive": "Arsip ujian HIMAKOM UGM",
-  "Getting ready for an exam? Browse past papers from HIMAKOM UGM and find materials for your courses.": "Sedang bersiap menghadapi ujian? Jelajahi soal-soal terdahulu dari HIMAKOM UGM dan temukan bahan untuk mata kuliahmu.",
+  "We recommend checking these past exam papers before your next exam. See what questions came up and use them to guide your study.": "Kami sarankan kamu melihat kumpulan soal ujian ini sebelum ujian berikutnya. Cek soal-soal yang pernah keluar dan gunakan sebagai panduan belajar.",
   "Looking for a place to start?": "Bingung harus mulai dari mana?",
   "Pick a resource that fits what you need and explore it at your own pace.": "Pilih sumber yang sesuai kebutuhanmu dan pelajari dengan ritmemu sendiri.",
   "Helpful resources": "Sumber belajar",
   "(opens in a new tab)": "(dibuka di tab baru)",
-  "Computer Science roadmap": "Roadmap Ilmu Komputer",
-  "Not sure what to learn next? Follow this roadmap to explore computer science topics and find free resources you can work through at your own pace.": "Bingung mau belajar apa selanjutnya? Ikuti roadmap ini untuk menjelajahi topik ilmu komputer dan menemukan sumber belajar gratis yang bisa kamu pelajari sesuai ritmemu.",
+  "roadmap.sh": "roadmap.sh",
+  "We recommend roadmap.sh if you have no idea where to start on your way to a career in tech. Pick a path, see what you need to learn, and take it one step at a time.": "Kami merekomendasikan roadmap.sh kalau kamu belum tahu harus mulai dari mana untuk meniti karier di bidang teknologi. Pilih jalur, lihat apa yang perlu dipelajari, lalu jalani satu langkah demi satu langkah.",
   "KKN Automation": "KKN Automation",
-  "Doing KKN? Use GitHub Actions to automate your daily attendance and program activity (proker) attendance.": "Sedang KKN? Gunakan GitHub Actions untuk mengotomatiskan presensi harian dan presensi program kerja (proker)."
+  "We recommend this tool for lazy people (most likely you) who want to automate KKN attendance and forget about it altogether.": "Kami merekomendasikan alat ini buat kamu yang malas (kemungkinan besar kamu) supaya presensi KKN-mu otomatis dan bisa kamu lupakan."
 }

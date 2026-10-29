@@ -27,6 +27,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Judul tautan roadmap komputer di Helpful Resources kini menggunakan nama
+  `roadmap.sh`, dan deskripsi sumber belajar kini berbicara lebih langsung
+  kepada pembaca.
+
 - Terjemahan Indonesia dan Inggris mencakup judul, ajakan bertindak, filter,
   pintasan keyboard, nama mata kuliah, detail, kuis dan catatan roadmap, arsip
   ujian, FAQ, alumni, sumber belajar, serta metadata halaman. Bahasa tersimpan

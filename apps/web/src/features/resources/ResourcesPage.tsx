@@ -8,31 +8,31 @@ const resources = [
     title: "CS50’s Introduction to Computer Science",
     url: "https://cs50.harvard.edu/x/",
     description:
-      "CS50 is one of the best ways to get started with computer science. Work through its 12-part lecture series in your spare time and build your fundamentals along the way.",
+      "We recommend CS50 as your starting point as a computer science student. You’ll learn data types, data structures, loops, recursion, APIs, and problem solving. You’ll also get that amazing feeling of copying and pasting commands into your terminal.",
   },
   {
-    title: "Computer Science roadmap",
+    title: "roadmap.sh",
     url: "https://roadmap.sh/computer-science",
     description:
-      "Not sure what to learn next? Follow this roadmap to explore computer science topics and find free resources you can work through at your own pace.",
+      "We recommend roadmap.sh if you have no idea where to start on your way to a career in tech. Pick a path, see what you need to learn, and take it one step at a time.",
   },
   {
     title: "DIKE UGM Skripsi LaTeX template",
     url: "https://github.com/vityasyyy/template-skripsi-dike-ugm",
     description:
-      "Starting your proposal or skripsi? Use this LaTeX template as your starting point, then fill it with your own research.",
+      "We made this ready-to-use proposal and skripsi template for you. It works well with coding agents, even if you’ve never used LaTeX.",
   },
   {
     title: "KKN Automation",
     url: "https://github.com/vityasyyy/kkn-automation-standalone",
     description:
-      "Doing KKN? Use GitHub Actions to automate your daily attendance and program activity (proker) attendance.",
+      "We recommend this tool for lazy people (most likely you) who want to automate KKN attendance and forget about it altogether.",
   },
   {
     title: "HIMAKOM UGM exam archive",
     url: "https://himakom.ugm.ac.id/exam",
     description:
-      "Getting ready for an exam? Browse past papers from HIMAKOM UGM and find materials for your courses.",
+      "We recommend checking these past exam papers before your next exam. See what questions came up and use them to guide your study.",
   },
 ];
 
