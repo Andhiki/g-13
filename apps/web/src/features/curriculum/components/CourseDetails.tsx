@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useLocale } from "../../../useLocale";
 import { lazy, useEffect, useState } from "react";
 import { DeferredContent } from "../../../ui/deferred-content";
@@ -57,9 +58,12 @@ export function CourseDetails(props: CourseDetailsProps) {
                 aria-hidden="true"
                 className="size-24 bg-current [mask:url('/theme/sonic-dancing.gif')_center/contain_no-repeat]"
               />
-              <p className="m-0 animate-pulse text-label-md motion-reduce:animate-none">
+              <Typography
+                variant="subtitle2"
+                className="m-0 animate-pulse font-sans motion-reduce:animate-none"
+              >
                 {text("Biar kami masak dulu…")}
-              </p>
+              </Typography>
             </div>
           </AlignDrawer.Content>
         </AlignDrawer.Root>

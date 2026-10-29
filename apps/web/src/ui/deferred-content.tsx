@@ -1,3 +1,4 @@
+import { Typography } from "./typography";
 import { useLocale } from "../useLocale";
 import { CatchBoundary } from "@tanstack/react-router";
 import { Suspense, type ReactNode } from "react";
@@ -10,7 +11,7 @@ function DownloadError() {
       role="alert"
       className="fixed inset-x-4 bottom-4 z-50 rounded-lg bg-bg-white-0 p-4 text-text-strong-950 shadow-regular-xs sm:right-auto"
     >
-      <p>{text("Konten gagal dimuat. Periksa koneksi internet.")}</p>
+      <Typography>{text("Konten gagal dimuat. Periksa koneksi internet.")}</Typography>
       <AlignButton.Root className="mt-3" onClick={() => window.location.reload()}>
         {text("Muat ulang")}
       </AlignButton.Root>

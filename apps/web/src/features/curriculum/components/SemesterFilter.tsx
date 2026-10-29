@@ -1,3 +1,4 @@
+import { Typography } from "../../../ui/typography";
 import { useLocale } from "../../../useLocale";
 import { useState } from "react";
 import { m, useReducedMotion } from "motion/react";
@@ -34,9 +35,11 @@ export function SemesterFilter({
           ease: [0.16, 1, 0.3, 1],
           opacity: { duration: 0 },
         }}
-        className="relative z-0 text-label-sm max-[1100px]:sr-only"
+        className="relative z-0 max-[1100px]:sr-only"
       >
-        {text("Semester")}
+        <Typography as="span" variant="label">
+          {text("Semester")}
+        </Typography>
       </m.span>
       <m.div
         initial={reducedMotion ? false : { scaleX: 0, opacity: 0 }}

@@ -121,32 +121,29 @@ export function CourseSearch({
                 ))}
               </AlignCommandMenu.Group>
             ) : (
-              <AlignCommandMenu.Empty
-                className="px-5 py-4 text-paragraph-sm text-text-sub-600"
-                role="status"
-              >
-                {text("Tidak ada mata kuliah yang cocok.")}
+              <AlignCommandMenu.Empty className="px-5 py-4 text-text-sub-600" role="status">
+                <Typography>{text("Tidak ada mata kuliah yang cocok.")}</Typography>
               </AlignCommandMenu.Empty>
             )
           ) : (
-            <AlignCommandMenu.Empty className="px-5 py-4 text-paragraph-sm text-text-sub-600">
-              {text("Ketik nama, kode, atau prasyarat untuk mencari.")}
+            <AlignCommandMenu.Empty className="px-5 py-4 text-text-sub-600">
+              <Typography>{text("Ketik nama, kode, atau prasyarat untuk mencari.")}</Typography>
             </AlignCommandMenu.Empty>
           )}
         </AlignCommandMenu.List>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-paragraph-xs text-text-sub-600">
-          <span className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-text-sub-600">
+          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
             <AlignKbd.Root aria-label={text("Panah bawah")}>↓</AlignKbd.Root>
             {text("Turun")}
-          </span>
-          <span className="flex items-center gap-1.5">
+          </Typography>
+          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
             <AlignKbd.Root aria-label={text("Panah atas")}>↑</AlignKbd.Root>
             {text("Naik")}
-          </span>
-          <span className="flex items-center gap-1.5">
+          </Typography>
+          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
             <AlignKbd.Root>Enter</AlignKbd.Root>
             {text("Buka mata kuliah")}
-          </span>
+          </Typography>
         </div>
       </AlignCommandMenu.Dialog>
     </div>

@@ -129,9 +129,11 @@ function CourseDetailsContent({
               <span
                 role="img"
                 aria-label={text("{{v0}} SKS", { v0: credit })}
-                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 font-display text-label-sm text-text-strong-950"
+                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 text-text-strong-950"
               >
-                <span aria-hidden="true">{credit}</span>
+                <Typography as="span" variant="label" className="font-display" aria-hidden="true">
+                  {credit}
+                </Typography>
               </span>
             )}
             <AlignDrawer.Title asChild>
@@ -213,11 +215,13 @@ function CourseDetailsContent({
                     <li key={item.id}>
                       <button
                         type="button"
-                        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
                         onClick={() => select(item.id)}
                         aria-label={text("Buka detail ") + courseName(item)}
                       >
-                        <span className="min-w-0">{courseName(item)}</span>
+                        <Typography as="span" className="min-w-0">
+                          {courseName(item)}
+                        </Typography>
                         <RiArrowRightLine
                           className="size-4 shrink-0 text-text-sub-600"
                           aria-hidden="true"
@@ -249,11 +253,13 @@ function CourseDetailsContent({
                   <li key={item.id}>
                     <button
                       type="button"
-                      className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+                      className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
                       onClick={() => select(item.id)}
                       aria-label={text("Buka detail ") + courseName(item)}
                     >
-                      <span className="min-w-0">{courseName(item)}</span>
+                      <Typography as="span" className="min-w-0">
+                        {courseName(item)}
+                      </Typography>
                       <RiArrowRightLine
                         className="size-4 shrink-0 text-text-sub-600"
                         aria-hidden="true"

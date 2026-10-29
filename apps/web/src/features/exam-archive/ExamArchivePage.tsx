@@ -153,15 +153,21 @@ export function ExamArchivePage() {
             </label>
           </div>
           <div
-            className="grid shrink-0 grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-paragraph-xs text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
+            className="grid shrink-0 grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
             aria-hidden="true"
           >
-            <span className="flex items-center gap-1">
+            <Typography as="span" variant="caption" className="flex items-center gap-1">
               {text("Nama")} <RiArrowUpLine className="size-3.5" aria-hidden="true" />
-            </span>
-            <span className="hidden text-center sm:block">{text("Dibuat")}</span>
-            <span className="text-center">{text("Ujian")}</span>
-            <span className="text-center">{text("Jenis")}</span>
+            </Typography>
+            <Typography as="span" variant="caption" className="hidden text-center sm:block">
+              {text("Dibuat")}
+            </Typography>
+            <Typography as="span" variant="caption" className="text-center">
+              {text("Ujian")}
+            </Typography>
+            <Typography as="span" variant="caption" className="text-center">
+              {text("Jenis")}
+            </Typography>
           </div>
           <div
             ref={list}
@@ -233,11 +239,13 @@ export function ExamArchivePage() {
                 >
                   {formatCreatedAt(entry.createdAt, relativeTimeFormatter)}
                 </Typography>
-                <span className="flex justify-center text-paragraph-xs text-text-sub-600">
+                <span className="flex justify-center text-text-sub-600">
                   {entry.kind === "paper" && entry.paper.exam ? (
                     <ExamBadge exam={entry.paper.exam} />
                   ) : (
-                    "—"
+                    <Typography as="span" variant="caption">
+                      —
+                    </Typography>
                   )}
                 </span>
                 <AlignBadge.Root
@@ -250,14 +258,11 @@ export function ExamArchivePage() {
               </button>
             ))}
             {folder.entries.length === 0 && (
-              <p
-                role="status"
-                className="px-3 py-16 text-center text-paragraph-sm text-text-sub-600"
-              >
+              <Typography role="status" className="px-3 py-16 text-center text-text-sub-600">
                 {location.length === 0 && query.trim()
                   ? text("Tidak ada mata kuliah yang cocok.")
                   : text("Folder kosong")}
-              </p>
+              </Typography>
             )}
           </div>
         </div>
