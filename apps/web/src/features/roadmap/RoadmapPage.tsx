@@ -3,7 +3,7 @@ import { DeferredContent } from "../../ui/deferred-content";
 import { Route } from "../../routes/roadmap";
 import { planningInput } from "./planning-input";
 import { RoadmapQuiz } from "./RoadmapQuiz";
-import { RoadmapLoading } from "./RoadmapLoading";
+import { Loading } from "../../ui/loading";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
 
 const RoadmapResult = lazy(() =>
@@ -42,7 +42,13 @@ export function RoadmapPage() {
   const restart = () => update(validateRoadmapSearch({}));
   if (input)
     return (
-      <DeferredContent fallback={<RoadmapLoading />}>
+      <DeferredContent
+        fallback={
+          <main className="flex min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5">
+            <Loading />
+          </main>
+        }
+      >
         <RoadmapResult input={input} answers={answers} update={update} restart={restart} />
       </DeferredContent>
     );

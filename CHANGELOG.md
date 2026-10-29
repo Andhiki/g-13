@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Semua indikator pemuatan memakai Sonic dengan teks berdenyut yang dipilih acak setiap kali muncul.
+
 - Jarak atas dan bawah tautan kontribusi pada modal pengaturan dibuat simetris.
 
 - Deskripsi pintasan keyboard ditampilkan di kiri dan tombol pintasan diratakan ke kanan.

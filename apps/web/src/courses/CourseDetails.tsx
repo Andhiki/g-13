@@ -1,4 +1,4 @@
-import { Typography } from "../ui/typography";
+import { Loading } from "../ui/loading";
 import { useLocale } from "../useLocale";
 import { lazy, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { DeferredContent } from "../ui/deferred-content";
@@ -99,21 +99,7 @@ export function CourseDetails({
                 <AlignDrawer.Title className="sr-only">
                   {text("Memuat detail mata kuliah…")}
                 </AlignDrawer.Title>
-                <div
-                  role="status"
-                  className="flex flex-1 flex-col items-center justify-center gap-4 text-primary-base"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="size-24 bg-current [mask:url('/theme/sonic-dancing.gif')_center/contain_no-repeat]"
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    className="m-0 animate-pulse font-sans motion-reduce:animate-none"
-                  >
-                    {text("Biar kami masak dulu…")}
-                  </Typography>
-                </div>
+                <Loading />
               </>
             }
           >
