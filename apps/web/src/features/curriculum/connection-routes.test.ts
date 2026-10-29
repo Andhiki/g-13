@@ -1,21 +1,25 @@
 import { expect, test } from "bun:test";
 import type { Edge, XYPosition } from "@xyflow/react";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap, LANE_STEP, LANE_X } from "./map-layout";
-import { semesterRelations } from "./semester-relations";
+import { buildMap } from "./map-layout";
 import { mapConnections } from "./map-connections";
-import { isCore } from "./course-utils";
 import { connectionRoutes, type RoutingNode } from "./connection-routes";
 import { buildRoadmap } from "../roadmap/planner.test-support";
+import { buildRoadmapGraph } from "../roadmap/graph-layout";
 import { validateRoadmapSearch } from "../roadmap/search";
 
-function routingNodes(nodes: { id: string; position: XYPosition }[]): RoutingNode[] {
-  return nodes.map((node) => ({
-    ...node,
-    measured: { width: 246, height: 82 },
-    source: { x: node.position.x + 246, y: node.position.y + 41 },
-    target: { x: node.position.x, y: node.position.y + 41 },
-  }));
+function routingNodes(nodes: { id: string; position: XYPosition; type?: string }[]): RoutingNode[] {
+  return nodes.map((node) => {
+    // Dimensions stand in for browser measurements; positions come from graph construction.
+    const width = node.type === "title" ? 540 : 246;
+    const height = node.type === "title" ? 180 : node.type === "activity" ? 160 : 82;
+    return {
+      ...node,
+      measured: { width, height },
+      source: { x: node.position.x + width, y: node.position.y + height / 2 },
+      target: { x: node.position.x, y: node.position.y + height / 2 },
+    };
+  });
 }
 
 function verifyRoutes(nodes: RoutingNode[], edges: Edge[]) {
@@ -92,49 +96,37 @@ for (const { id } of listCurricula()) {
     }
   });
 
-  test(`${id}: seven- and eight-semester roadmap connections use the same clean routing`, () => {
-    for (const lulus of [7, 8]) {
-      const plan = buildRoadmap(
-        validateRoadmapSearch({
-          kurikulum: id,
-          minat: id === "2021" ? "Lab Sistem Cerdas" : "Analisis Data",
-          iup: "tidak",
-          magang: "tidak",
-          lulus,
-        }),
-      );
-      const nodes = routingNodes(
-        plan.courses.map((item) => ({
-          id: item.course.id,
-          position: {
-            x: LANE_X + (item.semester - 1) * LANE_STEP + 12,
-            y:
-              220 +
-              plan.courses.filter((other) => other.semester === item.semester).indexOf(item) * 120,
-          },
-        })),
-      );
-      const core = new Set(
-        plan.courses.filter((item) => isCore(item.course)).map((item) => item.course.id),
-      );
-      const semesters = new Map(plan.courses.map((item) => [item.course.id, item.semester]));
-      const edges = semesterRelations(plan.relations, semesters)
-        .filter(
-          (relation) =>
-            nodes.some((node) => node.id === relation.source) &&
-            nodes.some((node) => node.id === relation.target),
-        )
-        .map((relation) => ({
-          id: `${relation.source}->${relation.target}`,
-          source: relation.source,
-          target: relation.target,
-          data: { optional: !core.has(relation.source) || !core.has(relation.target) },
-        }));
-      for (const edge of edges)
-        expect(semesters.get(edge.source)).not.toBe(semesters.get(edge.target));
-      verifyRoutes(nodes, mapConnections(edges, null, null));
-    }
-  });
+  for (const withActivities of [false, true]) {
+    test(`${id}: seven- and eight-semester roadmap routing, activities=${withActivities}`, () => {
+      for (const lulus of [7, 8]) {
+        const plan = buildRoadmap(
+          validateRoadmapSearch({
+            kurikulum: id,
+            minat: id === "2021" ? "Lab Sistem Cerdas" : "Analisis Data",
+            iup: withActivities ? "ya" : "tidak",
+            paparan: withActivities ? "double" : undefined,
+            magang: withActivities ? "ya" : "tidak",
+            lulus,
+          }),
+        );
+        const { nodes: graphNodes, edges } = buildRoadmapGraph({
+          plan,
+          target: lulus,
+          summary: "Roadmap routing test",
+          selectedId: null,
+          choose: () => {},
+          text: (key) => key,
+        });
+        const nodes = routingNodes(
+          graphNodes.filter((node) => node.type !== "lane" && !node.hidden),
+        );
+        const semesters = new Map(plan.courses.map((item) => [item.course.id, item.semester]));
+        for (const edge of edges)
+          expect(semesters.get(edge.source)).not.toBe(semesters.get(edge.target));
+        verifyRoutes(nodes, mapConnections(edges, null, null));
+      }
+    });
+  }
 }
 
 test("Jaringan Komputer reaches its practicum through a row gap without detouring above the column", () => {
