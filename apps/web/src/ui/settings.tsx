@@ -29,35 +29,55 @@ export function Settings() {
           <RiSettings3Line aria-hidden="true" className="size-5" />
         </AlignButton.Root>
       </AlignModal.Trigger>
-      <AlignModal.Content aria-describedby={undefined}>
-        <div className="border-b border-stroke-soft-200 p-5 pr-12">
+      <AlignModal.Content aria-describedby={undefined} className="max-w-[380px]">
+        <div className="border-b border-stroke-soft-200 px-4 py-3 pr-12">
           <AlignModal.Title asChild>
-            <Typography as="h2" variant="subtitle1">
+            <Typography as="h2" variant="subtitle2">
               {t("settings.title")}
             </Typography>
           </AlignModal.Title>
         </div>
-        <div className="space-y-5 p-5">
-          <div className="flex items-center justify-between gap-4">
-            <Typography variant="label">{t("settings.language")}</Typography>
-            <LanguageSwitch />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <Typography variant="label">{t("settings.theme")}</Typography>
-            <ThemeSwitch />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <Typography as="label" htmlFor="pointer-cursor" variant="label">
-              {t("settings.pointerCursor")}
+        <div className="space-y-3 px-4 py-3">
+          <section aria-labelledby="settings-appearance" className="space-y-1">
+            <Typography
+              as="h3"
+              id="settings-appearance"
+              variant="labelSmall"
+              className="text-text-sub-600"
+            >
+              {t("settings.appearance")}
             </Typography>
-            <Switch.Root
-              id="pointer-cursor"
-              checked={cursor === "pointer"}
-              onCheckedChange={(checked) => setCursor(checked ? "pointer" : "default")}
-            />
-          </div>
+            <div className="flex items-center justify-between gap-4">
+              <Typography variant="label">{t("settings.language")}</Typography>
+              <LanguageSwitch />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <Typography variant="label">{t("settings.theme")}</Typography>
+              <ThemeSwitch />
+            </div>
+          </section>
+          <section aria-labelledby="settings-behaviour" className="space-y-1">
+            <Typography
+              as="h3"
+              id="settings-behaviour"
+              variant="labelSmall"
+              className="text-text-sub-600"
+            >
+              {t("settings.behaviour")}
+            </Typography>
+            <div className="flex min-h-7 items-center justify-between gap-4">
+              <Typography as="label" htmlFor="pointer-cursor" variant="label">
+                {t("settings.pointerCursor")}
+              </Typography>
+              <Switch.Root
+                id="pointer-cursor"
+                checked={cursor === "pointer"}
+                onCheckedChange={(checked) => setCursor(checked ? "pointer" : "default")}
+              />
+            </div>
+          </section>
         </div>
-        <div className="border-t border-stroke-soft-200 p-5">
+        <div className="border-t border-stroke-soft-200 px-4 py-3">
           <AlignLinkButton.Root
             asChild
             variant="gray"

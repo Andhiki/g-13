@@ -16,8 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
-- Modal pengaturan memakai baris ringkas, pilihan bahasa EN/ID, ikon tema,
-  sakelar kursor penunjuk, dan tautan kontribusi satu baris.
+- Modal pengaturan dibuat lebih ringkas dengan bagian Tampilan dan Perilaku,
+  pilihan bahasa EN/ID, ikon tema, sakelar kursor penunjuk, dan tautan kontribusi
+  satu baris.
 
 ### 2026-10-29
 

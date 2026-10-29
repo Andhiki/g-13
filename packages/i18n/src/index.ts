@@ -22,6 +22,8 @@ const resourcesData = {
       },
       settings: {
         title: "Pengaturan",
+        appearance: "Tampilan",
+        behaviour: "Perilaku",
         language: "Bahasa",
         theme: "Tema",
         system: "Sistem",
@@ -65,6 +67,8 @@ const resourcesData = {
       },
       settings: {
         title: "Settings",
+        appearance: "Appearance",
+        behaviour: "Behaviour",
         language: "Language",
         theme: "Theme",
         system: "System",
