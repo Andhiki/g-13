@@ -14,7 +14,7 @@ export function mapConnections(edges: Edge[], selectedId: string | null, hovered
         opacity: (hoveredId ? !emphasized : selectedId && !selected)
           ? 0.18
           : edge.data?.optional
-            ? 0.65
+            ? 0.4
             : 1,
         ...(emphasized ? { stroke: "var(--color-primary-base)", strokeWidth: 2.4 } : {}),
       },
