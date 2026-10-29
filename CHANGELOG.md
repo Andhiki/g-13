@@ -30,8 +30,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Silabus dimuat bersama data kurikulum agar accordion langsung mengukur isi
   lengkap dan tidak melompat dari tinggi pesan pemuatan saat dibuka kembali.
 
-- Status pemuatan detail mata kuliah menampilkan Sonic berwarna oranye dan teks
-  berdenyut sambil menunggu panel siap.
+- Status pemuatan di sidebar detail mata kuliah menampilkan Sonic berwarna oranye
+  dan teks berdenyut sambil menunggu panel siap.
 
 - Rentang pintasan semester ditampilkan sebagai dua tombol keyboard terpisah
   dengan tanda hubung di antaranya.
