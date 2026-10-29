@@ -1,6 +1,6 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { AlignBadge } from "../../../ui/badge";
 import { AlignDrawer } from "../../../ui/drawer";
@@ -273,41 +273,7 @@ function CourseDetailsContent({
 
 function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
   const { text } = useLocale();
-  const [result, setResult] = useState<
-    | { status: "loading" }
-    | { status: "error" }
-    | { status: "loaded"; syllabus: Syllabus | undefined }
-  >({ status: "loading" });
-  useEffect(() => {
-    let active = true;
-    setResult({ status: "loading" });
-    void getSyllabus(data.id, code).then(
-      (syllabus) => {
-        if (active) setResult({ status: "loaded", syllabus });
-      },
-      () => {
-        if (active) setResult({ status: "error" });
-      },
-    );
-    return () => {
-      active = false;
-    };
-  }, [data.id, code]);
-  if (result.status === "loading") return <p role="status">{text("Memuat silabus…")}</p>;
-  if (result.status === "error")
-    return (
-      <div role="alert">
-        <p>{text("Silabus gagal dimuat. Periksa koneksi internet.")}</p>
-        <button
-          type="button"
-          className="min-h-11 text-primary-base underline"
-          onClick={() => window.location.reload()}
-        >
-          {text("Muat ulang")}
-        </button>
-      </div>
-    );
-  const { syllabus } = result;
+  const syllabus = getSyllabus(data.id, code);
   const versions = syllabus ? [syllabus, ...(syllabus.alternatives ?? [])] : [];
   return (
     <>

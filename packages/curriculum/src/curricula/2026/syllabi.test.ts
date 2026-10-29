@@ -44,9 +44,9 @@ test("source completeness is distinct from table-code coverage", () => {
   expect(retrieval.source_candidates.map((row) => row.code)).toEqual(["PACS262008"]);
 });
 
-test("2026 machine learning retains both source versions with separate provenance", async () => {
+test("2026 machine learning retains both source versions with separate provenance", () => {
   const record = syllabi.PACS262413;
-  expect((await getSyllabus("2026", "PACS262413"))?.alternatives?.[0].pdfPage).toBe(229);
+  expect(getSyllabus("2026", "PACS262413")?.alternatives?.[0].pdfPage).toBe(229);
   expect(record.title).toBe("Pembelajaran Mesin (3 SKS)");
   expect(record.pdfPage).toBe(217);
   expect(record.printedPage).toBe(199);

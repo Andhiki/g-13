@@ -1,3 +1,5 @@
+import syllabi2021 from "./curricula/2021/syllabi.json";
+import syllabi2026 from "./curricula/2026/syllabi.json";
 import { registry, type CurriculumId } from "./registry";
 import type { Course, Curriculum } from "./contracts/model";
 import type { AcademicRules, Syllabus } from "./contracts/rules";
@@ -17,14 +19,8 @@ export function getCurriculum(id: CurriculumId): Curriculum {
 export function getCourse(curriculum: CurriculumId, courseId: string): Course | undefined {
   return getCurriculum(curriculum).all.find((course) => course.id === courseId);
 }
-export async function getSyllabus(
-  curriculum: CurriculumId,
-  courseCode: string,
-): Promise<Syllabus | undefined> {
-  const { default: syllabi }: { default: Record<string, Syllabus> } =
-    curriculum === "2021"
-      ? await import("./curricula/2021/syllabi.json")
-      : await import("./curricula/2026/syllabi.json");
+export function getSyllabus(curriculum: CurriculumId, courseCode: string): Syllabus | undefined {
+  const syllabi: Record<string, Syllabus> = curriculum === "2021" ? syllabi2021 : syllabi2026;
   const key = courseCode.replaceAll("-", "");
   return Object.hasOwn(syllabi, key) ? syllabi[key] : undefined;
 }
