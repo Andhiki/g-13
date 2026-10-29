@@ -1,5 +1,5 @@
 {
-  "CS50’s Introduction to Computer Science": "Pengantar Ilmu Komputer CS50",
+  "CS50’s Introduction to Computer Science": "CS50’s Introduction to Computer Science",
   "CS50 is one of the best ways to get started with computer science. Work through its 12-part lecture series in your spare time and build your fundamentals along the way.": "CS50 adalah salah satu cara terbaik untuk mulai belajar ilmu komputer. Ikuti rangkaian 12 kuliahnya di waktu luang dan bangun pemahaman dasarmu.",
   "DIKE UGM Skripsi LaTeX template": "Template LaTeX Skripsi DIKE UGM",
   "Starting your proposal or skripsi? Use this LaTeX template as your starting point, then fill it with your own research.": "Mulai menulis proposal atau skripsi? Gunakan template LaTeX ini sebagai titik awal, lalu isi dengan penelitianmu sendiri.",
@@ -8,5 +8,9 @@
   "Looking for a place to start?": "Bingung harus mulai dari mana?",
   "Pick a resource that fits what you need and explore it at your own pace.": "Pilih sumber yang sesuai kebutuhanmu dan pelajari dengan ritmemu sendiri.",
   "Helpful resources": "Sumber belajar",
-  "(opens in a new tab)": "(dibuka di tab baru)"
+  "(opens in a new tab)": "(dibuka di tab baru)",
+  "Computer Science roadmap": "Roadmap Ilmu Komputer",
+  "Not sure what to learn next? Follow this roadmap to explore computer science topics and find free resources you can work through at your own pace.": "Bingung mau belajar apa selanjutnya? Ikuti roadmap ini untuk menjelajahi topik ilmu komputer dan menemukan sumber belajar gratis yang bisa kamu pelajari sesuai ritmemu.",
+  "KKN Automation": "KKN Automation",
+  "Doing KKN? Use GitHub Actions to automate your daily attendance and program activity (proker) attendance.": "Sedang KKN? Gunakan GitHub Actions untuk mengotomatiskan presensi harian dan presensi program kerja (proker)."
 }

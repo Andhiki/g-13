@@ -11,10 +11,22 @@ const resources = [
       "CS50 is one of the best ways to get started with computer science. Work through its 12-part lecture series in your spare time and build your fundamentals along the way.",
   },
   {
+    title: "Computer Science roadmap",
+    url: "https://roadmap.sh/computer-science",
+    description:
+      "Not sure what to learn next? Follow this roadmap to explore computer science topics and find free resources you can work through at your own pace.",
+  },
+  {
     title: "DIKE UGM Skripsi LaTeX template",
     url: "https://github.com/vityasyyy/template-skripsi-dike-ugm",
     description:
       "Starting your proposal or skripsi? Use this LaTeX template as your starting point, then fill it with your own research.",
+  },
+  {
+    title: "KKN Automation",
+    url: "https://github.com/vityasyyy/kkn-automation-standalone",
+    description:
+      "Doing KKN? Use GitHub Actions to automate your daily attendance and program activity (proker) attendance.",
   },
   {
     title: "HIMAKOM UGM exam archive",

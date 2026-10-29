@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Helpful Resources menambahkan roadmap Computer Science dari roadmap.sh dan
+  KKN Automation untuk presensi harian serta presensi proker melalui GitHub Actions.
+
 - Baris `..` pada folder arsip ujian untuk naik satu tingkat ke folder induk.
 
 #### Changed
@@ -29,7 +32,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Kartu pintasan keyboard disembunyikan pada layar kecil.
 
 - Halaman Helpful Resources berbicara langsung kepada pembaca dan menautkan
-  template skripsi DIKE UGM yang diperbarui.
+  template skripsi DIKE UGM yang diperbarui. Nama kursus CS50 tetap dalam bahasa
+  Inggris pada kedua pilihan bahasa.
 
 #### Fixed
 
