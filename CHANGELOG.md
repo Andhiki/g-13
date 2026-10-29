@@ -20,6 +20,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Kontrol zoom pada perangkat seluler hanya menampilkan tingkat zoom dan tombol reset.
+
 - Semua indikator pemuatan memakai Sonic dengan teks berdenyut yang dipilih acak setiap kali muncul.
 
 - Jarak atas dan bawah tautan kontribusi pada modal pengaturan dibuat simetris.

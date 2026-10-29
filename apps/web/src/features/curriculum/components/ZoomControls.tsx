@@ -85,7 +85,7 @@ export function ZoomControls({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="size-8 p-0"
+              className="size-8 p-0 max-[650px]:hidden"
               aria-label={text("Perkecil")}
               title={text("Perkecil")}
               disabled={zoom <= 0.05}
@@ -97,7 +97,7 @@ export function ZoomControls({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="size-8 p-0"
+              className="size-8 p-0 max-[650px]:hidden"
               aria-label={text("Perbesar")}
               title={text("Perbesar")}
               disabled={zoom >= 1.35}
