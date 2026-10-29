@@ -27,6 +27,11 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Tombol filter tetap di bawah pencarian saat berganti tampilan peta dan daftar.
+  Tata letak kedua kurikulum beserta tampilan fokus disiapkan sekali saat halaman
+  dimuat; peta tetap terpasang agar pergantian tampilan tidak mengulang pengukuran
+  atau perhitungan jalur.
+
 - Urutan mata kuliah dalam setiap kolom semester mendekatkan mata kuliah yang
   terhubung agar jalur prasyarat lebih pendek, tanpa mengubah semester atau
   pengelompokan mata kuliah pilihan.

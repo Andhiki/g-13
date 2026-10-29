@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap } from "./map-layout";
+import { buildMap, createMapLayout, anchorMap } from "./map-layout";
 import { assignedCoreSemester, isCore } from "./course-utils";
 
 for (const { id } of listCurricula()) {
   test(`${id}: overview connections retain endpoint relations and identify optional courses`, () => {
     const data = getCurriculum(id);
     const relations = getRelations(id);
-    const map = buildMap(data, data.all, relations, null, () => {});
+    const map = buildMap(createMapLayout(data, relations), data.all, null, () => {});
     const semesters = new Map(data.all.map((course) => [course.id, assignedCoreSemester(course)]));
     const sameSemester = relations.filter(
       (relation) =>
@@ -22,7 +22,12 @@ for (const { id } of listCurricula()) {
           (edge) => edge.source === relation.source && edge.target === relation.target,
         ),
       ).toBe(false);
-      const focused = buildMap(data, data.all, relations, relation.target, () => {});
+      const focused = buildMap(
+        createMapLayout(data, relations),
+        data.all,
+        relation.target,
+        () => {},
+      );
       expect(focused.edges.some((edge) => edge.source === relation.source)).toBe(false);
     }
     for (const edge of map.edges) {
@@ -35,7 +40,7 @@ for (const { id } of listCurricula()) {
       expect(edge.data?.optional).toBe(!isCore(source.data.course) || !isCore(target.data.course));
     }
     const selected = map.edges[0].target;
-    const focused = buildMap(data, data.all, relations, selected, () => {});
+    const focused = buildMap(createMapLayout(data, relations), data.all, selected, () => {});
     expect(focused.edges.length).toBeGreaterThan(0);
     expect(
       focused.edges.every((edge) => edge.source === selected || edge.target === selected),
@@ -46,7 +51,7 @@ for (const { id } of listCurricula()) {
 for (const { id } of listCurricula()) {
   test(`${id}: empty trailing semester is omitted and electives sit below every semester`, () => {
     const data = getCurriculum(id);
-    const map = buildMap(data, data.all, getRelations(id), null, () => {});
+    const map = buildMap(createMapLayout(data, getRelations(id)), data.all, null, () => {});
     expect(map.nodes.some((node) => node.id === "lane-semester-8")).toBe(false);
     expect(map.lastSemester).toBe(7);
     const choices = map.nodes.find((node) => node.id === "lane-choices")!;
@@ -84,7 +89,12 @@ for (const { id } of listCurricula()) {
       placements: data.core[0].placements.map((placement) => ({ ...placement, semester: 8 })),
     };
     const populated = { ...data, all: [...data.all, eighth], core: [...data.core, eighth] };
-    const withEighth = buildMap(populated, populated.all, getRelations(id), null, () => {});
+    const withEighth = buildMap(
+      createMapLayout(populated, getRelations(id)),
+      populated.all,
+      null,
+      () => {},
+    );
     expect(withEighth.lastSemester).toBe(8);
     expect(withEighth.nodes.some((node) => node.id === "lane-semester-8")).toBe(true);
     expect(withEighth.positions.has(eighth.id)).toBe(true);
@@ -103,7 +113,7 @@ test("ungrouped electives appear under Miscellaneous and extra groups wrap below
     })),
   }));
   const fixture = { ...data, all: [...data.core, ...electives], electives };
-  const map = buildMap(fixture, fixture.all, [], null, () => {});
+  const map = buildMap(createMapLayout(fixture, []), fixture.all, null, () => {});
   const first = map.positions.get("choice-0")!;
   const wrapped = map.positions.get("choice-8")!;
   expect(wrapped.x).toBe(first.x);
@@ -113,7 +123,7 @@ test("ungrouped electives appear under Miscellaneous and extra groups wrap below
   )!;
   expect(fallback).toBeDefined();
   expect(map.positions.get("choice-9")!.x).toBe(fallback.position.x + 12);
-  const filtered = buildMap(fixture, [electives[9]], [], null, () => {});
+  const filtered = buildMap(createMapLayout(fixture, []), [electives[9]], null, () => {});
   expect(filtered.positions.size).toBe(1);
   expect(filtered.positions.get("choice-9")).toEqual(map.positions.get("choice-9"));
   expect(filtered.nodes.filter((node) => node.id.startsWith("lane-choice-group-")).length).toBe(1);
@@ -130,7 +140,7 @@ for (const count of [6, 7, 48, 49]) {
       placements: template.placements.map((placement) => ({ ...placement, group: "Test group" })),
     }));
     const fixture = { ...data, all: [...data.core, ...electives], electives };
-    const map = buildMap(fixture, fixture.all, [], null, () => {});
+    const map = buildMap(createMapLayout(fixture, []), fixture.all, null, () => {});
     const positions = electives.map((course) => map.positions.get(course.id)!);
     expect(new Set(positions.map(({ x, y }) => `${x}:${y}`)).size).toBe(count);
     const first = positions[0];
@@ -154,7 +164,7 @@ for (const { id } of listCurricula()) {
   test(`${id}: semester rows shorten prerequisite connections and stay stable when filtered`, () => {
     const data = getCurriculum(id);
     const relations = getRelations(id);
-    const map = buildMap(data, data.all, relations, null, () => {});
+    const map = buildMap(createMapLayout(data, relations), data.all, null, () => {});
     const alphabetical = new Map<string, number>();
     for (let term = 1; term <= map.lastSemester; term++) {
       const courses = data.all
@@ -181,9 +191,38 @@ for (const { id } of listCurricula()) {
     );
     expect(after).toBeLessThan(before);
     const subset = data.core.slice(0, 5);
-    const filtered = buildMap(data, subset, relations, null, () => {});
+    const filtered = buildMap(createMapLayout(data, relations), subset, null, () => {});
     for (const course of subset)
       expect(filtered.positions.get(course.id)).toEqual(map.positions.get(course.id));
-    expect(buildMap(data, data.all, relations, null, () => {}).positions).toEqual(map.positions);
+    expect(buildMap(createMapLayout(data, relations), data.all, null, () => {}).positions).toEqual(
+      map.positions,
+    );
+  });
+}
+
+for (const { id } of listCurricula()) {
+  test(`${id}: prepared layouts can build every focus view without changing overview geometry`, () => {
+    const data = getCurriculum(id);
+    const layout = createMapLayout(data, getRelations(id));
+    const overview = buildMap(layout, data.all, null, () => {});
+    const original = new Map(layout.positions);
+    for (const course of data.all) {
+      const focused = buildMap(layout, data.all, course.id, () => {});
+      const before = new Map(focused.positions);
+      const anchor = { x: 700, y: 300 };
+      const anchored = anchorMap(focused, course.id, anchor);
+      expect(anchored.positions.get(course.id)).toEqual(anchor);
+      const center = focused.positions.get(course.id)!;
+      for (const node of anchored.nodes) {
+        const position = focused.positions.get(node.id)!;
+        expect(node.position).toEqual({
+          x: position.x + anchor.x - center.x,
+          y: position.y + anchor.y - center.y,
+        });
+      }
+      expect(focused.positions).toEqual(before);
+    }
+    expect(layout.positions).toEqual(original);
+    expect(overview.positions).toEqual(original);
   });
 }

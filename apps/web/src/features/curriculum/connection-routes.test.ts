@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import type { Edge, XYPosition } from "@xyflow/react";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap } from "./map-layout";
+import { buildMap, createMapLayout } from "./map-layout";
 import { mapConnections } from "./map-connections";
 import { connectionRoutes, type RoutingNode } from "./connection-routes";
 import { buildRoadmap } from "../roadmap/planner.test-support";
@@ -73,7 +73,7 @@ function verifyRoutes(nodes: RoutingNode[], edges: Edge[]) {
 for (const { id } of listCurricula()) {
   test(`${id}: overview and every optional hover keep orthogonal, obstacle-free, spaced or converging vertical lanes`, () => {
     const data = getCurriculum(id);
-    const map = buildMap(data, data.all, getRelations(id), null, () => {});
+    const map = buildMap(createMapLayout(data, getRelations(id)), data.all, null, () => {});
     const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
     const overview = verifyRoutes(nodes, mapConnections(map.edges, null, null));
     const optionalEndpoints = new Set(
@@ -91,7 +91,7 @@ for (const { id } of listCurricula()) {
     for (const selected of new Set(
       relations.flatMap((relation) => [relation.source, relation.target]),
     )) {
-      const map = buildMap(data, data.all, relations, selected, () => {});
+      const map = buildMap(createMapLayout(data, relations), data.all, selected, () => {});
       verifyRoutes(
         routingNodes(map.nodes.filter((node) => node.type === "course")),
         mapConnections(map.edges, selected, null),
@@ -156,7 +156,7 @@ test("connections cross an intervening column through a row gap without detourin
 
 test("pre-routing optional connections preserves base routes and includes every unrevealed edge", () => {
   const data = getCurriculum("2026");
-  const map = buildMap(data, data.all, getRelations("2026"), null, () => {});
+  const map = buildMap(createMapLayout(data, getRelations("2026")), data.all, null, () => {});
   const nodes = routingNodes(map.nodes.filter((node) => node.type === "course"));
   const edges = mapConnections(map.edges, null, null);
   const visible = connectionRoutes(nodes, edges);

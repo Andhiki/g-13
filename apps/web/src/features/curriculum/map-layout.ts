@@ -72,35 +72,11 @@ function shortenConnections(semesters: Map<number, Course[]>, relations: Relatio
   }
 }
 
-export function buildMap(
-  data: Curriculum,
-  visible: Course[],
-  relations: Relation[],
-  selectedId: string | null,
-  choose: (id: string) => void,
-  anchor?: { x: number; y: number },
-): {
-  nodes: MapNode[];
-  edges: Edge[];
-  positions: Map<string, { x: number; y: number }>;
-  relationCount: number;
-  lastSemester: number;
-} {
+export function createMapLayout(data: Curriculum, relations: Relation[]) {
   const graphRelations = semesterRelations(
     relations,
     new Map(data.all.map((course) => [course.id, assignedCoreSemester(course)])),
   );
-  const focusedRelations = selectedId
-    ? graphRelations.filter(
-        (relation) => relation.source === selectedId || relation.target === selectedId,
-      )
-    : [];
-  const focusedIds = new Set([
-    selectedId,
-    ...focusedRelations.flatMap((relation) => [relation.source, relation.target]),
-  ]);
-  const courses = selectedId ? data.all.filter((course) => focusedIds.has(course.id)) : visible;
-  const visibleIds = new Set(courses.map((course) => course.id));
   const lastSemester = Math.max(1, ...data.core.map((course) => assignedCoreSemester(course) ?? 0));
   const layoutCore = new Map<number, Course[]>();
   for (let term = 1; term <= lastSemester; term += 1) {
@@ -147,7 +123,6 @@ export function buildMap(
       connectable: false,
     });
     courses.forEach((course, index) => {
-      if (!visibleIds.has(course.id)) return;
       const position = {
         x: LANE_X + (term - 1) * LANE_STEP + COURSE_X_OFFSET,
         y: COURSE_Y_START + index * ROW_STEP,
@@ -171,6 +146,7 @@ export function buildMap(
     draggable: false,
     connectable: false,
   });
+  const choiceMembers = new Map<string, string[]>();
   let groupY = choiceStartY + 64;
   let column = 0;
   let rowHeight = 0;
@@ -185,21 +161,23 @@ export function buildMap(
         rowHeight = 0;
       }
       const x = LANE_X + column * LANE_STEP;
-      if (chunk.some((course) => visibleIds.has(course.id))) {
-        nodes.push({
-          id: `lane-choice-group-${group}${offset ? `-${offset}` : ""}`,
-          type: "lane",
-          position: { x, y: groupY },
-          style: { width: (columns - 1) * LANE_STEP + LANE_WIDTH, height: 56 },
-          zIndex: -1,
-          data: { kind: "lane", title: group, active: false },
-          selectable: false,
-          draggable: false,
-          connectable: false,
-        });
-      }
+      const id = `lane-choice-group-${group}${offset ? `-${offset}` : ""}`;
+      choiceMembers.set(
+        id,
+        chunk.map((course) => course.id),
+      );
+      nodes.push({
+        id,
+        type: "lane",
+        position: { x, y: groupY },
+        style: { width: (columns - 1) * LANE_STEP + LANE_WIDTH, height: 56 },
+        zIndex: -1,
+        data: { kind: "lane", title: group, active: false },
+        selectable: false,
+        draggable: false,
+        connectable: false,
+      });
       chunk.forEach((course, index) => {
-        if (!visibleIds.has(course.id)) return;
         positions.set(course.id, {
           x: x + COURSE_X_OFFSET + Math.floor(index / CHOICE_ROWS) * LANE_STEP,
           y: groupY + 72 + (index % CHOICE_ROWS) * ROW_STEP,
@@ -210,12 +188,38 @@ export function buildMap(
     }
   }
 
+  return { data, graphRelations, nodes, positions, lastSemester, choiceMembers };
+}
+
+export function buildMap(
+  layout: ReturnType<typeof createMapLayout>,
+  visible: Course[],
+  selectedId: string | null,
+  choose: (id: string) => void,
+) {
+  const { data, graphRelations, lastSemester } = layout;
+  const focusedRelations = selectedId
+    ? graphRelations.filter(
+        (relation) => relation.source === selectedId || relation.target === selectedId,
+      )
+    : [];
+  const focusedIds = new Set([
+    selectedId,
+    ...focusedRelations.flatMap((relation) => [relation.source, relation.target]),
+  ]);
+  const courses = selectedId ? data.all.filter((course) => focusedIds.has(course.id)) : visible;
+  const visibleIds = new Set(courses.map((course) => course.id));
+  const nodes = layout.nodes.filter((node) => {
+    const members = layout.choiceMembers.get(node.id);
+    return !members || members.some((id) => visibleIds.has(id));
+  });
+  const positions = new Map([...layout.positions].filter(([id]) => visibleIds.has(id)));
   const availableRelations = graphRelations.filter(
     (relation) => visibleIds.has(relation.source) && visibleIds.has(relation.target),
   );
   if (selectedId) {
     nodes.length = 0;
-    const center = anchor ?? positions.get(selectedId)!;
+    const center = positions.get(selectedId)!;
     positions.set(selectedId, center);
     for (const side of ["source", "target"] as const) {
       const neighbors = focusedRelations
@@ -289,4 +293,23 @@ export function buildMap(
     };
   });
   return { nodes, edges, positions, relationCount: availableRelations.length, lastSemester };
+}
+
+export function anchorMap(
+  map: ReturnType<typeof buildMap>,
+  selectedId: string,
+  anchor: { x: number; y: number },
+) {
+  const center = map.positions.get(selectedId)!;
+  const dx = anchor.x - center.x;
+  const dy = anchor.y - center.y;
+  if (dx === 0 && dy === 0) return map;
+  const positions = new Map(
+    [...map.positions].map(([id, position]) => [id, { x: position.x + dx, y: position.y + dy }]),
+  );
+  return {
+    ...map,
+    positions,
+    nodes: map.nodes.map((node) => ({ ...node, position: positions.get(node.id)! })),
+  };
 }

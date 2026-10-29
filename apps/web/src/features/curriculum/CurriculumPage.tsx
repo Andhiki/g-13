@@ -50,7 +50,6 @@ export function CurriculumPage() {
       }
     >
       <Overlay
-        filtersInToolbar={view === "list"}
         controlsLabel={text("Filter peta kurikulum")}
         navigation={
           <SemesterFilter
@@ -79,15 +78,21 @@ export function CurriculumPage() {
 
       <main
         style={{ "--course-sheet-height": `${detailsHeight}dvh` } as CSSProperties}
-        data-map-stage={view === "map" ? "" : undefined}
         className={
           view === "map"
             ? "fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden bg-bg-weak-25 text-text-strong-950"
             : "min-h-[calc(100dvh-var(--app-header-height))] text-text-strong-950"
         }
       >
-        {view === "map" ? (
+        <div
+          data-map-stage
+          aria-hidden={view !== "map"}
+          inert={view !== "map"}
+          className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
+          style={{ visibility: view === "map" ? "visible" : "hidden" }}
+        >
           <CurriculumMap
+            active={view === "map"}
             navigation={semesterNavigation}
             resetVersion={resetVersion}
             onReset={() => {
@@ -104,7 +109,8 @@ export function CurriculumPage() {
             positions={map.positions}
             lastSemester={map.lastSemester}
           />
-        ) : (
+        </div>
+        {view === "list" && (
           <section
             className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[416px] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >

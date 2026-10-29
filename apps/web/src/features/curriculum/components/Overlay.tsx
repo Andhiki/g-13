@@ -201,7 +201,6 @@ export function Overlay({
   controlsLabel,
   home,
   filterCopy = defaultFilterCopy,
-  filtersInToolbar = false,
 }: {
   navigation: ReactNode;
   search: ReactNode;
@@ -211,7 +210,6 @@ export function Overlay({
   controlsLabel: string;
   home?: ReactNode;
   filterCopy?: FilterCopy;
-  filtersInToolbar?: boolean;
 }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   useKeyboardShortcuts({ f: () => setFiltersOpen((open) => !open) });
@@ -234,15 +232,10 @@ export function Overlay({
           {navigation}
         </div>
         <div className="relative flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
-          <div
-            className={`flex min-h-10 items-center gap-2 transition-[width] duration-300 ease-out motion-reduce:transition-none max-[1100px]:order-1 max-[1100px]:w-full ${filtersInToolbar ? "w-[396px]" : "w-[348px]"}`}
-          >
+          <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
             {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
             {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
-            {filtersInToolbar && !compact && (
-              <div className="order-3 size-10 shrink-0" aria-hidden="true" />
-            )}
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
               {compact && (
                 <FilterDrawer copy={filterCopy} open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -259,7 +252,7 @@ export function Overlay({
               icon={RiFilter3Line}
               controlsId="desktop-filters"
               shortcut="F"
-              className={filtersInToolbar ? "top-0" : "top-[52px]"}
+              className="top-[52px]"
               open={filtersOpen}
               onOpenChange={setFiltersOpen}
             >

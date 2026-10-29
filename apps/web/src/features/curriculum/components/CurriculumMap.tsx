@@ -105,14 +105,17 @@ function ViewportFocus({
 }
 
 function SemesterViewport({
+  active,
   selectedId,
   onVisibleSemesters,
 }: {
+  active: boolean;
   selectedId: string | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
   const flow = useReactFlow<MapNode>();
   const update = useCallback(() => {
+    if (!active) return;
     if (selectedId) {
       onVisibleSemesters([]);
       return;
@@ -148,7 +151,7 @@ function SemesterViewport({
       }
     }
     onVisibleSemesters(semesters);
-  }, [flow, selectedId, onVisibleSemesters]);
+  }, [active, flow, selectedId, onVisibleSemesters]);
   useOnViewportChange({ onChange: update });
   useEffect(() => {
     update();
@@ -159,6 +162,7 @@ function SemesterViewport({
 }
 
 export function CurriculumMap({
+  active,
   navigation,
   resetVersion,
   onReset,
@@ -171,6 +175,7 @@ export function CurriculumMap({
   positions,
   lastSemester,
 }: {
+  active: boolean;
   navigation: { semester: number } | null;
   resetVersion: number;
   onReset: () => void;
@@ -230,7 +235,11 @@ export function CurriculumMap({
           selected={selectedId !== null}
           lastSemester={lastSemester}
         />
-        <SemesterViewport selectedId={selectedId} onVisibleSemesters={onVisibleSemesters} />
+        <SemesterViewport
+          active={active}
+          selectedId={selectedId}
+          onVisibleSemesters={onVisibleSemesters}
+        />
         <ViewportPortal>
           {selectedId === null && (
             <div
