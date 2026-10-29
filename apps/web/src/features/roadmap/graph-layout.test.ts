@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { buildRoadmap } from "./planner.test-support";
 import { validateRoadmapSearch } from "./search";
-import { buildRoadmapGraph } from "./graph-layout";
+import { buildRoadmapGraph, getRoadmapGraph } from "./graph-layout";
 import { electiveOptions } from "./options";
 
 const text = (key: string) => key;
@@ -165,4 +165,11 @@ test("selecting a course preserves placement and selection callbacks while highl
     stroke: "var(--color-primary-base)",
     strokeWidth: 2.2,
   });
+});
+
+test("roadmap graph preparation is reused across visits and separated by locale and target", () => {
+  const graph = getRoadmapGraph(input, "id");
+  expect(getRoadmapGraph({ ...input }, "id")).toBe(graph);
+  expect(getRoadmapGraph(input, "en")).not.toBe(graph);
+  expect(getRoadmapGraph({ ...input, target: 7 }, "id")).not.toBe(graph);
 });

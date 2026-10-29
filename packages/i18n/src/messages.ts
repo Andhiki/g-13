@@ -20,9 +20,17 @@ const loaders = {
   },
 };
 
-export async function loadMessages(
-  language: Language,
-  namespace: MessageNamespace,
-): Promise<Messages> {
-  return await loaders[language][namespace]();
+const messages = new Map<string, Promise<Messages>>();
+
+export function loadMessages(language: Language, namespace: MessageNamespace): Promise<Messages> {
+  const key = `${language}:${namespace}`;
+  let pending = messages.get(key);
+  if (!pending) {
+    pending = loaders[language][namespace]().catch((error: unknown) => {
+      messages.delete(key);
+      throw error;
+    });
+    messages.set(key, pending);
+  }
+  return pending;
 }

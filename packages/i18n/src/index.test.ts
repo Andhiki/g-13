@@ -66,3 +66,12 @@ test("API consumers can create independent instances from shared resources", asy
   await en.changeLanguage("id");
   expect(id.language).toBe("id");
 });
+
+test("message loads share the in-flight promise and loaded resources by language and namespace", async () => {
+  const first = loadMessages("en", "exam");
+  expect(loadMessages("en", "exam")).toBe(first);
+  const messages = await first;
+  expect(loadMessages("en", "exam")).toBe(first);
+  expect(await loadMessages("en", "exam")).toBe(messages);
+  expect(await loadMessages("id", "exam")).not.toBe(messages);
+});

@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Perhitungan peta, roadmap, dan jalur prasyarat serta pemuatan terjemahan
+  disimpan untuk dipakai kembali saat membuka tampilan yang sama.
+
 - Animasi muatan pada jalur prasyarat tetap berjalan selama detail mata kuliah
   terbuka. Drawer tetap terpasang saat pemuatan selesai agar animasi buka tidak
   terulang.

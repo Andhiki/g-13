@@ -1,3 +1,4 @@
+import { mapCourseState } from "../curriculum/map-state";
 import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
 import { useMemo, useRef, useState } from "react";
@@ -16,7 +17,7 @@ import { mapConnections } from "../curriculum/map-connections";
 import { LANE_X, LANE_STEP } from "../curriculum/map-layout";
 import type { Roadmap } from "./planner";
 import {
-  buildRoadmapGraph,
+  getRoadmapGraph,
   type ActivityNode,
   type TitleNode,
   type RoadmapNode,
@@ -113,12 +114,45 @@ export function RoadmapGraph({
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
-  const { text } = useLocale("roadmap");
+  const { text, language } = useLocale("roadmap");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const stage = useRef<HTMLElement>(null);
-  const { nodes, edges, semesters } = useMemo(
-    () => buildRoadmapGraph({ plan, target, summary, selectedId, choose, text }),
-    [plan, target, summary, selectedId, choose, text],
+  const graph = useMemo(
+    () => getRoadmapGraph({ plan, target, summary, text }, language),
+    [plan, target, summary, text, language],
+  );
+  const { semesters } = graph;
+  const nodes = useMemo(
+    () =>
+      graph.nodes.map((node): RoadmapNode => {
+        if (node.type === "title") return { ...node, hidden: selectedId !== null };
+        if (node.type !== "course") return node;
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            choose,
+            state: mapCourseState(node.id, selectedId, node.data.incoming, node.data.outgoing),
+          },
+        };
+      }),
+    [graph, selectedId, choose],
+  );
+  const edges = useMemo(
+    () =>
+      graph.edges.map((edge) => {
+        const focused = selectedId === edge.source || selectedId === edge.target;
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: focused ? "var(--color-primary-base)" : "var(--color-text-soft-400)",
+            strokeWidth: focused ? 2.2 : 1.2,
+          },
+          zIndex: focused ? 3 : 0,
+        };
+      }),
+    [graph, selectedId],
   );
   const revealedEdges = mapConnections(edges, selectedId, hoveredId);
   return (

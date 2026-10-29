@@ -27,6 +27,12 @@ export function getSyllabus(curriculum: CurriculumId, courseCode: string): Sylla
 export function getAcademicRules(curriculum: CurriculumId): AcademicRules {
   return registry[curriculum].rules;
 }
+const relations = new Map<CurriculumId, Relation[]>();
 export function getRelations(curriculum: CurriculumId): Relation[] {
-  return deriveRelations(getCurriculum(curriculum));
+  let result = relations.get(curriculum);
+  if (!result) {
+    result = deriveRelations(getCurriculum(curriculum));
+    relations.set(curriculum, result);
+  }
+  return result;
 }

@@ -1,3 +1,4 @@
+import type { Language } from "@g13/i18n";
 import type { Edge, Node } from "@xyflow/react";
 import { mapCourseState } from "../curriculum/map-state";
 import { semesterRelations } from "../curriculum/semester-relations";
@@ -132,4 +133,24 @@ export function buildRoadmapGraph({
     };
   });
   return { nodes, edges, semesters };
+}
+
+const graphs = new WeakMap<Roadmap, Map<string, ReturnType<typeof buildRoadmapGraph>>>();
+
+export function getRoadmapGraph(
+  input: Omit<Parameters<typeof buildRoadmapGraph>[0], "selectedId" | "choose">,
+  language: Language,
+) {
+  let prepared = graphs.get(input.plan);
+  if (!prepared) {
+    prepared = new Map();
+    graphs.set(input.plan, prepared);
+  }
+  const key = JSON.stringify([language, input.target, input.summary]);
+  let graph = prepared.get(key);
+  if (!graph) {
+    graph = buildRoadmapGraph({ ...input, selectedId: null, choose: () => {} });
+    prepared.set(key, graph);
+  }
+  return graph;
 }

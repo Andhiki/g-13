@@ -15,7 +15,7 @@ import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
 import { AlignButton, buttonVariants } from "../../ui/button";
 import { CourseDetails } from "../curriculum/components/CourseDetails";
-import { buildRoadmap } from "./planner";
+import { getRoadmap } from "./roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
 import { ElectiveReplacement } from "./ElectiveReplacement";
 import type { RoadmapSearch } from "./search";
@@ -35,10 +35,10 @@ export function RoadmapResult({
   answers: RoadmapSearch;
   update: (next: RoadmapSearch) => void;
 }) {
-  const { text, courseName } = useLocale("roadmap");
+  const { text, courseName, language } = useLocale("roadmap");
   const plan = useMemo(
-    () => buildRoadmap(answers, { text, courseName }),
-    [answers, text, courseName],
+    () => getRoadmap(answers, language, { text, courseName }),
+    [answers, language, text, courseName],
   );
   const [navigation, setNavigation] = useState<{ semester: number } | null>(null);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);

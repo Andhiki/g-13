@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
-import {
-  getCurriculum,
-  getRelations,
-  isCurriculumId,
-  listCurricula,
-  type CurriculumId,
-} from "@g13/curriculum";
-import { buildMap, createMapLayout, anchorMap } from "./map-layout";
+import { getCurriculum, getRelations, isCurriculumId, type CurriculumId } from "@g13/curriculum";
+import { anchorMap } from "./map-layout";
+import { getPreparedMap } from "./prepared-maps";
 
 const route = getRouteApi("/");
 
@@ -29,27 +24,15 @@ export function useCurriculumExplorer() {
     [navigate],
   );
 
-  const [preparedMaps] = useState(
-    () =>
-      new Map(
-        listCurricula().map(({ id }) => {
-          const data = getCurriculum(id);
-          const relations = getRelations(id);
-          const layout = createMapLayout(data, relations);
-          const choose = (courseId: string) => {
-            anchor.current = positions.current.get(courseId);
-            updateUrl(id, courseId);
-          };
-          const views = new Map<string | null, ReturnType<typeof buildMap>>();
-          views.set(null, buildMap(layout, data.all, null, choose));
-          for (const course of data.all)
-            views.set(course.id, buildMap(layout, data.all, course.id, choose));
-          return [id, { data, relations, choose, views }];
-        }),
-      ),
+  const data = getCurriculum(curriculum);
+  const relations = getRelations(curriculum);
+  const selectCourse = useCallback(
+    (id: string) => {
+      anchor.current = positions.current.get(id);
+      updateUrl(curriculum, id);
+    },
+    [curriculum, updateUrl],
   );
-  const prepared = preparedMaps.get(curriculum)!;
-  const { data, relations, choose: selectCourse } = prepared;
   const selected = data.all.find((course) => course.id === courseId) ?? null;
   const navigateToCourse = useCallback(
     (id: string) => {
@@ -68,9 +51,15 @@ export function useCurriculumExplorer() {
   );
   const closeDetails = useCallback(() => updateUrl(curriculum, null), [curriculum, updateUrl]);
   const map = useMemo(() => {
-    const view = prepared.views.get(selected?.id ?? null)!;
+    const prepared = getPreparedMap(curriculum, selected?.id ?? null);
+    const view = {
+      ...prepared,
+      nodes: prepared.nodes.map((node) =>
+        node.type === "course" ? { ...node, data: { ...node.data, choose: selectCourse } } : node,
+      ),
+    };
     return selected && anchor.current ? anchorMap(view, selected.id, anchor.current) : view;
-  }, [prepared, selected?.id]);
+  }, [curriculum, selected?.id, selectCourse]);
 
   useEffect(() => {
     positions.current = map.positions;

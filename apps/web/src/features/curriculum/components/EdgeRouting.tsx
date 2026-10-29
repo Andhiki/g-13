@@ -5,15 +5,16 @@ import {
   useEffect,
   useMemo,
   useState,
-  useRef,
   type ReactNode,
 } from "react";
 import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import type { RoutingNode } from "../connection-routes";
 import type { RoutingResult } from "../connection-routing.worker";
+import { getConnectionRoutes, routingRequest } from "../routing-cache";
 
-const Routes = createContext<RoutingResult>(new Map());
+const emptyRoutes: RoutingResult = new Map();
+const Routes = createContext(emptyRoutes);
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const measuredNodes = useStore(
@@ -75,38 +76,26 @@ function MeasuredRouting({ children }: { children: ReactNode }) {
           edge.data?.optional === next[index].data?.optional,
       ),
   );
-  const cache = useRef(new Map<string, RoutingResult>());
-  const routingKey = useMemo(() => JSON.stringify([nodes, edges]), [nodes, edges]);
-  const [result, setResult] = useState<{
-    nodes: RoutingNode[];
-    edges: Edge[];
-    routes: RoutingResult;
-  }>();
+  const request = useMemo(() => routingRequest(nodes, edges), [nodes, edges]);
+  const routingKey = useMemo(() => JSON.stringify(request), [request]);
+  const [result, setResult] = useState<{ key: string; routes: RoutingResult }>();
+  const [error, setError] = useState<Error>();
   useEffect(() => {
-    if (cache.current.has(routingKey)) return;
-    const worker = new Worker(new URL("../connection-routing.worker.ts", import.meta.url), {
-      type: "module",
-    });
-    worker.onmessage = ({ data }: MessageEvent<RoutingResult>) => {
-      cache.current.set(routingKey, data);
-      if (cache.current.size > 8) cache.current.delete(cache.current.keys().next().value!);
-      setResult({ nodes, edges, routes: data });
+    let active = true;
+    getConnectionRoutes(routingKey, request).then(
+      (routes) => {
+        if (active) setResult({ key: routingKey, routes });
+      },
+      (error: Error) => {
+        if (active) setError(error);
+      },
+    );
+    return () => {
+      active = false;
     };
-    worker.postMessage({
-      nodes,
-      edges: edges.map(({ id, source, target, hidden, data }) => ({
-        id,
-        source,
-        target,
-        hidden,
-        data: { optional: data?.optional },
-      })),
-    });
-    return () => worker.terminate();
-  }, [nodes, edges, routingKey]);
-  const routes =
-    cache.current.get(routingKey) ??
-    (result?.nodes === nodes && result.edges === edges ? result.routes : new Map());
+  }, [request, routingKey]);
+  if (error) throw error;
+  const routes = result?.key === routingKey ? result.routes : emptyRoutes;
   return <Routes.Provider value={routes}>{children}</Routes.Provider>;
 }
 
