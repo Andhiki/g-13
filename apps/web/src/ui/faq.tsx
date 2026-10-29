@@ -48,7 +48,7 @@ export function Faq({ className }: { className?: string }) {
       ),
     },
     {
-      question: "Apa perbedaan peta kurikulum dan roadmap kuliah?",
+      question: "Apa perbedaan peta kurikulum dan roadmap personal?",
       answer: text(
         "Peta kurikulum menampilkan mata kuliah dan hubungan prasyarat dalam suatu versi kurikulum. Roadmap menyusun rencana per semester berdasarkan jawaban kuis dan target selesai 7 atau 8 semester. Rencana ini perlu dicocokkan dengan ketentuan resmi prodi sebelum menentukan KRS.",
       ),

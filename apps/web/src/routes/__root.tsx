@@ -49,7 +49,7 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
         name: "description",
         content:
           loaderData?.common[
-            "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap kuliah, dan arsip ujian S1 Ilmu Komputer UGM."
+            "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap personal, dan arsip ujian S1 Ilmu Komputer UGM."
           ],
       },
       { title: loaderData?.common["Everything CS UGM"] },

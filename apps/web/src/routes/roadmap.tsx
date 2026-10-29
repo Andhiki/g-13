@@ -6,7 +6,7 @@ export const Route = createFileRoute("/roadmap")({
   validateSearch: validateRoadmapSearch,
   head: ({ match }) => ({
     meta: [
-      { title: match.context.common["Roadmap Kuliah"] },
+      { title: match.context.common["Roadmap Personal"] },
       {
         name: "description",
         content:

@@ -37,7 +37,7 @@ export function buildRoadmapGraph({
       type: "title",
       hidden: selectedId !== null,
       position: { x: LANE_X + 12, y: 12 },
-      data: { title: text("Roadmap kuliah"), summary },
+      data: { title: text("Roadmap personal"), summary },
       selectable: false,
     },
   ];
@@ -53,7 +53,7 @@ export function buildRoadmapGraph({
     nodes.push({
       id: `semester-${semester}`,
       type: "lane",
-      position: { x, y: 228 },
+      position: { x, y: 292 },
       style: { width: 270, height: 40 },
       data: {
         kind: "lane",
@@ -72,7 +72,7 @@ export function buildRoadmapGraph({
       nodes.push({
         id: item.course.id,
         type: "course",
-        position: { x: x + 12, y: 284 + index * 120 },
+        position: { x: x + 12, y: 348 + index * 120 },
         data: {
           kind: "course",
           course: item.course,
@@ -101,7 +101,7 @@ export function buildRoadmapGraph({
       nodes.push({
         id: `${activity.id}-${semester}`,
         type: "activity",
-        position: { x: x + 12, y: 284 + list.length * 120 + index * 190 },
+        position: { x: x + 12, y: 348 + list.length * 120 + index * 190 },
         data: { activity },
         zIndex: 2,
       }),

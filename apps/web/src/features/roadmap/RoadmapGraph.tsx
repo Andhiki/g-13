@@ -1,5 +1,6 @@
 import { mapCourseState } from "../../graph/map-state";
 import { useLocale } from "../../useLocale";
+import { AlignButton } from "../../ui/button";
 import { Typography } from "../../ui/typography";
 import { createContext, useContext, useMemo, useRef, useState, type RefObject } from "react";
 import {
@@ -24,15 +25,18 @@ import {
   type RoadmapNode,
 } from "./graph-layout";
 
-const TitleElement = createContext<RefObject<HTMLHeadingElement | null> | null>(null);
+const RoadmapTitleContext = createContext<{
+  heading: RefObject<HTMLHeadingElement | null>;
+  restart: () => void;
+} | null>(null);
 
 function RoadmapTitle({ data }: NodeProps<TitleNode>) {
   const { text } = useLocale("roadmap");
-  const title = useContext(TitleElement);
+  const title = useContext(RoadmapTitleContext);
   return (
     <div className="w-[540px]">
       <Typography
-        ref={title}
+        ref={title?.heading}
         data-roadmap-title
         as="h1"
         variant="graphTitle"
@@ -43,6 +47,14 @@ function RoadmapTitle({ data }: NodeProps<TitleNode>) {
       <Typography as="p" variant="paragraph" className="mb-0 mt-3 text-text-sub-600">
         {data.summary}
       </Typography>
+      <AlignButton.Root
+        variant="primary"
+        mode="filled"
+        className="nodrag nopan pointer-events-auto mt-4"
+        onClick={title?.restart}
+      >
+        {text("Coba lagi")}
+      </AlignButton.Root>
     </div>
   );
 }
@@ -114,6 +126,7 @@ const nodeTypes = {
 
 export function RoadmapGraph({
   plan,
+  restart,
   target,
   summary,
   selectedId,
@@ -122,6 +135,7 @@ export function RoadmapGraph({
   onVisibleSemesters,
 }: {
   plan: Roadmap;
+  restart: () => void;
   target: number;
   summary: string;
   selectedId: string | null;
@@ -175,9 +189,9 @@ export function RoadmapGraph({
     <section
       ref={stage}
       className="absolute inset-0 overflow-hidden bg-bg-weak-25"
-      aria-label={text("Grafik roadmap kuliah")}
+      aria-label={text("Grafik roadmap personal")}
     >
-      <TitleElement.Provider value={heading}>
+      <RoadmapTitleContext.Provider value={{ heading, restart }}>
         <EdgeRouting>
           <ReactFlow<RoadmapNode, Edge>
             className="absolute! inset-0"
@@ -228,7 +242,7 @@ export function RoadmapGraph({
             />
           </ReactFlow>
         </EdgeRouting>
-      </TitleElement.Provider>
+      </RoadmapTitleContext.Provider>
     </section>
   );
 }

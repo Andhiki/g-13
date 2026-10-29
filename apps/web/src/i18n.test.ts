@@ -45,7 +45,7 @@ test("English roadmap messages preserve planning results and localize course nam
       activities: "Double degree",
       review: "Review notes",
     }),
-  ).toContain("7-semester");
+  ).toContain("your goal of finishing in 7 semesters");
 });
 
 test("all course categories and prerequisite fragments have English resources", () => {

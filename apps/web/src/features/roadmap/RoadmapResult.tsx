@@ -1,16 +1,15 @@
 import { RoadmapShare } from "./RoadmapShare";
 import { useLocale } from "../../useLocale";
-import { AlignTooltip } from "../../ui/tooltip";
 import { getCurriculum } from "@g13/curriculum";
 import { Typography } from "../../ui/typography";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine, RiRestartLine } from "@remixicon/react";
+import { RiArrowLeftLine } from "@remixicon/react";
 import { Overlay } from "../../graph/Overlay";
 import { SemesterFilter } from "../../graph/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
-import { AlignButton, buttonVariants } from "../../ui/button";
+import { buttonVariants } from "../../ui/button";
 import { CourseDetails } from "../../courses/CourseDetails";
 import { getRoadmap } from "./roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
@@ -60,6 +59,7 @@ export function RoadmapResult({
       <main className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden">
         <RoadmapGraph
           plan={plan}
+          restart={restart}
           target={answers.lulus}
           summary={text("roadmapSummary", {
             curriculum: data.id,
@@ -89,38 +89,18 @@ export function RoadmapResult({
           description: text("Bandingkan target selesai dan waktu kegiatan."),
         }}
         home={
-          <div className="flex items-center gap-2">
-            <Link
-              to="/"
-              search={{ kurikulum: input.kurikulum }}
-              className={buttonVariants({
-                variant: "neutral",
-                mode: "stroke",
-                className: "pointer-events-auto",
-              })}
-            >
-              <RiArrowLeftLine className="size-5" aria-hidden="true" />
-              {text("Kembali")}
-            </Link>
-            <AlignTooltip.Provider>
-              <AlignTooltip.Root>
-                <AlignTooltip.Trigger asChild>
-                  <AlignButton.Root
-                    variant="neutral"
-                    mode="stroke"
-                    className="pointer-events-auto size-10 p-2.5"
-                    aria-label={text("Coba lagi")}
-                    onClick={restart}
-                  >
-                    <RiRestartLine className="size-5" aria-hidden="true" />
-                  </AlignButton.Root>
-                </AlignTooltip.Trigger>
-                <AlignTooltip.Content size="xsmall" side="bottom">
-                  {text("Coba lagi")}
-                </AlignTooltip.Content>
-              </AlignTooltip.Root>
-            </AlignTooltip.Provider>
-          </div>
+          <Link
+            to="/"
+            search={{ kurikulum: input.kurikulum }}
+            className={buttonVariants({
+              variant: "neutral",
+              mode: "stroke",
+              className: "pointer-events-auto",
+            })}
+          >
+            <RiArrowLeftLine className="size-5" aria-hidden="true" />
+            {text("Kembali")}
+          </Link>
         }
         navigation={
           <SemesterFilter

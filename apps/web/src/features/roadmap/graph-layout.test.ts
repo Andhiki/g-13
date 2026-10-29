@@ -32,7 +32,7 @@ for (const kurikulum of ["2021", "2026"] as const) {
       plan.courses.map((item) => item.course.id).sort(),
     );
     expect(graph.nodes.find((node) => node.id === "roadmap-title")?.data).toEqual({
-      title: "Roadmap kuliah",
+      title: "Roadmap personal",
       summary: "My plan",
     });
     expect(graph.nodes.some((node) => node.id === "graduation-7")).toBe(true);
