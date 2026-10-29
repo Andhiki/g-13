@@ -89,6 +89,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Sesuaikan lebar label pintasan keyboard dengan isi tombolnya.
+
 - Penyalinan tautan roadmap dan arsip ujian mengabaikan hasil penyalinan lama
   setelah pilihan berubah dan mempertahankan tautan awal saat penyalinan gagal.
 

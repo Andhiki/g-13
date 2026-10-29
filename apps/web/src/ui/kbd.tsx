@@ -6,7 +6,7 @@ function Root({ className, children, ...props }: ComponentProps<"div">) {
   return (
     <div
       className={twMerge(
-        "flex h-5 items-center gap-0.5 whitespace-nowrap rounded bg-bg-white-0 px-1.5 text-text-soft-400 ring-1 ring-inset ring-stroke-soft-200",
+        "inline-flex h-5 w-fit items-center gap-0.5 whitespace-nowrap rounded bg-bg-white-0 px-1.5 text-text-soft-400 ring-1 ring-inset ring-stroke-soft-200",
         className,
       )}
       {...props}
