@@ -1,10 +1,11 @@
+import { useSharedLink } from "../../ui/use-shared-link";
 import { useLocale } from "../../useLocale";
 import { AlignTooltip } from "../../ui/tooltip";
 import { toast, SuccessToast } from "../../ui/toast";
 import { defaultCurriculumId, getCurriculum } from "@g13/curriculum";
 import { m, useReducedMotion } from "motion/react";
 import { Typography } from "../../ui/typography";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiShareLine, RiCheckLine, RiRestartLine } from "@remixicon/react";
 import { AlignModal } from "../../ui/modal";
@@ -43,13 +44,11 @@ export function RoadmapResult({
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
-  const [share, setShare] = useState<"idle" | "copied" | "manual">("idle");
+  const { share, copyLink, dismiss } = useSharedLink({
+    selection: JSON.stringify(answers),
+    copiedDuration: 2000,
+  });
   const reducedMotion = useReducedMotion();
-  useEffect(() => {
-    if (share !== "copied") return;
-    const timer = window.setTimeout(() => setShare("idle"), 2000);
-    return () => window.clearTimeout(timer);
-  }, [share]);
   const selected = plan.courses.find((x) => x.course.id === selectedId);
   const data = getCurriculum(answers.kurikulum ?? defaultCurriculumId);
   const detailsData = useMemo(
@@ -64,17 +63,9 @@ export function RoadmapResult({
     }),
     [data, plan],
   );
-  const [manualLink, setManualLink] = useState("");
-  const [sharedPlan, setSharedPlan] = useState<RoadmapSearch | null>(null);
-  async function copyLink() {
-    setSharedPlan(answers);
-    try {
-      await navigator.clipboard.writeText(window.location.href);
+  async function sharePlan() {
+    if (await copyLink()) {
       toast.custom(() => <SuccessToast message={text("Tautan roadmap disalin")} />);
-      setShare("copied");
-    } catch {
-      setManualLink(window.location.href);
-      setShare("manual");
     }
   }
   return (
@@ -166,13 +157,13 @@ export function RoadmapResult({
                   <AlignButton.Root
                     variant="neutral"
                     mode="stroke"
-                    onClick={copyLink}
+                    onClick={() => void sharePlan()}
                     className="max-[650px]:size-10 max-[650px]:p-2.5"
                   >
                     <span className="relative size-5" aria-hidden="true">
                       {[
-                        { Icon: RiShareLine, active: share !== "copied" || sharedPlan !== answers },
-                        { Icon: RiCheckLine, active: share === "copied" && sharedPlan === answers },
+                        { Icon: RiShareLine, active: share?.status !== "copied" },
+                        { Icon: RiCheckLine, active: share?.status === "copied" },
                       ].map(({ Icon, active }, index) => (
                         <m.span
                           key={index}
@@ -194,14 +185,12 @@ export function RoadmapResult({
                       ))}
                     </span>
                     <span className="max-[650px]:sr-only">
-                      {share === "copied" && sharedPlan === answers
-                        ? text("Tautan disalin")
-                        : text("Bagikan")}
+                      {share?.status === "copied" ? text("Tautan disalin") : text("Bagikan")}
                     </span>
                   </AlignButton.Root>
                 </AlignTooltip.Trigger>
                 <AlignTooltip.Content size="xsmall" side="bottom">
-                  {share === "copied" && sharedPlan === answers
+                  {share?.status === "copied"
                     ? text("Tautan disalin")
                     : text("Salin tautan roadmap")}
                 </AlignTooltip.Content>
@@ -216,12 +205,12 @@ export function RoadmapResult({
         <RoadmapFilters answers={answers} update={update} />
       </Overlay>
       <span className="sr-only" role="status">
-        {share === "copied" && sharedPlan === answers ? text("Tautan roadmap disalin.") : ""}
+        {share?.status === "copied" ? text("Tautan roadmap disalin.") : ""}
       </span>
       <AlignModal.Root
-        open={share === "manual" && sharedPlan === answers}
+        open={share?.status === "manual"}
         onOpenChange={(open) => {
-          if (!open) setShare("idle");
+          if (!open) dismiss();
         }}
       >
         <AlignModal.Content>
@@ -239,7 +228,7 @@ export function RoadmapResult({
             <input
               aria-label={text("Tautan roadmap")}
               readOnly
-              value={manualLink}
+              value={share?.url ?? ""}
               onFocus={(event) => event.currentTarget.select()}
               className="mt-4 block w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
             />

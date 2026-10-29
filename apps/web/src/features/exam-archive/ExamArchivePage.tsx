@@ -1,3 +1,4 @@
+import { useSharedLink } from "../../ui/use-shared-link";
 import { useLocale } from "../../useLocale";
 import { AlignTooltip } from "../../ui/tooltip";
 import { toast, SuccessToast } from "../../ui/toast";
@@ -63,13 +64,8 @@ export function ExamArchivePage() {
   const navigate = Route.useNavigate();
   const { location, paper } = resolveArchive(search);
   const [query, setQuery] = useState("");
-  const [shared, setShared] = useState<{
-    selection: string;
-    url: string;
-    status: "copied" | "manual";
-  } | null>(null);
   const selection = JSON.stringify([...location, paper?.id]);
-  const share = shared?.selection === selection ? shared : null;
+  const { share, copyLink } = useSharedLink({ selection });
   const list = useRef<HTMLDivElement>(null);
   const modalTitle = useRef<HTMLHeadingElement>(null);
   const folder = browseArchive({
@@ -83,15 +79,9 @@ export function ExamArchivePage() {
   const openFolder = (next: ArchiveLocation) => {
     void navigate({ search: folderSearch(next), resetScroll: false });
   };
-  async function copyLink() {
-    if (!paper) return;
-    const url = window.location.href;
-    try {
-      await navigator.clipboard.writeText(url);
+  async function sharePaper() {
+    if (await copyLink()) {
       toast.custom(() => <SuccessToast message={text("Tautan arsip ujian disalin")} />);
-      setShared({ selection, url, status: "copied" });
-    } catch {
-      setShared({ selection, url, status: "manual" });
     }
   }
 
@@ -199,7 +189,6 @@ export function ExamArchivePage() {
                 onClick={() => {
                   if (entry.kind === "folder") openFolder(entry.location);
                   else {
-                    setShared(null);
                     void navigate({
                       search: { ...folderSearch(location), file: entry.paper.id },
                       resetScroll: false,
@@ -340,7 +329,7 @@ export function ExamArchivePage() {
                             : text("Salin tautan")
                         }
                         onClick={() => {
-                          void copyLink();
+                          void sharePaper();
                         }}
                       >
                         {share?.status === "copied" ? (

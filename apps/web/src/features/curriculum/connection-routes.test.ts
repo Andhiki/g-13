@@ -1,18 +1,20 @@
 import { expect, test } from "bun:test";
 import type { Edge, XYPosition } from "@xyflow/react";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap, LANE_STEP, LANE_X } from "./map-layout";
-import { semesterRelations } from "./semester-relations";
+import { buildMap } from "./map-layout";
 import { mapConnections } from "./map-connections";
-import { isCore } from "./course-utils";
 import { connectionRoutes, type RoutingNode } from "./connection-routes";
 import { buildRoadmap } from "../roadmap/planner.test-support";
+import { buildRoadmapGraph } from "../roadmap/graph-layout";
 import { validateRoadmapSearch } from "../roadmap/search";
 
-function routingNodes(nodes: { id: string; position: XYPosition }[]): RoutingNode[] {
+function routingNodes(nodes: { id: string; position: XYPosition; type?: string }[]): RoutingNode[] {
   return nodes.map((node) => ({
     ...node,
-    measured: { width: 246, height: 82 },
+    measured: {
+      width: node.type === "title" ? 540 : 246,
+      height: node.type === "activity" ? 160 : 82,
+    },
     source: { x: node.position.x + 246, y: node.position.y + 41 },
     target: { x: node.position.x, y: node.position.y + 41 },
   }));
@@ -103,36 +105,18 @@ for (const { id } of listCurricula()) {
           lulus,
         }),
       );
+      const graph = buildRoadmapGraph({
+        plan,
+        target: lulus,
+        summary: "",
+        selectedId: null,
+        choose: () => {},
+        text: (key) => key,
+      });
       const nodes = routingNodes(
-        plan.courses.map((item) => ({
-          id: item.course.id,
-          position: {
-            x: LANE_X + (item.semester - 1) * LANE_STEP + 12,
-            y:
-              220 +
-              plan.courses.filter((other) => other.semester === item.semester).indexOf(item) * 120,
-          },
-        })),
+        graph.nodes.filter((node) => node.type !== "lane" && !node.hidden),
       );
-      const core = new Set(
-        plan.courses.filter((item) => isCore(item.course)).map((item) => item.course.id),
-      );
-      const semesters = new Map(plan.courses.map((item) => [item.course.id, item.semester]));
-      const edges = semesterRelations(plan.relations, semesters)
-        .filter(
-          (relation) =>
-            nodes.some((node) => node.id === relation.source) &&
-            nodes.some((node) => node.id === relation.target),
-        )
-        .map((relation) => ({
-          id: `${relation.source}->${relation.target}`,
-          source: relation.source,
-          target: relation.target,
-          data: { optional: !core.has(relation.source) || !core.has(relation.target) },
-        }));
-      for (const edge of edges)
-        expect(semesters.get(edge.source)).not.toBe(semesters.get(edge.target));
-      verifyRoutes(nodes, mapConnections(edges, null, null));
+      verifyRoutes(nodes, mapConnections(graph.edges, null, null));
     }
   });
 }

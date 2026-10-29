@@ -42,7 +42,11 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
-- Menutup detail mata kuliah di grafik roadmap mengembalikan posisi grafik sebelumnya.
+- Penyalinan tautan roadmap dan arsip ujian mengabaikan hasil penyalinan lama
+  setelah pilihan berubah dan mempertahankan tautan awal saat penyalinan gagal.
+
+- Posisi kedua peta dipulihkan setelah menutup detail mata kuliah, kecuali pengguna
+  berpindah semester atau mengatur ulang tampilan.
 
 - Pergantian bahasa mempertahankan halaman saat kamus gagal diunduh dan tetap
   berfungsi tanpa akses cookie. Alamat halaman dengan huruf besar/kecil yang

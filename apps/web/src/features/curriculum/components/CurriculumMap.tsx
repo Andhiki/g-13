@@ -1,6 +1,6 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   getViewportForBounds,
@@ -12,12 +12,12 @@ import {
   useOnViewportChange,
   type Edge,
   type NodeTypes,
-  type Viewport,
 } from "@xyflow/react";
 import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes } from "./EdgeRouting";
 import { CourseNode, LaneNode } from "./MapNodes";
+import { GraphFocus } from "../../../ui/graph-focus";
 import { ZoomControls } from "./ZoomControls";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../map-layout";
 import { isCore } from "../course-utils";
@@ -27,32 +27,25 @@ const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
 function ViewportFocus({
   navigation,
-  focusKey,
+  curriculum,
   resetVersion,
   selectedId,
   positions,
 }: {
   navigation: { semester: number } | null;
-  focusKey: string;
+  curriculum: CurriculumId;
   resetVersion: number;
   selectedId: string | null;
   positions: Map<string, { x: number; y: number }>;
 }) {
-  const { getViewport, setCenter, setViewport } = useReactFlow();
-  const previousSelection = useRef(selectedId);
-  const overview = useRef<{
-    viewport: Viewport;
-    navigation: typeof navigation;
-    resetVersion: number;
-  } | null>(null);
-  useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timer = window.setTimeout(() => {
-      if (selectedId) {
-        if (previousSelection.current === null) {
-          overview.current = { viewport: getViewport(), navigation, resetVersion };
-        }
-        previousSelection.current = selectedId;
+  const { setCenter, setViewport } = useReactFlow();
+  return (
+    <GraphFocus
+      selectedId={selectedId}
+      navigation={navigation}
+      resetKey={`${curriculum}:${resetVersion}`}
+      onCourse={() => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const points = [...positions.values()];
         const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
         const phone = window.matchMedia("(width < 650px)").matches;
@@ -75,56 +68,40 @@ function ViewportFocus({
           0.88,
           0.12,
         );
-        const target = { ...viewport, x: viewport.x + left, y: viewport.y + top };
-        setViewport(target, {
-          duration: reducedMotion ? 0 : 150,
-          ease: (t) => 1 - Math.pow(1 - t, 4),
-          interpolate: "linear",
-        });
-        return;
-      }
-      previousSelection.current = null;
-      const saved = overview.current;
-      overview.current = null;
-      if (saved && saved.navigation === navigation && saved.resetVersion === resetVersion) {
-        setViewport(saved.viewport, { duration: reducedMotion ? 0 : 150 });
-        return;
-      }
-      if (navigation) {
-        setCenter(LANE_X + (navigation.semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
+        void setViewport(
+          { ...viewport, x: viewport.x + left, y: viewport.y + top },
+          {
+            duration: reducedMotion ? 0 : 150,
+            ease: (t) => 1 - Math.pow(1 - t, 4),
+            interpolate: "linear",
+          },
+        );
+      }}
+      onSemester={(semester) => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        void setCenter(LANE_X + (semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
           zoom: 0.72,
           duration: reducedMotion ? 0 : 600,
         });
-        return;
-      }
-      const phone = window.matchMedia("(width < 650px)").matches;
-      const title = document.querySelector<HTMLElement>("[data-map-title]")!;
-      const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
-      const left = Math.max(24, stage.width * 0.075);
-      const zoom = Math.min(phone ? 0.8 : 1.2, (stage.width - left - 24) / title.offsetWidth);
-      setViewport(
-        {
-          x: left - (LANE_X + 12) * zoom,
-          y: stage.height / 3 - title.offsetTop * zoom,
-          zoom,
-        },
-        { duration: reducedMotion ? 0 : 1000 },
-      );
-    }, 30);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [
-    navigation,
-    focusKey,
-    resetVersion,
-    selectedId,
-    positions,
-    getViewport,
-    setCenter,
-    setViewport,
-  ]);
-  return null;
+      }}
+      onOverview={() => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const phone = window.matchMedia("(width < 650px)").matches;
+        const title = document.querySelector<HTMLElement>("[data-map-title]")!;
+        const stage = document.querySelector("[data-map-stage]")!.getBoundingClientRect();
+        const left = Math.max(24, stage.width * 0.075);
+        const zoom = Math.min(phone ? 0.8 : 1.2, (stage.width - left - 24) / title.offsetWidth);
+        void setViewport(
+          {
+            x: left - (LANE_X + 12) * zoom,
+            y: stage.height / 3 - title.offsetTop * zoom,
+            zoom,
+          },
+          { duration: reducedMotion ? 0 : 1000 },
+        );
+      }}
+    />
+  );
 }
 
 function SemesterViewport({
@@ -208,7 +185,6 @@ export function CurriculumMap({
 }) {
   const { text } = useLocale();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const focusKey = [curriculum, selectedId ?? ""].join(":");
   const revealedEdges = useMemo(
     () => mapConnections(edges, selectedId, hoveredId),
     [edges, selectedId, hoveredId],
@@ -244,7 +220,7 @@ export function CurriculumMap({
       >
         <ViewportFocus
           navigation={navigation}
-          focusKey={focusKey}
+          curriculum={curriculum}
           resetVersion={resetVersion}
           selectedId={selectedId}
           positions={positions}
