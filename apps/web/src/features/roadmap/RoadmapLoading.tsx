@@ -1,7 +1,9 @@
+import { useLocale } from "../../useLocale";
 import { m, useReducedMotion } from "motion/react";
 import { Typography } from "../../ui/typography";
 
 export function RoadmapLoading() {
+  const { text } = useLocale("roadmap");
   const reducedMotion = useReducedMotion();
   const route = "M32 112 H80 Q104 112 104 88 V64 Q104 40 128 40 H208";
 
@@ -67,7 +69,7 @@ export function RoadmapLoading() {
         ))}
       </svg>
       <Typography as="h1" variant="subtitle1" className="motion-safe:animate-pulse">
-        Lagi merakit roadmapmu
+        {text("Lagi merakit roadmapmu")}
       </Typography>
     </main>
   );

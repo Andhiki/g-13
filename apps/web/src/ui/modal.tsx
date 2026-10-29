@@ -1,4 +1,5 @@
 // Adapted from AlignUI Modal v1.2. See docs/design-system.md and docs/licenses/alignui.txt.
+import { useLocale } from "../useLocale";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { RiCloseLine } from "@remixicon/react";
@@ -53,29 +54,32 @@ const Content = React.forwardRef<
     overlayClassName?: string;
     showClose?: boolean;
   }
->(({ className, overlayClassName, children, showClose = true, ...props }, ref) => (
-  <DialogPrimitive.Portal>
-    <Overlay className={overlayClassName}>
-      <DialogPrimitive.Content
-        ref={ref}
-        className={twMerge(
-          "relative w-full max-w-[400px] rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showClose && (
-          <DialogPrimitive.Close asChild>
-            <CompactButton className="absolute top-4 right-4" aria-label="Tutup dialog">
-              <RiCloseLine aria-hidden="true" />
-            </CompactButton>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </Overlay>
-  </DialogPrimitive.Portal>
-));
+>(({ className, overlayClassName, children, showClose = true, ...props }, ref) => {
+  const { text } = useLocale("common");
+  return (
+    <DialogPrimitive.Portal>
+      <Overlay className={overlayClassName}>
+        <DialogPrimitive.Content
+          ref={ref}
+          className={twMerge(
+            "relative w-full max-w-[400px] rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {showClose && (
+            <DialogPrimitive.Close asChild>
+              <CompactButton className="absolute top-4 right-4" aria-label={text("Tutup dialog")}>
+                <RiCloseLine aria-hidden="true" />
+              </CompactButton>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </Overlay>
+    </DialogPrimitive.Portal>
+  );
+});
 Content.displayName = "ModalContent";
 
 export const AlignModal = {

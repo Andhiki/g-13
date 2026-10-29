@@ -1,3 +1,4 @@
+import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -24,6 +25,7 @@ type TitleNode = Node<{ title: string; summary: string }, "title">;
 type RoadmapNode = MapNode | ActivityNode | TitleNode;
 
 function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<TitleNode>) {
+  const { text } = useLocale("roadmap");
   const heading = useRef<HTMLHeadingElement>(null);
   const { setViewport, viewportInitialized } = useReactFlow();
   useEffect(() => {
@@ -49,7 +51,7 @@ function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<
         variant="graphTitle"
         className="m-0 whitespace-nowrap text-text-strong-950"
       >
-        {data.title}
+        {text(data.title)}
       </Typography>
       <Typography as="p" variant="paragraph" className="mb-0 mt-3 text-text-sub-600">
         {data.summary}
@@ -58,16 +60,17 @@ function RoadmapTitle({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<
   );
 }
 function ActivityCard({ data }: NodeProps<ActivityNode>) {
+  const { text } = useLocale("roadmap");
   return (
     <div className="w-[246px] rounded-lg border border-primary-base bg-bg-white-0 p-4 text-text-strong-950">
       <Typography as="p" variant="caption" className="m-0 text-primary-base">
-        Kegiatan
+        {text("Kegiatan")}
       </Typography>
       <Typography as="h3" variant="label" className="mb-1 mt-1">
-        {data.activity.title}
+        {text(data.activity.title)}
       </Typography>
       <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
-        {data.activity.detail}
+        {text(data.activity.detail)}
       </Typography>
     </div>
   );
@@ -96,6 +99,7 @@ export function RoadmapGraph({
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
+  const { text } = useLocale("roadmap");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const flow = useRef<ReactFlowInstance<RoadmapNode, Edge>>(null);
   const stage = useRef<HTMLElement>(null);
@@ -119,7 +123,7 @@ export function RoadmapGraph({
         type: "title",
         hidden: selectedId !== null,
         position: { x: LANE_X + 12, y: 12 },
-        data: { title: "Roadmap kuliah", summary },
+        data: { title: text("Roadmap kuliah"), summary },
         selectable: false,
       },
     ];
@@ -139,7 +143,11 @@ export function RoadmapGraph({
         style: { width: 270, height: 40 },
         data: {
           kind: "lane",
-          title: `Semester ${semester} · ${credit} SKS${semester > target ? " · di luar target" : ""}`,
+          title: text("roadmapSemester", {
+            semester,
+            credits: credit,
+            suffix: semester > target ? text(" · di luar target") : "",
+          }),
           active: semester === target,
         },
         selectable: false,
@@ -174,9 +182,9 @@ export function RoadmapGraph({
       if (semester === target)
         activities.push({
           id: "graduation",
-          title: `Target selesai ${target} semester`,
+          title: text("Target selesai {{v0}} semester", { v0: target }),
           semester,
-          detail: "Selesaikan semua persyaratan dan periksa catatan rencana.",
+          detail: text("Selesaikan semua persyaratan dan periksa catatan rencana."),
           fullSemester: false,
         });
       activities.forEach((activity, index) =>
@@ -211,13 +219,13 @@ export function RoadmapGraph({
       };
     });
     return { nodes, edges };
-  }, [plan, target, summary, selectedId, choose]);
+  }, [plan, target, summary, selectedId, choose, text]);
   const revealedEdges = mapConnections(edges, selectedId, hoveredId);
   return (
     <section
       ref={stage}
       className="absolute inset-0 overflow-hidden bg-bg-weak-25"
-      aria-label="Grafik roadmap kuliah"
+      aria-label={text("Grafik roadmap kuliah")}
     >
       <EdgeRouting>
         <ReactFlow<RoadmapNode, Edge>
@@ -254,7 +262,7 @@ export function RoadmapGraph({
           elementsSelectable={false}
           zoomOnDoubleClick={false}
           proOptions={{ hideAttribution: true }}
-          aria-label="Roadmap mata kuliah per semester"
+          aria-label={text("Roadmap mata kuliah per semester")}
         >
           <Background
             variant={BackgroundVariant.Dots}

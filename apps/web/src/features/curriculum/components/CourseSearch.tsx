@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { useMemo, useRef, useState } from "react";
 import { useKeyboardShortcuts } from "../../../ui/use-keyboard-shortcuts";
@@ -14,6 +15,7 @@ export function CourseSearch({
   data: Curriculum;
   onSelect: (course: Course) => void;
 }) {
+  const { text, courseName } = useLocale();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -34,13 +36,13 @@ export function CourseSearch({
         variant="neutral"
         mode="stroke"
         size="medium"
-        aria-label="Cari mata kuliah"
+        aria-label={text("Cari mata kuliah")}
         aria-haspopup="dialog"
         aria-keyshortcuts="/"
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
-        <span className="flex-1 text-left">Cari mata kuliah</span>
+        <span className="flex-1 text-left">{text("Cari mata kuliah")}</span>
         <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
       </AlignButton.Root>
       <AlignCommandMenu.Dialog
@@ -55,17 +57,17 @@ export function CourseSearch({
         shouldFilter={false}
       >
         <AlignCommandMenu.DialogTitle className="sr-only">
-          Cari mata kuliah
+          {text("Cari mata kuliah")}
         </AlignCommandMenu.DialogTitle>
         <AlignCommandMenu.DialogDescription className="sr-only">
-          Cari berdasarkan nama, kode, atau prasyarat.
+          {text("Cari berdasarkan nama, kode, atau prasyarat.")}
         </AlignCommandMenu.DialogDescription>
         <div className="flex items-center gap-3 px-5 py-4">
           <div className="min-w-0 flex-1">
             <AlignCommandMenu.Input
               autoFocus
-              aria-label="Cari mata kuliah"
-              placeholder="Nama, kode, prasyarat…"
+              aria-label={text("Cari mata kuliah")}
+              placeholder={text("Nama, kode, prasyarat…")}
               value={query}
               onValueChange={setQuery}
             />
@@ -76,9 +78,9 @@ export function CourseSearch({
               mode="ghost"
               size="small"
               onClick={() => changeOpen(false)}
-              aria-label="Tutup pencarian"
+              aria-label={text("Tutup pencarian")}
             >
-              Batal
+              {text("Batal")}
             </AlignButton.Root>
           </div>
         </div>
@@ -97,7 +99,7 @@ export function CourseSearch({
                     }}
                   >
                     <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-0.5">
-                      <span>{course.title}</span>
+                      <span>{courseName(course)}</span>
                       {course.code && (
                         <Typography
                           as="span"
@@ -112,7 +114,7 @@ export function CourseSearch({
                         variant="labelSmall"
                         className="col-start-1 text-text-sub-600"
                       >
-                        {semesterLabel(course)}
+                        {semesterLabel(course, text)}
                       </Typography>
                     </span>
                   </AlignCommandMenu.Item>
@@ -123,27 +125,27 @@ export function CourseSearch({
                 className="px-5 py-4 text-paragraph-sm text-text-sub-600"
                 role="status"
               >
-                Tidak ada mata kuliah yang cocok.
+                {text("Tidak ada mata kuliah yang cocok.")}
               </AlignCommandMenu.Empty>
             )
           ) : (
             <AlignCommandMenu.Empty className="px-5 py-4 text-paragraph-sm text-text-sub-600">
-              Ketik nama, kode, atau prasyarat untuk mencari.
+              {text("Ketik nama, kode, atau prasyarat untuk mencari.")}
             </AlignCommandMenu.Empty>
           )}
         </AlignCommandMenu.List>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-paragraph-xs text-text-sub-600">
           <span className="flex items-center gap-1.5">
-            <AlignKbd.Root aria-label="Panah bawah">↓</AlignKbd.Root>
-            Turun
+            <AlignKbd.Root aria-label={text("Panah bawah")}>↓</AlignKbd.Root>
+            {text("Turun")}
           </span>
           <span className="flex items-center gap-1.5">
-            <AlignKbd.Root aria-label="Panah atas">↑</AlignKbd.Root>
-            Naik
+            <AlignKbd.Root aria-label={text("Panah atas")}>↑</AlignKbd.Root>
+            {text("Naik")}
           </span>
           <span className="flex items-center gap-1.5">
             <AlignKbd.Root>Enter</AlignKbd.Root>
-            Buka mata kuliah
+            {text("Buka mata kuliah")}
           </span>
         </div>
       </AlignCommandMenu.Dialog>

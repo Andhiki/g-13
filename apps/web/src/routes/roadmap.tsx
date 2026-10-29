@@ -4,13 +4,15 @@ import { validateRoadmapSearch } from "../features/roadmap/search";
 
 export const Route = createFileRoute("/roadmap")({
   validateSearch: validateRoadmapSearch,
-  head: () => ({
+  head: ({ match }) => ({
     meta: [
-      { title: "Roadmap Kuliah" },
+      { title: match.context.common["Roadmap Kuliah"] },
       {
         name: "description",
         content:
-          "Susun rencana kuliah S1 Ilmu Komputer UGM per semester berdasarkan kurikulum, peminatan, kegiatan, dan target lulus 7 atau 8 semester.",
+          match.context.common[
+            "Susun rencana kuliah S1 Ilmu Komputer UGM per semester berdasarkan kurikulum, peminatan, kegiatan, dan target lulus 7 atau 8 semester."
+          ],
       },
     ],
   }),

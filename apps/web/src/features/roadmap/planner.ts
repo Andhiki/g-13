@@ -36,7 +36,10 @@ export type Roadmap = {
   notes: string[];
 };
 
-export function buildRoadmap(answers: RoadmapSearch): Roadmap {
+export function buildRoadmap(
+  answers: RoadmapSearch,
+  localize: Parameters<typeof findConflicts>[3],
+): Roadmap {
   const data = getCurriculum(answers.kurikulum ?? defaultCurriculumId);
   const rules = getAcademicRules(data.id);
   const courses: PlannedCourse[] = data.core
@@ -57,7 +60,7 @@ export function buildRoadmap(answers: RoadmapSearch): Roadmap {
       id: "roadmap-agama",
       code: "",
       title: "Agama sesuai keyakinan",
-      englishTitle: "",
+      englishTitle: "Religion according to your faith",
       placements: [{ ...religion.placements[0], label: "Pilih satu mata kuliah agama" }],
     };
     courses.push({ course, semester: 1, kind: "required", originalId: course.id });
@@ -141,6 +144,6 @@ export function buildRoadmap(answers: RoadmapSearch): Roadmap {
       ...data.readingNotes,
     ],
   };
-  plan.conflicts = findConflicts(plan, answers, blocked);
+  plan.conflicts = findConflicts(plan, answers, blocked, localize);
   return plan;
 }

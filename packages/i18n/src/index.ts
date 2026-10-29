@@ -55,7 +55,7 @@ const resourcesData = {
   },
 } as const;
 
-export const resources: typeof resourcesData = resourcesData;
+export const resources: Resource = resourcesData;
 
 export const i18nOptions: {
   resources: Resource;
@@ -63,17 +63,50 @@ export const i18nOptions: {
   supportedLngs: Language[];
   defaultNS: "translation";
   interpolation: { escapeValue: false };
+  fallbackNS: string;
+  nsSeparator: false;
 } = {
-  resources: resources as Resource,
+  resources,
   fallbackLng: defaultLanguage,
   supportedLngs: [...supportedLanguages],
   defaultNS: "translation",
   interpolation: { escapeValue: false },
+  fallbackNS: "common",
+  nsSeparator: false,
 };
 
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "translation";
-    resources: (typeof resources)["id"];
+    resources: {
+      translation: (typeof resourcesData)["id"]["translation"];
+      common: Record<string, string>;
+      roadmap: Record<string, string>;
+      exam: Record<string, string>;
+      resources: Record<string, string>;
+      alumni: Record<string, string>;
+    };
   }
+}
+
+export function resolveLanguage(cookie?: string, acceptLanguage = ""): Language {
+  if (cookie === "id" || cookie === "en") return cookie;
+  const preferences = acceptLanguage
+    .split(",")
+    .map((entry) => {
+      const [code, ...parameters] = entry.trim().toLowerCase().split(";");
+      const quality = parameters.find((parameter) => parameter.trim().startsWith("q="));
+      return { code: code.split("-")[0], quality: quality ? Number(quality.trim().slice(2)) : 1 };
+    })
+    .filter((entry) => Number.isFinite(entry.quality) && entry.quality > 0);
+  preferences.sort((left, right) => right.quality - left.quality);
+  for (const { code } of preferences) if (code === "id" || code === "en") return code;
+  return defaultLanguage;
+}
+
+export function courseTitle(
+  course: { title: string; englishTitle: string },
+  language: Language,
+): string {
+  return language === "en" && course.englishTitle.trim() ? course.englishTitle : course.title;
 }

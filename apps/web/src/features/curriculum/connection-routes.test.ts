@@ -6,7 +6,7 @@ import { semesterRelations } from "./semester-relations";
 import { mapConnections } from "./map-connections";
 import { isCore } from "./course-utils";
 import { connectionRoutes, type RoutingNode } from "./connection-routes";
-import { buildRoadmap } from "../roadmap/planner";
+import { buildRoadmap } from "../roadmap/planner.test-support";
 import { validateRoadmapSearch } from "../roadmap/search";
 
 function routingNodes(nodes: { id: string; position: XYPosition }[]): RoutingNode[] {

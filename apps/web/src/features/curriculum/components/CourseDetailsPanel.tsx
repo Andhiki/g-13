@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { RiArrowRightLine, RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
@@ -87,6 +88,7 @@ function CourseDetailsContent({
   onHeightChange,
   height,
 }: Omit<CourseDetailsProps, "course" | "close"> & { course: Course; height: number }) {
+  const { text, courseName } = useLocale();
   const closeButton = useRef<HTMLButtonElement>(null);
   const byId = useMemo(() => new Map(data.all.map((item) => [item.id, item])), [data]);
   const prereqs = relations
@@ -114,19 +116,19 @@ function CourseDetailsContent({
         closeButton.current?.focus();
       }}
       onInteractOutside={modal ? undefined : (event) => event.preventDefault()}
-      aria-label={`Detail ${course.title}`}
+      aria-label={text("Detail {{v0}}", { v0: courseName(course) })}
     >
       <CourseSheetHandle height={height} onChange={(next) => onHeightChange?.(next)} />
       <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 sm:p-5">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
-            {course.code || "Mata kuliah pilihan"}
+            {course.code || text("Mata kuliah pilihan")}
           </Typography>
           <div className="mt-2 flex items-center gap-3">
             {credit !== null && (
               <span
                 role="img"
-                aria-label={`${credit} SKS`}
+                aria-label={text("{{v0}} SKS", { v0: credit })}
                 className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 font-display text-label-sm text-text-strong-950"
               >
                 <span aria-hidden="true">{credit}</span>
@@ -134,26 +136,26 @@ function CourseDetailsContent({
             )}
             <AlignDrawer.Title asChild>
               <Typography as="h2" variant="subtitle1" className="m-0 min-w-0 text-text-strong-950">
-                {course.title}
+                {courseName(course)}
               </Typography>
             </AlignDrawer.Title>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2" aria-label="Kategori mata kuliah">
+          <div className="mt-3 flex flex-wrap gap-2" aria-label={text("Kategori mata kuliah")}>
             {labels.map((label) => (
               <AlignBadge.Root
                 variant="light"
                 className="h-auto min-h-5 py-0.5 text-[12px] leading-4 font-medium"
                 key={label}
               >
-                {label}
+                {text(label)}
               </AlignBadge.Root>
             ))}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <CopyCourseButton key={course.id} value={course.id} label="ID mata kuliah" />
+          <CopyCourseButton key={course.id} value={course.id} label={text("ID mata kuliah")} />
           <AlignDrawer.Close asChild>
-            <CompactButton ref={closeButton} aria-label="Tutup detail mata kuliah">
+            <CompactButton ref={closeButton} aria-label={text("Tutup detail mata kuliah")}>
               <RiCloseLine className="size-5" aria-hidden="true" />
             </CompactButton>
           </AlignDrawer.Close>
@@ -161,7 +163,7 @@ function CourseDetailsContent({
       </AlignDrawer.Header>
       <AlignDrawer.Description asChild>
         <Typography as="p" variant="caption" className="sr-only">
-          Informasi akademik mata kuliah {course.title}.
+          {text("Informasi akademik mata kuliah")} {courseName(course)}.
         </Typography>
       </AlignDrawer.Description>
       <AlignDrawer.Body className="min-h-0 overflow-y-auto">
@@ -169,10 +171,10 @@ function CourseDetailsContent({
           <div className="mb-6">
             {credit === null && (
               <Typography as="p" variant="caption" className="mt-2 text-text-sub-600">
-                SKS belum dinyatakan
+                {text("SKS belum dinyatakan")}
               </Typography>
             )}
-            <SemesterIndicator label={semesterLabel(course)} />
+            <SemesterIndicator label={semesterLabel(course, text)} />
           </div>
           <div className="mt-2">
             <Accordion.Root
@@ -185,7 +187,7 @@ function CourseDetailsContent({
                 <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
                   <Accordion.Trigger>
                     <Typography as="span" variant="subtitle1">
-                      Silabus
+                      {text("Silabus")}
                     </Typography>
                     <Accordion.Arrow aria-hidden="true" />
                   </Accordion.Trigger>
@@ -203,7 +205,7 @@ function CourseDetailsContent({
           {(prereqs.length > 0 || requirements.length > 0) && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
               <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
-                Prasyarat
+                {text("Prasyarat")}
               </Typography>
               {prereqs.length > 0 && (
                 <ul className="-mx-2 divide-y divide-stroke-soft-200">
@@ -213,9 +215,9 @@ function CourseDetailsContent({
                         type="button"
                         className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
                         onClick={() => select(item.id)}
-                        aria-label={"Buka detail " + item.title}
+                        aria-label={text("Buka detail ") + courseName(item)}
                       >
-                        <span className="min-w-0">{item.title}</span>
+                        <span className="min-w-0">{courseName(item)}</span>
                         <RiArrowRightLine
                           className="size-4 shrink-0 text-text-sub-600"
                           aria-hidden="true"
@@ -232,7 +234,7 @@ function CourseDetailsContent({
                   key={item}
                   className="mb-0 mt-2 text-text-sub-600"
                 >
-                  {item}
+                  {text(item)}
                 </Typography>
               ))}
             </section>
@@ -240,7 +242,7 @@ function CourseDetailsContent({
           {next.length > 0 && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
               <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
-                Menjadi prasyarat untuk
+                {text("Menjadi prasyarat untuk")}
               </Typography>
               <ul className="-mx-2 divide-y divide-stroke-soft-200">
                 {next.map((item) => (
@@ -249,9 +251,9 @@ function CourseDetailsContent({
                       type="button"
                       className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-[14px] leading-5 text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
                       onClick={() => select(item.id)}
-                      aria-label={"Buka detail " + item.title}
+                      aria-label={text("Buka detail ") + courseName(item)}
                     >
-                      <span className="min-w-0">{item.title}</span>
+                      <span className="min-w-0">{courseName(item)}</span>
                       <RiArrowRightLine
                         className="size-4 shrink-0 text-text-sub-600"
                         aria-hidden="true"
@@ -270,6 +272,7 @@ function CourseDetailsContent({
 }
 
 function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
+  const { text } = useLocale();
   const [result, setResult] = useState<
     | { status: "loading" }
     | { status: "error" }
@@ -290,17 +293,17 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
       active = false;
     };
   }, [data.id, code]);
-  if (result.status === "loading") return <p role="status">Memuat silabus…</p>;
+  if (result.status === "loading") return <p role="status">{text("Memuat silabus…")}</p>;
   if (result.status === "error")
     return (
       <div role="alert">
-        <p>Silabus gagal dimuat. Periksa koneksi internet.</p>
+        <p>{text("Silabus gagal dimuat. Periksa koneksi internet.")}</p>
         <button
           type="button"
           className="min-h-11 text-primary-base underline"
           onClick={() => window.location.reload()}
         >
-          Muat ulang
+          {text("Muat ulang")}
         </button>
       </div>
     );
@@ -312,15 +315,15 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
         <>
           {versions.length > 1 && (
             <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
-              Dokumen kurikulum memuat {versions.length} versi silabus untuk kode ini. Keduanya
-              ditampilkan sesuai halaman sumber.
+              {text("Dokumen kurikulum memuat")} {versions.length}{" "}
+              {text("versi silabus untuk kode ini. Keduanya ditampilkan sesuai halaman sumber.")}
             </Typography>
           )}
           {versions.map((version) => (
             <div key={version.pdfPage}>
               {versions.length > 1 && (
                 <Typography as="p" variant="label" className="mt-4">
-                  Versi sumber — halaman cetak {version.printedPage}
+                  {text("Versi sumber — halaman cetak")} {version.printedPage}
                 </Typography>
               )}
               <SyllabusContent syllabus={version} sourceTitle={data.sourceTitle} />
@@ -329,7 +332,7 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
         </>
       ) : (
         <Typography as="p" variant="paragraph">
-          Silabus mata kuliah ini belum tersedia dalam data kurikulum {data.id}.
+          {text("Silabus mata kuliah ini belum tersedia dalam data kurikulum")} {data.id}.
         </Typography>
       )}
     </>
@@ -337,21 +340,29 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
 }
 
 function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; sourceTitle: string }) {
+  const { text } = useLocale();
   const topics = syllabusPoints(syllabus.syllabus);
   return (
     <>
+      <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
+        {text("sourceText")}
+      </Typography>
       {syllabus.description && (
         <>
           <Typography as="h3" variant="subtitle2" className="mt-3 text-text-strong-950">
-            Tujuan pembelajaran
+            {text("Tujuan pembelajaran")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="mt-2">
+          <Typography as="p" variant="paragraph" className="mt-2" lang="id">
             {syllabus.description}
           </Typography>
         </>
       )}
       {topics.length > 1 ? (
-        <ul aria-label="Pokok bahasan" className="list-disc space-y-1 pl-5 text-paragraph-sm">
+        <ul
+          aria-label={text("Pokok bahasan")}
+          lang="id"
+          className="list-disc space-y-1 pl-5 text-paragraph-sm"
+        >
           {topics.map((topic, index) => (
             <li key={index}>{topic}</li>
           ))}
@@ -364,7 +375,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
       {syllabus.references.length > 0 && (
         <>
           <Typography as="h3" variant="subtitle2" className="mt-4 text-text-strong-950">
-            Referensi
+            {text("Referensi")}
           </Typography>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-sm">
             {syllabus.references.map((reference, index) => (
@@ -374,7 +385,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                  aria-label={`${reference} (cari di Google, tab baru)`}
+                  aria-label={text("{{v0}} (cari di Google, tab baru)", { v0: reference })}
                 >
                   {reference}{" "}
                   <RiArrowRightUpLine
@@ -388,7 +399,8 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
         </>
       )}
       <Typography as="p" variant="caption" className="mt-4 ">
-        Sumber: {sourceTitle}, halaman cetak {syllabus.printedPage} (halaman PDF {syllabus.pdfPage}
+        {text("Sumber:")} {sourceTitle}
+        {text(", halaman cetak")} {syllabus.printedPage} {text("(halaman PDF")} {syllabus.pdfPage}
         ).
       </Typography>
     </>

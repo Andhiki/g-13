@@ -1,3 +1,4 @@
+import { courseTitle, type Language } from "@g13/i18n";
 import type { Course } from "@g13/curriculum";
 import { assignedCoreSemester, isCore } from "./course-utils";
 
@@ -8,7 +9,7 @@ export type CourseSection = {
   kind: "semester" | "unassigned" | "electives";
 };
 
-export function groupCoursesForList(courses: Course[]): CourseSection[] {
+export function groupCoursesForList(courses: Course[], language: Language = "id"): CourseSection[] {
   const semesters = new Map<number, Course[]>();
   const unassigned: Course[] = [];
   const electives: Course[] = [];
@@ -54,7 +55,9 @@ export function groupCoursesForList(courses: Course[]): CourseSection[] {
     });
   }
   for (const section of sections) {
-    section.courses.sort((left, right) => left.title.localeCompare(right.title, "id"));
+    section.courses.sort((left, right) =>
+      courseTitle(left, language).localeCompare(courseTitle(right, language), language),
+    );
   }
   return sections;
 }

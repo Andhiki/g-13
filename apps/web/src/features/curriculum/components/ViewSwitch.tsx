@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { useState } from "react";
 import { RiListUnordered, RiNodeTree } from "@remixicon/react";
 import { m, useReducedMotion } from "motion/react";
@@ -11,9 +12,10 @@ export function ViewSwitch({
   view: "map" | "list";
   onViewChange: (view: "map" | "list") => void;
 }) {
+  const { text } = useLocale();
   const [turns, setTurns] = useState(0);
   const reducedMotion = useReducedMotion();
-  const label = view === "map" ? "Tampilkan daftar" : "Tampilkan peta";
+  const label = view === "map" ? text("Tampilkan daftar") : text("Tampilkan peta");
   const Icon = view === "map" ? RiListUnordered : RiNodeTree;
 
   return (
@@ -27,7 +29,7 @@ export function ViewSwitch({
             className="size-10 rounded-full p-0"
             aria-pressed={view === "list"}
             aria-keyshortcuts="V"
-            aria-label={label}
+            aria-label={text(label)}
             onClick={() => {
               setTurns((value) => value + 1);
               onViewChange(view === "map" ? "list" : "map");
@@ -45,7 +47,7 @@ export function ViewSwitch({
           </AlignButton.Root>
         </AlignTooltip.Trigger>
         <AlignTooltip.Content size="xsmall" side="bottom">
-          {label}
+          {text(label)}
         </AlignTooltip.Content>
       </AlignTooltip.Root>
     </AlignTooltip.Provider>

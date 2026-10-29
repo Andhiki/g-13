@@ -2,12 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ResourcesPage } from "../features/resources/ResourcesPage";
 
 export const Route = createFileRoute("/resources")({
-  head: () => ({
+  head: ({ match }) => ({
     meta: [
-      { title: "Helpful Resources" },
+      { title: match.context.common["Helpful Resources"] },
       {
         name: "description",
-        content: "Useful computer science learning, thesis writing, and exam archive resources.",
+        content:
+          match.context.common[
+            "Useful computer science learning, thesis writing, and exam archive resources."
+          ],
       },
     ],
   }),

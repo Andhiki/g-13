@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { CopyCourseButton } from "./CopyCourseButton";
 import { Typography } from "../../../ui/typography";
 import { useId } from "react";
@@ -15,6 +16,7 @@ export function CourseTable({
   selectedId: string | null;
   select: (id: string) => void;
 }) {
+  const { text, courseName } = useLocale();
   const headingId = useId();
 
   return (
@@ -25,30 +27,32 @@ export function CourseTable({
     >
       <div className="mb-3 flex items-baseline justify-between gap-4">
         <Typography as="h2" variant="subtitle2" id={headingId} className="m-0 text-text-strong-950">
-          {section.title}
+          {text(section.title)}
         </Typography>
         <Typography as="span" variant="caption" className="text-text-sub-600">
-          {section.courses.length} mata kuliah
+          {text("courseCount", { count: section.courses.length })}
         </Typography>
       </div>
       <AlignTable.Root aria-labelledby={headingId}>
         <AlignTable.Header>
           <AlignTable.Row>
             <AlignTable.Head scope="col" className="w-40 max-[640px]:hidden">
-              Kode
+              {text("Kode")}
             </AlignTable.Head>
-            <AlignTable.Head scope="col">Mata kuliah</AlignTable.Head>
+            <AlignTable.Head scope="col">{text("Mata kuliah")}</AlignTable.Head>
             <AlignTable.Head scope="col" className="w-44 max-[640px]:hidden">
-              Kategori
+              {text("Kategori")}
             </AlignTable.Head>
             <AlignTable.Head scope="col" className="w-16 text-right">
-              SKS
+              {text("SKS")}
             </AlignTable.Head>
           </AlignTable.Row>
         </AlignTable.Header>
         <AlignTable.Body>
           {section.courses.map((course) => {
-            const categories = courseLabels(course).join(" · ");
+            const categories = courseLabels(course)
+              .map((label) => text(label))
+              .join(" · ");
             const semesterLabels = new Set(
               course.placements.map((placement) => placement.semesterLabel),
             );
@@ -61,7 +65,9 @@ export function CourseTable({
               );
             const groups = [
               ...new Set(course.placements.map((placement) => placement.group).filter(Boolean)),
-            ].join(" · ");
+            ]
+              .map((group) => text(group))
+              .join(" · ");
             const credits = [
               ...new Set(
                 course.placements
@@ -84,7 +90,7 @@ export function CourseTable({
                 <AlignTable.Cell className="h-10 max-[640px]:hidden">
                   <div className="flex items-center gap-1 whitespace-nowrap">
                     {course.code && (
-                      <CopyCourseButton value={course.code} label="kode mata kuliah" />
+                      <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
                     )}
                     <Typography as="span" variant="caption" className="text-text-sub-600">
                       {course.code || "—"}
@@ -97,12 +103,12 @@ export function CourseTable({
                     mode="ghost"
                     size="small"
                     className="h-auto min-h-9 w-full justify-start whitespace-normal px-0 py-1 text-left"
-                    aria-label={`Buka detail ${course.title}`}
+                    aria-label={text("Buka detail {{v0}}", { v0: courseName(course) })}
                     aria-pressed={selectedId === course.id}
                     onClick={() => select(course.id)}
                   >
                     <Typography as="span" variant="label" className="text-text-strong-950">
-                      {course.title}
+                      {courseName(course)}
                     </Typography>
                   </AlignButton.Root>
                   <Typography
@@ -112,7 +118,7 @@ export function CourseTable({
                   >
                     {course.code && (
                       <span className="inline-flex items-center gap-1">
-                        <CopyCourseButton value={course.code} label="kode mata kuliah" />
+                        <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
                         {course.code}
                       </span>
                     )}
@@ -124,7 +130,7 @@ export function CourseTable({
                       variant="caption"
                       className="mb-1 block text-text-sub-600"
                     >
-                      {semesterLabel(course)}
+                      {semesterLabel(course, text)}
                     </Typography>
                   )}
                 </AlignTable.Cell>

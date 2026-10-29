@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { useState } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { AlignButton } from "../../../ui/button";
@@ -11,6 +12,7 @@ export function SemesterFilter({
   onNavigate: (semester: number) => void;
   lastSemester?: number;
 }) {
+  const { text } = useLocale();
   const semesters = Array.from({ length: lastSemester }, (_, i) => String(i + 1));
   const reducedMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
@@ -19,7 +21,7 @@ export function SemesterFilter({
     <div
       className="flex min-w-0 items-center gap-3 max-[1100px]:w-full max-[1100px]:max-w-[360px]"
       role="group"
-      aria-label="Navigasi semester"
+      aria-label={text("Navigasi semester")}
     >
       <m.span
         initial={reducedMotion ? false : { x: "120%", opacity: 0 }}
@@ -34,7 +36,7 @@ export function SemesterFilter({
         }}
         className="relative z-0 text-label-sm max-[1100px]:sr-only"
       >
-        Semester
+        {text("Semester")}
       </m.span>
       <m.div
         initial={reducedMotion ? false : { scaleX: 0, opacity: 0 }}
@@ -68,10 +70,10 @@ export function SemesterFilter({
               mode="ghost"
               size="xsmall"
               className="hover:bg-primary-alpha-16 hover:text-primary-base hover:ring-transparent max-[1100px]:min-w-0 max-[1100px]:px-0"
-              aria-label={`Semester ${semester}`}
+              aria-label={text("Semester {{v0}}", { v0: semester })}
               aria-pressed={visible.includes(Number(semester))}
               aria-keyshortcuts={semester}
-              title={`Ke semester ${semester}`}
+              title={text("Ke semester {{v0}}", { v0: semester })}
               onClick={() => onNavigate(Number(semester))}
             >
               {semester}

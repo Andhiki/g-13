@@ -1,3 +1,4 @@
+import { useLocale } from "../../useLocale";
 import { RiArrowLeftLine, RiCornerDownLeftLine } from "@remixicon/react";
 import { Typography } from "../../ui/typography";
 import { useEffect, useRef } from "react";
@@ -15,6 +16,7 @@ export function RoadmapQuiz({
   answers: RoadmapSearch;
   update: (next: RoadmapSearch) => void;
 }) {
+  const { text } = useLocale("roadmap");
   const reducedMotion = useReducedMotion();
   const questions = quizQuestions(answers);
   const index = Math.max(
@@ -70,7 +72,7 @@ export function RoadmapQuiz({
             tabIndex={-1}
             className="m-0 max-w-[680px] outline-none"
           >
-            {question.title}
+            {text(question.title)}
           </Typography>
           <Typography
             as="p"
@@ -78,7 +80,7 @@ export function RoadmapQuiz({
             id="quiz-description"
             className="mb-8 mt-3 max-w-[650px] text-text-sub-600"
           >
-            {question.description}
+            {text(question.description)}
           </Typography>
         </m.div>
         <m.div
@@ -93,7 +95,7 @@ export function RoadmapQuiz({
           }}
           className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4"
           role="group"
-          aria-label="Pilihan jawaban"
+          aria-label={text("Pilihan jawaban")}
           aria-describedby="quiz-description"
         >
           {question.choices.map((choice, choiceIndex) => (
@@ -117,7 +119,7 @@ export function RoadmapQuiz({
                 <AlignKbd.Root aria-hidden="true" className="absolute left-3 top-3">
                   {choiceIndex + 1}
                 </AlignKbd.Root>
-                <span>{choice.label}</span>
+                <span>{text(choice.label)}</span>
               </AlignButton.Root>
             </m.div>
           ))}
@@ -131,7 +133,7 @@ export function RoadmapQuiz({
           aria-keyshortcuts="ArrowLeft"
           onClick={back}
         >
-          Kembali
+          {text("Kembali")}
           <AlignKbd.Root aria-hidden="true">
             <RiArrowLeftLine className="size-3" />
           </AlignKbd.Root>
@@ -143,7 +145,7 @@ export function RoadmapQuiz({
           aria-keyshortcuts="ArrowRight Enter"
           onClick={advance}
         >
-          {index === questions.length - 1 ? "Lihat roadmap" : "Lanjut"}
+          {index === questions.length - 1 ? text("Lihat roadmap") : text("Lanjut")}
           <AlignKbd.Root aria-hidden="true">
             <RiCornerDownLeftLine className="size-3" />
           </AlignKbd.Root>

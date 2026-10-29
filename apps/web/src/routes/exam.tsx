@@ -4,13 +4,15 @@ import { validateArchiveSearch } from "../features/exam-archive/search";
 
 export const Route = createFileRoute("/exam")({
   validateSearch: validateArchiveSearch,
-  head: () => ({
+  head: ({ match }) => ({
     meta: [
-      { title: "Arsip Ujian" },
+      { title: match.context.common["Arsip Ujian"] },
       {
         name: "description",
         content:
-          "Temukan arsip soal UTS dan UAS Ilmu Komputer UGM dari Himakom, dikelompokkan menurut mata kuliah dan tahun.",
+          match.context.common[
+            "Temukan arsip soal UTS dan UAS Ilmu Komputer UGM dari Himakom, dikelompokkan menurut mata kuliah dan tahun."
+          ],
       },
     ],
   }),

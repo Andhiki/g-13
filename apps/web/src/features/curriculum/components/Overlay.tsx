@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
@@ -31,6 +32,7 @@ function FilterDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { text, language } = useLocale();
   return (
     <AlignDrawer.Root open={open} onOpenChange={onOpenChange}>
       <AlignDrawer.Trigger asChild>
@@ -39,7 +41,9 @@ function FilterDrawer({
           mode="stroke"
           size="medium"
           className="size-10 p-2.5"
-          aria-label={`${open ? "Tutup" : "Buka"} ${copy.title.toLowerCase()}`}
+          aria-label={text(open ? "closeFilter" : "openFilter", {
+            name: text(copy.title).toLocaleLowerCase(language),
+          })}
           aria-expanded={open}
           aria-keyshortcuts="F"
         >
@@ -51,12 +55,12 @@ function FilterDrawer({
           <div className="min-w-0 flex-1">
             <AlignDrawer.Title asChild>
               <Typography as="h2" variant="label" className="text-text-strong-950">
-                {copy.title}
+                {text(copy.title)}
               </Typography>
             </AlignDrawer.Title>
             <AlignDrawer.Description asChild>
               <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
-                {copy.description}
+                {text(copy.description)}
               </Typography>
             </AlignDrawer.Description>
           </div>
@@ -66,7 +70,9 @@ function FilterDrawer({
               mode="ghost"
               size="medium"
               className="size-10 shrink-0 p-2.5"
-              aria-label={`Tutup ${copy.title.toLowerCase()}`}
+              aria-label={text("closeFilter", {
+                name: text(copy.title).toLocaleLowerCase(language),
+              })}
             >
               <RiCloseLine className="size-5" aria-hidden="true" />
             </AlignButton.Root>
@@ -93,6 +99,7 @@ function DesktopFilters({
   onOpenChange: (open: boolean) => void;
   toolbar?: boolean;
 }) {
+  const { text, language } = useLocale();
   const toggle = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
 
@@ -118,7 +125,7 @@ function DesktopFilters({
         reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
       }
       className="pointer-events-auto absolute right-0 top-0 z-20 overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:hidden"
-      aria-label={label}
+      aria-label={text(label)}
     >
       <AlignButton.Root
         ref={toggle}
@@ -126,7 +133,9 @@ function DesktopFilters({
         mode="ghost"
         size="medium"
         className="absolute right-0 top-0 z-10 size-10 p-2.5"
-        aria-label={`${open ? "Tutup" : "Buka"} ${copy.title.toLowerCase()}`}
+        aria-label={text(open ? "closeFilter" : "openFilter", {
+          name: text(copy.title).toLocaleLowerCase(language),
+        })}
         aria-expanded={open}
         aria-controls="desktop-filters"
         aria-keyshortcuts="F"
@@ -164,7 +173,7 @@ function DesktopFilters({
         className="flex w-[300px] flex-col gap-3 p-4"
       >
         <Typography as="h2" variant="label" className="m-0 pr-8">
-          Filter
+          {text("Filter")}
         </Typography>
         {children}
       </m.div>

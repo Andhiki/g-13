@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./messages": {
+      "types": "./dist/messages.d.mts",
+      "import": "./dist/messages.mjs"
     }
   },
   "scripts": {
@@ -15,12 +19,14 @@
     "lint": "oxlint --deny-warnings src tsdown.config.ts",
     "lint:fix": "oxlint --fix src tsdown.config.ts",
     "fmt": "oxfmt src tsdown.config.ts package.json tsconfig.json",
-    "fmt:check": "oxfmt --check src tsdown.config.ts package.json tsconfig.json"
+    "fmt:check": "oxfmt --check src tsdown.config.ts package.json tsconfig.json",
+    "test": "bun test"
   },
   "dependencies": {
     "i18next": "^26.5.11"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.4",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
     "tsdown": "^0.23.2",

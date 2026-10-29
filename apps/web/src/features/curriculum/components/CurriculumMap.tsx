@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -205,6 +206,7 @@ export function CurriculumMap({
   positions: Map<string, { x: number; y: number }>;
   lastSemester: number;
 }) {
+  const { text } = useLocale();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const focusKey = [curriculum, selectedId ?? ""].join(":");
   const revealedEdges = useMemo(
@@ -238,7 +240,7 @@ export function CurriculumMap({
         zoomOnScroll={false}
         zoomOnDoubleClick={false}
         fitView={false}
-        aria-label="Peta kurikulum Ilmu Komputer UGM"
+        aria-label={text("Peta kurikulum Ilmu Komputer UGM")}
       >
         <ViewportFocus
           navigation={navigation}
@@ -265,15 +267,16 @@ export function CurriculumMap({
                 variant="graphTitle"
                 className="m-0 whitespace-nowrap text-text-strong-950"
               >
-                Everything CS UGM
+                {text("Everything CS UGM")}
               </Typography>
               <Typography as="p" variant="paragraph" className="m-0 max-w-xl text-text-sub-600">
-                Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu
-                Komputer UGM.
+                {text(
+                  "Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu Komputer UGM.",
+                )}
               </Typography>
               <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
                 <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-                  Buat roadmap sendiri
+                  {text("Buat roadmap sendiri")}
                 </Link>
               </AlignFancyButton.Root>
             </div>

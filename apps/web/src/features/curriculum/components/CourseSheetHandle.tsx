@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { useEffect, useRef } from "react";
 
 const heights = [30, 75];
@@ -9,6 +10,7 @@ export function CourseSheetHandle({
   height: number;
   onChange: (height: number) => void;
 }) {
+  const { text } = useLocale();
   const button = useRef<HTMLButtonElement>(null);
   const suppressClick = useRef(false);
   const change = useRef(onChange);
@@ -28,7 +30,7 @@ export function CourseSheetHandle({
     const preview = (next: number) => {
       sheet.style.setProperty("--course-sheet-height", `${next}dvh`);
       handle.setAttribute("aria-valuenow", String(Math.round(next)));
-      handle.setAttribute("aria-valuetext", `${Math.round(next)}% layar`);
+      handle.setAttribute("aria-valuetext", text("screenHeight", { percent: Math.round(next) }));
     };
     const start = (target: EventTarget | null, y: number) => {
       if (!window.matchMedia("(max-width: 649px)").matches) return;
@@ -115,19 +117,19 @@ export function CourseSheetHandle({
       window.removeEventListener("pointerup", finish);
       sheet.removeEventListener("click", click, true);
     };
-  }, [height]);
+  }, [height, text]);
 
   return (
     <div className="flex shrink-0 justify-center min-[650px]:hidden">
       <button
         type="button"
         role="slider"
-        aria-label="Tinggi detail mata kuliah"
+        aria-label={text("Tinggi detail mata kuliah")}
         aria-orientation="vertical"
         aria-valuemin={30}
         aria-valuemax={75}
         aria-valuenow={Math.round(height)}
-        aria-valuetext={`${Math.round(height)}% layar`}
+        aria-valuetext={text("screenHeight", { percent: Math.round(height) })}
         className="flex h-5 w-24 touch-none items-center justify-center rounded-lg cursor-ns-resize outline-none focus-visible:[&>span]:bg-primary-base select-none"
         ref={button}
         onKeyDown={(event) => {

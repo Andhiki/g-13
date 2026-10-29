@@ -1,3 +1,4 @@
+import { useLocale } from "../useLocale";
 import { useTheme } from "next-themes";
 import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
 import { useEffect, useRef, useState } from "react";
@@ -6,12 +7,13 @@ import { RiMoonLine, RiSunLine } from "@remixicon/react";
 import { AlignButton } from "./button";
 
 export function ThemeSwitch() {
+  const { text } = useLocale("common");
   const { resolvedTheme, setTheme } = useTheme();
   const transitioning = useRef(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
-  const label = isDark ? "Ganti ke tema terang" : "Ganti ke tema gelap";
+  const label = isDark ? text("Ganti ke tema terang") : text("Ganti ke tema gelap");
   const Icon = isDark ? RiSunLine : RiMoonLine;
 
   const changeTheme = (value: "light" | "dark") => {
@@ -57,8 +59,8 @@ export function ThemeSwitch() {
       mode="stroke"
       size="medium"
       className="size-10 p-2.5"
-      aria-label={label}
-      title={`${label} (D)`}
+      aria-label={text(label)}
+      title={text("{{v0}} (D)", { v0: label })}
       aria-keyshortcuts="D"
       disabled={!mounted}
       onClick={() => changeTheme(isDark ? "light" : "dark")}

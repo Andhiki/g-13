@@ -1,18 +1,26 @@
-import LanguageDetector from "i18next-browser-languagedetector";
-import i18n from "i18next";
+import { createInstance, type i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
-import { i18nOptions } from "@g13/i18n";
+import { i18nOptions, resources, type Language } from "@g13/i18n";
+import type { MessageNamespace, Messages } from "@g13/i18n/messages";
 
-void i18n
-  .use(initReactI18next)
-  .use(LanguageDetector)
-  .init({
+export function createI18n({
+  language,
+  namespace,
+  messages,
+  common,
+}: {
+  language: Language;
+  namespace: MessageNamespace;
+  messages: Messages;
+  common: Messages;
+}): i18n {
+  const instance = createInstance();
+  instance.use(initReactI18next);
+  void instance.init({
     ...i18nOptions,
-    detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
-      lookupLocalStorage: "g13-language",
-    },
+    resources: { [language]: { ...resources[language], common, [namespace]: messages } },
+    lng: language,
+    initAsync: false,
   });
-
-export default i18n;
+  return instance;
+}

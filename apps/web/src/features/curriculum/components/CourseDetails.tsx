@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { lazy, useEffect, useState } from "react";
 import { DeferredContent } from "../../../ui/deferred-content";
 import type { CourseDetailsProps } from "./CourseDetailsPanel";
@@ -15,13 +16,14 @@ const CourseDetailsPanel = lazy(() =>
 );
 
 export function CourseDetails(props: CourseDetailsProps) {
+  const { text } = useLocale();
   const [loaded, setLoaded] = useState(false);
   if (!props.course && !loaded) return null;
   return (
     <DeferredContent
       fallback={
         <p role="status" className="fixed bottom-4 left-4 z-50 rounded-lg bg-bg-white-0 p-4">
-          Memuat detail mata kuliah…
+          {text("Memuat detail mata kuliah…")}
         </p>
       }
     >

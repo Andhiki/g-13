@@ -1,3 +1,4 @@
+import { useLocale } from "../../useLocale";
 import { AlignTooltip } from "../../ui/tooltip";
 import { toast, SuccessToast } from "../../ui/toast";
 import { defaultCurriculumId, getCurriculum } from "@g13/curriculum";
@@ -33,7 +34,11 @@ export function RoadmapResult({
   answers: RoadmapSearch;
   update: (next: RoadmapSearch) => void;
 }) {
-  const plan = useMemo(() => buildRoadmap(answers), [answers]);
+  const { text, courseName } = useLocale("roadmap");
+  const plan = useMemo(
+    () => buildRoadmap(answers, { text, courseName }),
+    [answers, text, courseName],
+  );
   const [navigation, setNavigation] = useState<{ semester: number } | null>(null);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -65,7 +70,7 @@ export function RoadmapResult({
     setSharedPlan(answers);
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.custom(() => <SuccessToast message="Tautan roadmap disalin" />);
+      toast.custom(() => <SuccessToast message={text("Tautan roadmap disalin")} />);
       setShare("copied");
     } catch {
       setManualLink(window.location.href);
@@ -78,7 +83,21 @@ export function RoadmapResult({
         <RoadmapGraph
           plan={plan}
           target={answers.lulus}
-          summary={`Kurikulum ${data.id}, ${answers.minat?.replace(/^Lab /, "").replace("tanpa-minat", "tanpa peminatan") ?? "tanpa peminatan"}, dengan target selesai ${answers.lulus} semester. ${plan.activities.map((activity) => activity.title).join(", ") || "Tanpa kegiatan tambahan"}. ${plan.conflicts.length ? `Ada ${plan.conflicts.length} hal yang perlu kamu periksa di catatan roadmap.` : "Cek catatan roadmap sebelum menyusun KRS."}`}
+          summary={text("roadmapSummary", {
+            curriculum: data.id,
+            interest: text(
+              answers.minat && answers.minat !== "tanpa-minat"
+                ? answers.minat.replace(/^Lab /, "")
+                : "Tanpa peminatan",
+            ),
+            target: answers.lulus,
+            activities:
+              plan.activities.map((activity) => text(activity.title)).join(", ") ||
+              text("Tanpa kegiatan tambahan"),
+            review: plan.conflicts.length
+              ? text("reviewCount", { count: plan.conflicts.length })
+              : text("Cek catatan roadmap sebelum menyusun KRS."),
+          })}
           selectedId={selectedId}
           choose={choose}
           navigation={navigation}
@@ -86,10 +105,10 @@ export function RoadmapResult({
         />
       </main>
       <Overlay
-        controlsLabel="Filter roadmap"
+        controlsLabel={text("Filter roadmap")}
         filterCopy={{
-          title: "Filter roadmap",
-          description: "Bandingkan target selesai dan waktu kegiatan.",
+          title: text("Filter roadmap"),
+          description: text("Bandingkan target selesai dan waktu kegiatan."),
         }}
         home={
           <div className="flex items-center gap-2">
@@ -103,7 +122,7 @@ export function RoadmapResult({
               })}
             >
               <RiArrowLeftLine className="size-5" aria-hidden="true" />
-              Kembali
+              {text("Kembali")}
             </Link>
             <AlignTooltip.Provider>
               <AlignTooltip.Root>
@@ -112,14 +131,14 @@ export function RoadmapResult({
                     variant="neutral"
                     mode="stroke"
                     className="pointer-events-auto size-10 p-2.5"
-                    aria-label="Coba lagi"
+                    aria-label={text("Coba lagi")}
                     onClick={restart}
                   >
                     <RiRestartLine className="size-5" aria-hidden="true" />
                   </AlignButton.Root>
                 </AlignTooltip.Trigger>
                 <AlignTooltip.Content size="xsmall" side="bottom">
-                  Coba lagi
+                  {text("Coba lagi")}
                 </AlignTooltip.Content>
               </AlignTooltip.Root>
             </AlignTooltip.Provider>
@@ -175,14 +194,16 @@ export function RoadmapResult({
                       ))}
                     </span>
                     <span className="max-[650px]:sr-only">
-                      {share === "copied" && sharedPlan === answers ? "Tautan disalin" : "Bagikan"}
+                      {share === "copied" && sharedPlan === answers
+                        ? text("Tautan disalin")
+                        : text("Bagikan")}
                     </span>
                   </AlignButton.Root>
                 </AlignTooltip.Trigger>
                 <AlignTooltip.Content size="xsmall" side="bottom">
                   {share === "copied" && sharedPlan === answers
-                    ? "Tautan disalin"
-                    : "Salin tautan roadmap"}
+                    ? text("Tautan disalin")
+                    : text("Salin tautan roadmap")}
                 </AlignTooltip.Content>
               </AlignTooltip.Root>
             </AlignTooltip.Provider>
@@ -195,7 +216,7 @@ export function RoadmapResult({
         <RoadmapFilters answers={answers} update={update} />
       </Overlay>
       <span className="sr-only" role="status">
-        {share === "copied" && sharedPlan === answers ? "Tautan roadmap disalin." : ""}
+        {share === "copied" && sharedPlan === answers ? text("Tautan roadmap disalin.") : ""}
       </span>
       <AlignModal.Root
         open={share === "manual" && sharedPlan === answers}
@@ -207,16 +228,16 @@ export function RoadmapResult({
           <div className="p-5">
             <AlignModal.Title asChild>
               <Typography as="h2" variant="subtitle1" className="pr-8">
-                Bagikan roadmap
+                {text("Bagikan roadmap")}
               </Typography>
             </AlignModal.Title>
             <AlignModal.Description asChild>
               <Typography as="p" variant="paragraph" className="mt-2 text-text-sub-600">
-                Salin tautan ini untuk membuka rencana yang sama.
+                {text("Salin tautan ini untuk membuka rencana yang sama.")}
               </Typography>
             </AlignModal.Description>
             <input
-              aria-label="Tautan roadmap"
+              aria-label={text("Tautan roadmap")}
               readOnly
               value={manualLink}
               onFocus={(event) => event.currentTarget.select()}
@@ -236,7 +257,7 @@ export function RoadmapResult({
           selected && (
             <div className="space-y-3">
               <Typography as="p" variant="paragraph" className="m-0">
-                {kinds[selected.kind]} · Rencana semester {selected.semester}
+                {text(kinds[selected.kind])} {text("· Rencana semester")} {selected.semester}
               </Typography>
               {selected.kind === "elective" && (
                 <ElectiveReplacement

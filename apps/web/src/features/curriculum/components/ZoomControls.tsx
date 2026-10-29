@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Panel, useReactFlow, useViewport } from "@xyflow/react";
 import { RiAddLine, RiSubtractLine, RiFocus3Line } from "@remixicon/react";
 import { useReducedMotion } from "motion/react";
@@ -14,6 +15,7 @@ export function ZoomControls({
   selected: boolean;
   lastSemester: number;
 }) {
+  const { text } = useLocale();
   const { zoomIn, zoomOut } = useReactFlow();
   const { zoom } = useViewport();
   const reducedMotion = useReducedMotion();
@@ -34,7 +36,7 @@ export function ZoomControls({
             id="map-keyboard-shortcuts-heading"
             className="m-0 mb-2 text-text-strong-950"
           >
-            Pintasan keyboard
+            {text("Pintasan keyboard")}
           </Typography>
           <dl className="m-0 grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
             {[
@@ -50,7 +52,7 @@ export function ZoomControls({
                 </dt>
                 <dd className="m-0">
                   <Typography as="span" variant="caption" className="text-text-sub-600">
-                    {description}
+                    {text(description)}
                   </Typography>
                 </dd>
               </div>
@@ -59,15 +61,15 @@ export function ZoomControls({
         </aside>
         <div
           role="group"
-          aria-label="Kontrol zoom"
+          aria-label={text("Kontrol zoom")}
           className="flex items-center gap-1 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
         >
           <AlignButton.Root
             variant="neutral"
             mode="ghost"
             className="size-10 p-0"
-            aria-label="Perkecil"
-            title="Perkecil"
+            aria-label={text("Perkecil")}
+            title={text("Perkecil")}
             disabled={zoom <= 0.05}
             onClick={() => zoomOut(options)}
           >
@@ -77,8 +79,8 @@ export function ZoomControls({
             variant="neutral"
             mode="ghost"
             className="size-10 p-0"
-            aria-label="Perbesar"
-            title="Perbesar"
+            aria-label={text("Perbesar")}
+            title={text("Perbesar")}
             disabled={zoom >= 1.35}
             onClick={() => zoomIn(options)}
           >
@@ -88,7 +90,7 @@ export function ZoomControls({
             as="span"
             variant="label"
             className="min-w-14 text-center tabular-nums text-text-sub-600"
-            aria-label={`Zoom ${Math.round(zoom * 100)}%`}
+            aria-label={text("Zoom {{v0}}%", { v0: Math.round(zoom * 100) })}
           >
             {Math.round(zoom * 100)}%
           </Typography>
@@ -96,8 +98,8 @@ export function ZoomControls({
             variant="neutral"
             mode="ghost"
             className="size-10 p-0"
-            aria-label="Kembali ke tampilan awal"
-            title="Kembali ke tampilan awal"
+            aria-label={text("Kembali ke tampilan awal")}
+            title={text("Kembali ke tampilan awal")}
             onClick={onReset}
           >
             <RiFocus3Line className="size-5" aria-hidden="true" />

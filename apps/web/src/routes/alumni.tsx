@@ -2,13 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AlumniPage } from "../features/alumni/AlumniPage";
 
 export const Route = createFileRoute("/alumni")({
-  head: () => ({
+  head: ({ match }) => ({
     meta: [
-      { title: "Meet Our Alumni" },
+      { title: match.context.common["Meet Our Alumni"] },
       {
         name: "description",
         content:
-          "Meet Ilmu Komputer UGM alumni building products, leading teams, and growing careers across technology.",
+          match.context.common[
+            "Meet Ilmu Komputer UGM alumni building products, leading teams, and growing careers across technology."
+          ],
       },
     ],
   }),

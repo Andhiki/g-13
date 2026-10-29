@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { buildRoadmap } from "./planner";
+import { buildRoadmap } from "./planner.test-support";
 import { validateRoadmapSearch } from "./search";
 
 const baseline = { kurikulum: "2026", minat: "Analisis Data", iup: "tidak", magang: "tidak" };

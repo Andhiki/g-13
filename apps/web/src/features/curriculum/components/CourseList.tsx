@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { animate } from "motion/react";
 import { useEffect, useMemo } from "react";
@@ -18,7 +19,8 @@ export function CourseList({
   selectedId: string | null;
   select: (id: string) => void;
 }) {
-  const sections = useMemo(() => groupCoursesForList(courses), [courses]);
+  const { text, language } = useLocale();
+  const sections = useMemo(() => groupCoursesForList(courses, language), [courses, language]);
 
   useEffect(() => {
     const update = () => {
@@ -76,7 +78,7 @@ export function CourseList({
   if (!sections.length) {
     return (
       <Typography as="p" variant="paragraph" className="p-4 text-text-sub-600" role="status">
-        Tidak ada mata kuliah pada filter ini.
+        {text("Tidak ada mata kuliah pada filter ini.")}
       </Typography>
     );
   }
@@ -84,7 +86,7 @@ export function CourseList({
   return (
     <div
       className="space-y-10 [&>section+section]:border-t [&>section+section]:border-stroke-soft-200 [&>section+section]:pt-6"
-      aria-label="Daftar mata kuliah"
+      aria-label={text("Daftar mata kuliah")}
     >
       {sections.map((section) => (
         <CourseTable key={section.id} section={section} selectedId={selectedId} select={select} />

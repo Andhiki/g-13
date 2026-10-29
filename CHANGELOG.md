@@ -20,6 +20,12 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Terjemahan Indonesia dan Inggris mencakup judul, ajakan bertindak, filter,
+  pintasan keyboard, nama mata kuliah, detail, kuis dan catatan roadmap, arsip
+  ujian, FAQ, alumni, sumber belajar, serta metadata halaman. Bahasa tersimpan
+  dalam cookie agar hasil render server dan browser sama; kamus dimuat sesuai
+  bahasa dan halaman yang dibuka. Pencarian arsip menerima nama Indonesia maupun Inggris.
+
 - Kartu pintasan keyboard disembunyikan pada layar kecil.
 
 - Halaman Helpful Resources berbicara langsung kepada pembaca dan menautkan

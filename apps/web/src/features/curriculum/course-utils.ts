@@ -27,11 +27,16 @@ export function courseLabels(course: Course) {
   return [...new Set(course.placements.map((placement) => placement.label).filter(Boolean))];
 }
 
-export function semesterLabel(course: Course) {
+export function semesterLabel(
+  course: Course,
+  text: (key: string, values?: Record<string, unknown>) => string = (key) => key,
+) {
   const terms = [
     ...new Set(course.placements.map((placement) => placement.semesterLabel).filter(Boolean)),
   ];
-  return terms.length ? "Semester " + terms.join(" / ") : "Semester tidak dinyatakan";
+  return terms.length
+    ? "Semester " + terms.map((term) => text(term)).join(" / ")
+    : text("Semester tidak dinyatakan");
 }
 
 export function requirementText(course: Course) {
@@ -44,13 +49,21 @@ export function requirementText(course: Course) {
   ];
 }
 
-export function sourceLocation(course: Course) {
+export function sourceLocation(course: Course, text: (key: string) => string = (key) => key) {
   const locations = new Set<string>();
   for (const placement of course.placements) {
     if (placement.printedPage && placement.pdfPage)
-      locations.add("Cetak hlm. " + placement.printedPage + " · PDF hlm. " + placement.pdfPage);
-    else if (placement.printedPage) locations.add("Cetak hlm. " + placement.printedPage);
-    else if (placement.pdfPage) locations.add("PDF hlm. " + placement.pdfPage);
+      locations.add(
+        text("Cetak hlm.") +
+          " " +
+          placement.printedPage +
+          " · " +
+          text("PDF hlm.") +
+          " " +
+          placement.pdfPage,
+      );
+    else if (placement.printedPage) locations.add(text("Cetak hlm.") + " " + placement.printedPage);
+    else if (placement.pdfPage) locations.add(text("PDF hlm.") + " " + placement.pdfPage);
   }
   return [...locations];
 }

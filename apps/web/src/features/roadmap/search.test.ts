@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { validateRoadmapSearch } from "./search";
 import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
-import { buildRoadmap } from "./planner";
+import { buildRoadmap } from "./planner.test-support";
 
 const baseline = {
   kurikulum: "2026",

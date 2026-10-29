@@ -62,10 +62,14 @@ export function browseArchive({
   location,
   query = "",
   catalog = examArchive,
+  displayName = (course: ExamCourse) => course.name,
+  locale = "id",
 }: {
   location: ArchiveLocation;
   query?: string;
   catalog?: readonly ExamCourse[];
+  displayName?: (course: ExamCourse) => string;
+  locale?: string;
 }) {
   const breadcrumbs: { name: string; location: ArchiveLocation }[] = [
     { name: "Arsip Ujian", location: [] },
@@ -73,18 +77,22 @@ export function browseArchive({
   const course = catalog.find((entry) => entry.id === location[0]);
   let entries: ArchiveEntry[];
   if (!course) {
-    const search = query.trim().toLocaleLowerCase("id");
+    const search = query.trim().toLocaleLowerCase(locale);
     entries = catalog
-      .filter((entry) => matchesCourseName(entry.name.toLocaleLowerCase("id"), search))
+      .filter((entry) =>
+        [entry.name, displayName(entry)].some((name) =>
+          matchesCourseName(name.toLocaleLowerCase(locale), search),
+        ),
+      )
       .map((entry) => ({
         kind: "folder",
         id: entry.id,
-        name: entry.name,
+        name: displayName(entry),
         location: [entry.id],
         createdAt: entry.createdAt,
       }));
   } else {
-    breadcrumbs.push({ name: course.name, location: [course.id] });
+    breadcrumbs.push({ name: displayName(course), location: [course.id] });
     const year = course.years.find((entry) => entry.name === location[1]);
     if (!year) {
       entries = [...course.years]
@@ -113,7 +121,7 @@ export function browseArchive({
   }
   return {
     breadcrumbs,
-    entries: entries.sort((a, b) => a.name.localeCompare(b.name, "id", { numeric: true })),
+    entries: entries.sort((a, b) => a.name.localeCompare(b.name, locale, { numeric: true })),
   };
 }
 

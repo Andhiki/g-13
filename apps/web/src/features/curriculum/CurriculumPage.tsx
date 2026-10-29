@@ -1,3 +1,4 @@
+import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
 import { useCallback, useState, type CSSProperties } from "react";
 import { CourseDetails } from "./components/CourseDetails";
@@ -12,6 +13,7 @@ import { useCurriculumExplorer } from "./useCurriculumExplorer";
 import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
 
 export function CurriculumPage() {
+  const { text } = useLocale();
   const explorer = useCurriculumExplorer();
   const { curriculum, data, relations, selected, view, map } = explorer;
 
@@ -49,7 +51,7 @@ export function CurriculumPage() {
     >
       <Overlay
         filtersInToolbar={view === "list"}
-        controlsLabel="Filter peta kurikulum"
+        controlsLabel={text("Filter peta kurikulum")}
         navigation={
           <SemesterFilter
             visible={view === "map" && selected ? [] : visibleSemesters}
@@ -108,7 +110,7 @@ export function CurriculumPage() {
           >
             <div className="mx-auto max-w-3xl">
               <Typography as="h1" variant="title" className="m-0 mb-8 text-text-strong-950">
-                Mata kuliah
+                {text("Mata kuliah")}
               </Typography>
               <CourseList
                 navigation={semesterNavigation}

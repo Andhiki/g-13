@@ -1,3 +1,4 @@
+import { useLocale } from "../../useLocale";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Typography } from "../../ui/typography";
 import { useState } from "react";
@@ -20,6 +21,7 @@ export function ElectiveReplacement({
   answers: RoadmapSearch;
   replace: (originalId: string, id: string) => void;
 }) {
+  const { text, courseName } = useLocale("roadmap");
   const [open, setOpen] = useState(false);
   const [choice, setChoice] = useState("");
   const available = electiveOptions(answers.kurikulum ?? defaultCurriculumId).filter(
@@ -38,28 +40,29 @@ export function ElectiveReplacement({
           setOpen(true);
         }}
       >
-        Ganti mata kuliah pilihan
+        {text("Ganti mata kuliah pilihan")}
       </AlignButton.Root>
       <AlignModal.Content>
         <div className="p-5">
           <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle1" className="pr-8">
-              Ganti mata kuliah pilihan
+              {text("Ganti mata kuliah pilihan")}
             </Typography>
           </AlignModal.Title>
           <AlignModal.Description asChild>
             <Typography as="p" variant="paragraph" className="mb-5 mt-2 text-text-sub-600">
-              Menggantikan {item.course.title}. Beban dan prasyarat rencana dihitung ulang.
+              {text("Menggantikan")} {courseName(item.course)}
+              {text(". Beban dan prasyarat rencana dihitung ulang.")}
             </Typography>
           </AlignModal.Description>
           <AlignSelect.Root value={choice} onValueChange={setChoice}>
-            <AlignSelect.Trigger aria-label="Mata kuliah pengganti">
-              <AlignSelect.Value placeholder="Pilih mata kuliah" />
+            <AlignSelect.Trigger aria-label={text("Mata kuliah pengganti")}>
+              <AlignSelect.Value placeholder={text("Pilih mata kuliah")} />
             </AlignSelect.Trigger>
             <AlignSelect.Content>
               {available.map((x) => (
                 <AlignSelect.Item key={x.id} value={x.id}>
-                  {x.title} · {creditsFor(x)} SKS
+                  {courseName(x)} · {creditsFor(x)} {text("SKS")}
                 </AlignSelect.Item>
               ))}
             </AlignSelect.Content>
@@ -67,13 +70,16 @@ export function ElectiveReplacement({
           {course && (
             <div className="mt-4 text-paragraph-sm">
               <Typography as="p" variant="paragraph">
-                {course.code} · {creditsFor(course)} SKS
+                {course.code} · {creditsFor(course)} {text("SKS")}
               </Typography>
               <Typography as="p" variant="paragraph">
-                Prasyarat: {requirementText(course).join("; ") || "Tidak dinyatakan dalam tabel."}
+                {text("Prasyarat:")}{" "}
+                {requirementText(course)
+                  .map((requirement) => text(requirement))
+                  .join("; ") || text("Tidak dinyatakan dalam tabel.")}
               </Typography>
               <Typography as="p" variant="caption" className="text-text-sub-600">
-                {sourceLocation(course).join("; ")}
+                {sourceLocation(course, text).join("; ")}
               </Typography>
             </div>
           )}
@@ -88,7 +94,7 @@ export function ElectiveReplacement({
                 }
               }}
             >
-              Gunakan mata kuliah ini
+              {text("Gunakan mata kuliah ini")}
             </AlignButton.Root>
           </div>
         </div>

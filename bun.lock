@@ -32,7 +32,6 @@
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
         "i18next": "^26.5.11",
-        "i18next-browser-languagedetector": "^8.2.3",
         "merge-refs": "^2.0.0",
         "motion": "^14.6.0",
         "next-themes": "^0.4.6",
@@ -80,6 +79,7 @@
         "i18next": "^26.5.11",
       },
       "devDependencies": {
+        "@types/bun": "^1.4.4",
         "oxfmt": "^0.74.0",
         "oxlint": "^1.89.0",
         "tsdown": "^0.23.2",
@@ -753,8 +753,6 @@
     "html-parse-stringify": ["html-parse-stringify@4.0.1", "", {}, "sha512-0zHsZJrK7S3K2aucXWL6ycoYJ/iNtIcFHC/nYQgFklPtrv5LpJctIiSCroWZWeuoXvuyFdzp6KzjJQ+OT5MfFw=="],
 
     "i18next": ["i18next@26.5.11", "", { "peerDependencies": { "typescript": "^5 || ^6 || ^7" }, "optionalPeers": ["typescript"] }, "sha512-Wc0klBPKxqZ2tL2qdAnF8xvvnWgr1IMGSY2ikTiAvaFVbz7xiFARtkoU4RidBDw1SyziGROp0qxu6qnJ7l2Wug=="],
-
-    "i18next-browser-languagedetector": ["i18next-browser-languagedetector@8.2.3", "", { "dependencies": { "@babel/runtime": "^7.29.2" } }, "sha512-0jSTK3ncpXj9MFdxRz+TVTKDkSvYH8ifB/OCmUdEMprvXC3vy7kEvdKpj0yYB72B0UKEHJLPMEeRVC/UXroWnw=="],
 
     "import-without-cache": ["import-without-cache@0.4.1", "", {}, "sha512-vXoV9PjKHEednCUu01e98TkImxy67e3BJXbTIOmIq4Hyzw3IAwYRcuPkfeTzJzwyyts4kjuA73x+pWJLc4f86A=="],
 

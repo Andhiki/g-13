@@ -3,17 +3,42 @@ import { Toaster } from "../ui/toast";
 import { AppHeader } from "../ui/app-header";
 import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { ThemeProvider } from "next-themes";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
-import i18n from "../i18n";
-import { defaultLanguage } from "@g13/i18n";
+import { createI18n } from "../i18n";
+import { readLanguage } from "../language";
+import { loadMessages, type MessageNamespace } from "@g13/i18n/messages";
 
 export const Route = createRootRoute({
-  head: () => ({
+  beforeLoad: async () => {
+    const language = readLanguage();
+    return { language, common: await loadMessages(language, "common") };
+  },
+  loader: async ({ context, location }) => {
+    const pathname = location.pathname.replace(/\/+$/, "");
+    const namespace: MessageNamespace =
+      pathname === "/roadmap"
+        ? "roadmap"
+        : pathname === "/exam"
+          ? "exam"
+          : pathname === "/resources"
+            ? "resources"
+            : pathname === "/alumni"
+              ? "alumni"
+              : "common";
+    return {
+      language: context.language,
+      namespace,
+      common: context.common,
+      messages: await loadMessages(context.language, namespace),
+    };
+  },
+  shouldReload: true,
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -22,9 +47,11 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap kuliah, dan arsip ujian S1 Ilmu Komputer UGM.",
+          loaderData?.common[
+            "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap kuliah, dan arsip ujian S1 Ilmu Komputer UGM."
+          ],
       },
-      { title: "Everything CS UGM" },
+      { title: loaderData?.common["Everything CS UGM"] },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -55,25 +82,21 @@ function AppLayout() {
   return (
     <div className="min-h-dvh pt-[var(--app-header-height)]">
       <AppHeader />
-      <LanguageDocumentSync />
       <Outlet />
       <Toaster />
     </div>
   );
 }
 
-function LanguageDocumentSync() {
-  const { i18n: instance } = useTranslation();
-  useEffect(() => {
-    document.documentElement.lang = instance.resolvedLanguage ?? defaultLanguage;
-  }, [instance, instance.resolvedLanguage]);
-  return null;
-}
-
 function RootDocument({ children }: { children: ReactNode }) {
+  const { language, namespace, messages, common } = Route.useLoaderData();
+  const i18n = useMemo(
+    () => createI18n({ language, namespace, messages, common }),
+    [language, namespace, messages, common],
+  );
   return (
     <html
-      lang={defaultLanguage}
+      lang={language}
       suppressHydrationWarning
       className="m-0 h-full w-full min-w-80 bg-bg-white-0 font-sans text-text-strong-950 [&_.remixicon_path]:origin-center [&_.remixicon_path]:scale-[0.8996] [font-synthesis:none] [text-rendering:optimizeLegibility] [&_a:focus-visible]:outline-3 [&_a:focus-visible]:outline-offset-3 [&_a:focus-visible]:outline-primary-base"
     >

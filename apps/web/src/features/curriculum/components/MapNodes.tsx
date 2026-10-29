@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { memo } from "react";
 import { Typography } from "../../../ui/typography";
 import { Handle, Position, useStore, type Node, type NodeProps } from "@xyflow/react";
@@ -57,6 +58,7 @@ export const CourseNode = memo(function CourseNode({
   id,
   data,
 }: NodeProps<Node<CourseNodeData, "course">>) {
+  const { text, courseName } = useLocale();
   const incomingVisible = useStore((state) =>
     state.edges.some((edge) => edge.target === id && !edge.hidden && edge.data?.visible),
   );
@@ -94,7 +96,7 @@ export const CourseNode = memo(function CourseNode({
         type="button"
         className="relative flex h-[82px] w-full cursor-pointer flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
         onClick={() => data.choose(course.id)}
-        aria-label={"Buka detail " + course.title}
+        aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}
       >
         <div data-course-metadata className="absolute inset-x-0 top-0 flex items-center">
@@ -103,7 +105,7 @@ export const CourseNode = memo(function CourseNode({
             variant="caption"
             className={styles.surface({ class: tab + " max-w-[calc(100%-72px)]" })}
           >
-            {course.code || "Slot pilihan"}
+            {course.code || text("Slot pilihan")}
           </Typography>
           <Typography
             as="span"
@@ -112,11 +114,11 @@ export const CourseNode = memo(function CourseNode({
               class: tab + " -ml-px flex-none " + styles.credit(),
             })}
           >
-            {credit === null ? "—" : credit + " SKS"}
+            {credit === null ? "—" : credit + text(" SKS")}
           </Typography>
         </div>
         <Typography data-course-title as="strong" variant="label" className={styles.title()}>
-          {course.title}
+          {courseName(course)}
         </Typography>
       </button>
       {data.outgoing.length > 0 && (
@@ -135,6 +137,7 @@ export const LaneNode = memo(function LaneNode({
   id,
   data,
 }: NodeProps<Node<LaneNodeData, "lane">>) {
+  const { text } = useLocale();
   const section = id === "lane-choices";
   return (
     <div
@@ -149,7 +152,7 @@ export const LaneNode = memo(function LaneNode({
         variant={section ? "title" : "label"}
         className={section ? "m-0 text-text-strong-950" : undefined}
       >
-        {data.title}
+        {text(data.title)}
       </Typography>
     </div>
   );

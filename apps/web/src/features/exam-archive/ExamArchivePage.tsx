@@ -1,6 +1,7 @@
+import { useLocale } from "../../useLocale";
 import { AlignTooltip } from "../../ui/tooltip";
 import { toast, SuccessToast } from "../../ui/toast";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   RiArrowUpLine,
@@ -27,21 +28,15 @@ import { Route } from "../../routes/exam";
 import type { ArchiveLocation } from "./contracts";
 
 function ExamBadge({ exam }: { exam: "UTS" | "UAS" }) {
+  const { text } = useLocale("exam");
   return (
     <AlignBadge.Root variant={exam === "UTS" ? "information" : "warning"} size="small">
-      {exam}
+      {text(exam)}
     </AlignBadge.Root>
   );
 }
 
-const archiveUpdatedLabel = new Intl.DateTimeFormat("id-ID", {
-  dateStyle: "long",
-  timeStyle: "short",
-  timeZone: "Asia/Jakarta",
-}).format(new Date(archiveUpdatedAt));
-
-const relativeTimeFormatter = new Intl.RelativeTimeFormat("id-ID", { numeric: "auto" });
-const formatCreatedAt = (value: string | null) => {
+const formatCreatedAt = (value: string | null, relativeTimeFormatter: Intl.RelativeTimeFormat) => {
   if (!value) return "—";
   const days = Math.round((Date.parse(value) - Date.now()) / 86_400_000);
   if (Math.abs(days) >= 365) return relativeTimeFormatter.format(Math.round(days / 365), "year");
@@ -50,6 +45,20 @@ const formatCreatedAt = (value: string | null) => {
 };
 
 export function ExamArchivePage() {
+  const { text, language } = useLocale("exam");
+  const archiveUpdatedLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language, {
+        dateStyle: "long",
+        timeStyle: "short",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(archiveUpdatedAt)),
+    [language],
+  );
+  const relativeTimeFormatter = useMemo(
+    () => new Intl.RelativeTimeFormat(language, { numeric: "auto" }),
+    [language],
+  );
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { location, paper } = resolveArchive(search);
@@ -63,7 +72,12 @@ export function ExamArchivePage() {
   const share = shared?.selection === selection ? shared : null;
   const list = useRef<HTMLDivElement>(null);
   const modalTitle = useRef<HTMLHeadingElement>(null);
-  const folder = browseArchive({ location, query });
+  const folder = browseArchive({
+    location,
+    query,
+    displayName: (course) => text(course.name),
+    locale: language,
+  });
   const parent = folder.breadcrumbs.at(-2);
   const links = paper ? paperLinks(paper) : null;
   const openFolder = (next: ArchiveLocation) => {
@@ -74,7 +88,7 @@ export function ExamArchivePage() {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
-      toast.custom(() => <SuccessToast message="Tautan arsip ujian disalin" />);
+      toast.custom(() => <SuccessToast message={text("Tautan arsip ujian disalin")} />);
       setShared({ selection, url, status: "copied" });
     } catch {
       setShared({ selection, url, status: "manual" });
@@ -85,24 +99,28 @@ export function ExamArchivePage() {
     <main className="mx-auto flex h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-0 py-5 text-text-strong-950 sm:px-8 sm:py-8">
       <header className="shrink-0 space-y-2 px-4 sm:px-0">
         <Typography as="h1" variant="title">
-          Arsip Ujian
+          {text("Arsip Ujian")}
         </Typography>
         <Typography as="p" variant="paragraph" className="text-text-sub-600">
-          Provided by{" "}
+          {text("Provided by")}{" "}
           <a
             href="https://himakom.ugm.ac.id"
             className="underline underline-offset-4 hover:text-text-strong-950"
           >
             Himakom UGM
           </a>
-          . Last updated at <time dateTime={archiveUpdatedAt}>{archiveUpdatedLabel} WIB</time>.
+          {text(". Last updated at")}{" "}
+          <time dateTime={archiveUpdatedAt}>
+            {archiveUpdatedLabel} {text("WIB")}
+          </time>
+          .
         </Typography>
       </header>
-      <section className="flex min-h-0 flex-1 flex-col" aria-label="Penjelajah arsip ujian">
+      <section className="flex min-h-0 flex-1 flex-col" aria-label={text("Penjelajah arsip ujian")}>
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y border-stroke-soft-200 sm:rounded-xl sm:border">
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-2">
             <AlignBreadcrumb.Root asChild>
-              <nav aria-label="Lokasi folder" className="min-w-0">
+              <nav aria-label={text("Lokasi folder")} className="min-w-0">
                 {folder.breadcrumbs.map((crumb, index) => (
                   <Fragment key={crumb.name}>
                     {index > 0 && (
@@ -116,13 +134,13 @@ export function ExamArchivePage() {
                       className="min-w-0 max-w-full break-words"
                     >
                       <Link
-                        aria-label={index === 0 ? "Arsip ujian — direktori home" : undefined}
+                        aria-label={index === 0 ? text("Arsip ujian — direktori home") : undefined}
                         to="/exam"
                         search={folderSearch(crumb.location)}
                         resetScroll={false}
                         aria-current={index === folder.breadcrumbs.length - 1 ? "page" : undefined}
                       >
-                        {index === 0 ? "~" : crumb.name}
+                        {index === 0 ? "~" : text(crumb.name)}
                       </Link>
                     </AlignBreadcrumb.Item>
                   </Fragment>
@@ -134,8 +152,8 @@ export function ExamArchivePage() {
               <input
                 type="search"
                 className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-                aria-label="Cari mata kuliah"
-                placeholder="Mata kuliah"
+                aria-label={text("Cari mata kuliah")}
+                placeholder={text("Mata kuliah")}
                 value={query}
                 onChange={(event) => {
                   setQuery(event.target.value);
@@ -149,16 +167,16 @@ export function ExamArchivePage() {
             aria-hidden="true"
           >
             <span className="flex items-center gap-1">
-              Nama <RiArrowUpLine className="size-3.5" aria-hidden="true" />
+              {text("Nama")} <RiArrowUpLine className="size-3.5" aria-hidden="true" />
             </span>
-            <span className="hidden text-center sm:block">Dibuat</span>
-            <span className="text-center">Ujian</span>
-            <span className="text-center">Jenis</span>
+            <span className="hidden text-center sm:block">{text("Dibuat")}</span>
+            <span className="text-center">{text("Ujian")}</span>
+            <span className="text-center">{text("Jenis")}</span>
           </div>
           <div
             ref={list}
             tabIndex={-1}
-            aria-label="Isi folder"
+            aria-label={text("Isi folder")}
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
           >
             {parent && (
@@ -166,7 +184,7 @@ export function ExamArchivePage() {
                 to="/exam"
                 search={folderSearch(parent.location)}
                 resetScroll={false}
-                aria-label="Naik satu folder"
+                aria-label={text("Naik satu folder")}
                 className="flex w-full items-center gap-3 border-b border-stroke-soft-200 px-3 py-3 text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
               >
                 <RiFolder3Line className="size-5 shrink-0 text-text-sub-600" aria-hidden="true" />
@@ -208,14 +226,14 @@ export function ExamArchivePage() {
                   )}
                   <span className="flex min-w-0 flex-1 flex-col">
                     <Typography as="span" className="min-w-0 break-words">
-                      {entry.name}
+                      {entry.kind === "folder" ? text(entry.name) : entry.name}
                     </Typography>
                     <Typography
                       as="span"
                       variant="caption"
                       className="text-text-soft-400 sm:hidden"
                     >
-                      Dibuat {formatCreatedAt(entry.createdAt)}
+                      {text("Dibuat")} {formatCreatedAt(entry.createdAt, relativeTimeFormatter)}
                     </Typography>
                   </span>
                 </span>
@@ -224,7 +242,7 @@ export function ExamArchivePage() {
                   variant="caption"
                   className="hidden text-center text-text-sub-600 sm:block"
                 >
-                  {formatCreatedAt(entry.createdAt)}
+                  {formatCreatedAt(entry.createdAt, relativeTimeFormatter)}
                 </Typography>
                 <span className="flex justify-center text-paragraph-xs text-text-sub-600">
                   {entry.kind === "paper" && entry.paper.exam ? (
@@ -238,7 +256,7 @@ export function ExamArchivePage() {
                   size="small"
                   className="w-fit justify-self-center rounded-md"
                 >
-                  {entry.kind === "folder" ? "Folder" : "Berkas"}
+                  {entry.kind === "folder" ? text("Folder") : text("Berkas")}
                 </AlignBadge.Root>
               </button>
             ))}
@@ -248,8 +266,8 @@ export function ExamArchivePage() {
                 className="px-3 py-16 text-center text-paragraph-sm text-text-sub-600"
               >
                 {location.length === 0 && query.trim()
-                  ? "Tidak ada mata kuliah yang cocok."
-                  : "Folder kosong"}
+                  ? text("Tidak ada mata kuliah yang cocok.")
+                  : text("Folder kosong")}
               </p>
             )}
           </div>
@@ -291,14 +309,14 @@ export function ExamArchivePage() {
               <div
                 className="flex shrink-0 items-center gap-1"
                 role="group"
-                aria-label="Aksi berkas"
+                aria-label={text("Aksi berkas")}
               >
                 <a
                   href={links.download}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Unduh"
-                  title="Unduh"
+                  aria-label={text("Unduh")}
+                  title={text("Unduh")}
                   className={buttonVariants({
                     variant: "neutral",
                     mode: "ghost",
@@ -317,7 +335,9 @@ export function ExamArchivePage() {
                         size="xsmall"
                         className="size-8 p-0"
                         aria-label={
-                          share?.status === "copied" ? "Tautan berhasil disalin" : "Salin tautan"
+                          share?.status === "copied"
+                            ? text("Tautan berhasil disalin")
+                            : text("Salin tautan")
                         }
                         onClick={() => {
                           void copyLink();
@@ -335,7 +355,7 @@ export function ExamArchivePage() {
                       </AlignButton.Root>
                     </AlignTooltip.Trigger>
                     <AlignTooltip.Content size="xsmall" side="bottom">
-                      {share?.status === "copied" ? "Tautan disalin" : "Salin tautan"}
+                      {share?.status === "copied" ? text("Tautan disalin") : text("Salin tautan")}
                     </AlignTooltip.Content>
                   </AlignTooltip.Root>
                 </AlignTooltip.Provider>
@@ -343,8 +363,8 @@ export function ExamArchivePage() {
                   href={links.drive}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Buka di Drive"
-                  title="Buka di Drive"
+                  aria-label={text("Buka di Drive")}
+                  title={text("Buka di Drive")}
                   className={buttonVariants({
                     variant: "neutral",
                     mode: "ghost",
@@ -360,8 +380,8 @@ export function ExamArchivePage() {
                     mode="ghost"
                     size="xsmall"
                     className="size-8 p-0"
-                    aria-label="Tutup dialog"
-                    title="Tutup"
+                    aria-label={text("Tutup dialog")}
+                    title={text("Tutup")}
                   >
                     <RiCloseLine className="size-4" aria-hidden="true" />
                   </AlignButton.Root>
@@ -369,16 +389,16 @@ export function ExamArchivePage() {
               </div>
             )}
             <span className="sr-only" role="status" aria-live="polite">
-              {share?.status === "copied" ? "Tautan berhasil disalin" : ""}
+              {share?.status === "copied" ? text("Tautan berhasil disalin") : ""}
             </span>
           </div>
           {share?.status === "manual" && (
             <div className="border-y border-stroke-soft-200 px-4 py-2">
               <Typography variant="caption" role="status">
-                Gagal menyalin otomatis. Salin tautan berikut.
+                {text("Gagal menyalin otomatis. Salin tautan berikut.")}
               </Typography>
               <input
-                aria-label="Tautan berkas"
+                aria-label={text("Tautan berkas")}
                 readOnly
                 value={share.url}
                 onFocus={(event) => event.currentTarget.select()}

@@ -1,3 +1,4 @@
+import { useLocale } from "../../../useLocale";
 import { useEffect, useState } from "react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { RiCheckLine, RiFileCopyLine } from "@remixicon/react";
@@ -6,6 +7,7 @@ import { CompactButton } from "../../../ui/compact-button";
 import { AlignTooltip } from "../../../ui/tooltip";
 
 export function CopyCourseButton({ value, label }: { value: string; label: string }) {
+  const { text } = useLocale();
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   const reducedMotion = useReducedMotion();
   useEffect(() => {
@@ -16,10 +18,10 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
 
   const statusLabel =
     status === "copied"
-      ? `${label} disalin`
+      ? text("{{v0}} disalin", { v0: label })
       : status === "error"
-        ? "Gagal menyalin. Coba lagi."
-        : `Salin ${label}`;
+        ? text("Gagal menyalin. Coba lagi.")
+        : text("Salin {{v0}}", { v0: label });
   const Icon = status === "copied" ? RiCheckLine : RiFileCopyLine;
   const hidden = {
     opacity: 0,
@@ -36,7 +38,9 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
               try {
                 await navigator.clipboard.writeText(value);
                 setStatus("copied");
-                toast.custom(() => <SuccessToast message={`${label} disalin`} />);
+                toast.custom(() => (
+                  <SuccessToast message={text("{{v0}} disalin", { v0: label })} />
+                ));
               } catch {
                 setStatus("error");
               }
