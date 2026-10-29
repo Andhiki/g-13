@@ -1,7 +1,10 @@
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Toaster } from "../ui/toast";
 import { AppHeader } from "../ui/app-header";
+import { StatusIllustration } from "../ui/status-illustration";
 import { Typography } from "../ui/typography";
+import { AlignButton } from "../ui/button";
+import { RiArrowLeftLine, RiRefreshLine } from "@remixicon/react";
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -59,20 +62,48 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
   shellComponent: RootDocument,
   component: AppLayout,
   notFoundComponent: NotFound,
+  errorComponent: ErrorPage,
 });
 
-function NotFound() {
+function StatusPage({ kind, reset }: { kind: "notFound" | "error"; reset?: () => void }) {
   const { t } = useTranslation();
   return (
-    <main>
-      <Typography as="h1" variant="title">
-        {t("notFound.title")}
-      </Typography>
-      <Link to="/" search={{ kurikulum: defaultCurriculumId }}>
-        {t("notFound.home")}
-      </Link>
+    <main className="flex min-h-[70dvh] items-center justify-center px-6 py-16 text-center">
+      <div className="flex w-full max-w-lg flex-col items-center">
+        <StatusIllustration kind={kind} />
+        <Typography as="h1" variant="title">
+          {t(`${kind}.title`)}
+        </Typography>
+        <Typography className="mt-3 text-text-sub-600">{t(`${kind}.description`)}</Typography>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {kind === "error" && (
+            <AlignButton.Root onClick={reset}>
+              <RiRefreshLine className="size-5" />
+              {t("error.retry")}
+            </AlignButton.Root>
+          )}
+          <AlignButton.Root
+            asChild
+            variant={kind === "error" ? "neutral" : "primary"}
+            mode={kind === "error" ? "stroke" : "filled"}
+          >
+            <Link to="/" search={{ kurikulum: defaultCurriculumId }}>
+              <RiArrowLeftLine className="size-5" />
+              {t("notFound.home")}
+            </Link>
+          </AlignButton.Root>
+        </div>
+      </div>
     </main>
   );
+}
+
+function NotFound() {
+  return <StatusPage kind="notFound" />;
+}
+
+function ErrorPage({ reset }: { reset: () => void }) {
+  return <StatusPage kind="error" reset={reset} />;
 }
 
 function AppLayout() {
@@ -86,7 +117,12 @@ function AppLayout() {
 }
 
 function RootDocument({ children }: { children: ReactNode }) {
-  const { language, namespace, messages, common } = Route.useLoaderData();
+  const { language, namespace, messages, common } = Route.useLoaderData() ?? {
+    language: "id" as const,
+    namespace: "common" as const,
+    messages: {},
+    common: {},
+  };
   const i18n = useMemo(
     () => createI18n({ language, namespace, messages, common }),
     [language, namespace, messages, common],
