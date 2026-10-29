@@ -7,7 +7,7 @@
   "scripts": {
     "studio": "remotionb studio",
     "build": "remotionb bundle --out-dir=dist",
-    "render": "remotionb render G13Trailer out/g13-cinematic.mp4",
+    "render": "remotionb render G13Trailer out/trailer.mp4",
     "typecheck": "tsc",
     "lint": "oxlint --deny-warnings src remotion.config.ts",
     "fmt": "oxfmt src remotion.config.ts package.json tsconfig.json",

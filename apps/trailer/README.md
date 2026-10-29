@@ -69,7 +69,7 @@ Run the render command:
 bun run --cwd apps/trailer render --codec=h264 --crf=18 --x264-preset=veryfast
 ```
 
-When the render finishes, open `apps/trailer/out/g13-cinematic.mp4`. The `out/`
+When the render finishes, open `apps/trailer/out/trailer.mp4`. The `out/`
 folder is ignored by Git, so the rendered video stays on your computer and is
 not included in commits. To learn about other render options, see
 [Remotion's render guide](https://www.remotion.dev/docs/render).
