@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-10-30
 
+#### Fixed
+
+- Tombol salin dan tutup pada drawer detail mata kuliah diratakan dalam satu baris.
+
 #### Changed
 
 - Semua indikator pemuatan memakai Sonic dengan teks berdenyut yang dipilih acak setiap kali muncul.

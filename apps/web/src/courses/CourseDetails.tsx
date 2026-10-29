@@ -5,6 +5,7 @@ import { DeferredContent } from "../ui/deferred-content";
 import { AlignDrawer } from "../ui/drawer";
 import { CompactButton } from "../ui/compact-button";
 import { RiCloseLine } from "@remixicon/react";
+import { CopyCourseButton } from "./CopyCourseButton";
 import { CourseSheetHandle } from "./CourseSheetHandle";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
 import { courseLayout } from "./layout";
@@ -84,15 +85,18 @@ export function CourseDetails({
               onHeightChange?.(next);
             }}
           />
-          <AlignDrawer.Close asChild>
-            <CompactButton
-              ref={closeButton}
-              className="absolute right-4 top-4 z-10 sm:right-5 sm:top-5"
-              aria-label={text("Tutup detail mata kuliah")}
-            >
-              <RiCloseLine className="size-5" aria-hidden="true" />
-            </CompactButton>
-          </AlignDrawer.Close>
+          <div className="absolute right-4 top-4 z-10 flex items-center gap-2 sm:right-5 sm:top-5">
+            <CopyCourseButton
+              key={content.course.id}
+              value={content.course.id}
+              label={text("ID mata kuliah")}
+            />
+            <AlignDrawer.Close asChild>
+              <CompactButton ref={closeButton} aria-label={text("Tutup detail mata kuliah")}>
+                <RiCloseLine className="size-5" aria-hidden="true" />
+              </CompactButton>
+            </AlignDrawer.Close>
+          </div>
           <DeferredContent
             fallback={
               <>

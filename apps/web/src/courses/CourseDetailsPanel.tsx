@@ -15,7 +15,6 @@ import {
 } from "@g13/curriculum";
 import { courseLabels, creditsFor, semesterLabel } from "./course-utils";
 import { SemesterIndicator } from "./SemesterIndicator";
-import { CopyCourseButton } from "./CopyCourseButton";
 
 import type { CourseDetailsProps } from "./CourseDetails";
 
@@ -41,7 +40,7 @@ export function CourseDetailsPanel({
   const credit = creditsFor(course);
   return (
     <>
-      <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 sm:p-5">
+      <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
             {course.code || text("Mata kuliah pilihan")}
@@ -75,9 +74,6 @@ export function CourseDetailsPanel({
               </AlignBadge.Root>
             ))}
           </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-2 pr-8">
-          <CopyCourseButton key={course.id} value={course.id} label={text("ID mata kuliah")} />
         </div>
       </AlignDrawer.Header>
       <AlignDrawer.Description asChild>
