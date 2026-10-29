@@ -255,6 +255,13 @@ for (const width of [1440, 390]) {
     await open(page, "/");
     await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
     await settled(page);
+    await page.getByRole("button", { name: "Perbesar", exact: true }).click();
+    await settled(page);
+    await page.mouse.move(width - 70, 550);
+    await page.mouse.down();
+    await page.mouse.move(width - 125, 490, { steps: 8 });
+    await page.mouse.up();
+    await settled(page);
     const filter = page.locator(
       width < 1100 ? '[aria-keyshortcuts="F"]' : '[aria-controls="desktop-filters"]',
     );
@@ -269,10 +276,9 @@ for (const width of [1440, 390]) {
       await page.getByRole("button", { name: "Tampilkan daftar", exact: true }).click();
       await expect(page.getByRole("heading", { name: "Mata kuliah", exact: true })).toBeVisible();
       expect(await filter.boundingBox()).toEqual(originalFilter);
-      expect(await graph.boundingBox()).toEqual(originalBounds);
       expect(await node.getAttribute("style")).toBe(originalNodeStyle);
       expect(await graph.evaluate((element) => element.isConnected)).toBe(true);
-      await expect(page.locator("[data-map-stage]")).toHaveAttribute("inert", "");
+      await expect(page.getByRole("group", { name: "Kontrol zoom", exact: true })).toHaveCount(0);
       expect(
         await page
           .locator(".react-flow__node")
@@ -283,15 +289,48 @@ for (const width of [1440, 390]) {
           ),
       ).toBe(false);
       await page.getByRole("button", { name: "Tampilkan peta", exact: true }).click();
-      await expect(page.locator("[data-map-stage]")).not.toHaveAttribute("inert", "");
+      await expect(page.getByRole("group", { name: "Kontrol zoom", exact: true })).toBeVisible();
+      expect(await graph.boundingBox()).toEqual(originalBounds);
       expect(await filter.boundingBox()).toEqual(originalFilter);
       expect(
         await graph.evaluate((element) => element === document.querySelector(".react-flow")),
       ).toBe(true);
+      await expectViewport(page, originalViewport);
       expect(await node.evaluate((element) => element.isConnected)).toBe(true);
       expect(await node.getAttribute("style")).toBe(originalNodeStyle);
-      await expectViewport(page, originalViewport);
     }
     expect(await page.evaluate(() => window.graphRoutingJobs)).toBe(jobs);
+  });
+}
+
+for (const width of [1440, 390]) {
+  test(`selected course survives repeated view switches, ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await open(page, "/");
+    await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
+    await settled(page);
+    await chooseVisibleCourse(page, true);
+    const selectedURL = page.url();
+    const focused = await viewport(page);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await page.getByRole("button", { name: "Tampilkan daftar", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Mata kuliah", exact: true })).toBeVisible();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await page.getByRole("button", { name: "Tampilkan peta", exact: true }).click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await expectViewport(page, focused);
+      expect(page.url()).toBe(selectedURL);
+    }
+    await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
+    await page.getByRole("button", { name: "Semester 3", exact: true }).click();
+    await settled(page);
+    const semester = await viewport(page);
+    await page.keyboard.press("v");
+    await expect(page.getByRole("heading", { name: "Mata kuliah", exact: true })).toBeVisible();
+    await page.keyboard.press("v");
+    await expectViewport(page, semester);
+    expect(errors).toEqual([]);
   });
 }
