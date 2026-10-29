@@ -40,6 +40,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menutup detail mata kuliah di grafik roadmap mengembalikan posisi grafik sebelumnya.
+
 - Pergantian bahasa mempertahankan halaman saat kamus gagal diunduh dan tetap
   berfungsi tanpa akses cookie. Alamat halaman dengan huruf besar/kecil yang
   berbeda memuat kamus terjemahan yang sesuai.

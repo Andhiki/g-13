@@ -10,6 +10,7 @@ import {
   type Node,
   type NodeProps,
   type Edge,
+  type Viewport,
 } from "@xyflow/react";
 import { EdgeRouting, routedEdgeTypes } from "../curriculum/components/EdgeRouting";
 import { CourseNode, LaneNode } from "../curriculum/components/MapNodes";
@@ -103,6 +104,28 @@ export function RoadmapGraph({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const flow = useRef<ReactFlowInstance<RoadmapNode, Edge>>(null);
   const stage = useRef<HTMLElement>(null);
+  const previousSelection = useRef(selectedId);
+  const overview = useRef<{ viewport: Viewport; navigation: typeof navigation } | null>(null);
+  useEffect(() => {
+    const instance = flow.current;
+    if (!instance) return;
+    if (previousSelection.current === null && selectedId !== null) {
+      overview.current = { viewport: instance.getViewport(), navigation };
+    }
+    if (previousSelection.current !== null && selectedId === null) {
+      const saved = overview.current;
+      overview.current = null;
+      if (saved && saved.navigation === navigation) {
+        const timer = window.setTimeout(() => {
+          const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          void flow.current?.setViewport(saved.viewport, { duration: reducedMotion ? 0 : 150 });
+        }, 30);
+        previousSelection.current = selectedId;
+        return () => window.clearTimeout(timer);
+      }
+    }
+    previousSelection.current = selectedId;
+  }, [selectedId, navigation]);
   useEffect(() => {
     if (navigation)
       void flow.current?.setCenter(LANE_X + (navigation.semester - 1) * LANE_STEP + 135, 420, {
