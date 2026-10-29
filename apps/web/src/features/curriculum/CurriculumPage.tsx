@@ -1,6 +1,6 @@
 import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
-import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { Activity, useCallback, useRef, useState, type CSSProperties } from "react";
 import { courseLayout } from "../../courses/layout";
 import { CourseDetails } from "../../courses/CourseDetails";
 import { CurriculumVersionFilter } from "./components/CourseFilters";
@@ -91,35 +91,33 @@ export function CurriculumPage() {
             : "min-h-[calc(100dvh-var(--app-header-height))] text-text-strong-950"
         }
       >
-        <div
-          ref={stage}
-          data-map-stage
-          aria-hidden={view !== "map"}
-          inert={view !== "map"}
-          className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
-          style={{ opacity: view === "map" ? 1 : 0 }}
-        >
-          <CurriculumMap
-            stage={stage}
-            active={view === "map"}
-            navigation={semesterNavigation}
-            resetVersion={resetVersion}
-            onReset={() => {
-              setSemesterNavigation(null);
-              explorer.closeDetails();
-              setResetVersion((version) => version + 1);
-            }}
-            onVisibleSemesters={reportSemesters}
-            close={explorer.closeDetails}
-            curriculum={curriculum}
-            selectedId={selected?.id ?? null}
-            nodes={map.nodes}
-            edges={map.edges}
-            positions={map.positions}
-            lastSemester={map.lastSemester}
-          />
-        </div>
-        {view === "list" && (
+        <Activity mode={view === "map" ? "visible" : "hidden"}>
+          <div
+            ref={stage}
+            data-map-stage
+            className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
+          >
+            <CurriculumMap
+              stage={stage}
+              navigation={semesterNavigation}
+              resetVersion={resetVersion}
+              onReset={() => {
+                setSemesterNavigation(null);
+                explorer.closeDetails();
+                setResetVersion((version) => version + 1);
+              }}
+              onVisibleSemesters={reportSemesters}
+              close={explorer.closeDetails}
+              curriculum={curriculum}
+              selectedId={selected?.id ?? null}
+              nodes={map.nodes}
+              edges={map.edges}
+              positions={map.positions}
+              lastSemester={map.lastSemester}
+            />
+          </div>
+        </Activity>
+        <Activity mode={view === "list" ? "visible" : "hidden"}>
           <section
             className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
@@ -136,7 +134,7 @@ export function CurriculumPage() {
               />
             </div>
           </section>
-        )}
+        </Activity>
         <CourseDetails
           onHeightChange={setDetailsHeight}
           modal={false}
