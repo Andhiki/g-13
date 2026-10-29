@@ -105,6 +105,11 @@ bun run check
 This checks code style, formatting, TypeScript types, and tests. Fix any reported
 problems, then run the command again.
 
+## Acknowledgements
+
+- [course.csui.dev](https://course.csui.dev) inspired this project.
+- [AlignUI](https://www.alignui.com) provides UI components used in this project.
+
 ## License and sources
 
 Original code and documentation are available under the [MIT license](LICENSE).
