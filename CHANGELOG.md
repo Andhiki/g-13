@@ -89,6 +89,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Tampilan daftar tidak lagi tertimpa node peta. Pergantian tampilan tetap memakai
+  node, posisi, dan jalur peta yang sudah disimpan tanpa menghitung ulang.
+
 - Sesuaikan lebar label pintasan keyboard dengan isi tombolnya.
 
 - Penyalinan tautan roadmap dan arsip ujian mengabaikan hasil penyalinan lama

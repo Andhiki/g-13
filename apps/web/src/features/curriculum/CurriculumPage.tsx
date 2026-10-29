@@ -89,7 +89,7 @@ export function CurriculumPage() {
           aria-hidden={view !== "map"}
           inert={view !== "map"}
           className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
-          style={{ visibility: view === "map" ? "visible" : "hidden" }}
+          style={{ opacity: view === "map" ? 1 : 0 }}
         >
           <CurriculumMap
             active={view === "map"}

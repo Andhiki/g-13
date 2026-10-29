@@ -235,36 +235,59 @@ test("map controls stay compact and shortcuts collapse like filters", async ({ p
   await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
 });
 
-test("view switches preserve the graph and keep filters below search", async ({ page }) => {
-  await page.addInitScript(() => {
-    window.graphRoutingJobs = 0;
-    const postMessage = Worker.prototype.postMessage;
-    Worker.prototype.postMessage = function (...args) {
-      window.graphRoutingJobs++;
-      return postMessage.apply(this, args);
-    };
+for (const width of [1440, 390]) {
+  test(`view switches preserve the graph and keep filters below search, ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.addInitScript(() => {
+      window.graphRoutingJobs = 0;
+      const postMessage = Worker.prototype.postMessage;
+      Worker.prototype.postMessage = function (...args) {
+        window.graphRoutingJobs++;
+        return postMessage.apply(this, args);
+      };
+    });
+    await open(page, "/");
+    await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
+    await settled(page);
+    const filter = page.locator(
+      width < 1100 ? '[aria-keyshortcuts="F"]' : '[aria-controls="desktop-filters"]',
+    );
+    const originalFilter = await filter.boundingBox();
+    const graph = await page.locator(".react-flow").elementHandle();
+    const originalViewport = await viewport(page);
+    const originalBounds = await graph.boundingBox();
+    const node = await page.locator(".react-flow__node").first().elementHandle();
+    const originalNodeStyle = await node.getAttribute("style");
+    const jobs = await page.evaluate(() => window.graphRoutingJobs);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await page.getByRole("button", { name: "Tampilkan daftar", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Mata kuliah", exact: true })).toBeVisible();
+      expect(await filter.boundingBox()).toEqual(originalFilter);
+      expect(await graph.boundingBox()).toEqual(originalBounds);
+      expect(await node.getAttribute("style")).toBe(originalNodeStyle);
+      expect(await graph.evaluate((element) => element.isConnected)).toBe(true);
+      await expect(page.locator("[data-map-stage]")).toHaveAttribute("inert", "");
+      expect(
+        await page
+          .locator(".react-flow__node")
+          .evaluateAll((nodes) =>
+            nodes.some((node) =>
+              node.checkVisibility({ visibilityProperty: true, opacityProperty: true }),
+            ),
+          ),
+      ).toBe(false);
+      await page.getByRole("button", { name: "Tampilkan peta", exact: true }).click();
+      await expect(page.locator("[data-map-stage]")).not.toHaveAttribute("inert", "");
+      expect(await filter.boundingBox()).toEqual(originalFilter);
+      expect(
+        await graph.evaluate((element) => element === document.querySelector(".react-flow")),
+      ).toBe(true);
+      expect(await node.evaluate((element) => element.isConnected)).toBe(true);
+      expect(await node.getAttribute("style")).toBe(originalNodeStyle);
+      await expectViewport(page, originalViewport);
+    }
+    expect(await page.evaluate(() => window.graphRoutingJobs)).toBe(jobs);
   });
-  await open(page, "/");
-  await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
-  await settled(page);
-  const filter = page.locator('[aria-controls="desktop-filters"]');
-  const originalFilter = await filter.boundingBox();
-  const graph = await page.locator(".react-flow").elementHandle();
-  const originalViewport = await viewport(page);
-  const jobs = await page.evaluate(() => window.graphRoutingJobs);
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await page.getByRole("button", { name: "Tampilkan daftar", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Mata kuliah", exact: true })).toBeVisible();
-    expect(await filter.boundingBox()).toEqual(originalFilter);
-    expect(await graph.evaluate((element) => element.isConnected)).toBe(true);
-    await expect(page.locator("[data-map-stage]")).toHaveAttribute("inert", "");
-    await page.getByRole("button", { name: "Tampilkan peta", exact: true }).click();
-    await expect(page.locator("[data-map-stage]")).not.toHaveAttribute("inert", "");
-    expect(await filter.boundingBox()).toEqual(originalFilter);
-    expect(
-      await graph.evaluate((element) => element === document.querySelector(".react-flow")),
-    ).toBe(true);
-    await expectViewport(page, originalViewport);
-  }
-  expect(await page.evaluate(() => window.graphRoutingJobs)).toBe(jobs);
-});
+}
