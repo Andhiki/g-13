@@ -310,7 +310,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
   const topics = syllabusPoints(syllabus.syllabus);
   return (
     <>
-      <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
+      <Typography as="p" variant="caption" className="mb-4 mt-3 text-text-sub-600">
         {text("sourceText")}
       </Typography>
       {syllabus.description && (
@@ -324,13 +324,13 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
         </>
       )}
       {topics.length > 1 ? (
-        <ul
-          aria-label={text("Pokok bahasan")}
-          lang="id"
-          className="list-disc space-y-1 pl-5 text-paragraph-sm"
-        >
+        <ul aria-label={text("Pokok bahasan")} lang="id" className="list-disc space-y-1 pl-5">
           {topics.map((topic, index) => (
-            <li key={index}>{topic}</li>
+            <li key={index}>
+              <Typography as="span" variant="paragraph">
+                {topic}
+              </Typography>
+            </li>
           ))}
         </ul>
       ) : (
@@ -343,7 +343,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
           <Typography as="h3" variant="subtitle2" className="mt-4 text-text-strong-950">
             {text("Referensi")}
           </Typography>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-sm">
+          <ul className="mt-3 list-disc space-y-1 pl-5">
             {syllabus.references.map((reference, index) => (
               <li key={index} className="pl-1">
                 <a
@@ -353,7 +353,9 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
                   className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
                   aria-label={text("{{v0}} (cari di Google, tab baru)", { v0: reference })}
                 >
-                  {reference}{" "}
+                  <Typography as="span" variant="paragraph">
+                    {reference}
+                  </Typography>{" "}
                   <RiArrowRightUpLine
                     className="inline-block size-3.5 align-text-bottom"
                     aria-hidden="true"

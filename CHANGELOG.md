@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Jarak keterangan bahasa asli pada silabus diperjelas, dengan tipografi konsisten
+  untuk pokok bahasan dan referensi.
+
 - Silabus dimuat bersama data kurikulum agar accordion langsung mengukur isi
   lengkap dan tidak melompat dari tinggi pesan pemuatan saat dibuka kembali.
 
