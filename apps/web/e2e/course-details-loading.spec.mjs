@@ -19,7 +19,9 @@ for (const width of [1440, 390]) {
     });
     await page.goto("/?kurikulum=2026");
     await page.waitForFunction(
-      () => document.querySelector('[aria-keyshortcuts="D"]')?.disabled === false,
+      () =>
+        document.querySelector('button[aria-label="Pengaturan"], button[aria-label="Settings"]')
+          ?.disabled === false,
     );
     await page.getByRole("button", { name: "Search courses", exact: true }).click();
     await page.getByRole("combobox").fill("PACS262418");

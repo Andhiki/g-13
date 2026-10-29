@@ -35,7 +35,7 @@ function RadioItem({
   return (
     <DropdownPrimitive.RadioItem
       className={twMerge(
-        "group/item relative flex cursor-pointer select-none items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out data-[highlighted]:bg-bg-weak-50 data-[disabled]:text-text-disabled-300",
+        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out data-[highlighted]:bg-bg-weak-50 data-[disabled]:text-text-disabled-300",
         className,
       )}
       {...props}

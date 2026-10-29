@@ -25,7 +25,9 @@ async function session(context, language, cookieMode) {
 
 async function hydrated(page) {
   await page.waitForFunction(
-    () => document.querySelector('[aria-keyshortcuts="D"]')?.disabled === false,
+    () =>
+      document.querySelector('button[aria-label="Pengaturan"], button[aria-label="Settings"]')
+        ?.disabled === false,
   );
 }
 
@@ -65,14 +67,20 @@ for (const mode of ["ignored", "denied"]) {
     await hydrated(page);
     await page.getByRole("link", { name: "Arsip Ujian", exact: true }).click();
     await page.getByRole("heading", { name: "Arsip Ujian", exact: true }).waitFor();
-    await page.getByRole("button", { name: "Beralih ke bahasa Inggris" }).click();
+    await page.getByRole("button", { name: "Pengaturan", exact: true }).click();
+    await page.getByRole("tab", { name: "English", exact: true }).click();
+    await page.getByRole("heading", { name: "Settings", exact: true }).waitFor();
+    await page.keyboard.press("Escape");
     await page.getByRole("heading", { name: "Exam archive", exact: true }).waitFor();
     assert.equal(await page.locator("html").getAttribute("lang"), "en");
     await page.getByRole("link", { name: "Learning resources", exact: true }).click();
     await page
       .getByRole("heading", { name: "Looking for a place to start?", exact: true })
       .waitFor();
-    await page.getByRole("button", { name: "Switch to Indonesian" }).click();
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
+    await page.getByRole("tab", { name: "Bahasa Indonesia", exact: true }).click();
+    await page.getByRole("heading", { name: "Pengaturan", exact: true }).waitFor();
+    await page.keyboard.press("Escape");
     await page
       .getByRole("heading", { name: "Bingung harus mulai dari mana?", exact: true })
       .waitFor();
@@ -87,17 +95,17 @@ test("failed language downloads preserve the current page and preference", async
   await page.goto(`${baseURL}/resources`);
   await hydrated(page);
   await page.route("**/assets/common-*.js", (route) => route.abort());
-  await page.getByRole("button", { name: "Beralih ke bahasa Inggris" }).click();
+  await page.getByRole("button", { name: "Pengaturan", exact: true }).click();
+  await page.getByRole("tab", { name: "English", exact: true }).click();
+  await page.keyboard.press("Escape");
   await page
     .getByText("Bahasa gagal dimuat. Periksa koneksi dan muat ulang untuk mencoba lagi.", {
       exact: true,
     })
     .waitFor();
-  assert.ok(
-    await page
-      .getByRole("heading", { name: "Bingung harus mulai dari mana?", exact: true })
-      .isVisible(),
-  );
+  await page
+    .getByRole("heading", { name: "Bingung harus mulai dari mana?", exact: true })
+    .waitFor();
   assert.equal(await page.locator("html").getAttribute("lang"), "id");
   assert.equal(
     (await context.cookies()).find((cookie) => cookie.name === "g13-language").value,
@@ -113,7 +121,10 @@ test("successful language selection persists across reloads", async ({ context, 
   await session(context, "id");
   await page.goto(`${baseURL}/resources`);
   await hydrated(page);
-  await page.getByRole("button", { name: "Beralih ke bahasa Inggris" }).click();
+  await page.getByRole("button", { name: "Pengaturan", exact: true }).click();
+  await page.getByRole("tab", { name: "English", exact: true }).click();
+  await page.getByRole("heading", { name: "Settings", exact: true }).waitFor();
+  await page.keyboard.press("Escape");
   await page.getByRole("heading", { name: "Looking for a place to start?", exact: true }).waitFor();
   assert.equal(
     (await context.cookies()).find((cookie) => cookie.name === "g13-language").value,

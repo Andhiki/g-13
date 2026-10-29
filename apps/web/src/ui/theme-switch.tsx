@@ -1,22 +1,17 @@
-import { useLocale } from "../useLocale";
 import { useTheme } from "next-themes";
-import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { RiMoonLine, RiSunLine } from "@remixicon/react";
-import { AlignButton } from "./button";
+import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
+import * as SegmentedControl from "./segmented-control";
+import { useTranslation } from "react-i18next";
 
 export function ThemeSwitch() {
-  const { text } = useLocale("common");
-  const { resolvedTheme, setTheme } = useTheme();
+  const { t } = useTranslation();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const transitioning = useRef(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const isDark = mounted && resolvedTheme === "dark";
-  const label = isDark ? text("Ganti ke tema terang") : text("Ganti ke tema gelap");
-  const Icon = isDark ? RiSunLine : RiMoonLine;
-
-  const changeTheme = (value: "light" | "dark") => {
+  const changeTheme = (value: "system" | "light" | "dark") => {
     if (transitioning.current) return;
     if (
       value === resolvedTheme ||
@@ -50,22 +45,39 @@ export function ThemeSwitch() {
     });
   };
 
-  useKeyboardShortcuts(mounted ? { d: () => changeTheme(isDark ? "light" : "dark") } : {});
-
   return (
-    <AlignButton.Root
-      type="button"
-      variant="neutral"
-      mode="stroke"
-      size="medium"
-      className="size-10 p-2.5"
-      aria-label={text(label)}
-      title={text("{{v0}} (D)", { v0: label })}
-      aria-keyshortcuts="D"
-      disabled={!mounted}
-      onClick={() => changeTheme(isDark ? "light" : "dark")}
+    <SegmentedControl.Root
+      value={mounted ? theme : "system"}
+      onValueChange={(value) => {
+        if (value === "system" || value === "light" || value === "dark") changeTheme(value);
+      }}
     >
-      <Icon className="size-5" aria-hidden="true" />
-    </AlignButton.Root>
+      <SegmentedControl.List aria-label={t("settings.theme")}>
+        <SegmentedControl.Trigger
+          value="system"
+          disabled={!mounted}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          <RiComputerLine className="size-4" aria-hidden="true" />
+          {t("settings.system")}
+        </SegmentedControl.Trigger>
+        <SegmentedControl.Trigger
+          value="dark"
+          disabled={!mounted}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          <RiMoonLine className="size-4" aria-hidden="true" />
+          {t("settings.dark")}
+        </SegmentedControl.Trigger>
+        <SegmentedControl.Trigger
+          value="light"
+          disabled={!mounted}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          <RiSunLine className="size-4" aria-hidden="true" />
+          {t("settings.light")}
+        </SegmentedControl.Trigger>
+      </SegmentedControl.List>
+    </SegmentedControl.Root>
   );
 }

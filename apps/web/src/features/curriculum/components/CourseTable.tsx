@@ -81,7 +81,7 @@ export function CourseTable({
             return (
               <AlignTable.Row
                 key={course.id}
-                className="cursor-pointer"
+                className="cursor-[var(--interactive-cursor)]"
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest("button")) return;
                   select(course.id);

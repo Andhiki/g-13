@@ -103,7 +103,7 @@ const Empty = Command.Empty;
 const itemVariants = tv({
   base: [
     "flex items-center gap-3 rounded-10 bg-bg-white-0",
-    "cursor-pointer text-paragraph-sm text-text-strong-950",
+    "cursor-[var(--interactive-cursor)] text-paragraph-sm text-text-strong-950",
     "transition duration-200 ease-out data-[selected=true]:bg-bg-weak-50",
   ],
   variants: {

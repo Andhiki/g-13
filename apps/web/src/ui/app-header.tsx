@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { m, useReducedMotion } from "motion/react";
-import { RiGithubFill, RiRouteLine } from "@remixicon/react";
+import { RiRouteLine } from "@remixicon/react";
 import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Image } from "@unpic/react";
 import { Faq } from "./faq";
-import { ThemeSwitch } from "./theme-switch";
+import { useTheme } from "next-themes";
+import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
+import { Settings } from "./settings";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
-import { LanguageSwitch } from "./language-switch";
 import { useTranslation } from "react-i18next";
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -102,24 +103,9 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
   );
 }
 
-function GitHubButton() {
-  const { t } = useTranslation();
-  return (
-    <AlignButton.Root asChild variant="neutral" mode="stroke" className="size-10 p-2.5">
-      <a
-        href="https://github.com/Andhiki/g-13"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t("navigation.github")}
-        title="GitHub"
-      >
-        <RiGithubFill aria-hidden="true" className="size-5" />
-      </a>
-    </AlignButton.Root>
-  );
-}
-
 export function AppHeader() {
+  const { resolvedTheme, setTheme } = useTheme();
+  useKeyboardShortcuts({ d: () => setTheme(resolvedTheme === "dark" ? "light" : "dark") });
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -173,9 +159,7 @@ export function AppHeader() {
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
-          <GitHubButton />
-          <LanguageSwitch />
-          <ThemeSwitch />
+          <Settings />
           <AlignButton.Root
             asChild
             variant="neutral-inverse"
@@ -275,9 +259,7 @@ export function AppHeader() {
           <Faq className="h-14 justify-start text-lg" />
         </nav>
         <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
-          <GitHubButton />
-          <LanguageSwitch />
-          <ThemeSwitch />
+          <Settings />
         </div>
       </AlignModal.Content>
     </AlignModal.Root>

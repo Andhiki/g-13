@@ -75,7 +75,7 @@ function Item({ className, children, ...props }: ComponentProps<typeof SelectPri
   return (
     <SelectPrimitive.Item
       className={twMerge(
-        "group relative flex cursor-pointer select-none items-center gap-2 rounded-lg p-2 pr-9 text-paragraph-sm text-text-strong-950 transition duration-200 ease-out data-[disabled]:pointer-events-none data-[disabled]:text-text-disabled-300 data-[highlighted]:bg-bg-weak-50 data-[highlighted]:outline-0",
+        "group relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 pr-9 text-paragraph-sm text-text-strong-950 transition duration-200 ease-out data-[disabled]:pointer-events-none data-[disabled]:text-text-disabled-300 data-[highlighted]:bg-bg-weak-50 data-[highlighted]:outline-0",
         className,
       )}
       {...props}

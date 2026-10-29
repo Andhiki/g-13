@@ -4,6 +4,19 @@
 
 :root {
   --app-header-height: 64px;
+  --interactive-cursor: default;
+}
+
+:is(
+    button,
+    a[href],
+    [role="button"],
+    [role="link"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="option"]
+  ):not(:disabled):not([aria-disabled="true"]):not([data-disabled]) {
+  cursor: var(--interactive-cursor);
 }
 
 /* Sonic mask reveal adapted from portfolio-magic's ModeToggle. */

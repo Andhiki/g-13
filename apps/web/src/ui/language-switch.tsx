@@ -4,7 +4,7 @@ import type { Language } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
 import { useTranslation } from "react-i18next";
 import { messageNamespace } from "../i18n";
-import { AlignButton } from "./button";
+import * as SegmentedControl from "./segmented-control";
 import { toast } from "./toast";
 
 export function LanguageSwitch() {
@@ -12,9 +12,9 @@ export function LanguageSwitch() {
   const { i18n, t } = useTranslation();
   const [pending, setPending] = useState(false);
   const language: Language = i18n.resolvedLanguage === "en" ? "en" : "id";
-  const nextLanguage: Language = language === "id" ? "en" : "id";
 
-  async function changeLanguage() {
+  async function changeLanguage(nextLanguage: Language) {
+    if (nextLanguage === language) return;
     const pathname = router.state.location.pathname;
     setPending(true);
     try {
@@ -40,17 +40,31 @@ export function LanguageSwitch() {
   }
 
   return (
-    <AlignButton.Root
-      variant="neutral"
-      mode="stroke"
-      className="h-10 min-w-10 px-2.5 text-xs font-semibold"
-      aria-label={t("language.switchTo")}
-      lang={language}
-      disabled={pending}
-      aria-busy={pending}
-      onClick={() => void changeLanguage()}
+    <SegmentedControl.Root
+      activationMode="manual"
+      value={language}
+      onValueChange={(value) => {
+        if (value === "id" || value === "en") void changeLanguage(value);
+      }}
     >
-      {language.toUpperCase()}
-    </AlignButton.Root>
+      <SegmentedControl.List aria-label={t("settings.language")} aria-busy={pending}>
+        <SegmentedControl.Trigger
+          value="id"
+          lang="id"
+          disabled={pending}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          Bahasa Indonesia
+        </SegmentedControl.Trigger>
+        <SegmentedControl.Trigger
+          value="en"
+          lang="en"
+          disabled={pending}
+          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+        >
+          English
+        </SegmentedControl.Trigger>
+      </SegmentedControl.List>
+    </SegmentedControl.Root>
   );
 }

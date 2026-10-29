@@ -13,7 +13,9 @@ test.beforeEach(async ({ context }) => {
 async function open(page, path) {
   await page.goto(`${baseURL}${path}`);
   await page.waitForFunction(
-    () => document.querySelector('[aria-keyshortcuts="D"]')?.disabled === false,
+    () =>
+      document.querySelector('button[aria-label="Pengaturan"], button[aria-label="Settings"]')
+        ?.disabled === false,
   );
 }
 

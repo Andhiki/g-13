@@ -97,7 +97,7 @@ export const CourseNode = memo(function CourseNode({
         data-course-button
         type="button"
         style={{ height: courseLayout.cardHeight }}
-        className="relative flex w-full cursor-pointer flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
+        className="relative flex w-full cursor-[var(--interactive-cursor)] flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
         onClick={() => data.choose(course.id)}
         aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}

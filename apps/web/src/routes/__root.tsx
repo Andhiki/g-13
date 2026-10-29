@@ -1,5 +1,6 @@
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Toaster } from "../ui/toast";
+import { CursorProvider } from "../ui/cursor-preference";
 import { AppHeader } from "../ui/app-header";
 import { StatusIllustration } from "../ui/status-illustration";
 import { Typography } from "../ui/typography";
@@ -139,11 +140,13 @@ function RootDocument({ children }: { children: ReactNode }) {
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <I18nextProvider i18n={i18n}>
           <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-            <LazyMotion features={domAnimation}>
-              <div id="root" className="m-0 h-full w-full min-w-80">
-                {children}
-              </div>
-            </LazyMotion>
+            <CursorProvider>
+              <LazyMotion features={domAnimation}>
+                <div id="root" className="m-0 h-full w-full min-w-80">
+                  {children}
+                </div>
+              </LazyMotion>
+            </CursorProvider>
           </ThemeProvider>
         </I18nextProvider>
         <Scripts />
