@@ -9,15 +9,17 @@ import { buildRoadmapGraph } from "../roadmap/graph-layout";
 import { validateRoadmapSearch } from "../roadmap/search";
 
 function routingNodes(nodes: { id: string; position: XYPosition; type?: string }[]): RoutingNode[] {
-  return nodes.map((node) => ({
-    ...node,
-    measured: {
-      width: node.type === "title" ? 540 : 246,
-      height: node.type === "activity" ? 160 : 82,
-    },
-    source: { x: node.position.x + 246, y: node.position.y + 41 },
-    target: { x: node.position.x, y: node.position.y + 41 },
-  }));
+  return nodes.map((node) => {
+    // Dimensions stand in for browser measurements; positions come from graph construction.
+    const width = node.type === "title" ? 540 : 246;
+    const height = node.type === "title" ? 180 : node.type === "activity" ? 160 : 82;
+    return {
+      ...node,
+      measured: { width, height },
+      source: { x: node.position.x + width, y: node.position.y + height / 2 },
+      target: { x: node.position.x, y: node.position.y + height / 2 },
+    };
+  });
 }
 
 function verifyRoutes(nodes: RoutingNode[], edges: Edge[]) {
@@ -94,31 +96,37 @@ for (const { id } of listCurricula()) {
     }
   });
 
-  test(`${id}: seven- and eight-semester roadmap connections use the same clean routing`, () => {
-    for (const lulus of [7, 8]) {
-      const plan = buildRoadmap(
-        validateRoadmapSearch({
-          kurikulum: id,
-          minat: id === "2021" ? "Lab Sistem Cerdas" : "Analisis Data",
-          iup: "tidak",
-          magang: "tidak",
-          lulus,
-        }),
-      );
-      const graph = buildRoadmapGraph({
-        plan,
-        target: lulus,
-        summary: "",
-        selectedId: null,
-        choose: () => {},
-        text: (key) => key,
-      });
-      const nodes = routingNodes(
-        graph.nodes.filter((node) => node.type !== "lane" && !node.hidden),
-      );
-      verifyRoutes(nodes, mapConnections(graph.edges, null, null));
-    }
-  });
+  for (const withActivities of [false, true]) {
+    test(`${id}: seven- and eight-semester roadmap routing, activities=${withActivities}`, () => {
+      for (const lulus of [7, 8]) {
+        const plan = buildRoadmap(
+          validateRoadmapSearch({
+            kurikulum: id,
+            minat: id === "2021" ? "Lab Sistem Cerdas" : "Analisis Data",
+            iup: withActivities ? "ya" : "tidak",
+            paparan: withActivities ? "double" : undefined,
+            magang: withActivities ? "ya" : "tidak",
+            lulus,
+          }),
+        );
+        const { nodes: graphNodes, edges } = buildRoadmapGraph({
+          plan,
+          target: lulus,
+          summary: "Roadmap routing test",
+          selectedId: null,
+          choose: () => {},
+          text: (key) => key,
+        });
+        const nodes = routingNodes(
+          graphNodes.filter((node) => node.type !== "lane" && !node.hidden),
+        );
+        const semesters = new Map(plan.courses.map((item) => [item.course.id, item.semester]));
+        for (const edge of edges)
+          expect(semesters.get(edge.source)).not.toBe(semesters.get(edge.target));
+        verifyRoutes(nodes, mapConnections(edges, null, null));
+      }
+    });
+  }
 }
 
 test("Jaringan Komputer reaches its practicum through a row gap without detouring above the column", () => {
