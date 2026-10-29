@@ -41,17 +41,27 @@ export function ZoomControls({
             onOpenChange={setShortcutsOpen}
           >
             <dl className="m-0 grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
+              <div className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
+                <dt className="flex items-center gap-1">
+                  <AlignKbd.Root>1</AlignKbd.Root>
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    -
+                  </Typography>
+                  <AlignKbd.Root>{lastSemester}</AlignKbd.Root>
+                </dt>
+                <dd className="m-0">
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    {text("Ke semester")}
+                  </Typography>
+                </dd>
+              </div>
               {[
-                { key: `1–${lastSemester}`, description: "Ke semester" },
                 { key: "f", description: "Buka/tutup filter" },
                 { key: "v", description: "Ganti tampilan" },
                 { key: "/", description: "Cari mata kuliah" },
                 { key: "d", description: "Ganti tema" },
               ].map(({ key, description }) => (
-                <div
-                  key={key}
-                  className="col-span-2 grid grid-cols-[auto_1fr] items-center gap-x-3"
-                >
+                <div key={key} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
                   <dt>
                     <AlignKbd.Root>{key}</AlignKbd.Root>
                   </dt>

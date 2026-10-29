@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Rentang pintasan semester ditampilkan sebagai dua tombol keyboard terpisah
+  dengan tanda hubung di antaranya.
+
 - Tombol filter tetap di bawah pencarian saat berganti tampilan peta dan daftar.
   Tata letak kedua kurikulum beserta tampilan fokus disiapkan sekali saat halaman
   dimuat; peta tetap terpasang agar pergantian tampilan tidak mengulang pengukuran
