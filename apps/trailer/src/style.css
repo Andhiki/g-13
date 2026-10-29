@@ -1,0 +1,8 @@
+@font-face {
+  font-family: Geist;
+  src: url("../public/geist-latin.woff2") format("woff2");
+  font-weight: 100 900;
+}
+* {
+  box-sizing: border-box;
+}

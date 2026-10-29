@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Proyek trailer Remotion dengan panduan pratinjau dan ekspor video `trailer.mp4`.
+
 - Halaman kesalahan dan halaman tidak ditemukan dengan ilustrasi dan tombol navigasi.
 
 - Helpful Resources menambahkan roadmap Computer Science dari roadmap.sh dan
