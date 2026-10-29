@@ -7,18 +7,19 @@ const resources = [
     title: "CS50’s Introduction to Computer Science",
     url: "https://cs50.harvard.edu/x/",
     description:
-      "Harvard’s introduction to computer science, covering core concepts through problem sets and projects.",
+      "CS50 is one of the best ways to get started with computer science. Work through its 12-part lecture series in your spare time and build your fundamentals along the way.",
   },
   {
-    title: "Skripsi LaTeX template",
-    url: "https://github.com/vityasyyy/skripsi",
-    description: "An open-source LaTeX template for writing a skripsi.",
+    title: "DIKE UGM Skripsi LaTeX template",
+    url: "https://github.com/vityasyyy/template-skripsi-dike-ugm",
+    description:
+      "Starting your proposal or skripsi? Use this LaTeX template as your starting point, then fill it with your own research.",
   },
   {
     title: "HIMAKOM UGM exam archive",
     url: "https://himakom.ugm.ac.id/exam",
     description:
-      "The original HIMAKOM UGM archive that provides the exam materials featured on this site.",
+      "Getting ready for an exam? Browse past papers from HIMAKOM UGM and find materials for your courses.",
   },
 ];
 
@@ -28,10 +29,10 @@ export function ResourcesPage() {
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
         <header className="lg:sticky lg:top-28 lg:self-start">
           <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
-            Helpful Resources
+            Looking for a place to start?
           </Typography>
           <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
-            A few useful places to learn, prepare, and find past exams.
+            Pick a resource that fits what you need and explore it at your own pace.
           </Typography>
         </header>
         <section

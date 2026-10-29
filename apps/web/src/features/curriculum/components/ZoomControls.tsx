@@ -26,7 +26,7 @@ export function ZoomControls({
       <div className="flex flex-col gap-2">
         <aside
           aria-labelledby="map-keyboard-shortcuts-heading"
-          className="w-52 rounded-10 bg-bg-white-0 p-3 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
+          className="hidden w-52 rounded-10 bg-bg-white-0 p-3 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 sm:block"
         >
           <Typography
             as="h2"

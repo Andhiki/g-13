@@ -18,6 +18,13 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Baris `..` pada folder arsip ujian untuk naik satu tingkat ke folder induk.
 
+#### Changed
+
+- Kartu pintasan keyboard disembunyikan pada layar kecil.
+
+- Halaman Helpful Resources berbicara langsung kepada pembaca dan menautkan
+  template skripsi DIKE UGM yang diperbarui.
+
 ### 2026-10-28
 
 #### Added
