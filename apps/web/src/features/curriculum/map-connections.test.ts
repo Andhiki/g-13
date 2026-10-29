@@ -19,8 +19,11 @@ test("core connections show by default and optional connections reveal on intera
   expect(hovered.map((edge) => edge.data.charging)).toEqual([true, true, false]);
   expect(mapConnections(edges, null, null).every((edge) => !edge.data.charging)).toBe(true);
   expect(hovered[0].style.strokeWidth).toBe(2.4);
+  expect(hovered[0].style.opacity).toBe(1);
+  expect(hovered[1].style.opacity).toBe(0.65);
   expect(hovered[2].style.opacity).toBe(0.18);
   expect(mapConnections(edges, "c", null)[1].data.visible).toBe(true);
+  expect(mapConnections(edges, "c", null)[1].style.opacity).toBe(0.65);
   expect(mapConnections(edges, null, null)[1].data.visible).toBe(false);
 });
 

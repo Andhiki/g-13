@@ -27,6 +27,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Jalur prasyarat mata kuliah pilihan ditampilkan lebih redup saat disorot agar
+  mudah dibedakan dari jalur mata kuliah wajib.
+
 - Jarak keterangan bahasa asli pada silabus diperjelas, dengan tipografi konsisten
   untuk pokok bahasan dan referensi.
 
