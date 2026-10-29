@@ -9,6 +9,8 @@ import { Faq } from "./faq";
 import { ThemeSwitch } from "./theme-switch";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
+import { LanguageSwitch } from "./language-switch";
+import { useTranslation } from "react-i18next";
 
 function MenuIcon({ open }: { open: boolean }) {
   const reducedMotion = useReducedMotion();
@@ -54,12 +56,13 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 function BrandLogo({ onClick }: { onClick?: () => void }) {
+  const { t } = useTranslation();
   return (
     <Link
       onClick={onClick}
       to="/"
       search={{ kurikulum: defaultCurriculumId }}
-      aria-label="OmahTI dan HIMAKOM UGM — beranda"
+      aria-label={t("navigation.home")}
       className="pointer-events-auto flex h-10 w-fit shrink-0 items-center gap-1 rounded sm:gap-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
     >
       <Image
@@ -100,13 +103,14 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
 }
 
 function GitHubButton() {
+  const { t } = useTranslation();
   return (
     <AlignButton.Root asChild variant="neutral" mode="stroke" className="size-10 p-2.5">
       <a
         href="https://github.com/Andhiki/g-13"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Buka repositori GitHub (tab baru)"
+        aria-label={t("navigation.github")}
         title="GitHub"
       >
         <RiGithubFill aria-hidden="true" className="size-5" />
@@ -117,6 +121,7 @@ function GitHubButton() {
 
 export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 640px)");
@@ -131,7 +136,7 @@ export function AppHeader() {
     <AlignModal.Root open={menuOpen} onOpenChange={setMenuOpen}>
       <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 px-4 text-text-strong-950 sm:gap-6 sm:px-6">
         <BrandLogo />
-        <nav aria-label="Navigasi aplikasi" className="hidden items-center gap-5 sm:flex">
+        <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 sm:flex">
           <AlignLinkButton.Root asChild>
             <Link
               to="/exam"
@@ -140,7 +145,7 @@ export function AppHeader() {
                 "aria-current": "page",
               }}
             >
-              Arsip Ujian
+              {t("navigation.examArchive")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild>
@@ -151,7 +156,7 @@ export function AppHeader() {
                 "aria-current": "page",
               }}
             >
-              Alumni
+              {t("navigation.alumni")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild>
@@ -162,13 +167,14 @@ export function AppHeader() {
                 "aria-current": "page",
               }}
             >
-              Resources
+              {t("navigation.resources")}
             </Link>
           </AlignLinkButton.Root>
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
           <GitHubButton />
+          <LanguageSwitch />
           <ThemeSwitch />
           <AlignButton.Root
             asChild
@@ -179,7 +185,7 @@ export function AppHeader() {
           >
             <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
               <RiRouteLine aria-hidden="true" className="size-4" />
-              Roadmap
+              {t("navigation.roadmap")}
             </Link>
           </AlignButton.Root>
         </div>
@@ -188,7 +194,7 @@ export function AppHeader() {
             variant="neutral"
             mode="ghost"
             className="ml-auto size-11 p-2.5 sm:hidden"
-            aria-label={menuOpen ? "Tutup navigasi" : "Buka navigasi"}
+            aria-label={menuOpen ? t("navigation.close") : t("navigation.open")}
             aria-expanded={menuOpen}
           >
             <MenuIcon open={menuOpen} />
@@ -201,7 +207,7 @@ export function AppHeader() {
         overlayClassName="bg-transparent p-0 backdrop-blur-none sm:hidden"
         className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto rounded-none text-text-strong-950 shadow-none data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none"
       >
-        <AlignModal.Title className="sr-only">Navigasi aplikasi</AlignModal.Title>
+        <AlignModal.Title className="sr-only">{t("navigation.label")}</AlignModal.Title>
         <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4">
           <BrandLogo onClick={() => setMenuOpen(false)} />
           <AlignModal.Close asChild>
@@ -209,14 +215,14 @@ export function AppHeader() {
               variant="neutral"
               mode="ghost"
               className="size-11 p-2.5"
-              aria-label="Tutup navigasi"
+              aria-label={t("navigation.close")}
             >
               <MenuIcon open={menuOpen} />
             </AlignButton.Root>
           </AlignModal.Close>
         </div>
         <nav
-          aria-label="Navigasi seluler"
+          aria-label={t("navigation.mobileLabel")}
           className="flex flex-col divide-y divide-stroke-soft-200 px-6"
         >
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
@@ -226,7 +232,7 @@ export function AppHeader() {
               onClick={() => setMenuOpen(false)}
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
-              Kurikulum
+              {t("navigation.curriculum")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
@@ -235,7 +241,7 @@ export function AppHeader() {
               onClick={() => setMenuOpen(false)}
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
-              Arsip Ujian
+              {t("navigation.examArchive")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
@@ -244,7 +250,7 @@ export function AppHeader() {
               onClick={() => setMenuOpen(false)}
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
-              Meet Our Alumni
+              {t("navigation.alumni")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
@@ -253,7 +259,7 @@ export function AppHeader() {
               onClick={() => setMenuOpen(false)}
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
-              Helpful Resources
+              {t("navigation.resources")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
@@ -263,13 +269,14 @@ export function AppHeader() {
               onClick={() => setMenuOpen(false)}
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
-              Roadmap
+              {t("navigation.roadmap")}
             </Link>
           </AlignLinkButton.Root>
           <Faq className="h-14 justify-start text-lg" />
         </nav>
         <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
           <GitHubButton />
+          <LanguageSwitch />
           <ThemeSwitch />
         </div>
       </AlignModal.Content>

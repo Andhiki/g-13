@@ -64,6 +64,7 @@ export function ExamArchivePage() {
   const list = useRef<HTMLDivElement>(null);
   const modalTitle = useRef<HTMLHeadingElement>(null);
   const folder = browseArchive({ location, query });
+  const parent = folder.breadcrumbs.at(-2);
   const links = paper ? paperLinks(paper) : null;
   const openFolder = (next: ArchiveLocation) => {
     void navigate({ search: folderSearch(next), resetScroll: false });
@@ -160,6 +161,18 @@ export function ExamArchivePage() {
             aria-label="Isi folder"
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
           >
+            {parent && (
+              <Link
+                to="/exam"
+                search={folderSearch(parent.location)}
+                resetScroll={false}
+                aria-label="Naik satu folder"
+                className="flex w-full items-center gap-3 border-b border-stroke-soft-200 px-3 py-3 text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
+              >
+                <RiFolder3Line className="size-5 shrink-0 text-text-sub-600" aria-hidden="true" />
+                <Typography as="span">..</Typography>
+              </Link>
+            )}
             {folder.entries.map((entry) => (
               <button
                 type="button"

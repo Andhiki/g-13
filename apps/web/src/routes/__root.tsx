@@ -3,11 +3,14 @@ import { Toaster } from "../ui/toast";
 import { AppHeader } from "../ui/app-header";
 import { Typography } from "../ui/typography";
 import { createRootRoute, HeadContent, Outlet, Scripts, Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { ThemeProvider } from "next-themes";
+import { I18nextProvider, useTranslation } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
+import i18n from "../i18n";
+import { defaultLanguage } from "@g13/i18n";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -31,32 +34,46 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   component: AppLayout,
-  notFoundComponent: () => (
+  notFoundComponent: NotFound,
+});
+
+function NotFound() {
+  const { t } = useTranslation();
+  return (
     <main>
       <Typography as="h1" variant="title">
-        Halaman tidak ditemukan
+        {t("notFound.title")}
       </Typography>
       <Link to="/" search={{ kurikulum: defaultCurriculumId }}>
-        Kembali ke peta kurikulum
+        {t("notFound.home")}
       </Link>
     </main>
-  ),
-});
+  );
+}
 
 function AppLayout() {
   return (
     <div className="min-h-dvh pt-[var(--app-header-height)]">
       <AppHeader />
+      <LanguageDocumentSync />
       <Outlet />
       <Toaster />
     </div>
   );
 }
 
+function LanguageDocumentSync() {
+  const { i18n: instance } = useTranslation();
+  useEffect(() => {
+    document.documentElement.lang = instance.resolvedLanguage ?? defaultLanguage;
+  }, [instance, instance.resolvedLanguage]);
+  return null;
+}
+
 function RootDocument({ children }: { children: ReactNode }) {
   return (
     <html
-      lang="id"
+      lang={defaultLanguage}
       suppressHydrationWarning
       className="m-0 h-full w-full min-w-80 bg-bg-white-0 font-sans text-text-strong-950 [&_.remixicon_path]:origin-center [&_.remixicon_path]:scale-[0.8996] [font-synthesis:none] [text-rendering:optimizeLegibility] [&_a:focus-visible]:outline-3 [&_a:focus-visible]:outline-offset-3 [&_a:focus-visible]:outline-primary-base"
     >
@@ -64,13 +81,15 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
-        <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-          <LazyMotion features={domAnimation}>
-            <div id="root" className="m-0 h-full w-full min-w-80">
-              {children}
-            </div>
-          </LazyMotion>
-        </ThemeProvider>
+        <I18nextProvider i18n={i18n}>
+          <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
+            <LazyMotion features={domAnimation}>
+              <div id="root" className="m-0 h-full w-full min-w-80">
+                {children}
+              </div>
+            </LazyMotion>
+          </ThemeProvider>
+        </I18nextProvider>
         <Scripts />
       </body>
     </html>

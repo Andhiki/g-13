@@ -12,9 +12,18 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-10-29
+
+#### Added
+
+- Baris `..` pada folder arsip ujian untuk naik satu tingkat ke folder induk.
+
 ### 2026-10-28
 
 #### Added
+
+- Pengaturan bahasa Indonesia dan Inggris memakai paket terjemahan bersama yang
+  dapat digunakan aplikasi web maupun API; pilihan bahasa dapat diganti dari header.
 
 - Ikon hamburger menu seluler bertransisi menjadi tanda X saat navigasi dibuka
   dan kembali menjadi hamburger saat ditutup. Animasi mengikuti preferensi reduced motion.

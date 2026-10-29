@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { browseArchive, paperLinks, resolveArchive } from "./archive";
 import { folderSearch, validateArchiveSearch } from "./search";
-import type { ExamCourse } from "./contracts";
+import type { ArchiveLocation, ExamCourse } from "./contracts";
 
 const catalog = [
   {
@@ -64,6 +64,23 @@ test("folder navigation sorts years newest first and resolves papers without fil
     drive: "https://drive.google.com/file/d/pdf-id/view",
     download: "https://drive.google.com/uc?export=download&id=pdf-id",
   });
+});
+
+test("parent navigation goes up one folder, including empty folders, and stops at root", () => {
+  const cases: { location: ArchiveLocation; parent: ArchiveLocation | undefined }[] = [
+    { location: [], parent: undefined },
+    { location: ["basis-data"], parent: [] },
+    { location: ["basis-data", "2024"], parent: ["basis-data"] },
+    { location: ["basis-data", "2023"], parent: ["basis-data"] },
+    { location: ["agama"], parent: [] },
+  ];
+  for (const { location, parent } of cases) {
+    const folder = browseArchive({ catalog, location });
+    expect(folder.breadcrumbs.at(-2)?.location).toEqual(parent);
+    if (parent) {
+      expect(resolveArchive(folderSearch(parent), catalog).location).toEqual(parent);
+    }
+  }
 });
 
 test("URL validation drops malformed input and resolves papers only inside the requested folder", () => {
