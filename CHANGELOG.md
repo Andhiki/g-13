@@ -16,7 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
-- Jalur koneksi mata kuliah tidak lagi berpindah mendadak saat drawer detail dibuka atau ditutup.
+- Koneksi mata kuliah memakai jalur membulat yang sama selama dan setelah drawer detail bergerak, tanpa pergantian jalur mendadak; perutean penghindar kartu otomatis dihapus.
 - Mata kuliah yang difokuskan tetap terlihat saat drawer ditutup, tanpa menghilang selama transisi peta.
 - Kontrol zoom roadmap tidak lagi tertutup tombol catatan.
 - Tombol salin dan tutup pada drawer detail mata kuliah diratakan dalam satu baris.
