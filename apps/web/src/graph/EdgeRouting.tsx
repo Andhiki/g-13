@@ -1,13 +1,17 @@
-import { createContext, useLayoutEffect, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useLayoutEffect, useMemo, type ReactNode } from "react";
 import {
   BaseEdge,
-  getSmoothStepPath,
   ReactFlowProvider,
   useStore,
   type Edge,
   type EdgeProps,
+  type XYPosition,
 } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
+import { routePath } from "./route-motion";
+
+export const ConnectionPaths = createContext<ReadonlyMap<string, XYPosition[]>>(new Map());
+
 export const ConnectionVisibility = createContext({
   incoming: new Set<string>(),
   outgoing: new Set<string>(),
@@ -66,12 +70,19 @@ export function EdgeRouting({ children }: { children: ReactNode }) {
 function RoutedEdge(
   props: EdgeProps<Edge<{ visible: boolean; charging: boolean; moving: boolean }>>,
 ) {
-  const path = getSmoothStepPath(props)[0];
+  const points = useContext(ConnectionPaths).get(props.id);
+  const path = points
+    ? routePath(
+        points,
+        { x: props.sourceX, y: props.sourceY },
+        { x: props.targetX, y: props.targetY },
+      )
+    : undefined;
   const reducedMotion = useReducedMotion();
   const { opacity = 1, ...style } = props.style ?? {};
   return (
     <AnimatePresence>
-      {props.data?.visible !== false && (
+      {path && props.data?.visible !== false && (
         <m.g
           key={props.id}
           initial={{ opacity: 0 }}
@@ -82,6 +93,7 @@ function RoutedEdge(
           <BaseEdge
             id={props.id}
             path={path}
+            data-routed="true"
             interactionWidth={props.interactionWidth}
             className="transition-[stroke,stroke-width] duration-150 motion-reduce:transition-none"
             style={style}

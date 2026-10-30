@@ -1,4 +1,4 @@
-import { Position, type Edge, type XYPosition } from "@xyflow/react";
+import { getBezierPath, Position, type Edge, type XYPosition } from "@xyflow/react";
 import { routeSmartEdgeBatch, type SmartEdgeBatchItem } from "@tisoap/react-flow-smart-edge";
 import { connectionCorners, connectionPath } from "./connection-path";
 
@@ -93,7 +93,23 @@ export function connectionRoutes(
     const otherNodes = nodes.filter((node) => node.id !== edge.source && node.id !== edge.target);
     const route = batch[edge.id];
     const rawPoints = centered.get(edge.id) ?? (route?.kind === "routed" ? route.points : null);
-    if (!rawPoints) continue;
+    if (!rawPoints) {
+      routes.set(edge.id, {
+        path: getBezierPath({
+          sourceX: source.x,
+          sourceY: source.y,
+          targetX: target.x,
+          targetY: target.y,
+          sourcePosition: Position.Right,
+          targetPosition: Position.Left,
+        })[0],
+        points: [
+          [source.x, source.y],
+          [target.x, target.y],
+        ],
+      });
+      continue;
+    }
     const points = connectionCorners(
       source,
       target,
