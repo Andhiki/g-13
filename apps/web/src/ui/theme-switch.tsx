@@ -36,8 +36,9 @@ export function ThemeSwitch() {
                 onClick={() => setTheme(mode)}
               >
                 <span
-                  className="flex aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200 bg-(--preview-bg) [--preview-bg:#fff] [--preview-line:#e5e5e5] [--preview-accent:#b75310] [[data-light-theme=himakom]_&]:[--preview-accent:#6246d6] data-[mode=dark]:[--preview-bg:#171717] data-[mode=dark]:[--preview-line:#353535] data-[mode=dark]:[--preview-accent:#ffa468] [[data-dark-theme=himakom]_&]:data-[mode=dark]:[--preview-bg:#191827] [[data-dark-theme=himakom]_&]:data-[mode=dark]:[--preview-line:#353149] [[data-dark-theme=himakom]_&]:data-[mode=dark]:[--preview-accent:#b5a1ff] data-[mode=system]:bg-[linear-gradient(90deg,#fff_50%,#191827_50%)] [&_i]:mb-[5px] [&_i]:block [&_i]:h-[5px] [&_i]:rounded-[5px] [&_i]:bg-(--preview-line)"
+                  className="flex aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200 bg-(--preview-bg) [--preview-bg:#fff] [--preview-line:#e5e5e5] [--preview-accent:#b75310] data-[scheme=himakom]:data-[mode=light]:[--preview-accent:#6246d6] data-[mode=dark]:[--preview-bg:#171717] data-[mode=dark]:[--preview-line:#353535] data-[mode=dark]:[--preview-accent:#ffa468] data-[scheme=himakom]:data-[mode=dark]:[--preview-bg:#191827] data-[scheme=himakom]:data-[mode=dark]:[--preview-line:#353149] data-[scheme=himakom]:data-[mode=dark]:[--preview-accent:#b5a1ff] data-[mode=system]:[--preview-accent:#737373] data-[mode=system]:bg-[linear-gradient(90deg,#fff_50%,#171717_50%)] [&_i]:mb-[5px] [&_i]:block [&_i]:h-[5px] [&_i]:rounded-[5px] [&_i]:bg-(--preview-line)"
                   data-mode={mode}
+                  data-scheme={mode === "system" ? undefined : schemes[mode]}
                   aria-hidden="true"
                 >
                   <span className="w-[23%] border-r border-(--preview-line) px-[5%] py-[10%]">

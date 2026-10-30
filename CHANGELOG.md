@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Pratinjau tema terang dan gelap mengikuti pilihan skema warna masing-masing.
 - Tombol aksi pada dialog pratinjau arsip ujian memakai garis tepi netral agar lebih mudah terlihat.
 
 - Koneksi mata kuliah disembunyikan selama transisi fokus dan kembali muncul perlahan setelah semua kartu dan jalur selesai berpindah, termasuk saat drawer detail ditutup.
