@@ -85,7 +85,7 @@ export function PaperPreview({
                 title={text("Unduh")}
                 className={buttonVariants({
                   variant: "neutral",
-                  mode: "ghost",
+                  mode: "stroke",
                   size: "xsmall",
                   className: "size-8 p-0",
                 })}
@@ -97,7 +97,7 @@ export function PaperPreview({
                   <AlignTooltip.Trigger asChild>
                     <AlignButton.Root
                       variant="neutral"
-                      mode="ghost"
+                      mode="stroke"
                       size="xsmall"
                       className="size-8 p-0"
                       aria-label={
@@ -133,7 +133,7 @@ export function PaperPreview({
                 title={text("Buka di Drive")}
                 className={buttonVariants({
                   variant: "neutral",
-                  mode: "ghost",
+                  mode: "stroke",
                   size: "xsmall",
                   className: "size-8 p-0",
                 })}
@@ -143,7 +143,7 @@ export function PaperPreview({
               <AlignModal.Close asChild>
                 <AlignButton.Root
                   variant="neutral"
-                  mode="ghost"
+                  mode="stroke"
                   size="xsmall"
                   className="size-8 p-0"
                   aria-label={text("Tutup dialog")}
