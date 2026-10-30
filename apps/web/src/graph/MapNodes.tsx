@@ -85,7 +85,8 @@ export const CourseNode = memo(function CourseNode({
         data-course-surface
         aria-hidden="true"
         className={styles.surface({
-          class: "pointer-events-none absolute inset-x-0 top-6 bottom-0 rounded-[0_8px_8px_8px]",
+          class:
+            "pointer-events-none absolute inset-x-0 top-6 bottom-0 rounded-[0_8px_8px_8px] [[data-compact-nodes=true]_&]:top-0 [[data-compact-nodes=true]_&]:rounded-lg",
         })}
       />
       {data.incoming.length > 0 && (
@@ -100,12 +101,15 @@ export const CourseNode = memo(function CourseNode({
         data-course-button
         type="button"
         style={{ height: courseLayout.cardHeight }}
-        className="relative flex w-full cursor-[var(--interactive-cursor)] flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base"
+        className="relative flex w-full cursor-[var(--interactive-cursor)] flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base [[data-compact-nodes=true]_&]:justify-center [[data-compact-nodes=true]_&]:px-3 [[data-compact-nodes=true]_&]:py-2 [[data-compact-nodes=true]_&]:text-center"
         onClick={() => data.choose(course.id)}
         aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}
       >
-        <div data-course-metadata className="absolute inset-x-0 top-0 flex items-center">
+        <div
+          data-course-metadata
+          className="absolute inset-x-0 top-0 flex items-center [[data-compact-nodes=true]_&]:hidden"
+        >
           <Typography
             as="span"
             variant="caption"
@@ -123,7 +127,15 @@ export const CourseNode = memo(function CourseNode({
             {credit === null ? "—" : credit + text(" SKS")}
           </Typography>
         </div>
-        <Typography data-course-title as="strong" variant="label" className={styles.title()}>
+        <Typography
+          data-course-title
+          as="strong"
+          variant="label"
+          className={styles.title({
+            class:
+              "[[data-compact-nodes=true]_&]:line-clamp-3 [[data-compact-nodes=true]_&]:text-[20px] [[data-compact-nodes=true]_&]:leading-[22px]",
+          })}
+        >
           {courseName(course)}
         </Typography>
       </button>

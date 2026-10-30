@@ -125,7 +125,7 @@ function RoutedEdge(
             <path
               d={path}
               pathLength={1}
-              className="course-connection-charge"
+              className="pointer-events-none animate-[course-connection-charge_9s_linear_infinite] fill-none stroke-[3] [stroke-linecap:round] [stroke-dasharray:0.012_0.988] motion-reduce:hidden"
               style={{
                 stroke: "var(--color-text-strong-950)",
                 animationPlayState: props.data.moving ? "paused" : "running",
