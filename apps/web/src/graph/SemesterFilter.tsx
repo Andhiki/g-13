@@ -59,12 +59,13 @@ export function SemesterFilter({
             data-semester-band=""
             initial={false}
             animate={{
-              left: `${((visible[0] ?? 1) - 1) * (100 / lastSemester)}%`,
-              width: `${visible.length ? (visible[visible.length - 1]! - visible[0]! + 1) * (100 / lastSemester) : 0}%`,
+              x: `${((visible[0] ?? 1) - 1) * 100}%`,
+              scaleX: visible.length ? visible[visible.length - 1]! - visible[0]! + 1 : 0,
               opacity: visible.length ? 1 : 0,
             }}
             transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}
-            className="pointer-events-none absolute inset-y-0 rounded-lg bg-primary-alpha-10"
+            className="pointer-events-none absolute inset-y-0 left-0 origin-left rounded-lg bg-primary-alpha-10"
+            style={{ width: `${100 / lastSemester}%` }}
           />
           {semesters.map((semester) => (
             <AlignButton.Root

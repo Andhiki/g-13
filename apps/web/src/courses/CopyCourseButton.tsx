@@ -26,7 +26,6 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
   const hidden = {
     opacity: 0,
     scale: reducedMotion ? 1 : 0.25,
-    filter: reducedMotion ? "blur(0px)" : "blur(4px)",
   };
   return (
     <AlignTooltip.Provider>
@@ -52,7 +51,7 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
                   key={status === "copied" ? "copied" : "copy"}
                   className="col-start-1 row-start-1 flex items-center justify-center"
                   initial={hidden}
-                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={hidden}
                   transition={
                     reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }

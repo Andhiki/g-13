@@ -40,7 +40,6 @@ export function RoadmapShare({ selection }: { selection: string }) {
                       animate={{
                         opacity: active ? 1 : 0,
                         scale: active || reducedMotion ? 1 : 0.25,
-                        filter: active || reducedMotion ? "blur(0px)" : "blur(4px)",
                       }}
                       transition={
                         reducedMotion

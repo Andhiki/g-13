@@ -161,7 +161,6 @@ export function MapControlPanel({
             animate={{
               opacity: active ? 1 : 0,
               scale: active ? 1 : 0.25,
-              filter: active ? "blur(0px)" : "blur(4px)",
             }}
             transition={
               reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }

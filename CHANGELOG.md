@@ -33,6 +33,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Animasi indikator semester memakai transform, pergantian ikon tidak lagi memakai blur, dan pulsa koneksi dijeda selama graf bergerak.
+
 - Hierarki daftar mata kuliah di ponsel diperjelas dengan kode, kategori, dan SKS yang mudah dibedakan.
 
 - Pembaruan graf selama animasi peta kurikulum dan roadmap dikurangi, dan fade koneksi disinkronkan dengan gerakan mata kuliah.

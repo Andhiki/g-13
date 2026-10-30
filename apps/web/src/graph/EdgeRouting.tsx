@@ -71,13 +71,14 @@ function RoutedEdge(
   props: EdgeProps<Edge<{ visible: boolean; charging: boolean; moving: boolean }>>,
 ) {
   const points = useContext(ConnectionPaths).get(props.id);
-  const path = points
-    ? routePath(
-        points,
-        { x: props.sourceX, y: props.sourceY },
-        { x: props.targetX, y: props.targetY },
-      )
-    : undefined;
+  const path =
+    points && props.data?.visible !== false
+      ? routePath(
+          points,
+          { x: props.sourceX, y: props.sourceY },
+          { x: props.targetX, y: props.targetY },
+        )
+      : undefined;
   const reducedMotion = useReducedMotion();
   const { opacity = 1, ...style } = props.style ?? {};
   return (
@@ -103,7 +104,10 @@ function RoutedEdge(
               d={path}
               pathLength={1}
               className="course-connection-charge"
-              style={{ stroke: "var(--color-text-strong-950)" }}
+              style={{
+                stroke: "var(--color-text-strong-950)",
+                animationPlayState: props.data.moving ? "paused" : "running",
+              }}
             />
           )}
         </m.g>
