@@ -65,11 +65,7 @@ export function CourseDetailsPanel({
           </div>
           <div className="mt-3 flex flex-wrap gap-2" aria-label={text("Kategori mata kuliah")}>
             {labels.map((label) => (
-              <AlignBadge.Root
-                variant="light"
-                className="h-auto min-h-5 py-0.5 text-[12px] leading-4 font-medium"
-                key={label}
-              >
+              <AlignBadge.Root variant="light" size="medium" key={label}>
                 {text(label)}
               </AlignBadge.Root>
             ))}

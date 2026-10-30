@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Ukuran teks badge mengikuti ukuran komponen, dan kode mata kuliah ditampilkan di atas nama pada daftar ponsel.
+
 - Tombol filter pada ponsel tetap berada di posisinya saat halaman dimuat.
 
 - Memperbesar drawer detail di ponsel tidak lagi mengubah zoom peta kurikulum atau roadmap.
