@@ -14,11 +14,13 @@ import {
 import {
   Background,
   BackgroundVariant,
+  getViewportForBounds,
   ReactFlow,
   useReactFlow,
   type NodeProps,
   type Edge,
 } from "@xyflow/react";
+import { ZoomControls } from "../../graph/ZoomControls";
 import { GraphFocus } from "../../graph/GraphFocus";
 import { EdgeRouting, routedEdgeTypes } from "../../graph/EdgeRouting";
 import { CourseNode, LaneNode } from "../../graph/MapNodes";
@@ -75,9 +77,13 @@ function RoadmapFocus({
   navigation,
   heading,
   stage,
+  focusPositions,
+  resetVersion,
 }: {
+  resetVersion: number;
   heading: RefObject<HTMLHeadingElement | null>;
   stage: RefObject<HTMLElement | null>;
+  focusPositions: Map<string, { x: number; y: number }>;
   selectedId: string | null;
   navigation: { semester: number } | null;
 }) {
@@ -86,14 +92,49 @@ function RoadmapFocus({
     <GraphFocus
       selectedId={selectedId}
       navigation={navigation}
-      resetKey="roadmap"
+      resetKey={`roadmap:${resetVersion}`}
       onSemester={(semester) => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         void setCenter(LANE_X + (semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
-          zoom: 0.8,
-          duration: 0,
+          zoom: 0.72,
+          duration: reducedMotion ? 0 : 600,
         });
       }}
+      onCourse={() => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const points = [...focusPositions.values()];
+        const bounds = stage.current!.getBoundingClientRect();
+        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
+        const left = phone ? 16 : courseLayout.detailsWidth + 24;
+        const top = phone ? 128 : 96;
+        const width = bounds.width - left - 16;
+        const height = bounds.height * (phone ? 0.55 : 1) - top - 24;
+        const minX = Math.min(...points.map((point) => point.x));
+        const minY = Math.min(...points.map((point) => point.y));
+        const viewport = getViewportForBounds(
+          {
+            x: minX,
+            y: minY,
+            width: Math.max(...points.map((point) => point.x)) - minX + courseLayout.cardWidth + 2,
+            height: Math.max(...points.map((point) => point.y)) - minY + courseLayout.cardHeight,
+          },
+          width,
+          height,
+          0.05,
+          0.88,
+          0.12,
+        );
+        void setViewport(
+          { ...viewport, x: viewport.x + left, y: viewport.y + top },
+          {
+            duration: reducedMotion ? 0 : 150,
+            ease: (t) => 1 - Math.pow(1 - t, 4),
+            interpolate: "linear",
+          },
+        );
+      }}
       onOverview={() => {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const titleElement = heading.current!;
         const bounds = stage.current!.getBoundingClientRect();
         const title = getNode("roadmap-title")!;
@@ -103,11 +144,14 @@ function RoadmapFocus({
           phone ? 0.8 : 1.2,
           (bounds.width - left - 24) / titleElement.offsetWidth,
         );
-        void setViewport({
-          x: left - title.position.x * zoom,
-          y: bounds.height / 3 - title.position.y * zoom,
-          zoom,
-        });
+        void setViewport(
+          {
+            x: left - title.position.x * zoom,
+            y: bounds.height / 3 - title.position.y * zoom,
+            zoom,
+          },
+          { duration: reducedMotion ? 0 : 1000 },
+        );
       }}
     />
   );
@@ -144,6 +188,8 @@ export function RoadmapGraph({
   summary,
   selectedId,
   choose,
+  close,
+  onReset,
   navigation,
   onVisibleSemesters,
 }: {
@@ -154,10 +200,13 @@ export function RoadmapGraph({
   summary: string;
   selectedId: string | null;
   choose: (id: string) => void;
+  close: () => void;
+  onReset: () => void;
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
   const { text, language } = useLocale("roadmap");
+  const [resetVersion, setResetVersion] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const stage = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -166,13 +215,42 @@ export function RoadmapGraph({
     [plan, target, summary, text, language],
   );
   const { semesters } = graph;
+  const { focusIds, focusPositions } = useMemo(() => {
+    const selectedCourse = graph.nodes.find(
+      (node) => node.id === selectedId && node.type === "course",
+    );
+    const focusIds = new Set<string>();
+    const focusPositions = new Map<string, { x: number; y: number }>();
+    if (!selectedCourse || selectedCourse.type !== "course") return { focusIds, focusPositions };
+    focusIds.add(selectedCourse.id);
+    focusPositions.set(selectedCourse.id, selectedCourse.position);
+    for (const [side, ids] of [
+      ["source", selectedCourse.data.incoming],
+      ["target", selectedCourse.data.outgoing],
+    ] as const) {
+      const neighbors = ids
+        .map((id) => graph.nodes.find((node) => node.id === id))
+        .filter((node): node is (typeof graph.nodes)[number] => node?.type === "course")
+        .sort((a, b) => a.position.y - b.position.y);
+      neighbors.forEach((neighbor, index) => {
+        focusIds.add(neighbor.id);
+        focusPositions.set(neighbor.id, {
+          x: selectedCourse.position.x + (side === "source" ? -LANE_STEP : LANE_STEP),
+          y: selectedCourse.position.y + (index - (neighbors.length - 1) / 2) * 120,
+        });
+      });
+    }
+    return { focusIds, focusPositions };
+  }, [graph, selectedId]);
   const nodes = useMemo(
     () =>
       graph.nodes.map((node): RoadmapNode => {
-        if (node.type === "title") return { ...node, hidden: selectedId !== null };
+        if (selectedId !== null && (node.type !== "course" || !focusIds.has(node.id)))
+          return { ...node, hidden: true };
         if (node.type !== "course") return node;
         return {
           ...node,
+          ...(selectedId !== null ? { position: focusPositions.get(node.id)! } : {}),
           data: {
             ...node.data,
             choose,
@@ -180,23 +258,27 @@ export function RoadmapGraph({
           },
         };
       }),
-    [graph, selectedId, choose],
+    [graph, selectedId, choose, focusIds, focusPositions],
   );
   const edges = useMemo(
     () =>
-      graph.edges.map((edge) => {
-        const focused = selectedId === edge.source || selectedId === edge.target;
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: focused ? "var(--color-primary-base)" : "var(--color-text-soft-400)",
-            strokeWidth: focused ? 2.2 : 1.2,
-          },
-          zIndex: focused ? 3 : 0,
-        };
-      }),
-    [graph, selectedId],
+      graph.edges
+        .filter(
+          (edge) => selectedId === null || (focusIds.has(edge.source) && focusIds.has(edge.target)),
+        )
+        .map((edge) => {
+          const focused = selectedId === edge.source || selectedId === edge.target;
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: focused ? "var(--color-primary-base)" : "var(--color-text-soft-400)",
+              strokeWidth: focused ? 2.2 : 1.2,
+            },
+            zIndex: focused ? 3 : 0,
+          };
+        }),
+    [graph, selectedId, focusIds],
   );
   const revealedEdges = mapConnections(edges, selectedId, hoveredId);
   return (
@@ -214,6 +296,7 @@ export function RoadmapGraph({
             edges={revealedEdges}
             nodeTypes={nodeTypes}
             edgeTypes={routedEdgeTypes}
+            onPaneClick={close}
             onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
             onNodeMouseLeave={() => setHoveredId(null)}
             onFocusCapture={(event) =>
@@ -233,20 +316,37 @@ export function RoadmapGraph({
                 }),
               );
             }}
-            minZoom={0.08}
-            maxZoom={1.5}
+            minZoom={0.05}
+            maxZoom={1.35}
             nodesDraggable={false}
             nodesConnectable={false}
             elementsSelectable={false}
             zoomOnDoubleClick={false}
+            panOnScroll
+            zoomOnScroll={false}
+            fitView={false}
             proOptions={{ hideAttribution: true }}
             aria-label={text("Roadmap mata kuliah per semester")}
           >
             <RoadmapFocus
+              resetVersion={resetVersion}
               heading={heading}
               stage={stage}
+              focusPositions={focusPositions}
               selectedId={selectedId}
               navigation={navigation}
+            />
+            <ZoomControls
+              selected={selectedId !== null}
+              lastSemester={semesters.length}
+              shortcuts={[
+                { key: "f", description: "Buka/tutup filter" },
+                { key: "d", description: "Ganti tema" },
+              ]}
+              onReset={() => {
+                onReset();
+                setResetVersion((version) => version + 1);
+              }}
             />
             <Background
               variant={BackgroundVariant.Dots}

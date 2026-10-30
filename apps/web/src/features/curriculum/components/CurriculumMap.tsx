@@ -18,7 +18,7 @@ import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes } from "../../../graph/EdgeRouting";
 import { CourseNode, LaneNode } from "../../../graph/MapNodes";
 import { GraphFocus } from "../../../graph/GraphFocus";
-import { ZoomControls } from "./ZoomControls";
+import { ZoomControls } from "../../../graph/ZoomControls";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../../graph/model";
 import { courseLayout } from "../../../courses/layout";
 import { isCore } from "../../../courses/course-utils";
@@ -243,6 +243,12 @@ export function CurriculumMap({
           positions={positions}
         />
         <ZoomControls
+          shortcuts={[
+            { key: "f", description: "Buka/tutup filter" },
+            { key: "v", description: "Ganti tampilan" },
+            { key: "/", description: "Cari mata kuliah" },
+            { key: "d", description: "Ganti tema" },
+          ]}
           onReset={onReset}
           selected={selectedId !== null}
           lastSemester={lastSemester}

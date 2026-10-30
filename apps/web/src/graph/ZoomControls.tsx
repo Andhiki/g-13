@@ -1,21 +1,23 @@
 import { useState } from "react";
-import { MapControlPanel } from "../../../graph/Overlay";
-import { useLocale } from "../../../useLocale";
+import { MapControlPanel } from "./Overlay";
+import { useLocale } from "../useLocale";
 import { Panel, useReactFlow, useViewport } from "@xyflow/react";
 import { RiAddLine, RiSubtractLine, RiFocus3Line, RiKeyboardLine } from "@remixicon/react";
 import { useReducedMotion } from "motion/react";
-import { AlignButton } from "../../../ui/button";
-import { AlignKbd } from "../../../ui/kbd";
-import { Typography } from "../../../ui/typography";
+import { AlignButton } from "../ui/button";
+import { AlignKbd } from "../ui/kbd";
+import { Typography } from "../ui/typography";
 
 export function ZoomControls({
   onReset,
   selected,
   lastSemester,
+  shortcuts,
 }: {
   onReset: () => void;
   selected: boolean;
   lastSemester: number;
+  shortcuts: { key: string; description: string }[];
 }) {
   const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -55,12 +57,7 @@ export function ZoomControls({
                   <AlignKbd.Root>{lastSemester}</AlignKbd.Root>
                 </dd>
               </div>
-              {[
-                { key: "f", description: "Buka/tutup filter" },
-                { key: "v", description: "Ganti tampilan" },
-                { key: "/", description: "Cari mata kuliah" },
-                { key: "d", description: "Ganti tema" },
-              ].map(({ key, description }) => (
+              {shortcuts.map(({ key, description }) => (
                 <div key={key} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
                   <dt>
                     <Typography as="span" variant="caption" className="text-text-sub-600">

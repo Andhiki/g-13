@@ -17,6 +17,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Fixed
 
 - Tombol salin dan tutup pada drawer detail mata kuliah diratakan dalam satu baris.
+- Fokus mata kuliah, gerakan viewport, animasi navigasi semester, dan pintasan angka pada hasil roadmap disamakan dengan peta kurikulum.
 
 #### Changed
 

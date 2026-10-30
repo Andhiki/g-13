@@ -334,3 +334,29 @@ for (const width of [1440, 390]) {
     expect(errors).toEqual([]);
   });
 }
+
+test("roadmap shortcuts focus semesters with animation and course selection focuses connected courses", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await open(page, roadmapPath);
+  await settled(page);
+  const initial = await viewport(page);
+  await page.keyboard.press("3");
+  await expect.poll(async () => (await viewport(page)).x).not.toBe(initial.x);
+  const moving = await viewport(page);
+  await settled(page);
+  const semester = await viewport(page);
+  expect(semester.zoom).toBeCloseTo(0.72, 2);
+  expect(moving).not.toEqual(semester);
+  await chooseVisibleCourse(page, true);
+  expect(await viewport(page)).not.toEqual(semester);
+  await expect(page.locator(".react-flow__node-lane:visible")).toHaveCount(0);
+  await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
+  await expectViewport(page, semester);
+  await page.locator('[aria-controls="map-keyboard-shortcuts"]').click();
+  await expect(page.locator("#map-keyboard-shortcuts")).toContainText("Ke semester");
+  await expect(page.locator("#map-keyboard-shortcuts")).not.toContainText("Ganti tampilan");
+  await page.getByRole("button", { name: "Kembali ke tampilan awal", exact: true }).click();
+  await expectViewport(page, initial);
+});

@@ -13,6 +13,7 @@ import { buttonVariants } from "../../ui/button";
 import { CourseDetails } from "../../courses/CourseDetails";
 import { getRoadmap } from "./roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
+import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
 import { ElectiveReplacement } from "./ElectiveReplacement";
 import type { PlanningInput } from "./planning-input";
 import type { RoadmapSearch } from "./search";
@@ -40,6 +41,24 @@ export function RoadmapResult({
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
+  const lastSemester = Math.max(
+    1,
+    ...plan.courses.map((x) => x.semester),
+    ...plan.activities.map((x) => x.semester),
+  );
+  const navigateToSemester = (semester: number) => {
+    if (semester > lastSemester) return;
+    setSelectedId(null);
+    setNavigation({ semester });
+  };
+  useKeyboardShortcuts(
+    Object.fromEntries(
+      Array.from({ length: Math.min(lastSemester, 8) }, (_, index) => [
+        String(index + 1),
+        () => navigateToSemester(index + 1),
+      ]),
+    ),
+  );
   const selected = plan.courses.find((x) => x.course.id === selectedId);
   const data = getCurriculum(input.kurikulum);
   const detailsData = useMemo(
@@ -79,6 +98,11 @@ export function RoadmapResult({
           })}
           selectedId={selectedId}
           choose={choose}
+          close={() => setSelectedId(null)}
+          onReset={() => {
+            setSelectedId(null);
+            setNavigation(null);
+          }}
           navigation={navigation}
           onVisibleSemesters={setVisibleSemesters}
         />
@@ -106,15 +130,8 @@ export function RoadmapResult({
         navigation={
           <SemesterFilter
             visible={visibleSemesters}
-            onNavigate={(semester) => {
-              setSelectedId(null);
-              setNavigation({ semester });
-            }}
-            lastSemester={Math.max(
-              1,
-              ...plan.courses.map((x) => x.semester),
-              ...plan.activities.map((x) => x.semester),
-            )}
+            onNavigate={navigateToSemester}
+            lastSemester={lastSemester}
           />
         }
         search={null}
