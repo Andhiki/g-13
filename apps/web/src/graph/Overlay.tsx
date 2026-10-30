@@ -237,11 +237,13 @@ export function Overlay({
             {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
-              {compact && (
-                <FilterDrawer copy={filterCopy} open={filtersOpen} onOpenChange={setFiltersOpen}>
-                  {children}
-                </FilterDrawer>
-              )}
+              <FilterDrawer
+                copy={filterCopy}
+                open={compact && filtersOpen}
+                onOpenChange={setFiltersOpen}
+              >
+                {children}
+              </FilterDrawer>
             </div>
           </div>
           {!compact && (
@@ -252,7 +254,7 @@ export function Overlay({
               icon={RiFilter3Line}
               controlsId="desktop-filters"
               shortcut="F"
-              className="top-[52px]"
+              className="top-[52px] max-[1100px]:hidden"
               open={filtersOpen}
               onOpenChange={setFiltersOpen}
             >
