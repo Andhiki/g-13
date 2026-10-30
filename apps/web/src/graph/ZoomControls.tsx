@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MapControlPanel } from "./Overlay";
 import { useLocale } from "../useLocale";
-import { Panel, useReactFlow, useViewport } from "@xyflow/react";
+import { Panel, useReactFlow, useStore } from "@xyflow/react";
 import { RiAddLine, RiSubtractLine, RiFocus3Line, RiKeyboardLine } from "@remixicon/react";
 import { useReducedMotion } from "motion/react";
 import { AlignButton } from "../ui/button";
@@ -24,7 +24,7 @@ export function ZoomControls({
   const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const { zoomIn, zoomOut } = useReactFlow();
-  const { zoom } = useViewport();
+  const zoom = useStore((state) => state.transform[2]);
   const reducedMotion = useReducedMotion();
   const options = { duration: reducedMotion ? 0 : 150 };
   return (

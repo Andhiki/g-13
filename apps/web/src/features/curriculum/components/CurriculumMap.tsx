@@ -16,6 +16,7 @@ import {
   ViewportPortal,
   useReactFlow,
   useStore,
+  useNodes,
   useOnViewportChange,
   type Edge,
   type NodeTypes,
@@ -83,45 +84,24 @@ function ViewportFocus({
 }
 
 function SemesterViewport({
-  stage,
   active,
   selectedId,
   onVisibleSemesters,
 }: {
-  stage: RefObject<HTMLDivElement | null>;
   active: boolean;
   selectedId: string | null;
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
   const flow = useReactFlow<MapNode>();
   const origin = useContext(GraphOrigin);
-  const lanes = useStore(
-    (state) => state.nodes.filter((node) => node.type === "lane"),
-    (before, after) =>
-      before.length === after.length &&
-      before.every(
-        (node, index) =>
-          node.id === after[index].id &&
-          node.position.x === after[index].position.x &&
-          node.position.y === after[index].position.y,
-      ),
-  );
-  const update = useCallback(() => {
-    if (!active) return;
-    if (selectedId) {
-      onVisibleSemesters([]);
-      return;
-    }
-    const bounds = stage.current!.getBoundingClientRect();
-    const viewport = flow.getViewport();
-    const semesters: number[] = [];
-    const nodes = flow.getNodes();
-    const top = window.matchMedia("(width < 1100px)").matches ? 116 : 76;
+  const nodes = useNodes<MapNode>();
+  const width = useStore((state) => state.width);
+  const height = useStore((state) => state.height);
+  const semesterBounds = useMemo(() => {
+    const bounds: { semester: number; x: number; bottom: number }[] = [];
     for (let semester = 1; semester <= 8; semester++) {
-      if (!lanes.some((node) => node.id === `lane-semester-${semester}`)) continue;
-      const laneX = LANE_X + (semester - 1) * LANE_STEP + origin.x;
-      const left = viewport.x + laneX * viewport.zoom;
-      const width = LANE_WIDTH * viewport.zoom;
+      if (!nodes.some((node) => node.id === `lane-semester-${semester}`)) continue;
+      const x = LANE_X + (semester - 1) * LANE_STEP + origin.x;
       const bottom = Math.max(
         140,
         ...nodes
@@ -129,27 +109,39 @@ function SemesterViewport({
             (node) =>
               node.type === "course" &&
               isCore(node.data.course) &&
-              node.position.x >= laneX &&
-              node.position.x < laneX + LANE_WIDTH,
+              node.position.x >= x &&
+              node.position.x < x + LANE_WIDTH,
           )
           .map((node) => node.position.y + courseLayout.cardHeight),
       );
+      bounds.push({ semester, x, bottom });
+    }
+    return bounds;
+  }, [nodes, origin.x]);
+  const update = useCallback(() => {
+    if (!active) return;
+    if (selectedId) {
+      onVisibleSemesters([]);
+      return;
+    }
+    const viewport = flow.getViewport();
+    const semesters: number[] = [];
+    const top = width < 1100 ? 116 : 76;
+    const laneWidth = LANE_WIDTH * viewport.zoom;
+    for (const { semester, x, bottom } of semesterBounds) {
+      const left = viewport.x + x * viewport.zoom;
       if (
-        Math.min(bounds.width, left + width) - Math.max(0, left) >= width / 2 &&
+        Math.min(width, left + laneWidth) - Math.max(0, left) >= laneWidth / 2 &&
         viewport.y + bottom * viewport.zoom > top &&
-        viewport.y + (100 + origin.y) * viewport.zoom < bounds.height
+        viewport.y + (100 + origin.y) * viewport.zoom < height
       ) {
         semesters.push(semester);
       }
     }
     onVisibleSemesters(semesters);
-  }, [active, flow, selectedId, onVisibleSemesters, stage, origin, lanes]);
+  }, [active, flow, selectedId, onVisibleSemesters, origin.y, semesterBounds, width, height]);
   useOnViewportChange({ onChange: update });
-  useEffect(() => {
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [update]);
+  useEffect(update, [update]);
   return null;
 }
 
@@ -280,7 +272,6 @@ export function CurriculumMap({
           lastSemester={lastSemester}
         />
         <SemesterViewport
-          stage={stage}
           active={active}
           selectedId={selectedId}
           onVisibleSemesters={onVisibleSemesters}

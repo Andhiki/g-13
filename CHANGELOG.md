@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-10-31
+
+#### Fixed
+
+- Mengurangi pekerjaan saat menggeser peta dengan menghitung ulang batas semester hanya saat tata letak berubah dan memperbarui kontrol zoom hanya saat tingkat zoom berubah.
+
 ### 2026-10-30
 
 #### Added
