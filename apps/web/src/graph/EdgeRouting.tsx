@@ -192,22 +192,32 @@ function RoutedEdge(
           exit={{ opacity: 0 }}
           transition={{ duration: reducedMotion || props.data?.moving ? 0 : 0.15, ease: "easeOut" }}
         >
-          <BaseEdge
-            id={props.id}
-            path={path}
-            interactionWidth={props.interactionWidth}
-            data-routed={routed ? "true" : undefined}
-            className="transition-[stroke,stroke-width] duration-150 motion-reduce:transition-none"
-            style={style}
-          />
-          {props.data?.charging && (
-            <path
-              d={path}
-              pathLength={1}
-              className="course-connection-charge"
-              style={{ stroke: "var(--color-text-strong-950)" }}
-            />
-          )}
+          <AnimatePresence initial={false}>
+            <m.g
+              key={routed ? "routed" : "fallback"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.15, ease: "easeOut" }}
+            >
+              <BaseEdge
+                id={props.id}
+                path={path}
+                interactionWidth={routed ? props.interactionWidth : 0}
+                data-routed={routed ? "true" : undefined}
+                className="transition-[stroke,stroke-width] duration-150 motion-reduce:transition-none"
+                style={style}
+              />
+              {props.data?.charging && (
+                <path
+                  d={path}
+                  pathLength={1}
+                  className="course-connection-charge"
+                  style={{ stroke: "var(--color-text-strong-950)" }}
+                />
+              )}
+            </m.g>
+          </AnimatePresence>
         </m.g>
       )}
     </AnimatePresence>
