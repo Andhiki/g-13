@@ -49,7 +49,7 @@ function focusViewport(nodes: Node[], selected: Node, width: number, height: num
     ),
   );
   const zoom = Math.max(
-    0.05,
+    phone ? 0.65 : 0.05,
     Math.min(0.88, availableWidth / (radiusX * 2.24), availableHeight / (radiusY * 2.24)),
   );
   return {

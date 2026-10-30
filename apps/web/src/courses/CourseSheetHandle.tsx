@@ -9,19 +9,23 @@ const [minimum, maximum] = heights;
 export function CourseSheetHandle({
   height,
   onChange,
+  onClose,
   sheet: sheetRef,
 }: {
   height: number;
   sheet: RefObject<HTMLDivElement | null>;
   onChange: (height: number) => void;
+  onClose: () => void;
 }) {
   const { text } = useLocale();
   const button = useRef<HTMLButtonElement>(null);
   const suppressClick = useRef(false);
   const change = useRef(onChange);
+  const close = useRef(onClose);
   useEffect(() => {
     change.current = onChange;
-  }, [onChange]);
+    close.current = onClose;
+  }, [onChange, onClose]);
   useEffect(() => {
     const handle = button.current!;
     const sheet = sheetRef.current!;
@@ -62,33 +66,38 @@ export function CourseSheetHandle({
         active.dragging = true;
       }
       event.preventDefault();
-      active.current = Math.max(
-        minimum,
-        Math.min(maximum, height + (delta / window.innerHeight) * 100),
-      );
+      active.current = Math.max(0, Math.min(maximum, height + (delta / window.innerHeight) * 100));
       if (frame === null)
         frame = requestAnimationFrame(() => {
           frame = null;
           if (active) preview(active.current);
         });
     };
-    const finish = () => {
+    const finish = (cancelled = false) => {
       if (frame !== null) cancelAnimationFrame(frame);
       frame = null;
       if (active?.dragging) {
+        suppressClick.current = true;
+        if (cancelled || active.current < minimum / 2) {
+          preview(height);
+          if (!cancelled) close.current();
+          active = null;
+          return;
+        }
         const next = heights.reduce((best, value) =>
           Math.abs(value - active!.current) < Math.abs(best - active!.current) ? value : best,
         );
         preview(next);
-        suppressClick.current = true;
         change.current(next);
       }
       active = null;
     };
     const touchStart = (event: TouchEvent) => {
       if (event.touches.length === 1) start(event.target, event.touches[0].clientY);
-      else finish();
+      else finish(true);
     };
+    const end = () => finish();
+    const cancel = () => finish(true);
     const touchMove = (event: TouchEvent) => {
       if (event.touches.length === 1) move(event.touches[0].clientY, event);
     };
@@ -112,21 +121,21 @@ export function CourseSheetHandle({
     };
     sheet.addEventListener("touchstart", touchStart, { passive: true });
     sheet.addEventListener("touchmove", touchMove, { passive: false });
-    sheet.addEventListener("touchend", finish);
-    sheet.addEventListener("touchcancel", finish);
+    sheet.addEventListener("touchend", end);
+    sheet.addEventListener("touchcancel", cancel);
     sheet.addEventListener("pointerdown", pointerDown);
     window.addEventListener("pointermove", pointerMove);
-    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointerup", end);
     sheet.addEventListener("click", click, true);
     return () => {
       if (frame !== null) cancelAnimationFrame(frame);
       sheet.removeEventListener("touchstart", touchStart);
       sheet.removeEventListener("touchmove", touchMove);
-      sheet.removeEventListener("touchend", finish);
-      sheet.removeEventListener("touchcancel", finish);
+      sheet.removeEventListener("touchend", end);
+      sheet.removeEventListener("touchcancel", cancel);
       sheet.removeEventListener("pointerdown", pointerDown);
       window.removeEventListener("pointermove", pointerMove);
-      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointerup", end);
       sheet.removeEventListener("click", click, true);
     };
   }, [height, text, sheetRef]);

@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Drawer detail mata kuliah di ponsel dapat ditutup dengan menariknya ke bawah.
+- Fokus mata kuliah di ponsel membatasi zoom keluar agar kartu tetap terbaca meskipun memiliki banyak koneksi.
+
 - Ukuran teks badge mengikuti ukuran komponen, dan kode mata kuliah ditampilkan di atas nama pada daftar ponsel.
 
 - Tombol filter pada ponsel tetap berada di posisinya saat halaman dimuat.

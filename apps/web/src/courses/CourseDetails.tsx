@@ -80,6 +80,7 @@ export function CourseDetails({
           <CourseSheetHandle
             sheet={sheet}
             height={height}
+            onClose={close}
             onChange={(next) => {
               setHeight(next);
               onHeightChange?.(next);
