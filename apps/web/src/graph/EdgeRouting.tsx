@@ -1,16 +1,18 @@
-import { createContext, useContext, useLayoutEffect, useMemo, type ReactNode } from "react";
 import {
-  BaseEdge,
-  ReactFlowProvider,
-  useStore,
-  type Edge,
-  type EdgeProps,
-  type XYPosition,
-} from "@xyflow/react";
+  createContext,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { BaseEdge, ReactFlowProvider, useStore, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { routePath } from "./route-motion";
+import { connectionPaths } from "./connection-paths";
 
-export const ConnectionPaths = createContext<ReadonlyMap<string, XYPosition[]>>(new Map());
+export const ConnectionPaths = createContext(connectionPaths());
 
 export const ConnectionVisibility = createContext({
   incoming: new Set<string>(),
@@ -70,13 +72,29 @@ export function EdgeRouting({ children }: { children: ReactNode }) {
 function RoutedEdge(
   props: EdgeProps<Edge<{ visible: boolean; charging: boolean; moving: boolean }>>,
 ) {
-  const points = useContext(ConnectionPaths).get(props.id);
+  const paths = useContext(ConnectionPaths);
+  const hasPath = useSyncExternalStore(
+    paths.subscribe,
+    () => paths.has(props.id),
+    () => false,
+  );
+  const group = useRef<SVGGElement>(null);
+  useLayoutEffect(() => {
+    if (!hasPath || props.data?.visible === false) return;
+    return paths.subscribe(() => {
+      const points = paths.get(props.id);
+      if (!points || !group.current) return;
+      const path = routePath(points, points[0], points[points.length - 1]);
+      for (const element of group.current.querySelectorAll("path")) element.setAttribute("d", path);
+    });
+  }, [paths, props.id, hasPath, props.data?.visible, props.data?.charging]);
+  const points = paths.get(props.id);
   const path =
     points && props.data?.visible !== false
       ? routePath(
           points,
-          { x: props.sourceX, y: props.sourceY },
-          { x: props.targetX, y: props.targetY },
+          props.data?.moving ? points[0] : { x: props.sourceX, y: props.sourceY },
+          props.data?.moving ? points[points.length - 1] : { x: props.targetX, y: props.targetY },
         )
       : undefined;
   const reducedMotion = useReducedMotion();
@@ -85,11 +103,15 @@ function RoutedEdge(
     <AnimatePresence>
       {path && props.data?.visible !== false && (
         <m.g
+          ref={group}
           key={props.id}
           initial={{ opacity: 0 }}
           animate={{ opacity }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reducedMotion || props.data?.moving ? 0 : 0.15, ease: "easeOut" }}
+          transition={{
+            duration: reducedMotion ? 0 : props.data?.moving ? 0.4 : 0.15,
+            ease: "easeOut",
+          }}
         >
           <BaseEdge
             id={props.id}

@@ -10,6 +10,7 @@ import {
   type XYPosition,
 } from "@xyflow/react";
 import { ConnectionPaths } from "./EdgeRouting";
+import { connectionPaths } from "./connection-paths";
 import { getConnectionRoutes, routingRequest } from "./routing-cache";
 import { mixRoute, resampleRoute, routeLength, routeSamples } from "./route-motion";
 import type { RoutingNode } from "./connection-routes";
@@ -88,13 +89,14 @@ export function MotionGraph<N extends Node>({
             (node.type !== "course" || node.internals.handleBounds !== undefined)),
       ),
   );
+  const element = useStore((state) => state.domNode);
   const width = useStore((state) => state.width);
   const height = useStore((state) => state.height);
   const [displayed, setDisplayed] = useState(nodes);
   const [moving, setMoving] = useState(false);
   const current = useRef(displayed);
-  const [paths, setPaths] = useState<Map<string, XYPosition[]>>(new Map());
-  const currentPaths = useRef(paths);
+  const [paths] = useState(connectionPaths);
+  const currentPaths = useRef(new Map<string, XYPosition[]>());
   const measurements = useRef(new Map<string, Omit<RoutingNode, "id" | "position">>());
   const ready = nodesInitialized || currentPaths.current.size > 0;
   const [routingError, setRoutingError] = useState<Error>();
@@ -107,7 +109,7 @@ export function MotionGraph<N extends Node>({
   const settled = useEffectEvent(() => onMoveEnd?.(null, getViewport()));
 
   useLayoutEffect(() => {
-    if (!viewportInitialized || !ready) return;
+    if (!viewportInitialized || !ready || !element) return;
     const before = previous.current;
     const reset = before.resetKey !== resetKey || before.navigation !== navigation;
     const selectionChanged = before.selectedId !== selectedId;
@@ -120,7 +122,27 @@ export function MotionGraph<N extends Node>({
     const departingEdges = outgoing.filter((edge) => !edgeIds.has(edge.id));
     setLeavingEdges(departingEdges);
     currentEdges.current = edges;
-    const starts = new Map(current.current.map((node) => [node.id, node]));
+    const elements = new Map(
+      Array.from(element.querySelectorAll<HTMLElement>(".react-flow__node")).map((node) => [
+        node.dataset.id,
+        node,
+      ]),
+    );
+    const snapshot = current.current.map((node) => {
+      const element = elements.get(node.id);
+      if (!element) return node;
+      const style = getComputedStyle(element);
+      const transform = new DOMMatrixReadOnly(style.transform);
+      return {
+        ...node,
+        measured: getInternalNode(node.id)?.measured ?? node.measured,
+        position: { x: transform.m41, y: transform.m42 },
+        style: { ...node.style, opacity: Number(style.opacity), transition: "none" },
+      };
+    });
+    current.current = snapshot;
+    setDisplayed(snapshot);
+    const starts = new Map(snapshot.map((node) => [node.id, node]));
     const anchorId = selectedId ?? before.selectedId;
     const anchor = starts.get(anchorId ?? "");
     const destination = nodes.find((node) => node.id === anchorId);
@@ -181,49 +203,36 @@ export function MotionGraph<N extends Node>({
     let active = true;
     let started = 0;
     let transitions: { id: string; start: XYPosition[]; end: XYPosition[] }[] = [];
+    const movingNode = targets.find((node) => {
+      const start = starts.get(node.id);
+      return (
+        start &&
+        Math.hypot(start.position.x - node.position.x, start.position.y - node.position.y) > 0.01
+      );
+    });
+    const movingElement = movingNode ? elements.get(movingNode.id) : undefined;
+    let nodeAnimation: Animation | undefined;
     const render = (time: number) => {
-      const progress = animate ? Math.min(1, (time - started) / duration) : 1;
+      // Follow the CSS clock: React may commit card destinations after this loop starts.
+      nodeAnimation ??= movingElement
+        ?.getAnimations()
+        .find(
+          (animation) =>
+            animation instanceof CSSTransition && animation.transitionProperty === "transform",
+        );
+      const cssTime = nodeAnimation?.currentTime;
+      const cssDuration = nodeAnimation?.effect?.getComputedTiming().duration;
+      const animationDuration = typeof cssDuration === "number" ? cssDuration : duration;
+      let elapsed = time - started;
+      if (movingElement && (nodeAnimation || elapsed < duration))
+        elapsed = typeof cssTime === "number" ? cssTime : 0;
+      const progress = animate ? Math.min(1, elapsed / animationDuration) : 1;
       const t = ease(progress);
-      const next: N[] = targets.map((node) => {
-        const start = starts.get(node.id);
-        const opacity = start && !start.hidden ? Number(start.style?.opacity ?? 1) : 0;
-        const measured = getInternalNode(node.id)?.measured ?? node.measured;
-        if (
-          measured === node.measured &&
-          opacity === 1 &&
-          start?.position.x === node.position.x &&
-          start.position.y === node.position.y
-        )
-          return node;
-        return {
-          ...node,
-          measured,
-          position: {
-            x: mix(start?.position.x ?? node.position.x, node.position.x, t),
-            y: mix(start?.position.y ?? node.position.y, node.position.y, t),
-          },
-          style: { ...node.style, opacity: mix(opacity, 1, t) },
-        };
-      });
-      if (progress < 1) {
-        for (const node of leaving)
-          next.push({
-            ...node,
-            measured: getInternalNode(node.id)?.measured ?? node.measured,
-            style: {
-              ...node.style,
-              opacity: Number(node.style?.opacity ?? 1) * (1 - t),
-              pointerEvents: "none",
-            },
-          });
-      }
       const nextPaths = new Map(
         transitions.map(({ id, start, end }) => [id, mixRoute(start, end, t)]),
       );
       currentPaths.current = nextPaths;
-      setPaths(nextPaths);
-      current.current = next;
-      setDisplayed(next);
+      paths.update(nextPaths);
       if (cameraMoving.current)
         void setViewport({
           x: mix(startViewport.x, endViewport.x, t),
@@ -234,6 +243,8 @@ export function MotionGraph<N extends Node>({
       else {
         inFlight.current = false;
         setMoving(false);
+        current.current = targets;
+        setDisplayed(targets);
         frame = requestAnimationFrame(settled);
       }
     };
@@ -293,6 +304,25 @@ export function MotionGraph<N extends Node>({
           if (!start) continue;
           transitions.push({ id: edge.id, start, end: deform(start, edge, false) });
         }
+        const transition = animate
+          ? `transform ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1), opacity ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1)`
+          : "none";
+        const next: N[] = targets.map((node) => ({
+          ...node,
+          style: { ...node.style, opacity: 1, transition },
+        }));
+        if (animate) {
+          for (const node of leaving)
+            next.push({
+              ...node,
+              style: { ...node.style, opacity: 0, transition, pointerEvents: "none" },
+            });
+        }
+        setLeavingEdges(
+          departingEdges.map((edge) => ({ ...edge, style: { ...edge.style, opacity: 0 } })),
+        );
+        current.current = next;
+        setDisplayed(next);
         started = performance.now();
         setMoving(animate);
         render(started);
@@ -317,11 +347,12 @@ export function MotionGraph<N extends Node>({
     getViewport,
     setViewport,
     getInternalNode,
+    element,
+    paths,
   ]);
 
   if (routingError) throw routingError;
 
-  const opacity = new Map(displayed.map((node) => [node.id, Number(node.style?.opacity ?? 1)]));
   const visibleEdges = useMemo(() => {
     const edgeIds = new Set(edges.map((edge) => edge.id));
     const visible = moving
@@ -340,15 +371,7 @@ export function MotionGraph<N extends Node>({
             onMoveStart?.(event, viewport);
           }}
           nodes={displayed}
-          edges={visibleEdges.map((edge) => {
-            const fade = Math.min(opacity.get(edge.source) ?? 0, opacity.get(edge.target) ?? 0);
-            return fade === 1
-              ? edge
-              : {
-                  ...edge,
-                  style: { ...edge.style, opacity: Number(edge.style?.opacity ?? 1) * fade },
-                };
-          })}
+          edges={visibleEdges}
         />
       </ConnectionPaths.Provider>
     </GraphOrigin.Provider>
