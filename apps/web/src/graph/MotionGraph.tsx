@@ -79,7 +79,7 @@ export function MotionGraph<N extends Node>({
   navigation: { semester: number } | null;
   sheetHeight?: number;
 }) {
-  const { getViewport, setViewport, viewportInitialized } = useReactFlow();
+  const { getViewport, setViewport, getInternalNode, viewportInitialized } = useReactFlow();
   const width = useStore((state) => state.width);
   const height = useStore((state) => state.height);
   const [displayed, setDisplayed] = useState(nodes);
@@ -145,6 +145,7 @@ export function MotionGraph<N extends Node>({
         const opacity = start && !start.hidden ? Number(start.style?.opacity ?? 1) : 0;
         return {
           ...node,
+          measured: getInternalNode(node.id)?.measured ?? node.measured,
           position: {
             x: mix(start?.position.x ?? node.position.x, node.position.x, t),
             y: mix(start?.position.y ?? node.position.y, node.position.y, t),
@@ -156,6 +157,7 @@ export function MotionGraph<N extends Node>({
         for (const node of leaving)
           next.push({
             ...node,
+            measured: getInternalNode(node.id)?.measured ?? node.measured,
             style: {
               ...node.style,
               opacity: Number(node.style?.opacity ?? 1) * (1 - t),
@@ -191,6 +193,7 @@ export function MotionGraph<N extends Node>({
     sheetHeight,
     getViewport,
     setViewport,
+    getInternalNode,
   ]);
 
   const opacity = new Map(displayed.map((node) => [node.id, Number(node.style?.opacity ?? 1)]));
