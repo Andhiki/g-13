@@ -10,6 +10,7 @@ export const typographyVariants = tv(
         subtitle2: "font-display text-label-md",
         paragraph: "text-paragraph-sm",
         caption: "text-paragraph-xs",
+        code: "font-mono text-paragraph-xs",
         label: "text-label-sm",
         labelSmall: "text-label-xs",
         graphTitle: "font-display text-title-h1 max-[650px]:text-title-h4",

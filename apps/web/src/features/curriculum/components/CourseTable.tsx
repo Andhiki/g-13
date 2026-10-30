@@ -2,6 +2,7 @@ import { useLocale } from "../../../useLocale";
 import { CopyCourseButton } from "../../../courses/CopyCourseButton";
 import { Typography } from "../../../ui/typography";
 import { useId } from "react";
+import { AlignBadge } from "../../../ui/badge";
 import { AlignButton } from "../../../ui/button";
 import { AlignTable } from "../../../ui/table";
 import { courseLabels, semesterLabel } from "../../../courses/course-utils";
@@ -50,9 +51,8 @@ export function CourseTable({
         </AlignTable.Header>
         <AlignTable.Body>
           {section.courses.map((course) => {
-            const categories = courseLabels(course)
-              .map((label) => text(label))
-              .join(" · ");
+            const categoryLabels = courseLabels(course).map((label) => text(label));
+            const categories = categoryLabels.join(" · ");
             const semesterLabels = new Set(
               course.placements.map((placement) => placement.semesterLabel),
             );
@@ -111,19 +111,26 @@ export function CourseTable({
                       {courseName(course)}
                     </Typography>
                   </AlignButton.Root>
-                  <Typography
-                    as="span"
-                    variant="caption"
-                    className="mb-1 flex flex-wrap items-center gap-1 text-text-sub-600 min-[640px]:hidden"
-                  >
+                  <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 min-[640px]:hidden">
                     {course.code && (
-                      <span className="inline-flex items-center gap-1">
+                      <div className="inline-flex items-center gap-1">
                         <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
-                        {course.code}
-                      </span>
+                        <Typography as="span" variant="code" className="text-text-sub-600">
+                          {course.code}
+                        </Typography>
+                      </div>
                     )}
-                    {[categories, groups].filter(Boolean).join(" · ")}
-                  </Typography>
+                    {categoryLabels.map((label) => (
+                      <AlignBadge.Root key={label} variant="light" size="medium">
+                        {label}
+                      </AlignBadge.Root>
+                    ))}
+                    {groups && (
+                      <Typography as="span" variant="caption" className="text-text-sub-600">
+                        {groups}
+                      </Typography>
+                    )}
+                  </div>
                   {showSemesters && (
                     <Typography
                       as="span"
@@ -151,6 +158,7 @@ export function CourseTable({
                     className="text-text-sub-600 tabular-nums"
                   >
                     {credits || "—"}
+                    <span className="min-[640px]:hidden"> {text("SKS")}</span>
                   </Typography>
                 </AlignTable.Cell>
               </AlignTable.Row>
