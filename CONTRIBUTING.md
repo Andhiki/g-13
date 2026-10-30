@@ -57,6 +57,8 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
   dokumen sumber. Ikuti [panduan impor](AGENTS.d/curriculum-import.md); jangan simpan
   skrip ekstraksi PDF sekali pakai. Perubahan sumber harus menyertakan provenance.
 - `*.test.ts`: tes Bun untuk perilaku data dan logika aplikasi.
+- Verifikasi perubahan UI secara manual. Jangan menambahkan tes UI, termasuk
+  pemeriksaan teks, posisi piksel, ukuran, tata letak, atau animasi.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run fmt` dan
   `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru

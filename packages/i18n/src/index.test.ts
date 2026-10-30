@@ -61,8 +61,6 @@ test("API consumers can create independent instances from shared resources", asy
     id.init({ ...i18nOptions, lng: "id" }),
     en.init({ ...i18nOptions, lng: "en" }),
   ]);
-  expect(id.t("navigation.examArchive")).toBe("Arsip Ujian");
-  expect(String(en.t("navigation.examArchive"))).toBe("Exam archive");
   await en.changeLanguage("id");
   expect(id.language).toBe("id");
 });

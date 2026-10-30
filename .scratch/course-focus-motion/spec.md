@@ -47,15 +47,10 @@ Closing preserves the current zoom and the previously selected course's screen p
 
 ## Testing Decisions
 
-- Prefer one high-level seam: interaction with the rendered graph and course details through the existing Playwright browser suite. Exercise both curriculum and roadmap through their real selection and dismissal controls.
-- Check observable behavior: selected-course screen bounds, visible related courses, camera zoom, restored map relationships, drawer state, and connected edge endpoints. Avoid assertions about hook state, timer counts, internal animation APIs, or exact intermediate frame counts.
-- Sample intermediate course positions during entry and exit to establish actual movement rather than testing only endpoints. Use tolerances for browser rendering and avoid hard-coding an exact duration.
-- Verify that closing leaves the selected course stationary and preserves zoom throughout the transition and after settlement, including after any user pan or zoom while focused.
-- Cover selecting another course during entry, closing during entry, and selecting again during exit. After settling, only the most recent action may determine the view.
-- Cover desktop and phone viewports, both graph views, asymmetric connections, a course with no direct connections, and reduced motion. Reduced motion must reach the same final state without animated travel.
-- Use existing map-sharing browser tests as prior art for graph interaction and existing syllabus-animation browser tests as prior art for motion checks. Inspect those tests before implementation rather than assuming their helpers cover this feature.
-- Add lower-level tests only if essential coordinate or transition behavior cannot be proved reliably through the rendered interaction seam; do not mirror the implementation with redundant tests.
-- The user confirmed these rendered interaction checks: selected-course screen position, zoom stability on close, smooth interruption, and connected edges during movement, across desktop, mobile, and reduced-motion settings in both graph views.
+- Verify UI behavior manually in the curriculum map and roadmap, on desktop and mobile, including reduced motion.
+- Do not implement automated UI tests, including checks for text presence, pixel alignment, dimensions, layout, or animation timing.
+- Keep automated tests for curriculum data and application logic.
+- This policy supersedes the earlier agreement to automate rendered interaction checks.
 
 ## Out of Scope
 
