@@ -69,7 +69,7 @@ export function ThemeSwitch() {
         <div className="grid grid-cols-2 gap-3">
           {(["omahti", "himakom"] as const).map((scheme) => (
             <div key={scheme} className="theme-palette-card">
-              <div className="flex justify-center gap-5 py-3 sm:gap-8">
+              <div className="flex justify-center gap-4 py-2 sm:gap-6">
                 {(["light", "dark"] satisfies ThemeMode[]).map((mode) => {
                   const Icon = mode === "light" ? RiSunLine : RiMoonLine;
                   const selected = schemes[mode] === scheme;
@@ -88,7 +88,7 @@ export function ThemeSwitch() {
                     >
                       {mounted && selected && (
                         <span className="theme-swatch-badge">
-                          <Icon className="size-3" aria-hidden="true" />
+                          <Icon className="size-4" aria-hidden="true" />
                         </span>
                       )}
                     </button>

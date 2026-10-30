@@ -45,6 +45,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Kelompok mata kuliah pilihan peminatan/laboratorium ditampilkan sebelum MBKM pada peta; kelompok MBKM selebar satu baris ditempatkan paling akhir.
+
+- Kartu skema warna dibuat lebih ringkas dengan lingkaran gradasi lebih kecil dan penanda pilihan terang/gelap lebih besar.
+
 - Animasi indikator semester memakai transform, pergantian ikon tidak lagi memakai blur, dan pulsa koneksi dijeda selama graf bergerak.
 
 - Hierarki daftar mata kuliah di ponsel diperjelas dengan kode, kategori, dan SKS yang mudah dibedakan.

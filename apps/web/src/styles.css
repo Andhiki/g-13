@@ -215,13 +215,13 @@ html[data-dark-theme="himakom"] .theme-mode-preview[data-mode="dark"] {
   content: "";
 }
 .theme-palette-card {
-  padding: 14px;
+  padding: 12px;
   border: 1px solid var(--color-stroke-soft-200);
   border-radius: 14px;
 }
 .theme-swatch {
   position: relative;
-  width: clamp(44px, 9vw, 68px);
+  width: clamp(44px, 8vw, 56px);
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle at 65% 25%, #f3c7a4, transparent 65%), #fafafa;
@@ -248,8 +248,8 @@ html[data-dark-theme="himakom"] .theme-mode-preview[data-mode="dark"] {
   right: -5px;
   bottom: -5px;
   display: grid;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   place-items: center;
   border: 1px solid var(--color-stroke-sub-300);
   border-radius: 50%;

@@ -77,8 +77,12 @@ export function createMapLayout(data: Curriculum, relations: Relation[]) {
     grouped.push(course);
     choiceGroups.set(group, grouped);
   }
-  const groups = [...choiceGroups].sort(([a], [b]) =>
-    a === "Miscellaneous" ? 1 : b === "Miscellaneous" ? -1 : a.localeCompare(b, "id"),
+  const groupPriority = (group: string, courses: Course[]) =>
+    group.includes("MBKM") ? (courses.length > (CHOICE_COLUMNS - 1) * CHOICE_ROWS ? 2 : 1) : 0;
+  const groups = [...choiceGroups].sort(
+    ([a, aCourses], [b, bCourses]) =>
+      groupPriority(a, aCourses) - groupPriority(b, bCourses) ||
+      (a === "Miscellaneous" ? 1 : b === "Miscellaneous" ? -1 : a.localeCompare(b, "id")),
   );
   const choiceStartY =
     COURSE_Y_START +
