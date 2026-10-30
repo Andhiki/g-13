@@ -207,6 +207,7 @@ export function MotionGraph<N extends Node>({
     const animate =
       !reset && (selectionChanged || selectedId !== null || inFlight.current) && !reducedMotion;
     inFlight.current = animate;
+    setMoving(animate);
     const destinations = new Map(targets.map((node) => [node.id, node]));
     const shift = (id: string, reverse: boolean) => {
       const start = starts.get(id)?.position;
@@ -227,6 +228,7 @@ export function MotionGraph<N extends Node>({
     let lastEased = 0;
     let routeStart = 0;
     let routesStarted = 0;
+    let routesReady = false;
     let transitions: { id: string; start: XYPosition[]; end: XYPosition[] }[] = [];
     const movingNode = targets.find((node) => {
       const start = starts.get(node.id);
@@ -272,7 +274,7 @@ export function MotionGraph<N extends Node>({
           zoom: mix(startViewport.zoom, endViewport.zoom, t),
         });
       if (progress < 1 || pathProgress < 1) frame = requestAnimationFrame(render);
-      else {
+      else if (routesReady) {
         inFlight.current = false;
         setMoving(false);
         current.current = targets;
@@ -330,6 +332,7 @@ export function MotionGraph<N extends Node>({
     getConnectionRoutes(JSON.stringify(request), request).then(
       (routes) => {
         if (!active) return;
+        routesReady = true;
         transitions = edges.flatMap((edge) => {
           const id = edge.id;
           const route = routes.get(id);

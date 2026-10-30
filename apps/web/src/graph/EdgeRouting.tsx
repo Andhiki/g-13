@@ -106,10 +106,10 @@ function RoutedEdge(
           ref={group}
           key={props.id}
           initial={{ opacity: 0 }}
-          animate={{ opacity }}
+          animate={{ opacity: props.data?.moving ? 0 : opacity }}
           exit={{ opacity: 0 }}
           transition={{
-            duration: reducedMotion ? 0 : props.data?.moving ? 0.4 : 0.15,
+            duration: reducedMotion || props.data?.moving ? 0 : 0.15,
             ease: "easeOut",
           }}
         >

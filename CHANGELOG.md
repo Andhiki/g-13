@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Koneksi mata kuliah disembunyikan selama transisi fokus dan kembali muncul perlahan setelah semua kartu dan jalur selesai berpindah, termasuk saat drawer detail ditutup.
 - Slot mata kuliah pilihan 2021 Revisi 2023 tampil redup seperti mata kuliah pilihan lainnya.
 - Pilihan agama ditampilkan sebagai satu mata kuliah Agama pada peta kurikulum dan hasil roadmap; arsip ujian tetap terpisah.
 
