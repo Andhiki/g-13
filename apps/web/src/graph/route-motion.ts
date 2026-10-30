@@ -70,6 +70,37 @@ export function resampleRoute(points: XYPosition[], count: number) {
   });
 }
 
+function hasEqualSteps(points: XYPosition[], index: number) {
+  const before = points[index - 1];
+  const point = points[index];
+  const after = points[index + 1];
+  return (
+    Math.abs(before.x - 2 * point.x + after.x) < 1e-7 &&
+    Math.abs(before.y - 2 * point.y + after.y) < 1e-7
+  );
+}
+
+export function routeTransition(start: XYPosition[], end: XYPosition[]) {
+  const indices = [0];
+  for (let index = 1; index < end.length - 1; index++) {
+    // Equal steps in both routes stay linear throughout interpolation.
+    if (!hasEqualSteps(start, index) || !hasEqualSteps(end, index)) indices.push(index);
+  }
+  indices.push(end.length - 1);
+  return { start: indices.map((index) => start[index]), end: indices.map((index) => end[index]) };
+}
+
+export function deformRoute(points: XYPosition[], source: XYPosition, target: XYPosition) {
+  const { lengths, length } = routeDistances(points);
+  return points.map((point, index) => {
+    const t = length ? lengths[index] / length : index / (points.length - 1);
+    return {
+      x: point.x + source.x * (1 - t) + target.x * t,
+      y: point.y + source.y * (1 - t) + target.y * t,
+    };
+  });
+}
+
 export function mixRoute(start: XYPosition[], end: XYPosition[], t: number) {
   return end.map((point, index) => ({
     x: start[index].x + (point.x - start[index].x) * t,

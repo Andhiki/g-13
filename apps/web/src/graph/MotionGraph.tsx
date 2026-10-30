@@ -12,7 +12,14 @@ import {
 import { ConnectionPaths } from "./EdgeRouting";
 import { connectionPaths } from "./connection-paths";
 import { getConnectionRoutes, routingRequest } from "./routing-cache";
-import { mixRoute, resampleRoute, routeLength, routeSamples } from "./route-motion";
+import {
+  deformRoute,
+  mixRoute,
+  resampleRoute,
+  routeLength,
+  routeSamples,
+  routeTransition,
+} from "./route-motion";
 import type { RoutingNode } from "./connection-routes";
 import { courseLayout } from "../courses/layout";
 
@@ -275,13 +282,7 @@ export function MotionGraph<N extends Node>({
         const deform = (points: XYPosition[], edge: Edge, reverse: boolean) => {
           const source = shift(edge.source, reverse);
           const target = shift(edge.target, reverse);
-          return points.map((point, index) => {
-            const t = index / (points.length - 1);
-            return {
-              x: point.x + source.x * (1 - t) + target.x * t,
-              y: point.y + source.y * (1 - t) + target.y * t,
-            };
-          });
+          return deformRoute(points, source, target);
         };
         transitions = edges.flatMap((edge) => {
           const id = edge.id;
@@ -294,15 +295,17 @@ export function MotionGraph<N extends Node>({
           return [
             {
               id,
-              start: previous ? resampleRoute(previous, count) : deform(end, edge, true),
-              end,
+              ...routeTransition(
+                previous ? resampleRoute(previous, count) : deform(end, edge, true),
+                end,
+              ),
             },
           ];
         });
         for (const edge of departingEdges) {
           const start = currentPaths.current.get(edge.id);
           if (!start) continue;
-          transitions.push({ id: edge.id, start, end: deform(start, edge, false) });
+          transitions.push({ id: edge.id, ...routeTransition(start, deform(start, edge, false)) });
         }
         const transition = animate
           ? `transform ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1), opacity ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1)`
