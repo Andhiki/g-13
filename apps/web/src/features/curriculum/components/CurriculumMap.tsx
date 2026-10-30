@@ -207,7 +207,6 @@ export function CurriculumMap({
   nodes,
   edges,
   lastSemester,
-  detailsHeight,
 }: {
   stage: RefObject<HTMLDivElement | null>;
   active: boolean;
@@ -221,7 +220,6 @@ export function CurriculumMap({
   nodes: MapNode[];
   edges: Edge[];
   lastSemester: number;
-  detailsHeight: number;
 }) {
   const { text } = useLocale();
   const title = useRef<HTMLDivElement>(null);
@@ -234,7 +232,6 @@ export function CurriculumMap({
     <EdgeRouting>
       <MotionGraph<MapNode>
         selectedId={selectedId}
-        sheetHeight={detailsHeight}
         resetKey={`${curriculum}:${resetVersion}`}
         navigation={navigation}
         key={curriculum}

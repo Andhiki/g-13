@@ -101,7 +101,6 @@ export function CurriculumPage() {
         >
           <CurriculumMap
             stage={stage}
-            detailsHeight={detailsHeight}
             active={view === "map"}
             navigation={semesterNavigation}
             resetVersion={resetVersion}

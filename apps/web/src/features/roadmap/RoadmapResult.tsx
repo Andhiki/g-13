@@ -10,7 +10,6 @@ import { SemesterFilter } from "../../graph/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
 import { buttonVariants } from "../../ui/button";
-import { courseLayout } from "../../courses/layout";
 import { CourseDetails } from "../../courses/CourseDetails";
 import { getRoadmap } from "./roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
@@ -40,7 +39,6 @@ export function RoadmapResult({
   const plan = useMemo(() => getRoadmap(input), [input]);
   const [navigation, setNavigation] = useState<{ semester: number } | null>(null);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
-  const [detailsHeight, setDetailsHeight] = useState(courseLayout.sheetHeights[0]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
   const lastSemester = Math.max(
@@ -80,7 +78,6 @@ export function RoadmapResult({
       <main className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden">
         <RoadmapGraph
           plan={plan}
-          detailsHeight={detailsHeight}
           restart={restart}
           shareLink={<RoadmapShare selection={JSON.stringify(answers)} />}
           target={answers.lulus}
@@ -145,7 +142,6 @@ export function RoadmapResult({
         <RoadmapFilters answers={answers} update={update} />
       </Overlay>
       <CourseDetails
-        onHeightChange={setDetailsHeight}
         modal={false}
         course={selected?.course ?? data.all.find((course) => course.id === selectedId) ?? null}
         data={detailsData}

@@ -150,7 +150,6 @@ export function RoadmapGraph({
   onReset,
   navigation,
   onVisibleSemesters,
-  detailsHeight,
 }: {
   plan: Roadmap;
   restart: () => void;
@@ -163,7 +162,6 @@ export function RoadmapGraph({
   onReset: () => void;
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
-  detailsHeight: number;
 }) {
   const { text, language } = useLocale("roadmap");
   const [resetVersion, setResetVersion] = useState(0);
@@ -251,7 +249,6 @@ export function RoadmapGraph({
         <EdgeRouting>
           <MotionGraph<RoadmapNode>
             selectedId={selectedId}
-            sheetHeight={detailsHeight}
             resetKey={`roadmap:${resetVersion}`}
             navigation={navigation}
             className="absolute! inset-0"

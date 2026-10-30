@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Memperbesar drawer detail di ponsel tidak lagi mengubah zoom peta kurikulum atau roadmap.
+
 - Perutean otomatis penghindar kartu dipulihkan; jalur koneksi dan posisi mata kuliah dianimasikan bersama tanpa pergantian jalur setelah drawer selesai bergerak.
 - Mata kuliah yang difokuskan tetap terlihat saat drawer ditutup, tanpa menghilang selama transisi peta.
 - Kontrol zoom roadmap tidak lagi tertutup tombol catatan.

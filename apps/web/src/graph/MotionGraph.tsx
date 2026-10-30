@@ -21,20 +21,14 @@ const duration = 400;
 const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 const mix = (from: number, to: number, t: number) => from + (to - from) * t;
 
-function focusViewport(
-  nodes: Node[],
-  selected: Node,
-  width: number,
-  height: number,
-  sheetHeight: number,
-): Viewport {
+function focusViewport(nodes: Node[], selected: Node, width: number, height: number): Viewport {
   const phone = window.matchMedia(courseLayout.phoneQuery).matches;
   const left = phone ? 16 : courseLayout.detailsWidth + 24;
   const top = phone ? 128 : 96;
   const availableWidth = Math.max(1, width - left - 16);
   const availableHeight = Math.max(
     1,
-    height - top - 24 - (phone ? (innerHeight * sheetHeight) / 100 : 0),
+    height - top - 24 - (phone ? (innerHeight * courseLayout.sheetHeights[0]) / 100 : 0),
   );
   const center = {
     x: selected.position.x + courseLayout.cardWidth / 2,
@@ -71,7 +65,6 @@ export function MotionGraph<N extends Node>({
   selectedId,
   resetKey,
   navigation,
-  sheetHeight = courseLayout.sheetHeights[0],
   onMoveStart,
   onMoveEnd,
   ...props
@@ -81,7 +74,6 @@ export function MotionGraph<N extends Node>({
   selectedId: string | null;
   resetKey: string;
   navigation: { semester: number } | null;
-  sheetHeight?: number;
 }) {
   const { getViewport, setViewport, getInternalNode, viewportInitialized } = useReactFlow();
   const nodesInitialized = useStore(
@@ -179,9 +171,7 @@ export function MotionGraph<N extends Node>({
     const leaving = current.current.filter((node) => !targetIds.has(node.id));
     const startViewport = getViewport();
     const selected = targets.find((node) => node.id === selectedId);
-    const endViewport = selected
-      ? focusViewport(targets, selected, width, height, sheetHeight)
-      : startViewport;
+    const endViewport = selected ? focusViewport(targets, selected, width, height) : startViewport;
     cameraMoving.current = selected !== undefined && !reset;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const animate =
@@ -324,7 +314,6 @@ export function MotionGraph<N extends Node>({
     ready,
     width,
     height,
-    sheetHeight,
     getViewport,
     setViewport,
     getInternalNode,
