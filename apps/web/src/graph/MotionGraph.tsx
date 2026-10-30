@@ -120,6 +120,7 @@ export function MotionGraph<N extends Node>({
     const before = previous.current;
     const reset = before.resetKey !== resetKey || before.navigation !== navigation;
     const selectionChanged = before.selectedId !== selectedId;
+    const returning = !reset && selectionChanged && selectedId === null;
     previous.current = { selectedId, resetKey, navigation };
     if (reset) offset.current = { x: 0, y: 0 };
     const edgeIds = new Set(edges.map((edge) => edge.id));
@@ -206,9 +207,26 @@ export function MotionGraph<N extends Node>({
     const animate =
       !reset && (selectionChanged || selectedId !== null || inFlight.current) && !reducedMotion;
     inFlight.current = animate;
+    const destinations = new Map(targets.map((node) => [node.id, node]));
+    const shift = (id: string, reverse: boolean) => {
+      const start = starts.get(id)?.position;
+      const end = destinations.get(id)?.position;
+      if (!start || !end) return { x: 0, y: 0 };
+      const sign = reverse ? -1 : 1;
+      return { x: (end.x - start.x) * sign, y: (end.y - start.y) * sign };
+    };
+    const deform = (points: XYPosition[], edge: Edge, reverse: boolean) => {
+      const source = shift(edge.source, reverse);
+      const target = shift(edge.target, reverse);
+      return deformRoute(points, source, target);
+    };
     let frame = 0;
     let active = true;
     let started = 0;
+    let nodeProgress = 0;
+    let lastEased = 0;
+    let routeStart = 0;
+    let routesStarted = 0;
     let transitions: { id: string; start: XYPosition[]; end: XYPosition[] }[] = [];
     const movingNode = targets.find((node) => {
       const start = starts.get(node.id);
@@ -233,10 +251,17 @@ export function MotionGraph<N extends Node>({
       let elapsed = time - started;
       if (movingElement && (nodeAnimation || elapsed < duration))
         elapsed = typeof cssTime === "number" ? cssTime : 0;
-      const progress = animate ? Math.min(1, elapsed / animationDuration) : 1;
+      nodeProgress = animate ? Math.max(nodeProgress, Math.min(1, elapsed / animationDuration)) : 1;
+      const progress = nodeProgress;
       const t = ease(progress);
+      lastEased = t;
+      const pathProgress = !animate
+        ? 1
+        : routeStart === 1
+          ? ease(Math.min(1, (time - routesStarted) / 150))
+          : Math.max(0, (t - routeStart) / (1 - routeStart));
       const nextPaths = new Map(
-        transitions.map(({ id, start, end }) => [id, mixRoute(start, end, t)]),
+        transitions.map(({ id, start, end }) => [id, mixRoute(start, end, pathProgress)]),
       );
       currentPaths.current = nextPaths;
       paths.update(nextPaths);
@@ -246,7 +271,7 @@ export function MotionGraph<N extends Node>({
           y: mix(startViewport.y, endViewport.y, t),
           zoom: mix(startViewport.zoom, endViewport.zoom, t),
         });
-      if (progress < 1) frame = requestAnimationFrame(render);
+      if (progress < 1 || pathProgress < 1) frame = requestAnimationFrame(render);
       else {
         inFlight.current = false;
         setMoving(false);
@@ -255,6 +280,40 @@ export function MotionGraph<N extends Node>({
         frame = requestAnimationFrame(settled);
       }
     };
+    const start = () => {
+      const transition = animate
+        ? `transform ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1), opacity ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1)`
+        : "none";
+      const next: N[] = targets.map((node) => ({
+        ...node,
+        style: { ...node.style, opacity: 1, transition },
+      }));
+      if (animate) {
+        for (const node of leaving)
+          next.push({
+            ...node,
+            style: { ...node.style, opacity: 0, transition, pointerEvents: "none" },
+          });
+      }
+      setLeavingEdges(
+        departingEdges.map((edge) => ({ ...edge, style: { ...edge.style, opacity: 0 } })),
+      );
+      current.current = next;
+      setDisplayed(next);
+      started = performance.now();
+      setMoving(animate);
+      if (returning && animate) frame = requestAnimationFrame(render);
+      else render(started);
+    };
+    if (returning) {
+      transitions = [...edges, ...departingEdges].flatMap((edge) => {
+        const start = currentPaths.current.get(edge.id);
+        return start
+          ? [{ id: edge.id, ...routeTransition(start, deform(start, edge, false)) }]
+          : [];
+      });
+      start();
+    }
     const routingNodes = targets
       .filter((node) => node.type !== "lane")
       .map((node): RoutingNode => {
@@ -271,19 +330,6 @@ export function MotionGraph<N extends Node>({
     getConnectionRoutes(JSON.stringify(request), request).then(
       (routes) => {
         if (!active) return;
-        const destinations = new Map(targets.map((node) => [node.id, node]));
-        const shift = (id: string, reverse: boolean) => {
-          const start = starts.get(id)?.position;
-          const end = destinations.get(id)?.position;
-          if (!start || !end) return { x: 0, y: 0 };
-          const sign = reverse ? -1 : 1;
-          return { x: (end.x - start.x) * sign, y: (end.y - start.y) * sign };
-        };
-        const deform = (points: XYPosition[], edge: Edge, reverse: boolean) => {
-          const source = shift(edge.source, reverse);
-          const target = shift(edge.target, reverse);
-          return deformRoute(points, source, target);
-        };
         transitions = edges.flatMap((edge) => {
           const id = edge.id;
           const route = routes.get(id);
@@ -296,7 +342,9 @@ export function MotionGraph<N extends Node>({
             {
               id,
               ...routeTransition(
-                previous ? resampleRoute(previous, count) : deform(end, edge, true),
+                previous
+                  ? resampleRoute(previous, count)
+                  : mixRoute(deform(end, edge, true), end, returning ? lastEased : 0),
                 end,
               ),
             },
@@ -307,28 +355,15 @@ export function MotionGraph<N extends Node>({
           if (!start) continue;
           transitions.push({ id: edge.id, ...routeTransition(start, deform(start, edge, false)) });
         }
-        const transition = animate
-          ? `transform ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1), opacity ${duration}ms cubic-bezier(0.333333, 1, 0.666667, 1)`
-          : "none";
-        const next: N[] = targets.map((node) => ({
-          ...node,
-          style: { ...node.style, opacity: 1, transition },
-        }));
-        if (animate) {
-          for (const node of leaving)
-            next.push({
-              ...node,
-              style: { ...node.style, opacity: 0, transition, pointerEvents: "none" },
-            });
-        }
-        setLeavingEdges(
-          departingEdges.map((edge) => ({ ...edge, style: { ...edge.style, opacity: 0 } })),
-        );
-        current.current = next;
-        setDisplayed(next);
-        started = performance.now();
-        setMoving(animate);
-        render(started);
+        if (returning) {
+          routeStart = lastEased;
+          routesStarted = performance.now();
+          inFlight.current = animate;
+          setMoving(animate);
+          cancelAnimationFrame(frame);
+          if (animate) frame = requestAnimationFrame(render);
+          else render(routesStarted);
+        } else start();
       },
       (error: Error) => {
         if (active) setRoutingError(error);

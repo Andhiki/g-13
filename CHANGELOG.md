@@ -20,6 +20,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Mata kuliah mulai kembali ke posisi peta saat drawer detail mulai ditutup, tanpa menunggu perutean koneksi selesai.
+
 - Animasi koneksi prasyarat memproses lebih sedikit titik pada bagian lurus, sambil mempertahankan bentuk jalur dan sambungan ke kartu.
 
 - Sorotan navigasi semester mengikuti batas tombol tanpa meregangkan sudut; teks pilihan kuis roadmap dipusatkan secara vertikal.
