@@ -23,6 +23,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Pembaruan graf selama animasi peta kurikulum dan roadmap dikurangi, dan fade koneksi disinkronkan dengan gerakan mata kuliah.
+
 - Fokus mata kuliah pada peta kurikulum dan roadmap bergerak mulus bersama drawer; saat detail ditutup, mata kuliah tetap di tempat dan tingkat zoom dipertahankan.
 
 - Tombol bagikan roadmap dipindahkan ke samping tombol coba lagi, dengan label konfirmasi setelah tautan disalin.

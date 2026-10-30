@@ -1,10 +1,11 @@
 import { useLocale } from "../useLocale";
-import { memo } from "react";
+import { memo, useContext } from "react";
 import { Typography } from "../ui/typography";
-import { Handle, Position, useStore, type Node, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
 import { courseLayout } from "../courses/layout";
 import { creditsFor, isCore } from "../courses/course-utils";
+import { ConnectionVisibility } from "./EdgeRouting";
 import type { CourseNodeData, LaneNodeData } from "./model";
 
 const courseStyles = tv({
@@ -60,12 +61,9 @@ export const CourseNode = memo(function CourseNode({
   data,
 }: NodeProps<Node<CourseNodeData, "course">>) {
   const { text, courseName } = useLocale();
-  const incomingVisible = useStore((state) =>
-    state.edges.some((edge) => edge.target === id && !edge.hidden && edge.data?.visible),
-  );
-  const outgoingVisible = useStore((state) =>
-    state.edges.some((edge) => edge.source === id && !edge.hidden && edge.data?.visible),
-  );
+  const visibility = useContext(ConnectionVisibility);
+  const incomingVisible = visibility.incoming.has(id);
+  const outgoingVisible = visibility.outgoing.has(id);
   const course = data.course;
   const credit = creditsFor(course);
   const choice = !isCore(course);

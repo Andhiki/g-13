@@ -1,4 +1,4 @@
-import { createContext, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { createContext, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   useReactFlow,
@@ -120,6 +120,7 @@ export function MotionGraph<N extends Node>({
       .filter((node) => !node.hidden)
       .map((node) => ({
         ...node,
+        measured: getInternalNode(node.id)?.measured ?? node.measured,
         position: { x: node.position.x + offset.current.x, y: node.position.y + offset.current.y },
       }));
     const targetIds = new Set(targets.map((node) => node.id));
@@ -143,9 +144,17 @@ export function MotionGraph<N extends Node>({
       const next = targets.map((node) => {
         const start = starts.get(node.id);
         const opacity = start && !start.hidden ? Number(start.style?.opacity ?? 1) : 0;
+        const measured = getInternalNode(node.id)?.measured ?? node.measured;
+        if (
+          measured === node.measured &&
+          opacity === 1 &&
+          start?.position.x === node.position.x &&
+          start.position.y === node.position.y
+        )
+          return node;
         return {
           ...node,
-          measured: getInternalNode(node.id)?.measured ?? node.measured,
+          measured,
           position: {
             x: mix(start?.position.x ?? node.position.x, node.position.x, t),
             y: mix(start?.position.y ?? node.position.y, node.position.y, t),
@@ -197,10 +206,13 @@ export function MotionGraph<N extends Node>({
   ]);
 
   const opacity = new Map(displayed.map((node) => [node.id, Number(node.style?.opacity ?? 1)]));
-  const edgeIds = new Set(edges.map((edge) => edge.id));
-  const visibleEdges = moving
-    ? [...edges, ...leavingEdges.filter((edge) => !edgeIds.has(edge.id))]
-    : edges;
+  const visibleEdges = useMemo(() => {
+    const edgeIds = new Set(edges.map((edge) => edge.id));
+    const visible = moving
+      ? [...edges, ...leavingEdges.filter((edge) => !edgeIds.has(edge.id))]
+      : edges;
+    return visible.map((edge) => ({ ...edge, data: { ...edge.data, moving } }));
+  }, [edges, leavingEdges, moving]);
   return (
     <GraphOrigin.Provider value={offset.current}>
       <ReactFlow<N, Edge>
@@ -211,16 +223,15 @@ export function MotionGraph<N extends Node>({
           onMoveStart?.(event, viewport);
         }}
         nodes={displayed}
-        edges={visibleEdges.map((edge) => ({
-          ...edge,
-          style: {
-            ...edge.style,
-            opacity:
-              Number(edge.style?.opacity ?? 1) *
-              Math.min(opacity.get(edge.source) ?? 0, opacity.get(edge.target) ?? 0),
-          },
-          data: { ...edge.data, moving },
-        }))}
+        edges={visibleEdges.map((edge) => {
+          const fade = Math.min(opacity.get(edge.source) ?? 0, opacity.get(edge.target) ?? 0);
+          return fade === 1
+            ? edge
+            : {
+                ...edge,
+                style: { ...edge.style, opacity: Number(edge.style?.opacity ?? 1) * fade },
+              };
+        })}
       />
     </GraphOrigin.Provider>
   );

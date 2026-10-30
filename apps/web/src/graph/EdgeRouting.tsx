@@ -22,6 +22,38 @@ import { getConnectionRoutes, routingRequest } from "./routing-cache";
 
 const emptyRoutes: RoutingResult = new Map();
 const Routes = createContext(emptyRoutes);
+export const ConnectionVisibility = createContext({
+  incoming: new Set<string>(),
+  outgoing: new Set<string>(),
+});
+
+function VisibleConnections({ children }: { children: ReactNode }) {
+  const edges = useStore(
+    (state) => state.edges,
+    (previous, next) =>
+      previous.length === next.length &&
+      previous.every(
+        (edge, index) =>
+          edge.source === next[index].source &&
+          edge.target === next[index].target &&
+          edge.hidden === next[index].hidden &&
+          edge.data?.visible === next[index].data?.visible,
+      ),
+  );
+  const visibility = useMemo(() => {
+    const incoming = new Set<string>();
+    const outgoing = new Set<string>();
+    for (const edge of edges) {
+      if (edge.hidden || !edge.data?.visible) continue;
+      incoming.add(edge.target);
+      outgoing.add(edge.source);
+    }
+    return { incoming, outgoing };
+  }, [edges]);
+  return (
+    <ConnectionVisibility.Provider value={visibility}>{children}</ConnectionVisibility.Provider>
+  );
+}
 
 function MeasuredRouting({ children }: { children: ReactNode }) {
   const moving = useStore((state) => state.edges.some((edge) => edge.data?.moving));
@@ -127,7 +159,7 @@ export function EdgeRouting({ children }: { children: ReactNode }) {
     <ReactFlowProvider>
       <MeasuredRouting>
         <ZoomDetail />
-        {children}
+        <VisibleConnections>{children}</VisibleConnections>
       </MeasuredRouting>
     </ReactFlowProvider>
   );
@@ -158,7 +190,7 @@ function RoutedEdge(
           initial={{ opacity: 0 }}
           animate={{ opacity }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.15, ease: "easeOut" }}
+          transition={{ duration: reducedMotion || props.data?.moving ? 0 : 0.15, ease: "easeOut" }}
         >
           <BaseEdge
             id={props.id}
