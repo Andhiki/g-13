@@ -1,87 +1,103 @@
 import { useTheme } from "next-themes";
-import { useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { useEffect, useState } from "react";
 import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
-import * as SegmentedControl from "./segmented-control";
+import { useThemePreference, type ThemeMode } from "./theme-preference";
+import { Typography } from "./typography";
 import { useTranslation } from "react-i18next";
 
 export function ThemeSwitch() {
   const { t } = useTranslation();
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const transitioning = useRef(false);
+  const { schemes, setScheme } = useThemePreference();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const changeTheme = (value: "system" | "light" | "dark") => {
-    if (transitioning.current) return;
-    if (
-      value === resolvedTheme ||
-      document.hidden ||
-      !document.startViewTransition ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setTheme(value);
-      return;
-    }
-
-    transitioning.current = true;
-    requestAnimationFrame(() => {
-      const root = document.documentElement;
-      root.classList.add("theme-transition");
-      try {
-        const transition = document.startViewTransition(() => {
-          flushSync(() => setTheme(value));
-        });
-        void transition.finished
-          .catch(() => {})
-          .finally(() => {
-            root.classList.remove("theme-transition");
-            transitioning.current = false;
-          });
-      } catch {
-        setTheme(value);
-        root.classList.remove("theme-transition");
-        transitioning.current = false;
-      }
-    });
-  };
 
   return (
-    <SegmentedControl.Root
-      className="w-28 shrink-0"
-      value={mounted ? theme : "system"}
-      onValueChange={(value) => {
-        if (value === "system" || value === "light" || value === "dark") changeTheme(value);
-      }}
-    >
-      <SegmentedControl.List aria-label={t("settings.theme")}>
-        <SegmentedControl.Trigger
-          value="system"
-          aria-label={t("settings.system")}
-          title={t("settings.system")}
-          disabled={!mounted}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
+    <div className="space-y-5">
+      <section aria-labelledby="settings-color-scheme" className="space-y-3">
+        <Typography as="h3" id="settings-color-scheme" variant="label">
+          {t("settings.theme")}
+        </Typography>
+        <div
+          className="grid grid-cols-3 gap-2 sm:gap-3"
+          role="group"
+          aria-labelledby="settings-color-scheme"
         >
-          <RiComputerLine className="size-4" aria-hidden="true" />
-        </SegmentedControl.Trigger>
-        <SegmentedControl.Trigger
-          value="dark"
-          aria-label={t("settings.dark")}
-          title={t("settings.dark")}
-          disabled={!mounted}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
-        >
-          <RiMoonLine className="size-4" aria-hidden="true" />
-        </SegmentedControl.Trigger>
-        <SegmentedControl.Trigger
-          value="light"
-          aria-label={t("settings.light")}
-          title={t("settings.light")}
-          disabled={!mounted}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
-        >
-          <RiSunLine className="size-4" aria-hidden="true" />
-        </SegmentedControl.Trigger>
-      </SegmentedControl.List>
-    </SegmentedControl.Root>
+          {(["system", "light", "dark"] as const).map((mode) => {
+            const Icon =
+              mode === "system" ? RiComputerLine : mode === "light" ? RiSunLine : RiMoonLine;
+            return (
+              <button
+                key={mode}
+                type="button"
+                className="theme-mode-card"
+                aria-pressed={mounted && theme === mode}
+                disabled={!mounted}
+                onClick={() => setTheme(mode)}
+              >
+                <span className="theme-mode-preview" data-mode={mode} aria-hidden="true">
+                  <span className="theme-preview-sidebar">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className="theme-preview-body">
+                    <i />
+                    <i />
+                    <i />
+                    <span />
+                  </span>
+                </span>
+                <span className="flex items-center justify-center gap-1.5">
+                  <Icon className="size-4" aria-hidden="true" />
+                  {t(`settings.${mode}`)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+      <section aria-labelledby="settings-themes" className="space-y-3">
+        <Typography as="h3" id="settings-themes" variant="label">
+          {t("settings.themes")}
+        </Typography>
+        <div className="grid grid-cols-2 gap-3">
+          {(["omahti", "himakom"] as const).map((scheme) => (
+            <div key={scheme} className="theme-palette-card">
+              <div className="flex justify-center gap-5 py-3 sm:gap-8">
+                {(["light", "dark"] satisfies ThemeMode[]).map((mode) => {
+                  const Icon = mode === "light" ? RiSunLine : RiMoonLine;
+                  const selected = schemes[mode] === scheme;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      className="theme-swatch"
+                      data-scheme={scheme}
+                      data-mode={mode}
+                      aria-label={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
+                      title={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
+                      aria-pressed={mounted && selected}
+                      disabled={!mounted}
+                      onClick={() => {
+                        setScheme(mode, scheme);
+                        if (resolvedTheme !== mode) setTheme(mode);
+                      }}
+                    >
+                      {mounted && selected && (
+                        <span className="theme-swatch-badge">
+                          <Icon className="size-3" aria-hidden="true" />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <Typography variant="label">{scheme === "omahti" ? "OmahTI" : "HIMAKOM"}</Typography>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

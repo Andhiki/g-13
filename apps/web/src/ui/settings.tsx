@@ -29,7 +29,10 @@ export function Settings() {
           <RiSettings3Line aria-hidden="true" className="size-5" />
         </AlignButton.Root>
       </AlignModal.Trigger>
-      <AlignModal.Content aria-describedby={undefined} className="max-w-[380px]">
+      <AlignModal.Content
+        aria-describedby={undefined}
+        className="max-w-[640px] max-h-[calc(100dvh-2rem)] overflow-y-auto"
+      >
         <div className="border-b border-stroke-soft-200 px-4 py-3 pr-12">
           <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle2">
@@ -37,7 +40,7 @@ export function Settings() {
             </Typography>
           </AlignModal.Title>
         </div>
-        <div className="space-y-3 px-4 py-3">
+        <div className="space-y-5 px-5 py-4">
           <section aria-labelledby="settings-appearance" className="space-y-1">
             <Typography
               as="h3"
@@ -51,11 +54,9 @@ export function Settings() {
               <Typography variant="label">{t("settings.language")}</Typography>
               <LanguageSwitch />
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <Typography variant="label">{t("settings.theme")}</Typography>
-              <ThemeSwitch />
-            </div>
           </section>
+          <ThemeSwitch />
+
           <section aria-labelledby="settings-behaviour" className="space-y-1">
             <Typography
               as="h3"

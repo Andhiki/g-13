@@ -16,6 +16,7 @@ import {
 import { useMemo, type ReactNode } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { ThemeProvider } from "next-themes";
+import { ThemePreferenceProvider, themePreferenceScript } from "../ui/theme-preference";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import appStyles from "../styles.css?url";
@@ -136,17 +137,20 @@ function RootDocument({ children }: { children: ReactNode }) {
     >
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: themePreferenceScript }} />
       </head>
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <I18nextProvider i18n={i18n}>
           <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-            <CursorProvider>
-              <LazyMotion features={domAnimation}>
-                <div id="root" className="m-0 h-full w-full min-w-80">
-                  {children}
-                </div>
-              </LazyMotion>
-            </CursorProvider>
+            <ThemePreferenceProvider>
+              <CursorProvider>
+                <LazyMotion features={domAnimation}>
+                  <div id="root" className="m-0 h-full w-full min-w-80">
+                    {children}
+                  </div>
+                </LazyMotion>
+              </CursorProvider>
+            </ThemePreferenceProvider>
           </ThemeProvider>
         </I18nextProvider>
         <Scripts />

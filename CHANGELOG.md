@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-10-30
 
+#### Added
+
+- Pemilih tema OmahTI dan HIMAKOM dengan pratinjau skema Sistem, Terang, dan Gelap serta pilihan warna tersimpan terpisah untuk mode terang dan gelap.
+
 #### Fixed
 
 - Drawer detail mata kuliah di ponsel dapat ditutup dengan menariknya ke bawah.
