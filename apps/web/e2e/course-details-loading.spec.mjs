@@ -30,7 +30,7 @@ for (const width of [1440, 390]) {
       has: page.getByRole("button", { name: "Close course details", exact: true }),
     });
     try {
-      await expect(drawer.getByRole("status")).toBeVisible();
+      await expect(drawer.getByRole("status").filter({ hasText: /\S/ })).toBeVisible();
       await drawer.getByRole("button", { name: "Close course details", exact: true }).focus();
       await drawer.evaluate((element) => {
         window.loadingDrawer = element;

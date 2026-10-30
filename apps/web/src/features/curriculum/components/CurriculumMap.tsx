@@ -1,14 +1,21 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  getViewportForBounds,
   Background,
   BackgroundVariant,
-  ReactFlow,
   ViewportPortal,
   useReactFlow,
+  useStore,
   useOnViewportChange,
   type Edge,
   type NodeTypes,
@@ -17,6 +24,7 @@ import type { CurriculumId } from "@g13/curriculum";
 import { AlignFancyButton } from "../../../ui/fancy-button";
 import { EdgeRouting, routedEdgeTypes } from "../../../graph/EdgeRouting";
 import { CourseNode, LaneNode } from "../../../graph/MapNodes";
+import { GraphOrigin, MotionGraph } from "../../../graph/MotionGraph";
 import { GraphFocus } from "../../../graph/GraphFocus";
 import { ZoomControls } from "../../../graph/ZoomControls";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../../graph/model";
@@ -31,7 +39,6 @@ function ViewportFocus({
   curriculum,
   resetVersion,
   selectedId,
-  positions,
   stage,
   title,
 }: {
@@ -39,7 +46,6 @@ function ViewportFocus({
   curriculum: CurriculumId;
   resetVersion: number;
   selectedId: string | null;
-  positions: Map<string, { x: number; y: number }>;
   stage: RefObject<HTMLDivElement | null>;
   title: RefObject<HTMLDivElement | null>;
 }) {
@@ -49,39 +55,6 @@ function ViewportFocus({
       selectedId={selectedId}
       navigation={navigation}
       resetKey={`${curriculum}:${resetVersion}`}
-      onCourse={() => {
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const points = [...positions.values()];
-        const bounds = stage.current!.getBoundingClientRect();
-        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
-        const left = phone ? 16 : courseLayout.detailsWidth + 24;
-        const top = phone ? 128 : 96;
-        const width = bounds.width - left - 16;
-        const height = bounds.height * (phone ? 0.55 : 1) - top - 24;
-        const minX = Math.min(...points.map((point) => point.x));
-        const minY = Math.min(...points.map((point) => point.y));
-        const viewport = getViewportForBounds(
-          {
-            x: minX,
-            y: minY,
-            width: Math.max(...points.map((point) => point.x)) - minX + courseLayout.cardWidth + 2,
-            height: Math.max(...points.map((point) => point.y)) - minY + courseLayout.cardHeight,
-          },
-          width,
-          height,
-          0.05,
-          0.88,
-          0.12,
-        );
-        void setViewport(
-          { ...viewport, x: viewport.x + left, y: viewport.y + top },
-          {
-            duration: reducedMotion ? 0 : 150,
-            ease: (t) => 1 - Math.pow(1 - t, 4),
-            interpolate: "linear",
-          },
-        );
-      }}
       onSemester={(semester) => {
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         void setCenter(LANE_X + (semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
@@ -121,6 +94,18 @@ function SemesterViewport({
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
   const flow = useReactFlow<MapNode>();
+  const origin = useContext(GraphOrigin);
+  const lanes = useStore(
+    (state) => state.nodes.filter((node) => node.type === "lane"),
+    (before, after) =>
+      before.length === after.length &&
+      before.every(
+        (node, index) =>
+          node.id === after[index].id &&
+          node.position.x === after[index].position.x &&
+          node.position.y === after[index].position.y,
+      ),
+  );
   const update = useCallback(() => {
     if (!active) return;
     if (selectedId) {
@@ -133,8 +118,8 @@ function SemesterViewport({
     const nodes = flow.getNodes();
     const top = window.matchMedia("(width < 1100px)").matches ? 116 : 76;
     for (let semester = 1; semester <= 8; semester++) {
-      if (!nodes.some((node) => node.id === `lane-semester-${semester}`)) continue;
-      const laneX = LANE_X + (semester - 1) * LANE_STEP;
+      if (!lanes.some((node) => node.id === `lane-semester-${semester}`)) continue;
+      const laneX = LANE_X + (semester - 1) * LANE_STEP + origin.x;
       const left = viewport.x + laneX * viewport.zoom;
       const width = LANE_WIDTH * viewport.zoom;
       const bottom = Math.max(
@@ -152,13 +137,13 @@ function SemesterViewport({
       if (
         Math.min(bounds.width, left + width) - Math.max(0, left) >= width / 2 &&
         viewport.y + bottom * viewport.zoom > top &&
-        viewport.y + 100 * viewport.zoom < bounds.height
+        viewport.y + (100 + origin.y) * viewport.zoom < bounds.height
       ) {
         semesters.push(semester);
       }
     }
     onVisibleSemesters(semesters);
-  }, [active, flow, selectedId, onVisibleSemesters, stage]);
+  }, [active, flow, selectedId, onVisibleSemesters, stage, origin, lanes]);
   useOnViewportChange({ onChange: update });
   useEffect(() => {
     update();
@@ -166,6 +151,47 @@ function SemesterViewport({
     return () => window.removeEventListener("resize", update);
   }, [update]);
   return null;
+}
+
+function MapTitle({
+  selectedId,
+  title,
+}: {
+  selectedId: string | null;
+  title: RefObject<HTMLDivElement | null>;
+}) {
+  const { text } = useLocale();
+  const origin = useContext(GraphOrigin);
+  return (
+    <ViewportPortal>
+      {selectedId === null && (
+        <div
+          ref={title}
+          data-map-title
+          className="absolute -top-[144px] flex flex-col items-start gap-4 max-[650px]:-top-[104px]"
+          style={{ left: LANE_X + 12 + origin.x, transform: `translateY(${origin.y}px)` }}
+        >
+          <Typography
+            as="h1"
+            variant="graphTitle"
+            className="m-0 whitespace-nowrap text-text-strong-950"
+          >
+            {text("Everything CS UGM")}
+          </Typography>
+          <Typography as="p" variant="paragraph" className="m-0 max-w-xl text-text-sub-600">
+            {text(
+              "Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu Komputer UGM.",
+            )}
+          </Typography>
+          <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
+            <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+              {text("Buat roadmap sendiri")}
+            </Link>
+          </AlignFancyButton.Root>
+        </div>
+      )}
+    </ViewportPortal>
+  );
 }
 
 export function CurriculumMap({
@@ -180,8 +206,8 @@ export function CurriculumMap({
   selectedId,
   nodes,
   edges,
-  positions,
   lastSemester,
+  detailsHeight,
 }: {
   stage: RefObject<HTMLDivElement | null>;
   active: boolean;
@@ -194,8 +220,8 @@ export function CurriculumMap({
   selectedId: string | null;
   nodes: MapNode[];
   edges: Edge[];
-  positions: Map<string, { x: number; y: number }>;
   lastSemester: number;
+  detailsHeight: number;
 }) {
   const { text } = useLocale();
   const title = useRef<HTMLDivElement>(null);
@@ -206,7 +232,11 @@ export function CurriculumMap({
   );
   return (
     <EdgeRouting>
-      <ReactFlow<MapNode, Edge>
+      <MotionGraph<MapNode>
+        selectedId={selectedId}
+        sheetHeight={detailsHeight}
+        resetKey={`${curriculum}:${resetVersion}`}
+        navigation={navigation}
         key={curriculum}
         className="absolute! inset-0 z-0 bg-transparent!"
         proOptions={{ hideAttribution: true }}
@@ -240,7 +270,6 @@ export function CurriculumMap({
           curriculum={curriculum}
           resetVersion={resetVersion}
           selectedId={selectedId}
-          positions={positions}
         />
         <ZoomControls
           shortcuts={[
@@ -259,34 +288,7 @@ export function CurriculumMap({
           selectedId={selectedId}
           onVisibleSemesters={onVisibleSemesters}
         />
-        <ViewportPortal>
-          {selectedId === null && (
-            <div
-              ref={title}
-              data-map-title
-              className="absolute -top-[144px] flex flex-col items-start gap-4 max-[650px]:-top-[104px]"
-              style={{ left: LANE_X + 12 }}
-            >
-              <Typography
-                as="h1"
-                variant="graphTitle"
-                className="m-0 whitespace-nowrap text-text-strong-950"
-              >
-                {text("Everything CS UGM")}
-              </Typography>
-              <Typography as="p" variant="paragraph" className="m-0 max-w-xl text-text-sub-600">
-                {text(
-                  "Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu Komputer UGM.",
-                )}
-              </Typography>
-              <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
-                <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-                  {text("Buat roadmap sendiri")}
-                </Link>
-              </AlignFancyButton.Root>
-            </div>
-          )}
-        </ViewportPortal>
+        <MapTitle selectedId={selectedId} title={title} />
         <Background
           className="bg-bg-weak-25"
           variant={BackgroundVariant.Dots}
@@ -294,7 +296,7 @@ export function CurriculumMap({
           gap={24}
           size={1.2}
         />
-      </ReactFlow>
+      </MotionGraph>
     </EdgeRouting>
   );
 }

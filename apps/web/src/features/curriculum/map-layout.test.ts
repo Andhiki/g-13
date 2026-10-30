@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { getCurriculum, getRelations, listCurricula } from "@g13/curriculum";
-import { buildMap, createMapLayout, anchorMap } from "./map-layout";
+import { buildMap, createMapLayout } from "./map-layout";
 import { assignedCoreSemester, isCore } from "../../courses/course-utils";
 
 for (const { id } of listCurricula()) {
@@ -208,19 +208,8 @@ for (const { id } of listCurricula()) {
     const original = new Map(layout.positions);
     for (const course of data.all) {
       const focused = buildMap(layout, data.all, course.id, () => {});
-      const before = new Map(focused.positions);
-      const anchor = { x: 700, y: 300 };
-      const anchored = anchorMap(focused, course.id, anchor);
-      expect(anchored.positions.get(course.id)).toEqual(anchor);
-      const center = focused.positions.get(course.id)!;
-      for (const node of anchored.nodes) {
-        const position = focused.positions.get(node.id)!;
-        expect(node.position).toEqual({
-          x: position.x + anchor.x - center.x,
-          y: position.y + anchor.y - center.y,
-        });
-      }
-      expect(focused.positions).toEqual(before);
+      expect(focused.positions.get(course.id)).toEqual(original.get(course.id));
+      expect(focused.nodes.every((node) => focused.positions.has(node.id))).toBe(true);
     }
     expect(layout.positions).toEqual(original);
     expect(overview.positions).toEqual(original);

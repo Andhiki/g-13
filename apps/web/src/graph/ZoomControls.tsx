@@ -13,7 +13,9 @@ export function ZoomControls({
   selected,
   lastSemester,
   shortcuts,
+  className = "",
 }: {
+  className?: string;
   onReset: () => void;
   selected: boolean;
   lastSemester: number;
@@ -28,7 +30,7 @@ export function ZoomControls({
   return (
     <Panel
       position="bottom-right"
-      className={`m-3! sm:m-4! ${selected ? "max-[650px]:bottom-[var(--course-sheet-height)]!" : ""}`}
+      className={`m-3! sm:m-4! ${className} ${selected ? "max-[650px]:bottom-[var(--course-sheet-height)]!" : ""}`}
     >
       <div className="flex items-end gap-2">
         <div className="relative hidden size-10 sm:block">

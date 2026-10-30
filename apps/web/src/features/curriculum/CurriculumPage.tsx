@@ -65,7 +65,7 @@ export function CurriculumPage() {
           <CourseSearch
             key={curriculum}
             data={data}
-            onSelect={(course) => explorer.navigateToCourse(course.id)}
+            onSelect={(course) => explorer.selectCourse(course.id)}
           />
         }
       >
@@ -101,6 +101,7 @@ export function CurriculumPage() {
         >
           <CurriculumMap
             stage={stage}
+            detailsHeight={detailsHeight}
             active={view === "map"}
             navigation={semesterNavigation}
             resetVersion={resetVersion}
@@ -115,7 +116,6 @@ export function CurriculumPage() {
             selectedId={selected?.id ?? null}
             nodes={map.nodes}
             edges={map.edges}
-            positions={map.positions}
             lastSemester={map.lastSemester}
           />
         </div>

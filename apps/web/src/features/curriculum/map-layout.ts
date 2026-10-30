@@ -276,22 +276,3 @@ export function buildMap(
   });
   return { nodes, edges, positions, relationCount: availableRelations.length, lastSemester };
 }
-
-export function anchorMap(
-  map: ReturnType<typeof buildMap>,
-  selectedId: string,
-  anchor: { x: number; y: number },
-) {
-  const center = map.positions.get(selectedId)!;
-  const dx = anchor.x - center.x;
-  const dy = anchor.y - center.y;
-  if (dx === 0 && dy === 0) return map;
-  const positions = new Map(
-    [...map.positions].map(([id, position]) => [id, { x: position.x + dx, y: position.y + dy }]),
-  );
-  return {
-    ...map,
-    positions,
-    nodes: map.nodes.map((node) => ({ ...node, position: positions.get(node.id)! })),
-  };
-}

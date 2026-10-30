@@ -11,16 +11,9 @@ import {
   type RefObject,
   type ReactNode,
 } from "react";
-import {
-  Background,
-  BackgroundVariant,
-  getViewportForBounds,
-  ReactFlow,
-  useReactFlow,
-  type NodeProps,
-  type Edge,
-} from "@xyflow/react";
+import { Background, BackgroundVariant, useReactFlow, type NodeProps } from "@xyflow/react";
 import { ZoomControls } from "../../graph/ZoomControls";
+import { MotionGraph } from "../../graph/MotionGraph";
 import { GraphFocus } from "../../graph/GraphFocus";
 import { EdgeRouting, routedEdgeTypes } from "../../graph/EdgeRouting";
 import { CourseNode, LaneNode } from "../../graph/MapNodes";
@@ -77,13 +70,11 @@ function RoadmapFocus({
   navigation,
   heading,
   stage,
-  focusPositions,
   resetVersion,
 }: {
   resetVersion: number;
   heading: RefObject<HTMLHeadingElement | null>;
   stage: RefObject<HTMLElement | null>;
-  focusPositions: Map<string, { x: number; y: number }>;
   selectedId: string | null;
   navigation: { semester: number } | null;
 }) {
@@ -99,39 +90,6 @@ function RoadmapFocus({
           zoom: 0.72,
           duration: reducedMotion ? 0 : 600,
         });
-      }}
-      onCourse={() => {
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const points = [...focusPositions.values()];
-        const bounds = stage.current!.getBoundingClientRect();
-        const phone = window.matchMedia(courseLayout.phoneQuery).matches;
-        const left = phone ? 16 : courseLayout.detailsWidth + 24;
-        const top = phone ? 128 : 96;
-        const width = bounds.width - left - 16;
-        const height = bounds.height * (phone ? 0.55 : 1) - top - 24;
-        const minX = Math.min(...points.map((point) => point.x));
-        const minY = Math.min(...points.map((point) => point.y));
-        const viewport = getViewportForBounds(
-          {
-            x: minX,
-            y: minY,
-            width: Math.max(...points.map((point) => point.x)) - minX + courseLayout.cardWidth + 2,
-            height: Math.max(...points.map((point) => point.y)) - minY + courseLayout.cardHeight,
-          },
-          width,
-          height,
-          0.05,
-          0.88,
-          0.12,
-        );
-        void setViewport(
-          { ...viewport, x: viewport.x + left, y: viewport.y + top },
-          {
-            duration: reducedMotion ? 0 : 150,
-            ease: (t) => 1 - Math.pow(1 - t, 4),
-            interpolate: "linear",
-          },
-        );
       }}
       onOverview={() => {
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -192,6 +150,7 @@ export function RoadmapGraph({
   onReset,
   navigation,
   onVisibleSemesters,
+  detailsHeight,
 }: {
   plan: Roadmap;
   restart: () => void;
@@ -204,6 +163,7 @@ export function RoadmapGraph({
   onReset: () => void;
   navigation: { semester: number } | null;
   onVisibleSemesters: (semesters: number[]) => void;
+  detailsHeight: number;
 }) {
   const { text, language } = useLocale("roadmap");
   const [resetVersion, setResetVersion] = useState(0);
@@ -289,7 +249,11 @@ export function RoadmapGraph({
     >
       <RoadmapTitleContext.Provider value={{ heading, restart, shareLink }}>
         <EdgeRouting>
-          <ReactFlow<RoadmapNode, Edge>
+          <MotionGraph<RoadmapNode>
+            selectedId={selectedId}
+            sheetHeight={detailsHeight}
+            resetKey={`roadmap:${resetVersion}`}
+            navigation={navigation}
             className="absolute! inset-0"
             key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
             nodes={nodes}
@@ -306,13 +270,17 @@ export function RoadmapGraph({
             }
             onBlurCapture={() => setHoveredId(null)}
             defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
-            onMoveEnd={(_, viewport) => {
-              const width = stage.current?.clientWidth ?? 0;
+            onMoveEnd={() => {
+              const bounds = stage.current!.getBoundingClientRect();
               onVisibleSemesters(
                 semesters.filter((term) => {
-                  const left = viewport.x + (LANE_X + (term - 1) * LANE_STEP) * viewport.zoom;
-                  const laneWidth = LANE_WIDTH * viewport.zoom;
-                  return Math.min(width, left + laneWidth) - Math.max(0, left) >= laneWidth / 2;
+                  const lane = stage.current!.querySelector(`[data-id="semester-${term}"]`);
+                  if (!lane) return false;
+                  const box = lane.getBoundingClientRect();
+                  return (
+                    Math.min(bounds.right, box.right) - Math.max(bounds.left, box.left) >=
+                    box.width / 2
+                  );
                 }),
               );
             }}
@@ -332,11 +300,11 @@ export function RoadmapGraph({
               resetVersion={resetVersion}
               heading={heading}
               stage={stage}
-              focusPositions={focusPositions}
               selectedId={selectedId}
               navigation={navigation}
             />
             <ZoomControls
+              className="right-12!"
               selected={selectedId !== null}
               lastSemester={semesters.length}
               shortcuts={[
@@ -354,7 +322,7 @@ export function RoadmapGraph({
               gap={24}
               size={1}
             />
-          </ReactFlow>
+          </MotionGraph>
         </EdgeRouting>
       </RoadmapTitleContext.Provider>
     </section>

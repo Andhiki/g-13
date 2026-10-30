@@ -16,10 +16,13 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Kontrol zoom roadmap tidak lagi tertutup tombol catatan.
 - Tombol salin dan tutup pada drawer detail mata kuliah diratakan dalam satu baris.
 - Fokus mata kuliah, gerakan viewport, animasi navigasi semester, dan pintasan angka pada hasil roadmap disamakan dengan peta kurikulum.
 
 #### Changed
+
+- Fokus mata kuliah pada peta kurikulum dan roadmap bergerak mulus bersama drawer; saat detail ditutup, mata kuliah tetap di tempat dan tingkat zoom dipertahankan.
 
 - Tombol bagikan roadmap dipindahkan ke samping tombol coba lagi, dengan label konfirmasi setelah tautan disalin.
 

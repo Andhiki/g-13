@@ -77,7 +77,7 @@ async function chooseVisibleCourse(page, connected = false) {
 
 for (const width of [1440, 390]) {
   for (const path of ["/", roadmapPath]) {
-    test(`${path === "/" ? "curriculum" : "roadmap"}, ${width}px: closing details restores a panned view; semester navigation wins`, async ({
+    test(`${path === "/" ? "curriculum" : "roadmap"}, ${width}px: closing details preserves focus; semester navigation wins`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 1000 });
@@ -106,8 +106,9 @@ for (const width of [1440, 390]) {
         .first();
       await related.click();
       await settled(page);
+      const focused = await viewport(page);
       await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
-      await expectViewport(page, panned);
+      await expectViewport(page, focused);
       await chooseVisibleCourse(page);
       await page.getByRole("button", { name: "Semester 3", exact: true }).click();
       await page
@@ -117,8 +118,9 @@ for (const width of [1440, 390]) {
       const semesterView = await viewport(page);
       assert.notDeepEqual(semesterView, panned);
       await chooseVisibleCourse(page);
+      const focusedSemester = await viewport(page);
       await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
-      await expectViewport(page, semesterView);
+      await expectViewport(page, focusedSemester);
       if (path === "/") {
         await chooseVisibleCourse(page);
         await expect(page.getByRole("group", { name: "Kontrol zoom", exact: true })).toHaveCount(0);
@@ -255,7 +257,7 @@ for (const width of [1440, 390]) {
     await open(page, "/");
     await expect(page.locator('[data-routed="true"]:visible').first()).toBeVisible();
     await settled(page);
-    await page.getByRole("button", { name: "Perbesar", exact: true }).click();
+    if (width >= 650) await page.getByRole("button", { name: "Perbesar", exact: true }).click();
     await settled(page);
     await page.mouse.move(width - 70, 550);
     await page.mouse.down();
@@ -352,8 +354,9 @@ test("roadmap shortcuts focus semesters with animation and course selection focu
   await chooseVisibleCourse(page, true);
   expect(await viewport(page)).not.toEqual(semester);
   await expect(page.locator(".react-flow__node-lane:visible")).toHaveCount(0);
+  const focused = await viewport(page);
   await page.getByRole("button", { name: "Tutup detail mata kuliah", exact: true }).click();
-  await expectViewport(page, semester);
+  await expectViewport(page, focused);
   await page.locator('[aria-controls="map-keyboard-shortcuts"]').click();
   await expect(page.locator("#map-keyboard-shortcuts")).toContainText("Ke semester");
   await expect(page.locator("#map-keyboard-shortcuts")).not.toContainText("Ganti tampilan");
