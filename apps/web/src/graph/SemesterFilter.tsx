@@ -17,6 +17,8 @@ export function SemesterFilter({
   const semesters = Array.from({ length: lastSemester }, (_, i) => String(i + 1));
   const reducedMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
+  const firstVisible = (visible[0] ?? 1) - 1;
+  const visibleSpan = visible.length ? visible[visible.length - 1]! - visible[0]! + 1 : 0;
 
   return (
     <div
@@ -59,13 +61,12 @@ export function SemesterFilter({
             data-semester-band=""
             initial={false}
             animate={{
-              x: `${((visible[0] ?? 1) - 1) * 100}%`,
-              scaleX: visible.length ? visible[visible.length - 1]! - visible[0]! + 1 : 0,
+              left: `calc(${(firstVisible * 100) / lastSemester}% + ${(firstVisible * 2) / lastSemester}px)`,
+              width: `calc(${(visibleSpan * 100) / lastSemester}% - ${((lastSemester - visibleSpan) * 2) / lastSemester}px)`,
               opacity: visible.length ? 1 : 0,
             }}
             transition={{ duration: reducedMotion ? 0 : 0.2, ease: "easeOut" }}
-            className="pointer-events-none absolute inset-y-0 left-0 origin-left rounded-lg bg-primary-alpha-10"
-            style={{ width: `${100 / lastSemester}%` }}
+            className="pointer-events-none absolute inset-y-0 left-0 rounded-lg bg-primary-alpha-10"
           />
           {semesters.map((semester) => (
             <AlignButton.Root

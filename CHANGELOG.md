@@ -22,6 +22,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Animasi koneksi prasyarat memproses lebih sedikit titik pada bagian lurus, sambil mempertahankan bentuk jalur dan sambungan ke kartu.
 
+- Sorotan navigasi semester mengikuti batas tombol tanpa meregangkan sudut; teks pilihan kuis roadmap dipusatkan secara vertikal.
+
 - Gerakan kartu pada peta kurikulum dan roadmap memakai transisi CSS; pembaruan jalur koneksi tidak lagi merender ulang graf setiap frame, dan perutean memakai ulang worker.
 
 - Pemilihan skema warna hanya mengubah palet tersimpan tanpa berpindah mode terang/gelap; hierarki judul pengaturan tampilan diperjelas.

@@ -112,7 +112,7 @@ export function RoadmapQuiz({
                 variant={selected === choice.value ? "primary" : "neutral"}
                 mode={selected === choice.value ? "lighter" : "stroke"}
                 aria-pressed={selected === choice.value}
-                className="min-h-24 h-auto w-full whitespace-normal px-10 pt-10 pb-6 text-label-lg sm:min-h-32 sm:px-12 sm:pt-10 sm:pb-8"
+                className="min-h-24 h-auto w-full whitespace-normal px-10 py-8 text-label-lg sm:min-h-32 sm:px-12"
                 aria-keyshortcuts={String(choiceIndex + 1)}
                 onClick={() => choose(choice.value)}
               >
