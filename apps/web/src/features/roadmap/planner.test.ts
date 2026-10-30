@@ -29,7 +29,7 @@ test("2021 uses one neutral religion choice, replaces slots, and counts 104 requ
   expect(plan.requiredCredits).toBe(104);
   expect(
     plan.courses.filter((x) => /Agama/.test(x.course.title)).map((x) => x.course.title),
-  ).toEqual(["Agama sesuai keyakinan"]);
+  ).toEqual(["Agama"]);
   expect(plan.courses.some((x) => x.course.id.startsWith("2021-slot"))).toBe(false);
   expect(plan.courses.some((x) => x.course.id === "PACS262605")).toBe(false);
   expect(plan.courses.filter((x) => x.course.id === "MII21-4002")).toHaveLength(1);

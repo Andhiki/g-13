@@ -13,12 +13,15 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
   data.required_schedule.courses.forEach((row, index) => {
     const code = text(row.code_raw),
       title = text(row.name_id) || "Mata kuliah tanpa nama",
-      slot = row.record_kind === "elective_slot";
-    const id = slot
-      ? "2021-slot-" + text(row.course_no_raw || index + 1) + "-s" + text(row.semester)
-      : row.code_complete && code && code !== "MII21-"
-        ? code
-        : "2021-core-" + slug(title) + "-" + index;
+      slot = row.record_kind === "elective_slot",
+      religion = row.choice_group === "religion";
+    const id = religion
+      ? "2021-agama"
+      : slot
+        ? "2021-slot-" + text(row.course_no_raw || index + 1) + "-s" + text(row.semester)
+        : row.code_complete && code && code !== "MII21-"
+          ? code
+          : "2021-core-" + slug(title) + "-" + index;
     const label = slot
       ? "Slot pilihan"
       : row.choice_group === "religion"
@@ -28,9 +31,9 @@ export function adaptCurriculum2021(data: typeof sourceData): Curriculum {
           : "Wajib terjadwal (W)";
     rows.push({
       id,
-      code: code === "MII21-" ? "" : code,
-      title: slot ? "Mata Kuliah Pilihan" : title,
-      englishTitle: text(row.name_en),
+      code: religion || code === "MII21-" ? "" : code,
+      title: religion ? "Agama" : slot ? "Mata Kuliah Pilihan" : title,
+      englishTitle: religion ? "Religion" : text(row.name_en),
       placement: makePlacement(
         "core",
         label,

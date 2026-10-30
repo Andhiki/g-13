@@ -66,12 +66,17 @@ export const CourseNode = memo(function CourseNode({
   const outgoingVisible = visibility.outgoing.has(id);
   const course = data.course;
   const credit = creditsFor(course);
-  const choice = !isCore(course);
+  const choice = !isCore(course) || course.id.startsWith("2021-slot-");
   const styles = courseStyles({ choice, state: data.state ?? undefined });
   return (
     <div
       style={{ width: courseLayout.cardWidth }}
-      className={styles.root()}
+      className={styles.root({
+        class:
+          choice && !data.state
+            ? "opacity-[0.42] hover:opacity-100 focus-within:opacity-100"
+            : undefined,
+      })}
       data-course={course.id}
       data-course-kind={choice ? "choice" : "core"}
       data-course-state={data.state ?? undefined}
@@ -106,7 +111,7 @@ export const CourseNode = memo(function CourseNode({
             variant="caption"
             className={styles.surface({ class: tab + " max-w-[calc(100%-72px)]" })}
           >
-            {course.code || text("Slot pilihan")}
+            {course.code || (choice ? text("Slot pilihan") : courseName(course))}
           </Typography>
           <Typography
             as="span"

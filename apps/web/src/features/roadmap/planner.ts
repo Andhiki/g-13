@@ -40,28 +40,13 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
   const data = getCurriculum(answers.kurikulum);
   const rules = getAcademicRules(data.id);
   const courses: PlannedCourse[] = data.core
-    .filter(
-      (course) =>
-        !rules.excludedCoreIds.includes(course.id) && !rules.religionChoiceIds.includes(course.id),
-    )
+    .filter((course) => !rules.excludedCoreIds.includes(course.id))
     .map((course) => ({
       course,
       semester: assignedCoreSemester(course) ?? 1,
       kind: "required",
       originalId: course.id,
     }));
-  if (rules.religionChoiceIds.length) {
-    const religion = data.core.find((course) => rules.religionChoiceIds.includes(course.id))!;
-    const course = {
-      ...religion,
-      id: "roadmap-agama",
-      code: "",
-      title: "Agama sesuai keyakinan",
-      englishTitle: "Religion according to your faith",
-      placements: [{ ...religion.placements[0], label: "Pilih satu mata kuliah agama" }],
-    };
-    courses.push({ course, semester: 1, kind: "required", originalId: course.id });
-  }
   for (const course of data.electives.filter((course) =>
     course.placements.some((p) => p.section === "interest" && p.group === answers.minat),
   )) {

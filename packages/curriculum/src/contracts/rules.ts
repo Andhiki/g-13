@@ -16,7 +16,6 @@ export type AcademicRules = {
   interestMode: "laboratory" | "specialization";
   doubleDegreeWithoutInterest: boolean;
   excludedCoreIds: string[];
-  religionChoiceIds: string[];
   preferredElectives: Record<string, string[]>;
   internship: {
     note: string;

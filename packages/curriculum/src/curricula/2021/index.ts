@@ -15,9 +15,6 @@ export const curriculum2021: CurriculumSlice = {
     excludedCoreIds: curriculum.core
       .filter((course) => course.id.startsWith("2021-slot"))
       .map((course) => course.id),
-    religionChoiceIds: curriculum.core
-      .filter((course) => course.placements.some((p) => p.label === "Pilihan agama"))
-      .map((course) => course.id),
     preferredElectives: {},
     internship: {
       kind: "activity",

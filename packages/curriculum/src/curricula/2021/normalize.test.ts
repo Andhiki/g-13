@@ -81,3 +81,20 @@ test("elective slots share a simple display name while retaining distinct identi
     source.required_schedule.courses.find((row) => row.record_kind === "elective_slot")?.name_id,
   ).toBe("Mata Kuliah Pilihan-1");
 });
+
+test("combines religion alternatives into one two-credit semester-one course", () => {
+  const religions = curriculum.core.filter((course) =>
+    course.placements.some((p) => p.label === "Pilihan agama"),
+  );
+  expect(religions).toHaveLength(1);
+  expect(religions[0]).toMatchObject({
+    id: "2021-agama",
+    code: "",
+    title: "Agama",
+    englishTitle: "Religion",
+    placements: [{ semester: 1, credits: 2 }],
+  });
+  expect(
+    source.required_schedule.courses.filter((row) => row.choice_group === "religion"),
+  ).toHaveLength(6);
+});

@@ -11,7 +11,6 @@ export const curriculum2026: CurriculumSlice = {
     interestMode: "specialization",
     doubleDegreeWithoutInterest: true,
     excludedCoreIds: [],
-    religionChoiceIds: [],
     preferredElectives: Object.fromEntries(
       [
         ...new Set(source.course_schedule.interest_area_rows.map((row) => row.interest_area_raw)),

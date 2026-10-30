@@ -41,7 +41,6 @@ for (const curriculum of listCurricula()) {
     const scheduling = rules.scheduling;
     const ids = [
       ...rules.excludedCoreIds,
-      ...rules.religionChoiceIds,
       ...Object.values(rules.preferredElectives).flat(),
       ...(rules.internship.kind === "credited"
         ? rules.internship.options.map((option) => option.courseId)

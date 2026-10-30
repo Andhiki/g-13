@@ -16,6 +16,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Slot mata kuliah pilihan 2021 Revisi 2023 tampil redup seperti mata kuliah pilihan lainnya.
+- Pilihan agama ditampilkan sebagai satu mata kuliah Agama pada peta kurikulum dan hasil roadmap; arsip ujian tetap terpisah.
+
 - Mengurangi pekerjaan saat menggeser peta dengan menghitung ulang batas semester hanya saat tata letak berubah dan memperbarui kontrol zoom hanya saat tingkat zoom berubah.
 
 ### 2026-10-30
