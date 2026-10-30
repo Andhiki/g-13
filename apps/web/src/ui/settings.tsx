@@ -41,33 +41,25 @@ export function Settings() {
           </AlignModal.Title>
         </div>
         <div className="space-y-5 px-5 py-4">
-          <section aria-labelledby="settings-appearance" className="space-y-1">
-            <Typography
-              as="h3"
-              id="settings-appearance"
-              variant="labelSmall"
-              className="text-text-sub-600"
-            >
+          <section aria-labelledby="settings-appearance" className="space-y-4">
+            <Typography as="h3" id="settings-appearance" variant="label">
               {t("settings.appearance")}
             </Typography>
             <div className="flex items-center justify-between gap-4">
-              <Typography variant="label">{t("settings.language")}</Typography>
+              <Typography variant="labelSmall" className="text-text-sub-600">
+                {t("settings.language")}
+              </Typography>
               <LanguageSwitch />
             </div>
+            <ThemeSwitch />
           </section>
-          <ThemeSwitch />
 
           <section aria-labelledby="settings-behaviour" className="space-y-1">
-            <Typography
-              as="h3"
-              id="settings-behaviour"
-              variant="labelSmall"
-              className="text-text-sub-600"
-            >
+            <Typography as="h3" id="settings-behaviour" variant="label">
               {t("settings.behaviour")}
             </Typography>
             <div className="flex min-h-7 items-center justify-between gap-4">
-              <Typography as="label" htmlFor="pointer-cursor" variant="label">
+              <Typography as="label" htmlFor="pointer-cursor" variant="labelSmall">
                 {t("settings.pointerCursor")}
               </Typography>
               <Switch.Root

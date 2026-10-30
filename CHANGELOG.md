@@ -20,6 +20,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Pemilihan skema warna hanya mengubah palet tersimpan tanpa berpindah mode terang/gelap; hierarki judul pengaturan tampilan diperjelas.
+
 - Drawer detail mata kuliah di ponsel dapat ditutup dengan menariknya ke bawah.
 - Fokus mata kuliah di ponsel membatasi zoom keluar agar kartu tetap terbaca meskipun memiliki banyak koneksi.
 

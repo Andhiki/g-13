@@ -7,21 +7,21 @@ import { useTranslation } from "react-i18next";
 
 export function ThemeSwitch() {
   const { t } = useTranslation();
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { schemes, setScheme } = useThemePreference();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
     <div className="space-y-5">
-      <section aria-labelledby="settings-color-scheme" className="space-y-3">
-        <Typography as="h3" id="settings-color-scheme" variant="label">
+      <section aria-labelledby="settings-theme" className="space-y-3">
+        <Typography as="h4" id="settings-theme" variant="labelSmall" className="text-text-sub-600">
           {t("settings.theme")}
         </Typography>
         <div
           className="grid grid-cols-3 gap-2 sm:gap-3"
           role="group"
-          aria-labelledby="settings-color-scheme"
+          aria-labelledby="settings-theme"
         >
           {(["system", "light", "dark"] as const).map((mode) => {
             const Icon =
@@ -57,9 +57,14 @@ export function ThemeSwitch() {
           })}
         </div>
       </section>
-      <section aria-labelledby="settings-themes" className="space-y-3">
-        <Typography as="h3" id="settings-themes" variant="label">
-          {t("settings.themes")}
+      <section aria-labelledby="settings-color-scheme" className="space-y-3">
+        <Typography
+          as="h4"
+          id="settings-color-scheme"
+          variant="labelSmall"
+          className="text-text-sub-600"
+        >
+          {t("settings.colorScheme")}
         </Typography>
         <div className="grid grid-cols-2 gap-3">
           {(["omahti", "himakom"] as const).map((scheme) => (
@@ -79,10 +84,7 @@ export function ThemeSwitch() {
                       title={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
                       aria-pressed={mounted && selected}
                       disabled={!mounted}
-                      onClick={() => {
-                        setScheme(mode, scheme);
-                        if (resolvedTheme !== mode) setTheme(mode);
-                      }}
+                      onClick={() => setScheme(mode, scheme)}
                     >
                       {mounted && selected && (
                         <span className="theme-swatch-badge">
