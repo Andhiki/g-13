@@ -28,12 +28,9 @@ export function ZoomControls({
   const reducedMotion = useReducedMotion();
   const options = { duration: reducedMotion ? 0 : 150 };
   return (
-    <Panel
-      position="bottom-right"
-      className={`m-3! sm:m-4! ${className} ${selected ? "max-[650px]:bottom-[var(--course-sheet-height)]!" : ""}`}
-    >
+    <Panel position="bottom-right" className={`m-4! max-[650px]:hidden ${className}`}>
       <div className="flex items-end gap-2">
-        <div className="relative hidden size-10 sm:block">
+        <div className="relative size-10">
           <MapControlPanel
             label="Pintasan keyboard"
             title="Pintasan keyboard"
@@ -84,7 +81,7 @@ export function ZoomControls({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="size-8 p-0 max-[650px]:hidden"
+              className="size-8 p-0"
               aria-label={text("Perkecil")}
               title={text("Perkecil")}
               disabled={zoom <= 0.05}
@@ -96,7 +93,7 @@ export function ZoomControls({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="size-8 p-0 max-[650px]:hidden"
+              className="size-8 p-0"
               aria-label={text("Perbesar")}
               title={text("Perbesar")}
               disabled={zoom >= 1.35}

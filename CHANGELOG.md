@@ -29,7 +29,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Study Roadmap berganti nama menjadi Personal Roadmap dengan ringkasan hasil yang lebih personal dan tombol coba lagi di bawah judul serta deskripsi.
 
-- Kontrol zoom pada perangkat seluler hanya menampilkan tingkat zoom dan tombol reset.
+- Seluruh kontrol zoom, termasuk tingkat zoom dan tombol reset, disembunyikan pada perangkat seluler.
 
 - Semua indikator pemuatan memakai Sonic dengan teks berdenyut yang dipilih acak setiap kali muncul.
 
