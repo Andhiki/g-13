@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Transisi peta menghindari perhitungan jalur tersembunyi setiap frame; perpindahan ke daftar tetap mempertahankan peta dan cache sambil menonaktifkan animasi tersembunyi. Pembaruan hover, zoom, dan pelacakan semester dibatasi pada perubahan yang diperlukan.
+
 - Pratinjau tema terang dan gelap mengikuti pilihan skema warna masing-masing.
 - Tombol aksi pada dialog pratinjau arsip ujian memakai garis tepi netral agar lebih mudah terlihat.
 

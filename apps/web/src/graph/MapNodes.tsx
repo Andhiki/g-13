@@ -1,5 +1,5 @@
 import { useLocale } from "../useLocale";
-import { memo, useContext } from "react";
+import { memo, useCallback, useContext, useSyncExternalStore } from "react";
 import { Typography } from "../ui/typography";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
@@ -62,8 +62,20 @@ export const CourseNode = memo(function CourseNode({
 }: NodeProps<Node<CourseNodeData, "course">>) {
   const { text, courseName } = useLocale();
   const visibility = useContext(ConnectionVisibility);
-  const incomingVisible = visibility.incoming.has(id);
-  const outgoingVisible = visibility.outgoing.has(id);
+  const subscribe = useCallback(
+    (listener: () => void) => visibility.subscribe(id, listener),
+    [visibility, id],
+  );
+  const incomingVisible = useSyncExternalStore(
+    subscribe,
+    () => visibility.incoming(id),
+    () => false,
+  );
+  const outgoingVisible = useSyncExternalStore(
+    subscribe,
+    () => visibility.outgoing(id),
+    () => false,
+  );
   const course = data.course;
   const credit = creditsFor(course);
   const choice = !isCore(course) || course.id.startsWith("2021-slot-");

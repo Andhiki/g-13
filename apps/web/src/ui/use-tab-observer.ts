@@ -38,6 +38,7 @@ export function useTabObserver({ onActiveTabChange }: TabObserverOptions = {}) {
         childList: true,
         subtree: true,
         attributes: true,
+        attributeFilter: ["data-state"],
       });
     }
 

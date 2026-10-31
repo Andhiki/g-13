@@ -16,7 +16,6 @@ import {
   ViewportPortal,
   useReactFlow,
   useStore,
-  useNodes,
   useOnViewportChange,
   type Edge,
   type NodeTypes,
@@ -36,6 +35,7 @@ import { mapConnections } from "../../../graph/map-connections";
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 
 function ViewportFocus({
+  active,
   navigation,
   curriculum,
   resetVersion,
@@ -43,6 +43,7 @@ function ViewportFocus({
   stage,
   title,
 }: {
+  active: boolean;
   navigation: { semester: number } | null;
   curriculum: CurriculumId;
   resetVersion: number;
@@ -57,14 +58,16 @@ function ViewportFocus({
       navigation={navigation}
       resetKey={`${curriculum}:${resetVersion}`}
       onSemester={(semester) => {
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reducedMotion =
+          !active || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         void setCenter(LANE_X + (semester - 1) * LANE_STEP + LANE_WIDTH / 2, 420, {
           zoom: 0.72,
           duration: reducedMotion ? 0 : 600,
         });
       }}
       onOverview={() => {
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reducedMotion =
+          !active || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const phone = window.matchMedia(courseLayout.phoneQuery).matches;
         const heading = title.current!;
         const bounds = stage.current!.getBoundingClientRect();
@@ -84,24 +87,23 @@ function ViewportFocus({
 }
 
 function SemesterViewport({
-  active,
-  selectedId,
+  enabled,
+  nodes,
   onVisibleSemesters,
 }: {
-  active: boolean;
-  selectedId: string | null;
+  enabled: boolean;
+  nodes: MapNode[];
   onVisibleSemesters: (semesters: number[]) => void;
 }) {
   const flow = useReactFlow<MapNode>();
   const origin = useContext(GraphOrigin);
-  const nodes = useNodes<MapNode>();
   const width = useStore((state) => state.width);
   const height = useStore((state) => state.height);
   const semesterBounds = useMemo(() => {
     const bounds: { semester: number; x: number; bottom: number }[] = [];
     for (let semester = 1; semester <= 8; semester++) {
       if (!nodes.some((node) => node.id === `lane-semester-${semester}`)) continue;
-      const x = LANE_X + (semester - 1) * LANE_STEP + origin.x;
+      const x = LANE_X + (semester - 1) * LANE_STEP;
       const bottom = Math.max(
         140,
         ...nodes
@@ -117,31 +119,35 @@ function SemesterViewport({
       bounds.push({ semester, x, bottom });
     }
     return bounds;
-  }, [nodes, origin.x]);
+  }, [nodes]);
+  const lastVisible = useRef<string | null>(null);
   const update = useCallback(() => {
-    if (!active) return;
-    if (selectedId) {
-      onVisibleSemesters([]);
-      return;
-    }
     const viewport = flow.getViewport();
     const semesters: number[] = [];
     const top = width < 1100 ? 116 : 76;
     const laneWidth = LANE_WIDTH * viewport.zoom;
     for (const { semester, x, bottom } of semesterBounds) {
-      const left = viewport.x + x * viewport.zoom;
+      const left = viewport.x + (x + origin.x) * viewport.zoom;
       if (
         Math.min(width, left + laneWidth) - Math.max(0, left) >= laneWidth / 2 &&
-        viewport.y + bottom * viewport.zoom > top &&
+        viewport.y + (bottom + origin.y) * viewport.zoom > top &&
         viewport.y + (100 + origin.y) * viewport.zoom < height
       ) {
         semesters.push(semester);
       }
     }
-    onVisibleSemesters(semesters);
-  }, [active, flow, selectedId, onVisibleSemesters, origin.y, semesterBounds, width, height]);
-  useOnViewportChange({ onChange: update });
-  useEffect(update, [update]);
+    const key = semesters.join(",");
+    if (lastVisible.current !== key) {
+      lastVisible.current = key;
+      onVisibleSemesters(semesters);
+    }
+  }, [flow, onVisibleSemesters, origin.x, origin.y, semesterBounds, width, height]);
+  useOnViewportChange({ onChange: enabled ? update : undefined });
+  useEffect(() => {
+    if (!enabled) return;
+    lastVisible.current = null;
+    update();
+  }, [enabled, update]);
   return null;
 }
 
@@ -223,6 +229,7 @@ export function CurriculumMap({
   return (
     <EdgeRouting>
       <MotionGraph<MapNode>
+        active={active}
         selectedId={selectedId}
         resetKey={`${curriculum}:${resetVersion}`}
         navigation={navigation}
@@ -253,6 +260,7 @@ export function CurriculumMap({
         aria-label={text("Peta kurikulum Ilmu Komputer UGM")}
       >
         <ViewportFocus
+          active={active}
           stage={stage}
           title={title}
           navigation={navigation}
@@ -261,6 +269,7 @@ export function CurriculumMap({
           selectedId={selectedId}
         />
         <ZoomControls
+          active={active}
           shortcuts={[
             { key: "f", description: "Buka/tutup filter" },
             { key: "v", description: "Ganti tampilan" },
@@ -272,8 +281,8 @@ export function CurriculumMap({
           lastSemester={lastSemester}
         />
         <SemesterViewport
-          active={active}
-          selectedId={selectedId}
+          enabled={active && selectedId === null}
+          nodes={nodes}
           onVisibleSemesters={onVisibleSemesters}
         />
         <MapTitle selectedId={selectedId} title={title} />

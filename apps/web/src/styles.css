@@ -81,3 +81,10 @@ html[data-dark-theme="himakom"].dark {
   --color-primary-alpha-16: #b5a1ff29;
   --color-primary-alpha-10: #b5a1ff1a;
 }
+
+[data-graph-active="false"] *,
+[data-graph-active="false"] *::before,
+[data-graph-active="false"] *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}

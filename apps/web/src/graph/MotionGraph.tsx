@@ -10,16 +10,7 @@ import {
   type XYPosition,
 } from "@xyflow/react";
 import { ConnectionPaths } from "./EdgeRouting";
-import { connectionPaths } from "./connection-paths";
 import { getConnectionRoutes, routingRequest } from "./routing-cache";
-import {
-  deformRoute,
-  mixRoute,
-  resampleRoute,
-  routeLength,
-  routeSamples,
-  routeTransition,
-} from "./route-motion";
 import type { RoutingNode } from "./connection-routes";
 import { courseLayout } from "../courses/layout";
 
@@ -73,6 +64,7 @@ export function MotionGraph<N extends Node>({
   selectedId,
   resetKey,
   navigation,
+  active = true,
   onMoveStart,
   onMoveEnd,
   ...props
@@ -82,19 +74,23 @@ export function MotionGraph<N extends Node>({
   selectedId: string | null;
   resetKey: string;
   navigation: { semester: number } | null;
+  active?: boolean;
 }) {
   const { getViewport, setViewport, getInternalNode, viewportInitialized } = useReactFlow();
+  const [routes, setRoutes] = useState<Awaited<ReturnType<typeof getConnectionRoutes>>>(new Map());
+  const [initialized, setInitialized] = useState(false);
   const nodesInitialized = useStore(
     (state) =>
-      state.nodeLookup.size > 0 &&
-      Array.from(state.nodeLookup.values()).every(
-        (node) =>
-          node.hidden ||
-          node.type === "lane" ||
-          (node.measured.width &&
-            node.measured.height &&
-            (node.type !== "course" || node.internals.handleBounds !== undefined)),
-      ),
+      initialized ||
+      (state.nodeLookup.size > 0 &&
+        Array.from(state.nodeLookup.values()).every(
+          (node) =>
+            node.hidden ||
+            node.type === "lane" ||
+            (node.measured.width &&
+              node.measured.height &&
+              (node.type !== "course" || node.internals.handleBounds !== undefined)),
+        )),
   );
   const element = useStore((state) => state.domNode);
   const width = useStore((state) => state.width);
@@ -102,52 +98,45 @@ export function MotionGraph<N extends Node>({
   const [displayed, setDisplayed] = useState(nodes);
   const [moving, setMoving] = useState(false);
   const current = useRef(displayed);
-  const [paths] = useState(connectionPaths);
-  const currentPaths = useRef(new Map<string, XYPosition[]>());
   const measurements = useRef(new Map<string, Omit<RoutingNode, "id" | "position">>());
-  const ready = nodesInitialized || currentPaths.current.size > 0;
   const [routingError, setRoutingError] = useState<Error>();
-  const currentEdges = useRef(edges);
-  const [leavingEdges, setLeavingEdges] = useState<Edge[]>([]);
-  const previous = useRef({ selectedId, resetKey, navigation });
+  const previous = useRef({ selectedId, resetKey, navigation, active });
   const cameraMoving = useRef(false);
   const inFlight = useRef(false);
   const offset = useRef<XYPosition>({ x: 0, y: 0 });
-  const settled = useEffectEvent(() => onMoveEnd?.(null, getViewport()));
+  const settled = useEffectEvent(() => {
+    if (active) onMoveEnd?.(null, getViewport());
+  });
 
   useLayoutEffect(() => {
-    if (!viewportInitialized || !ready || !element) return;
+    if (!viewportInitialized || !nodesInitialized || !element) return;
     const before = previous.current;
     const reset = before.resetKey !== resetKey || before.navigation !== navigation;
     const selectionChanged = before.selectedId !== selectedId;
     const returning = !reset && selectionChanged && selectedId === null;
-    previous.current = { selectedId, resetKey, navigation };
+    previous.current = { selectedId, resetKey, navigation, active };
     if (reset) offset.current = { x: 0, y: 0 };
-    const edgeIds = new Set(edges.map((edge) => edge.id));
-    const outgoing = inFlight.current
-      ? [...currentEdges.current, ...leavingEdges]
-      : currentEdges.current;
-    const departingEdges = outgoing.filter((edge) => !edgeIds.has(edge.id));
-    setLeavingEdges(departingEdges);
-    currentEdges.current = edges;
     const elements = new Map(
       Array.from(element.querySelectorAll<HTMLElement>(".react-flow__node")).map((node) => [
         node.dataset.id,
         node,
       ]),
     );
-    const snapshot = current.current.map((node) => {
-      const element = elements.get(node.id);
-      if (!element) return node;
-      const style = getComputedStyle(element);
-      const transform = new DOMMatrixReadOnly(style.transform);
-      return {
-        ...node,
-        measured: getInternalNode(node.id)?.measured ?? node.measured,
-        position: { x: transform.m41, y: transform.m42 },
-        style: { ...node.style, opacity: Number(style.opacity), transition: "none" },
-      };
-    });
+    const snapshot =
+      active && inFlight.current
+        ? current.current.map((node) => {
+            const element = elements.get(node.id);
+            if (!element) return node;
+            const style = getComputedStyle(element);
+            const transform = new DOMMatrixReadOnly(style.transform);
+            return {
+              ...node,
+              measured: getInternalNode(node.id)?.measured ?? node.measured,
+              position: { x: transform.m41, y: transform.m42 },
+              style: { ...node.style, opacity: Number(style.opacity), transition: "none" },
+            };
+          })
+        : current.current;
     current.current = snapshot;
     setDisplayed(snapshot);
     const starts = new Map(snapshot.map((node) => [node.id, node]));
@@ -202,34 +191,22 @@ export function MotionGraph<N extends Node>({
     const startViewport = getViewport();
     const selected = targets.find((node) => node.id === selectedId);
     const endViewport = selected ? focusViewport(targets, selected, width, height) : startViewport;
-    cameraMoving.current = selected !== undefined && !reset;
+    cameraMoving.current = selected !== undefined && !reset && before.active === active;
+    if (!active) void setViewport(startViewport);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const animate =
-      !reset && (selectionChanged || selectedId !== null || inFlight.current) && !reducedMotion;
+      active &&
+      before.active &&
+      !reset &&
+      (selectionChanged || selectedId !== null || inFlight.current) &&
+      !reducedMotion;
     inFlight.current = animate;
-    setMoving(animate);
-    const destinations = new Map(targets.map((node) => [node.id, node]));
-    const shift = (id: string, reverse: boolean) => {
-      const start = starts.get(id)?.position;
-      const end = destinations.get(id)?.position;
-      if (!start || !end) return { x: 0, y: 0 };
-      const sign = reverse ? -1 : 1;
-      return { x: (end.x - start.x) * sign, y: (end.y - start.y) * sign };
-    };
-    const deform = (points: XYPosition[], edge: Edge, reverse: boolean) => {
-      const source = shift(edge.source, reverse);
-      const target = shift(edge.target, reverse);
-      return deformRoute(points, source, target);
-    };
+    setMoving(true);
     let frame = 0;
-    let active = true;
+    let cancelled = false;
     let started = 0;
     let nodeProgress = 0;
-    let lastEased = 0;
-    let routeStart = 0;
-    let routesStarted = 0;
     let routesReady = false;
-    let transitions: { id: string; start: XYPosition[]; end: XYPosition[] }[] = [];
     const movingNode = targets.find((node) => {
       const start = starts.get(node.id);
       return (
@@ -256,30 +233,19 @@ export function MotionGraph<N extends Node>({
       nodeProgress = animate ? Math.max(nodeProgress, Math.min(1, elapsed / animationDuration)) : 1;
       const progress = nodeProgress;
       const t = ease(progress);
-      lastEased = t;
-      const pathProgress = !animate
-        ? 1
-        : routeStart === 1
-          ? ease(Math.min(1, (time - routesStarted) / 150))
-          : Math.max(0, (t - routeStart) / (1 - routeStart));
-      const nextPaths = new Map(
-        transitions.map(({ id, start, end }) => [id, mixRoute(start, end, pathProgress)]),
-      );
-      currentPaths.current = nextPaths;
-      paths.update(nextPaths);
       if (cameraMoving.current)
         void setViewport({
           x: mix(startViewport.x, endViewport.x, t),
           y: mix(startViewport.y, endViewport.y, t),
           zoom: mix(startViewport.zoom, endViewport.zoom, t),
         });
-      if (progress < 1 || pathProgress < 1) frame = requestAnimationFrame(render);
+      if (progress < 1) frame = requestAnimationFrame(render);
       else if (routesReady) {
         inFlight.current = false;
         setMoving(false);
         current.current = targets;
         setDisplayed(targets);
-        frame = requestAnimationFrame(settled);
+        if (active) frame = requestAnimationFrame(settled);
       }
     };
     const start = () => {
@@ -297,25 +263,13 @@ export function MotionGraph<N extends Node>({
             style: { ...node.style, opacity: 0, transition, pointerEvents: "none" },
           });
       }
-      setLeavingEdges(
-        departingEdges.map((edge) => ({ ...edge, style: { ...edge.style, opacity: 0 } })),
-      );
       current.current = next;
       setDisplayed(next);
       started = performance.now();
-      setMoving(animate);
       if (returning && animate) frame = requestAnimationFrame(render);
       else render(started);
     };
-    if (returning) {
-      transitions = [...edges, ...departingEdges].flatMap((edge) => {
-        const start = currentPaths.current.get(edge.id);
-        return start
-          ? [{ id: edge.id, ...routeTransition(start, deform(start, edge, false)) }]
-          : [];
-      });
-      start();
-    }
+    start();
     const routingNodes = targets
       .filter((node) => node.type !== "lane")
       .map((node): RoutingNode => {
@@ -331,81 +285,50 @@ export function MotionGraph<N extends Node>({
     const request = routingRequest(routingNodes, edges);
     getConnectionRoutes(JSON.stringify(request), request).then(
       (routes) => {
-        if (!active) return;
+        if (cancelled) return;
+        setRoutes(routes);
+        setInitialized(true);
         routesReady = true;
-        transitions = edges.flatMap((edge) => {
-          const id = edge.id;
-          const route = routes.get(id);
-          if (!route) return [];
-
-          const previous = currentPaths.current.get(id);
-          const count = Math.max(32, previous?.length ?? 0, Math.ceil(routeLength(route.path) / 6));
-          const end = routeSamples(route.path, count);
-          return [
-            {
-              id,
-              ...routeTransition(
-                previous
-                  ? resampleRoute(previous, count)
-                  : mixRoute(deform(end, edge, true), end, returning ? lastEased : 0),
-                end,
-              ),
-            },
-          ];
-        });
-        for (const edge of departingEdges) {
-          const start = currentPaths.current.get(edge.id);
-          if (!start) continue;
-          transitions.push({ id: edge.id, ...routeTransition(start, deform(start, edge, false)) });
-        }
-        if (returning) {
-          routeStart = lastEased;
-          routesStarted = performance.now();
-          inFlight.current = animate;
-          setMoving(animate);
-          cancelAnimationFrame(frame);
-          if (animate) frame = requestAnimationFrame(render);
-          else render(routesStarted);
-        } else start();
+        cancelAnimationFrame(frame);
+        if (animate) frame = requestAnimationFrame(render);
+        else render(performance.now());
       },
       (error: Error) => {
-        if (active) setRoutingError(error);
+        if (!cancelled) setRoutingError(error);
       },
     );
     return () => {
-      active = false;
+      cancelled = true;
       cancelAnimationFrame(frame);
     };
   }, [
     nodes,
+    active,
     selectedId,
     resetKey,
     navigation,
     viewportInitialized,
-    ready,
+    nodesInitialized,
     width,
     height,
     getViewport,
     setViewport,
     getInternalNode,
     element,
-    paths,
   ]);
 
   if (routingError) throw routingError;
 
-  const visibleEdges = useMemo(() => {
-    const edgeIds = new Set(edges.map((edge) => edge.id));
-    const visible = moving
-      ? [...edges, ...leavingEdges.filter((edge) => !edgeIds.has(edge.id))]
-      : edges;
-    return visible.map((edge) => ({ ...edge, data: { ...edge.data, moving } }));
-  }, [edges, leavingEdges, moving]);
+  const visibleEdges = useMemo(
+    () => edges.map((edge) => ({ ...edge, data: { ...edge.data, moving, active } })),
+    [edges, moving, active],
+  );
   return (
     <GraphOrigin.Provider value={offset.current}>
-      <ConnectionPaths.Provider value={paths}>
+      <ConnectionPaths.Provider value={routes}>
         <ReactFlow<N, Edge>
           {...props}
+          data-graph-active={active}
           onMoveEnd={onMoveEnd}
           onMoveStart={(event, viewport) => {
             if (event) cameraMoving.current = false;

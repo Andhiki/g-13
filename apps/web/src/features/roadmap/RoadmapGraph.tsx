@@ -238,7 +238,10 @@ export function RoadmapGraph({
         }),
     [graph, selectedId, focusIds],
   );
-  const revealedEdges = mapConnections(edges, selectedId, hoveredId);
+  const revealedEdges = useMemo(
+    () => mapConnections(edges, selectedId, hoveredId),
+    [edges, selectedId, hoveredId],
+  );
   return (
     <section
       ref={stage}

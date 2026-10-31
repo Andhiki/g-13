@@ -39,6 +39,9 @@ export function RoadmapResult({
   const plan = useMemo(() => getRoadmap(input), [input]);
   const [navigation, setNavigation] = useState<{ semester: number } | null>(null);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
+  const reportSemesters = useCallback((next: number[]) => {
+    setVisibleSemesters((previous) => (previous.join(",") === next.join(",") ? previous : next));
+  }, []);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const choose = useCallback((id: string) => setSelectedId(id), []);
   const lastSemester = Math.max(
@@ -104,7 +107,7 @@ export function RoadmapResult({
             setNavigation(null);
           }}
           navigation={navigation}
-          onVisibleSemesters={setVisibleSemesters}
+          onVisibleSemesters={reportSemesters}
         />
       </main>
       <Overlay

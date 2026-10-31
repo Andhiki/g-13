@@ -9,12 +9,14 @@ import { AlignKbd } from "../ui/kbd";
 import { Typography } from "../ui/typography";
 
 export function ZoomControls({
+  active = true,
   onReset,
   selected,
   lastSemester,
   shortcuts,
   className = "",
 }: {
+  active?: boolean;
   className?: string;
   onReset: () => void;
   selected: boolean;
@@ -23,10 +25,6 @@ export function ZoomControls({
 }) {
   const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const { zoomIn, zoomOut } = useReactFlow();
-  const zoom = useStore((state) => state.transform[2]);
-  const reducedMotion = useReducedMotion();
-  const options = { duration: reducedMotion ? 0 : 150 };
   return (
     <Panel position="bottom-right" className={`m-4! max-[650px]:hidden ${className}`}>
       <div className="flex items-end gap-2">
@@ -71,58 +69,69 @@ export function ZoomControls({
             </dl>
           </MapControlPanel>
         </div>
-        {!selected && (
-          <div
-            role="group"
-            aria-label={text("Kontrol zoom")}
-            className="flex items-center gap-0 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
-          >
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xsmall"
-              className="size-8 p-0"
-              aria-label={text("Perkecil")}
-              title={text("Perkecil")}
-              disabled={zoom <= 0.05}
-              onClick={() => zoomOut(options)}
-            >
-              <RiSubtractLine className="size-4" aria-hidden="true" />
-            </AlignButton.Root>
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xsmall"
-              className="size-8 p-0"
-              aria-label={text("Perbesar")}
-              title={text("Perbesar")}
-              disabled={zoom >= 1.35}
-              onClick={() => zoomIn(options)}
-            >
-              <RiAddLine className="size-4" aria-hidden="true" />
-            </AlignButton.Root>
-            <Typography
-              as="span"
-              variant="label"
-              className="min-w-10 text-center tabular-nums text-text-sub-600"
-              aria-label={text("Zoom {{v0}}%", { v0: Math.round(zoom * 100) })}
-            >
-              {Math.round(zoom * 100)}%
-            </Typography>
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xsmall"
-              className="size-8 p-0"
-              aria-label={text("Kembali ke tampilan awal")}
-              title={text("Kembali ke tampilan awal")}
-              onClick={onReset}
-            >
-              <RiFocus3Line className="size-4" aria-hidden="true" />
-            </AlignButton.Root>
-          </div>
-        )}
+        {active && !selected && <ZoomButtons onReset={onReset} />}
       </div>
     </Panel>
+  );
+}
+
+function ZoomButtons({ onReset }: { onReset: () => void }) {
+  const { text } = useLocale();
+  const { zoomIn, zoomOut } = useReactFlow();
+  const percent = useStore((state) => Math.round(state.transform[2] * 100));
+  const atMinimum = useStore((state) => state.transform[2] <= 0.05);
+  const atMaximum = useStore((state) => state.transform[2] >= 1.35);
+  const reducedMotion = useReducedMotion();
+  const options = { duration: reducedMotion ? 0 : 150 };
+  return (
+    <div
+      role="group"
+      aria-label={text("Kontrol zoom")}
+      className="flex items-center gap-0 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
+    >
+      <AlignButton.Root
+        variant="neutral"
+        mode="ghost"
+        size="xsmall"
+        className="size-8 p-0"
+        aria-label={text("Perkecil")}
+        title={text("Perkecil")}
+        disabled={atMinimum}
+        onClick={() => zoomOut(options)}
+      >
+        <RiSubtractLine className="size-4" aria-hidden="true" />
+      </AlignButton.Root>
+      <AlignButton.Root
+        variant="neutral"
+        mode="ghost"
+        size="xsmall"
+        className="size-8 p-0"
+        aria-label={text("Perbesar")}
+        title={text("Perbesar")}
+        disabled={atMaximum}
+        onClick={() => zoomIn(options)}
+      >
+        <RiAddLine className="size-4" aria-hidden="true" />
+      </AlignButton.Root>
+      <Typography
+        as="span"
+        variant="label"
+        className="min-w-10 text-center tabular-nums text-text-sub-600"
+        aria-label={text("Zoom {{v0}}%", { v0: percent })}
+      >
+        {percent}%
+      </Typography>
+      <AlignButton.Root
+        variant="neutral"
+        mode="ghost"
+        size="xsmall"
+        className="size-8 p-0"
+        aria-label={text("Kembali ke tampilan awal")}
+        title={text("Kembali ke tampilan awal")}
+        onClick={onReset}
+      >
+        <RiFocus3Line className="size-4" aria-hidden="true" />
+      </AlignButton.Root>
+    </div>
   );
 }

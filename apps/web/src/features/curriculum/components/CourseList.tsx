@@ -23,23 +23,33 @@ export function CourseList({
   const sections = useMemo(() => groupCoursesForList(courses, language), [courses, language]);
 
   useEffect(() => {
-    const update = () => {
-      const semesters = [...document.querySelectorAll<HTMLElement>("[data-semester]")]
-        .filter((element) => {
-          const bounds = element.getBoundingClientRect();
-          return (
-            bounds.bottom > window.innerHeight * 0.25 && bounds.top < window.innerHeight * 0.75
+    const elements = [...document.querySelectorAll<HTMLElement>("[data-semester]")];
+    let observer: IntersectionObserver;
+    const observe = () => {
+      observer?.disconnect();
+      const visible = new Set<HTMLElement>();
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!(entry.target instanceof HTMLElement)) continue;
+            if (entry.isIntersecting) visible.add(entry.target);
+            else visible.delete(entry.target);
+          }
+          onVisibleSemesters(
+            elements
+              .filter((element) => visible.has(element))
+              .map((element) => Number(element.dataset.semester)),
           );
-        })
-        .map((element) => Number(element.dataset.semester));
-      onVisibleSemesters(semesters);
+        },
+        { rootMargin: `-${window.innerHeight * 0.25}px 0px -${window.innerHeight * 0.25}px 0px` },
+      );
+      for (const element of elements) observer.observe(element);
     };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    observe();
+    window.addEventListener("resize", observe);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      observer.disconnect();
+      window.removeEventListener("resize", observe);
     };
   }, [sections, onVisibleSemesters]);
 

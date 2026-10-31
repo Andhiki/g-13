@@ -23,7 +23,9 @@ const SegmentedControlList = React.forwardRef<
   const { mounted, listRef } = useTabObserver({
     onActiveTabChange: (_, activeTab) => {
       const { offsetWidth: width, offsetLeft: left } = activeTab;
-      setLineStyle({ width, left });
+      setLineStyle((previous) =>
+        previous.width === width && previous.left === left ? previous : { width, left },
+      );
     },
   });
 
