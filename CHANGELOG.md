@@ -20,6 +20,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Memperbaiki pencarian arsip ujian untuk tanda baca dan huruf yang terlewat dalam nama mata kuliah.
 - Menghapus penanda urutan yang tidak sesuai pada daftar arsip ujian.
 
 ### 2026-10-31

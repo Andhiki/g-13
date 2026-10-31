@@ -17,7 +17,7 @@ function oneTypoApart(query: string, title: string) {
     } else {
       if (edits === 1) return false;
       edits = 1;
-      if (left[i] === right[j + 1] && left[i + 1] === right[j]) {
+      if (left.length === right.length && left[i] === right[j + 1] && left[i + 1] === right[j]) {
         i += 2;
         j += 2;
       } else if (left.length === right.length) {
@@ -34,8 +34,9 @@ function oneTypoApart(query: string, title: string) {
 }
 
 function matchesCourseName(name: string, query: string) {
-  const words = query.split(/\s+/);
   if (name.includes(query)) return true;
+  const words = query.match(/[\p{L}\p{N}]+/gu) ?? [];
+  if (words.length === 0) return false;
   const titleWords = name.match(/[\p{L}\p{N}]+/gu) ?? [];
   return words.every((word) => {
     const match = titleWords.findIndex(

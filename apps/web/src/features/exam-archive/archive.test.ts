@@ -44,6 +44,15 @@ test("course search ignores years and filenames and preserves empty courses", ()
   expect(browseArchive({ catalog, location: ["agama"] }).entries).toEqual([]);
 });
 
+test("course search handles punctuation, word order, and typos", () => {
+  for (const query of ["basis-data", "data basis", "bais data", "basiss data", "baiss data"]) {
+    expect(
+      browseArchive({ catalog, location: [], query }).entries.map((entry) => entry.id),
+    ).toEqual(["basis-data"]);
+  }
+  expect(browseArchive({ catalog, location: [], query: "---" }).entries).toEqual([]);
+});
+
 test("folder navigation sorts years newest first and resolves papers without filtering filenames", () => {
   expect(
     browseArchive({ catalog, location: ["basis-data"] }).entries.map((entry) => entry.name),
