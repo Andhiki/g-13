@@ -22,8 +22,6 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
-- Memperbaiki sudut kiri baris daftar kurikulum pada layar kecil.
-
 - Memperbaiki interaksi sentuh, ukuran teks input, area aman header dan drawer, serta warna bilah browser yang mengikuti tema aplikasi di ponsel.
 
 - Rekomendasi roadmap dibatasi hingga semester 8; beban atau prasyarat yang belum dapat dipenuhi tetap ditandai sebagai konflik.
