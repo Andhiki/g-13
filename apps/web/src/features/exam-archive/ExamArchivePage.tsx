@@ -12,8 +12,9 @@ import {
 import { AlignBreadcrumb } from "../../ui/breadcrumb";
 import { AlignBadge } from "../../ui/badge";
 import { Typography } from "../../ui/typography";
-import { browseArchive, resolveArchive } from "./archive";
+import { browseArchive, prepareCourseSearch, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
+import { examArchive } from "./catalog";
 import { archiveUpdatedAt } from "./metadata";
 import { Route } from "../../routes/exam";
 import type { ArchiveLocation } from "./contracts";
@@ -55,9 +56,14 @@ export function ExamArchivePage() {
   const { location, paper } = resolveArchive(search);
   const [query, setQuery] = useState("");
   const list = useRef<HTMLDivElement>(null);
+  const searchIndex = useMemo(
+    () => prepareCourseSearch(examArchive, (course) => text(course.name), language),
+    [text, language],
+  );
   const folder = browseArchive({
     location,
     query,
+    searchIndex,
     displayName: (course) => text(course.name),
     locale: language,
   });

@@ -53,6 +53,40 @@ test("course search handles punctuation, word order, and typos", () => {
   expect(browseArchive({ catalog, location: [], query: "---" }).entries).toEqual([]);
 });
 
+test("course search ranks close matches and supports aliases and incomplete typos", () => {
+  const courses = [
+    ...catalog,
+    {
+      id: "other",
+      name: "Pengantar Basis Data",
+      sourceFolderId: "other",
+      createdAt: null,
+      years: [],
+    },
+    {
+      id: "algorithm",
+      name: "Algoritma Genetika",
+      sourceFolderId: "algorithm",
+      createdAt: null,
+      years: [],
+    },
+    {
+      id: "ambiguous",
+      name: "Data Dasar",
+      sourceFolderId: "ambiguous",
+      createdAt: null,
+      years: [],
+    },
+  ];
+  const results = (query: string) =>
+    browseArchive({ catalog: courses, location: [], query }).entries.map((entry) => entry.id);
+  expect(results("basis data")).toEqual(["basis-data", "other"]);
+  expect(results("basdat")).toEqual(["basis-data"]);
+  expect(results("algorim")).toEqual(["algorithm"]);
+  expect(results("da data")).toEqual(["ambiguous"]);
+  expect(results("xx")).toEqual([]);
+});
+
 test("folder navigation sorts years newest first and resolves papers without filtering filenames", () => {
   expect(
     browseArchive({ catalog, location: ["basis-data"] }).entries.map((entry) => entry.name),

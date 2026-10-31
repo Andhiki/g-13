@@ -33,20 +33,58 @@ function oneTypoApart(query: string, title: string) {
   return edits + left.length - i + right.length - j <= 1;
 }
 
-function matchesCourseName(name: string, query: string) {
-  if (name.includes(query)) return true;
-  const words = query.match(/[\p{L}\p{N}]+/gu) ?? [];
-  if (words.length === 0) return false;
-  const titleWords = name.match(/[\p{L}\p{N}]+/gu) ?? [];
-  return words.every((word) => {
-    const match = titleWords.findIndex(
-      (titleWord) =>
-        titleWord.includes(word) || (word.length >= 4 && oneTypoApart(word, titleWord)),
-    );
-    if (match === -1) return false;
-    titleWords.splice(match, 1);
-    return true;
-  });
+const aliases: Record<string, string[]> = { "Basis Data": ["basdat"] };
+
+function tokens(value: string, locale: string) {
+  return value.toLocaleLowerCase(locale).match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
+export function prepareCourseSearch(
+  catalog: readonly ExamCourse[],
+  displayName: (course: ExamCourse) => string,
+  locale: string,
+) {
+  return catalog.map((course) => ({
+    course,
+    name: displayName(course),
+    names: [course.name, displayName(course), ...(aliases[course.name] ?? [])].map((name) =>
+      tokens(name, locale),
+    ),
+  }));
+}
+
+function wordScore(query: string, word: string) {
+  if (query === word) return 0;
+  if (word.startsWith(query)) return 1;
+  if (word.includes(query)) return 2;
+  if (query.length < 4) return Infinity;
+  if (oneTypoApart(query, word)) return 3;
+  if (
+    [query.length - 1, query.length, query.length + 1].some(
+      (length) => length < word.length && oneTypoApart(query, word.slice(0, length)),
+    )
+  )
+    return 4;
+  return Infinity;
+}
+
+function nameScore(query: string[], name: string[]) {
+  if (query.length > name.length) return Infinity;
+  function assign(index: number, used: Set<number>): number {
+    if (index === query.length) return 0;
+    let best = Infinity;
+    for (let i = 0; i < name.length; i++) {
+      if (used.has(i)) continue;
+      const score = wordScore(query[index], name[i]);
+      if (!Number.isFinite(score)) continue;
+      used.add(i);
+      best = Math.min(best, score + assign(index + 1, used));
+      used.delete(i);
+    }
+    return best;
+  }
+  const score = assign(0, new Set());
+  return score === 0 && query.join(" ") === name.join(" ") ? -1 : score;
 }
 
 type ArchiveEntry =
@@ -65,12 +103,14 @@ export function browseArchive({
   catalog = examArchive,
   displayName = (course: ExamCourse) => course.name,
   locale = "id",
+  searchIndex,
 }: {
   location: ArchiveLocation;
   query?: string;
   catalog?: readonly ExamCourse[];
   displayName?: (course: ExamCourse) => string;
   locale?: string;
+  searchIndex?: ReturnType<typeof prepareCourseSearch>;
 }) {
   const breadcrumbs: { name: string; location: ArchiveLocation }[] = [
     { name: "Arsip Ujian", location: [] },
@@ -78,20 +118,29 @@ export function browseArchive({
   const course = catalog.find((entry) => entry.id === location[0]);
   let entries: ArchiveEntry[];
   if (!course) {
-    const search = query.trim().toLocaleLowerCase(locale);
-    entries = catalog
-      .filter((entry) =>
-        [entry.name, displayName(entry)].some((name) =>
-          matchesCourseName(name.toLocaleLowerCase(locale), search),
-        ),
-      )
+    const search = tokens(query, locale);
+    const hasQuery = query.trim().length > 0;
+    entries = (searchIndex ?? prepareCourseSearch(catalog, displayName, locale))
+      .map((entry) => ({
+        ...entry,
+        score: hasQuery
+          ? search.length
+            ? Math.min(
+                ...entry.names.map((name, index) => nameScore(search, name) + (index >= 2 ? 2 : 0)),
+              )
+            : Infinity
+          : 0,
+      }))
+      .filter((entry) => Number.isFinite(entry.score))
+      .sort((a, b) => a.score - b.score || a.name.localeCompare(b.name, locale, { numeric: true }))
       .map((entry) => ({
         kind: "folder",
-        id: entry.id,
-        name: displayName(entry),
-        location: [entry.id],
-        createdAt: entry.createdAt,
+        id: entry.course.id,
+        name: entry.name,
+        location: [entry.course.id],
+        createdAt: entry.course.createdAt,
       }));
+    return { breadcrumbs, entries };
   } else {
     breadcrumbs.push({ name: displayName(course), location: [course.id] });
     const year = course.years.find((entry) => entry.name === location[1]);

@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengurutkan hasil pencarian arsip berdasarkan kecocokan dan mendukung singkatan serta salah ketik saat mengetik.
 - Menyembunyikan pencarian mata kuliah saat membuka folder arsip ujian, serta menjadikan entri arsip sebagai tautan.
 
 #### Fixed
