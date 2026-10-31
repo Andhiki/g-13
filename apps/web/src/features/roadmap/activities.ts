@@ -13,6 +13,7 @@ export function planActivities(answers: PlanningInput) {
     const fullSemester = ["exchange", "internship", "double"].includes(answers.exposure.kind);
     const semester = answers.exposure.kind === "double" ? 5 : answers.semesterPaparan;
     activities.push({
+      recommendedCredits: 0,
       id: "exposure",
       title: option.label,
       semester,
@@ -42,6 +43,7 @@ export function planActivities(answers: PlanningInput) {
     const { option } = answers.internship;
     if (answers.exposure.kind !== "internship") {
       activities.push({
+        recommendedCredits: 0,
         id: "internship",
         title: answers.internship.kind === "activity" ? "Magang" : "Magang + Kerja Praktik",
         semester,
@@ -54,7 +56,20 @@ export function planActivities(answers: PlanningInput) {
       });
     }
     if (option.fullSemester) blocked.add(semester);
-    notes.push(rules.internship.note);
+    if (answers.internship.kind === "activity") {
+      const activity = activities.find(
+        (item) => item.id === (answers.exposure.kind === "internship" ? "exposure" : "internship"),
+      );
+      if (activity) {
+        activity.recommendedCredits = option.fullSemester ? 20 : 4;
+        activity.detail = option.fullSemester
+          ? "Rekomendasi 20 SKS untuk Magang satu semester. Konversi 4–20 SKS mengikuti persetujuan prodi; rencana ini mengurangi mata kuliah pilihan."
+          : "Rekomendasi 4 SKS untuk Magang singkat. Konversi 4–20 SKS mengikuti persetujuan prodi; rencana ini mengurangi mata kuliah pilihan.";
+      }
+      notes.push(
+        "SKS Magang 2021 adalah rekomendasi perencanaan, bukan SKS yang sudah diakui. Konversi 4–20 SKS dan modul pengganti perlu persetujuan prodi.",
+      );
+    } else notes.push(rules.internship.note);
   } else if (rules.internship.noInternshipNote) {
     notes.push(rules.internship.noInternshipNote);
   }

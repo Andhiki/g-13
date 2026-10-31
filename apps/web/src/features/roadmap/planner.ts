@@ -24,6 +24,7 @@ export type Activity = {
   semester: number;
   detail: string;
   fullSemester: boolean;
+  recommendedCredits: number;
   endSemester: number;
 };
 export type Roadmap = {
@@ -75,7 +76,13 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
     );
   });
   const relations = getRelations(data.id);
-  let total = courses.reduce((sum, item) => sum + (creditsFor(item.course) ?? 0), 0);
+  const { activities, blocked, notes } = planActivities(answers);
+  const activityCredits = activities.reduce(
+    (sum, activity) => sum + activity.recommendedCredits,
+    0,
+  );
+  let total =
+    activityCredits + courses.reduce((sum, item) => sum + (creditsFor(item.course) ?? 0), 0);
   for (const course of candidates) {
     if (total >= data.totalCredits) break;
     if (courses.some((item) => item.course.id === course.id)) continue;
@@ -108,8 +115,7 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
     item.course = course;
     item.semester = Math.min(...course.placements.map((p) => p.semester ?? 5));
   }
-  const { activities, blocked, notes } = planActivities(answers);
-  scheduleCourses(courses, relations, answers, blocked);
+  scheduleCourses(courses, relations, answers, blocked, activities);
   const plan: Roadmap = {
     courses,
     activities,
@@ -117,7 +123,8 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
     requiredCredits: courses
       .filter((x) => x.kind === "required")
       .reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0),
-    totalCredits: courses.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0),
+    totalCredits:
+      activityCredits + courses.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0),
     conflicts: [],
     notes: [
       "Rencana dari semester 1, dengan asumsi mata kuliah selesai sesuai urutan. Batas perencanaan 24 SKS memerlukan hak SKS sesuai IP. Penawaran aktual, nilai, aturan KKN, dan persetujuan dosen belum diverifikasi.",

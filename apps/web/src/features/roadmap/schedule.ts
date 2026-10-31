@@ -1,15 +1,17 @@
 import { getAcademicRules, type Relation } from "@g13/curriculum";
 import { creditsFor } from "../../courses/course-utils";
-import type { PlannedCourse } from "./planner";
+import type { Activity, PlannedCourse } from "./planner";
 import type { PlanningInput } from "./planning-input";
 
 export const planningLimit = 24;
+export const lastPlanningSemester = 8;
 
 export function scheduleCourses(
   courses: PlannedCourse[],
   relations: Relation[],
   answers: PlanningInput,
   blocked: Set<number>,
+  activities: Activity[] = [],
 ) {
   const rules = getAcademicRules(answers.kurikulum).scheduling;
   const endIds = rules.graduationIds;
@@ -28,7 +30,7 @@ export function scheduleCourses(
       !endIds.includes(item.course.id) &&
       !(item.course.id === rules.practicalWorkId && answers.internship.kind !== "none")
     ) {
-      while (blocked.has(item.semester)) item.semester++;
+      while (item.semester < lastPlanningSemester && blocked.has(item.semester)) item.semester++;
     }
   }
   const fixedSixthTermCredits = courses
@@ -38,11 +40,14 @@ export function scheduleCourses(
     const kknIds = rules.overflowCourseIds;
     for (const item of courses.filter((x) => kknIds.includes(x.course.id) && x.semester === 6)) {
       item.semester = 7;
-      while (blocked.has(item.semester)) item.semester++;
+      while (item.semester < lastPlanningSemester && blocked.has(item.semester)) item.semester++;
     }
   }
   const placed = courses.filter((x) => x.kind === "required" || x.kind === "internship");
   const load = (term: number) =>
+    activities
+      .filter((activity) => activity.semester === term)
+      .reduce((sum, activity) => sum + activity.recommendedCredits, 0) +
     placed
       .filter((x) => x.semester === term)
       .reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
@@ -56,7 +61,7 @@ export function scheduleCourses(
       });
     let term = item.semester;
     while (
-      term < 14 &&
+      term + rules.electiveSemesterStep <= lastPlanningSemester &&
       (blocked.has(term) ||
         load(term) + (creditsFor(item.course) ?? 0) > planningLimit ||
         prereqs.some(({ course, timing }) =>
@@ -64,7 +69,7 @@ export function scheduleCourses(
         ))
     )
       term += rules.electiveSemesterStep;
-    item.semester = term;
+    item.semester = Math.min(term, lastPlanningSemester);
     placed.push(item);
   }
   const proposal = courses.find((x) => x.course.id === proposalId);
@@ -75,12 +80,19 @@ export function scheduleCourses(
         !endIds.includes(x.course.id) &&
         x !== proposal,
     );
-    proposal.semester = Math.max(proposal.semester, ...requirements.map((x) => x.semester));
-    while (blocked.has(proposal.semester)) proposal.semester++;
+    proposal.semester = Math.min(
+      lastPlanningSemester - 1,
+      Math.max(proposal.semester, ...requirements.map((x) => x.semester)),
+    );
+    while (proposal.semester < lastPlanningSemester - 1 && blocked.has(proposal.semester))
+      proposal.semester++;
     for (const item of courses.filter((x) => endIds.includes(x.course.id)))
-      item.semester = Math.max(item.semester, proposal.semester + 1);
+      item.semester = Math.min(
+        lastPlanningSemester,
+        Math.max(item.semester, proposal.semester + 1),
+      );
   }
   for (const item of courses.filter((x) => endIds.includes(x.course.id))) {
-    while (blocked.has(item.semester)) item.semester++;
+    while (item.semester < lastPlanningSemester && blocked.has(item.semester)) item.semester++;
   }
 }

@@ -4,6 +4,7 @@ import { mapCourseState } from "../../graph/map-state";
 import { semesterRelations } from "../../graph/semester-relations";
 import { creditsFor, isCore } from "../../courses/course-utils";
 import { LANE_X, LANE_STEP, type MapNode } from "../../graph/model";
+import { lastPlanningSemester } from "./schedule";
 import type { Activity, Roadmap } from "./planner";
 
 export type ActivityNode = Node<{ activity: Activity }, "activity">;
@@ -25,10 +26,9 @@ export function buildRoadmapGraph({
   choose: (id: string) => void;
   text: (key: string, values?: Record<string, unknown>) => string;
 }) {
-  const last = Math.max(
-    1,
-    ...plan.courses.map((x) => x.semester),
-    ...plan.activities.map((x) => x.semester),
+  const last = Math.min(
+    lastPlanningSemester,
+    Math.max(1, ...plan.courses.map((x) => x.semester), ...plan.activities.map((x) => x.semester)),
   );
   const semesters = Array.from({ length: last }, (_, i) => i + 1);
   const nodes: RoadmapNode[] = [
@@ -48,7 +48,11 @@ export function buildRoadmapGraph({
   );
   for (const semester of semesters) {
     const list = plan.courses.filter((x) => x.semester === semester);
-    const credit = list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
+    const credit =
+      plan.activities
+        .filter((activity) => activity.semester === semester)
+        .reduce((sum, activity) => sum + activity.recommendedCredits, 0) +
+      list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
     const x = LANE_X + (semester - 1) * LANE_STEP;
     nodes.push({
       id: `semester-${semester}`,
@@ -90,6 +94,7 @@ export function buildRoadmapGraph({
     );
     if (semester === target)
       activities.push({
+        recommendedCredits: 0,
         id: "graduation",
         title: text("Target selesai {{v0}} semester", { v0: target }),
         semester,

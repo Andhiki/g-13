@@ -28,10 +28,17 @@ export function findConflicts(plan: Roadmap, answers: PlanningInput, blocked: Se
         v1: curriculum.totalCredits,
       }),
     );
-  const semesters = new Set(plan.courses.map((x) => x.semester));
+  const semesters = new Set([
+    ...plan.courses.map((x) => x.semester),
+    ...plan.activities.map((x) => x.semester),
+  ]);
   for (const term of semesters) {
     const list = plan.courses.filter((x) => x.semester === term);
-    const credits = list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
+    const credits =
+      plan.activities
+        .filter((activity) => activity.semester === term)
+        .reduce((sum, activity) => sum + activity.recommendedCredits, 0) +
+      list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
     if (credits > planningLimit)
       conflicts.push(
         message("Semester {{v0}} memuat {{v1}} SKS, melebihi batas perencanaan {{v2}} SKS.", {
