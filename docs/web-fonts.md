@@ -64,8 +64,8 @@ as harmless rounding. Embedding or idle precaching was not added.
 The full specimen passed with **zero changed pixels** after preserving canonical
 decompositions. It covers normal/italic/nested bold runs at 400/500/600/700,
 ASCII, ligatures, accents, Extended-A, punctuation, code, Chinese, Japanese,
-and Korean. Verification captures and temporary scripts live in
-`.scratch/font-audit/`, outside the committed application and test suite.
+and Korean. Temporary verification captures and scripts were removed after
+the audit; the results are recorded here.
 
 Tool reference: [FontTools subsetting documentation](https://fonttools.readthedocs.io/en/latest/subset/index.html).
 
