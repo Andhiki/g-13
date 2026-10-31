@@ -1,0 +1,62 @@
+{
+  "inter": {
+    "before": {
+      "bytes": 48256,
+      "glyphs": 518,
+      "axes": {
+        "wght": [100.0, 400.0, 900.0]
+      },
+      "features": {
+        "GSUB": ["calt", "ccmp", "dnom", "frac", "locl", "numr", "pnum", "tnum"],
+        "GPOS": ["kern", "mark", "mkmk"]
+      },
+      "hinting": true,
+      "codepoints": 230
+    },
+    "after": {
+      "subset": {
+        "bytes": 31240,
+        "glyphs": 411,
+        "axes": {
+          "wght": [400.0, 400.0, 900.0]
+        },
+        "features": {
+          "GSUB": ["calt", "ccmp", "locl", "tnum"],
+          "GPOS": ["kern", "mark", "mkmk"]
+        },
+        "hinting": true,
+        "codepoints": 207
+      }
+    }
+  },
+  "geist": {
+    "before": {
+      "bytes": 29400,
+      "glyphs": 288,
+      "axes": {
+        "wght": [100.0, 400.0, 900.0]
+      },
+      "features": {
+        "GSUB": ["ccmp", "dnom", "frac", "liga", "locl", "numr", "pnum", "tnum"],
+        "GPOS": ["kern", "mark", "mkmk"]
+      },
+      "hinting": true,
+      "codepoints": 225
+    },
+    "after": {
+      "subset": {
+        "bytes": 19220,
+        "glyphs": 248,
+        "axes": {
+          "wght": [400.0, 400.0, 900.0]
+        },
+        "features": {
+          "GSUB": ["ccmp", "liga", "locl", "tnum"],
+          "GPOS": ["kern", "mark"]
+        },
+        "hinting": true,
+        "codepoints": 208
+      }
+    }
+  }
+}

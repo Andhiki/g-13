@@ -19,6 +19,8 @@ import { ThemeProvider } from "next-themes";
 import { ThemePreferenceProvider, themePreferenceScript } from "../ui/theme-preference";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
+import interFont from "../fonts/inter-subset.woff2?url";
+import geistFont from "../fonts/geist-subset.woff2?url";
 import appStyles from "../styles.css?url";
 import { createI18n, messageNamespace } from "../i18n";
 import { readLanguage } from "../language";
@@ -59,6 +61,8 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
       { title: loaderData?.common["Everything CS UGM"] },
     ],
     links: [
+      { rel: "preload", as: "font", type: "font/woff2", crossOrigin: "anonymous", href: interFont },
+      { rel: "preload", as: "font", type: "font/woff2", crossOrigin: "anonymous", href: geistFont },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: flowStyles },
       { rel: "stylesheet", href: appStyles },

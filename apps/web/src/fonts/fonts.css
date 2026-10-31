@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 900;
+  src: url("./inter-subset.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 900;
+  src: url("./geist-subset.woff2") format("woff2");
+}

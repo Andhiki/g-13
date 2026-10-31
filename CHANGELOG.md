@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memperkecil unduhan font web dengan subset karakter yang dipreload, tanpa mengubah tampilan atau font cadangan.
+
 - Memperjelas ilustrasi halaman tidak ditemukan dan halaman galat dengan peta lipat, rute yang lebih terlihat, dan karakter yang lebih besar. Jalur mengikuti koridor labirin tanpa menembus dinding.
 
 #### Fixed
