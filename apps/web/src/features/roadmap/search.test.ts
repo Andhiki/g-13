@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { validateRoadmapSearch } from "./search";
-import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
+import { answerQuestion, firstUnanswered, questionIndex, quizQuestions } from "./quiz";
 import { buildRoadmap } from "./planner.test-support";
 
 const baseline = {
@@ -10,6 +10,14 @@ const baseline = {
   magang: "tidak",
   hasil: true,
 };
+test("quiz links cannot skip missing answers and can revisit earlier answers", () => {
+  const incomplete = validateRoadmapSearch({ kurikulum: "2026", langkah: "magang" });
+  expect(quizQuestions(incomplete)[questionIndex(quizQuestions(incomplete), incomplete)].key).toBe(
+    "iup",
+  );
+  const revisiting = validateRoadmapSearch({ ...baseline, langkah: "kurikulum" });
+  expect(questionIndex(quizQuestions(revisiting), revisiting)).toBe(0);
+});
 test("URL validation rejects incompatible choices and skips conditional questions", () => {
   const answers = validateRoadmapSearch({
     ...baseline,

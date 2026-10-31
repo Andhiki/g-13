@@ -24,6 +24,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Memperbaiki tautan roadmap yang melewati pertanyaan agar kembali ke jawaban pertama yang belum diisi.
+
 - Merapikan posisi kontrol roadmap di layar desktop dan tablet, serta menyembunyikan kontrol zoom dan pintasan keyboard di layar yang lebih kecil.
 
 - Memperbaiki navigasi semester pada tampilan daftar agar menggulir ke semester yang dipilih.

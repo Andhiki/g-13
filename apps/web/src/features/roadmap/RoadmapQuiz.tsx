@@ -6,7 +6,7 @@ import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
 import { m, useReducedMotion } from "motion/react";
 import { AlignKbd } from "../../ui/kbd";
 import { AlignButton } from "../../ui/button";
-import { answerQuestion, firstUnanswered, quizQuestions } from "./quiz";
+import { answerQuestion, questionIndex, quizQuestions } from "./quiz";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
 
 export function RoadmapQuiz({
@@ -19,12 +19,7 @@ export function RoadmapQuiz({
   const { text } = useLocale("roadmap");
   const reducedMotion = useReducedMotion();
   const questions = quizQuestions(answers);
-  const index = Math.max(
-    0,
-    questions.findIndex(
-      (q) => q.key === (answers.langkah ?? firstUnanswered(answers)?.key ?? "kurikulum"),
-    ),
-  );
+  const index = questionIndex(questions, answers);
   const question = questions[index];
   const selected = answers[question.key];
   const heading = useRef<HTMLHeadingElement>(null);

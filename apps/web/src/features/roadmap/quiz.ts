@@ -106,6 +106,15 @@ export function firstUnanswered(answers: RoadmapSearch) {
   );
 }
 
+export function questionIndex(questions: Question[], answers: RoadmapSearch) {
+  const firstMissing = questions.findIndex(
+    (question) => !question.choices.some((choice) => choice.value === answers[question.key]),
+  );
+  const requested = questions.findIndex((question) => question.key === answers.langkah);
+  if (requested < 0) return firstMissing < 0 ? 0 : firstMissing;
+  return firstMissing < 0 ? requested : Math.min(requested, firstMissing);
+}
+
 export function answerQuestion(
   answers: RoadmapSearch,
   key: AnswerKey,
