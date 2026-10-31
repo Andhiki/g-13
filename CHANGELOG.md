@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-10-31
 
+#### Changed
+
+- Memperjelas ilustrasi halaman tidak ditemukan dan halaman galat dengan peta lipat, rute yang lebih terlihat, dan karakter yang lebih besar. Jalur mengikuti koridor labirin tanpa menembus dinding.
+
 #### Fixed
 
 - Rekomendasi roadmap dibatasi hingga semester 8; beban atau prasyarat yang belum dapat dipenuhi tetap ditandai sebagai konflik.
