@@ -36,22 +36,18 @@ export function ThemeSwitch() {
                 onClick={() => setTheme(mode)}
               >
                 <span
-                  className="flex aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200 bg-(--preview-bg) [--preview-bg:#fff] [--preview-line:#e5e5e5] [--preview-accent:#b75310] data-[scheme=himakom]:data-[mode=light]:[--preview-accent:#6246d6] data-[mode=dark]:[--preview-bg:#171717] data-[mode=dark]:[--preview-line:#353535] data-[mode=dark]:[--preview-accent:#ffa468] data-[scheme=himakom]:data-[mode=dark]:[--preview-bg:#191827] data-[scheme=himakom]:data-[mode=dark]:[--preview-line:#353149] data-[scheme=himakom]:data-[mode=dark]:[--preview-accent:#b5a1ff] data-[mode=system]:[--preview-accent:#737373] data-[mode=system]:bg-[linear-gradient(90deg,#fff_50%,#171717_50%)] [&_i]:mb-[5px] [&_i]:block [&_i]:h-[5px] [&_i]:rounded-[5px] [&_i]:bg-(--preview-line)"
-                  data-mode={mode}
-                  data-scheme={mode === "system" ? undefined : schemes[mode]}
+                  className="relative block aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200"
                   aria-hidden="true"
                 >
-                  <span className="w-[23%] border-r border-(--preview-line) px-[5%] py-[10%]">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className="relative flex-1 px-[7%] py-[15%] [&_i:first-child]:ml-auto [&_i:first-child]:w-[60%] [&_i:first-child]:bg-(--preview-accent) [&_i:nth-child(3)]:w-[60%]">
-                    <i />
-                    <i />
-                    <i />
-                    <span className="absolute right-[7%] bottom-[10%] left-[7%] h-[15%] rounded-[5px] border border-(--preview-line) after:absolute after:inset-y-0.5 after:right-0.5 after:aspect-square after:rounded-full after:bg-(--preview-accent) after:content-['']" />
-                  </span>
+                  <ThemeMap
+                    mode={mode === "dark" ? "dark" : "light"}
+                    scheme={schemes[mode === "dark" ? "dark" : "light"]}
+                  />
+                  {mode === "system" && (
+                    <span className="absolute inset-0 [clip-path:inset(0_0_0_50%)]">
+                      <ThemeMap mode="dark" scheme={schemes.dark} />
+                    </span>
+                  )}
                 </span>
                 <span className="flex items-center justify-center gap-1.5">
                   <Icon className="size-4" aria-hidden="true" />
@@ -109,5 +105,42 @@ export function ThemeSwitch() {
         </div>
       </section>
     </div>
+  );
+}
+
+function ThemeMap({ mode, scheme }: { mode: ThemeMode; scheme: "omahti" | "himakom" }) {
+  return (
+    <span
+      className="relative block h-full overflow-hidden bg-(--map-bg) text-(--map-text) [--map-bg:#fafafa] [--map-surface:#fff] [--map-line:#e5e5e5] [--map-text:#262626] [--map-accent:#b75310] data-[mode=dark]:[--map-bg:#171717] data-[mode=dark]:[--map-surface:#242424] data-[mode=dark]:[--map-line:#404040] data-[mode=dark]:[--map-text:#f5f5f5] data-[mode=dark]:[--map-accent:#ffa468] data-[scheme=himakom]:[--map-accent:#6246d6] data-[scheme=himakom]:data-[mode=dark]:[--map-bg:#191827] data-[scheme=himakom]:data-[mode=dark]:[--map-surface:#252337] data-[scheme=himakom]:data-[mode=dark]:[--map-line:#403b58] data-[scheme=himakom]:data-[mode=dark]:[--map-accent:#b5a1ff]"
+      data-mode={mode}
+      data-scheme={scheme}
+    >
+      <span className="flex h-[22%] items-center gap-[4%] border-b border-(--map-line) bg-(--map-surface) px-[6%]">
+        <span className="grid aspect-square h-[60%] place-items-center rounded-[3px] bg-(--map-accent) text-[clamp(5px,0.7vw,8px)] font-bold text-white">
+          g
+        </span>
+        <span className="text-[clamp(5px,0.75vw,9px)] font-bold tracking-tight">g-13</span>
+        <span className="ml-auto h-[2px] w-[15%] rounded-full bg-(--map-line)" />
+      </span>
+      <span className="absolute top-[32%] left-[6%] text-[clamp(5px,0.7vw,8px)] font-semibold">
+        Peta kurikulum
+      </span>
+      <span className="absolute top-[50%] left-[10%] h-px w-[75%] bg-(--map-line)" />
+      <span className="absolute top-[46%] left-[8%] w-[24%] rounded-[3px] border border-(--map-accent) bg-(--map-surface) p-[3%]">
+        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
+        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
+      </span>
+      <span className="absolute top-[46%] left-[39%] w-[24%] rounded-[3px] border border-(--map-line) bg-(--map-surface) p-[3%]">
+        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
+        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
+      </span>
+      <span className="absolute top-[46%] left-[70%] w-[24%] rounded-[3px] border border-(--map-line) bg-(--map-surface) p-[3%]">
+        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
+        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
+      </span>
+      <span className="absolute right-[6%] bottom-[9%] rounded-full bg-(--map-surface) px-[5%] py-[2%] text-[clamp(5px,0.65vw,7px)] font-semibold shadow-sm">
+        + &nbsp; −
+      </span>
+    </span>
   );
 }
