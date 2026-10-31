@@ -40,7 +40,8 @@ export function planActivities(answers: PlanningInput) {
   }
   if (answers.internship.kind !== "none") {
     const semester = answers.exposure.kind === "internship" ? answers.semesterPaparan : 6;
-    const { option } = answers.internship;
+    const fullSemester =
+      answers.internship.kind === "activity" || answers.internship.option.fullSemester;
     if (answers.exposure.kind !== "internship") {
       activities.push({
         recommendedCredits: 0,
@@ -50,21 +51,20 @@ export function planActivities(answers: PlanningInput) {
         endSemester: semester,
         detail:
           answers.internship.kind === "activity"
-            ? option.detail
+            ? "Rekomendasi 20 SKS Magang. Konversi 4–20 SKS mengikuti persetujuan prodi dan tidak ditentukan oleh durasi; rencana ini mengurangi mata kuliah pilihan."
             : "Dalam semester. Durasi kalender mengikuti panduan dan persetujuan prodi.",
-        fullSemester: option.fullSemester,
+        fullSemester,
       });
     }
-    if (option.fullSemester) blocked.add(semester);
+    if (fullSemester) blocked.add(semester);
     if (answers.internship.kind === "activity") {
       const activity = activities.find(
         (item) => item.id === (answers.exposure.kind === "internship" ? "exposure" : "internship"),
       );
       if (activity) {
-        activity.recommendedCredits = option.fullSemester ? 20 : 4;
-        activity.detail = option.fullSemester
-          ? "Rekomendasi 20 SKS untuk Magang satu semester. Konversi 4–20 SKS mengikuti persetujuan prodi; rencana ini mengurangi mata kuliah pilihan."
-          : "Rekomendasi 4 SKS untuk Magang singkat. Konversi 4–20 SKS mengikuti persetujuan prodi; rencana ini mengurangi mata kuliah pilihan.";
+        activity.recommendedCredits = 20;
+        activity.detail =
+          "Rekomendasi 20 SKS Magang. Konversi 4–20 SKS mengikuti persetujuan prodi dan tidak ditentukan oleh durasi; rencana ini mengurangi mata kuliah pilihan.";
       }
       notes.push(
         "SKS Magang 2021 adalah rekomendasi perencanaan, bukan SKS yang sudah diakui. Konversi 4–20 SKS dan modul pengganti perlu persetujuan prodi.",

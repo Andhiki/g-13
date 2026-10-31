@@ -118,3 +118,18 @@ test("malformed JSON query objects cannot crash curriculum and semester validati
   expect(answers.lulus).toBe(8);
   expect(answers.semesterPaparan).toBe(6);
 });
+
+test("2021 internship completes the quiz without duration and recommends 20 credits", () => {
+  const answers = validateRoadmapSearch({
+    ...baseline,
+    kurikulum: "2021",
+    minat: "Lab Sistem Cerdas",
+    magang: "ya",
+  });
+  expect(quizQuestions(answers).some((question) => question.key === "durasi")).toBe(false);
+  expect(firstUnanswered(answers)).toBeUndefined();
+  expect(
+    buildRoadmap(answers).activities.find((activity) => activity.id === "internship")
+      ?.recommendedCredits,
+  ).toBe(20);
+});

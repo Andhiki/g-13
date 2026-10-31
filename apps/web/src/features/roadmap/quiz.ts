@@ -90,14 +90,12 @@ export function quizQuestions(answers: RoadmapSearch): Question[] {
       },
     ],
   });
-  if (answers.magang === "ya")
+  if (answers.magang === "ya" && rules.internship.kind === "credited")
     questions.push({
       key: "durasi",
       title: "Seberapa lama rencana Magangmu?",
       description:
-        rules.internship.kind === "credited"
-          ? "Pilih tier beban Magang. Durasi kalender mengikuti panduan prodi, bukan konversi bulan otomatis."
-          : "Ini preferensi durasi, bukan keputusan konversi SKS. Modul yang diakui ditentukan bersama prodi.",
+        "Pilih tier beban Magang. Durasi kalender mengikuti panduan prodi, bukan konversi bulan otomatis.",
       choices: rules.internship.options,
     });
   return questions;

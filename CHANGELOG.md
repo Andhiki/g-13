@@ -18,7 +18,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Rekomendasi roadmap dibatasi hingga semester 8; beban atau prasyarat yang belum dapat dipenuhi tetap ditandai sebagai konflik.
 
-- Roadmap kuis 2021 merekomendasikan 4 SKS Magang singkat atau 20 SKS satu semester dan mengurangi beban mata kuliah pilihan sesuai estimasi konversi.
+- Roadmap kuis 2021 merekomendasikan 20 SKS Magang tanpa pertanyaan durasi dan mengurangi beban mata kuliah pilihan sesuai estimasi konversi.
 
 - Slot mata kuliah pilihan selalu ditempatkan di bawah mata kuliah wajib pada setiap semester, baik di peta maupun daftar.
 

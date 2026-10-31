@@ -22,7 +22,6 @@ test("incomplete or incompatible quiz answers cannot enter the planner", () => {
     { ...baseline, iup: "ya", paparan: "invalid" },
     { ...baseline, magang: "ya" },
     { ...baseline, minat: "unknown" },
-    { ...baseline, kurikulum: "2021", minat: "Lab Sistem Cerdas", magang: "ya", durasi: "penuh" },
   ])
     expect(planningInput(validateRoadmapSearch(answers))).toBeNull();
 });

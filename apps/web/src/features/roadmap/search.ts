@@ -32,7 +32,8 @@ export function validateRoadmapSearch(input: Record<string, unknown>): RoadmapSe
         input.minat === "tanpa-minat"))
       ? String(input.minat)
       : undefined;
-  const durations = kurikulum ? getAcademicRules(kurikulum).internship.options : [];
+  const internship = kurikulum ? getAcademicRules(kurikulum).internship : null;
+  const durations = internship?.kind === "credited" ? internship.options : [];
   const durasi =
     magang === "ya" && durations.some((x) => x.value === input.durasi)
       ? String(input.durasi)

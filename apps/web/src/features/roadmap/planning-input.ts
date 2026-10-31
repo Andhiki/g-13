@@ -18,7 +18,7 @@ export type PlanningInput = {
   exposure: { kind: "none" } | { kind: Exposure; option: AcademicOption };
   internship:
     | { kind: "none" }
-    | { kind: "activity"; option: InternshipOption }
+    | { kind: "activity" }
     | { kind: "credited"; option: InternshipOption; course: Course };
 };
 
@@ -51,9 +51,7 @@ export function planningInput(answers: RoadmapSearch): PlanningInput | null {
       if (!course) return null;
       internship = { kind: "credited", option, course };
     } else {
-      const option = rules.internship.options.find((option) => option.value === answers.durasi);
-      if (!option) return null;
-      internship = { kind: "activity", option };
+      internship = { kind: "activity" };
     }
   }
   return {

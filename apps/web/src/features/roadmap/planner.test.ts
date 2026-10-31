@@ -95,7 +95,7 @@ for (const durasi of ["singkat", "semester"]) {
       }),
     );
     expect(plan.activities).toHaveLength(1);
-    expect(plan.activities[0].recommendedCredits).toBe(durasi === "singkat" ? 4 : 20);
+    expect(plan.activities[0].recommendedCredits).toBe(20);
     expect(plan.activities[0].semester).toBe(7);
     expect(plan.totalCredits).toBeGreaterThanOrEqual(144);
   });
