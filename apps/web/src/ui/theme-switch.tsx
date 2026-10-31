@@ -115,31 +115,24 @@ function ThemeMap({ mode, scheme }: { mode: ThemeMode; scheme: "omahti" | "himak
       data-mode={mode}
       data-scheme={scheme}
     >
-      <span className="flex h-[22%] items-center gap-[4%] border-b border-(--map-line) bg-(--map-surface) px-[6%]">
-        <span className="grid aspect-square h-[60%] place-items-center rounded-[3px] bg-(--map-accent) text-[clamp(5px,0.7vw,8px)] font-bold text-white">
-          g
-        </span>
-        <span className="text-[clamp(5px,0.75vw,9px)] font-bold tracking-tight">g-13</span>
-        <span className="ml-auto h-[2px] w-[15%] rounded-full bg-(--map-line)" />
+      <span className="flex h-[23%] items-center gap-[4%] border-b border-(--map-line) bg-(--map-surface) px-[7%]">
+        <span className="size-[7%] min-h-[5px] min-w-[5px] rounded-sm bg-(--map-accent)" />
+        <span className="h-[3px] w-[20%] rounded-full bg-(--map-line)" />
+        <span className="ml-auto h-[3px] w-[12%] rounded-full bg-(--map-line)" />
       </span>
-      <span className="absolute top-[32%] left-[6%] text-[clamp(5px,0.7vw,8px)] font-semibold">
-        Peta kurikulum
+      <span className="absolute top-[39%] left-[8%] h-[3px] w-[26%] rounded-full bg-(--map-text) opacity-40" />
+      <span className="absolute top-[67%] left-[15%] h-px w-[70%] bg-(--map-line)" />
+      <span className="absolute top-[55%] left-[8%] h-[25%] w-[25%] rounded-[4px] border border-(--map-accent) bg-(--map-surface) p-[3%]">
+        <span className="block h-[3px] w-[50%] rounded-full bg-(--map-accent)" />
+        <span className="mt-[4px] block h-[3px] w-[85%] rounded-full bg-(--map-line)" />
       </span>
-      <span className="absolute top-[50%] left-[10%] h-px w-[75%] bg-(--map-line)" />
-      <span className="absolute top-[46%] left-[8%] w-[24%] rounded-[3px] border border-(--map-accent) bg-(--map-surface) p-[3%]">
-        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
-        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
+      <span className="absolute top-[55%] left-[38%] h-[25%] w-[25%] rounded-[4px] border border-(--map-line) bg-(--map-surface) p-[3%]">
+        <span className="block h-[3px] w-[50%] rounded-full bg-(--map-accent) opacity-60" />
+        <span className="mt-[4px] block h-[3px] w-[85%] rounded-full bg-(--map-line)" />
       </span>
-      <span className="absolute top-[46%] left-[39%] w-[24%] rounded-[3px] border border-(--map-line) bg-(--map-surface) p-[3%]">
-        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
-        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
-      </span>
-      <span className="absolute top-[46%] left-[70%] w-[24%] rounded-[3px] border border-(--map-line) bg-(--map-surface) p-[3%]">
-        <span className="block h-[2px] w-[45%] rounded-full bg-(--map-accent)" />
-        <span className="mt-[3px] block h-[2px] w-full rounded-full bg-(--map-line)" />
-      </span>
-      <span className="absolute right-[6%] bottom-[9%] rounded-full bg-(--map-surface) px-[5%] py-[2%] text-[clamp(5px,0.65vw,7px)] font-semibold shadow-sm">
-        + &nbsp; −
+      <span className="absolute top-[55%] left-[68%] h-[25%] w-[25%] rounded-[4px] border border-(--map-line) bg-(--map-surface) p-[3%]">
+        <span className="block h-[3px] w-[50%] rounded-full bg-(--map-accent) opacity-60" />
+        <span className="mt-[4px] block h-[3px] w-[85%] rounded-full bg-(--map-line)" />
       </span>
     </span>
   );
