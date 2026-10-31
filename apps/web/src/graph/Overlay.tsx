@@ -227,9 +227,13 @@ export function Overlay({
         aria-hidden="true"
         className="pointer-events-none fixed inset-x-0 top-[var(--app-header-height)] z-[9] h-28 bg-linear-to-b from-bg-white-0 from-40% via-bg-white-0/90 via-60% to-transparent max-[1100px]:h-32"
       />
-      <div className="pointer-events-none fixed inset-x-4 top-[calc(var(--app-header-height)+14px)] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-[calc(var(--app-header-height)+12px)] max-[1100px]:flex-col max-[1100px]:gap-2 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      <div
+        className={`pointer-events-none fixed inset-x-4 top-[calc(var(--app-header-height)+14px)] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-[calc(var(--app-header-height)+12px)] max-[1100px]:flex-col max-[1100px]:gap-2 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] ${!search && !searchLeading ? "min-[650px]:max-[1100px]:flex-row" : ""}`}
+      >
         <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">{home}</div>
-        <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
+        <div
+          className={`pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full ${!search && !searchLeading ? "min-[650px]:max-[1100px]:absolute min-[650px]:max-[1100px]:left-1/2 min-[650px]:max-[1100px]:w-[360px] min-[650px]:max-[1100px]:-translate-x-1/2" : ""}`}
+        >
           {navigation}
         </div>
         <div className="relative flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
@@ -255,7 +259,7 @@ export function Overlay({
               icon={RiFilter3Line}
               controlsId="desktop-filters"
               shortcut="F"
-              className="top-[52px] max-[1100px]:hidden"
+              className={`${search || searchLeading ? "top-[52px]" : "top-0"} max-[1100px]:hidden`}
               open={filtersOpen}
               onOpenChange={setFiltersOpen}
             >

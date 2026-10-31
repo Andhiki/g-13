@@ -1,3 +1,4 @@
+import { RiRefreshLine } from "@remixicon/react";
 import { mapCourseState } from "../../graph/map-state";
 import { useLocale } from "../../useLocale";
 import { AlignButton } from "../../ui/button";
@@ -58,6 +59,7 @@ function RoadmapTitle({ data }: NodeProps<TitleNode>) {
           className="pointer-events-auto"
           onClick={title?.restart}
         >
+          <RiRefreshLine className="size-5" />
           {text("Coba lagi")}
         </AlignButton.Root>
         {title?.shareLink}

@@ -26,7 +26,10 @@ export function ZoomControls({
   const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   return (
-    <Panel position="bottom-right" className={`m-4! max-[650px]:hidden ${className}`}>
+    <Panel
+      position="bottom-right"
+      className={`m-4! mb-[max(1rem,env(safe-area-inset-bottom))]! max-[1100px]:mb-[max(0.75rem,env(safe-area-inset-bottom))]! max-[1100px]:hidden ${className}`}
+    >
       <div className="flex items-end gap-2">
         <div className="relative size-10">
           <MapControlPanel

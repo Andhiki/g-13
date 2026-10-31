@@ -16,11 +16,17 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menambahkan ikon ulangi pada tombol Coba lagi di roadmap.
+
 - Memperkecil unduhan font web dengan subset karakter yang dipreload, tanpa mengubah tampilan atau font cadangan.
 
 - Memperjelas ilustrasi halaman tidak ditemukan dan halaman galat dengan peta lipat, rute yang lebih terlihat, dan karakter yang lebih besar. Jalur mengikuti koridor labirin tanpa menembus dinding.
 
 #### Fixed
+
+- Merapikan posisi kontrol roadmap di layar desktop dan tablet, serta menyembunyikan kontrol zoom dan pintasan keyboard di layar yang lebih kecil.
+
+- Memperbaiki navigasi semester pada tampilan daftar agar menggulir ke semester yang dipilih.
 
 - Memperbaiki interaksi sentuh, ukuran teks input, area aman header dan drawer, serta warna bilah browser yang mengikuti tema aplikasi di ponsel.
 

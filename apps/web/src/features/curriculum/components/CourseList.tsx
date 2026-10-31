@@ -57,9 +57,7 @@ export function CourseList({
     if (!navigation) return;
     const section = document.getElementById(`semester-${navigation.semester}`);
     if (!section) return;
-    const headerHeight = Number.parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--app-header-height"),
-    );
+    const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
     const top = headerHeight + (window.matchMedia("(width < 1100px)").matches ? 144 : 128);
     const target = Math.max(
       0,
