@@ -120,7 +120,7 @@ export function AppHeader() {
 
   return (
     <AlignModal.Root open={menuOpen} onOpenChange={setMenuOpen}>
-      <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 px-4 text-text-strong-950 sm:gap-6 sm:px-6">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] text-text-strong-950 sm:gap-6 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
         <BrandLogo />
         <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 sm:flex">
           <AlignLinkButton.Root asChild>
@@ -189,10 +189,10 @@ export function AppHeader() {
         showClose={false}
         aria-describedby={undefined}
         overlayClassName="bg-transparent p-0 backdrop-blur-none sm:hidden"
-        className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto rounded-none text-text-strong-950 shadow-none data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none"
+        className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto overscroll-contain rounded-none pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-text-strong-950 shadow-none data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none"
       >
         <AlignModal.Title className="sr-only">{t("navigation.label")}</AlignModal.Title>
-        <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4">
+        <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4 pt-[env(safe-area-inset-top)]">
           <BrandLogo onClick={() => setMenuOpen(false)} />
           <AlignModal.Close asChild>
             <AlignButton.Root

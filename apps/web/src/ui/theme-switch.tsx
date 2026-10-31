@@ -75,7 +75,7 @@ export function ThemeSwitch() {
           {(["omahti", "himakom"] as const).map((scheme) => (
             <div
               key={scheme}
-              className="rounded-[14px] border border-stroke-soft-200 p-3 has-[button:hover]:bg-bg-weak-25"
+              className="rounded-[14px] border border-stroke-soft-200 p-3 hover:bg-bg-weak-25"
             >
               <div className="flex justify-center gap-4 py-2 sm:gap-6">
                 {(["light", "dark"] satisfies ThemeMode[]).map((mode) => {

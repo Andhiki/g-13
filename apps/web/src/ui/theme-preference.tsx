@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type ThemeScheme = "omahti" | "himakom";
@@ -15,6 +16,7 @@ const ThemePreferenceContext = createContext<{
 }>({ schemes: { light: "omahti", dark: "omahti" }, setScheme: () => {} });
 
 export function ThemePreferenceProvider({ children }: { children: ReactNode }) {
+  const { resolvedTheme } = useTheme();
   const [schemes, setSchemes] = useState<Record<ThemeMode, ThemeScheme>>({
     light: "omahti",
     dark: "omahti",
@@ -36,6 +38,14 @@ export function ThemePreferenceProvider({ children }: { children: ReactNode }) {
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
   }, []);
+
+  useEffect(() => {
+    const color =
+      resolvedTheme === "dark" ? (schemes.dark === "himakom" ? "#191827" : "#171717") : "#ffffff";
+    for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+      meta.content = color;
+    }
+  }, [resolvedTheme, schemes]);
 
   function setScheme(mode: ThemeMode, scheme: ThemeScheme) {
     setSchemes((current) => ({ ...current, [mode]: scheme }));

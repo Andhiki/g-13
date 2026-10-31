@@ -3,7 +3,7 @@
 @import "./alignui.css";
 
 :root {
-  --app-header-height: 64px;
+  --app-header-height: calc(64px + env(safe-area-inset-top, 0px));
   --interactive-cursor: default;
 }
 
@@ -17,6 +17,43 @@
     [role="option"]
   ):not(:disabled):not([aria-disabled="true"]):not([data-disabled]) {
   cursor: var(--interactive-cursor);
+}
+
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+:is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
+  touch-action: manipulation;
+}
+
+:is(button, [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+:is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]):not(
+    :disabled
+  ):not([aria-disabled="true"]):not([data-disabled]):active {
+  opacity: 0.7;
+}
+
+@media (any-pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

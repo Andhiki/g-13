@@ -24,7 +24,7 @@ function Content({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Content
           className={twMerge(
-            "fixed inset-y-0 left-0 z-50 w-full max-w-[400px] overflow-y-auto border-r border-stroke-soft-200 bg-bg-white-0",
+            "fixed inset-y-0 left-0 z-50 w-full max-w-[400px] overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] border-r border-stroke-soft-200 bg-bg-white-0",
             drawerMotion,
             "data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
             className,
@@ -47,13 +47,13 @@ function Content({
       >
         <DialogPrimitive.Content
           className={twMerge(
-            "size-full max-w-[400px] overflow-y-auto border-r border-stroke-soft-200 bg-bg-white-0",
+            "size-full max-w-[400px] overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] border-r border-stroke-soft-200 bg-bg-white-0",
             drawerMotion,
             bottom
               ? "data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full"
               : "data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
             bottom &&
-              "fixed inset-x-0 bottom-0 h-auto max-h-[85dvh] max-w-none rounded-t-10 border-t border-r-0",
+              "fixed inset-x-0 bottom-0 h-auto max-h-[85dvh] pt-0 max-w-none rounded-t-10 border-t border-r-0",
             className,
           )}
           {...props}
@@ -75,7 +75,7 @@ function Header({ className, ...props }: ComponentProps<"div">) {
 }
 
 function Body({ className, ...props }: ComponentProps<"div">) {
-  return <div className={twMerge("flex-1", className)} {...props} />;
+  return <div className={twMerge("flex-1 overscroll-contain", className)} {...props} />;
 }
 
 export const AlignDrawer = { Root, Trigger, Close, Content, Header, Title, Description, Body };

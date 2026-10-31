@@ -78,7 +78,9 @@ function FilterDrawer({
             </AlignButton.Root>
           </AlignDrawer.Close>
         </div>
-        <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 pb-5">{children}</div>
+        <div className="flex min-h-0 flex-col gap-5 overflow-y-auto overscroll-contain px-5 pb-5">
+          {children}
+        </div>
       </AlignDrawer.Content>
     </AlignDrawer.Root>
   );
@@ -225,7 +227,7 @@ export function Overlay({
         aria-hidden="true"
         className="pointer-events-none fixed inset-x-0 top-[var(--app-header-height)] z-[9] h-28 bg-linear-to-b from-bg-white-0 from-40% via-bg-white-0/90 via-60% to-transparent max-[1100px]:h-32"
       />
-      <div className="pointer-events-none fixed inset-x-4 top-[calc(var(--app-header-height)+14px)] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-[calc(var(--app-header-height)+12px)] max-[1100px]:flex-col max-[1100px]:gap-2">
+      <div className="pointer-events-none fixed inset-x-4 top-[calc(var(--app-header-height)+14px)] z-10 flex items-start text-text-strong-950 max-[1100px]:inset-x-3 max-[1100px]:top-[calc(var(--app-header-height)+12px)] max-[1100px]:flex-col max-[1100px]:gap-2 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         <div className="min-w-0 flex-1 basis-0 max-[1100px]:hidden">{home}</div>
         <div className="pointer-events-auto flex min-h-10 shrink-0 items-center justify-center max-[1100px]:order-2 max-[1100px]:w-full">
           {navigation}
@@ -263,7 +265,7 @@ export function Overlay({
         </div>
       </div>
       {viewControl && (
-        <div className="fixed right-4 bottom-4 z-10 max-[1100px]:right-3 max-[1100px]:bottom-3">
+        <div className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 max-[1100px]:right-[max(0.75rem,env(safe-area-inset-right))] max-[1100px]:bottom-[max(0.75rem,env(safe-area-inset-bottom))]">
           {viewControl}
         </div>
       )}

@@ -43,9 +43,12 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
   head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#ffffff", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#171717", media: "(prefers-color-scheme: dark)" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
+      },
+      { name: "theme-color", content: "#ffffff" },
       {
         name: "description",
         content:
