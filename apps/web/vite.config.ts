@@ -6,6 +6,8 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
 export default defineConfig({
   server: { host: true },
+  build: { sourcemap: true },
+  environments: { client: { build: { sourcemap: false } } },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
