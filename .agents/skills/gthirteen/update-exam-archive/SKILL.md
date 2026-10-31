@@ -5,7 +5,7 @@ description: Use when importing, scraping, reviewing, or editing Himakom UGM exa
 
 # Update the exam archive
 
-Read [`AGENTS.d/exam-archive-import.md`](../../../../AGENTS.d/exam-archive-import.md) before changing the catalog. It is the source of truth for the importer and catalog fields.
+Read [`docs/exam-archive-import.md`](../../../../docs/exam-archive-import.md) before changing the catalog. It is the source of truth for the importer and catalog fields.
 
 1. Treat `apps/web/src/features/exam-archive/catalog.ts` as a curated catalog. The importer is for the initial import, not recurring synchronization. For routine scrape requests, compare Himakom's course and Drive folder listings with the saved catalog, then apply reviewed additions or corrections directly while preserving human categorization and IDs.
 2. For an initial import, run `bun apps/web/scripts/import-exam-archive.ts /tmp/exam-catalog.ts`. Review `/tmp/exam-catalog.ts.report.json` and the candidate before adopting anything. Unreadable folders or incomplete listings are failures; retain the existing snapshot and investigate them. Review uncertain years and UTS/UAS labels against the source.

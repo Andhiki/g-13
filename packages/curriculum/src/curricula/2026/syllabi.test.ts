@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { getSyllabus } from "@g13/curriculum";
 import syllabi from "./syllabi.json";
-import audit from "../../../../../output/data/ugm-ilkom-2026-syllabus-audit.json";
+import audit from "../../../data/ugm-ilkom-2026-syllabus-audit.json";
 
 test("all 89 numbered 2026 source entries are represented, including the duplicate code", () => {
   const section = audit.numbered_ilkom_section;

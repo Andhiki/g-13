@@ -8,7 +8,7 @@ Synthesize the current conversation and codebase into a spec. Do not interview t
 
 ## Process
 
-1. Read [`AGENTS.d/issue-tracker.md`](../../../../AGENTS.d/issue-tracker.md), [`CONTEXT.md`](../../../../CONTEXT.md), and relevant decisions in `docs/adr/`. Explore the code when needed to describe the current behavior accurately.
+1. Read [`docs/issue-tracker.md`](../../../../docs/issue-tracker.md), [`CONTEXT.md`](../../../../CONTEXT.md), and relevant decisions in `docs/adr/`. Explore the code when needed to describe the current behavior accurately.
 2. Identify the highest useful seam for testing the requested behavior. Prefer existing seams and keep the number of seams small. If the choice would change scope or architecture, present it to the user and resolve it before writing the spec.
 3. Write the spec to `.scratch/<feature-slug>/spec.md` using the template below. The local issue tracker guide is authoritative; do not publish to an external tracker.
 

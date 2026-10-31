@@ -1,6 +1,6 @@
 {
   "source": {
-    "file": "output/sources/fmipa-kurikulum-sarjana-2026.pdf",
+    "file": "packages/curriculum/sources/fmipa-kurikulum-sarjana-2026.pdf",
     "sha256": "ffa6d141c99228b79092d9da647f47e9b37d2966f6aca8ca9567de8b7a506520",
     "syllabus_pdf_ranges": [
       [39, 44],

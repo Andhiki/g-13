@@ -7,7 +7,7 @@ Interview the user about the plan until the goal and important decisions are cle
 
 ## Explore the domain
 
-Before domain exploration, read [`AGENTS.d/domain.md`](../../../../AGENTS.d/domain.md), [`CONTEXT.md`](../../../../CONTEXT.md), and relevant decisions in `docs/adr/`. Use the project's terms and point out conflicts between the user's wording, the glossary, code, and recorded decisions.
+Before domain exploration, read [`docs/domain.md`](../../../../docs/domain.md), [`CONTEXT.md`](../../../../CONTEXT.md), and relevant decisions in `docs/adr/`. Use the project's terms and point out conflicts between the user's wording, the glossary, code, and recorded decisions.
 
 Ask focused questions to resolve vague terms and boundaries. Use concrete scenarios to probe edge cases and relationships. Keep interviewing while answers would change the proposed behavior or its scope.
 

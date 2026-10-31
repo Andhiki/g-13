@@ -1,4 +1,4 @@
-// Adapted from AlignUI Dropdown v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Dropdown v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu";
 import { RiCheckLine } from "@remixicon/react";
 import { twMerge } from "tailwind-merge";

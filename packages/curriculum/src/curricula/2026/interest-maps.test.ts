@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import maps from "../../../../../output/data/ugm-ilkom-2026-interest-maps.json";
+import maps from "../../../data/ugm-ilkom-2026-interest-maps.json";
 import table from "./source.json";
 
 test("six visually transcribed interest maps retain every required-interest table course", () => {

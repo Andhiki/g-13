@@ -4,7 +4,7 @@ A community-built, open-source guide to UGM Computer Science courses. Explore th
 curriculum, see which courses depend on others, and sketch a semester-by-semester
 study plan. A prerequisite is a course you need to take first.
 
-![The g-13 course map showing courses and prerequisite links](assets/readme/peta-kurikulum-preview.png)
+![The g-13 course map showing courses and prerequisite links](docs/assets/peta-kurikulum-preview.png)
 
 Use the course map, search for a course, open its details, or try the roadmap. This
 is a community project. It is **not an official UGM or department service**, and
@@ -56,14 +56,9 @@ across the website, trailer, and shared packages in this repository.
 
 ```mermaid
 flowchart LR
-    command["You run a Bun command"] --> turbo["Turborepo coordinates tasks"]
-    source["packages/curriculum/src<br/>Course data and rules"] --> build["Build the package"]
-    turbo --> build
-    build --> dist["packages/curriculum/dist<br/>JavaScript and types"]
-    dist --> app["apps/web<br/>Course map website"]
-    translations["packages/i18n<br/>Translations"] --> app
-    trailer["apps/trailer<br/>Remotion trailer"]
-    app --> site["Course map website"]
+    curriculum["packages/curriculum<br/>Course data and rules"] --> web["apps/web<br/>Website"]
+    translations["packages/i18n<br/>Translations"] --> web
+    curriculum --> trailer["apps/trailer<br/>Trailer"]
 ```
 
 Each curriculum’s data and rules live in `packages/curriculum/`. Building that
@@ -85,11 +80,11 @@ first. Before `bun run dev`, build the curriculum package once with
 - `packages/i18n/` — shared translations.
 - `apps/trailer/` — Remotion video project.
 - `docs/adr/` — important technical decisions.
-- `AGENTS.d/` — contributor and agent workflows.
+- `docs/` — contributor and agent workflows.
 
 For website changes, start in `apps/web/`. For curriculum changes, start in
 `packages/curriculum/` and include an official source. Read the
-[curriculum import guide](AGENTS.d/curriculum-import.md) before changing
+[curriculum import guide](docs/curriculum-import.md) before changing
 curriculum data.
 
 ## Want to contribute?
@@ -99,7 +94,7 @@ Everyone is welcome, including people who are new to programming.
 - Have an idea or found a problem? [Open an issue](https://github.com/Andhiki/g-13/issues).
 - Have a code or writing change ready? [Send a pull request](https://github.com/Andhiki/g-13/pulls).
 - Before contributing, read the [contribution guide](CONTRIBUTING.md),
-  [AGENTS.d](AGENTS.d/README.md), and [community guidelines](CODE_OF_CONDUCT.md).
+  [AGENTS.md](AGENTS.md), and [community guidelines](CODE_OF_CONDUCT.md).
 
 Before sending a code change, run:
 

@@ -1,4 +1,4 @@
-// Adapted from AlignUI Toast and Alert. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Toast and Alert. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ReactElement } from "react";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import { toast as sonnerToast, Toaster, type ToasterProps } from "sonner";

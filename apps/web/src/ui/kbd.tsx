@@ -1,4 +1,4 @@
-// Adapted from AlignUI Kbd v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Kbd v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
 

@@ -4,8 +4,8 @@ PDF layouts change between editions. Inspect the new official document and produ
 reviewable JSON; there is deliberately no permanent PDF migration or extraction
 script. Temporary extraction tools may help with one document, but do not commit
 them as a reusable importer. The contracts below describe the output, not a PDF
-parser. Retained PDFs live in `output/sources/`; page manifests and audit data
-live in `output/data/`. Keep source facts and unresolved ambiguity with the
+parser. Retained PDFs live in `packages/curriculum/sources/`; page manifests and audit data
+live in `packages/curriculum/data/`. Keep source facts and unresolved ambiguity with the
 edition's structured data rather than separate history documents.
 
 ## Ownership
@@ -20,8 +20,8 @@ edition's structured data rather than separate history documents.
 - `index.ts`: exports a value explicitly typed as `CurriculumSlice`, containing
   `curriculum`, `syllabi`, and `rules`.
 - Tests beside the JSON: source-specific facts, anomalies, and provenance checks.
-- `output/sources/`: original PDFs and source snapshots.
-- `output/data/`: page manifests, visual transcriptions, and independent audit
+- `packages/curriculum/sources/`: original PDFs and source snapshots.
+- `packages/curriculum/data/`: page manifests, visual transcriptions, and independent audit
   reports. These are evidence, not a second runtime dataset.
 
 ## Common output contract

@@ -1,4 +1,4 @@
-// Adapted from AlignUI Button v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Button v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ComponentProps } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { tv, type VariantProps } from "tailwind-variants";

@@ -1,4 +1,4 @@
-// Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import { useLocale } from "../useLocale";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";

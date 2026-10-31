@@ -1,4 +1,4 @@
-/* AlignUI CLI 0.0.19, orange/gray theme. MIT license: ../../../licenses/alignui.txt. */
+/* AlignUI CLI 0.0.19, orange/gray theme. MIT license: ../../../THIRD_PARTY_NOTICES.md. */
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
   --font-sans: "Inter Variable", Arial, sans-serif;

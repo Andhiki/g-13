@@ -1,4 +1,4 @@
-// Adapted from AlignUI Switch v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Switch v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import * as React from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { clsx } from "clsx";

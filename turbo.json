@@ -13,8 +13,7 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/output/data/**"]
+      "dependsOn": ["^build"]
     },
     "lint": {},
     "fmt:check": {},
@@ -25,8 +24,7 @@
       "cache": false
     },
     "@g13/curriculum#test": {
-      "dependsOn": ["build"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/output/data/**"]
+      "dependsOn": ["build"]
     },
     "@g13/curriculum#typecheck": {
       "dependsOn": ["build"]

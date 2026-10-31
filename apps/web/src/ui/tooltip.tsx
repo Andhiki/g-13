@@ -1,4 +1,4 @@
-// Adapted from AlignUI Tooltip v0.0.0. See licenses/alignui.txt.
+// Adapted from AlignUI Tooltip v0.0.0. See THIRD_PARTY_NOTICES.md.
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { tv, type VariantProps } from "tailwind-variants";

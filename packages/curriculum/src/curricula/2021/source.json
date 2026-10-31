@@ -14,7 +14,7 @@
     {
       "id": "pdf_revision_2023",
       "title": "Dokumen Kurikulum Program Sarjana FMIPA UGM Tahun 2021 Revisi 2023",
-      "file": "output/sources/fmipa-kurikulum-sarjana-2021-revisi-2023.pdf",
+      "file": "packages/curriculum/sources/fmipa-kurikulum-sarjana-2021-revisi-2023.pdf",
       "url": "https://simpan.ugm.ac.id/s/3LLHypTUeGoVDGH/download",
       "verified_from": "https://dcse.fmipa.ugm.ac.id/dokumen-akademik/",
       "verification_note": "DIKE UGM Dokumen Akademik links to this curriculum document as the FMIPA 2021 revision 2023.",
@@ -26,7 +26,7 @@
     {
       "id": "departmental_html_snapshot",
       "title": "Matakuliah Program Studi Sarjana Ilmu Komputer",
-      "file": "output/sources/dcse-s1-ilkom-matakuliah-2026-10-22.html",
+      "file": "packages/curriculum/sources/dcse-s1-ilkom-matakuliah-2026-10-22.html",
       "url": "https://dcse.fmipa.ugm.ac.id/s1-ilkom/s1ik-matakuliah/",
       "sha256": "2754fd7398012b60e056a1e90f7f734863d9f72ebbfdaef071261f318ab47e61",
       "size_bytes": 161356,

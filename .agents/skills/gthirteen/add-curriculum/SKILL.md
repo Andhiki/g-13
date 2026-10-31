@@ -5,7 +5,7 @@ description: Use when adding a new official curriculum edition to the curriculum
 
 # Add a curriculum edition
 
-Read [`CONTEXT.md`](../../../../CONTEXT.md), relevant decisions in `docs/adr/`, and [`AGENTS.d/curriculum-import.md`](../../../../AGENTS.d/curriculum-import.md) before editing. Follow its ownership, output contract, academic rules, and add-edition steps.
+Read [`CONTEXT.md`](../../../../CONTEXT.md), relevant decisions in `docs/adr/`, and [`docs/curriculum-import.md`](../../../../docs/curriculum-import.md) before editing. Follow its ownership, output contract, academic rules, and add-edition steps.
 
 1. Establish the official source, edition, page references, and provenance. Inspect the source directly; use temporary extraction tools if useful, but do not commit a reusable PDF extractor.
 2. Add the edition's source data, syllabus records, explicit normalizer, typed slice, academic rules, and source-specific tests under `packages/curriculum/src/curricula/<id>/`.

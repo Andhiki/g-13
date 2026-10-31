@@ -5,7 +5,7 @@ description: Use when changing courses, prerequisites, academic rules, or syllab
 
 # Modify a curriculum edition
 
-Read [`CONTEXT.md`](../../../../CONTEXT.md), the edition's source data and relevant audit records, and [`AGENTS.d/curriculum-import.md`](../../../../AGENTS.d/curriculum-import.md). Check `docs/adr/` for decisions that affect the change and inspect the official source for the affected edition.
+Read [`CONTEXT.md`](../../../../CONTEXT.md), the edition's source data and relevant audit records, and [`docs/curriculum-import.md`](../../../../docs/curriculum-import.md). Check `docs/adr/` for decisions that affect the change and inspect the official source for the affected edition.
 
 1. Identify the exact curriculum edition, course or rule, and source pages. For corrections, record the current and corrected values before editing. If the source is ambiguous or unavailable, preserve the ambiguity and report it instead of inferring an academic rule.
 2. Edit the authoritative source data and the edition's normalizer, syllabus, or rules as needed. Preserve provenance and source fields, stable course IDs, and the common curriculum contract. Add or update source-specific tests for the changed facts.

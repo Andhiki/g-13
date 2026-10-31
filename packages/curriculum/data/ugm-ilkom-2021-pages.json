@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "program": "UGM S1 Ilmu Komputer (Ilkom), Kurikulum 2021 Revisi 2023",
-  "source_pdf": "output/sources/fmipa-kurikulum-sarjana-2021-revisi-2023.pdf",
+  "source_pdf": "packages/curriculum/sources/fmipa-kurikulum-sarjana-2021-revisi-2023.pdf",
   "scope": {
     "printed_pages": [
       213,

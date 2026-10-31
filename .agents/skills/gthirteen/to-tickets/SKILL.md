@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # To tickets
 
-Read [`AGENTS.d/issue-tracker.md`](../../../../AGENTS.d/issue-tracker.md) and [`AGENTS.d/triage-labels.md`](../../../../AGENTS.d/triage-labels.md). This repository uses local Markdown tickets under `.scratch/`.
+Read [`docs/issue-tracker.md`](../../../../docs/issue-tracker.md) and [`docs/triage-labels.md`](../../../../docs/triage-labels.md). This repository uses local Markdown tickets under `.scratch/`.
 
 ## Process
 
@@ -14,7 +14,7 @@ Read [`AGENTS.d/issue-tracker.md`](../../../../AGENTS.d/issue-tracker.md) and [`
 2. Split the work into tracer-bullet tickets. Each ticket should deliver a narrow, complete, observable behavior and fit in a fresh work session. Sequence prerequisites first and list only genuine blockers.
 3. Keep each ticket independently verifiable. Avoid unrelated refactors. For a broad API or data migration, sequence a complete migration without compatibility shims; do not preserve old behavior solely for backward compatibility.
 4. Present the proposed tickets as a numbered list with a title, blockers, delivered behavior, and acceptance criteria. Ask whether the scope, granularity, and dependencies are right. Revise until the user approves the breakdown.
-5. After approval, write one file per ticket in `.scratch/<feature-slug>/issues/`, numbered from `01` in dependency order. Follow the issue-tracker guide and template below. Use `ready-for-agent` for specified tickets, or the appropriate status from `AGENTS.d/triage-labels.md` when they need information or maintainer review.
+5. After approval, write one file per ticket in `.scratch/<feature-slug>/issues/`, numbered from `01` in dependency order. Follow the issue-tracker guide and template below. Use `ready-for-agent` for specified tickets, or the appropriate status from `docs/triage-labels.md` when they need information or maintainer review.
 
 Do not create tickets before the user approves the proposed breakdown. Do not modify a parent spec or ticket while splitting it.
 

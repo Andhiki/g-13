@@ -1,4 +1,4 @@
-// Adapted from AlignUI Drawer v1.2. See docs/adr/0002-alignui-source.md and licenses/alignui.txt.
+// Adapted from AlignUI Drawer v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { twMerge } from "tailwind-merge";
 import type { ComponentProps } from "react";
