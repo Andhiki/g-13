@@ -12,6 +12,16 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-01
+
+#### Changed
+
+- Menyembunyikan pencarian mata kuliah saat membuka folder arsip ujian, serta menjadikan entri arsip sebagai tautan.
+
+#### Fixed
+
+- Menghapus penanda urutan yang tidak sesuai pada daftar arsip ujian.
+
 ### 2026-10-31
 
 #### Changed

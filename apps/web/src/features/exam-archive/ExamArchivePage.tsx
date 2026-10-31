@@ -3,7 +3,6 @@ import { useLocale } from "../../useLocale";
 import { Fragment, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  RiArrowUpLine,
   RiFilePdf2Line,
   RiFileTextLine,
   RiFolder3Line,
@@ -119,27 +118,26 @@ export function ExamArchivePage() {
                 ))}
               </nav>
             </AlignBreadcrumb.Root>
-            <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
-              <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
-              <input
-                type="search"
-                className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-                aria-label={text("Cari mata kuliah")}
-                placeholder={text("Mata kuliah")}
-                value={query}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  if (location.length > 0) openFolder([]);
-                }}
-              />
-            </label>
+            {location.length === 0 && (
+              <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
+                <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
+                <input
+                  type="search"
+                  className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+                  aria-label={text("Cari mata kuliah")}
+                  placeholder={text("Mata kuliah")}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </label>
+            )}
           </div>
           <div
             className="grid shrink-0 grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
             aria-hidden="true"
           >
             <Typography as="span" variant="caption" className="flex items-center gap-1">
-              {text("Nama")} <RiArrowUpLine className="size-3.5" aria-hidden="true" />
+              {text("Nama")}
             </Typography>
             <Typography as="span" variant="caption" className="hidden text-center sm:block">
               {text("Dibuat")}
@@ -170,19 +168,16 @@ export function ExamArchivePage() {
               </Link>
             )}
             {folder.entries.map((entry) => (
-              <button
-                type="button"
+              <Link
                 key={entry.id}
+                to="/exam"
+                search={
+                  entry.kind === "folder"
+                    ? folderSearch(entry.location)
+                    : { ...folderSearch(location), file: entry.paper.id }
+                }
+                resetScroll={false}
                 className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
-                onClick={() => {
-                  if (entry.kind === "folder") openFolder(entry.location);
-                  else {
-                    void navigate({
-                      search: { ...folderSearch(location), file: entry.paper.id },
-                      resetScroll: false,
-                    });
-                  }
-                }}
               >
                 <span className="flex min-w-0 items-center gap-3">
                   {entry.kind === "folder" ? (
@@ -237,7 +232,7 @@ export function ExamArchivePage() {
                 >
                   {entry.kind === "folder" ? text("Folder") : text("Berkas")}
                 </AlignBadge.Root>
-              </button>
+              </Link>
             ))}
             {folder.entries.length === 0 && (
               <Typography role="status" className="px-3 py-16 text-center text-text-sub-600">

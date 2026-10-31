@@ -52,7 +52,7 @@ Press `Ctrl+C` in the terminal to stop the website.
 ## How the project is put together
 
 Bun installs dependencies and runs commands. Turborepo coordinates commands
-across the website and curriculum package in this repository.
+across the website, trailer, and shared packages in this repository.
 
 ```mermaid
 flowchart LR
@@ -60,7 +60,9 @@ flowchart LR
     source["packages/curriculum/src<br/>Course data and rules"] --> build["Build the package"]
     turbo --> build
     build --> dist["packages/curriculum/dist<br/>JavaScript and types"]
-    dist --> app["apps/web<br/>Imports @g13/curriculum"]
+    dist --> app["apps/web<br/>Course map website"]
+    translations["packages/i18n<br/>Translations"] --> app
+    trailer["apps/trailer<br/>Remotion trailer"]
     app --> site["Course map website"]
 ```
 
@@ -80,6 +82,8 @@ first. Before `bun run dev`, build the curriculum package once with
 - `apps/web/src/ui/` — shared buttons, dialogs, and other interface pieces.
 - `packages/curriculum/src/curricula/` — data and rules for each curriculum.
 - `packages/curriculum/src/contracts/` — shared descriptions of the data’s shape.
+- `packages/i18n/` — shared translations.
+- `apps/trailer/` — Remotion video project.
 - `docs/adr/` — important technical decisions.
 - `AGENTS.d/` — contributor and agent workflows.
 

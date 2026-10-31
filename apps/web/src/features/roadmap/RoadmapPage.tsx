@@ -19,9 +19,15 @@ export function RoadmapPage() {
       if (!restored.current) {
         restored.current = true;
         if (!answers.kurikulum) {
-          const stored = JSON.parse(localStorage.getItem("cs-courses:roadmap") ?? "null");
+          let stored: unknown;
+          try {
+            stored = JSON.parse(localStorage.getItem("cs-courses:roadmap") ?? "null");
+          } catch (error) {
+            if (!(error instanceof SyntaxError)) throw error;
+            localStorage.removeItem("cs-courses:roadmap");
+          }
           if (stored && typeof stored === "object" && !Array.isArray(stored)) {
-            const saved = validateRoadmapSearch(stored);
+            const saved = validateRoadmapSearch(Object.fromEntries(Object.entries(stored)));
             if (saved.kurikulum) {
               void navigate({ search: saved, replace: true });
               return;
