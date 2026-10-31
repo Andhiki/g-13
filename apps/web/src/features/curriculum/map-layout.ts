@@ -22,7 +22,11 @@ function shortenConnections(semesters: Map<number, Course[]>, relations: Relatio
     neighbors.set(target, [...(neighbors.get(target) ?? []), source]);
   }
   for (const courses of semesters.values()) {
-    courses.sort((a, b) => Number(neighbors.has(b.id)) - Number(neighbors.has(a.id)));
+    courses.sort(
+      (a, b) =>
+        Number(a.id.startsWith("2021-slot-")) - Number(b.id.startsWith("2021-slot-")) ||
+        Number(neighbors.has(b.id)) - Number(neighbors.has(a.id)),
+    );
     courses.forEach((course, row) => rows.set(course.id, row));
   }
   const distance = (id: string, row: number) =>
@@ -38,6 +42,7 @@ function shortenConnections(semesters: Map<number, Course[]>, relations: Relatio
         for (let b = a + 1; b < courses.length; b++) {
           const first = courses[a],
             second = courses[b];
+          if (first.id.startsWith("2021-slot-") !== second.id.startsWith("2021-slot-")) continue;
           if (
             distance(first.id, b) + distance(second.id, a) >=
             distance(first.id, a) + distance(second.id, b)

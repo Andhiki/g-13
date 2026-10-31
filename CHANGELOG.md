@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Slot mata kuliah pilihan selalu ditempatkan di bawah mata kuliah wajib pada setiap semester, baik di peta maupun daftar.
+
 - Transisi peta menghindari perhitungan jalur tersembunyi setiap frame; perpindahan ke daftar tetap mempertahankan peta dan cache sambil menonaktifkan animasi tersembunyi. Pembaruan hover, zoom, dan pelacakan semester dibatasi pada perubahan yang diperlukan.
 
 - Pratinjau tema terang dan gelap mengikuti pilihan skema warna masing-masing.

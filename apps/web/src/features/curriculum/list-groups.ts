@@ -55,8 +55,10 @@ export function groupCoursesForList(courses: Course[], language: Language = "id"
     });
   }
   for (const section of sections) {
-    section.courses.sort((left, right) =>
-      courseTitle(left, language).localeCompare(courseTitle(right, language), language),
+    section.courses.sort(
+      (left, right) =>
+        Number(left.id.startsWith("2021-slot-")) - Number(right.id.startsWith("2021-slot-")) ||
+        courseTitle(left, language).localeCompare(courseTitle(right, language), language),
     );
   }
   return sections;
