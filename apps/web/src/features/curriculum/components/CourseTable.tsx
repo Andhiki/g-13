@@ -97,7 +97,7 @@ export function CourseTable({
                     </Typography>
                   </div>
                 </AlignTable.Cell>
-                <AlignTable.Cell className="h-10">
+                <AlignTable.Cell className="h-10 max-[640px]:rounded-l-xl">
                   {course.code && (
                     <div className="mt-2 inline-flex items-center gap-1 min-[640px]:hidden">
                       <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
