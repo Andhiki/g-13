@@ -14,7 +14,7 @@ const courseStyles = tv({
     surface:
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:
-      "m-0 line-clamp-2 text-text-strong-950 group-hover:text-text-strong-950 group-focus-within:text-text-strong-950",
+      "m-0 shrink-0 line-clamp-2 text-text-strong-950 group-hover:text-text-strong-950 group-focus-within:text-text-strong-950",
     handle:
       "size-[7px]! border! border-bg-white-0! bg-bg-sub-300! transition-opacity duration-150 motion-reduce:transition-none",
     credit:
@@ -145,7 +145,7 @@ export const CourseNode = memo(function CourseNode({
           variant="label"
           className={styles.title({
             class:
-              "[[data-compact-nodes=true]_&]:line-clamp-3 [[data-compact-nodes=true]_&]:text-[20px] [[data-compact-nodes=true]_&]:leading-[22px]",
+              "[[data-compact-nodes=true]_&]:line-clamp-3 [[data-compact-nodes=true]_&]:text-[20px] [[data-compact-nodes=true]_&]:leading-[1.2]",
           })}
         >
           {courseName(course)}

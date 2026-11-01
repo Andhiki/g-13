@@ -35,6 +35,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Memperbaiki teks mata kuliah yang terpotong dengan ruang baris dan tinggi kartu yang sesuai untuk font, termasuk pada layar ponsel.
 - Menggunakan gulir halus bawaan browser untuk navigasi semester pada tampilan daftar agar animasi tidak bergantung pada pembaruan JavaScript setiap frame.
 - Memperbaiki isi panel filter dan pintasan keyboard yang tertutup latar setelah animasi membuka selesai.
 - Memperbaiki pencarian arsip ujian untuk tanda baca dan huruf yang terlewat dalam nama mata kuliah.
