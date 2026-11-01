@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Menambahkan pintasan / untuk membuka pencarian mata kuliah dari folder mana pun di arsip ujian pada layar besar.
 - Menambahkan pintasan j/k untuk berpindah baris dan - untuk naik satu folder di arsip ujian, serta daftar tips keyboard pada layar besar.
 - Menambahkan navigasi keyboard dengan tombol panah dan Enter pada arsip ujian, termasuk panah kiri untuk naik satu folder dan panah kanan untuk membuka folder atau berkas.
 - Menambahkan pengaturan untuk menonaktifkan efek blur latar belakang.

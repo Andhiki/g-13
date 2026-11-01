@@ -55,23 +55,35 @@ export function ExamArchivePage() {
   const navigate = Route.useNavigate();
   const { location, paper } = resolveArchive(search);
   const [query, setQuery] = useState("");
+  const searchInput = useRef<HTMLInputElement>(null);
+  const focusSearch = useRef(false);
   const list = useRef<HTMLDivElement>(null);
   const focusNextFolder = useRef(false);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
-        !["ArrowDown", "ArrowUp", "j", "k"].includes(event.key) ||
+        !["ArrowDown", "ArrowUp", "j", "k", "/"].includes(event.key) ||
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
         event.shiftKey ||
         paper ||
         !(event.target instanceof HTMLElement) ||
-        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']") ||
-        list.current?.contains(event.target)
+        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']")
       )
         return;
+      if (event.key === "/") {
+        if (!window.matchMedia("(min-width: 640px)").matches) return;
+        event.preventDefault();
+        if (searchInput.current) searchInput.current.focus();
+        else {
+          focusSearch.current = true;
+          void navigate({ search: folderSearch([]), resetScroll: false });
+        }
+        return;
+      }
+      if (list.current?.contains(event.target)) return;
       const first = list.current?.querySelector<HTMLAnchorElement>("a");
       if (first) {
         event.preventDefault();
@@ -80,10 +92,13 @@ export function ExamArchivePage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [paper]);
+  }, [paper, navigate]);
   const locationKey = JSON.stringify(location);
   useLayoutEffect(() => {
-    if (focusNextFolder.current) {
+    if (focusSearch.current) {
+      focusSearch.current = false;
+      searchInput.current?.focus();
+    } else if (focusNextFolder.current) {
       focusNextFolder.current = false;
       (list.current?.querySelector<HTMLAnchorElement>("a") ?? list.current)?.focus();
     }
@@ -127,6 +142,11 @@ export function ExamArchivePage() {
         <div className="mt-8 hidden text-text-sub-600 sm:block">
           <Typography className="mb-2">{text("Tip:")}</Typography>
           <ul className="m-0 list-none space-y-1 p-0">
+            <li>
+              <Typography as="span">
+                <kbd>/</kbd> — {text("Cari mata kuliah")}
+              </Typography>
+            </li>
             <li>
               <Typography as="span">
                 <kbd>j</kbd> / <kbd>↓</kbd> — {text("Ke bawah")}
@@ -185,6 +205,7 @@ export function ExamArchivePage() {
               <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
                 <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
                 <input
+                  ref={searchInput}
                   type="search"
                   className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
                   aria-label={text("Cari mata kuliah")}
