@@ -11,7 +11,7 @@ function Root({ className, children, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     >
-      <span className="text-subheading-2xs">{children}</span>
+      <span className="text-subheading-2xs tabular-nums">{children}</span>
     </div>
   );
 }
