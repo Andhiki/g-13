@@ -40,7 +40,7 @@ export function CourseDetailsPanel({
   const credit = creditsFor(course);
   return (
     <>
-      <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
+      <AlignDrawer.Header className="max-[650px]:touch-none shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
         <div className="min-w-0 flex-1">
           <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
             {course.code || text("Mata kuliah pilihan")}

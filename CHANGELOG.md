@@ -43,6 +43,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Mencegah daftar di belakang detail mata kuliah ikut bergulir saat menyeret judul panel pada Safari iPhone.
+
 - Menunda perubahan tampilan kartu akibat zoom hingga transisi graf dan kamera selesai.
 
 - Menampilkan menu hamburger pada lebar di bawah 768 piksel agar navigasi tidak meluap pada layar kecil.

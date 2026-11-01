@@ -54,15 +54,17 @@ export function CourseSheetHandle({
       if (!active) return;
       const delta = active.y - y;
       if (!active.dragging) {
-        if (Math.abs(delta) < 8) return;
         // Expanded content keeps native scrolling; dragging down takes over only at its top.
         if (
-          (delta > 0 && height === maximum) ||
-          (delta < 0 && (active.scroll?.scrollTop ?? 0) > 0)
+          active.scroll &&
+          ((delta > 0 && height === maximum) || (delta < 0 && active.scroll.scrollTop > 0))
         ) {
           active = null;
           return;
         }
+        // Safari must not start native scrolling before the drag threshold is reached.
+        event.preventDefault();
+        if (Math.abs(delta) < 8) return;
         active.dragging = true;
       }
       event.preventDefault();
