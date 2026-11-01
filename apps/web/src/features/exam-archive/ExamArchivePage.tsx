@@ -140,32 +140,36 @@ export function ExamArchivePage() {
           </time>
           .
         </Typography>
-        <div className="mt-8 hidden text-text-sub-600 sm:block">
+        <div className="mt-8 hidden text-text-sub-600 min-[650px]:block">
           <Typography className="mb-2">{text("Tip:")}</Typography>
           <ul className="m-0 list-none space-y-1 p-0">
             <li>
-              <Typography as="span">
-                <kbd>/</kbd> — {text("Cari mata kuliah")}
+              <Typography as="span" className="flex items-center gap-1.5">
+                <AlignKbd.Root>/</AlignKbd.Root> — {text("Cari mata kuliah")}
               </Typography>
             </li>
             <li>
-              <Typography as="span">
-                <kbd>j</kbd> / <kbd>↓</kbd> — {text("Ke bawah")}
+              <Typography as="span" className="flex items-center gap-1.5">
+                <AlignKbd.Root>j</AlignKbd.Root> / <AlignKbd.Root>↓</AlignKbd.Root> —{" "}
+                {text("Ke bawah")}
               </Typography>
             </li>
             <li>
-              <Typography as="span">
-                <kbd>k</kbd> / <kbd>↑</kbd> — {text("Ke atas")}
+              <Typography as="span" className="flex items-center gap-1.5">
+                <AlignKbd.Root>k</AlignKbd.Root> / <AlignKbd.Root>↑</AlignKbd.Root> —{" "}
+                {text("Ke atas")}
               </Typography>
             </li>
             <li>
-              <Typography as="span">
-                <kbd>Enter</kbd> / <kbd>→</kbd> — {text("Buka folder atau berkas")}
+              <Typography as="span" className="flex items-center gap-1.5">
+                <AlignKbd.Root>Enter</AlignKbd.Root> / <AlignKbd.Root>→</AlignKbd.Root> —{" "}
+                {text("Buka folder atau berkas")}
               </Typography>
             </li>
             <li>
-              <Typography as="span">
-                <kbd>-</kbd> / <kbd>←</kbd> — {text("Naik satu folder")}
+              <Typography as="span" className="flex items-center gap-1.5">
+                <AlignKbd.Root>-</AlignKbd.Root> / <AlignKbd.Root>←</AlignKbd.Root> —{" "}
+                {text("Naik satu folder")}
               </Typography>
             </li>
           </ul>
