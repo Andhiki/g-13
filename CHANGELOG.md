@@ -16,7 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
-- Menambahkan navigasi keyboard dengan tombol panah dan Enter pada arsip ujian.
+- Menambahkan navigasi keyboard dengan tombol panah dan Enter pada arsip ujian, termasuk panah kiri untuk naik satu folder dan panah kanan untuk membuka folder atau berkas.
 - Menambahkan pengaturan untuk menonaktifkan efek blur latar belakang.
 
 #### Changed

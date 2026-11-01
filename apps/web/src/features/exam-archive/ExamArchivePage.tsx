@@ -201,6 +201,21 @@ export function ExamArchivePage() {
             tabIndex={-1}
             aria-label={text("Isi folder")}
             onKeyDown={(event) => {
+              if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+              if (event.key === "ArrowLeft") {
+                if (parent) {
+                  event.preventDefault();
+                  focusNextFolder.current = true;
+                  openFolder(parent.location);
+                }
+                return;
+              }
+              if (event.key === "ArrowRight" && event.target instanceof HTMLAnchorElement) {
+                event.preventDefault();
+                focusNextFolder.current = event.target.dataset.folder === "true";
+                event.target.click();
+                return;
+              }
               if (event.key === "Enter" && event.target instanceof HTMLAnchorElement) {
                 focusNextFolder.current = event.target.dataset.folder === "true";
               }
