@@ -38,6 +38,7 @@ export function ZoomControls({
             icon={RiKeyboardLine}
             controlsId="map-keyboard-shortcuts"
             width={240}
+            anchor="bottom"
             className="bottom-0"
             open={shortcutsOpen}
             onOpenChange={setShortcutsOpen}

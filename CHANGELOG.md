@@ -20,6 +20,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memindahkan judul dan tombol tutup panel pintasan keyboard ke bawah agar tombol tetap di posisi yang sama saat dibuka dan ditutup.
 - Menyederhanakan animasi tombol tampilan dan panel kontrol peta.
 - Menambah jarak antara pilihan warna dan namanya di pengaturan.
 - Memperbarui pratinjau tema dengan tampilan peta kurikulum.

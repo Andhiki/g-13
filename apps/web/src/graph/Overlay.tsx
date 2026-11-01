@@ -95,6 +95,7 @@ export function MapControlPanel({
   controlsId,
   shortcut,
   width = 300,
+  anchor = "top",
   className,
   open,
   onOpenChange,
@@ -107,6 +108,7 @@ export function MapControlPanel({
   controlsId: string;
   shortcut?: string;
   width?: number;
+  anchor?: "top" | "bottom";
   className: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -141,7 +143,9 @@ export function MapControlPanel({
         animate={{
           clipPath: open
             ? "inset(0 0 0 0 round 10px)"
-            : `inset(0 0 calc(100% - 40px) ${width - 40}px round 10px)`,
+            : anchor === "bottom"
+              ? `inset(calc(100% - 40px) 0 0 ${width - 40}px round 10px)`
+              : `inset(0 0 calc(100% - 40px) ${width - 40}px round 10px)`,
         }}
         transition={reducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="absolute inset-0 rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
@@ -151,7 +155,7 @@ export function MapControlPanel({
         variant="neutral"
         mode="ghost"
         size="medium"
-        className="pointer-events-auto absolute right-0 top-0 z-10 size-10 p-2.5"
+        className={`pointer-events-auto absolute right-0 ${anchor === "bottom" ? "bottom-0" : "top-0"} z-10 size-10 p-2.5`}
         aria-label={text(open ? "closeFilter" : "openFilter", {
           name: text(toggleName).toLocaleLowerCase(language),
         })}
@@ -191,7 +195,11 @@ export function MapControlPanel({
         className={`flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
         style={{ width }}
       >
-        <Typography as="h2" variant="label" className="m-0 pr-8">
+        <Typography
+          as="h2"
+          variant="label"
+          className={`m-0 pr-8 ${anchor === "bottom" ? "order-last" : ""}`}
+        >
           {text(title)}
         </Typography>
         {children}
