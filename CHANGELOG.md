@@ -24,6 +24,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menghapus animasi pan dan zoom pembuka pada graf halaman utama agar tampilan langsung berada di posisi awal.
 - Menyembunyikan seluruh petunjuk tombol keyboard pada layar kecil, termasuk panduan di dialog pencarian.
 - Membedakan mata kuliah wajib dengan kartu berbingkai dan mata kuliah pilihan tanpa bingkai, menjaga teks tetap jelas, serta menambahkan sorotan interaksi di luar kartu.
 

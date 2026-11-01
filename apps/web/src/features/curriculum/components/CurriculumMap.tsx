@@ -66,21 +66,16 @@ function ViewportFocus({
         });
       }}
       onOverview={() => {
-        const reducedMotion =
-          !active || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const phone = window.matchMedia(courseLayout.phoneQuery).matches;
         const heading = title.current!;
         const bounds = stage.current!.getBoundingClientRect();
         const left = Math.max(24, bounds.width * 0.075);
         const zoom = Math.min(phone ? 0.8 : 1.2, (bounds.width - left - 24) / heading.offsetWidth);
-        void setViewport(
-          {
-            x: left - (LANE_X + 12) * zoom,
-            y: bounds.height / 3 - heading.offsetTop * zoom,
-            zoom,
-          },
-          { duration: reducedMotion ? 0 : 1000 },
-        );
+        void setViewport({
+          x: left - (LANE_X + 12) * zoom,
+          y: bounds.height / 3 - heading.offsetTop * zoom,
+          zoom,
+        });
       }}
     />
   );
