@@ -1,6 +1,6 @@
 import { PaperPreview } from "./PaperPreview";
 import { useLocale } from "../../useLocale";
-import { Fragment, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   RiFilePdf2Line,
@@ -57,6 +57,30 @@ export function ExamArchivePage() {
   const [query, setQuery] = useState("");
   const list = useRef<HTMLDivElement>(null);
   const focusNextFolder = useRef(false);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        (event.key !== "ArrowDown" && event.key !== "ArrowUp") ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        paper ||
+        !(event.target instanceof HTMLElement) ||
+        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']") ||
+        list.current?.contains(event.target)
+      )
+        return;
+      const first = list.current?.querySelector<HTMLAnchorElement>("a");
+      if (first) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [paper]);
   const locationKey = JSON.stringify(location);
   useLayoutEffect(() => {
     if (focusNextFolder.current) {
@@ -143,7 +167,7 @@ export function ExamArchivePage() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => {
-                    if (event.key === "ArrowDown") {
+                    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                       const first = list.current?.querySelector<HTMLAnchorElement>("a");
                       if (first) {
                         event.preventDefault();
@@ -189,9 +213,7 @@ export function ExamArchivePage() {
               const index = links.findIndex((link) => link === document.activeElement);
               const next =
                 index === -1
-                  ? event.key === "ArrowDown"
-                    ? 0
-                    : links.length - 1
+                  ? 0
                   : Math.max(
                       0,
                       Math.min(links.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)),
@@ -207,7 +229,7 @@ export function ExamArchivePage() {
                 search={folderSearch(parent.location)}
                 resetScroll={false}
                 aria-label={text("Naik satu folder")}
-                className="flex w-full items-center gap-3 border-b border-stroke-soft-200 px-3 py-3 text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
+                className="flex w-full items-center gap-3 border-b border-stroke-soft-200 px-3 py-3 text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-none focus-visible:shadow-[inset_2px_0_0_var(--color-primary-base)]"
               >
                 <RiFolder3Line className="size-5 shrink-0 text-text-sub-600" aria-hidden="true" />
                 <Typography as="span">..</Typography>
@@ -224,7 +246,7 @@ export function ExamArchivePage() {
                     : { ...folderSearch(location), file: entry.paper.id }
                 }
                 resetScroll={false}
-                className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
+                className="grid w-full grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-x-2 rounded-none border-b border-stroke-soft-200 bg-transparent px-3 py-3 text-left text-paragraph-sm text-text-strong-950 transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 focus-visible:outline-none focus-visible:shadow-[inset_2px_0_0_var(--color-primary-base)] sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-x-4"
               >
                 <span className="flex min-w-0 items-center gap-3">
                   {entry.kind === "folder" ? (

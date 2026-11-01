@@ -21,6 +21,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memulai navigasi arsip ujian dari baris pertama saat menekan panah tanpa perlu memfokuskan pencarian, serta menyederhanakan sorotan fokus dengan aksen di kiri.
+
 - Menata ulang arsip ujian dengan judul di samping dan penjelajah berkas setinggi layar.
 - Menambahkan umpan balik saat menekan tombol salin tautan pada pratinjau arsip ujian.
 - Memindahkan judul dan tombol tutup panel pintasan keyboard ke bawah agar tombol tetap di posisi yang sama saat dibuka dan ditutup.
