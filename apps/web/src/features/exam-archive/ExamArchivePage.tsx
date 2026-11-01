@@ -11,6 +11,7 @@ import {
 } from "@remixicon/react";
 import { AlignBreadcrumb } from "../../ui/breadcrumb";
 import { AlignBadge } from "../../ui/badge";
+import { AlignKbd } from "../../ui/kbd";
 import { Typography } from "../../ui/typography";
 import { browseArchive, prepareCourseSearch, resolveArchive } from "./archive";
 import { folderSearch } from "./search";
@@ -222,6 +223,7 @@ export function ExamArchivePage() {
                     }
                   }}
                 />
+                <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
               </label>
             )}
           </div>
