@@ -1,6 +1,6 @@
 import { PaperPreview } from "./PaperPreview";
 import { useLocale } from "../../useLocale";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   RiFilePdf2Line,
@@ -56,6 +56,14 @@ export function ExamArchivePage() {
   const { location, paper } = resolveArchive(search);
   const [query, setQuery] = useState("");
   const list = useRef<HTMLDivElement>(null);
+  const focusNextFolder = useRef(false);
+  const locationKey = JSON.stringify(location);
+  useLayoutEffect(() => {
+    if (focusNextFolder.current) {
+      focusNextFolder.current = false;
+      (list.current?.querySelector<HTMLAnchorElement>("a") ?? list.current)?.focus();
+    }
+  }, [locationKey]);
   const searchIndex = useMemo(
     () => prepareCourseSearch(examArchive, (course) => text(course.name), language),
     [text, language],
@@ -134,6 +142,15 @@ export function ExamArchivePage() {
                   placeholder={text("Mata kuliah")}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowDown") {
+                      const first = list.current?.querySelector<HTMLAnchorElement>("a");
+                      if (first) {
+                        event.preventDefault();
+                        first.focus();
+                      }
+                    }
+                  }}
                 />
               </label>
             )}
@@ -159,10 +176,33 @@ export function ExamArchivePage() {
             ref={list}
             tabIndex={-1}
             aria-label={text("Isi folder")}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && event.target instanceof HTMLAnchorElement) {
+                focusNextFolder.current = event.target.dataset.folder === "true";
+              }
+              if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+              const links = Array.from(
+                event.currentTarget.querySelectorAll<HTMLAnchorElement>("a"),
+              );
+              if (!links.length) return;
+              event.preventDefault();
+              const index = links.findIndex((link) => link === document.activeElement);
+              const next =
+                index === -1
+                  ? event.key === "ArrowDown"
+                    ? 0
+                    : links.length - 1
+                  : Math.max(
+                      0,
+                      Math.min(links.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)),
+                    );
+              links[next]?.focus();
+            }}
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
           >
             {parent && (
               <Link
+                data-folder="true"
                 to="/exam"
                 search={folderSearch(parent.location)}
                 resetScroll={false}
@@ -176,6 +216,7 @@ export function ExamArchivePage() {
             {folder.entries.map((entry) => (
               <Link
                 key={entry.id}
+                data-folder={entry.kind === "folder"}
                 to="/exam"
                 search={
                   entry.kind === "folder"

@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Menambahkan navigasi keyboard dengan tombol panah dan Enter pada arsip ujian.
 - Menambahkan pengaturan untuk menonaktifkan efek blur latar belakang.
 
 #### Changed
@@ -29,6 +30,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menggunakan gulir halus bawaan browser untuk navigasi semester pada tampilan daftar agar animasi tidak bergantung pada pembaruan JavaScript setiap frame.
 - Memperbaiki isi panel filter dan pintasan keyboard yang tertutup latar setelah animasi membuka selesai.
 - Memperbaiki pencarian arsip ujian untuk tanda baca dan huruf yang terlewat dalam nama mata kuliah.
 - Menghapus penanda urutan yang tidak sesuai pada daftar arsip ujian.

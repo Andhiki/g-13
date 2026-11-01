@@ -33,6 +33,7 @@ export function PaperPreview({
     selection: JSON.stringify([...location, paper?.id]),
   });
   const modalTitle = useRef<HTMLHeadingElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
   const links = paper ? paperLinks(paper) : null;
   async function sharePaper() {
     if (await copyLink())
@@ -51,11 +52,14 @@ export function PaperPreview({
         aria-describedby={undefined}
         onOpenAutoFocus={(event) => {
           event.preventDefault();
+          previousFocus.current =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
           modalTitle.current?.focus();
         }}
         onCloseAutoFocus={(event) => {
           event.preventDefault();
-          list.current?.focus();
+          if (previousFocus.current?.isConnected) previousFocus.current.focus();
+          else list.current?.focus();
         }}
       >
         <div className="flex min-w-0 items-center justify-between gap-4 p-4">
