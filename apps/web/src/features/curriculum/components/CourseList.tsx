@@ -1,6 +1,5 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
-import { animate } from "motion/react";
 import { useEffect, useMemo } from "react";
 import type { Course } from "@g13/curriculum";
 import { groupCoursesForList } from "../list-groups";
@@ -66,12 +65,14 @@ export function CourseList({
         document.documentElement.scrollHeight - window.innerHeight,
       ),
     );
-    const animation = animate(window.scrollY, target, {
-      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 0.6,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (value) => window.scrollTo(0, value),
+    window.scrollTo({
+      top: target,
+      left: 0,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
     });
-    const stop = () => animation.stop();
+    const stop = () => window.scrollTo({ top: window.scrollY, behavior: "instant" });
     window.addEventListener("wheel", stop, { passive: true });
     window.addEventListener("touchstart", stop, { passive: true });
     window.addEventListener("keydown", stop);
