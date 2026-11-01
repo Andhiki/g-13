@@ -21,6 +21,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menyembunyikan seluruh petunjuk tombol keyboard pada layar kecil, termasuk panduan di dialog pencarian.
 - Membedakan mata kuliah wajib dengan kartu berbingkai dan mata kuliah pilihan tanpa bingkai, menjaga teks tetap jelas, serta menambahkan sorotan interaksi di luar kartu.
 
 - Mengganti judul panel pemilih kurikulum menjadi “Kurikulum” dan ikonnya menjadi tumpukan lapisan agar mudah dibedakan dari menu di ponsel.
@@ -40,6 +41,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Menyembunyikan pencarian mata kuliah saat membuka folder arsip ujian, serta menjadikan entri arsip sebagai tautan.
 
 #### Fixed
+
+- Menunda perubahan tampilan kartu akibat zoom hingga transisi graf dan kamera selesai.
 
 - Menampilkan menu hamburger pada lebar di bawah 768 piksel agar navigasi tidak meluap pada layar kecil.
 - Memperbaiki teks mata kuliah yang terpotong dengan ruang baris dan tinggi kartu yang sesuai untuk font, termasuk pada layar ponsel.

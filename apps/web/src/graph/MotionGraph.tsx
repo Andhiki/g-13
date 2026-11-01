@@ -97,6 +97,18 @@ export function MotionGraph<N extends Node>({
   const height = useStore((state) => state.height);
   const [displayed, setDisplayed] = useState(nodes);
   const [moving, setMoving] = useState(false);
+  const [viewportMoving, setViewportMoving] = useState(false);
+  const compact = useStore((state) => state.transform[2] < 0.7);
+  useLayoutEffect(() => {
+    if (!element || moving || viewportMoving) return;
+    element.dataset.compactNodes = String(compact);
+  }, [element, compact, moving, viewportMoving]);
+  useLayoutEffect(
+    () => () => {
+      if (element) delete element.dataset.compactNodes;
+    },
+    [element],
+  );
   const current = useRef(displayed);
   const measurements = useRef(new Map<string, Omit<RoutingNode, "id" | "position">>());
   const [routingError, setRoutingError] = useState<Error>();
@@ -329,8 +341,12 @@ export function MotionGraph<N extends Node>({
         <ReactFlow<N, Edge>
           {...props}
           data-graph-active={active}
-          onMoveEnd={onMoveEnd}
+          onMoveEnd={(event, viewport) => {
+            setViewportMoving(false);
+            onMoveEnd?.(event, viewport);
+          }}
           onMoveStart={(event, viewport) => {
+            setViewportMoving(true);
             if (event) cameraMoving.current = false;
             onMoveStart?.(event, viewport);
           }}

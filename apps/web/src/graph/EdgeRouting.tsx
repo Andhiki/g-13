@@ -1,12 +1,5 @@
 import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from "react";
-import {
-  BaseEdge,
-  ReactFlowProvider,
-  useStore,
-  useStoreApi,
-  type Edge,
-  type EdgeProps,
-} from "@xyflow/react";
+import { BaseEdge, ReactFlowProvider, useStoreApi, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import type { RoutingResult } from "./connection-routing.worker";
 import { connectionVisibility } from "./connection-visibility";
@@ -28,23 +21,9 @@ function VisibleConnections({ children }: { children: ReactNode }) {
   );
 }
 
-function ZoomDetail() {
-  const compact = useStore((state) => state.transform[2] < 0.7);
-  const element = useStore((state) => state.domNode);
-  useLayoutEffect(() => {
-    if (!element) return;
-    element.dataset.compactNodes = String(compact);
-    return () => {
-      delete element.dataset.compactNodes;
-    };
-  }, [element, compact]);
-  return null;
-}
-
 export function EdgeRouting({ children }: { children: ReactNode }) {
   return (
     <ReactFlowProvider>
-      <ZoomDetail />
       <VisibleConnections>{children}</VisibleConnections>
     </ReactFlowProvider>
   );
