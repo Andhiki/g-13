@@ -81,12 +81,12 @@ export function ExamArchivePage() {
   };
 
   return (
-    <main className="mx-auto flex h-[calc(100dvh-var(--app-header-height))] max-w-5xl flex-col gap-6 px-0 py-5 text-text-strong-950 sm:px-8 sm:py-8">
-      <header className="shrink-0 space-y-2 px-4 sm:px-0">
-        <Typography as="h1" variant="title">
+    <main className="flex h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950 lg:grid lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)]">
+      <header className="shrink-0 px-5 py-10 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
+        <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
           {text("Arsip Ujian")}
         </Typography>
-        <Typography as="p" variant="paragraph" className="text-text-sub-600">
+        <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
           {text("Provided by")}{" "}
           <a
             href="https://himakom.ugm.ac.id"
@@ -102,7 +102,7 @@ export function ExamArchivePage() {
         </Typography>
       </header>
       <section className="flex min-h-0 flex-1 flex-col" aria-label={text("Penjelajah arsip ujian")}>
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y border-stroke-soft-200 sm:rounded-xl sm:border">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-stroke-soft-200 lg:border-l lg:border-t-0">
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-2">
             <AlignBreadcrumb.Root asChild>
               <nav aria-label={text("Lokasi folder")} className="min-w-0">

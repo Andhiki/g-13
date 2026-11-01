@@ -21,6 +21,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menata ulang arsip ujian dengan judul di samping dan penjelajah berkas setinggi layar.
 - Menambahkan umpan balik saat menekan tombol salin tautan pada pratinjau arsip ujian.
 - Memindahkan judul dan tombol tutup panel pintasan keyboard ke bawah agar tombol tetap di posisi yang sama saat dibuka dan ditutup.
 - Menyederhanakan animasi tombol tampilan dan panel kontrol peta.
