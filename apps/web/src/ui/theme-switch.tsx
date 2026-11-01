@@ -99,7 +99,9 @@ export function ThemeSwitch() {
                   );
                 })}
               </div>
-              <Typography variant="label">{scheme === "omahti" ? "OmahTI" : "HIMAKOM"}</Typography>
+              <Typography variant="label" className="mt-3">
+                {scheme === "omahti" ? "OmahTI" : "HIMAKOM"}
+              </Typography>
             </div>
           ))}
         </div>
