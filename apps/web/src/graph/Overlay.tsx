@@ -192,7 +192,7 @@ export function MapControlPanel({
         initial={false}
         animate={{ opacity: open ? 1 : 0 }}
         transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
-        className={`flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`relative flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
         style={{ width }}
       >
         <Typography
