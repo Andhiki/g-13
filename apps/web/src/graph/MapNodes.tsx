@@ -11,6 +11,8 @@ import type { CourseNodeData, LaneNodeData } from "./model";
 const courseStyles = tv({
   slots: {
     root: "group relative animate-in fade-in-0 transition-opacity duration-150 motion-reduce:animate-none",
+    button:
+      "relative flex w-full cursor-[var(--interactive-cursor)] flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base [[data-compact-nodes=true]_&]:justify-center [[data-compact-nodes=true]_&]:px-3 [[data-compact-nodes=true]_&]:py-2 [[data-compact-nodes=true]_&]:text-center ring-offset-2 ring-offset-bg-white-0 hover:ring-2 hover:ring-stroke-sub-300",
     surface:
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:
@@ -24,28 +26,25 @@ const courseStyles = tv({
     choice: {
       true: {
         surface:
-          "border-[color-mix(in_srgb,var(--color-blue-500)_30%,var(--color-stroke-soft-200))] bg-[color-mix(in_srgb,var(--color-blue-500)_8%,var(--color-bg-white-0))] group-hover:border-[color-mix(in_srgb,var(--color-blue-500)_50%,var(--color-stroke-sub-300))] group-hover:bg-[color-mix(in_srgb,var(--color-blue-500)_13%,var(--color-bg-white-0))]",
-        title: "text-text-strong-950",
-        credit:
-          "bg-[color-mix(in_srgb,var(--color-blue-500)_14%,var(--color-bg-white-0))] group-hover:bg-[color-mix(in_srgb,var(--color-blue-500)_18%,var(--color-bg-white-0))]",
+          "border-transparent bg-bg-weak-50 group-hover:border-transparent group-hover:bg-bg-soft-200",
       },
     },
     state: {
       selected: {
-        surface:
-          "border-primary-base bg-primary-lighter group-hover:border-primary-base group-hover:bg-primary-lighter",
+        button: "ring-2 ring-primary-base hover:ring-primary-base",
+        surface: "bg-primary-lighter group-hover:bg-primary-lighter",
         title: "text-text-strong-950",
         handle: "bg-primary-base!",
         credit:
           "bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-primary-lighter))] group-hover:bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-primary-lighter))]",
       },
       prerequisite: {
-        surface: "border-warning-dark group-hover:border-warning-dark",
+        button: "ring-2 ring-warning-dark hover:ring-warning-dark",
         title: "text-text-strong-950",
         handle: "bg-warning-dark!",
       },
       dependent: {
-        surface: "border-feature-dark group-hover:border-feature-dark",
+        button: "ring-2 ring-feature-dark hover:ring-feature-dark",
         title: "text-text-strong-950",
         handle: "bg-feature-dark!",
       },
@@ -83,12 +82,7 @@ export const CourseNode = memo(function CourseNode({
   return (
     <div
       style={{ width: courseLayout.cardWidth }}
-      className={styles.root({
-        class:
-          choice && !data.state
-            ? "opacity-[0.42] hover:opacity-100 focus-within:opacity-100"
-            : undefined,
-      })}
+      className={styles.root()}
       data-course={course.id}
       data-course-kind={choice ? "choice" : "core"}
       data-course-state={data.state ?? undefined}
@@ -113,7 +107,7 @@ export const CourseNode = memo(function CourseNode({
         data-course-button
         type="button"
         style={{ height: courseLayout.cardHeight }}
-        className="relative flex w-full cursor-[var(--interactive-cursor)] flex-col items-stretch rounded-lg border-0 bg-transparent px-3 pt-[34px] pb-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary-base [[data-compact-nodes=true]_&]:justify-center [[data-compact-nodes=true]_&]:px-3 [[data-compact-nodes=true]_&]:py-2 [[data-compact-nodes=true]_&]:text-center"
+        className={styles.button()}
         onClick={() => data.choose(course.id)}
         aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}
