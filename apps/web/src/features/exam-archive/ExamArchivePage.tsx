@@ -60,6 +60,7 @@ export function ExamArchivePage() {
   const focusSearch = useRef(false);
   const list = useRef<HTMLDivElement>(null);
   const focusNextFolder = useRef(false);
+  const previousLocation = useRef(location);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -96,9 +97,20 @@ export function ExamArchivePage() {
   }, [paper, navigate]);
   const locationKey = JSON.stringify(location);
   useLayoutEffect(() => {
+    const previous = previousLocation.current;
+    previousLocation.current = location;
     if (focusSearch.current) {
       focusSearch.current = false;
       searchInput.current?.focus();
+    } else if (
+      location.length < previous.length &&
+      location.every((segment, index) => segment === previous[index])
+    ) {
+      focusNextFolder.current = false;
+      const childLocationKey = JSON.stringify(previous.slice(0, location.length + 1));
+      const links = Array.from(list.current?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
+      const child = links.find((link) => link.dataset.location === childLocationKey);
+      (child ?? links[0] ?? list.current)?.focus();
     } else if (focusNextFolder.current) {
       focusNextFolder.current = false;
       (list.current?.querySelector<HTMLAnchorElement>("a") ?? list.current)?.focus();
@@ -309,6 +321,7 @@ export function ExamArchivePage() {
               <Link
                 key={entry.id}
                 data-folder={entry.kind === "folder"}
+                data-location={entry.kind === "folder" ? JSON.stringify(entry.location) : undefined}
                 to="/exam"
                 search={
                   entry.kind === "folder"

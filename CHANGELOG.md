@@ -44,6 +44,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Mengembalikan fokus ke folder yang baru ditinggalkan saat naik ke folder induk di arsip ujian, termasuk lewat tombol kembali browser.
 - Mencegah daftar di belakang detail mata kuliah ikut bergulir saat menyeret judul panel pada Safari iPhone.
 
 - Menunda perubahan tampilan kartu akibat zoom hingga transisi graf dan kamera selesai.
