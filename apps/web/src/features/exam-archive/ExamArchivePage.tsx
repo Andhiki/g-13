@@ -61,20 +61,41 @@ export function ExamArchivePage() {
   const list = useRef<HTMLDivElement>(null);
   const focusNextFolder = useRef(false);
   const previousLocation = useRef(location);
+  const locationKey = JSON.stringify(location);
   useEffect(() => {
+    let lastGAt: number | null = null;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
-        !["ArrowDown", "ArrowUp", "j", "k", "/"].includes(event.key) ||
+        !["ArrowDown", "ArrowUp", "j", "k", "/", "g", "G"].includes(event.key) ||
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
-        event.shiftKey ||
+        (event.shiftKey && event.key !== "G") ||
         paper ||
         !(event.target instanceof HTMLElement) ||
         event.target.closest("input, textarea, select, [contenteditable], [role='dialog']")
-      )
+      ) {
+        lastGAt = null;
         return;
+      }
+      if (event.key === "g") {
+        event.preventDefault();
+        if (event.repeat) return;
+        if (lastGAt !== null && event.timeStamp - lastGAt < 1000) {
+          lastGAt = null;
+          list.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+        } else lastGAt = event.timeStamp;
+        return;
+      }
+      lastGAt = null;
+      if (event.key === "G") {
+        event.preventDefault();
+        Array.from(list.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])
+          .at(-1)
+          ?.focus();
+        return;
+      }
       if (event.key === "/") {
         if (!window.matchMedia("(min-width: 640px)").matches) return;
         event.preventDefault();
@@ -94,8 +115,7 @@ export function ExamArchivePage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [paper, navigate]);
-  const locationKey = JSON.stringify(location);
+  }, [paper, navigate, locationKey]);
   useLayoutEffect(() => {
     const previous = previousLocation.current;
     previousLocation.current = location;
@@ -230,6 +250,11 @@ export function ExamArchivePage() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      event.preventDefault();
+                      event.currentTarget.blur();
+                      return;
+                    }
                     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                       const first = list.current?.querySelector<HTMLAnchorElement>("a");
                       if (first) {
@@ -266,15 +291,18 @@ export function ExamArchivePage() {
             aria-label={text("Isi folder")}
             onKeyDown={(event) => {
               if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-              if (event.key === "ArrowLeft" || event.key === "-") {
+              if (["ArrowLeft", "-", "Backspace", "h"].includes(event.key)) {
+                event.preventDefault();
                 if (parent) {
-                  event.preventDefault();
                   focusNextFolder.current = true;
                   openFolder(parent.location);
                 }
                 return;
               }
-              if (event.key === "ArrowRight" && event.target instanceof HTMLAnchorElement) {
+              if (
+                (event.key === "ArrowRight" || event.key === "l") &&
+                event.target instanceof HTMLAnchorElement
+              ) {
                 event.preventDefault();
                 focusNextFolder.current = event.target.dataset.folder === "true";
                 event.target.click();

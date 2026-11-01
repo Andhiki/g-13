@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Menambahkan pintasan gg/G untuk menuju baris pertama/terakhir serta h/l untuk naik/membuka folder di arsip ujian.
 - Menambahkan pintasan / untuk membuka pencarian mata kuliah dari folder mana pun di arsip ujian pada layar besar, beserta petunjuk tombol di kolom pencarian.
 - Menambahkan pintasan j/k untuk berpindah baris dan - untuk naik satu folder di arsip ujian, serta daftar tips keyboard dengan komponen tombol pada layar besar.
 - Menambahkan navigasi keyboard dengan tombol panah dan Enter pada arsip ujian, termasuk panah kiri untuk naik satu folder dan panah kanan untuk membuka folder atau berkas.
@@ -44,6 +45,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Mengaktifkan Backspace untuk naik satu folder dan Escape untuk melepas fokus pencarian di arsip ujian.
 - Mengembalikan fokus ke folder yang baru ditinggalkan saat naik ke folder induk di arsip ujian, termasuk lewat tombol kembali browser.
 - Mencegah daftar di belakang detail mata kuliah ikut bergulir saat menyeret judul panel pada Safari iPhone.
 
