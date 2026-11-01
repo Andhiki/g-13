@@ -1,6 +1,7 @@
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
 import { useMemo, useRef, useState } from "react";
+import { RiSearchLine } from "@remixicon/react";
 import { useKeyboardShortcuts } from "../../../ui/use-keyboard-shortcuts";
 import { AlignButton } from "../../../ui/button";
 import { AlignCommandMenu } from "../../../ui/command-menu";
@@ -43,7 +44,10 @@ export function CourseSearch({
         onClick={() => setOpen(true)}
       >
         <span className="flex-1 text-left">{text("Cari mata kuliah")}</span>
-        <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
+        <RiSearchLine className="size-5 shrink-0 min-[650px]:hidden" aria-hidden="true" />
+        <AlignKbd.Root className="hidden min-[650px]:inline-flex" aria-hidden="true">
+          /
+        </AlignKbd.Root>
       </AlignButton.Root>
       <AlignCommandMenu.Dialog
         open={open}

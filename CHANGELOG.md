@@ -21,6 +21,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengganti petunjuk pintasan pencarian mata kuliah dengan ikon kaca pembesar pada layar kecil.
 - Menggunakan angka dengan lebar seragam pada komponen petunjuk pintasan keyboard.
 - Memulai navigasi arsip ujian dari baris pertama saat menekan panah tanpa perlu memfokuskan pencarian, serta menyederhanakan sorotan fokus dengan aksen di kiri.
 
