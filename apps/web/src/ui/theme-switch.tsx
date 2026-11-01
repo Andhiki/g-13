@@ -4,6 +4,7 @@ import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
 import { useThemePreference, type ThemeMode } from "./theme-preference";
 import { Typography } from "./typography";
 import { useTranslation } from "react-i18next";
+import { AlignButton } from "./button";
 
 export function ThemeSwitch() {
   const { t } = useTranslation();
@@ -27,16 +28,17 @@ export function ThemeSwitch() {
             const Icon =
               mode === "system" ? RiComputerLine : mode === "light" ? RiSunLine : RiMoonLine;
             return (
-              <button
+              <AlignButton.Root
                 key={mode}
-                type="button"
-                className="grid gap-2.5 rounded-[14px] border border-stroke-soft-200 px-2 pt-2 pb-3 text-[13px] font-medium text-text-sub-600 hover:bg-bg-weak-25 focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-primary-base aria-pressed:border-primary-base aria-pressed:bg-primary-alpha-10 aria-pressed:text-text-strong-950 aria-pressed:shadow-[0_0_0_2px_var(--color-primary-base)]"
+                variant="neutral"
+                mode="stroke"
+                className="h-11 gap-1.5 px-2 aria-pressed:bg-primary-alpha-10 aria-pressed:text-text-strong-950 aria-pressed:ring-primary-base sm:grid sm:h-auto sm:justify-normal sm:gap-2.5 sm:rounded-[14px] sm:pt-2 sm:pb-3 sm:text-[13px] sm:aria-pressed:shadow-[0_0_0_2px_var(--color-primary-base)]"
                 aria-pressed={mounted && theme === mode}
                 disabled={!mounted}
                 onClick={() => setTheme(mode)}
               >
                 <span
-                  className="relative block aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200"
+                  className="relative hidden aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200 sm:block"
                   aria-hidden="true"
                 >
                   <ThemeMap
@@ -53,7 +55,7 @@ export function ThemeSwitch() {
                   <Icon className="size-4" aria-hidden="true" />
                   {t(`settings.${mode}`)}
                 </span>
-              </button>
+              </AlignButton.Root>
             );
           })}
         </div>
@@ -73,7 +75,7 @@ export function ThemeSwitch() {
               key={scheme}
               className="rounded-[14px] border border-stroke-soft-200 p-3 hover:bg-bg-weak-25"
             >
-              <div className="flex justify-center gap-4 py-2 sm:gap-6">
+              <div className="flex justify-center gap-6 py-2 sm:gap-8">
                 {(["light", "dark"] satisfies ThemeMode[]).map((mode) => {
                   const Icon = mode === "light" ? RiSunLine : RiMoonLine;
                   const selected = schemes[mode] === scheme;
