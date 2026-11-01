@@ -24,6 +24,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mempercepat animasi buka dan tutup panel detail mata kuliah dari 400 ms menjadi 200 ms.
+
 - Mengganti kartu tema dengan pilihan ikon sistem, terang, dan gelap dalam kontrol bersegmen yang ringkas.
 - Merapikan dialog pengaturan dengan kelompok bahasa, tampilan, dan interaksi, hierarki teks yang konsisten, serta pilihan warna terang dan gelap yang lebih jelas.
 - Menghapus animasi pan dan zoom pembuka pada graf halaman utama agar tampilan langsung berada di posisi awal.
