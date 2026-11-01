@@ -145,6 +145,12 @@ function RootDocument({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themePreferenceScript }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(localStorage.getItem("g13-blur")==="off")document.documentElement.setAttribute("data-no-blur","")}catch{}',
+          }}
+        />
       </head>
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <I18nextProvider i18n={i18n}>

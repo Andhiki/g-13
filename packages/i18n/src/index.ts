@@ -23,6 +23,7 @@ const resourcesData = {
       settings: {
         title: "Pengaturan",
         appearance: "Tampilan",
+        blur: "Efek blur latar belakang",
         behaviour: "Perilaku",
         language: "Bahasa",
         theme: "Tema",
@@ -69,6 +70,7 @@ const resourcesData = {
       settings: {
         title: "Settings",
         appearance: "Appearance",
+        blur: "Background blur",
         behaviour: "Behaviour",
         language: "Language",
         theme: "Theme",

@@ -73,6 +73,10 @@ html {
   }
 }
 
+html[data-no-blur] .backdrop-blur-\[10px\] {
+  backdrop-filter: none;
+}
+
 html[data-light-theme="himakom"]:not(.dark) {
   --color-primary-dark: #292451;
   --color-primary-darker: #4532a6;

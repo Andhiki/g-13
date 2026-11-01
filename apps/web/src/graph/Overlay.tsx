@@ -130,21 +130,28 @@ export function MapControlPanel({
   }, [open, onOpenChange]);
 
   return (
-    <m.section
-      initial={false}
-      animate={{ width: open ? width : 40, height: open ? "auto" : 40 }}
-      transition={
-        reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
-      }
-      className={`pointer-events-auto absolute right-0 z-20 overflow-hidden rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 ${className}`}
+    <section
+      className={`pointer-events-none absolute right-0 z-20 ${className}`}
+      style={{ width }}
       aria-label={text(label)}
     >
+      <m.div
+        aria-hidden="true"
+        initial={false}
+        animate={{
+          clipPath: open
+            ? "inset(0 0 0 0 round 10px)"
+            : `inset(0 0 calc(100% - 40px) ${width - 40}px round 10px)`,
+        }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+        className="absolute inset-0 rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
+      />
       <AlignButton.Root
         ref={toggle}
         variant="neutral"
         mode="ghost"
         size="medium"
-        className="absolute right-0 top-0 z-10 size-10 p-2.5"
+        className="pointer-events-auto absolute right-0 top-0 z-10 size-10 p-2.5"
         aria-label={text(open ? "closeFilter" : "openFilter", {
           name: text(toggleName).toLocaleLowerCase(language),
         })}
@@ -162,10 +169,10 @@ export function MapControlPanel({
             initial={false}
             animate={{
               opacity: active ? 1 : 0,
-              scale: active ? 1 : 0.25,
+              scale: active ? 1 : 0.9,
             }}
             transition={
-              reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
+              reducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }
             }
             className="absolute flex size-5 items-center justify-center"
             aria-hidden="true"
@@ -181,7 +188,7 @@ export function MapControlPanel({
         initial={false}
         animate={{ opacity: open ? 1 : 0 }}
         transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
-        className="flex flex-col gap-3 p-4"
+        className={`flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
         style={{ width }}
       >
         <Typography as="h2" variant="label" className="m-0 pr-8">
@@ -189,7 +196,7 @@ export function MapControlPanel({
         </Typography>
         {children}
       </m.div>
-    </m.section>
+    </section>
   );
 }
 

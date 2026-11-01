@@ -15,6 +15,20 @@ export function Settings() {
   useEffect(() => setMounted(true), []);
   const { t } = useTranslation();
   const { cursor, setCursor } = useCursorPreference();
+  const [blur, setBlur] = useState(true);
+  useEffect(() => {
+    setBlur(!document.documentElement.hasAttribute("data-no-blur"));
+  }, []);
+
+  function changeBlur(enabled: boolean) {
+    setBlur(enabled);
+    document.documentElement.toggleAttribute("data-no-blur", !enabled);
+    try {
+      localStorage.setItem("g13-blur", enabled ? "on" : "off");
+    } catch {
+      // The preference still applies for this session.
+    }
+  }
 
   return (
     <AlignModal.Root>
@@ -52,6 +66,12 @@ export function Settings() {
               <LanguageSwitch />
             </div>
             <ThemeSwitch />
+            <div className="flex min-h-7 items-center justify-between gap-4">
+              <Typography as="label" htmlFor="backdrop-blur" variant="labelSmall">
+                {t("settings.blur")}
+              </Typography>
+              <Switch.Root id="backdrop-blur" checked={blur} onCheckedChange={changeBlur} />
+            </div>
           </section>
 
           <section aria-labelledby="settings-behaviour" className="space-y-1">

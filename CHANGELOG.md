@@ -14,8 +14,13 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-01
 
+#### Added
+
+- Menambahkan pengaturan untuk menonaktifkan efek blur latar belakang.
+
 #### Changed
 
+- Menyederhanakan animasi tombol tampilan dan panel kontrol peta.
 - Menambah jarak antara pilihan warna dan namanya di pengaturan.
 - Memperbarui pratinjau tema dengan tampilan peta kurikulum.
 - Mengurutkan hasil pencarian arsip berdasarkan kecocokan dan mendukung singkatan serta salah ketik saat mengetik.
