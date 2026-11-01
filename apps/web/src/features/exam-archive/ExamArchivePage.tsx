@@ -61,7 +61,7 @@ export function ExamArchivePage() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
-        (event.key !== "ArrowDown" && event.key !== "ArrowUp") ||
+        !["ArrowDown", "ArrowUp", "j", "k"].includes(event.key) ||
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
@@ -124,6 +124,31 @@ export function ExamArchivePage() {
           </time>
           .
         </Typography>
+        <div className="mt-8 hidden text-text-sub-600 sm:block">
+          <Typography className="mb-2">{text("Tip:")}</Typography>
+          <ul className="m-0 list-none space-y-1 p-0">
+            <li>
+              <Typography as="span">
+                <kbd>j</kbd> / <kbd>↓</kbd> — {text("Ke bawah")}
+              </Typography>
+            </li>
+            <li>
+              <Typography as="span">
+                <kbd>k</kbd> / <kbd>↑</kbd> — {text("Ke atas")}
+              </Typography>
+            </li>
+            <li>
+              <Typography as="span">
+                <kbd>Enter</kbd> / <kbd>→</kbd> — {text("Buka folder atau berkas")}
+              </Typography>
+            </li>
+            <li>
+              <Typography as="span">
+                <kbd>-</kbd> / <kbd>←</kbd> — {text("Naik satu folder")}
+              </Typography>
+            </li>
+          </ul>
+        </div>
       </header>
       <section className="flex min-h-0 flex-1 flex-col" aria-label={text("Penjelajah arsip ujian")}>
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-stroke-soft-200 lg:border-l lg:border-t-0">
@@ -202,7 +227,7 @@ export function ExamArchivePage() {
             aria-label={text("Isi folder")}
             onKeyDown={(event) => {
               if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-              if (event.key === "ArrowLeft") {
+              if (event.key === "ArrowLeft" || event.key === "-") {
                 if (parent) {
                   event.preventDefault();
                   focusNextFolder.current = true;
@@ -219,7 +244,7 @@ export function ExamArchivePage() {
               if (event.key === "Enter" && event.target instanceof HTMLAnchorElement) {
                 focusNextFolder.current = event.target.dataset.folder === "true";
               }
-              if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+              if (!["ArrowDown", "ArrowUp", "j", "k"].includes(event.key)) return;
               const links = Array.from(
                 event.currentTarget.querySelectorAll<HTMLAnchorElement>("a"),
               );
@@ -231,7 +256,10 @@ export function ExamArchivePage() {
                   ? 0
                   : Math.max(
                       0,
-                      Math.min(links.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)),
+                      Math.min(
+                        links.length - 1,
+                        index + (event.key === "ArrowDown" || event.key === "j" ? 1 : -1),
+                      ),
                     );
               links[next]?.focus();
             }}
