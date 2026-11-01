@@ -2,7 +2,7 @@ import { useLocale } from "../useLocale";
 import { Typography } from "../ui/typography";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
-import { RiCloseLine, RiFilter3Line } from "@remixicon/react";
+import { RiCloseLine, RiStackLine } from "@remixicon/react";
 import { AlignButton } from "../ui/button";
 import { AlignDrawer } from "../ui/drawer";
 import { useKeyboardShortcuts } from "../ui/use-keyboard-shortcuts";
@@ -15,24 +15,32 @@ function subscribeToCompactControls(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
-type FilterCopy = { title: string; description: string };
-const defaultFilterCopy: FilterCopy = {
-  title: "Filter kurikulum",
+type PanelCopy = {
+  title: string;
+  description: string;
+  openLabel: string;
+  icon: typeof RiStackLine;
+};
+const defaultPanelCopy: PanelCopy = {
+  title: "Kurikulum",
+  openLabel: "Pilih kurikulum",
+  icon: RiStackLine,
   description: "Pilih versi kurikulum.",
 };
 
-function FilterDrawer({
+function MapControlDrawer({
   children,
   copy,
   open,
   onOpenChange,
 }: {
   children: ReactNode;
-  copy: FilterCopy;
+  copy: PanelCopy;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const { text, language } = useLocale();
+  const Icon = copy.icon;
   return (
     <AlignDrawer.Root open={open} onOpenChange={onOpenChange}>
       <AlignDrawer.Trigger asChild>
@@ -41,13 +49,12 @@ function FilterDrawer({
           mode="stroke"
           size="medium"
           className="size-10 p-2.5"
-          aria-label={text(open ? "closeFilter" : "openFilter", {
-            name: text(copy.title).toLocaleLowerCase(language),
-          })}
+          aria-label={text(copy.openLabel)}
+          title={text(copy.openLabel)}
           aria-expanded={open}
           aria-keyshortcuts="F"
         >
-          <RiFilter3Line className="size-5" aria-hidden="true" />
+          <Icon className="size-5" aria-hidden="true" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
       <AlignDrawer.Content side="bottom">
@@ -70,7 +77,7 @@ function FilterDrawer({
               mode="ghost"
               size="medium"
               className="size-10 shrink-0 p-2.5"
-              aria-label={text("closeFilter", {
+              aria-label={text("closePanel", {
                 name: text(copy.title).toLocaleLowerCase(language),
               })}
             >
@@ -90,7 +97,7 @@ export function MapControlPanel({
   children,
   label,
   title,
-  toggleName = title,
+  openLabel,
   icon: Icon,
   controlsId,
   shortcut,
@@ -103,8 +110,8 @@ export function MapControlPanel({
   children: ReactNode;
   label: string;
   title: string;
-  toggleName?: string;
-  icon: typeof RiFilter3Line;
+  openLabel?: string;
+  icon: typeof RiStackLine;
   controlsId: string;
   shortcut?: string;
   width?: number;
@@ -156,9 +163,14 @@ export function MapControlPanel({
         mode="ghost"
         size="medium"
         className={`pointer-events-auto absolute right-0 ${anchor === "bottom" ? "bottom-0" : "top-0"} z-10 size-10 p-2.5`}
-        aria-label={text(open ? "closeFilter" : "openFilter", {
-          name: text(toggleName).toLocaleLowerCase(language),
-        })}
+        aria-label={
+          !open && openLabel
+            ? text(openLabel)
+            : text(open ? "closePanel" : "openPanel", {
+                name: text(title).toLocaleLowerCase(language),
+              })
+        }
+        title={!open && openLabel ? text(openLabel) : undefined}
         aria-expanded={open}
         aria-controls={controlsId}
         aria-keyshortcuts={shortcut}
@@ -216,7 +228,7 @@ export function Overlay({
   children,
   controlsLabel,
   home,
-  filterCopy = defaultFilterCopy,
+  panelCopy = defaultPanelCopy,
 }: {
   navigation: ReactNode;
   search: ReactNode;
@@ -225,10 +237,10 @@ export function Overlay({
   children: ReactNode;
   controlsLabel: string;
   home?: ReactNode;
-  filterCopy?: FilterCopy;
+  panelCopy?: PanelCopy;
 }) {
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  useKeyboardShortcuts({ f: () => setFiltersOpen((open) => !open) });
+  const [panelOpen, setPanelOpen] = useState(false);
+  useKeyboardShortcuts({ f: () => setPanelOpen((open) => !open) });
 
   const compact = useSyncExternalStore(
     subscribeToCompactControls,
@@ -257,26 +269,26 @@ export function Overlay({
             {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
             <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
             <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
-              <FilterDrawer
-                copy={filterCopy}
-                open={compact && filtersOpen}
-                onOpenChange={setFiltersOpen}
+              <MapControlDrawer
+                copy={panelCopy}
+                open={compact && panelOpen}
+                onOpenChange={setPanelOpen}
               >
                 {children}
-              </FilterDrawer>
+              </MapControlDrawer>
             </div>
           </div>
           {!compact && (
             <MapControlPanel
               label={controlsLabel}
-              title="Filter"
-              toggleName={filterCopy.title}
-              icon={RiFilter3Line}
-              controlsId="desktop-filters"
+              title={panelCopy.title}
+              openLabel={panelCopy.openLabel}
+              icon={panelCopy.icon}
+              controlsId="desktop-map-controls"
               shortcut="F"
               className={`${search || searchLeading ? "top-[52px]" : "top-0"} max-[1100px]:hidden`}
-              open={filtersOpen}
-              onOpenChange={setFiltersOpen}
+              open={panelOpen}
+              onOpenChange={setPanelOpen}
             >
               {children}
             </MapControlPanel>

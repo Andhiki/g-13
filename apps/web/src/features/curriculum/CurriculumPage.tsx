@@ -52,7 +52,7 @@ export function CurriculumPage() {
       }
     >
       <Overlay
-        controlsLabel={text("Filter peta kurikulum")}
+        controlsLabel={text("Kurikulum")}
         navigation={
           <SemesterFilter
             visible={view === "map" && selected ? [] : visibleSemesters}

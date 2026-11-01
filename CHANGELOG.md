@@ -21,6 +21,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Membedakan mata kuliah wajib dengan kartu berbingkai dan mata kuliah pilihan tanpa bingkai, menjaga teks tetap jelas, serta menambahkan sorotan interaksi di luar kartu.
+
+- Mengganti judul panel pemilih kurikulum menjadi “Kurikulum” dan ikonnya menjadi tumpukan lapisan agar mudah dibedakan dari menu di ponsel.
+
 - Menyederhanakan pilihan tema menjadi grup tombol pada layar kecil dan menambah jarak antara lingkaran skema warna terang dan gelap.
 - Mengganti petunjuk pintasan pencarian mata kuliah dengan ikon kaca pembesar pada layar kecil.
 - Menggunakan angka dengan lebar seragam pada komponen petunjuk pintasan keyboard.

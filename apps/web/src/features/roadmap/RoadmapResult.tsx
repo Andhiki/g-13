@@ -4,7 +4,7 @@ import { getCurriculum } from "@g13/curriculum";
 import { Typography } from "../../ui/typography";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiFilter3Line } from "@remixicon/react";
 import { Overlay } from "../../graph/Overlay";
 import { SemesterFilter } from "../../graph/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
@@ -112,8 +112,10 @@ export function RoadmapResult({
       </main>
       <Overlay
         controlsLabel={text("Filter roadmap")}
-        filterCopy={{
+        panelCopy={{
           title: text("Filter roadmap"),
+          openLabel: text("Buka filter roadmap"),
+          icon: RiFilter3Line,
           description: text("Bandingkan target selesai dan waktu kegiatan."),
         }}
         home={

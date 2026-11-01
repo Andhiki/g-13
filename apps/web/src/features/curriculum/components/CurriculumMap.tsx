@@ -271,7 +271,7 @@ export function CurriculumMap({
         <ZoomControls
           active={active}
           shortcuts={[
-            { key: "f", description: "Buka/tutup filter" },
+            { key: "f", description: "Buka/tutup pilihan kurikulum" },
             { key: "v", description: "Ganti tampilan" },
             { key: "/", description: "Cari mata kuliah" },
             { key: "d", description: "Ganti tema" },
