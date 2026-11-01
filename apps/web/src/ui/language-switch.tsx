@@ -5,6 +5,7 @@ import { loadMessages } from "@g13/i18n/messages";
 import { useTranslation } from "react-i18next";
 import { messageNamespace } from "../i18n";
 import * as SegmentedControl from "./segmented-control";
+import { Typography } from "./typography";
 import { toast } from "./toast";
 
 export function LanguageSwitch() {
@@ -41,7 +42,7 @@ export function LanguageSwitch() {
 
   return (
     <SegmentedControl.Root
-      className="w-28 shrink-0"
+      className="shrink-0"
       activationMode="manual"
       value={language}
       onValueChange={(value) => {
@@ -56,7 +57,9 @@ export function LanguageSwitch() {
           disabled={pending}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
-          EN
+          <Typography as="span" variant="label">
+            English
+          </Typography>
         </SegmentedControl.Trigger>
         <SegmentedControl.Trigger
           value="id"
@@ -65,7 +68,9 @@ export function LanguageSwitch() {
           disabled={pending}
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
-          ID
+          <Typography as="span" variant="label">
+            Bahasa Indonesia
+          </Typography>
         </SegmentedControl.Trigger>
       </SegmentedControl.List>
     </SegmentedControl.Root>

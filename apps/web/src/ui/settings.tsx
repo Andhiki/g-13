@@ -45,41 +45,50 @@ export function Settings() {
       </AlignModal.Trigger>
       <AlignModal.Content
         aria-describedby={undefined}
-        className="max-w-[640px] max-h-[calc(100dvh-2rem)] overflow-y-auto"
+        className="flex max-w-[640px] max-h-[calc(100dvh-2rem)] flex-col overflow-hidden"
       >
-        <div className="border-b border-stroke-soft-200 px-4 py-3 pr-12">
+        <div className="shrink-0 border-b border-stroke-soft-200 px-5 py-4 pr-14">
           <AlignModal.Title asChild>
-            <Typography as="h2" variant="subtitle2">
+            <Typography as="h2" variant="subtitle1">
               {t("settings.title")}
             </Typography>
           </AlignModal.Title>
         </div>
-        <div className="space-y-5 px-5 py-4">
-          <section aria-labelledby="settings-appearance" className="space-y-4">
-            <Typography as="h3" id="settings-appearance" variant="label">
+        <div className="min-h-0 space-y-6 overflow-y-auto px-5 py-5">
+          <section
+            aria-labelledby="settings-language"
+            className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center"
+          >
+            <Typography as="h3" id="settings-language" variant="label" className="font-semibold">
+              {t("settings.language")}
+            </Typography>
+            <LanguageSwitch />
+          </section>
+          <section
+            aria-labelledby="settings-appearance"
+            className="space-y-4 border-t border-stroke-soft-200 pt-6"
+          >
+            <Typography as="h3" id="settings-appearance" variant="label" className="font-semibold">
               {t("settings.appearance")}
             </Typography>
-            <div className="flex items-center justify-between gap-4">
-              <Typography variant="labelSmall" className="text-text-sub-600">
-                {t("settings.language")}
-              </Typography>
-              <LanguageSwitch />
-            </div>
             <ThemeSwitch />
-            <div className="flex min-h-7 items-center justify-between gap-4">
-              <Typography as="label" htmlFor="backdrop-blur" variant="labelSmall">
+            <div className="flex min-h-11 items-center justify-between gap-4">
+              <Typography as="label" htmlFor="backdrop-blur" variant="label">
                 {t("settings.blur")}
               </Typography>
               <Switch.Root id="backdrop-blur" checked={blur} onCheckedChange={changeBlur} />
             </div>
           </section>
 
-          <section aria-labelledby="settings-behaviour" className="space-y-1">
-            <Typography as="h3" id="settings-behaviour" variant="label">
+          <section
+            aria-labelledby="settings-behaviour"
+            className="space-y-3 border-t border-stroke-soft-200 pt-6"
+          >
+            <Typography as="h3" id="settings-behaviour" variant="label" className="font-semibold">
               {t("settings.behaviour")}
             </Typography>
-            <div className="flex min-h-7 items-center justify-between gap-4">
-              <Typography as="label" htmlFor="pointer-cursor" variant="labelSmall">
+            <div className="flex min-h-11 items-center justify-between gap-4">
+              <Typography as="label" htmlFor="pointer-cursor" variant="label">
                 {t("settings.pointerCursor")}
               </Typography>
               <Switch.Root
@@ -90,7 +99,7 @@ export function Settings() {
             </div>
           </section>
         </div>
-        <div className="flex items-center border-t border-stroke-soft-200 px-4 py-3">
+        <div className="flex shrink-0 items-center border-t border-stroke-soft-200 px-5 py-3">
           <AlignLinkButton.Root
             asChild
             variant="gray"

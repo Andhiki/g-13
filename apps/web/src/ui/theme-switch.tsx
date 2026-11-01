@@ -16,7 +16,7 @@ export function ThemeSwitch() {
   return (
     <div className="space-y-5">
       <section aria-labelledby="settings-theme" className="space-y-3">
-        <Typography as="h4" id="settings-theme" variant="labelSmall" className="text-text-sub-600">
+        <Typography as="h4" id="settings-theme" variant="label" className="text-text-strong-950">
           {t("settings.theme")}
         </Typography>
         <div
@@ -32,13 +32,13 @@ export function ThemeSwitch() {
                 key={mode}
                 variant="neutral"
                 mode="stroke"
-                className="h-11 gap-1.5 px-2 aria-pressed:bg-primary-alpha-10 aria-pressed:text-text-strong-950 aria-pressed:ring-primary-base sm:grid sm:h-auto sm:justify-normal sm:gap-2.5 sm:rounded-[14px] sm:pt-2 sm:pb-3 sm:text-[13px] sm:aria-pressed:shadow-[0_0_0_2px_var(--color-primary-base)]"
+                className="h-11 gap-1.5 px-2 aria-pressed:bg-primary-alpha-10 aria-pressed:text-text-strong-950 aria-pressed:ring-primary-base sm:grid sm:h-auto sm:justify-normal sm:gap-2.5 sm:rounded-[14px] sm:pt-2 sm:pb-3"
                 aria-pressed={mounted && theme === mode}
                 disabled={!mounted}
                 onClick={() => setTheme(mode)}
               >
                 <span
-                  className="relative hidden aspect-[1.85] overflow-hidden rounded-lg border border-stroke-soft-200 sm:block"
+                  className="relative hidden aspect-[2.4] overflow-hidden rounded-lg border border-stroke-soft-200 sm:block"
                   aria-hidden="true"
                 >
                   <ThemeMap
@@ -53,7 +53,9 @@ export function ThemeSwitch() {
                 </span>
                 <span className="flex items-center justify-center gap-1.5">
                   <Icon className="size-4" aria-hidden="true" />
-                  {t(`settings.${mode}`)}
+                  <Typography as="span" variant="label">
+                    {t(`settings.${mode}`)}
+                  </Typography>
                 </span>
               </AlignButton.Root>
             );
@@ -64,46 +66,50 @@ export function ThemeSwitch() {
         <Typography
           as="h4"
           id="settings-color-scheme"
-          variant="labelSmall"
-          className="text-text-sub-600"
+          variant="label"
+          className="text-text-strong-950"
         >
           {t("settings.colorScheme")}
         </Typography>
-        <div className="grid grid-cols-2 gap-3">
-          {(["omahti", "himakom"] as const).map((scheme) => (
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
+          {(["light", "dark"] satisfies ThemeMode[]).map((mode) => (
             <div
-              key={scheme}
+              key={mode}
               className="rounded-[14px] border border-stroke-soft-200 p-3 hover:bg-bg-weak-25"
             >
-              <div className="flex justify-center gap-6 py-2 sm:gap-8">
-                {(["light", "dark"] satisfies ThemeMode[]).map((mode) => {
+              <Typography variant="label" className="mb-3">
+                {t(`settings.${mode}`)}
+              </Typography>
+              <div className="flex justify-around gap-3">
+                {(["omahti", "himakom"] as const).map((scheme) => {
                   const Icon = mode === "light" ? RiSunLine : RiMoonLine;
                   const selected = schemes[mode] === scheme;
                   return (
-                    <button
-                      key={mode}
-                      type="button"
-                      className="relative aspect-square w-[clamp(44px,8vw,56px)] rounded-full bg-[radial-gradient(circle_at_65%_25%,#f3c7a4,transparent_65%),linear-gradient(#fafafa,#fafafa)] shadow-[inset_0_0_0_1px_#00000010,inset_0_-3px_8px_#00000015,0_2px_4px_#00000010] data-[mode=dark]:bg-[radial-gradient(circle_at_65%_25%,#a15b32,transparent_70%),linear-gradient(#171717,#171717)] data-[scheme=himakom]:bg-[radial-gradient(circle_at_65%_25%,#8b73e5,transparent_65%),linear-gradient(#f5f3fc,#f5f3fc)] data-[scheme=himakom]:data-[mode=dark]:bg-[radial-gradient(circle_at_65%_25%,#7654dc,transparent_70%),linear-gradient(#191827,#191827)] aria-pressed:outline-2 aria-pressed:outline-offset-5 aria-pressed:outline-primary-base focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-primary-base"
-                      data-scheme={scheme}
-                      data-mode={mode}
-                      aria-label={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
-                      title={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
-                      aria-pressed={mounted && selected}
-                      disabled={!mounted}
-                      onClick={() => setScheme(mode, scheme)}
-                    >
-                      {mounted && selected && (
-                        <span className="absolute -right-[5px] -bottom-[5px] grid size-7 place-items-center rounded-full border border-stroke-sub-300 bg-bg-white-0 text-text-strong-950">
-                          <Icon className="size-4" aria-hidden="true" />
-                        </span>
-                      )}
-                    </button>
+                    <div key={scheme} className="flex flex-col items-center gap-3 py-2">
+                      <button
+                        type="button"
+                        className="relative aspect-square w-[clamp(44px,8vw,56px)] rounded-full bg-[radial-gradient(circle_at_65%_25%,#f3c7a4,transparent_65%),linear-gradient(#fafafa,#fafafa)] shadow-[inset_0_0_0_1px_#00000010,inset_0_-3px_8px_#00000015,0_2px_4px_#00000010] data-[mode=dark]:bg-[radial-gradient(circle_at_65%_25%,#a15b32,transparent_70%),linear-gradient(#171717,#171717)] data-[scheme=himakom]:bg-[radial-gradient(circle_at_65%_25%,#8b73e5,transparent_65%),linear-gradient(#f5f3fc,#f5f3fc)] data-[scheme=himakom]:data-[mode=dark]:bg-[radial-gradient(circle_at_65%_25%,#7654dc,transparent_70%),linear-gradient(#191827,#191827)] aria-pressed:outline-2 aria-pressed:outline-offset-5 aria-pressed:outline-primary-base focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-primary-base"
+                        data-scheme={scheme}
+                        data-mode={mode}
+                        aria-label={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
+                        title={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
+                        aria-pressed={mounted && selected}
+                        disabled={!mounted}
+                        onClick={() => setScheme(mode, scheme)}
+                      >
+                        {mounted && selected && (
+                          <span className="absolute -right-[5px] -bottom-[5px] grid size-7 place-items-center rounded-full border border-stroke-sub-300 bg-bg-white-0 text-text-strong-950">
+                            <Icon className="size-4" aria-hidden="true" />
+                          </span>
+                        )}
+                      </button>
+                      <Typography as="span" variant="labelSmall">
+                        {scheme === "omahti" ? "OmahTI" : "HIMAKOM"}
+                      </Typography>
+                    </div>
                   );
                 })}
               </div>
-              <Typography variant="label" className="mt-3">
-                {scheme === "omahti" ? "OmahTI" : "HIMAKOM"}
-              </Typography>
             </div>
           ))}
         </div>
