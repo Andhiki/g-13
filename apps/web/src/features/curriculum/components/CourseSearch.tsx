@@ -45,9 +45,7 @@ export function CourseSearch({
       >
         <span className="flex-1 text-left">{text("Cari mata kuliah")}</span>
         <RiSearchLine className="size-5 shrink-0 min-[650px]:hidden" aria-hidden="true" />
-        <AlignKbd.Root className="hidden min-[650px]:inline-flex" aria-hidden="true">
-          /
-        </AlignKbd.Root>
+        <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
       </AlignButton.Root>
       <AlignCommandMenu.Dialog
         open={open}
@@ -135,7 +133,7 @@ export function CourseSearch({
             </AlignCommandMenu.Empty>
           )}
         </AlignCommandMenu.List>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-text-sub-600">
+        <div className="hidden flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-text-sub-600 min-[650px]:flex">
           <Typography as="span" variant="caption" className="flex items-center gap-1.5">
             <AlignKbd.Root aria-label={text("Panah bawah")}>↓</AlignKbd.Root>
             {text("Turun")}
