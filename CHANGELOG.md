@@ -41,6 +41,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menampilkan menu hamburger pada lebar di bawah 768 piksel agar navigasi tidak meluap pada layar kecil.
 - Memperbaiki teks mata kuliah yang terpotong dengan ruang baris dan tinggi kartu yang sesuai untuk font, termasuk pada layar ponsel.
 - Menggunakan gulir halus bawaan browser untuk navigasi semester pada tampilan daftar agar animasi tidak bergantung pada pembaruan JavaScript setiap frame.
 - Memperbaiki isi panel filter dan pintasan keyboard yang tertutup latar setelah animasi membuka selesai.
@@ -227,7 +228,6 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   bahasa dan halaman yang dibuka. Pencarian arsip menerima nama Indonesia maupun Inggris.
 
 - Kartu pintasan keyboard disembunyikan pada layar kecil.
-
 - Halaman Helpful Resources berbicara langsung kepada pembaca dan menautkan
   template skripsi DIKE UGM yang diperbarui. Nama kursus CS50 tetap dalam bahasa
   Inggris pada kedua pilihan bahasa.

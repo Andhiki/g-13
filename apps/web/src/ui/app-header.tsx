@@ -64,7 +64,7 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
       to="/"
       search={{ kurikulum: defaultCurriculumId }}
       aria-label={t("navigation.home")}
-      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center gap-1 rounded sm:gap-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
+      className="pointer-events-auto flex h-10 w-fit shrink-0 items-center gap-1 rounded md:gap-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-base"
     >
       <Image
         src="/brand/omahti-light.svg"
@@ -110,7 +110,7 @@ export function AppHeader() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 640px)");
+    const desktop = window.matchMedia("(min-width: 768px)");
     const closeOnDesktop = () => {
       if (desktop.matches) setMenuOpen(false);
     };
@@ -120,9 +120,9 @@ export function AppHeader() {
 
   return (
     <AlignModal.Root open={menuOpen} onOpenChange={setMenuOpen}>
-      <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] text-text-strong-950 sm:gap-6 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] text-text-strong-950 md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
         <BrandLogo />
-        <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 sm:flex">
+        <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 md:flex">
           <AlignLinkButton.Root asChild>
             <Link
               to="/exam"
@@ -158,14 +158,14 @@ export function AppHeader() {
           </AlignLinkButton.Root>
           <Faq />
         </nav>
-        <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex">
+        <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
           <Settings />
           <AlignButton.Root
             asChild
             variant="neutral-inverse"
             mode="filled"
             size="small"
-            className="px-2 sm:px-3"
+            className="px-2 md:px-3"
           >
             <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
               <RiRouteLine aria-hidden="true" className="size-4" />
@@ -177,7 +177,7 @@ export function AppHeader() {
           <AlignButton.Root
             variant="neutral"
             mode="ghost"
-            className="ml-auto size-11 p-2.5 sm:hidden"
+            className="ml-auto size-11 p-2.5 md:hidden"
             aria-label={menuOpen ? t("navigation.close") : t("navigation.open")}
             aria-expanded={menuOpen}
           >
@@ -188,7 +188,7 @@ export function AppHeader() {
       <AlignModal.Content
         showClose={false}
         aria-describedby={undefined}
-        overlayClassName="bg-transparent p-0 backdrop-blur-none sm:hidden"
+        overlayClassName="bg-transparent p-0 backdrop-blur-none md:hidden"
         className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto overscroll-contain rounded-none pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-text-strong-950 shadow-none data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none"
       >
         <AlignModal.Title className="sr-only">{t("navigation.label")}</AlignModal.Title>
