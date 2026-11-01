@@ -1,11 +1,10 @@
 import { useLocale } from "../useLocale";
-import { memo, useCallback, useContext, useSyncExternalStore } from "react";
+import { memo } from "react";
 import { Typography } from "../ui/typography";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { tv } from "tailwind-variants";
 import { courseLayout } from "../courses/layout";
 import { creditsFor, isCore } from "../courses/course-utils";
-import { ConnectionVisibility } from "./EdgeRouting";
 import type { CourseNodeData, LaneNodeData } from "./model";
 
 const courseStyles = tv({
@@ -17,8 +16,6 @@ const courseStyles = tv({
       "border border-stroke-soft-200 bg-bg-white-0 group-hover:border-stroke-sub-300 group-hover:bg-bg-weak-50",
     title:
       "m-0 shrink-0 line-clamp-2 text-text-strong-950 group-hover:text-text-strong-950 group-focus-within:text-text-strong-950",
-    handle:
-      "size-[7px]! border! border-bg-white-0! bg-bg-sub-300! transition-opacity duration-150 motion-reduce:transition-none",
     credit:
       "bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-bg-white-0))] group-hover:bg-bg-weak-50",
   },
@@ -34,19 +31,16 @@ const courseStyles = tv({
         button: "ring-2 ring-primary-base hover:ring-primary-base",
         surface: "bg-primary-lighter group-hover:bg-primary-lighter",
         title: "text-text-strong-950",
-        handle: "bg-primary-base!",
         credit:
           "bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-primary-lighter))] group-hover:bg-[color-mix(in_srgb,var(--color-bg-weak-50)_65%,var(--color-primary-lighter))]",
       },
       prerequisite: {
         button: "ring-2 ring-warning-dark hover:ring-warning-dark",
         title: "text-text-strong-950",
-        handle: "bg-warning-dark!",
       },
       dependent: {
         button: "ring-2 ring-feature-dark hover:ring-feature-dark",
         title: "text-text-strong-950",
-        handle: "bg-feature-dark!",
       },
       unrelated: { root: "opacity-[0.42]" },
     },
@@ -56,25 +50,9 @@ const courseStyles = tv({
 const tab = "h-[25px] truncate rounded-t-lg border-b-0 px-3 pt-[3px] text-text-sub-600";
 
 export const CourseNode = memo(function CourseNode({
-  id,
   data,
 }: NodeProps<Node<CourseNodeData, "course">>) {
   const { text, courseName } = useLocale();
-  const visibility = useContext(ConnectionVisibility);
-  const subscribe = useCallback(
-    (listener: () => void) => visibility.subscribe(id, listener),
-    [visibility, id],
-  );
-  const incomingVisible = useSyncExternalStore(
-    subscribe,
-    () => visibility.incoming(id),
-    () => false,
-  );
-  const outgoingVisible = useSyncExternalStore(
-    subscribe,
-    () => visibility.outgoing(id),
-    () => false,
-  );
   const course = data.course;
   const credit = creditsFor(course);
   const choice = !isCore(course) || course.id.startsWith("2021-slot-");
@@ -96,12 +74,7 @@ export const CourseNode = memo(function CourseNode({
         })}
       />
       {data.incoming.length > 0 && (
-        <Handle
-          id="in"
-          type="target"
-          position={Position.Left}
-          className={styles.handle({ class: incomingVisible ? "opacity-100!" : "opacity-0!" })}
-        />
+        <Handle id="in" type="target" position={Position.Left} className="invisible!" />
       )}
       <button
         data-course-button
@@ -146,12 +119,7 @@ export const CourseNode = memo(function CourseNode({
         </Typography>
       </button>
       {data.outgoing.length > 0 && (
-        <Handle
-          id="out"
-          type="source"
-          position={Position.Right}
-          className={styles.handle({ class: outgoingVisible ? "opacity-100!" : "opacity-0!" })}
-        />
+        <Handle id="out" type="source" position={Position.Right} className="invisible!" />
       )}
     </div>
   );

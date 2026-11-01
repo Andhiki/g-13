@@ -24,6 +24,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menghapus titik sambungan pada kartu mata kuliah di peta kurikulum dan roadmap agar garis prasyarat terlihat lebih bersih.
+
 - Mempercepat animasi buka dan tutup panel detail mata kuliah dari 400 ms menjadi 200 ms.
 
 - Mengganti kartu tema dengan pilihan ikon sistem, terang, dan gelap dalam kontrol bersegmen yang ringkas.

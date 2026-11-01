@@ -1,32 +1,11 @@
-import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from "react";
-import { BaseEdge, ReactFlowProvider, useStoreApi, type Edge, type EdgeProps } from "@xyflow/react";
+import { createContext, useContext, type ReactNode } from "react";
+import { BaseEdge, ReactFlowProvider, type Edge, type EdgeProps } from "@xyflow/react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import type { RoutingResult } from "./connection-routing.worker";
-import { connectionVisibility } from "./connection-visibility";
 
 export const ConnectionPaths = createContext<RoutingResult>(new Map());
-export const ConnectionVisibility = createContext(connectionVisibility());
-
-function VisibleConnections({ children }: { children: ReactNode }) {
-  const store = useStoreApi();
-  const [visibility] = useState(connectionVisibility);
-  useLayoutEffect(() => {
-    visibility.update(store.getState().edges);
-    return store.subscribe((state, previous) => {
-      if (state.edges !== previous.edges) visibility.update(state.edges);
-    });
-  }, [store, visibility]);
-  return (
-    <ConnectionVisibility.Provider value={visibility}>{children}</ConnectionVisibility.Provider>
-  );
-}
-
 export function EdgeRouting({ children }: { children: ReactNode }) {
-  return (
-    <ReactFlowProvider>
-      <VisibleConnections>{children}</VisibleConnections>
-    </ReactFlowProvider>
-  );
+  return <ReactFlowProvider>{children}</ReactFlowProvider>;
 }
 
 function RoutedEdge(
