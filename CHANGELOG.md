@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengganti ikon tab dengan emoji kopi dan memperbaiki metadata untuk pencarian serta pratinjau tautan.
 - Merapikan halaman FAQ utama dengan pencarian lebar penuh berpetunjuk pintasan `/`, filter topik, dan 30 jawaban dalam bahasa Indonesia serta Inggris.
 
 - Menambahkan notifikasi ajakan memberi bintang di GitHub setelah membuka lima detail mata kuliah atau setelah membuat roadmap.

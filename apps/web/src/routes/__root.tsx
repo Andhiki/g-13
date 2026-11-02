@@ -36,6 +36,7 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
     const namespace = messageNamespace(location.pathname);
     return {
       language: context.language,
+      pathname: location.pathname,
       namespace,
       common: context.common,
       messages: await loadMessages(context.language, namespace),
@@ -59,8 +60,20 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
           ],
       },
       { title: loaderData?.common["Everything CS UGM"] },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "g-13" },
+      { property: "og:image", content: "https://csugm.andhiki.tech/social-preview.png" },
+      { property: "og:title", content: loaderData?.common["Everything CS UGM"] },
+      {
+        property: "og:description",
+        content:
+          loaderData?.common[
+            "Jelajahi peta kurikulum 2021 dan 2026, prasyarat mata kuliah, roadmap personal, dan arsip ujian S1 Ilmu Komputer UGM."
+          ],
+      },
     ],
     links: [
+      { rel: "canonical", href: `https://csugm.andhiki.tech${loaderData?.pathname ?? "/"}` },
       { rel: "preload", as: "font", type: "font/woff2", crossOrigin: "anonymous", href: interFont },
       { rel: "preload", as: "font", type: "font/woff2", crossOrigin: "anonymous", href: geistFont },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },

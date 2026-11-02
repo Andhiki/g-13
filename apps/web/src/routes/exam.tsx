@@ -7,8 +7,16 @@ export const Route = createFileRoute("/exam")({
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["Arsip Ujian"] },
+      { property: "og:title", content: match.context.common["Arsip Ujian"] },
       {
         name: "description",
+        content:
+          match.context.common[
+            "Temukan arsip soal UTS dan UAS Ilmu Komputer UGM dari Himakom, dikelompokkan menurut mata kuliah dan tahun."
+          ],
+      },
+      {
+        property: "og:description",
         content:
           match.context.common[
             "Temukan arsip soal UTS dan UAS Ilmu Komputer UGM dari Himakom, dikelompokkan menurut mata kuliah dan tahun."

@@ -5,8 +5,16 @@ export const Route = createFileRoute("/resources")({
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["Helpful Resources"] },
+      { property: "og:title", content: match.context.common["Helpful Resources"] },
       {
         name: "description",
+        content:
+          match.context.common[
+            "Useful computer science learning, thesis writing, and exam archive resources."
+          ],
+      },
+      {
+        property: "og:description",
         content:
           match.context.common[
             "Useful computer science learning, thesis writing, and exam archive resources."
