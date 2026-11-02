@@ -15,7 +15,7 @@ const resourcesData = {
         alumni: "Alumni",
         resources: "Sumber Belajar",
         roadmap: "Roadmap",
-        curriculumFaq: "FAQ 2026",
+        faq: "FAQ",
         open: "Buka navigasi",
         close: "Tutup navigasi",
         home: "OmahTI dan HIMAKOM UGM — beranda",
@@ -63,7 +63,7 @@ const resourcesData = {
         alumni: "Alumni",
         resources: "Learning resources",
         roadmap: "Roadmap",
-        curriculumFaq: "2026 FAQ",
+        faq: "FAQ",
         open: "Open navigation",
         close: "Close navigation",
         home: "OmahTI and HIMAKOM UGM — home",
@@ -134,7 +134,7 @@ declare module "i18next" {
       exam: Record<string, string>;
       resources: Record<string, string>;
       alumni: Record<string, string>;
-      curriculumFaq: Record<string, string>;
+      faq: Record<string, string>;
     };
   }
 }

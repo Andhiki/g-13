@@ -14,9 +14,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-02
 
-#### Added
+#### Changed
 
-- Menambahkan halaman FAQ Kurikulum 2026 dengan pencarian, filter topik, dan bahasa Indonesia serta Inggris.
+- Menjadikan halaman FAQ sebagai FAQ utama, dengan pencarian dan filter topik untuk 30 jawaban dalam bahasa Indonesia serta Inggris.
 
 - Menambahkan notifikasi ajakan memberi bintang di GitHub setelah membuka lima detail mata kuliah atau setelah membuat roadmap.
 - Notifikasi dapat muncul lagi setiap lima detail mata kuliah setelah satu jam, dan berhenti setelah tombol bintang ditekan.

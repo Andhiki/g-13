@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RiSearchLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
 import * as Accordion from "../../ui/accordion";
+import { AlignLinkButton } from "../../ui/link-button";
 import { Typography } from "../../ui/typography";
 
 const sections = [
@@ -189,8 +190,8 @@ const questions: { section: SectionId; question: string; answer: string }[] = [
   },
 ];
 
-export function CurriculumFaqPage() {
-  const { text, language } = useLocale("curriculumFaq");
+export function FaqPage() {
+  const { text, language } = useLocale("faq");
   const [query, setQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState<SectionId | "all">("all");
   const locale = language === "id" ? "id-ID" : "en";
@@ -220,161 +221,135 @@ export function CurriculumFaqPage() {
 
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-      <div className="mx-auto max-w-7xl">
-        <header className="grid gap-8 border-b border-stroke-soft-200 pb-9 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:gap-12">
-          <div>
-            <Typography
-              as="p"
-              variant="labelSmall"
-              className="mb-3 mt-0 text-primary-base uppercase tracking-[0.16em]"
-            >
-              {text("Academic guide · 2026 curriculum")}
-            </Typography>
-            <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
-              {text("Frequently asked questions")}
-            </Typography>
-            <Typography
-              as="p"
-              variant="paragraph"
-              className="mb-0 mt-4 max-w-2xl text-text-sub-600"
-            >
-              {text(
-                "Find answers about graduation requirements, specializations, the final project, and the transition from the 2021 curriculum.",
-              )}
-            </Typography>
-          </div>
-          <div className="flex min-w-48 items-center gap-4 rounded-2xl bg-primary-lighter px-5 py-4 md:min-w-56 md:gap-5 md:px-6 md:py-5">
-            <Typography
-              as="span"
-              variant="title"
-              className="m-0 text-5xl leading-none text-primary-dark"
-            >
-              144
-            </Typography>
-            <div>
-              <Typography as="p" variant="label" className="m-0 text-primary-dark">
-                SKS
-              </Typography>
-              <Typography as="p" variant="caption" className="mb-0 mt-1 max-w-28 text-primary-dark">
-                {text("minimum credits to graduate")}
-              </Typography>
-            </div>
-          </div>
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
+        <header className="lg:sticky lg:top-28 lg:self-start">
+          <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
+            {text("FAQ")}
+          </Typography>
+          <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
+            {text(
+              "Find answers about study requirements, specializations, final projects, and curriculum transitions.",
+            )}
+          </Typography>
         </header>
 
-        <div className="grid gap-9 pt-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16">
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <Typography as="p" variant="caption" className="mb-3 mt-0 text-text-soft-400">
+        <section aria-label={text("FAQ")} className="grid content-start">
+          <label className="relative block">
+            <span className="sr-only">{text("Search questions and answers")}</span>
+            <RiSearchLine
+              aria-hidden="true"
+              className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-soft-400"
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.currentTarget.value)}
+              placeholder={text("Search questions and answers")}
+              className="h-12 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 pl-12 pr-4 text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus-visible:border-primary-base focus-visible:ring-2 focus-visible:ring-primary-alpha-10"
+            />
+          </label>
+
+          <div className="mt-6 border-y border-stroke-soft-200 py-4">
+            <Typography as="p" variant="label" className="mb-3 mt-0 text-text-sub-600">
               {text("Filter by topic")}
             </Typography>
             <div
               role="group"
               aria-label={text("FAQ topic filters")}
-              className="flex flex-wrap gap-2 lg:flex-col lg:gap-0"
+              className="flex flex-wrap gap-2"
             >
-              <button
+              <AlignLinkButton.Root
                 type="button"
+                variant={selectedSection === "all" ? "primary" : "gray"}
+                underline={selectedSection === "all"}
                 aria-pressed={selectedSection === "all"}
                 onClick={() => setSelectedSection("all")}
-                className={`flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 py-2 text-left text-paragraph-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base lg:rounded-none lg:border-b lg:border-stroke-soft-200 lg:px-0 ${selectedSection === "all" ? "bg-primary-lighter text-primary-dark lg:bg-transparent" : "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"}`}
+                className="h-auto min-h-10 justify-between gap-2 rounded-md border border-stroke-soft-200 px-3 py-2 text-left whitespace-normal"
               >
-                <span>{text("All topics")}</span>
-                <span className="font-mono text-paragraph-xs text-text-soft-400">
+                <Typography as="span" variant="labelSmall">
+                  {text("All topics")}
+                </Typography>
+                <Typography as="span" variant="caption" className="text-text-soft-400">
                   {searchResultCount.toString().padStart(2, "0")}
-                </span>
-              </button>
+                </Typography>
+              </AlignLinkButton.Root>
               {matchingGroups.map((section) => (
-                <button
+                <AlignLinkButton.Root
                   key={section.id}
                   type="button"
+                  variant={selectedSection === section.id ? "primary" : "gray"}
+                  underline={selectedSection === section.id}
                   aria-pressed={selectedSection === section.id}
                   onClick={() => setSelectedSection(section.id)}
-                  className={`flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 py-2 text-left text-paragraph-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base lg:rounded-none lg:border-b lg:border-stroke-soft-200 lg:px-0 ${selectedSection === section.id ? "bg-primary-lighter text-primary-dark lg:bg-transparent" : "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"}`}
+                  className="h-auto min-h-10 justify-between gap-2 rounded-md border border-stroke-soft-200 px-3 py-2 text-left whitespace-normal"
                 >
-                  <span>{text(section.title)}</span>
-                  <span className="font-mono text-paragraph-xs text-text-soft-400">
+                  <Typography as="span" variant="labelSmall">
+                    {text(section.title)}
+                  </Typography>
+                  <Typography as="span" variant="caption" className="text-text-soft-400">
                     {section.items.length.toString().padStart(2, "0")}
-                  </span>
-                </button>
+                  </Typography>
+                </AlignLinkButton.Root>
               ))}
             </div>
-            <Typography as="p" variant="caption" className="mb-0 mt-6 text-text-soft-400">
-              {text(
-                "This page summarizes the FAQ provided. Follow official program guidance for academic decisions.",
-              )}
-            </Typography>
-          </aside>
-
-          <div className="min-w-0">
-            <label className="relative block">
-              <span className="sr-only">{text("Search questions and answers")}</span>
-              <RiSearchLine
-                aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-soft-400"
-              />
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.currentTarget.value)}
-                placeholder={text("Search questions and answers")}
-                className="h-12 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 pl-12 pr-4 text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus-visible:border-primary-base focus-visible:ring-2 focus-visible:ring-primary-alpha-10"
-              />
-            </label>
-            <Typography
-              as="p"
-              variant="caption"
-              aria-live="polite"
-              className="mb-0 mt-3 text-text-soft-400"
-            >
-              {text("Showing {{count}} answers", { count: resultCount })}
-            </Typography>
-
-            {groups.length ? (
-              <div className="mt-7 space-y-9">
-                {groups.map((section) => (
-                  <section
-                    key={section.id}
-                    id={section.id}
-                    aria-label={text(section.title)}
-                    className="scroll-mt-24 border-t border-stroke-soft-200 pt-5"
-                  >
-                    <Typography as="h2" variant="subtitle1" className="m-0 text-text-strong-950">
-                      {text(section.title)}
-                    </Typography>
-                    <Accordion.Root
-                      type="single"
-                      collapsible
-                      className="mt-2 divide-y divide-stroke-soft-200"
-                    >
-                      {section.items.map((item) => (
-                        <Accordion.Item key={item.question} value={item.question}>
-                          <Accordion.Header>
-                            <Accordion.Trigger>
-                              {item.question}
-                              <Accordion.Arrow aria-hidden="true" className="shrink-0" />
-                            </Accordion.Trigger>
-                          </Accordion.Header>
-                          <Accordion.Content className="max-w-3xl pb-4 leading-relaxed">
-                            {item.answer}
-                          </Accordion.Content>
-                        </Accordion.Item>
-                      ))}
-                    </Accordion.Root>
-                  </section>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-7 rounded-xl border border-dashed border-stroke-soft-200 px-5 py-8 text-center">
-                <Typography as="p" variant="subtitle2" className="m-0 text-text-strong-950">
-                  {text("No matching questions")}
-                </Typography>
-                <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
-                  {text("Try a different word or clear your search.")}
-                </Typography>
-              </div>
-            )}
           </div>
-        </div>
+
+          <Typography as="p" variant="caption" className="mb-0 mt-4 text-text-soft-400">
+            {text("Use the latest official program guidance for academic decisions.")}
+          </Typography>
+          <Typography
+            as="p"
+            variant="caption"
+            aria-live="polite"
+            className="mb-0 mt-3 text-text-soft-400"
+          >
+            {text("Showing {{count}} answers", { count: resultCount })}
+          </Typography>
+
+          {groups.length ? (
+            <div className="mt-7 space-y-9">
+              {groups.map((section) => (
+                <section
+                  key={section.id}
+                  aria-label={text(section.title)}
+                  className="border-t border-stroke-soft-200 pt-5"
+                >
+                  <Typography as="h2" variant="subtitle1" className="m-0 text-text-strong-950">
+                    {text(section.title)}
+                  </Typography>
+                  <Accordion.Root
+                    type="single"
+                    collapsible
+                    className="mt-2 divide-y divide-stroke-soft-200"
+                  >
+                    {section.items.map((item) => (
+                      <Accordion.Item key={item.question} value={item.question}>
+                        <Accordion.Header>
+                          <Accordion.Trigger>
+                            {item.question}
+                            <Accordion.Arrow aria-hidden="true" className="shrink-0" />
+                          </Accordion.Trigger>
+                        </Accordion.Header>
+                        <Accordion.Content className="max-w-3xl pb-4 leading-relaxed">
+                          {item.answer}
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion.Root>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-7 rounded-xl border border-dashed border-stroke-soft-200 px-5 py-8 text-center">
+              <Typography as="p" variant="subtitle2" className="m-0 text-text-strong-950">
+                {text("No matching questions")}
+              </Typography>
+              <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
+                {text("Try a different word or clear your search.")}
+              </Typography>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );

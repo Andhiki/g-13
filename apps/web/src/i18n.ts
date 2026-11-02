@@ -35,8 +35,8 @@ export function messageNamespace(pathname: string): MessageNamespace {
       return "resources";
     case "/alumni":
       return "alumni";
-    case "/faq-2026":
-      return "curriculumFaq";
+    case "/faq":
+      return "faq";
     default:
       return "common";
   }

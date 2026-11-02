@@ -1,12 +1,6 @@
 import type { Language } from "./index";
 
-export type MessageNamespace =
-  | "common"
-  | "roadmap"
-  | "exam"
-  | "resources"
-  | "alumni"
-  | "curriculumFaq";
+export type MessageNamespace = "common" | "roadmap" | "exam" | "resources" | "alumni" | "faq";
 export type Messages = Record<string, string>;
 
 const loaders = {
@@ -16,7 +10,7 @@ const loaders = {
     exam: () => import("./locales/id/exam.json").then((module) => module.default),
     resources: () => import("./locales/id/resources.json").then((module) => module.default),
     alumni: () => import("./locales/id/alumni.json").then((module) => module.default),
-    curriculumFaq: () => import("./locales/id/curriculumFaq.json").then((module) => module.default),
+    faq: () => import("./locales/id/faq.json").then((module) => module.default),
   },
   en: {
     common: () => import("./locales/en/common.json").then((module) => module.default),
@@ -24,7 +18,7 @@ const loaders = {
     exam: () => import("./locales/en/exam.json").then((module) => module.default),
     resources: () => import("./locales/en/resources.json").then((module) => module.default),
     alumni: () => import("./locales/en/alumni.json").then((module) => module.default),
-    curriculumFaq: () => import("./locales/en/curriculumFaq.json").then((module) => module.default),
+    faq: () => import("./locales/en/faq.json").then((module) => module.default),
   },
 };
 
