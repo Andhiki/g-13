@@ -16,7 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
-- Menambahkan notifikasi ajakan memberi bintang di GitHub setelah membuka lima detail mata kuliah.
+- Menambahkan notifikasi ajakan memberi bintang di GitHub setelah membuka lima detail mata kuliah atau setelah membuat roadmap.
+- Notifikasi dapat muncul lagi setiap lima detail mata kuliah setelah satu jam, dan berhenti setelah tombol bintang ditekan.
 
 ### 2026-11-01
 

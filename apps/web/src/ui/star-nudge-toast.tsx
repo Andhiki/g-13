@@ -1,8 +1,9 @@
 import { RiGithubFill, RiStarFill } from "@remixicon/react";
+import { toast } from "./toast";
 import { AlignButton } from "./button";
-import { GITHUB_REPOSITORY_URL } from "./star-nudge";
+import { GITHUB_REPOSITORY_URL, markStarGiven } from "./star-nudge";
 
-export function StarNudgeToast({
+function StarNudgeToast({
   message,
   starLabel,
   laterLabel,
@@ -35,5 +36,23 @@ export function StarNudgeToast({
         </div>
       </div>
     </div>
+  );
+}
+
+export function showStarNudgeToast(text: (key: string) => string): void {
+  toast.custom(
+    (id) => (
+      <StarNudgeToast
+        message={text("Suka g-13? Beri kami bintang di GitHub.")}
+        starLabel={text("Beri bintang")}
+        laterLabel={text("Nanti saja")}
+        onStar={() => {
+          markStarGiven();
+          toast.dismiss(id);
+        }}
+        onLater={() => toast.dismiss(id)}
+      />
+    ),
+    { id: "g13-star-nudge", duration: 12000 },
   );
 }

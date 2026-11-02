@@ -8,6 +8,8 @@ import { AlignKbd } from "../../ui/kbd";
 import { AlignButton } from "../../ui/button";
 import { answerQuestion, questionIndex, quizQuestions } from "./quiz";
 import { validateRoadmapSearch, type RoadmapSearch } from "./search";
+import { noteRoadmapCreated } from "../../ui/star-nudge";
+import { showStarNudgeToast } from "../../ui/star-nudge-toast";
 
 export function RoadmapQuiz({
   answers,
@@ -17,6 +19,7 @@ export function RoadmapQuiz({
   update: (next: RoadmapSearch) => void;
 }) {
   const { text } = useLocale("roadmap");
+  const { text: commonText } = useLocale();
   const reducedMotion = useReducedMotion();
   const questions = quizQuestions(answers);
   const index = questionIndex(questions, answers);
@@ -29,6 +32,7 @@ export function RoadmapQuiz({
   const advance = () => {
     const next = questions[index + 1];
     update({ ...answers, langkah: next?.key, hasil: next ? undefined : true });
+    if (!next && noteRoadmapCreated()) showStarNudgeToast(commonText);
   };
   const choose = (value: string) =>
     update(

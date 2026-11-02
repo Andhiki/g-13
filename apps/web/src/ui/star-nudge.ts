@@ -1,38 +1,67 @@
 export const STAR_NUDGE_STORAGE_KEY = "g13-star-nudge";
 export const STAR_NUDGE_THRESHOLD = 5;
+export const STAR_NUDGE_COOLDOWN_MS = 60 * 60 * 1000;
 export const GITHUB_REPOSITORY_URL = "https://github.com/Andhiki/g-13";
 
 export type StarNudgeState = {
+  starred: boolean;
   courses: string[];
-  dismissed: boolean;
+  lastShownAt: number | null;
 };
 
-const emptyState: StarNudgeState = { courses: [], dismissed: false };
+const emptyState: StarNudgeState = { starred: false, courses: [], lastShownAt: null };
 let fallbackState = emptyState;
 
 export function parseStarNudgeState(raw: string | null): StarNudgeState {
   if (!raw) return emptyState;
   try {
-    const value = JSON.parse(raw) as { courses?: unknown; dismissed?: unknown };
+    const value = JSON.parse(raw) as {
+      starred?: unknown;
+      courses?: unknown;
+      lastShownAt?: unknown;
+    };
     return {
+      starred: value.starred === true,
       courses: Array.isArray(value.courses)
         ? [...new Set(value.courses.filter((id): id is string => typeof id === "string"))]
         : [],
-      dismissed: value.dismissed === true,
+      lastShownAt:
+        typeof value.lastShownAt === "number" && Number.isFinite(value.lastShownAt)
+          ? value.lastShownAt
+          : null,
     };
   } catch {
     return emptyState;
   }
 }
 
-export function recordCourseOpen(
+function coolingDown(state: StarNudgeState, now: number): boolean {
+  return state.lastShownAt !== null && now < state.lastShownAt + STAR_NUDGE_COOLDOWN_MS;
+}
+
+export function afterCourseOpen(
   state: StarNudgeState,
   courseId: string,
+  now: number,
 ): { state: StarNudgeState; show: boolean } {
-  if (state.dismissed || state.courses.includes(courseId)) return { state, show: false };
+  if (state.starred || state.courses.includes(courseId)) return { state, show: false };
   const courses = [...state.courses, courseId];
-  if (courses.length < STAR_NUDGE_THRESHOLD) return { state: { ...state, courses }, show: false };
-  return { state: { ...state, courses, dismissed: true }, show: true };
+  if (courses.length < STAR_NUDGE_THRESHOLD || coolingDown(state, now)) {
+    return { state: { ...state, courses }, show: false };
+  }
+  return { state: { ...state, courses: [], lastShownAt: now }, show: true };
+}
+
+export function afterRoadmapCreated(
+  state: StarNudgeState,
+  now: number,
+): { state: StarNudgeState; show: boolean } {
+  if (state.starred) return { state, show: false };
+  return { state: { ...state, courses: [], lastShownAt: now }, show: true };
+}
+
+export function afterStarGiven(state: StarNudgeState): StarNudgeState {
+  return state.starred ? state : { ...state, starred: true };
 }
 
 export function readStarNudgeState(): StarNudgeState {
@@ -54,14 +83,23 @@ export function writeStarNudgeState(state: StarNudgeState): void {
 }
 
 /** Records a course view and returns true when the star nudge should appear. */
-export function noteCourseOpen(courseId: string): boolean {
+export function noteCourseOpen(courseId: string, now = Date.now()): boolean {
   const current = readStarNudgeState();
-  const next = recordCourseOpen(current, courseId);
+  const next = afterCourseOpen(current, courseId, now);
   if (next.state !== current) writeStarNudgeState(next.state);
   return next.show;
 }
 
-export function dismissStarNudge(): void {
+/** Records a roadmap creation and returns true when the star nudge should appear. */
+export function noteRoadmapCreated(now = Date.now()): boolean {
   const current = readStarNudgeState();
-  if (!current.dismissed) writeStarNudgeState({ ...current, dismissed: true });
+  const next = afterRoadmapCreated(current, now);
+  if (next.state !== current) writeStarNudgeState(next.state);
+  return next.show;
+}
+
+export function markStarGiven(): void {
+  const current = readStarNudgeState();
+  const next = afterStarGiven(current);
+  if (next !== current) writeStarNudgeState(next);
 }

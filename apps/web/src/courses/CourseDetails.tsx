@@ -7,9 +7,8 @@ import { CompactButton } from "../ui/compact-button";
 import { RiCloseLine } from "@remixicon/react";
 import { CopyCourseButton } from "./CopyCourseButton";
 import { CourseSheetHandle } from "./CourseSheetHandle";
-import { toast } from "../ui/toast";
-import { StarNudgeToast } from "../ui/star-nudge-toast";
-import { dismissStarNudge, noteCourseOpen } from "../ui/star-nudge";
+import { showStarNudgeToast } from "../ui/star-nudge-toast";
+import { noteCourseOpen } from "../ui/star-nudge";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
 import { courseLayout } from "./layout";
 
@@ -55,25 +54,7 @@ export function CourseDetails({
   }
   useEffect(() => {
     const courseId = course?.id;
-    if (!courseId || !noteCourseOpen(courseId)) return;
-    toast.custom(
-      (id) => (
-        <StarNudgeToast
-          message={text("Suka g-13? Beri kami bintang di GitHub.")}
-          starLabel={text("Beri bintang")}
-          laterLabel={text("Nanti saja")}
-          onStar={() => {
-            dismissStarNudge();
-            toast.dismiss(id);
-          }}
-          onLater={() => {
-            dismissStarNudge();
-            toast.dismiss(id);
-          }}
-        />
-      ),
-      { duration: 12000 },
-    );
+    if (courseId && noteCourseOpen(courseId)) showStarNudgeToast(text);
   }, [course?.id, text]);
   const content = selection ?? lastSelection;
 
