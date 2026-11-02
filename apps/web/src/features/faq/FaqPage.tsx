@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiSearchLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
 import * as Accordion from "../../ui/accordion";
+import { AlignKbd } from "../../ui/kbd";
 import { AlignLinkButton } from "../../ui/link-button";
 import { Typography } from "../../ui/typography";
 
@@ -194,8 +195,30 @@ export function FaqPage() {
   const { text, language } = useLocale("faq");
   const [query, setQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState<SectionId | "all">("all");
+  const searchInput = useRef<HTMLInputElement>(null);
   const locale = language === "id" ? "id-ID" : "en";
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.key !== "/" ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        !(event.target instanceof HTMLElement) ||
+        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']") ||
+        !window.matchMedia("(min-width: 640px)").matches
+      ) {
+        return;
+      }
+      event.preventDefault();
+      searchInput.current?.focus();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
   const localizedQuestions = questions.map((item) => ({
     ...item,
     question: text(item.question),
@@ -217,8 +240,6 @@ export function FaqPage() {
     (count, section) => count + section.items.length,
     0,
   );
-  const resultCount = groups.reduce((count, section) => count + section.items.length, 0);
-
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
@@ -234,19 +255,24 @@ export function FaqPage() {
         </header>
 
         <section aria-label={text("FAQ")} className="grid content-start">
-          <label className="relative block">
-            <span className="sr-only">{text("Search questions and answers")}</span>
-            <RiSearchLine
-              aria-hidden="true"
-              className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-soft-400"
-            />
+          <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
+            <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
             <input
+              ref={searchInput}
               type="search"
+              className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+              aria-label={text("Search questions and answers")}
+              placeholder={text("Search questions and answers")}
               value={query}
               onChange={(event) => setQuery(event.currentTarget.value)}
-              placeholder={text("Search questions and answers")}
-              className="h-12 w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 pl-12 pr-4 text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus-visible:border-primary-base focus-visible:ring-2 focus-visible:ring-primary-alpha-10"
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  event.currentTarget.blur();
+                }
+              }}
             />
+            <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
           </label>
 
           <div className="mt-6 border-y border-stroke-soft-200 py-4">
@@ -264,14 +290,8 @@ export function FaqPage() {
                 underline={selectedSection === "all"}
                 aria-pressed={selectedSection === "all"}
                 onClick={() => setSelectedSection("all")}
-                className="h-auto min-h-10 justify-between gap-2 rounded-md border border-stroke-soft-200 px-3 py-2 text-left whitespace-normal"
               >
-                <Typography as="span" variant="labelSmall">
-                  {text("All topics")}
-                </Typography>
-                <Typography as="span" variant="caption" className="text-text-soft-400">
-                  {searchResultCount.toString().padStart(2, "0")}
-                </Typography>
+                {text("All topics")} ({searchResultCount})
               </AlignLinkButton.Root>
               {matchingGroups.map((section) => (
                 <AlignLinkButton.Root
@@ -281,30 +301,12 @@ export function FaqPage() {
                   underline={selectedSection === section.id}
                   aria-pressed={selectedSection === section.id}
                   onClick={() => setSelectedSection(section.id)}
-                  className="h-auto min-h-10 justify-between gap-2 rounded-md border border-stroke-soft-200 px-3 py-2 text-left whitespace-normal"
                 >
-                  <Typography as="span" variant="labelSmall">
-                    {text(section.title)}
-                  </Typography>
-                  <Typography as="span" variant="caption" className="text-text-soft-400">
-                    {section.items.length.toString().padStart(2, "0")}
-                  </Typography>
+                  {text(section.title)} ({section.items.length})
                 </AlignLinkButton.Root>
               ))}
             </div>
           </div>
-
-          <Typography as="p" variant="caption" className="mb-0 mt-4 text-text-soft-400">
-            {text("Use the latest official program guidance for academic decisions.")}
-          </Typography>
-          <Typography
-            as="p"
-            variant="caption"
-            aria-live="polite"
-            className="mb-0 mt-3 text-text-soft-400"
-          >
-            {text("Showing {{count}} answers", { count: resultCount })}
-          </Typography>
 
           {groups.length ? (
             <div className="mt-7 space-y-9">
