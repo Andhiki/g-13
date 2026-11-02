@@ -255,7 +255,7 @@ export function FaqPage() {
         </header>
 
         <section aria-label={text("FAQ")} className="grid content-start">
-          <label className="ml-auto flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600 sm:w-72">
+          <label className="flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600">
             <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
             <input
               ref={searchInput}
@@ -275,10 +275,7 @@ export function FaqPage() {
             <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
           </label>
 
-          <div className="mt-6 border-y border-stroke-soft-200 py-4">
-            <Typography as="p" variant="label" className="mb-3 mt-0 text-text-sub-600">
-              {text("Filter by topic")}
-            </Typography>
+          <div className="mt-6">
             <div
               role="group"
               aria-label={text("FAQ topic filters")}

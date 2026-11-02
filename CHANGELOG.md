@@ -16,7 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
-- Merapikan halaman FAQ utama dengan pencarian ringkas berpetunjuk pintasan `/`, filter topik, dan 30 jawaban dalam bahasa Indonesia serta Inggris.
+- Merapikan halaman FAQ utama dengan pencarian lebar penuh berpetunjuk pintasan `/`, filter topik, dan 30 jawaban dalam bahasa Indonesia serta Inggris.
 
 - Menambahkan notifikasi ajakan memberi bintang di GitHub setelah membuka lima detail mata kuliah atau setelah membuat roadmap.
 - Notifikasi dapat muncul lagi setiap lima detail mata kuliah setelah satu jam, dan berhenti setelah tombol bintang ditekan.
