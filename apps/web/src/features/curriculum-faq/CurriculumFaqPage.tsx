@@ -192,6 +192,7 @@ const questions: { section: SectionId; question: string; answer: string }[] = [
 export function CurriculumFaqPage() {
   const { text, language } = useLocale("curriculumFaq");
   const [query, setQuery] = useState("");
+  const [selectedSection, setSelectedSection] = useState<SectionId | "all">("all");
   const locale = language === "id" ? "id-ID" : "en";
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
   const localizedQuestions = questions.map((item) => ({
@@ -199,16 +200,22 @@ export function CurriculumFaqPage() {
     question: text(item.question),
     answer: text(item.answer),
   }));
-  const groups = sections
-    .map((section) => ({
-      ...section,
-      items: localizedQuestions.filter(
-        (item) =>
-          item.section === section.id &&
-          `${item.question} ${item.answer}`.toLocaleLowerCase(locale).includes(normalizedQuery),
-      ),
-    }))
-    .filter((section) => section.items.length > 0);
+  const matchingGroups = sections.map((section) => ({
+    ...section,
+    items: localizedQuestions.filter(
+      (item) =>
+        item.section === section.id &&
+        `${item.question} ${item.answer}`.toLocaleLowerCase(locale).includes(normalizedQuery),
+    ),
+  }));
+  const groups = matchingGroups.filter(
+    (section) =>
+      section.items.length > 0 && (selectedSection === "all" || section.id === selectedSection),
+  );
+  const searchResultCount = matchingGroups.reduce(
+    (count, section) => count + section.items.length,
+    0,
+  );
   const resultCount = groups.reduce((count, section) => count + section.items.length, 0);
 
   return (
@@ -258,25 +265,39 @@ export function CurriculumFaqPage() {
         <div className="grid gap-9 pt-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16">
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <Typography as="p" variant="caption" className="mb-3 mt-0 text-text-soft-400">
-              {text("Browse by topic")}
+              {text("Filter by topic")}
             </Typography>
-            <nav
-              aria-label={text("FAQ topics")}
+            <div
+              role="group"
+              aria-label={text("FAQ topic filters")}
               className="flex flex-wrap gap-2 lg:flex-col lg:gap-0"
             >
-              {groups.map((section) => (
-                <a
+              <button
+                type="button"
+                aria-pressed={selectedSection === "all"}
+                onClick={() => setSelectedSection("all")}
+                className={`flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 py-2 text-left text-paragraph-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base lg:rounded-none lg:border-b lg:border-stroke-soft-200 lg:px-0 ${selectedSection === "all" ? "bg-primary-lighter text-primary-dark lg:bg-transparent" : "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"}`}
+              >
+                <span>{text("All topics")}</span>
+                <span className="font-mono text-paragraph-xs text-text-soft-400">
+                  {searchResultCount.toString().padStart(2, "0")}
+                </span>
+              </button>
+              {matchingGroups.map((section) => (
+                <button
                   key={section.id}
-                  href={"#" + section.id}
-                  className="flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 py-2 text-paragraph-sm text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base lg:rounded-none lg:border-b lg:border-stroke-soft-200 lg:px-0"
+                  type="button"
+                  aria-pressed={selectedSection === section.id}
+                  onClick={() => setSelectedSection(section.id)}
+                  className={`flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 py-2 text-left text-paragraph-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base lg:rounded-none lg:border-b lg:border-stroke-soft-200 lg:px-0 ${selectedSection === section.id ? "bg-primary-lighter text-primary-dark lg:bg-transparent" : "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"}`}
                 >
                   <span>{text(section.title)}</span>
                   <span className="font-mono text-paragraph-xs text-text-soft-400">
                     {section.items.length.toString().padStart(2, "0")}
                   </span>
-                </a>
+                </button>
               ))}
-            </nav>
+            </div>
             <Typography as="p" variant="caption" className="mb-0 mt-6 text-text-soft-400">
               {text(
                 "This page summarizes the FAQ provided. Follow official program guidance for academic decisions.",
