@@ -1,12 +1,15 @@
 import { Loading } from "../ui/loading";
 import { useLocale } from "../useLocale";
-import { lazy, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { lazy, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { DeferredContent } from "../ui/deferred-content";
 import { AlignDrawer } from "../ui/drawer";
 import { CompactButton } from "../ui/compact-button";
 import { RiCloseLine } from "@remixicon/react";
 import { CopyCourseButton } from "./CopyCourseButton";
 import { CourseSheetHandle } from "./CourseSheetHandle";
+import { toast } from "../ui/toast";
+import { StarNudgeToast } from "../ui/star-nudge-toast";
+import { dismissStarNudge, noteCourseOpen } from "../ui/star-nudge";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
 import { courseLayout } from "./layout";
 
@@ -50,6 +53,28 @@ export function CourseDetails({
   ) {
     setLastSelection(selection);
   }
+  useEffect(() => {
+    const courseId = course?.id;
+    if (!courseId || !noteCourseOpen(courseId)) return;
+    toast.custom(
+      (id) => (
+        <StarNudgeToast
+          message={text("Suka g-13? Beri kami bintang di GitHub.")}
+          starLabel={text("Beri bintang")}
+          laterLabel={text("Nanti saja")}
+          onStar={() => {
+            dismissStarNudge();
+            toast.dismiss(id);
+          }}
+          onLater={() => {
+            dismissStarNudge();
+            toast.dismiss(id);
+          }}
+        />
+      ),
+      { duration: 12000 },
+    );
+  }, [course?.id, text]);
   const content = selection ?? lastSelection;
 
   return (
