@@ -156,6 +156,17 @@ export function AppHeader() {
               {t("navigation.resources")}
             </Link>
           </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild>
+            <Link
+              to="/faq-2026"
+              activeProps={{
+                className: "decoration-current",
+                "aria-current": "page",
+              }}
+            >
+              {t("navigation.curriculumFaq")}
+            </Link>
+          </AlignLinkButton.Root>
           <Faq />
         </nav>
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
@@ -254,6 +265,15 @@ export function AppHeader() {
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
               {t("navigation.roadmap")}
+            </Link>
+          </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
+            <Link
+              to="/faq-2026"
+              onClick={() => setMenuOpen(false)}
+              activeProps={{ "aria-current": "page", className: "decoration-current" }}
+            >
+              {t("navigation.curriculumFaq")}
             </Link>
           </AlignLinkButton.Root>
           <Faq className="h-14 justify-start text-lg" />
