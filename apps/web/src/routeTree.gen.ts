@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
+import { Route as Faq2026RouteImport } from './routes/faq-2026'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 
@@ -30,6 +31,11 @@ const ExamRoute = ExamRouteImport.update({
   path: '/exam',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Faq2026Route = Faq2026RouteImport.update({
+  id: '/faq-2026',
+  path: '/faq-2026',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/faq-2026': typeof Faq2026Route
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/faq-2026': typeof Faq2026Route
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
+  '/faq-2026': typeof Faq2026Route
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
+  fullPaths: '/' | '/alumni' | '/exam' | '/faq-2026' | '/resources' | '/roadmap'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
-  id: '__root__' | '/' | '/alumni' | '/exam' | '/resources' | '/roadmap'
+  to: '/' | '/alumni' | '/exam' | '/faq-2026' | '/resources' | '/roadmap'
+  id:
+    | '__root__'
+    | '/'
+    | '/alumni'
+    | '/exam'
+    | '/faq-2026'
+    | '/resources'
+    | '/roadmap'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
+  Faq2026Route: typeof Faq2026Route
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
 }
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq-2026': {
+      id: '/faq-2026'
+      path: '/faq-2026'
+      fullPath: '/faq-2026'
+      preLoaderRoute: typeof Faq2026RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
+  Faq2026Route: Faq2026Route,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
 }
