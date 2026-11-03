@@ -157,6 +157,13 @@ export function MapControlPanel({
         transition={reducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="absolute inset-0 rounded-10 bg-bg-white-0 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200"
       />
+      <m.div
+        aria-hidden="true"
+        initial={false}
+        animate={{ opacity: open ? 0 : 1 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.1 }}
+        className={`absolute right-0 ${anchor === "bottom" ? "bottom-0" : "top-0"} size-10 rounded-10 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200`}
+      />
       <AlignButton.Root
         ref={toggle}
         variant="neutral"

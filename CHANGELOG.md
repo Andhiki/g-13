@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-03
+
+#### Fixed
+
+- Bingkai tombol pemilih kurikulum dan pintasan keyboard tampil utuh di keempat sisi saat panel tertutup.
+
 ### 2026-11-02
 
 #### Changed
