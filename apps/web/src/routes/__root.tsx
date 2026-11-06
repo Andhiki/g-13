@@ -157,6 +157,13 @@ function RootDocument({ children }: { children: ReactNode }) {
     >
       <head>
         <HeadContent />
+        {import.meta.env.PROD && (
+          <script
+            type="module"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon='{"token": "38f322cab5754b91a26627775d91250a"}'
+          />
+        )}
         <script dangerouslySetInnerHTML={{ __html: themePreferenceScript }} />
         <script
           dangerouslySetInnerHTML={{
