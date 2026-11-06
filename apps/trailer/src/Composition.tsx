@@ -656,6 +656,9 @@ function Ending() {
             <Icon kind="arrow" size={40} />
           </span>
         </div>
+        <div style={{ marginTop: 18, fontSize: 28, color: "#555b57", fontWeight: 450 }}>
+          csugm.andhiki.tech
+        </div>
       </div>
       <div
         style={{
