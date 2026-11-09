@@ -15,6 +15,8 @@ import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
+import { Route as ApiAlumniRouteImport } from './routes/api/alumni'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +48,16 @@ const RoadmapRoute = RoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlumniAllRoute = AlumniAllRouteImport.update({
+  id: '/alumni_/all',
+  path: '/alumni/all',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlumniRoute = ApiAlumniRouteImport.update({
+  id: '/api/alumni',
+  path: '/api/alumni',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
+  '/alumni/all': typeof AlumniAllRoute
+  '/api/alumni': typeof ApiAlumniRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +76,8 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
+  '/alumni/all': typeof AlumniAllRoute
+  '/api/alumni': typeof ApiAlumniRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,14 +87,40 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
+  '/alumni_/all': typeof AlumniAllRoute
+  '/api/alumni': typeof ApiAlumniRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alumni' | '/exam' | '/faq' | '/resources' | '/roadmap'
+  fullPaths:
+    | '/'
+    | '/alumni'
+    | '/exam'
+    | '/faq'
+    | '/resources'
+    | '/roadmap'
+    | '/alumni/all'
+    | '/api/alumni'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alumni' | '/exam' | '/faq' | '/resources' | '/roadmap'
+  to:
+    | '/'
+    | '/alumni'
+    | '/exam'
+    | '/faq'
+    | '/resources'
+    | '/roadmap'
+    | '/alumni/all'
+    | '/api/alumni'
   id:
-    '__root__' | '/' | '/alumni' | '/exam' | '/faq' | '/resources' | '/roadmap'
+    | '__root__'
+    | '/'
+    | '/alumni'
+    | '/exam'
+    | '/faq'
+    | '/resources'
+    | '/roadmap'
+    | '/alumni_/all'
+    | '/api/alumni'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +130,8 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
+  AlumniAllRoute: typeof AlumniAllRoute
+  ApiAlumniRoute: typeof ApiAlumniRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +178,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alumni_/all': {
+      id: '/alumni_/all'
+      path: '/alumni/all'
+      fullPath: '/alumni/all'
+      preLoaderRoute: typeof AlumniAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alumni': {
+      id: '/api/alumni'
+      path: '/api/alumni'
+      fullPath: '/api/alumni'
+      preLoaderRoute: typeof ApiAlumniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -144,6 +202,8 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
+  AlumniAllRoute: AlumniAllRoute,
+  ApiAlumniRoute: ApiAlumniRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -82,6 +82,10 @@ first. Before `bun run dev`, build the curriculum package once with
 - `docs/adr/` — important technical decisions.
 - `docs/` — contributor and agent workflows.
 
+The alumni directory reads from a Strapi collection through a server route. It needs
+a `STRAPI_API_TOKEN` secret; see the
+[alumni directory guide](docs/alumni-directory.md) before running or deploying it.
+
 For website changes, start in `apps/web/`. For curriculum changes, start in
 `packages/curriculum/` and include an official source. Read the
 [curriculum import guide](docs/curriculum-import.md) before changing
