@@ -1,5 +1,7 @@
 import { useLocale } from "../../useLocale";
-import { RiLinkedinBoxFill } from "@remixicon/react";
+import { RiLinkedinBoxFill, RiArrowRightLine } from "@remixicon/react";
+import { Link } from "@tanstack/react-router";
+import { AlignFancyButton } from "../../ui/fancy-button";
 import { AlignButton } from "../../ui/button";
 import { Typography } from "../../ui/typography";
 
@@ -171,6 +173,12 @@ export function AlumniPage() {
               "Meet Ilmu Komputer UGM alumni building products, leading teams, and growing careers across technology.",
             )}
           </Typography>
+          <AlignFancyButton.Root asChild className="mt-6">
+            <Link to="/alumni/all">
+              {text("Jelajahi semua alumni")}
+              <RiArrowRightLine aria-hidden="true" className="size-5" />
+            </Link>
+          </AlignFancyButton.Root>
         </header>
         <section aria-label={text("Alumni stories")} className="grid content-start gap-4">
           {alumniProfiles.map((story) => (
