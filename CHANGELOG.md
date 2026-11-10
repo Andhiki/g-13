@@ -12,6 +12,16 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-09
+
+#### Added
+
+- Menambahkan direktori alumni di `/alumni/all` berisi kartu alumni yang bisa dicari
+  berdasarkan nama, instansi, atau posisi, disaring per angkatan, dan dimuat bertahap.
+  Data diambil lewat rute server `/api/alumni` sehingga kunci API Strapi tidak pernah
+  sampai ke peramban dan data kontak pribadi tidak ikut ditampilkan.
+- Menambahkan tombol “Jelajahi semua alumni” di halaman alumni.
+
 ### 2026-11-03
 
 #### Fixed
