@@ -157,7 +157,7 @@ const focusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const drawerMotion =
-  "data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=open]:animate-in data-[state=closed]:duration-200 data-[state=closed]:ease-in data-[state=closed]:animate-out data-[state=closed]:pointer-events-none motion-reduce:animate-none";
+  "data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=open]:animate-in data-[state=closed]:duration-200 data-[state=closed]:ease-in data-[state=closed]:animate-out data-[state=closed]:[animation-fill-mode:forwards] data-[state=closed]:pointer-events-none motion-reduce:animate-none";
 
 const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
   {
@@ -361,7 +361,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
       {isModal ? (
         <div
           className={twMerge(
-            "fixed inset-0 z-50 grid grid-cols-1 place-items-start overflow-hidden bg-overlay backdrop-blur-[10px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:duration-200 data-[state=closed]:duration-200 motion-reduce:animate-none",
+            "fixed inset-0 z-50 grid grid-cols-1 place-items-start overflow-hidden bg-overlay backdrop-blur-[10px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:[animation-fill-mode:forwards] data-[state=open]:fade-in-0 data-[state=open]:duration-200 data-[state=closed]:duration-200 motion-reduce:animate-none",
             bottom && "items-end",
           )}
           data-state={state}

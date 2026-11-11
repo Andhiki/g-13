@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-11
 
+#### Fixed
+
+- Menghilangkan kilatan panel saat detail mata kuliah ditutup dengan gestur geser.
+
 #### Changed
 
 - Mengganti drawer detail mata kuliah dan panel peta dengan implementasi ringan yang tetap mendukung animasi, keyboard, dan aksesibilitas dialog.

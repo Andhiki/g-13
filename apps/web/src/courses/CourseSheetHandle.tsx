@@ -81,7 +81,7 @@ export function CourseSheetHandle({
       if (active?.dragging) {
         suppressClick.current = true;
         if (cancelled || active.current < minimum / 2) {
-          preview(height);
+          preview(cancelled ? height : active.current);
           if (!cancelled) close.current();
           active = null;
           return;
