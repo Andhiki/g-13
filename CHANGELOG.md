@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-11
+
+#### Changed
+
+- Mengganti drawer detail mata kuliah dan panel peta dengan implementasi ringan yang tetap mendukung animasi, keyboard, dan aksesibilitas dialog.
+
 ### 2026-11-09
 
 #### Added
