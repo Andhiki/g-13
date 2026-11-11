@@ -120,10 +120,14 @@ export function CurriculumPage() {
         </div>
         {view === "list" && (
           <section
-            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 ${selected ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
+            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 max-[640px]:pt-28 ${selected ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
           >
             <div className="mx-auto max-w-3xl">
-              <Typography as="h1" variant="title" className="m-0 mb-8 text-text-strong-950">
+              <Typography
+                as="h1"
+                variant="title"
+                className="m-0 mb-8 text-text-strong-950 max-[640px]:mb-4"
+              >
                 {text("Mata kuliah")}
               </Typography>
               <CourseList

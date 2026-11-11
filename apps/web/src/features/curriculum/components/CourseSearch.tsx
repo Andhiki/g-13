@@ -43,7 +43,7 @@ export function CourseSearch({
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
-        <span className="flex-1 text-left">{text("Cari mata kuliah")}</span>
+        <span className="min-w-0 flex-1 truncate text-left">{text("Cari mata kuliah")}</span>
         <RiSearchLine className="size-5 shrink-0 min-[650px]:hidden" aria-hidden="true" />
         <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
       </AlignButton.Root>

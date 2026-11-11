@@ -20,6 +20,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Merapikan daftar mata kuliah di layar kecil agar nama, kode, dan SKS lebih mudah dipindai.
 - Mengganti drawer detail mata kuliah dan panel peta dengan implementasi ringan yang tetap mendukung animasi, keyboard, dan aksesibilitas dialog.
 
 ### 2026-11-09
