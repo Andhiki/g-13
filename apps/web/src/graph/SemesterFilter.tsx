@@ -22,7 +22,7 @@ export function SemesterFilter({
 
   return (
     <div
-      className="flex min-w-0 items-center gap-3 max-[1100px]:w-full max-[1100px]:max-w-[360px]"
+      className="flex min-w-0 items-center gap-2 max-[1100px]:w-full max-[1100px]:max-w-[360px]"
       role="group"
       aria-label={text("Navigasi semester")}
     >
@@ -37,7 +37,7 @@ export function SemesterFilter({
           ease: [0.16, 1, 0.3, 1],
           opacity: { duration: 0 },
         }}
-        className="relative z-0 max-[1100px]:sr-only"
+        className="relative z-0"
       >
         <Typography as="span" variant="label">
           {text("Semester")}
@@ -50,7 +50,7 @@ export function SemesterFilter({
         transition={
           reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
         }
-        className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:w-full"
+        className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:min-w-0 max-[1100px]:flex-1"
       >
         <div
           className="relative grid w-full gap-0.5"

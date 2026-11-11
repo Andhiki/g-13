@@ -81,7 +81,7 @@ export function CourseTable({
             return (
               <AlignTable.Row
                 key={course.id}
-                className="cursor-[var(--interactive-cursor)]"
+                className="cursor-[var(--interactive-cursor)] max-[640px]:border-b max-[640px]:border-stroke-soft-200"
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest("button")) return;
                   select(course.id);
@@ -98,14 +98,6 @@ export function CourseTable({
                   </div>
                 </AlignTable.Cell>
                 <AlignTable.Cell className="h-10">
-                  {course.code && (
-                    <div className="mt-2 inline-flex items-center gap-1 min-[640px]:hidden">
-                      <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
-                      <Typography as="span" variant="code" className="text-text-sub-600">
-                        {course.code}
-                      </Typography>
-                    </div>
-                  )}
                   <AlignButton.Root
                     variant="neutral"
                     mode="ghost"
@@ -120,6 +112,14 @@ export function CourseTable({
                     </Typography>
                   </AlignButton.Root>
                   <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 min-[640px]:hidden">
+                    {course.code && (
+                      <div className="inline-flex items-center gap-1">
+                        <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
+                        <Typography as="span" variant="code" className="text-text-sub-600">
+                          {course.code}
+                        </Typography>
+                      </div>
+                    )}
                     {categoryLabels.map((label) => (
                       <AlignBadge.Root key={label} variant="light" size="medium">
                         {label}
@@ -151,7 +151,7 @@ export function CourseTable({
                     </Typography>
                   )}
                 </AlignTable.Cell>
-                <AlignTable.Cell className="h-10 text-right">
+                <AlignTable.Cell className="h-10 whitespace-nowrap text-right max-[640px]:align-top max-[640px]:pt-3">
                   <Typography
                     as="span"
                     variant="paragraph"
