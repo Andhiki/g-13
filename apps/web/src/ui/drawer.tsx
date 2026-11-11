@@ -185,6 +185,8 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const portalRef = useRef<HTMLDivElement | null>(null);
+  const setOpenRef = useRef(setOpen);
+  setOpenRef.current = setOpen;
   const onOpenAutoFocusRef = useRef(onOpenAutoFocus);
   const onInteractOutsideRef = useRef(onInteractOutside);
   onOpenAutoFocusRef.current = onOpenAutoFocus;
@@ -241,7 +243,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
       if (event.key === "Escape" && !event.defaultPrevented) {
         event.preventDefault();
         event.stopPropagation();
-        setOpen(false);
+        setOpenRef.current(false);
         return;
       }
       if (!isModal || event.key !== "Tab") return;
@@ -276,7 +278,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
     const onPointerDown = (event: PointerEvent) => {
       if (isModal || content.contains(event.target as Node)) return;
       onInteractOutsideRef.current?.(event);
-      if (!event.defaultPrevented) setOpen(false);
+      if (!event.defaultPrevented) setOpenRef.current(false);
     };
 
     document.addEventListener("keydown", onKeyDown, true);
@@ -308,7 +310,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
           : context.triggerRef.current;
       restoreTarget?.focus({ preventScroll: true });
     };
-  }, [context.triggerRef, isModal, mounted, open, present, setOpen]);
+  }, [context.triggerRef, isModal, mounted, open, present]);
 
   const handleOverlayPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
