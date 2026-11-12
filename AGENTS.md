@@ -10,4 +10,10 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When writing user-facing copy, refer to the app rather than its internal name g-13.
+
+- When changing frontend UI, take a screenshot and show it to the user.
+
+- When designing the GitHub star toast, give the GitHub icon prominence and right-align actions with the primary button last.
+
 - When placing course metadata and badges in a row, align them in a shared flex container and inspect the result.

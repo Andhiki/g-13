@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-12
+
+#### Changed
+
+- Merapikan tampilan ajakan memberi bintang di GitHub agar lebih mudah dibaca.
+
 ### 2026-11-11
 
 #### Fixed
