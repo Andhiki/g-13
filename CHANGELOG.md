@@ -17,6 +17,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Fixed
 
 - Menghapus kategori yang berulang pada tabel mata kuliah.
+- Memastikan panel detail mata kuliah tetap tampil sampai animasi penutupan selesai.
 
 #### Changed
 
