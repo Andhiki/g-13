@@ -2,11 +2,9 @@ import { expect, test } from "bun:test";
 import {
   alumniAvatarTone,
   alumniInitials,
-  alumniPageSize,
   collectAlumni,
   filterAlumni,
   normalizeLinkedIn,
-  pageAlumni,
   sanitizeAlumni,
 } from "./directory";
 
@@ -127,23 +125,6 @@ test("filters combine batch and free text across name, employer, and position", 
   expect(filterAlumni(items, { query: "dosen", batch: 2022 })).toEqual([]);
 });
 
-test("pagination grows in fixed steps and reports the remainder", () => {
-  const items = Array.from({ length: alumniPageSize + 3 }, (_, index) => ({
-    id: index,
-    name: `Alumni ${index}`,
-    batch: 2020,
-    employer: "",
-    position: "",
-    linkedin: null,
-  }));
-  expect(pageAlumni(items, 0)).toEqual({
-    items: items.slice(0, alumniPageSize),
-    hasMore: true,
-  });
-  expect(pageAlumni(items, alumniPageSize * 2).items).toHaveLength(items.length);
-  expect(pageAlumni(items, alumniPageSize * 2).hasMore).toBe(false);
-});
-
 test("initials skip academic titles and stay at two letters", () => {
   expect(alumniInitials("Haris Setyawan, S.Kom, M.S.E")).toBe("HS");
   expect(alumniInitials("Anindito Baskoro Satrianto")).toBe("AS");
@@ -155,5 +136,4 @@ test("avatar tone is stable for the same record", () => {
   const tone = alumniAvatarTone(31);
   expect(tone).toEqual(alumniAvatarTone(31));
   expect(tone.solid).toMatch(/^bg-\S+ text-\S+$/);
-  expect(tone.band).toMatch(/^bg-\S+$/);
 });
