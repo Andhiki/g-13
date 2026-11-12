@@ -202,9 +202,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
       return;
     }
     if (!present) return;
-    const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 220;
-    const timeout = window.setTimeout(() => setPresent(false), duration);
-    return () => window.clearTimeout(timeout);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPresent(false);
   }, [open, present]);
 
   const setRefs = useCallback(
@@ -344,7 +342,10 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
       aria-modal={isModal && open ? true : undefined}
       data-state={state}
       className={contentClassName}
-      onAnimationEnd={onAnimationEnd}
+      onAnimationEnd={(event) => {
+        onAnimationEnd?.(event);
+        if (event.target === event.currentTarget && !open) setPresent(false);
+      }}
       {...props}
     >
       <div className="relative flex size-full flex-col">{children}</div>
