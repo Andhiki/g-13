@@ -2,8 +2,8 @@
 
 The `Alumni` collection lives in the community's Strapi instance at
 `https://strapi.kagamailkomp.id`. The website never calls Strapi from the browser.
-A server route at [`/api/alumni`](../../apps/web/src/routes/api/alumni.ts) fetches,
-sanitises, and caches the data, then the directory page at `/alumni/all` renders it.
+The `/alumni/all` route fetches and sanitises the data on the server before rendering.
+The [`/api/alumni`](../../apps/web/src/routes/api/alumni.ts) route supplies retries.
 
 ## Why a server route instead of a direct request
 
@@ -73,7 +73,7 @@ Strapi caps `pagination[pageSize]` at **100** for this token regardless of the v
 requested. 226 public records therefore need three pages; `alumniUpstream.maxPages`
 bounds the loop. If the collection grows past 500 records, raise `maxPages`.
 
-The browser shows all matching cards. Filtering and search run client-side on the
+The browser shows all matching cards in alphabetical order. Filtering and search run client-side on the
 full payload (~45 KB), which keeps typing responsive.
 
 ## Avatars
@@ -85,14 +85,13 @@ with the person's consent; do not derive photos from LinkedIn URLs.
 
 ## Caching
 
-The route responds with:
+The retry API responds with:
 
 ```
 Cache-Control: public, max-age=300, s-maxage=3600, stale-while-revalidate=86400
 ```
 
-The edge serves stale data while refreshing, so a Strapi outage does not take the
-directory down.
+The initial page is server-rendered on each request; it does not currently use ISR.
 
 ## Verifying a change
 

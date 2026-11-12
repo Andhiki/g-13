@@ -1,4 +1,5 @@
 import "@tanstack/react-start/server-only";
+import type { StrapiAlumniResponse } from "./directory";
 
 // Server-only configuration for the alumni directory.
 // The Strapi token is read from the environment at request time and is never
@@ -30,8 +31,8 @@ const fields = [
   "populate[pekerjaan][fields][1]=position",
   "populate[metadata][fields][0]=isPublic",
   "filters[metadata][isPublic][$eq]=true",
-  "sort[0]=batch:desc",
-  "sort[1]=name:asc",
+  "sort[0]=name:asc",
+  "sort[1]=id:asc",
   `pagination[pageSize]=${pageSize}`,
 ].join("&");
 
@@ -40,6 +41,22 @@ export const alumniUpstream = {
   timeoutMs: 8_000,
   pageUrl: (page: number) => `${strapiOrigin()}/api/alumnis?${fields}&pagination[page]=${page}`,
 };
+
+export async function fetchAlumniPages(token: string): Promise<StrapiAlumniResponse[]> {
+  const pages: StrapiAlumniResponse[] = [];
+  for (let page = 1; page <= alumniUpstream.maxPages; page++) {
+    const response = await fetch(alumniUpstream.pageUrl(page), {
+      headers: { authorization: `Bearer ${token}`, accept: "application/json" },
+      signal: AbortSignal.timeout(alumniUpstream.timeoutMs),
+    });
+    if (!response.ok) throw new Error(`upstream ${response.status}`);
+    const body = (await response.json()) as StrapiAlumniResponse;
+    pages.push(body);
+    const pageCount = body.meta?.pagination?.pageCount;
+    if (typeof pageCount !== "number" || page >= pageCount) break;
+  }
+  return pages;
+}
 
 // Edge caches the response; the browser revalidates cheaply and keeps serving
 // stale data while the edge refreshes.

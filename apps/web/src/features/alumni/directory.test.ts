@@ -68,7 +68,7 @@ test("non-profile URLs are rejected", () => {
   }
 });
 
-test("pages are deduplicated and sorted newest batch first, then by name", () => {
+test("pages are deduplicated and sorted by name across batches", () => {
   const data = collectAlumni([
     {
       data: [
@@ -85,7 +85,7 @@ test("pages are deduplicated and sorted newest batch first, then by name", () =>
       meta: { pagination: { total: 3 } },
     },
   ]);
-  expect(data.items.map((item) => item.name)).toEqual(["Ani", "Cici", "Budi"]);
+  expect(data.items.map((item) => item.name)).toEqual(["Ani", "Budi", "Cici"]);
   expect(data.batches).toEqual([2022, 2021]);
   expect(data.total).toBe(3);
 });
