@@ -196,7 +196,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
               className="group relative flex h-3 w-9 items-center justify-end pr-1 focus-visible:outline-2 focus-visible:outline-primary-base"
             >
               {(hovered === letter || (!hovered && current === letter)) && (
-                <span className="absolute right-9 rounded-6 bg-bg-strong-950 px-2 py-1 text-label-sm text-white">
+                <span className="absolute right-9 rounded-6 bg-bg-strong-950 px-2 py-1 text-label-sm text-text-white-0">
                   {letter}
                 </span>
               )}
