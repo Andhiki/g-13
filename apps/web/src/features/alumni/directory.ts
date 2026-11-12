@@ -7,6 +7,7 @@ export type AlumniCard = {
   batch: number;
   employer: string;
   position: string;
+  education?: string;
   linkedin: string | null;
 };
 
@@ -131,15 +132,6 @@ export function filterAlumni(items: AlumniCard[], filter: AlumniFilter): AlumniC
   });
 }
 
-export const alumniPageSize = 24;
-
-export type AlumniPage = { items: AlumniCard[]; hasMore: boolean };
-
-export function pageAlumni(items: AlumniCard[], visible: number): AlumniPage {
-  const limit = Math.max(visible, alumniPageSize);
-  return { items: items.slice(0, limit), hasMore: items.length > limit };
-}
-
 // Titles appear after a comma or as dotted abbreviations, never as a plain surname.
 // Requires at least one dot so names like "Mira" or "Dewi" survive untouched.
 const academicAbbreviations = /^[a-z]{1,4}(\.[a-z]{1,4})+\.?$/i;
@@ -166,17 +158,12 @@ export function alumniInitials(name: string): string {
   return `${first}${last}`.toUpperCase();
 }
 
-// `solid` paints the avatar circle, `band` paints the tinted header behind it.
-// The band is one step weaker so the avatar keeps its contrast on both themes.
 const avatarTones = [
-  { solid: "bg-faded-light text-faded-dark", band: "bg-bg-weak-50" },
-  {
-    solid: "bg-information-light text-information-dark",
-    band: "bg-information-lighter",
-  },
-  { solid: "bg-success-light text-success-dark", band: "bg-success-lighter" },
-  { solid: "bg-warning-light text-warning-dark", band: "bg-warning-lighter" },
-  { solid: "bg-feature-light text-feature-dark", band: "bg-feature-lighter" },
+  { solid: "bg-faded-light text-faded-dark" },
+  { solid: "bg-information-light text-information-dark" },
+  { solid: "bg-success-light text-success-dark" },
+  { solid: "bg-warning-light text-warning-dark" },
+  { solid: "bg-feature-light text-feature-dark" },
 ] as const;
 
 export type AlumniAvatarTone = (typeof avatarTones)[number];

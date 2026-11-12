@@ -73,9 +73,8 @@ Strapi caps `pagination[pageSize]` at **100** for this token regardless of the v
 requested. 226 public records therefore need three pages; `alumniUpstream.maxPages`
 bounds the loop. If the collection grows past 500 records, raise `maxPages`.
 
-The browser shows 24 cards at a time and reveals more with **Load more**. Filtering
-and search run client-side on the full payload (~45 KB), which keeps typing instant
-and works offline after the first load.
+The browser shows all matching cards. Filtering and search run client-side on the
+full payload (~45 KB), which keeps typing responsive.
 
 ## Avatars
 
@@ -105,6 +104,6 @@ bun run dev
 ```
 
 Then open `/alumni` and `/alumni/all`, and check both desktop and mobile layouts.
-Automated tests cover the sanitisation, URL normalisation, filtering, and pagination
+Automated tests cover the sanitisation, URL normalisation and filtering
 logic in [`directory.test.ts`](../../apps/web/src/features/alumni/directory.test.ts);
 UI behaviour is verified manually as the contribution guide requires.

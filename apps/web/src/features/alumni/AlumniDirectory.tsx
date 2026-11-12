@@ -1,12 +1,13 @@
 import { useDeferredValue, useId, useMemo, useState } from "react";
-import { RiArrowLeftLine, RiLoader4Line, RiSearchLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiSearchLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../../useLocale";
 import { AlignButton } from "../../ui/button";
+import { Loading } from "../../ui/loading";
 import { AlignSelect } from "../../ui/select";
 import { Typography } from "../../ui/typography";
 import { AlumniDirectoryCard } from "./AlumniDirectoryCard";
-import { alumniPageSize, filterAlumni, pageAlumni } from "./directory";
+import { filterAlumni } from "./directory";
 import { useAlumniDirectory } from "./useAlumniDirectory";
 
 const allBatches = "semua";
@@ -16,7 +17,6 @@ export function AlumniDirectory() {
   const directory = useAlumniDirectory();
   const [batch, setBatch] = useState(allBatches);
   const [query, setQuery] = useState("");
-  const [visible, setVisible] = useState(alumniPageSize);
   const searchId = useId();
   // Keystrokes stay responsive on mobile; the heavy list re-renders behind them.
   const deferredQuery = useDeferredValue(query);
@@ -33,21 +33,9 @@ export function AlumniDirectory() {
     [items, batch, deferredQuery],
   );
 
-  const page = pageAlumni(filtered, visible);
-
-  const changeBatch = (value: string) => {
-    setBatch(value);
-    setVisible(alumniPageSize);
-  };
-
-  const changeQuery = (value: string) => {
-    setQuery(value);
-    setVisible(alumniPageSize);
-  };
-
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-6xl">
         <header className="max-w-2xl">
           <Link
             to="/alumni"
@@ -82,16 +70,16 @@ export function AlumniDirectory() {
               id={searchId}
               type="search"
               value={query}
-              onChange={(event) => changeQuery(event.target.value)}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder={text("Cari nama, instansi, atau posisi")}
               className="h-10 w-full rounded-10 bg-bg-white-0 pl-10 pr-3 text-paragraph-sm text-text-strong-950 ring-1 ring-inset ring-stroke-soft-200 outline-none transition placeholder:text-text-sub-600 focus:ring-stroke-strong-950"
             />
           </div>
-          <AlignSelect.Root value={batch} onValueChange={changeBatch} variant="compact">
+          <AlignSelect.Root value={batch} onValueChange={setBatch} variant="compact">
             <AlignSelect.Trigger className="sm:w-56" aria-label={text("Angkatan")}>
               <AlignSelect.Value />
             </AlignSelect.Trigger>
-            <AlignSelect.Content>
+            <AlignSelect.Content align="end" className="w-[var(--radix-select-trigger-width)]">
               <AlignSelect.Item value={allBatches}>{text("Semua angkatan")}</AlignSelect.Item>
               {batches.map((year) => (
                 <AlignSelect.Item key={year} value={String(year)}>
@@ -104,24 +92,12 @@ export function AlumniDirectory() {
 
         <p aria-live="polite" className="mt-6 text-paragraph-sm text-text-sub-600">
           {directory.status === "ready" &&
-            text("Menampilkan {{v0}} dari {{v1}} alumni", {
-              v0: String(page.items.length),
-              v1: String(filtered.length),
-            })}
+            text("Menampilkan {{v0}} alumni", { v0: String(filtered.length) })}
         </p>
 
         {directory.status === "loading" && (
-          <div
-            role="status"
-            className="mt-6 flex items-center justify-center gap-2 py-20 text-text-sub-600"
-          >
-            <RiLoader4Line
-              aria-hidden="true"
-              className="size-5 animate-spin motion-reduce:animate-none"
-            />
-            <Typography as="span" variant="paragraph" className="m-0">
-              {text("Memuat alumni")}
-            </Typography>
+          <div className="mt-6 flex min-h-64">
+            <Loading />
           </div>
         )}
 
@@ -139,7 +115,7 @@ export function AlumniDirectory() {
           </div>
         )}
 
-        {directory.status === "ready" && page.items.length === 0 && (
+        {directory.status === "ready" && filtered.length === 0 && (
           <div className="mt-6 rounded-10 border border-stroke-soft-200 p-10 text-center">
             <Typography variant="label" className="m-0">
               {text("Tidak ada alumni yang cocok.")}
@@ -150,26 +126,14 @@ export function AlumniDirectory() {
           </div>
         )}
 
-        {page.items.length > 0 && (
-          <ul className="mt-6 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {page.items.map((alumnus) => (
+        {filtered.length > 0 && (
+          <ul className="mt-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((alumnus) => (
               <li key={alumnus.id} className="min-w-0">
                 <AlumniDirectoryCard alumnus={alumnus} />
               </li>
             ))}
           </ul>
-        )}
-
-        {page.hasMore && (
-          <div className="mt-8 flex justify-center">
-            <AlignButton.Root
-              variant="neutral"
-              mode="stroke"
-              onClick={() => setVisible((value) => value + alumniPageSize)}
-            >
-              {text("Muat lebih banyak")}
-            </AlignButton.Root>
-          </div>
         )}
       </div>
     </main>
