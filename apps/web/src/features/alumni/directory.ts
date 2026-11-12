@@ -111,8 +111,7 @@ export function collectAlumni(pages: StrapiAlumniResponse[]): AlumniDirectoryDat
   }
   items.sort(
     (left, right) =>
-      right.batch - left.batch ||
-      left.name.localeCompare(right.name, "id", { sensitivity: "base" }),
+      left.name.localeCompare(right.name, "id", { sensitivity: "base" }) || left.id - right.id,
   );
   return {
     items,

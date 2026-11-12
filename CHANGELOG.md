@@ -21,6 +21,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengurutkan direktori alumni berdasarkan nama dan menambahkan navigasi alfabet.
+- Menambahkan ikon bank dan perusahaan yang tercantum di direktori alumni.
 - Merapikan kartu direktori alumni, menampilkan semua hasil tanpa tombol tambahan, menambahkan ikon untuk beberapa perusahaan, dan menyamakan tampilan pemuatan dengan halaman lain.
 - Merapikan tampilan ajakan memberi bintang di GitHub agar lebih mudah dibaca.
 

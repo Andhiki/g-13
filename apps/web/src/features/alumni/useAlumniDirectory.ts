@@ -6,16 +6,17 @@ export type AlumniDirectoryState =
   | { status: "ready"; data: AlumniDirectoryData }
   | { status: "unavailable" };
 
-/**
- * Reads the sanitised directory from our own `/api/alumni` route.
- * The Strapi token stays on the server; the browser only ever sees this endpoint.
- * The response is cached by the edge, so revisits resolve without a network round trip.
- */
-export function useAlumniDirectory(): AlumniDirectoryState & { reload: () => void } {
-  const [state, setState] = useState<AlumniDirectoryState>({ status: "loading" });
+// Initial data comes from the server loader; retries use the cached API route.
+export function useAlumniDirectory(
+  initialData: AlumniDirectoryData | null,
+): AlumniDirectoryState & { reload: () => void } {
+  const [state, setState] = useState<AlumniDirectoryState>(
+    initialData ? { status: "ready", data: initialData } : { status: "unavailable" },
+  );
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    if (attempt === 0) return;
     const controller = new AbortController();
     let active = true;
     setState({ status: "loading" });
