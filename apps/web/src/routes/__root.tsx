@@ -61,7 +61,7 @@ export const Route = createRootRouteWithContext<{ language?: Language }>()({
       },
       { title: loaderData?.common["Everything CS UGM"] },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "g-13" },
+      { property: "og:site_name", content: loaderData?.common["Everything CS UGM"] },
       { property: "og:image", content: "https://csugm.andhiki.tech/social-preview.png" },
       { property: "og:title", content: loaderData?.common["Everything CS UGM"] },
       {
