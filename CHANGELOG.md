@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-12
 
+#### Fixed
+
+- Menghapus kategori yang berulang pada tabel mata kuliah.
+
 #### Changed
 
 - Merapikan tampilan ajakan memberi bintang di GitHub agar lebih mudah dibaca.

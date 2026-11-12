@@ -64,7 +64,15 @@ export function CourseTable({
                   placement.semesterLabel && placement.semesterLabel !== String(placement.semester),
               );
             const groups = [
-              ...new Set(course.placements.map((placement) => placement.group).filter(Boolean)),
+              ...new Set(
+                course.placements
+                  .filter(
+                    (placement) =>
+                      placement.groupKind === "interest" || placement.groupKind === "other",
+                  )
+                  .map((placement) => placement.group)
+                  .filter(Boolean),
+              ),
             ]
               .map((group) => text(group))
               .join(" · ");

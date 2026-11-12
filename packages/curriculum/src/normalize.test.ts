@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { makePlacement } from "./normalize";
 
 const creditsFor = (value: unknown) =>
-  makePlacement("core", "", "", "none", 1, value, "", null).credits;
+  makePlacement("core", "Wajib", "", "none", 1, value, "", null).credits;
 
 test("missing and invalid source credits stay unknown instead of becoming zero", () => {
   for (const value of [null, undefined, "", "  ", "unknown", Infinity, -1, true, {}]) {

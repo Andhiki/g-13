@@ -28,7 +28,7 @@ function semester(value: unknown) {
 
 export function makePlacement(
   section: Section,
-  label: string,
+  label: Placement["label"],
   group: string,
   groupKind: Placement["groupKind"],
   sem: unknown,
