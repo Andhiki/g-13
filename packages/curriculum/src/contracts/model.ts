@@ -1,11 +1,21 @@
 import type { CurriculumId } from "../registry";
 export type { CurriculumId } from "../registry";
 export type GroupKind = "interest" | "elective" | "activity" | "other" | "none";
+export type CourseCategory =
+  | "Wajib"
+  | "Wajib minat (WM)"
+  | "Pilihan bebas (P)"
+  | "Aktivitas di luar program studi"
+  | "Slot pilihan"
+  | "Pilihan agama"
+  | "Pilihan terjadwal (P)"
+  | "Wajib terjadwal (W)"
+  | "Mata kuliah pilihan";
 type Section = "core" | "interest" | "elective";
 
 export type Placement = {
   section: Section;
-  label: string;
+  label: CourseCategory;
   group: string;
   groupKind: GroupKind;
   semester: number | null;
