@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menampilkan indikator saat direktori alumni sedang dimuat.
 - Memperjelas huruf navigasi direktori alumni pada mode gelap.
 - Menghapus kategori yang berulang pada tabel mata kuliah.
 - Memastikan panel detail mata kuliah tetap tampil sampai animasi penutupan selesai.
