@@ -48,7 +48,7 @@ export function AlumniDirectoryCard({ alumnus }: { alumnus: AlumniCard }) {
                 <img
                   src={logo}
                   alt=""
-                  className="mr-1.5 inline-block size-4 align-[-3px] object-contain dark:brightness-125"
+                  className="mr-1.5 inline-block h-4 w-auto max-w-12 align-[-3px] object-contain dark:brightness-125"
                 />
               )}
               {alumnus.employer && (
