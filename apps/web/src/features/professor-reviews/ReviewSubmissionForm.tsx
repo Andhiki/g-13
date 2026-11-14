@@ -276,7 +276,7 @@ export function ReviewSubmissionForm({
         </fieldset>
       </div>
 
-      <footer className="shrink-0 border-t border-stroke-soft-200 px-5 py-3">
+      <footer className="shrink-0 border-t border-stroke-soft-200 p-5">
         {message && (
           <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
             <p className="m-0">{text(message)}</p>
