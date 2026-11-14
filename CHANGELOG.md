@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-14
 
+#### Fixed
+
+- Menyamakan ukuran teks tombol pada ajakan memberi bintang di GitHub dengan teks pesannya.
+
 #### Changed
 
 - Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
