@@ -1,22 +1,6 @@
 # Web fonts
 
-Run `python scripts/optimize-fonts.py` in a Python environment with
-`fonttools==4.68.0` and `brotli==1.2.1`, after `bun install --frozen-lockfile`.
-Then run `bun run --cwd apps/web fmt`, review the audit and pixel comparisons,
-and commit `apps/web/src/fonts/` with the changes. Processing is manual; the
-build consumes committed assets.
-
-Rerun after changing font versions, content, translations, curriculum data,
-font families, weights, inline styles, OpenType settings, or hyphenation.
-Review the explicit axis/feature allowlists for style changes. Repeat original
-versus optimized screenshots against the same settled DOM, including accented
-characters, bold inside italics, code, component overrides, and CJK.
-
-The script scans TS/TSX, CSS and JSON in web source and both data packages.
-It retains supported Latin-1/Extended-A, source characters, U+2010 if supported,
-and their canonical decompositions. That last step matters: browsers can compose
-an absent precomposed character from a base and combining mark in the font.
-It never introduces CJK coverage or changes fallback stacks or font-display.
+The build consumes committed font assets. The original one-off optimization script has been removed; regenerate and verify the subsets when font coverage or styles change.
 
 Source and rendered-style inspection found Inter 400/500 and Geist 500, no
 custom feature/axis overrides, and manual hyphenation. Code uses system
