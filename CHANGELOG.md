@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menyelaraskan halaman dosen dengan pola pengantar di kiri dan konten di kanan, serta menambahkan pengurutan dosen dan ulasan.
 - Mempermudah pengisian ulasan dengan penilaian bintang, pencarian mata kuliah dalam satu kolom, pilihan dosen dari kartu, dan pesan validasi per kolom.
 
 #### Added

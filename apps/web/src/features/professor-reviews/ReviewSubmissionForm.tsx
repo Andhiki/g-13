@@ -1,5 +1,6 @@
+import { AlignFancyButton } from "../../ui/fancy-button";
 import { useEffect, useRef, useState } from "react";
-import { RiAddLine, RiArrowDownSLine, RiCheckLine } from "@remixicon/react";
+import { RiAddLine, RiArrowDownSLine, RiArrowRightLine, RiCheckLine } from "@remixicon/react";
 import { AlignSelect } from "../../ui/select";
 import { AlignButton } from "../../ui/button";
 import { useLocale } from "../../useLocale";
@@ -57,7 +58,9 @@ export function ReviewSubmissionForm({
     requestAnimationFrame(() => {
       section.current?.scrollIntoView({ block: "start" });
       form.current
-        ?.querySelector<HTMLInputElement>('input[role="combobox"]')
+        ?.querySelector<HTMLElement>(
+          draft.professorId ? 'input[role="combobox"]' : "#review-professor",
+        )
         ?.focus({ preventScroll: true });
     });
   }, [draft]);
@@ -76,7 +79,7 @@ export function ReviewSubmissionForm({
   return (
     <section
       ref={section}
-      className="mx-auto mt-8 max-w-3xl scroll-mt-24 rounded-10 border border-stroke-soft-200 bg-bg-white-0"
+      className="scroll-mt-24 rounded-10 border border-stroke-soft-200 bg-bg-white-0"
     >
       <button
         type="button"
@@ -328,13 +331,14 @@ export function ReviewSubmissionForm({
               )}
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <AlignButton.Root
+              <AlignFancyButton.Root
                 type="submit"
                 disabled={pending || !data.professors.length || !data.courses.length}
                 className="min-h-11 w-full sm:w-auto"
               >
                 {text(pending ? "Publishing…" : "Publish review")}
-              </AlignButton.Root>
+                <RiArrowRightLine aria-hidden="true" className="size-5" />
+              </AlignFancyButton.Root>
               {publishedId && (
                 <AlignButton.Root
                   type="button"
