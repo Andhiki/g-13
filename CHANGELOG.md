@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memindahkan formulir ulasan ke dialog AlignUI dan merangkum kartu dosen menjadi nama, jumlah ulasan, rating keseluruhan, serta mata kuliah yang diulas.
+- Menghapus keterangan batas pengiriman dan privasi dari formulir ulasan.
 - Menggabungkan pencarian dosen dan mata kuliah serta menu urutan, merangkum kartu dosen, dan menghaluskan buka-tutup formulir ulasan.
 - Menyelaraskan halaman dosen dengan pola pengantar di kiri dan konten di kanan, serta menambahkan pengurutan dosen dan ulasan.
 - Mempermudah pengisian ulasan dengan penilaian bintang, pencarian mata kuliah dalam satu kolom, pilihan dosen dari kartu, dan pesan validasi per kolom.

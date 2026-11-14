@@ -29,13 +29,13 @@ export function StarRatingField({
         {hint}
       </p>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="flex" onPointerLeave={() => setPreview(0)}>
+        <div className="flex gap-1.5" onPointerLeave={() => setPreview(0)}>
           {[1, 2, 3, 4, 5].map((score) => {
             const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
             return (
               <label
                 key={score}
-                className="relative flex size-11 cursor-pointer items-center justify-center rounded-lg"
+                className="relative flex size-10 cursor-pointer items-center justify-center rounded-10 border border-stroke-soft-200 bg-bg-white-0 transition duration-200 ease-out has-checked:border-primary-base has-checked:bg-primary-alpha-10 hover:border-stroke-strong-950"
                 onPointerEnter={(event) => {
                   if (event.pointerType === "mouse") setPreview(score);
                 }}
@@ -52,10 +52,10 @@ export function StarRatingField({
                   aria-describedby={error ? `${id}-error` : `${id}-hint`}
                   onChange={() => onChange(score)}
                 />
-                <span className="absolute inset-0 rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-base" />
+                <span className="absolute inset-0 rounded-10 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-base" />
                 <Star
                   aria-hidden="true"
-                  className={`pointer-events-none size-7 ${score <= (preview || value) ? "text-primary-base" : "text-text-sub-600"}`}
+                  className={`pointer-events-none size-5 ${score <= (preview || value) ? "text-primary-base" : "text-text-sub-600"}`}
                 />
               </label>
             );

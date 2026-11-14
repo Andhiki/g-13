@@ -5,10 +5,12 @@ import { useLocale } from "../../useLocale";
 import { AlignFancyButton } from "../../ui/fancy-button";
 import { Typography } from "../../ui/typography";
 import { ProfessorReviewCard } from "./ProfessorReviewCard";
-import { ReviewSubmissionForm, type ReviewDraft } from "./ReviewSubmissionForm";
+import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
+import type { ReviewDraft } from "./ReviewSubmissionForm";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { orderProfessors, type ProfessorOrder, type ReviewOrder } from "./review-order";
 import { searchProfessors } from "./professor-search";
+import { toast, SuccessToast } from "../../ui/toast";
 
 type ReviewData = Awaited<ReturnType<typeof import("./repository").getPublicProfessorReviews>>;
 const ratingDescriptions = [
@@ -49,6 +51,7 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
   }, [data, expandedProfessorId, reviewToFocus]);
   const startReview = (professorId: string, courseId: string | null = null) =>
     setReviewDraft((current) => ({ professorId, courseId, request: (current?.request ?? 0) + 1 }));
+  const closeReview = () => setReviewDraft(null);
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
@@ -101,19 +104,7 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
           </aside>
         </header>
         <div className="min-w-0">
-          <ReviewSubmissionForm
-            data={data}
-            draft={reviewDraft}
-            onPublished={async (reviewId) => {
-              setQuery("");
-              setReviewToFocus(reviewId);
-              await router.invalidate({
-                filter: (match) => match.routeId === "/professors",
-                sync: true,
-              });
-            }}
-          />
-          <section aria-label={text("Search and sort")} className="mt-6">
+          <section aria-label={text("Search and sort")}>
             <div className="flex items-center gap-2">
               <label className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
                 <span className="sr-only">{text("Search professors or courses")}</span>
@@ -196,6 +187,21 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
           </section>
         </div>
       </div>
+      <ReviewSubmissionDialog
+        data={data}
+        draft={reviewDraft}
+        onClose={closeReview}
+        onPublished={async (reviewId) => {
+          closeReview();
+          setQuery("");
+          setReviewToFocus(reviewId);
+          toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
+          await router.invalidate({
+            filter: (match) => match.routeId === "/professors",
+            sync: true,
+          });
+        }}
+      />
     </main>
   );
 }

@@ -41,8 +41,6 @@
   "Check all fields and select a professor and course.": "Periksa semua kolom dan pilih dosen serta mata kuliah.",
   "Reviews are temporarily unavailable. Please try again later.": "Ulasan sementara tidak tersedia. Silakan coba lagi nanti.",
   "Could not confirm publication. Refresh the page before trying again.": "Penerbitan belum dapat dipastikan. Muat ulang halaman sebelum mencoba lagi.",
-  "Reviews publish immediately and are unverified. Do not include personal information in your name or review. Anonymous hides your display name, but does not guarantee anonymity from infrastructure operators.": "Ulasan langsung terbit dan tidak terverifikasi. Jangan sertakan informasi pribadi dalam nama atau ulasan. Anonim menyembunyikan nama tampilan, tetapi tidak menjamin anonimitas dari pengelola infrastruktur.",
-  "Limit: 3 submissions per IP per hour. A keyed IP hash is kept until the hour ends and removed on a later submission; raw IPs are not stored in reviews.": "Batas: 3 pengiriman per IP per jam. Hash IP berkunci disimpan hingga akhir jam dan dihapus pada pengiriman berikutnya; IP asli tidak disimpan dalam ulasan.",
   "{{metric}}: {{value}} of 5": "{{metric}}: {{value}} dari 5",
   "Not rated": "Belum dinilai",
   "Courses": "Mata kuliah",
@@ -69,9 +67,6 @@
   "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.": "Nama tampilanmu bersifat publik. Anonim menyembunyikannya, tetapi pengelola infrastruktur mungkin tetap dapat mengidentifikasimu.",
   "Display name": "Nama tampilan",
   "1–80 characters. Avoid personal information.": "1–80 karakter. Hindari informasi pribadi.",
-  "Reviews publish immediately and are unverified. Do not include personal information.": "Ulasan langsung terbit dan tidak terverifikasi. Jangan sertakan informasi pribadi.",
-  "Privacy and submission limits": "Privasi dan batas pengiriman",
-  "View published review": "Lihat ulasan yang terbit",
   "The professor or course may no longer be available. Choose them again and retry.": "Dosen atau mata kuliah mungkin sudah tidak tersedia. Pilih kembali dan coba lagi.",
   "Your review is published. Refresh the page to see it.": "Ulasanmu telah terbit. Muat ulang halaman untuk melihatnya.",
   "Professor order": "Urutan dosen",
@@ -97,5 +92,7 @@
   "Read reviews": "Baca ulasan",
   "Try a name, course code, or a combination: Afiahayati di basis data.": "Cari nama, kode mata kuliah, atau gabungannya: Afiahayati di basis data.",
   "{{count}} professors. Course searches show ratings from matching published reviews.": "{{count}} dosen. Pencarian mata kuliah menampilkan rating dari ulasan terbit yang cocok.",
-  "No professors or reviewed courses match this search. Try another name or clear your search.": "Tidak ada dosen atau mata kuliah berulasan yang cocok. Coba nama lain atau hapus pencarian."
+  "No professors or reviewed courses match this search. Try another name or clear your search.": "Tidak ada dosen atau mata kuliah berulasan yang cocok. Coba nama lain atau hapus pencarian.",
+  "Courses reviewed": "Mata kuliah yang diulas",
+  "Cancel": "Batal"
 }

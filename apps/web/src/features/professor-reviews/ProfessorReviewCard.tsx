@@ -23,14 +23,9 @@ export function ProfessorReviewCard({
 }) {
   const { text, language } = useLocale("professors");
   const reducedMotion = useReducedMotion();
-  const metrics = [
-    { label: "Clarity", value: average(professor.reviews.map((review) => review.clarity)) },
-    { label: "Support", value: average(professor.reviews.map((review) => review.support)) },
-    {
-      label: "Organization",
-      value: average(professor.reviews.map((review) => review.organization)),
-    },
-  ];
+  const courses = [
+    ...new Map(professor.reviews.map((review) => [review.courseId, review])).values(),
+  ].sort((a, b) => a.code.localeCompare(b.code));
   const overall = average(professor.reviews.map((review) => review.overall));
   return (
     <article className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-5">
@@ -51,16 +46,23 @@ export function ProfessorReviewCard({
           {overall === null ? "—" : overall.toFixed(1)}
         </div>
       </div>
-      <dl className="mb-0 mt-4 grid gap-2 rounded-lg bg-bg-weak-50 p-3 sm:grid-cols-3 sm:text-center">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="flex items-center justify-between gap-3 sm:block">
-            <dt className="text-paragraph-xs text-text-sub-600">{text(metric.label)}</dt>
-            <dd className="m-0 text-label-sm sm:mt-1">
-              {metric.value === null ? "—" : metric.value.toFixed(1)}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      {courses.length > 0 && (
+        <ul aria-label={text("Courses reviewed")} className="mb-0 mt-3 flex flex-wrap gap-1.5 pl-0">
+          {courses.map((course) => (
+            <li
+              key={course.courseId}
+              className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-1"
+            >
+              <span className="shrink-0 font-mono text-paragraph-xs text-text-sub-600">
+                {course.code}
+              </span>
+              <span className="truncate text-paragraph-xs">
+                {courseDisplayName(course, language)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         {professor.reviews.length ? (
           <AlignButton.Root
