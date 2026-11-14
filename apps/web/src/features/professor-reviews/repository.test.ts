@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { expect, it } from "bun:test";
 import { getPlatformProxy } from "wrangler";
 import { createDatabase, courses, professors, reviews } from "@g13/db";
@@ -5,7 +6,7 @@ import { getPublicProfessorReviews } from "./repository";
 
 it("returns only published, non-deleted reviews in public professor metrics", async () => {
   const platform = await getPlatformProxy<{ DB: D1Database }>({
-    configPath: new URL("../../../wrangler.jsonc", import.meta.url).pathname,
+    configPath: fileURLToPath(new URL("../../../wrangler.jsonc", import.meta.url)),
     persist: false,
   });
 

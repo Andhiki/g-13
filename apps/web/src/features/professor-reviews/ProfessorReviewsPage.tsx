@@ -1,3 +1,4 @@
+import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
 import { useMemo, useState } from "react";
 import { RiCloseLine, RiSearchLine, RiStarFill } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
@@ -68,6 +69,8 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
             </div>
           </div>
         </aside>
+
+        <ReviewSubmissionForm data={data} />
 
         <section aria-label={text("Professor search")} className="mt-8 grid gap-4 md:grid-cols-2">
           <label className="block">

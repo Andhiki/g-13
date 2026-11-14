@@ -34,3 +34,9 @@ CREATE TABLE IF NOT EXISTS review_likes (
 
 CREATE INDEX IF NOT EXISTS reviews_professor_course_idx ON reviews(professor_id, course_id);
 CREATE INDEX IF NOT EXISTS reviews_status_deleted_idx ON reviews(status, deleted_at);
+
+CREATE TABLE IF NOT EXISTS review_submission_limits (
+  key TEXT PRIMARY KEY NOT NULL,
+  count INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);

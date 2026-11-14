@@ -62,4 +62,10 @@ export const reviewLikes = sqliteTable(
   (table) => [primaryKey({ columns: [table.reviewId, table.browserId] })],
 );
 
-export const schema = { professors, courses, reviews, reviewLikes };
+export const reviewSubmissionLimits = sqliteTable("review_submission_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});
+
+export const schema = { professors, courses, reviews, reviewLikes, reviewSubmissionLimits };

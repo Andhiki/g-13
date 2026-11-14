@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Formulir ulasan dosen tanpa akun, dengan nama atau anonim, penerbitan langsung, dan pembatasan pengiriman per IP.
 - Menambahkan halaman dosen di `/professors` dengan ulasan komunitas, filter mata kuliah dwibahasa, rata-rata metrik, dan penjelasan bahwa ulasan belum terverifikasi.
 
 ### 2026-11-12
