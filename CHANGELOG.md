@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
 - Merapikan dialog ulasan dengan garis vertikal pada penilaian, petunjuk di placeholder, dan footer yang lebih rapat.
 - Memindahkan panduan rating dan catatan ulasan belum terverifikasi ke popover ikon info.
 - Memindahkan formulir ulasan ke dialog AlignUI dan merangkum kartu dosen menjadi nama, jumlah ulasan, rating keseluruhan, serta mata kuliah yang diulas.

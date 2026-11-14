@@ -131,7 +131,7 @@ export function ProfessorReviewCard({
                     <p className="mb-0 mt-3 whitespace-pre-wrap break-words text-paragraph-sm leading-relaxed">
                       {review.body}
                     </p>
-                    <dl className="mb-0 mt-3 grid grid-cols-3 gap-2 rounded-lg bg-bg-weak-50 p-2.5">
+                    <dl className="mb-0 mt-3 grid gap-2 rounded-lg bg-bg-weak-50 p-2.5 sm:grid-cols-3">
                       {(
                         [
                           ["Clarity", review.clarity],
@@ -139,9 +139,12 @@ export function ProfessorReviewCard({
                           ["Organization", review.organization],
                         ] as const
                       ).map(([label, value]) => (
-                        <div key={label} className="min-w-0 text-center">
+                        <div
+                          key={label}
+                          className="flex min-w-0 items-center justify-between gap-3 sm:block sm:text-center"
+                        >
                           <dt className="text-paragraph-xs text-text-sub-600">{text(label)}</dt>
-                          <dd className="m-0 mt-0.5 flex items-center justify-center gap-1 text-label-xs">
+                          <dd className="m-0 flex shrink-0 items-center justify-center gap-1 text-label-xs sm:mt-0.5">
                             <RiStarFill aria-hidden="true" className="size-3 text-primary-base" />
                             {value}/5
                           </dd>
