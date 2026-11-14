@@ -10,6 +10,8 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When diagnosing caching, reproduce client navigation and retry requests before treating document cache hits as proof the user flow works.
+
 - When labeling the alumni class tabs, use “All” or “Semua” for the unfiltered tab.
 
 - When acting as a review sub-agent, report findings only; let the parent agent apply fixes.

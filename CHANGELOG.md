@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menggunakan cache data alumni yang sama saat membuka direktori dan mencoba ulang, serta menyajikan data lama saat pembaruan atau sumber data terganggu.
 - Menyembunyikan scrollbar pada tab angkatan alumni tanpa menonaktifkan pengguliran horizontal.
 
 #### Changed
