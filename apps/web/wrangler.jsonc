@@ -11,4 +11,5 @@
     }
   ],
   "main": "@tanstack/react-start/server-entry",
+  "cache": { "enabled": true },
 }

@@ -17,8 +17,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Fixed
 
 - Menyamakan ukuran teks tombol pada ajakan memberi bintang di GitHub dengan teks pesannya.
+- Menyembunyikan scrollbar pada tab angkatan alumni tanpa menonaktifkan pengguliran horizontal.
 
 #### Changed
+
+- Membuat pencarian alumni yang melekat transparan dengan efek kaca dan mempercepat animasinya menjadi 120 ms.
+
+- Menyimpan sementara halaman direktori alumni agar tetap tersedia saat sumber data mengalami gangguan sementara.
+- Mengganti pilihan angkatan pada direktori alumni dengan tab yang dapat digeser, serta menambahkan pintasan `/` dan animasi pada pencarian yang tetap terlihat saat menggulir.
 
 - Membuka akses langsung ke direktori dan ulasan dosen; peluncuran produksi tetap memerlukan D1, secret pembatasan laju, dan kesiapan penanganan laporan.
 
@@ -51,6 +57,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menampilkan indikator saat direktori alumni sedang dimuat.
+- Memperjelas huruf navigasi direktori alumni pada mode gelap.
 - Menghapus kategori yang berulang pada tabel mata kuliah.
 - Memastikan panel detail mata kuliah tetap tampil sampai animasi penutupan selesai.
 

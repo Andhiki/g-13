@@ -54,6 +54,6 @@ Do not rerun the importer over a curated catalog: source normalization cannot pr
 human categorization choices. If retrying an incomplete initial import, compare its
 candidate with the previous catalog and manually review the differences before adopting.
 
-The [saved import report](../output/data/exam-archive-import.json) records source coverage and unresolved metadata for human review;
+The [saved import report](data/exam-archive-import.json) records source coverage and unresolved metadata for human review;
 it is not downloaded by the application. No PDF binaries, credentials, or Drive API keys
 are required or stored.
