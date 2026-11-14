@@ -1,44 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export async function readLecturerReviewsWhenEnabled<T>(
-  enabled: boolean,
-  read: () => Promise<T>,
-): Promise<T | null> {
-  return enabled ? read() : null;
-}
-
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () => {
-  const [{ env }, { parseRuntimeEnvironment }, { createDatabase }, { getLecturerDirectory }] =
-    await Promise.all([
-      import("cloudflare:workers"),
-      import("@g13/env"),
-      import("@g13/db"),
-      import("./repository"),
-    ]);
-  const configuration = parseRuntimeEnvironment({
-    LECTURER_REVIEWS_ENABLED: env.LECTURER_REVIEWS_ENABLED,
-  });
-  return readLecturerReviewsWhenEnabled(configuration.features.lecturerReviews, async () => {
-    const database = createDatabase(env.DB);
-    return getLecturerDirectory(database);
-  });
+  const [{ env }, { createDatabase }, { getLecturerDirectory }] = await Promise.all([
+    import("cloudflare:workers"),
+    import("@g13/db"),
+    import("./repository"),
+  ]);
+  const database = createDatabase(env.DB);
+  return getLecturerDirectory(database);
 });
 
 export const loadLecturerDetail = createServerFn({ method: "GET" })
   .validator((input: { lecturerId: string }) => input)
   .handler(async ({ data }) => {
-    const [{ env }, { parseRuntimeEnvironment }, { createDatabase }, { getLecturerDetail }] =
-      await Promise.all([
-        import("cloudflare:workers"),
-        import("@g13/env"),
-        import("@g13/db"),
-        import("./repository"),
-      ]);
-    if (
-      !parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: env.LECTURER_REVIEWS_ENABLED }).features
-        .lecturerReviews
-    )
-      return null;
+    const [{ env }, { createDatabase }, { getLecturerDetail }] = await Promise.all([
+      import("cloudflare:workers"),
+      import("@g13/db"),
+      import("./repository"),
+    ]);
     return getLecturerDetail(createDatabase(env.DB), data.lecturerId);
   });
 
@@ -48,7 +27,7 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
     const [
       { env },
       { getRequest },
-      { parseRuntimeEnvironment, parseSubmissionEnvironment },
+      { parseSubmissionEnvironment },
       { createDatabase },
       { submitReview },
     ] = await Promise.all([
@@ -58,10 +37,6 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
       import("@g13/db"),
       import("./submission"),
     ]);
-    const enabled = parseRuntimeEnvironment({
-      LECTURER_REVIEWS_ENABLED: env.LECTURER_REVIEWS_ENABLED,
-    }).features.lecturerReviews;
-    if (!enabled) return { ok: false as const, error: "unavailable" as const };
     const secret = parseSubmissionEnvironment(
       env as unknown as Record<string, unknown>,
     ).REVIEW_RATE_LIMIT_SECRET;
@@ -71,24 +46,17 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
     const ip =
       request.headers.get("cf-connecting-ip") ??
       (["localhost", "127.0.0.1"].includes(host) ? "127.0.0.1" : null);
-    return submitReview(createDatabase(env.DB), data, { enabled, ip, secret });
+    return submitReview(createDatabase(env.DB), data, { ip, secret });
   });
 
 export const loadBrowserLikes = createServerFn({ method: "POST" })
   .validator((input: { browserId: string }) => input)
   .handler(async ({ data }) => {
-    const [{ env }, { parseRuntimeEnvironment }, { createDatabase }, { getBrowserLikes }] =
-      await Promise.all([
-        import("cloudflare:workers"),
-        import("@g13/env"),
-        import("@g13/db"),
-        import("./likes"),
-      ]);
-    if (
-      !parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: env.LECTURER_REVIEWS_ENABLED }).features
-        .lecturerReviews
-    )
-      return [];
+    const [{ env }, { createDatabase }, { getBrowserLikes }] = await Promise.all([
+      import("cloudflare:workers"),
+      import("@g13/db"),
+      import("./likes"),
+    ]);
     return getBrowserLikes(createDatabase(env.DB), data?.browserId);
   });
 
@@ -98,7 +66,7 @@ export const updateReviewLike = createServerFn({ method: "POST" })
     const [
       { env },
       { getRequest },
-      { parseRuntimeEnvironment, parseSubmissionEnvironment },
+      { parseSubmissionEnvironment },
       { createDatabase },
       { setReviewLike },
     ] = await Promise.all([
@@ -108,10 +76,6 @@ export const updateReviewLike = createServerFn({ method: "POST" })
       import("@g13/db"),
       import("./likes"),
     ]);
-    const enabled = parseRuntimeEnvironment({
-      LECTURER_REVIEWS_ENABLED: env.LECTURER_REVIEWS_ENABLED,
-    }).features.lecturerReviews;
-    if (!enabled) return { ok: false as const, error: "unavailable" as const };
     const secret = parseSubmissionEnvironment(
       env as unknown as Record<string, unknown>,
     ).REVIEW_RATE_LIMIT_SECRET;
@@ -120,5 +84,5 @@ export const updateReviewLike = createServerFn({ method: "POST" })
     const ip =
       request.headers.get("cf-connecting-ip") ??
       (["localhost", "127.0.0.1"].includes(host) ? "127.0.0.1" : null);
-    return setReviewLike(createDatabase(env.DB), data, { enabled, ip, secret });
+    return setReviewLike(createDatabase(env.DB), data, { ip, secret });
   });

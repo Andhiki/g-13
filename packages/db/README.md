@@ -18,7 +18,9 @@ schema changes automatically.
 ## Review submissions
 
 Set the server-only `REVIEW_RATE_LIMIT_SECRET` to a random secret of at least 32
-characters (Wrangler secret in production; `.dev.vars` locally). Never expose it
+characters (Wrangler secret in production; `apps/web/.env` locally, copied from
+`.env.example`). Do not also create `.dev.vars`, which prevents Cloudflare from
+loading `.env`. `packages/env` validates runtime secrets. Never expose the secret
 to the browser. Submissions fail closed without it or a trusted client IP.
 Cloudflare supplies `CF-Connecting-IP`; local development uses loopback. Do not
 serve this handler behind a proxy that allows visitors to forge that header.
@@ -33,5 +35,9 @@ may retain expired hashes until the next submission. Raw IPs are not stored here
 infrastructure logging has separate retention. Secret rotation resets limits.
 No migrations are generated. Apply `schema.sql` locally before testing.
 
-Launch remains blocked by #26 (human owner, takedown and retention decisions)
-and a real production D1 ID. #27 still needs moderator authentication decisions.
+Public launch requires a production D1 database with the schema and seed applied,
+the server-only rate-limit secret, and a named human owner ready to review reports
+and remove content promptly. These are operational launch requirements; the
+lecturer review pages and actions are always available in the application.
+Retention decisions remain open in #26; moderator authentication decisions still
+need resolution in #27.

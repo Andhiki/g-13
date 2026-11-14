@@ -1,20 +1,5 @@
-import { describe, expect, it } from "bun:test";
-import { isFeatureEnabled, parseRuntimeEnvironment, parseSubmissionEnvironment } from "./index";
-
-describe("runtime feature flags", () => {
-  it("defaults lecturer reviews to disabled", () => {
-    expect(parseRuntimeEnvironment({}).features.lecturerReviews).toBe(false);
-  });
-
-  it("parses the configured flag", () => {
-    const flags = parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: "true" }).features;
-    expect(isFeatureEnabled(flags, "lecturerReviews")).toBe(true);
-  });
-
-  it("rejects values outside the typed flag contract", () => {
-    expect(() => parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: "yes" })).toThrow();
-  });
-});
+import { expect, it } from "bun:test";
+import { parseSubmissionEnvironment } from "./index";
 
 it("requires a server rate-limit secret of at least 32 characters", () => {
   expect(() => parseSubmissionEnvironment({})).toThrow();

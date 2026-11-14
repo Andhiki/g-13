@@ -27,8 +27,9 @@ The browser only ever sees `/api/alumni`.
 | `STRAPI_API_TOKEN` | yes | Read-only token for the `Alumni` collection |
 | `STRAPI_ORIGIN` | no | Strapi base URL; defaults to `https://strapi.kagamailkomp.id` |
 
-Local development: copy [`apps/web/.dev.vars.example`](../../apps/web/.dev.vars.example)
-to `apps/web/.dev.vars` and fill in the token. `.dev.vars` is ignored by git.
+Local development: copy [`apps/web/.env.example`](../../apps/web/.env.example)
+to `apps/web/.env` and fill in the token. `.env` is ignored by git.
+Use only `.env`; an existing `.dev.vars` prevents Cloudflare from loading it.
 
 Production: `bunx wrangler secret put STRAPI_API_TOKEN` from `apps/web`.
 

@@ -73,15 +73,10 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
     await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
     await db.insert(courses).values({ id: "c", code: "CS1", nameId: "Data", nameEn: "Data" });
     const context = {
-      enabled: true,
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
       now: 3_600_000,
     };
-    expect(await submitReview(db, input, { ...context, enabled: false })).toEqual({
-      ok: false,
-      error: "unavailable",
-    });
     expect(await submitReview(db, input, { ...context, ip: null })).toEqual({
       ok: false,
       error: "unavailable",

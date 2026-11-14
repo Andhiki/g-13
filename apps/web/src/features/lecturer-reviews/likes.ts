@@ -17,9 +17,9 @@ export async function getBrowserLikes(db: Database, browserId: string): Promise<
 export async function setReviewLike(
   db: Database,
   input: { reviewId: string; browserId: string; liked: boolean },
-  context: { enabled: boolean; ip: string | null; secret: string; now?: number },
+  context: { ip: string | null; secret: string; now?: number },
 ) {
-  if (!context.enabled || !context.ip || context.secret.length < 32)
+  if (!context.ip || context.secret.length < 32)
     return { ok: false as const, error: "unavailable" as const };
   if (
     typeof input?.reviewId !== "string" ||

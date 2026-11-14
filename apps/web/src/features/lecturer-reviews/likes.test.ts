@@ -50,7 +50,6 @@ it("likes and unlikes visible reviews once per browser and limits abuse", async 
     const browserId = crypto.randomUUID();
     const input = { reviewId: "r", browserId, liked: true };
     const context = {
-      enabled: true,
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
       now: 3_600_000,
@@ -63,7 +62,7 @@ it("likes and unlikes visible reviews once per browser and limits abuse", async 
       ok: false,
       error: "invalid",
     });
-    expect(await setReviewLike(db, input, { ...context, enabled: false })).toEqual({
+    expect(await setReviewLike(db, input, { ...context, ip: null })).toEqual({
       ok: false,
       error: "unavailable",
     });

@@ -14,14 +14,12 @@ export async function submitReview(
   db: Database,
   input: unknown,
   context: {
-    enabled: boolean;
     ip: string | null;
     secret: string;
     now?: number;
   },
 ): Promise<SubmissionResult> {
-  if (!context.enabled || !context.ip || context.secret.length < 32)
-    return { ok: false, error: "unavailable" };
+  if (!context.ip || context.secret.length < 32) return { ok: false, error: "unavailable" };
   let review: ReviewSubmission;
   try {
     review = validateSubmission(input);
