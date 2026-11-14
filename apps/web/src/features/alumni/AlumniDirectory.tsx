@@ -111,22 +111,20 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
           <section
             ref={searchSectionRef}
             aria-label={text("Filter alumni")}
-            className="sticky top-[var(--app-header-height)] z-30 mt-3 bg-bg-white-0 py-3"
+            className="sticky top-[var(--app-header-height)] z-30 mt-3 py-3"
           >
             <m.div
               className="relative mx-auto"
               initial={false}
               animate={{ width: isSticky ? "90%" : "100%" }}
-              transition={
-                reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.2 }
-              }
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.12, ease: "easeOut" }}
             >
               <label htmlFor={searchId} className="sr-only">
                 {text("Cari alumni")}
               </label>
               <RiSearchLine
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-primary-base"
+                className="pointer-events-none absolute left-4 top-1/2 z-10 size-5 -translate-y-1/2 text-primary-base"
               />
               <input
                 id={searchId}
@@ -135,7 +133,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={text("Cari nama, instansi, atau posisi")}
-                className="h-12 w-full rounded-full bg-bg-weak-50 pl-12 pr-4 min-[651px]:pr-12 text-paragraph-sm text-text-strong-950 ring-1 ring-inset ring-stroke-soft-200 outline-none transition-colors placeholder:text-text-sub-600 focus:bg-bg-white-0 focus:ring-primary-base"
+                className="h-12 w-full rounded-full bg-bg-weak-50/60 backdrop-blur-xl pl-12 pr-4 min-[651px]:pr-12 text-paragraph-sm text-text-strong-950 ring-1 ring-inset ring-stroke-soft-200 outline-none transition-colors duration-120 placeholder:text-text-sub-600 focus:bg-bg-weak-50/75 focus:ring-primary-base"
               />
               <AlignKbd.Root
                 aria-hidden="true"
@@ -148,7 +146,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
           {directory.status === "ready" && (
             <Tabs.List
               aria-label={text("Angkatan")}
-              className="mt-5 flex w-full overflow-x-auto border-b border-stroke-soft-200"
+              className="mt-5 flex w-full overflow-x-auto border-b border-stroke-soft-200 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               <Tabs.Trigger value={allBatches} className={tabClassName}>
                 {text("Semua angkatan")}
