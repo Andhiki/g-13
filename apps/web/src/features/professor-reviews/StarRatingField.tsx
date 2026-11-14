@@ -29,7 +29,7 @@ export function StarRatingField({
         {hint}
       </p>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="flex gap-1.5" onPointerLeave={() => setPreview(0)}>
+        <div className="flex gap-1 sm:gap-1.5" onPointerLeave={() => setPreview(0)}>
           {[1, 2, 3, 4, 5].map((score) => {
             const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
             return (

@@ -132,7 +132,7 @@ export function ReviewSubmissionForm({
         </AlignModal.Description>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-5">
+      <div className="min-h-0 overflow-y-auto px-5 pt-5 pb-3">
         <fieldset disabled={pending} className="min-w-0 space-y-6 disabled:opacity-70">
           <div className="space-y-4">
             <div>
@@ -193,45 +193,44 @@ export function ReviewSubmissionForm({
             </div>
           </div>
 
-          <div className="space-y-5 rounded-10 bg-bg-weak-50 p-4">
+          <div className="space-y-4">
             <div>
               <h3 className="m-0 text-label-md">{text("Rate your experience")}</h3>
               <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
                 {text("Choose a score for each: 1 (lowest) to 5 (highest).")}
               </p>
             </div>
-            {metrics.map((metric) => (
-              <StarRatingField
-                key={metric.name}
-                name={metric.name}
-                label={text(metric.label)}
-                hint={text(metric.hint)}
-                value={ratings[metric.name]}
-                onChange={(value) => {
-                  setRatings((current) => ({ ...current, [metric.name]: value }));
-                  clearError(metric.name);
-                }}
-                error={errors[metric.name] ? text(errors[metric.name] ?? "") : undefined}
-              />
-            ))}
+            <div className="space-y-5 border-l border-stroke-soft-200 pl-4">
+              {metrics.map((metric) => (
+                <StarRatingField
+                  key={metric.name}
+                  name={metric.name}
+                  label={text(metric.label)}
+                  hint={text(metric.hint)}
+                  value={ratings[metric.name]}
+                  onChange={(value) => {
+                    setRatings((current) => ({ ...current, [metric.name]: value }));
+                    clearError(metric.name);
+                  }}
+                  error={errors[metric.name] ? text(errors[metric.name] ?? "") : undefined}
+                />
+              ))}
+            </div>
           </div>
 
           <div>
             <label htmlFor="review-body" className="text-label-sm">
               {text("Your experience")}
             </label>
-            <p id="review-body-hint" className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
-              {text("What helped you learn? What could be improved?")}
-            </p>
             <textarea
               id="review-body"
               className={control}
               name="body"
               maxLength={1000}
               rows={4}
+              placeholder={text("What helped you learn? What could be improved?")}
               value={body}
               {...errorProps("body")}
-              aria-describedby={`review-body-hint${errors.body ? " review-body-error" : ""}`}
               onChange={(event) => {
                 setBody(event.target.value);
                 clearError("body");
@@ -254,11 +253,6 @@ export function ReviewSubmissionForm({
               />
               {text("Publish as Anonymous")}
             </label>
-            <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
-              {text(
-                "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.",
-              )}
-            </p>
             {!anonymous && (
               <div className="mt-3">
                 <label htmlFor="review-author" className="text-label-sm">
@@ -282,14 +276,16 @@ export function ReviewSubmissionForm({
         </fieldset>
       </div>
 
-      <footer className="shrink-0 space-y-3 border-t border-stroke-soft-200 p-4 sm:p-5">
-        <div role="status" aria-live="polite" className="text-paragraph-sm text-error-base">
-          {message && <p className="m-0">{text(message)}</p>}
-        </div>
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <footer className="shrink-0 border-t border-stroke-soft-200 px-5 py-3">
+        {message && (
+          <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
+            <p className="m-0">{text(message)}</p>
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3">
           <AlignButton.Root
             type="button"
-            mode="ghost"
+            mode="stroke"
             variant="neutral"
             className="min-h-11"
             onClick={onClose}
@@ -299,10 +295,12 @@ export function ReviewSubmissionForm({
           <AlignFancyButton.Root
             type="submit"
             disabled={pending || !data.professors.length || !data.courses.length}
-            className="min-h-11 w-full sm:w-auto"
+            className="min-h-11 w-full"
           >
-            {text(pending ? "Publishing…" : "Publish review")}
-            <RiArrowRightLine aria-hidden="true" className="size-5" />
+            <span className="text-paragraph-xs sm:text-label-sm">
+              {text(pending ? "Publishing…" : "Publish review")}
+            </span>
+            <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />
           </AlignFancyButton.Root>
         </div>
       </footer>
