@@ -1,9 +1,9 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "g-13-kurikulum-ilkom-ugm",
+  "name": "g-13",
   "compatibility_date": "2026-10-19",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "cache": { "enabled": true },
-  "services": [{ "binding": "ALUMNI", "service": "g-13-kurikulum-ilkom-ugm" }],
+  "services": [{ "binding": "ALUMNI", "service": "g-13" }],
 }
