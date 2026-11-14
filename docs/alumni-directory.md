@@ -85,13 +85,29 @@ with the person's consent; do not derive photos from LinkedIn URLs.
 
 ## Caching
 
-The retry API responds with:
+The route loader and Retry both read `/api/alumni`. The server loader uses the
+`ALUMNI` self-service binding, so SSR and client navigation consult the same
+Workers Cache entry as browser requests. Only the API handler fetches Strapi.
+Workers Cache is enabled in `wrangler.jsonc`; its cache is shared across service
+bindings and public requests, independent of hostname.
+[Cloudflare Workers Cache](https://developers.cloudflare.com/workers/cache/)
+
+Successful API responses use separate browser and CDN policies:
 
 ```
-Cache-Control: public, max-age=300, s-maxage=3600, stale-while-revalidate=86400
+Cache-Control: public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400
+CDN-Cache-Control: public, max-age=3600, stale-while-revalidate=86400, stale-if-error=86400
 ```
 
-The initial page is server-rendered on each request; it does not currently use ISR.
+The edge serves fresh data for one hour, then may serve stale data for up to one
+day while refreshing in the background or when the upstream fails. A cold cache
+still waits for Strapi. Errors are not stored as successful directory data.
+Do not add `s-maxage`: it disables stale serving in Workers Cache.
+[Cache configuration](https://developers.cloudflare.com/workers/cache/configuration/)
+
+Successful `/alumni/all` HTML is also cached for one hour with one day of stale
+serving. Client navigation calls a server function whose response remains
+`no-store`, but that function now reads the cached API rather than Strapi.
 
 ## Verifying a change
 

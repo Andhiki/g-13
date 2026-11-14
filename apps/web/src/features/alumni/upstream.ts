@@ -58,6 +58,8 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
   return pages;
 }
 
-// Edge caches the response; the browser revalidates cheaply and keeps serving
-// stale data while the edge refreshes.
-export const alumniCache = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
+export const alumniCache =
+  "public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400";
+// s-maxage disables stale serving in Workers Cache; use a separate CDN policy.
+export const alumniCdnCache =
+  "public, max-age=3600, stale-while-revalidate=86400, stale-if-error=86400";

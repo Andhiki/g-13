@@ -5,4 +5,5 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "cache": { "enabled": true },
+  "services": [{ "binding": "ALUMNI", "service": "g-13-kurikulum-ilkom-ugm" }],
 }
