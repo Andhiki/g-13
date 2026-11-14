@@ -1,5 +1,5 @@
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import { RiArrowDownSLine, RiStarFill } from "@remixicon/react";
+import { RiArrowDownSLine, RiPencilLine, RiStarFill } from "@remixicon/react";
 import { AlignButton } from "../../ui/button";
 import { useLocale } from "../../useLocale";
 import { courseDisplayName } from "./course-search";
@@ -43,7 +43,7 @@ export function ProfessorReviewCard({
           })}
         >
           <RiStarFill aria-hidden="true" className="size-4 text-primary-base" />
-          {overall === null ? "—" : overall.toFixed(1)}
+          {overall === null ? "?" : overall.toFixed(1)}
         </div>
       </div>
       {courses.length > 0 && (
@@ -68,24 +68,30 @@ export function ProfessorReviewCard({
           <AlignButton.Root
             variant="neutral"
             mode="ghost"
-            className="min-h-11 gap-2"
+            className="size-11 p-0"
             onClick={onToggle}
             aria-expanded={expanded}
             aria-controls={`professor-reviews-${professor.id}`}
+            aria-label={`${text(expanded ? "Hide reviews" : "Read reviews")} · ${professor.name}`}
+            title={text(expanded ? "Hide reviews" : "Read reviews")}
           >
-            {text(expanded ? "Hide reviews" : "Read reviews")}
-            <span className="sr-only"> · {professor.name}</span>
             <RiArrowDownSLine
               aria-hidden="true"
-              className={`size-4 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
+              className={`size-5 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
             />
           </AlignButton.Root>
         ) : (
           <span className="text-paragraph-xs text-text-sub-600">{text("No reviews yet")}</span>
         )}
-        <AlignButton.Root variant="neutral" mode="ghost" className="min-h-11" onClick={onWrite}>
-          {text("Write a review")}
-          <span className="sr-only"> · {professor.name}</span>
+        <AlignButton.Root
+          variant="neutral"
+          mode="ghost"
+          className="size-11 p-0"
+          onClick={onWrite}
+          aria-label={`${text("Write a review")} · ${professor.name}`}
+          title={text("Write a review")}
+        >
+          <RiPencilLine aria-hidden="true" className="size-5" />
         </AlignButton.Root>
       </div>
       <div id={`professor-reviews-${professor.id}`}>
@@ -122,17 +128,23 @@ export function ProfessorReviewCard({
                     <p className="mb-0 mt-3 whitespace-pre-wrap break-words text-paragraph-sm leading-relaxed">
                       {review.body}
                     </p>
-                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-paragraph-xs text-text-sub-600">
-                      <span>
-                        {text("Clarity")}: {review.clarity}/5
-                      </span>
-                      <span>
-                        {text("Support")}: {review.support}/5
-                      </span>
-                      <span>
-                        {text("Organization")}: {review.organization}/5
-                      </span>
-                    </div>
+                    <dl className="mb-0 mt-3 grid grid-cols-3 gap-2 rounded-lg bg-bg-weak-50 p-2.5">
+                      {(
+                        [
+                          ["Clarity", review.clarity],
+                          ["Support", review.support],
+                          ["Organization", review.organization],
+                        ] as const
+                      ).map(([label, value]) => (
+                        <div key={label} className="min-w-0 text-center">
+                          <dt className="text-paragraph-xs text-text-sub-600">{text(label)}</dt>
+                          <dd className="m-0 mt-0.5 flex items-center justify-center gap-1 text-label-xs">
+                            <RiStarFill aria-hidden="true" className="size-3 text-primary-base" />
+                            {value}/5
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </article>
                 ))}
               </div>
