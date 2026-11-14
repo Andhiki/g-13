@@ -146,6 +146,17 @@ export function AppHeader() {
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild>
             <Link
+              to="/professors"
+              activeProps={{
+                className: "decoration-current",
+                "aria-current": "page",
+              }}
+            >
+              {t("navigation.professors")}
+            </Link>
+          </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild>
+            <Link
               to="/resources"
               activeProps={{
                 className: "decoration-current",
@@ -244,6 +255,15 @@ export function AppHeader() {
               activeProps={{ "aria-current": "page", className: "decoration-current" }}
             >
               {t("navigation.alumni")}
+            </Link>
+          </AlignLinkButton.Root>
+          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
+            <Link
+              to="/professors"
+              onClick={() => setMenuOpen(false)}
+              activeProps={{ "aria-current": "page", className: "decoration-current" }}
+            >
+              {t("navigation.professors")}
             </Link>
           </AlignLinkButton.Root>
           <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">

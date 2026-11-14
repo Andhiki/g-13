@@ -3,5 +3,12 @@
   "name": "g-13-kurikulum-ilkom-ugm",
   "compatibility_date": "2026-10-19",
   "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "professor-reviews",
+      "database_id": "00000000-0000-0000-0000-000000000001"
+    }
+  ],
   "main": "@tanstack/react-start/server-entry",
 }

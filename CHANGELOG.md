@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-14
+
+#### Added
+
+- Menambahkan halaman dosen di `/professors` dengan ulasan komunitas, filter mata kuliah dwibahasa, rata-rata metrik, dan penjelasan bahwa ulasan belum terverifikasi.
+
 ### 2026-11-12
 
 #### Fixed

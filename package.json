@@ -13,6 +13,8 @@
     "build": "turbo run build",
     "preview": "bun run --cwd apps/web preview",
     "deploy": "bun run --cwd apps/web deploy",
+    "db:push": "wrangler d1 execute professor-reviews --config apps/web/wrangler.jsonc --local --file packages/db/schema.sql",
+    "db:seed": "wrangler d1 execute professor-reviews --config apps/web/wrangler.jsonc --local --file packages/db/seed.sql",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",

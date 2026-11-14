@@ -34,7 +34,7 @@ test("request instances retain their own language and resource namespaces", () =
 });
 
 test("namespace selection follows case-insensitive routes and trailing slashes", () => {
-  for (const namespace of ["roadmap", "exam", "resources", "alumni"] as const) {
+  for (const namespace of ["roadmap", "exam", "resources", "alumni", "professors"] as const) {
     expect(messageNamespace(`/${namespace}`)).toBe(namespace);
     expect(messageNamespace(`/${namespace.toUpperCase()}/`)).toBe(namespace);
   }

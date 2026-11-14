@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ProfessorsRouteImport } from './routes/professors'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
@@ -36,6 +37,11 @@ const ExamRoute = ExamRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfessorsRoute = ProfessorsRouteImport.update({
+  id: '/professors',
+  path: '/professors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
+  '/professors': typeof ProfessorsRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
+  '/professors': typeof ProfessorsRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
+  '/professors': typeof ProfessorsRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni_/all': typeof AlumniAllRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/alumni'
     | '/exam'
     | '/faq'
+    | '/professors'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/alumni'
     | '/exam'
     | '/faq'
+    | '/professors'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/alumni'
     | '/exam'
     | '/faq'
+    | '/professors'
     | '/resources'
     | '/roadmap'
     | '/alumni_/all'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
   FaqRoute: typeof FaqRoute
+  ProfessorsRoute: typeof ProfessorsRoute
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
   AlumniAllRoute: typeof AlumniAllRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professors': {
+      id: '/professors'
+      path: '/professors'
+      fullPath: '/professors'
+      preLoaderRoute: typeof ProfessorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
   FaqRoute: FaqRoute,
+  ProfessorsRoute: ProfessorsRoute,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
   AlumniAllRoute: AlumniAllRoute,

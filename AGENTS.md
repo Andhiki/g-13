@@ -10,6 +10,7 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When course records support two languages, store both Indonesian and English names, display the selected language, and search both names regardless of locale.
 - When acting as a review sub-agent, report findings only; let the parent agent apply fixes.
 
 - When redesigning alumni cards from references, retain the dense grid and a centered max-width page; use references for compact role and education lines rather than copying their layout.
