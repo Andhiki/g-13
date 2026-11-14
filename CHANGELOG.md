@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-14
 
+#### Changed
+
+- Mempermudah pengisian ulasan dengan penilaian bintang, pencarian mata kuliah dalam satu kolom, pilihan dosen dari kartu, dan pesan validasi per kolom.
+
 #### Added
 
 - Formulir ulasan dosen tanpa akun, dengan nama atau anonim, penerbitan langsung, dan pembatasan pengiriman per IP.

@@ -1,3 +1,4 @@
+import { getSubmissionErrors } from "./submission-validation";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "bun:test";
 import { getPlatformProxy } from "wrangler";
@@ -34,6 +35,25 @@ it("validates required fields, integer ratings, limits and anonymous names", () 
   ]) {
     expect(() => validateSubmission({ ...input, ...patch })).toThrow();
   }
+});
+it("reports field errors and enforces text boundaries", () => {
+  expect(getSubmissionErrors({ ...input, clarity: 0, body: " " })).toEqual({
+    clarity: "Choose a rating from 1 to 5.",
+    body: "Describe your experience using 1–1,000 characters.",
+  });
+  const boundaries = {
+    ...input,
+    body: "a".repeat(1000),
+    termLabel: "a".repeat(60),
+    authorName: "a".repeat(80),
+  };
+  expect(getSubmissionErrors(boundaries)).toEqual({});
+  for (const field of ["body", "termLabel", "authorName"] as const) {
+    expect(
+      getSubmissionErrors({ ...boundaries, [field]: boundaries[field] + "a" })[field],
+    ).toBeDefined();
+  }
+  expect(() => validateSubmission(null)).toThrow();
 });
 it("publishes named and anonymous submissions, rejects references, and atomically limits IPs", async () => {
   const platform = await getPlatformProxy<{ DB: D1Database }>({
@@ -74,8 +94,14 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
       ok: false,
       error: "invalid",
     });
-    expect(await submitReview(db, input, context)).toEqual({ ok: true });
-    expect(await submitReview(db, { ...input, anonymous: true }, context)).toEqual({ ok: true });
+    expect(await submitReview(db, input, context)).toMatchObject({
+      ok: true,
+      reviewId: expect.any(String),
+    });
+    expect(await submitReview(db, { ...input, anonymous: true }, context)).toMatchObject({
+      ok: true,
+      reviewId: expect.any(String),
+    });
     let data = await getPublicProfessorReviews(db);
     expect(data.professors[0]).toMatchObject({ reviewCount: 2, overallAverage: 3 });
     expect(data.professors[0].reviews.map((r) => r.authorName).sort()).toEqual([
@@ -87,8 +113,14 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
     );
     expect(attempts.filter((r) => r.ok)).toHaveLength(1);
     expect(attempts.filter((r) => !r.ok && r.error === "rate-limit")).toHaveLength(4);
-    expect(await submitReview(db, input, { ...context, ip: "192.0.2.2" })).toEqual({ ok: true });
-    expect(await submitReview(db, input, { ...context, now: 7_200_000 })).toEqual({ ok: true });
+    expect(await submitReview(db, input, { ...context, ip: "192.0.2.2" })).toMatchObject({
+      ok: true,
+      reviewId: expect.any(String),
+    });
+    expect(await submitReview(db, input, { ...context, now: 7_200_000 })).toMatchObject({
+      ok: true,
+      reviewId: expect.any(String),
+    });
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
     expect(limits.results).toHaveLength(1);

@@ -1,5 +1,6 @@
-import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
-import { useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { ReviewSubmissionForm, type ReviewDraft } from "./ReviewSubmissionForm";
+import { useEffect, useMemo, useState } from "react";
 import { RiCloseLine, RiSearchLine, RiStarFill } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
 import { AlignButton } from "../../ui/button";
@@ -13,10 +14,22 @@ function average(values: number[]): number | null {
 }
 
 export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
+  const router = useRouter();
+  const [reviewToFocus, setReviewToFocus] = useState<string | null>(null);
+  const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(null);
   const { text, language } = useLocale("professors");
   const [professorQuery, setProfessorQuery] = useState("");
   const [courseQuery, setCourseQuery] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!reviewToFocus) return;
+    const review = document.getElementById(`review-${reviewToFocus}`);
+    if (!review) return;
+    review.scrollIntoView({ block: "center" });
+    review.focus({ preventScroll: true });
+    setReviewToFocus(null);
+  }, [data, reviewToFocus]);
 
   const selectedCourse = data.courses.find((course) => course.id === selectedCourseId) ?? null;
   const courseMatches = useMemo(
@@ -70,7 +83,20 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
           </div>
         </aside>
 
-        <ReviewSubmissionForm data={data} />
+        <ReviewSubmissionForm
+          data={data}
+          draft={reviewDraft}
+          onPublished={async (reviewId) => {
+            setProfessorQuery("");
+            setSelectedCourseId(null);
+            setCourseQuery("");
+            setReviewToFocus(reviewId);
+            await router.invalidate({
+              filter: (match) => match.routeId === "/professors",
+              sync: true,
+            });
+          }}
+        />
 
         <section aria-label={text("Professor search")} className="mt-8 grid gap-4 md:grid-cols-2">
           <label className="block">
@@ -214,6 +240,22 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
                       </div>
                     </div>
 
+                    <AlignButton.Root
+                      type="button"
+                      mode="ghost"
+                      variant="neutral"
+                      className="mt-3 min-h-11"
+                      onClick={() =>
+                        setReviewDraft((current) => ({
+                          professorId: professor.id,
+                          courseId: selectedCourseId,
+                          request: (current?.request ?? 0) + 1,
+                        }))
+                      }
+                    >
+                      {text("Write a review")}
+                      <span className="sr-only"> · {professor.name}</span>
+                    </AlignButton.Root>
                     {shownReviews.length ? (
                       <>
                         <dl className="mt-5 grid grid-cols-3 gap-2 rounded-lg bg-bg-weak-50 p-3 text-center">
@@ -231,6 +273,8 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
                             <article
                               className="rounded-lg border border-stroke-soft-200 p-4"
                               key={review.id}
+                              id={`review-${review.id}`}
+                              tabIndex={-1}
                             >
                               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                                 <Typography as="strong" variant="label">
