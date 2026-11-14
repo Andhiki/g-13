@@ -20,6 +20,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengajak pengunjung menjadi pengulas pertama pada kartu dosen yang belum memiliki ulasan.
+
 - Mengubah direktori dosen menjadi ringkasan dengan tautan ke halaman detail khusus; ulasan lengkap, pengurutan ulasan, dan tombol suka tersedia di halaman dosen.
 - Memadatkan kartu dosen, menampilkan rating sebagai lima bintang, membatasi tampilan awal mata kuliah menjadi tiga, dan menghapus petunjuk pencarian.
 - Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
