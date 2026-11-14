@@ -35,64 +35,67 @@ export function ProfessorReviewCard({
           <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
             {text("{{count}} reviews", { count: professor.reviews.length })}
           </p>
-        </div>
-        <div
-          className="flex shrink-0 items-center gap-1.5 rounded-full bg-bg-weak-50 px-3 py-1.5 text-label-sm"
-          aria-label={text("Overall rating: {{rating}}", {
-            rating: overall === null ? text("Not rated") : `${overall.toFixed(1)}/5`,
-          })}
-        >
-          <RiStarFill aria-hidden="true" className="size-4 text-primary-base" />
-          {overall === null ? "?" : overall.toFixed(1)}
-        </div>
-      </div>
-      {courses.length > 0 && (
-        <ul aria-label={text("Courses reviewed")} className="mb-0 mt-3 flex flex-wrap gap-1.5 pl-0">
-          {courses.map((course) => (
-            <li
-              key={course.courseId}
-              className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-1"
+          {courses.length > 0 && (
+            <ul
+              aria-label={text("Courses reviewed")}
+              className="mb-0 mt-3 flex flex-wrap gap-1.5 pl-0"
             >
-              <span className="shrink-0 font-mono text-paragraph-xs text-text-sub-600">
-                {course.code}
-              </span>
-              <span className="truncate text-paragraph-xs">
-                {courseDisplayName(course, language)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        {professor.reviews.length ? (
-          <AlignButton.Root
-            variant="neutral"
-            mode="ghost"
-            className="size-11 p-0"
-            onClick={onToggle}
-            aria-expanded={expanded}
-            aria-controls={`professor-reviews-${professor.id}`}
-            aria-label={`${text(expanded ? "Hide reviews" : "Read reviews")} · ${professor.name}`}
-            title={text(expanded ? "Hide reviews" : "Read reviews")}
+              {courses.map((course) => (
+                <li
+                  key={course.courseId}
+                  className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-1"
+                >
+                  <span className="shrink-0 font-mono text-paragraph-xs text-text-sub-600">
+                    {course.code}
+                  </span>
+                  <span className="truncate text-paragraph-xs">
+                    {courseDisplayName(course, language)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <div
+            className="flex items-center gap-1.5 rounded-full bg-bg-weak-50 px-3 py-1.5 text-label-sm"
+            aria-label={text("Overall rating: {{rating}}", {
+              rating: overall === null ? text("Not rated") : `${overall.toFixed(1)}/5`,
+            })}
           >
-            <RiArrowDownSLine
-              aria-hidden="true"
-              className={`size-5 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
-            />
-          </AlignButton.Root>
-        ) : (
-          <span className="text-paragraph-xs text-text-sub-600">{text("No reviews yet")}</span>
-        )}
-        <AlignButton.Root
-          variant="neutral"
-          mode="ghost"
-          className="size-11 p-0"
-          onClick={onWrite}
-          aria-label={`${text("Write a review")} · ${professor.name}`}
-          title={text("Write a review")}
-        >
-          <RiPencilLine aria-hidden="true" className="size-5" />
-        </AlignButton.Root>
+            <RiStarFill aria-hidden="true" className="size-4 text-primary-base" />
+            {overall === null ? "?" : overall.toFixed(1)}
+          </div>
+          <div className="flex items-center gap-0.5">
+            {professor.reviews.length > 0 && (
+              <AlignButton.Root
+                variant="neutral"
+                mode="ghost"
+                className="size-10 p-0"
+                onClick={onToggle}
+                aria-expanded={expanded}
+                aria-controls={`professor-reviews-${professor.id}`}
+                aria-label={`${text(expanded ? "Hide reviews" : "Read reviews")} · ${professor.name}`}
+                title={text(expanded ? "Hide reviews" : "Read reviews")}
+              >
+                <RiArrowDownSLine
+                  aria-hidden="true"
+                  className={`size-5 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
+                />
+              </AlignButton.Root>
+            )}
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              className="size-10 p-0"
+              onClick={onWrite}
+              aria-label={`${text("Write a review")} · ${professor.name}`}
+              title={text("Write a review")}
+            >
+              <RiPencilLine aria-hidden="true" className="size-5" />
+            </AlignButton.Root>
+          </div>
+        </div>
       </div>
       <div id={`professor-reviews-${professor.id}`}>
         <AnimatePresence initial={false}>
