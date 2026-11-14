@@ -81,5 +81,21 @@
   "Highest rating": "Highest rating",
   "Lowest rating": "Lowest rating",
   "Newest first": "Newest first",
-  "Oldest first": "Oldest first"
+  "Oldest first": "Oldest first",
+  "Sort": "Sort",
+  "Sort professors and reviews": "Sort professors and reviews",
+  "Search and sort": "Search and sort",
+  "Search professors or courses": "Search professors or courses",
+  "Clear search": "Clear search",
+  "Understanding the ratings": "Understanding the ratings",
+  "Clarity of explanations and examples.": "Clarity of explanations and examples.",
+  "Help and guidance when students need it.": "Help and guidance when students need it.",
+  "Structure of course materials and class activities.": "Structure of course materials and class activities.",
+  "Overall ratings give equal weight to these three aspects. Scores range from 1 to 5.": "Overall ratings give equal weight to these three aspects. Scores range from 1 to 5.",
+  "Overall rating: {{rating}}": "Overall rating: {{rating}}",
+  "Hide reviews": "Hide reviews",
+  "Read reviews": "Read reviews",
+  "Try a name, course code, or a combination: Afiahayati di basis data.": "Try a name, course code, or a combination: Afiahayati di basis data.",
+  "{{count}} professors. Course searches show ratings from matching published reviews.": "{{count}} professors. Course searches show ratings from matching published reviews.",
+  "No professors or reviewed courses match this search. Try another name or clear your search.": "No professors or reviewed courses match this search. Try another name or clear your search."
 }

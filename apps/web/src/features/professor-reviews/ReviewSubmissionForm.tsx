@@ -1,3 +1,4 @@
+import { m, useReducedMotion } from "motion/react";
 import { AlignFancyButton } from "../../ui/fancy-button";
 import { useEffect, useRef, useState } from "react";
 import { RiAddLine, RiArrowDownSLine, RiArrowRightLine, RiCheckLine } from "@remixicon/react";
@@ -36,6 +37,7 @@ export function ReviewSubmissionForm({
   onPublished: (reviewId: string) => Promise<void>;
 }) {
   const { text } = useLocale("professors");
+  const reducedMotion = useReducedMotion();
   const section = useRef<HTMLElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false);
@@ -90,9 +92,20 @@ export function ReviewSubmissionForm({
       >
         <RiAddLine aria-hidden="true" className="size-5 text-primary-base" />
         <span className="flex-1 text-label-md">{text("Write a review")}</span>
-        <RiArrowDownSLine aria-hidden="true" className={`size-5 ${open ? "rotate-180" : ""}`} />
+        <RiArrowDownSLine
+          aria-hidden="true"
+          className={`size-5 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
+        />
       </button>
-      <div id="review-submission-form" hidden={!open}>
+      <m.div
+        id="review-submission-form"
+        initial={false}
+        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+        transition={{ duration: reducedMotion ? 0 : 0.24, ease: "easeInOut" }}
+        inert={!open}
+        aria-hidden={!open}
+        className="overflow-hidden"
+      >
         <form
           ref={form}
           noValidate
@@ -354,7 +367,7 @@ export function ReviewSubmissionForm({
             </div>
           </div>
         </form>
-      </div>
+      </m.div>
     </section>
   );
 }

@@ -81,5 +81,21 @@
   "Highest rating": "Rating tertinggi",
   "Lowest rating": "Rating terendah",
   "Newest first": "Terbaru",
-  "Oldest first": "Terlama"
+  "Oldest first": "Terlama",
+  "Sort": "Urutkan",
+  "Sort professors and reviews": "Urutkan dosen dan ulasan",
+  "Search and sort": "Cari dan urutkan",
+  "Search professors or courses": "Cari dosen atau mata kuliah",
+  "Clear search": "Hapus pencarian",
+  "Understanding the ratings": "Arti penilaian",
+  "Clarity of explanations and examples.": "Kejelasan penjelasan dan contoh yang diberikan.",
+  "Help and guidance when students need it.": "Bantuan dan arahan saat mahasiswa membutuhkannya.",
+  "Structure of course materials and class activities.": "Keteraturan materi dan kegiatan perkuliahan.",
+  "Overall ratings give equal weight to these three aspects. Scores range from 1 to 5.": "Rating keseluruhan memberi bobot yang sama untuk ketiga aspek ini. Nilai berkisar dari 1 hingga 5.",
+  "Overall rating: {{rating}}": "Rating keseluruhan: {{rating}}",
+  "Hide reviews": "Tutup ulasan",
+  "Read reviews": "Baca ulasan",
+  "Try a name, course code, or a combination: Afiahayati di basis data.": "Cari nama, kode mata kuliah, atau gabungannya: Afiahayati di basis data.",
+  "{{count}} professors. Course searches show ratings from matching published reviews.": "{{count}} dosen. Pencarian mata kuliah menampilkan rating dari ulasan terbit yang cocok.",
+  "No professors or reviewed courses match this search. Try another name or clear your search.": "Tidak ada dosen atau mata kuliah berulasan yang cocok. Coba nama lain atau hapus pencarian."
 }
