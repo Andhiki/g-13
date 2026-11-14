@@ -45,7 +45,6 @@
   "{{metric}}: {{value}} of 5": "{{metric}}: {{value}} dari 5",
   "Not rated": "Belum dinilai",
   "Courses": "Mata kuliah",
-  "Search Indonesian or English names, or a course code.": "Cari nama Indonesia, Inggris, atau kode mata kuliah.",
   "Select a lecturer.": "Pilih dosen.",
   "Select a course from the results.": "Pilih mata kuliah dari hasil pencarian.",
   "Enter a term using 1–60 characters.": "Isi semester dengan 1–60 karakter.",
@@ -109,5 +108,6 @@
   "Average ratings": "Rata-rata penilaian",
   "Reviews": "Ulasan",
   "No reviews yet. Be the first to share your experience.": "Belum ada ulasan. Jadilah orang pertama yang berbagi pengalaman.",
-  "Be the first to review!": "Jadilah yang pertama memberi ulasan!"
+  "Be the first to review!": "Jadilah yang pertama memberi ulasan!",
+  "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "Alamat IP digunakan untuk membatasi pengiriman ulasan dan suka. Alamat IP mentah tidak disimpan pada data ulasan atau suka."
 }

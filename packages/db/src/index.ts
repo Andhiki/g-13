@@ -7,4 +7,4 @@ export function createDatabase(
   return drizzle(binding, { schema });
 }
 
-export { courses, lecturers, reviewLikes, reviews, schema } from "./schema";
+export { courses, lecturers, reviewLikes, reviewSubmissionLimits, reviews, schema } from "./schema";

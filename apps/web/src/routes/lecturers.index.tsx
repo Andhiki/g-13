@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LecturerReviewsPage } from "../features/lecturer-reviews/LecturerReviewsPage";
-import { lecturerDirectoryQueryOptions } from "../features/lecturer-reviews/queries";
+import { LecturerReviewsPage } from "../features/lecturer-reviews/components/LecturerReviewsPage";
+import { lecturerDirectoryQueryOptions } from "../features/lecturer-reviews/client/queries";
 
 export const Route = createFileRoute("/lecturers/")({
   loader: async ({ context }) => {

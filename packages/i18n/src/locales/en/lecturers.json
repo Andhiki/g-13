@@ -45,7 +45,6 @@
   "{{metric}}: {{value}} of 5": "{{metric}}: {{value}} of 5",
   "Not rated": "Not rated",
   "Courses": "Courses",
-  "Search Indonesian or English names, or a course code.": "Search Indonesian or English names, or a course code.",
   "Select a lecturer.": "Select a lecturer.",
   "Select a course from the results.": "Select a course from the results.",
   "Enter a term using 1–60 characters.": "Enter a term using 1–60 characters.",
@@ -109,5 +108,6 @@
   "Average ratings": "Average ratings",
   "Reviews": "Reviews",
   "No reviews yet. Be the first to share your experience.": "No reviews yet. Be the first to share your experience.",
-  "Be the first to review!": "Be the first to review!"
+  "Be the first to review!": "Be the first to review!",
+  "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records."
 }

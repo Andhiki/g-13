@@ -10,6 +10,16 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When using static imports in TanStack server handlers, keep server-only
+  references inside handler bodies and keep request-dependent work out of module
+  initialization.
+
+- When a server-backed web feature grows, follow [docs/web-feature-structure.md](docs/web-feature-structure.md) and add only layers with real responsibilities.
+
+- When writing environment examples, comment only non-obvious defaults and secret requirements, using short lines.
+
+- When implementing review RPCs, validate untrusted input with Zod, keep SQL in repositories and business rules in services, and extract cryptographic identity hashing into a named function.
+
 - When tightening lecturer detail layouts, reduce desktop padding and section gaps while preserving mobile spacing.
 
 - When a lecturer detail name feels too dominant, use the subtitle1 style while keeping the semantic h1.

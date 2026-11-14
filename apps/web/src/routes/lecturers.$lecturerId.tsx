@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LecturerDetailPage } from "../features/lecturer-reviews/LecturerDetailPage";
-import { lecturerDetailQueryOptions } from "../features/lecturer-reviews/queries";
+import { LecturerDetailPage } from "../features/lecturer-reviews/components/LecturerDetailPage";
+import { lecturerDetailQueryOptions } from "../features/lecturer-reviews/client/queries";
 
 export const Route = createFileRoute("/lecturers/$lecturerId")({
   loader: async ({ context, params }) => {
