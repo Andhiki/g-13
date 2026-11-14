@@ -1,10 +1,11 @@
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { RiArrowRightLine, RiCloseLine, RiSearchLine, RiStarFill } from "@remixicon/react";
+import { RiArrowRightLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
 import { AlignFancyButton } from "../../ui/fancy-button";
 import { Typography } from "../../ui/typography";
 import { ProfessorReviewCard } from "./ProfessorReviewCard";
+import { RatingGuidePopover } from "./RatingGuidePopover";
 import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
 import type { ReviewDraft } from "./ReviewSubmissionForm";
 import { ReviewSortMenu } from "./ReviewSortMenu";
@@ -13,11 +14,6 @@ import { searchProfessors } from "./professor-search";
 import { toast, SuccessToast } from "../../ui/toast";
 
 type ReviewData = Awaited<ReturnType<typeof import("./repository").getPublicProfessorReviews>>;
-const ratingDescriptions = [
-  ["Clarity", "Clarity of explanations and examples."],
-  ["Support", "Help and guidance when students need it."],
-  ["Organization", "Structure of course materials and class activities."],
-] as const;
 export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
   const router = useRouter();
   const { text } = useLocale("professors");
@@ -62,46 +58,13 @@ export function ProfessorReviewsPage({ data }: { data: ReviewData }) {
           <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
             {text("Browse community experiences with Ilmu Komputer UGM lecturers.")}
           </Typography>
-          <AlignFancyButton.Root className="mt-6" onClick={() => startReview("")}>
-            {text("Write a review")}
-            <RiArrowRightLine aria-hidden="true" className="size-5" />
-          </AlignFancyButton.Root>
-          <section aria-labelledby="rating-guide" className="mt-8 max-w-md">
-            <h2 id="rating-guide" className="m-0 text-label-sm">
-              {text("Understanding the ratings")}
-            </h2>
-            <dl className="mb-0 mt-4 space-y-4">
-              {ratingDescriptions.map(([label, description]) => (
-                <div key={label}>
-                  <dt className="text-label-sm">{text(label)}</dt>
-                  <dd className="m-0 mt-1 text-paragraph-sm text-text-sub-600">
-                    {text(description)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mb-0 mt-4 text-paragraph-xs text-text-sub-600">
-              {text(
-                "Overall ratings give equal weight to these three aspects. Scores range from 1 to 5.",
-              )}
-            </p>
-          </section>
-          <aside className="mt-6 max-w-md rounded-10 border border-stroke-soft-200 p-4">
-            <div className="flex items-start gap-3">
-              <RiStarFill aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-base" />
-              <div>
-                <h2 className="m-0 text-label-sm">{text("Unverified reviews")}</h2>
-                <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
-                  {text(
-                    "Reviews are shared by the community and do not prove course attendance. This is a community-run project, not an official university service.",
-                  )}
-                </p>
-                <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
-                  {text("Ratings summarize experiences and are not a definitive ranking.")}
-                </p>
-              </div>
-            </div>
-          </aside>
+          <div className="mt-6 flex items-center gap-2">
+            <RatingGuidePopover />
+            <AlignFancyButton.Root onClick={() => startReview("")}>
+              {text("Write a review")}
+              <RiArrowRightLine aria-hidden="true" className="size-5" />
+            </AlignFancyButton.Root>
+          </div>
         </header>
         <div className="min-w-0">
           <section aria-label={text("Search and sort")}>
