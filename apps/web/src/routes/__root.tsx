@@ -26,8 +26,12 @@ import { createI18n, messageNamespace } from "../i18n";
 import { readLanguage } from "../language";
 import { loadMessages } from "@g13/i18n/messages";
 import type { Language } from "@g13/i18n";
+import type { QueryClient } from "@tanstack/react-query";
 
-export const Route = createRootRouteWithContext<{ language?: Language }>()({
+export const Route = createRootRouteWithContext<{
+  language?: Language;
+  queryClient: QueryClient;
+}>()({
   beforeLoad: async ({ context }) => {
     const language = context.language ?? readLanguage();
     return { language, common: await loadMessages(language, "common") };

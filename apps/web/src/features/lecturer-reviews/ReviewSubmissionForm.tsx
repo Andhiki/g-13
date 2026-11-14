@@ -1,6 +1,7 @@
 import { Typography } from "../../ui/typography";
 import { AlignFancyButton } from "../../ui/fancy-button";
 import { useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RiArrowRightLine } from "@remixicon/react";
 import { AlignSelect } from "../../ui/select";
 import { AlignButton } from "../../ui/button";
@@ -8,8 +9,12 @@ import { AlignModal } from "../../ui/modal";
 import { useLocale } from "../../useLocale";
 import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
-import { getSubmissionErrors, type SubmissionErrors } from "./submission-validation";
-import { publishLecturerReview } from "./server";
+import {
+  getSubmissionErrors,
+  type ReviewSubmission,
+  type SubmissionErrors,
+} from "./submission-validation";
+import { publishLecturerReviewMutationOptions } from "./mutations";
 
 export type ReviewFormData = {
   lecturers: { id: string; name: string }[];
@@ -45,13 +50,14 @@ export function ReviewSubmissionForm({
   onPublished: (reviewId: string) => Promise<void>;
 }) {
   const { text } = useLocale("lecturers");
+  const queryClient = useQueryClient();
+  const publishMutation = useMutation(publishLecturerReviewMutationOptions(queryClient));
   const form = useRef<HTMLFormElement>(null);
   const [lecturerId, setLecturerId] = useState(initialLecturerId);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
   const [body, setBody] = useState("");
   const [ratings, setRatings] = useState({ clarity: 0, support: 0, organization: 0 });
-  const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [message, setMessage] = useState("");
   useEffect(() => {
@@ -87,14 +93,14 @@ export function ReviewSubmissionForm({
       className="flex max-h-[calc(100dvh-2rem)] min-h-0 flex-col"
       onSubmit={async (event) => {
         event.preventDefault();
-        if (pending) return;
+        if (publishMutation.isPending) return;
         const values = new FormData(event.currentTarget);
-        const input = {
+        const input: ReviewSubmission = {
           lecturerId,
           courseId,
-          termLabel: values.get("termLabel"),
+          termLabel: String(values.get("termLabel") ?? ""),
           anonymous,
-          authorName: values.get("authorName") ?? "",
+          authorName: String(values.get("authorName") ?? ""),
           body,
           ...ratings,
         };
@@ -107,9 +113,8 @@ export function ReviewSubmissionForm({
           );
           return;
         }
-        setPending(true);
         try {
-          const result = await publishLecturerReview({ data: input });
+          const result = await publishMutation.mutateAsync(input);
           if (!result.ok) {
             setMessage(
               result.error === "rate-limit"
@@ -123,8 +128,6 @@ export function ReviewSubmissionForm({
           await onPublished(result.reviewId);
         } catch {
           setMessage("Could not confirm publication. Refresh the page before trying again.");
-        } finally {
-          setPending(false);
         }
       }}
     >
@@ -142,7 +145,10 @@ export function ReviewSubmissionForm({
       </header>
 
       <div className="min-h-0 overflow-y-auto px-5 pt-5 pb-3">
-        <fieldset disabled={pending} className="min-w-0 space-y-6 disabled:opacity-70">
+        <fieldset
+          disabled={publishMutation.isPending}
+          className="min-w-0 space-y-6 disabled:opacity-70"
+        >
           <div className="space-y-4">
             <div>
               <Typography as="label" variant="label" htmlFor="review-lecturer">
@@ -315,11 +321,11 @@ export function ReviewSubmissionForm({
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
-            disabled={pending || !data.lecturers.length || !data.courses.length}
+            disabled={publishMutation.isPending || !data.lecturers.length || !data.courses.length}
             className="min-h-11 w-full"
           >
             <Typography as="span" variant="caption" className="sm:text-label-sm">
-              {text(pending ? "Publishing…" : "Publish review")}
+              {text(publishMutation.isPending ? "Publishing…" : "Publish review")}
             </Typography>
             <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />
           </AlignFancyButton.Root>

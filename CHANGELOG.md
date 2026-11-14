@@ -20,6 +20,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Membuka akses langsung ke direktori dan ulasan dosen; peluncuran produksi tetap memerlukan D1, secret pembatasan laju, dan kesiapan penanganan laporan.
+
+- Mengecilkan nama dosen pada halaman detail agar lebih ringkas.
+
+- Merapatkan jarak vertikal halaman detail dosen pada desktop.
+
+- Memperbarui direktori dan halaman detail dosen saat ulasan diterbitkan atau suka diubah.
+
 - Mengajak pengunjung menjadi pengulas pertama pada kartu dosen yang belum memiliki ulasan.
 
 - Mengubah direktori dosen menjadi ringkasan dengan tautan ke halaman detail khusus; ulasan lengkap, pengurutan ulasan, dan tombol suka tersedia di halaman dosen.

@@ -10,6 +10,10 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When tightening lecturer detail layouts, reduce desktop padding and section gaps while preserving mobile spacing.
+
+- When a lecturer detail name feels too dominant, use the subtitle1 style while keeping the semantic h1.
+
 - When naming the review domain, use lecturer (dosen) throughout schema, APIs, routes, modules, and copy; professor denotes a rank rather than every lecturer.
 
 - When aligning lecturer card headers, center the lecturer name, stars, and small action buttons in one row and inspect desktop and mobile screenshots before reporting completion.

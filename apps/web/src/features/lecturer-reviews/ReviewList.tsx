@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
 import { Typography } from "../../ui/typography";
@@ -17,12 +16,14 @@ export function ReviewList({
   language,
   likedReviews,
   canLike,
+  likePending,
   onLike,
 }: {
   reviews: Reviews;
   language: "id" | "en";
   likedReviews: string[];
   canLike: boolean;
+  likePending: boolean;
   onLike: (reviewId: string, liked: boolean) => Promise<void>;
 }) {
   const { text } = useLocale("lecturers");
@@ -86,6 +87,7 @@ export function ReviewList({
             count={review.likeCount}
             liked={likedReviews.includes(review.id)}
             canLike={canLike}
+            pending={likePending}
             onLike={onLike}
           />
         </article>
@@ -99,16 +101,17 @@ function ReviewLikeButton({
   count,
   liked,
   canLike,
+  pending,
   onLike,
 }: {
   reviewId: string;
   count: number;
   liked: boolean;
   canLike: boolean;
+  pending: boolean;
   onLike: (reviewId: string, liked: boolean) => Promise<void>;
 }) {
   const { text } = useLocale("lecturers");
-  const [pending, setPending] = useState(false);
   const Icon = liked ? RiThumbUpFill : RiThumbUpLine;
   return (
     <button
@@ -117,14 +120,7 @@ function ReviewLikeButton({
       aria-pressed={liked}
       aria-label={text(liked ? "Unlike review" : "Like review")}
       disabled={!canLike || pending}
-      onClick={async () => {
-        setPending(true);
-        try {
-          await onLike(reviewId, !liked);
-        } finally {
-          setPending(false);
-        }
-      }}
+      onClick={() => onLike(reviewId, !liked)}
     >
       <Icon className="size-4" aria-hidden="true" />
       <Typography as="span" variant="label">

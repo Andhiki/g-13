@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { RiArrowRightLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
@@ -11,11 +11,10 @@ import type { ReviewDraft } from "./ReviewSubmissionForm";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { orderLecturers, type LecturerOrder } from "./review-order";
 import { searchLecturers } from "./lecturer-search";
+import { lecturerDirectoryQueryOptions } from "./queries";
 
-type DirectoryData = Awaited<ReturnType<typeof import("./repository").getLecturerDirectory>>;
-
-export function LecturerReviewsPage({ data }: { data: DirectoryData }) {
-  const router = useRouter();
+export function LecturerReviewsPage() {
+  const { data } = useSuspenseQuery(lecturerDirectoryQueryOptions());
   const { text } = useLocale("lecturers");
   const [query, setQuery] = useState("");
   const [lecturerOrder, setLecturerOrder] = useState<LecturerOrder>("name");
@@ -105,10 +104,6 @@ export function LecturerReviewsPage({ data }: { data: DirectoryData }) {
         onPublished={async () => {
           setReviewDraft(null);
           setQuery("");
-          await router.invalidate({
-            filter: (match) => match.routeId === "/lecturers/",
-            sync: true,
-          });
         }}
       />
     </main>

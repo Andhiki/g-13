@@ -1,16 +1,17 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { LecturerDetailPage } from "../features/lecturer-reviews/LecturerDetailPage";
-import { loadLecturerDetail } from "../features/lecturer-reviews/server";
+import { lecturerDetailQueryOptions } from "../features/lecturer-reviews/queries";
 
 export const Route = createFileRoute("/lecturers/$lecturerId")({
-  loader: async ({ params }) => {
-    const data = await loadLecturerDetail({ data: { lecturerId: params.lecturerId } });
-    if (!data) throw notFound();
-    return data;
+  loader: async ({ context, params }) => {
+    await context.queryClient.query(lecturerDetailQueryOptions(params.lecturerId));
   },
-  head: ({ match, loaderData }) => {
-    const title = loaderData
-      ? `${loaderData.lecturer.name} · ${match.context.common["Dosen dan ulasan"]}`
+  head: ({ match }) => {
+    const data = match.context.queryClient.getQueryData(
+      lecturerDetailQueryOptions(match.params.lecturerId).queryKey,
+    );
+    const title = data
+      ? `${data.lecturer.name} · ${match.context.common["Dosen dan ulasan"]}`
       : match.context.common["Dosen dan ulasan"];
     return {
       meta: [
@@ -24,5 +25,5 @@ export const Route = createFileRoute("/lecturers/$lecturerId")({
       ],
     };
   },
-  component: () => <LecturerDetailPage data={Route.useLoaderData()} />,
+  component: () => <LecturerDetailPage lecturerId={Route.useParams().lecturerId} />,
 });

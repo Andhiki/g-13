@@ -1,12 +1,10 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { LecturerReviewsPage } from "../features/lecturer-reviews/LecturerReviewsPage";
-import { loadLecturerDirectory } from "../features/lecturer-reviews/server";
+import { lecturerDirectoryQueryOptions } from "../features/lecturer-reviews/queries";
 
 export const Route = createFileRoute("/lecturers/")({
-  loader: async () => {
-    const data = await loadLecturerDirectory();
-    if (!data) throw notFound();
-    return data;
+  loader: async ({ context }) => {
+    await context.queryClient.query(lecturerDirectoryQueryOptions());
   },
   head: ({ match }) => ({
     meta: [
@@ -19,5 +17,5 @@ export const Route = createFileRoute("/lecturers/")({
       },
     ],
   }),
-  component: () => <LecturerReviewsPage data={Route.useLoaderData()} />,
+  component: LecturerReviewsPage,
 });

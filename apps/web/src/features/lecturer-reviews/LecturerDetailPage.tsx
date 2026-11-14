@@ -1,4 +1,5 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { useLocale } from "../../useLocale";
@@ -12,18 +13,23 @@ import { ReviewSortMenu } from "./ReviewSortMenu";
 import { RatingStars } from "./LecturerReviewCard";
 import { courseDisplayName } from "./course-search";
 import { orderReviews, type ReviewOrder } from "./review-order";
-import { loadBrowserLikes, updateReviewLike } from "./server";
+import { lecturerBrowserLikesQueryOptions, lecturerDetailQueryOptions } from "./queries";
+import { updateReviewLikeMutationOptions } from "./mutations";
 
-type DetailData = NonNullable<Awaited<ReturnType<typeof import("./repository").getLecturerDetail>>>;
-
-export function LecturerDetailPage({ data }: { data: DetailData }) {
-  const router = useRouter();
+export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
+  const { data } = useSuspenseQuery(lecturerDetailQueryOptions(lecturerId));
   const { text, language } = useLocale("lecturers");
+  const queryClient = useQueryClient();
   const [browserId, setBrowserId] = useState<string | null>(null);
-  const [likedReviews, setLikedReviews] = useState<string[]>([]);
-  const [likeError, setLikeError] = useState("");
+  const [storageUnavailable, setStorageUnavailable] = useState(false);
   const [reviewOrder, setReviewOrder] = useState<ReviewOrder>("newest");
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const likesQuery = useQuery({
+    ...lecturerBrowserLikesQueryOptions(browserId ?? ""),
+    enabled: browserId !== null,
+  });
+  const likeMutation = useMutation(updateReviewLikeMutationOptions(queryClient));
+  const likedReviews = likesQuery.data ?? [];
   const reviews = orderReviews(data.reviews, reviewOrder);
   useEffect(() => {
     try {
@@ -31,25 +37,23 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
       const id = localStorage.getItem(key) || crypto.randomUUID();
       localStorage.setItem(key, id);
       setBrowserId(id);
-      void loadBrowserLikes({ data: { browserId: id } })
-        .then(setLikedReviews)
-        .catch(() => setLikeError(text("Could not update like. Please try again.")));
     } catch {
-      setLikeError(text("Enable browser storage to like reviews."));
+      setStorageUnavailable(true);
     }
-  }, [text]);
+  }, []);
+  const likeError = storageUnavailable
+    ? text("Enable browser storage to like reviews.")
+    : likesQuery.isError || likeMutation.isError
+      ? text("Could not update like. Please try again.")
+      : "";
 
   return (
-    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12 lg:py-16">
+    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12 lg:py-8">
       <div className="mx-auto max-w-4xl">
         <LinkBack />
-        <header className="mt-6">
+        <header className="mt-6 lg:mt-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Typography
-              as="h1"
-              variant="title"
-              className="m-0 min-w-0 flex-1 text-title-h3 sm:text-title-h2"
-            >
+            <Typography as="h1" variant="subtitle1" className="m-0 min-w-0 flex-1">
               {data.lecturer.name}
             </Typography>
             <RatingStars
@@ -67,7 +71,7 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
               count: data.lecturer.reviewCount,
             })}
           </Typography>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
+          <div className="mt-5 flex flex-wrap items-center gap-2 lg:mt-3">
             <RatingGuidePopover />
             <AlignFancyButton.Root onClick={() => setReviewDialogOpen(true)}>
               {text("Write a review")}
@@ -76,7 +80,7 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
           </div>
         </header>
 
-        <section aria-label={text("Courses reviewed")} className="mt-8">
+        <section aria-label={text("Courses reviewed")} className="mt-8 lg:mt-6">
           <Typography as="h2" variant="subtitle2" className="mb-0">
             {text("Courses reviewed")}
           </Typography>
@@ -103,7 +107,7 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
           )}
         </section>
 
-        <section aria-label={text("Average ratings")} className="mt-8">
+        <section aria-label={text("Average ratings")} className="mt-8 lg:mt-6">
           <Typography as="h2" variant="subtitle2" className="mb-0">
             {text("Average ratings")}
           </Typography>
@@ -134,7 +138,7 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
           </dl>
         </section>
 
-        <section aria-label={text("Reviews")} className="mt-8">
+        <section aria-label={text("Reviews")} className="mt-8 lg:mt-6">
           <div className="mb-3 flex items-center justify-between gap-3">
             <Typography as="h2" variant="subtitle2" className="mb-0">
               {text("Reviews")}
@@ -150,23 +154,13 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
             reviews={reviews}
             language={language}
             likedReviews={likedReviews}
-            canLike={browserId !== null}
+            canLike={browserId !== null && !likesQuery.isPending && !likesQuery.isError}
+            likePending={likeMutation.isPending}
             onLike={async (reviewId, liked) => {
               if (!browserId) return;
-              try {
-                const result = await updateReviewLike({ data: { reviewId, browserId, liked } });
-                if (!result.ok) throw new Error(result.error);
-                setLikedReviews((current) =>
-                  liked ? [...current, reviewId] : current.filter((id) => id !== reviewId),
-                );
-                setLikeError("");
-                await router.invalidate({
-                  filter: (match) => match.routeId === "/lecturers/$lecturerId",
-                  sync: true,
-                });
-              } catch {
-                setLikeError(text("Could not update like. Please try again."));
-              }
+              await likeMutation
+                .mutateAsync({ reviewId, browserId, lecturerId, liked })
+                .catch(() => undefined);
             }}
           />
         </section>
@@ -180,10 +174,6 @@ export function LecturerDetailPage({ data }: { data: DetailData }) {
         onPublished={async () => {
           setReviewDialogOpen(false);
           toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
-          await router.invalidate({
-            filter: (match) => match.routeId === "/lecturers/$lecturerId",
-            sync: true,
-          });
         }}
       />
     </main>
