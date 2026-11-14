@@ -14,7 +14,13 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-14
 
+#### Fixed
+
+- Menyembunyikan scrollbar pada tab angkatan alumni tanpa menonaktifkan pengguliran horizontal.
+
 #### Changed
+
+- Membuat pencarian alumni yang melekat transparan dengan efek kaca dan mempercepat animasinya menjadi 120 ms.
 
 - Menyimpan sementara halaman direktori alumni agar tetap tersedia saat sumber data mengalami gangguan sementara.
 - Mengganti pilihan angkatan pada direktori alumni dengan tab yang dapat digeser, serta menambahkan pintasan `/` dan animasi pada pencarian yang tetap terlihat saat menggulir.
