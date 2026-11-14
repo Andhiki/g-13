@@ -1,6 +1,6 @@
--- Initial professor list is maintained from the public DIKE UGM faculty directory:
+-- Initial lecturer list is maintained from the public DIKE UGM faculty directory:
 -- https://dcse.fmipa.ugm.ac.id/dosen/ (reviewed 2026-11-14).
-INSERT INTO professors (id, name) VALUES
+INSERT INTO lecturers (id, name) VALUES
   ('afiahayati', 'Afiahayati'),
   ('ahmad-ashari', 'Ahmad Ashari'),
   ('aina-musdholifah', 'Aina Musdholifah'),

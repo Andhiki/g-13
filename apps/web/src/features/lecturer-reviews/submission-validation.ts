@@ -1,5 +1,5 @@
 export type ReviewSubmission = {
-  professorId: string;
+  lecturerId: string;
   courseId: string;
   termLabel: string;
   anonymous: boolean;
@@ -14,7 +14,7 @@ export function getSubmissionErrors(value: unknown): SubmissionErrors {
   const v = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
   const errors: SubmissionErrors = {};
   const fields = [
-    ["professorId", 100, "Select a professor."],
+    ["lecturerId", 100, "Select a lecturer."],
     ["courseId", 100, "Select a course from the results."],
     ["termLabel", 60, "Enter a term using 1–60 characters."],
     ["body", 1000, "Describe your experience using 1–1,000 characters."],
@@ -39,7 +39,7 @@ export function validateSubmission(value: unknown): ReviewSubmission {
   if (Object.keys(getSubmissionErrors(value)).length) throw new Error("invalid");
   const v = value as ReviewSubmission;
   return {
-    professorId: v.professorId.trim(),
+    lecturerId: v.lecturerId.trim(),
     courseId: v.courseId.trim(),
     termLabel: v.termLabel.trim(),
     anonymous: v.anonymous,

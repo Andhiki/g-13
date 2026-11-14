@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { check, index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const professors = sqliteTable("professors", {
+export const lecturers = sqliteTable("lecturers", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
 });
@@ -17,9 +17,9 @@ export const reviews = sqliteTable(
   "reviews",
   {
     id: text("id").primaryKey(),
-    professorId: text("professor_id")
+    lecturerId: text("lecturer_id")
       .notNull()
-      .references(() => professors.id),
+      .references(() => lecturers.id),
     courseId: text("course_id")
       .notNull()
       .references(() => courses.id),
@@ -38,7 +38,7 @@ export const reviews = sqliteTable(
     deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
   },
   (table) => [
-    index("reviews_professor_course_idx").on(table.professorId, table.courseId),
+    index("reviews_lecturer_course_idx").on(table.lecturerId, table.courseId),
     index("reviews_status_deleted_idx").on(table.status, table.deletedAt),
     check(
       "reviews_ratings_range",
@@ -68,4 +68,4 @@ export const reviewSubmissionLimits = sqliteTable("review_submission_limits", {
   expiresAt: integer("expires_at").notNull(),
 });
 
-export const schema = { professors, courses, reviews, reviewLikes, reviewSubmissionLimits };
+export const schema = { lecturers, courses, reviews, reviewLikes, reviewSubmissionLimits };

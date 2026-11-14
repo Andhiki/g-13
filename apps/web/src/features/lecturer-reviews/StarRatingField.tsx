@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 // AlignUI Rating appearance with native radio inputs for selection and keyboard support.
 // See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import { useId, useState } from "react";
@@ -19,15 +20,24 @@ export function StarRatingField({
   onChange: (value: number) => void;
   error?: string;
 }) {
-  const { text } = useLocale("professors");
+  const { text } = useLocale("lecturers");
   const id = useId();
   const [preview, setPreview] = useState(0);
   return (
     <fieldset aria-describedby={`${id}-hint${error ? ` ${id}-error` : ""}`} className="min-w-0">
-      <legend className="text-label-sm">{label}</legend>
-      <p id={`${id}-hint`} className="mb-2 mt-1 text-paragraph-xs text-text-sub-600">
+      <legend>
+        <Typography as="span" variant="label">
+          {label}
+        </Typography>
+      </legend>
+      <Typography
+        as="p"
+        variant="caption"
+        id={`${id}-hint`}
+        className="mb-2 mt-1 text-text-sub-600"
+      >
         {hint}
-      </p>
+      </Typography>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <div className="flex gap-1 sm:gap-1.5" onPointerLeave={() => setPreview(0)}>
           {[1, 2, 3, 4, 5].map((score) => {
@@ -61,14 +71,19 @@ export function StarRatingField({
             );
           })}
         </div>
-        <span className="text-paragraph-xs text-text-sub-600" aria-live="polite">
+        <Typography as="span" variant="caption" className="text-text-sub-600" aria-live="polite">
           {value ? `${value}/5` : text("Not rated")}
-        </span>
+        </Typography>
       </div>
       {error && (
-        <p id={`${id}-error`} className="mb-0 mt-1 text-paragraph-xs text-error-base">
+        <Typography
+          as="p"
+          variant="caption"
+          id={`${id}-error`}
+          className="mb-0 mt-1 text-error-base"
+        >
           {error}
-        </p>
+        </Typography>
       )}
     </fieldset>
   );

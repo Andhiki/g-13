@@ -7,7 +7,7 @@ const course = {
   nameEn: "Database Systems",
 };
 
-describe("professor review course catalog", () => {
+describe("lecturer review course catalog", () => {
   it("searches the code and both language names regardless of selected language", () => {
     expect(matchesCourseSearch(course, "TIF221")).toBe(true);
     expect(matchesCourseSearch(course, "basis data")).toBe(true);

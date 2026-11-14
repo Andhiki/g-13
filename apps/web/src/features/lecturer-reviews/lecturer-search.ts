@@ -1,8 +1,8 @@
 type Course = { id: string; code: string; nameId: string; nameEn: string };
-type Professor = { name: string; reviews: { courseId: string }[] };
+type Lecturer = { name: string; courses: { courseId: string }[] };
 
-export function searchProfessors<T extends Professor>(
-  professors: T[],
+export function searchLecturers<T extends Lecturer>(
+  lecturers: T[],
   courses: Course[],
   query: string,
 ): T[] {
@@ -11,11 +11,11 @@ export function searchProfessors<T extends Professor>(
     .replace(/\bmata\s+kuliah\b/gu, " ")
     .split(/[^\p{L}\p{N}]+/u)
     .filter((word) => word && !["di", "pada", "in"].includes(word));
-  if (!words.length) return professors;
-  return professors.flatMap((professor) => {
-    const name = professor.name.toLocaleLowerCase();
+  if (!words.length) return lecturers;
+  return lecturers.flatMap((lecturer) => {
+    const name = lecturer.name.toLocaleLowerCase();
     const courseWords = words.filter((word) => !name.includes(word));
-    if (!courseWords.length) return [professor];
+    if (!courseWords.length) return [lecturer];
     const matchingIds = new Set(
       courses
         .filter((course) => {
@@ -24,7 +24,7 @@ export function searchProfessors<T extends Professor>(
         })
         .map((course) => course.id),
     );
-    const reviews = professor.reviews.filter((review) => matchingIds.has(review.courseId));
-    return reviews.length ? [{ ...professor, reviews }] : [];
+    const matchingCourses = lecturer.courses.filter((course) => matchingIds.has(course.courseId));
+    return matchingCourses.length ? [{ ...lecturer, courses: matchingCourses }] : [];
   });
 }

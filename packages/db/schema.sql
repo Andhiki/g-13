@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS professors (
+CREATE TABLE IF NOT EXISTS lecturers (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL
 );
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS courses (
 
 CREATE TABLE IF NOT EXISTS reviews (
   id TEXT PRIMARY KEY NOT NULL,
-  professor_id TEXT NOT NULL REFERENCES professors(id),
+  lecturer_id TEXT NOT NULL REFERENCES lecturers(id),
   course_id TEXT NOT NULL REFERENCES courses(id),
   term_label TEXT NOT NULL,
   author_name TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS review_likes (
   PRIMARY KEY (review_id, browser_id)
 );
 
-CREATE INDEX IF NOT EXISTS reviews_professor_course_idx ON reviews(professor_id, course_id);
+CREATE INDEX IF NOT EXISTS reviews_lecturer_course_idx ON reviews(lecturer_id, course_id);
 CREATE INDEX IF NOT EXISTS reviews_status_deleted_idx ON reviews(status, deleted_at);
 
 CREATE TABLE IF NOT EXISTS review_submission_limits (

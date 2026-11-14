@@ -10,6 +10,10 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When naming the review domain, use lecturer (dosen) throughout schema, APIs, routes, modules, and copy; professor denotes a rank rather than every lecturer.
+
+- When aligning lecturer card headers, center the lecturer name, stars, and small action buttons in one row and inspect desktop and mobile screenshots before reporting completion.
+
 - When course records support two languages, store both Indonesian and English names, display the selected language, and search both names regardless of locale.
 - When acting as a review sub-agent, report findings only; let the parent agent apply fixes.
 

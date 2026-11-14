@@ -2,17 +2,17 @@ import { describe, expect, it } from "bun:test";
 import { isFeatureEnabled, parseRuntimeEnvironment, parseSubmissionEnvironment } from "./index";
 
 describe("runtime feature flags", () => {
-  it("defaults professor reviews to disabled", () => {
-    expect(parseRuntimeEnvironment({}).features.professorReviews).toBe(false);
+  it("defaults lecturer reviews to disabled", () => {
+    expect(parseRuntimeEnvironment({}).features.lecturerReviews).toBe(false);
   });
 
   it("parses the configured flag", () => {
-    const flags = parseRuntimeEnvironment({ PROFESSOR_REVIEWS_ENABLED: "true" }).features;
-    expect(isFeatureEnabled(flags, "professorReviews")).toBe(true);
+    const flags = parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: "true" }).features;
+    expect(isFeatureEnabled(flags, "lecturerReviews")).toBe(true);
   });
 
   it("rejects values outside the typed flag contract", () => {
-    expect(() => parseRuntimeEnvironment({ PROFESSOR_REVIEWS_ENABLED: "yes" })).toThrow();
+    expect(() => parseRuntimeEnvironment({ LECTURER_REVIEWS_ENABLED: "yes" })).toThrow();
   });
 });
 

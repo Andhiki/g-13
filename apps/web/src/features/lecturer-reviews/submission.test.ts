@@ -2,12 +2,12 @@ import { getSubmissionErrors } from "./submission-validation";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "bun:test";
 import { getPlatformProxy } from "wrangler";
-import { createDatabase, courses, professors } from "@g13/db";
-import { getPublicProfessorReviews } from "./repository";
+import { createDatabase, courses, lecturers } from "@g13/db";
+import { getLecturerDetail, getLecturerDirectory } from "./repository";
 import { submitReview, validateSubmission } from "./submission";
 
 const input = {
-  professorId: "p",
+  lecturerId: "p",
   courseId: "c",
   termLabel: "2026/2027 Ganjil",
   anonymous: false,
@@ -70,7 +70,7 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
       .filter(Boolean))
       await platform.env.DB.prepare(sql).run();
     const db = createDatabase(platform.env.DB);
-    await db.insert(professors).values({ id: "p", name: "Professor" });
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
     await db.insert(courses).values({ id: "c", code: "CS1", nameId: "Data", nameEn: "Data" });
     const context = {
       enabled: true,
@@ -90,7 +90,7 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
       ok: false,
       error: "invalid",
     });
-    expect(await submitReview(db, { ...input, professorId: "missing" }, context)).toEqual({
+    expect(await submitReview(db, { ...input, lecturerId: "missing" }, context)).toEqual({
       ok: false,
       error: "invalid",
     });
@@ -102,9 +102,9 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
       ok: true,
       reviewId: expect.any(String),
     });
-    let data = await getPublicProfessorReviews(db);
-    expect(data.professors[0]).toMatchObject({ reviewCount: 2, overallAverage: 3 });
-    expect(data.professors[0].reviews.map((r) => r.authorName).sort()).toEqual([
+    let data = await getLecturerDirectory(db);
+    expect(data.lecturers[0]).toMatchObject({ reviewCount: 2, overallAverage: 3 });
+    expect((await getLecturerDetail(db, "p"))?.reviews.map((r) => r.authorName).sort()).toEqual([
       "Anonymous",
       "Student",
     ]);
@@ -124,8 +124,8 @@ it("publishes named and anonymous submissions, rejects references, and atomicall
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
     expect(limits.results).toHaveLength(1);
-    data = await getPublicProfessorReviews(db);
-    expect(data.professors[0].reviewCount).toBe(5);
+    data = await getLecturerDirectory(db);
+    expect(data.lecturers[0].reviewCount).toBe(5);
   } finally {
     await platform.dispose();
   }

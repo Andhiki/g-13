@@ -8,5 +8,5 @@ STRAPI_API_TOKEN=
 # Optional: override the Strapi origin. Defaults to https://strapi.kagamailkomp.id
 STRAPI_ORIGIN=
 
-# Enable the professor reviews feature in the local Wrangler environment.
-PROFESSOR_REVIEWS_ENABLED=true
+# Enable the lecturer reviews feature in the local Wrangler environment.
+LECTURER_REVIEWS_ENABLED=true

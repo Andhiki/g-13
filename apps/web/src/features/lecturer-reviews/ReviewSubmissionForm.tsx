@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { AlignFancyButton } from "../../ui/fancy-button";
 import { useEffect, useRef, useState } from "react";
 import { RiArrowRightLine } from "@remixicon/react";
@@ -8,10 +9,13 @@ import { useLocale } from "../../useLocale";
 import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
 import { getSubmissionErrors, type SubmissionErrors } from "./submission-validation";
-import { publishProfessorReview } from "./server";
+import { publishLecturerReview } from "./server";
 
-type Data = Awaited<ReturnType<typeof import("./repository").getPublicProfessorReviews>>;
-export type ReviewDraft = { professorId: string; courseId: string | null; request: number };
+export type ReviewFormData = {
+  lecturers: { id: string; name: string }[];
+  courses: { id: string; code: string; nameId: string; nameEn: string }[];
+};
+export type ReviewDraft = { lecturerId: string; courseId: string | null; request: number };
 const control =
   "mt-2 block min-h-11 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
 const metrics = [
@@ -29,20 +33,20 @@ const metrics = [
 ] as const;
 export function ReviewSubmissionForm({
   data,
-  initialProfessorId,
+  initialLecturerId,
   initialCourseId,
   onClose,
   onPublished,
 }: {
-  data: Data;
-  initialProfessorId: string;
+  data: ReviewFormData;
+  initialLecturerId: string;
   initialCourseId: string;
   onClose: () => void;
   onPublished: (reviewId: string) => Promise<void>;
 }) {
-  const { text } = useLocale("professors");
+  const { text } = useLocale("lecturers");
   const form = useRef<HTMLFormElement>(null);
-  const [professorId, setProfessorId] = useState(initialProfessorId);
+  const [lecturerId, setLecturerId] = useState(initialLecturerId);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
   const [body, setBody] = useState("");
@@ -54,11 +58,11 @@ export function ReviewSubmissionForm({
     requestAnimationFrame(() => {
       form.current
         ?.querySelector<HTMLElement>(
-          initialProfessorId ? 'input[role="combobox"]' : "#review-professor",
+          initialLecturerId ? 'input[role="combobox"]' : "#review-lecturer",
         )
         ?.focus({ preventScroll: true });
     });
-  }, [initialProfessorId]);
+  }, [initialLecturerId]);
   const clearError = (name: keyof SubmissionErrors) =>
     setErrors((current) => ({ ...current, [name]: undefined }));
   const errorProps = (name: keyof SubmissionErrors) => ({
@@ -67,9 +71,14 @@ export function ReviewSubmissionForm({
   });
   const fieldError = (name: keyof SubmissionErrors) =>
     errors[name] && (
-      <p id={`review-${name}-error`} className="mb-0 mt-1.5 text-paragraph-xs text-error-base">
+      <Typography
+        as="p"
+        variant="caption"
+        id={`review-${name}-error`}
+        className="mb-0 mt-1.5 text-error-base"
+      >
         {text(errors[name])}
-      </p>
+      </Typography>
     );
   return (
     <form
@@ -81,7 +90,7 @@ export function ReviewSubmissionForm({
         if (pending) return;
         const values = new FormData(event.currentTarget);
         const input = {
-          professorId,
+          lecturerId,
           courseId,
           termLabel: values.get("termLabel"),
           anonymous,
@@ -100,13 +109,13 @@ export function ReviewSubmissionForm({
         }
         setPending(true);
         try {
-          const result = await publishProfessorReview({ data: input });
+          const result = await publishLecturerReview({ data: input });
           if (!result.ok) {
             setMessage(
               result.error === "rate-limit"
                 ? "Submission limit reached. Try again next hour."
                 : result.error === "invalid"
-                  ? "The professor or course may no longer be available. Choose them again and retry."
+                  ? "The lecturer or course may no longer be available. Choose them again and retry."
                   : "Reviews are temporarily unavailable. Please try again later.",
             );
             return;
@@ -121,14 +130,14 @@ export function ReviewSubmissionForm({
     >
       <header className="shrink-0 border-b border-stroke-soft-200 p-5 pr-14">
         <AlignModal.Title asChild>
-          <h2 className="m-0 font-display text-label-lg text-text-strong-950">
+          <Typography as="h2" variant="subtitle1" className="m-0 font-display text-text-strong-950">
             {text("Write a review")}
-          </h2>
+          </Typography>
         </AlignModal.Title>
         <AlignModal.Description asChild>
-          <p className="mb-0 mt-1 text-paragraph-sm text-text-sub-600">
+          <Typography as="p" variant="paragraph" className="mb-0 mt-1 text-text-sub-600">
             {text("Share an experience to help other students choose their classes.")}
-          </p>
+          </Typography>
         </AlignModal.Description>
       </header>
 
@@ -136,33 +145,33 @@ export function ReviewSubmissionForm({
         <fieldset disabled={pending} className="min-w-0 space-y-6 disabled:opacity-70">
           <div className="space-y-4">
             <div>
-              <label htmlFor="review-professor" className="text-label-sm">
-                {text("Professor")}
-              </label>
+              <Typography as="label" variant="label" htmlFor="review-lecturer">
+                {text("Lecturer")}
+              </Typography>
               <AlignSelect.Root
-                name="professorId"
-                value={professorId}
+                name="lecturerId"
+                value={lecturerId}
                 onValueChange={(value) => {
-                  setProfessorId(value);
-                  clearError("professorId");
+                  setLecturerId(value);
+                  clearError("lecturerId");
                 }}
               >
                 <AlignSelect.Trigger
-                  id="review-professor"
+                  id="review-lecturer"
                   className="mt-2 min-h-11"
-                  {...errorProps("professorId")}
+                  {...errorProps("lecturerId")}
                 >
-                  <AlignSelect.Value placeholder={text("Select a professor")} />
+                  <AlignSelect.Value placeholder={text("Select a lecturer")} />
                 </AlignSelect.Trigger>
                 <AlignSelect.Content>
-                  {data.professors.map((p) => (
+                  {data.lecturers.map((p) => (
                     <AlignSelect.Item key={p.id} value={p.id}>
                       {p.name}
                     </AlignSelect.Item>
                   ))}
                 </AlignSelect.Content>
               </AlignSelect.Root>
-              {fieldError("professorId")}
+              {fieldError("lecturerId")}
             </div>
             <ReviewCourseField
               courses={data.courses}
@@ -174,9 +183,9 @@ export function ReviewSubmissionForm({
               error={errors.courseId ? text(errors.courseId) : undefined}
             />
             <div>
-              <label htmlFor="review-term" className="text-label-sm">
+              <Typography as="label" variant="label" htmlFor="review-term">
                 {text("Term")}
-              </label>
+              </Typography>
               <input
                 id="review-term"
                 className={control}
@@ -186,19 +195,21 @@ export function ReviewSubmissionForm({
                 {...errorProps("termLabel")}
                 onChange={() => clearError("termLabel")}
               />
-              <p className="mb-0 mt-1.5 text-paragraph-xs text-text-sub-600">
+              <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
                 {text("When did you take this class? 1–60 characters.")}
-              </p>
+              </Typography>
               {fieldError("termLabel")}
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <h3 className="m-0 text-label-md">{text("Rate your experience")}</h3>
-              <p className="mb-0 mt-1 text-paragraph-xs text-text-sub-600">
+              <Typography as="h3" variant="subtitle2" className="m-0">
+                {text("Rate your experience")}
+              </Typography>
+              <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
                 {text("Choose a score for each: 1 (lowest) to 5 (highest).")}
-              </p>
+              </Typography>
             </div>
             <div className="space-y-5 border-l border-stroke-soft-200 pl-4">
               {metrics.map((metric) => (
@@ -219,9 +230,9 @@ export function ReviewSubmissionForm({
           </div>
 
           <div>
-            <label htmlFor="review-body" className="text-label-sm">
+            <Typography as="label" variant="label" htmlFor="review-body">
               {text("Your experience")}
-            </label>
+            </Typography>
             <textarea
               id="review-body"
               className={control}
@@ -236,15 +247,23 @@ export function ReviewSubmissionForm({
                 clearError("body");
               }}
             />
-            <div className="mt-1.5 flex justify-between gap-3 text-paragraph-xs text-text-sub-600">
-              <span>{text("1–1,000 characters. Avoid personal information.")}</span>
-              <span className="shrink-0 tabular-nums">{body.length}/1,000</span>
+            <div className="mt-1.5 flex justify-between gap-3 text-text-sub-600">
+              <Typography as="span" variant="caption">
+                {text("1–1,000 characters. Avoid personal information.")}
+              </Typography>
+              <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
+                {body.length}/1,000
+              </Typography>
             </div>
             {fieldError("body")}
           </div>
 
           <div>
-            <label className="flex min-h-11 cursor-pointer items-center gap-3 text-label-sm">
+            <Typography
+              as="label"
+              variant="label"
+              className="flex min-h-11 cursor-pointer items-center gap-3"
+            >
               <input
                 type="checkbox"
                 className="size-4 accent-primary-base"
@@ -252,12 +271,12 @@ export function ReviewSubmissionForm({
                 onChange={(event) => setAnonymous(event.target.checked)}
               />
               {text("Publish as Anonymous")}
-            </label>
+            </Typography>
             {!anonymous && (
               <div className="mt-3">
-                <label htmlFor="review-author" className="text-label-sm">
+                <Typography as="label" variant="label" htmlFor="review-author">
                   {text("Display name")}
-                </label>
+                </Typography>
                 <input
                   id="review-author"
                   className={control}
@@ -266,9 +285,9 @@ export function ReviewSubmissionForm({
                   {...errorProps("authorName")}
                   onChange={() => clearError("authorName")}
                 />
-                <p className="mb-0 mt-1.5 text-paragraph-xs text-text-sub-600">
+                <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
                   {text("1–80 characters. Avoid personal information.")}
-                </p>
+                </Typography>
                 {fieldError("authorName")}
               </div>
             )}
@@ -279,7 +298,9 @@ export function ReviewSubmissionForm({
       <footer className="shrink-0 border-t border-stroke-soft-200 p-5">
         {message && (
           <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
-            <p className="m-0">{text(message)}</p>
+            <Typography as="p" variant="paragraph" className="m-0">
+              {text(message)}
+            </Typography>
           </div>
         )}
         <div className="grid grid-cols-2 gap-3">
@@ -294,12 +315,12 @@ export function ReviewSubmissionForm({
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
-            disabled={pending || !data.professors.length || !data.courses.length}
+            disabled={pending || !data.lecturers.length || !data.courses.length}
             className="min-h-11 w-full"
           >
-            <span className="text-paragraph-xs sm:text-label-sm">
+            <Typography as="span" variant="caption" className="sm:text-label-sm">
               {text(pending ? "Publishing…" : "Publish review")}
-            </span>
+            </Typography>
             <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />
           </AlignFancyButton.Root>
         </div>

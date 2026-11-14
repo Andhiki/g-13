@@ -13,11 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
-import { Route as ProfessorsRouteImport } from './routes/professors'
+import { Route as LecturersRouteImport } from './routes/lecturers'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
 import { Route as ApiAlumniRouteImport } from './routes/api/alumni'
+import { Route as LecturersIndexRouteImport } from './routes/lecturers.index'
+import { Route as LecturersLecturerIdRouteImport } from './routes/lecturers.$lecturerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,9 +41,9 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfessorsRoute = ProfessorsRouteImport.update({
-  id: '/professors',
-  path: '/professors',
+const LecturersRoute = LecturersRouteImport.update({
+  id: '/lecturers',
+  path: '/lecturers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -64,28 +66,41 @@ const ApiAlumniRoute = ApiAlumniRouteImport.update({
   path: '/api/alumni',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LecturersIndexRoute = LecturersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LecturersRoute,
+} as any)
+const LecturersLecturerIdRoute = LecturersLecturerIdRouteImport.update({
+  id: '/$lecturerId',
+  path: '/$lecturerId',
+  getParentRoute: () => LecturersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
-  '/professors': typeof ProfessorsRoute
+  '/lecturers': typeof LecturersRouteWithChildren
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
+  '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/lecturers/': typeof LecturersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
-  '/professors': typeof ProfessorsRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
+  '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/lecturers': typeof LecturersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -93,11 +108,13 @@ export interface FileRoutesById {
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
-  '/professors': typeof ProfessorsRoute
+  '/lecturers': typeof LecturersRouteWithChildren
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni_/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
+  '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/lecturers/': typeof LecturersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -106,33 +123,38 @@ export interface FileRouteTypes {
     | '/alumni'
     | '/exam'
     | '/faq'
-    | '/professors'
+    | '/lecturers'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
+    | '/lecturers/$lecturerId'
+    | '/lecturers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/alumni'
     | '/exam'
     | '/faq'
-    | '/professors'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
+    | '/lecturers/$lecturerId'
+    | '/lecturers'
   id:
     | '__root__'
     | '/'
     | '/alumni'
     | '/exam'
     | '/faq'
-    | '/professors'
+    | '/lecturers'
     | '/resources'
     | '/roadmap'
     | '/alumni_/all'
     | '/api/alumni'
+    | '/lecturers/$lecturerId'
+    | '/lecturers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,7 +162,7 @@ export interface RootRouteChildren {
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
   FaqRoute: typeof FaqRoute
-  ProfessorsRoute: typeof ProfessorsRoute
+  LecturersRoute: typeof LecturersRouteWithChildren
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
   AlumniAllRoute: typeof AlumniAllRoute
@@ -177,11 +199,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/professors': {
-      id: '/professors'
-      path: '/professors'
-      fullPath: '/professors'
-      preLoaderRoute: typeof ProfessorsRouteImport
+    '/lecturers': {
+      id: '/lecturers'
+      path: '/lecturers'
+      fullPath: '/lecturers'
+      preLoaderRoute: typeof LecturersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -212,15 +234,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAlumniRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lecturers/': {
+      id: '/lecturers/'
+      path: '/'
+      fullPath: '/lecturers/'
+      preLoaderRoute: typeof LecturersIndexRouteImport
+      parentRoute: typeof LecturersRoute
+    }
+    '/lecturers/$lecturerId': {
+      id: '/lecturers/$lecturerId'
+      path: '/$lecturerId'
+      fullPath: '/lecturers/$lecturerId'
+      preLoaderRoute: typeof LecturersLecturerIdRouteImport
+      parentRoute: typeof LecturersRoute
+    }
   }
 }
+
+interface LecturersRouteChildren {
+  LecturersLecturerIdRoute: typeof LecturersLecturerIdRoute
+  LecturersIndexRoute: typeof LecturersIndexRoute
+}
+
+const LecturersRouteChildren: LecturersRouteChildren = {
+  LecturersLecturerIdRoute: LecturersLecturerIdRoute,
+  LecturersIndexRoute: LecturersIndexRoute,
+}
+
+const LecturersRouteWithChildren = LecturersRoute._addFileChildren(
+  LecturersRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
   FaqRoute: FaqRoute,
-  ProfessorsRoute: ProfessorsRoute,
+  LecturersRoute: LecturersRouteWithChildren,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
   AlumniAllRoute: AlumniAllRoute,

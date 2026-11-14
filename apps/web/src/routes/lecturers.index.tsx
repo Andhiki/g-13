@@ -1,10 +1,10 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { ProfessorReviewsPage } from "../features/professor-reviews/ProfessorReviewsPage";
-import { loadProfessorReviews } from "../features/professor-reviews/server";
+import { LecturerReviewsPage } from "../features/lecturer-reviews/LecturerReviewsPage";
+import { loadLecturerDirectory } from "../features/lecturer-reviews/server";
 
-export const Route = createFileRoute("/professors")({
+export const Route = createFileRoute("/lecturers/")({
   loader: async () => {
-    const data = await loadProfessorReviews();
+    const data = await loadLecturerDirectory();
     if (!data) throw notFound();
     return data;
   },
@@ -19,5 +19,5 @@ export const Route = createFileRoute("/professors")({
       },
     ],
   }),
-  component: () => <ProfessorReviewsPage data={Route.useLoaderData()} />,
+  component: () => <LecturerReviewsPage data={Route.useLoaderData()} />,
 });

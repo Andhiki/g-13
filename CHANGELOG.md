@@ -20,6 +20,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Mengubah direktori dosen menjadi ringkasan dengan tautan ke halaman detail khusus; ulasan lengkap, pengurutan ulasan, dan tombol suka tersedia di halaman dosen.
+- Memadatkan kartu dosen, menampilkan rating sebagai lima bintang, membatasi tampilan awal mata kuliah menjadi tiga, dan menghapus petunjuk pencarian.
 - Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
 - Merapikan dialog ulasan dengan garis vertikal pada penilaian, petunjuk di placeholder, dan footer yang lebih rapat.
 - Memindahkan panduan rating dan catatan ulasan belum terverifikasi ke popover ikon info.
@@ -31,8 +33,9 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Added
 
+- Menyukai dan membatalkan suka pada ulasan dosen tanpa akun.
 - Formulir ulasan dosen tanpa akun, dengan nama atau anonim, penerbitan langsung, dan pembatasan pengiriman per IP.
-- Menambahkan halaman dosen di `/professors` dengan ulasan komunitas, filter mata kuliah dwibahasa, rata-rata metrik, dan penjelasan bahwa ulasan belum terverifikasi.
+- Menambahkan direktori dosen di `/lecturers` dan halaman detail `/lecturers/$lecturerId` dengan ulasan komunitas, filter mata kuliah dwibahasa, rata-rata metrik, dan penjelasan bahwa ulasan belum terverifikasi.
 
 ### 2026-11-12
 

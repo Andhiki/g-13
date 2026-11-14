@@ -4,6 +4,6 @@
 declare namespace Cloudflare {
   interface Env {
     DB: D1Database;
-    PROFESSOR_REVIEWS_ENABLED?: string;
+    LECTURER_REVIEWS_ENABLED?: string;
   }
 }

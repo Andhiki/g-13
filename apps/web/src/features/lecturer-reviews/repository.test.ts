@@ -1,10 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { expect, it } from "bun:test";
 import { getPlatformProxy } from "wrangler";
-import { createDatabase, courses, professors, reviews } from "@g13/db";
-import { getPublicProfessorReviews } from "./repository";
+import { createDatabase, courses, lecturers, reviews } from "@g13/db";
+import { getLecturerDetail, getLecturerDirectory } from "./repository";
 
-it("returns only published, non-deleted reviews in public professor metrics", async () => {
+it("returns only published, non-deleted reviews in public lecturer metrics", async () => {
   const platform = await getPlatformProxy<{ DB: D1Database }>({
     configPath: fileURLToPath(new URL("../../../wrangler.jsonc", import.meta.url)),
     persist: false,
@@ -22,9 +22,9 @@ it("returns only published, non-deleted reviews in public professor metrics", as
     }
 
     const database = createDatabase(platform.env.DB);
-    await database.insert(professors).values([
-      { id: "prof-visible", name: "Visible Professor" },
-      { id: "prof-empty", name: "Professor Without Reviews" },
+    await database.insert(lecturers).values([
+      { id: "lecturer-visible", name: "Visible Lecturer" },
+      { id: "lecturer-empty", name: "Lecturer Without Reviews" },
     ]);
     await database.insert(courses).values([
       { id: "course-one", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" },
@@ -34,7 +34,7 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       Promise.resolve(
         database.insert(reviews).values({
           id: "invalid-rating",
-          professorId: "prof-visible",
+          lecturerId: "lecturer-visible",
           courseId: "course-one",
           termLabel: "2026/2027 Ganjil",
           authorName: "Student",
@@ -49,7 +49,7 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       Promise.resolve(
         database.insert(reviews).values({
           id: "invalid-reference",
-          professorId: "missing-professor",
+          lecturerId: "missing-lecturer",
           courseId: "course-one",
           termLabel: "2026/2027 Ganjil",
           authorName: "Student",
@@ -63,7 +63,7 @@ it("returns only published, non-deleted reviews in public professor metrics", as
     await database.insert(reviews).values([
       {
         id: "visible-review",
-        professorId: "prof-visible",
+        lecturerId: "lecturer-visible",
         courseId: "course-one",
         termLabel: "2026/2027 Ganjil",
         authorName: "Student",
@@ -74,7 +74,7 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       },
       {
         id: "hidden-review",
-        professorId: "prof-visible",
+        lecturerId: "lecturer-visible",
         courseId: "course-one",
         termLabel: "2026/2027 Ganjil",
         authorName: "Student",
@@ -86,7 +86,7 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       },
       {
         id: "deleted-review",
-        professorId: "prof-visible",
+        lecturerId: "lecturer-visible",
         courseId: "course-one",
         termLabel: "2026/2027 Ganjil",
         authorName: "Student",
@@ -98,25 +98,28 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       },
     ]);
 
-    const result = await getPublicProfessorReviews(database);
-    const visibleProfessor = result.professors.find((professor) => professor.id === "prof-visible");
-    const emptyProfessor = result.professors.find((professor) => professor.id === "prof-empty");
+    const result = await getLecturerDirectory(database);
+    const visibleLecturer = result.lecturers.find((lecturer) => lecturer.id === "lecturer-visible");
+    const emptyLecturer = result.lecturers.find((lecturer) => lecturer.id === "lecturer-empty");
 
-    expect(visibleProfessor).toMatchObject({
+    expect(visibleLecturer).toMatchObject({
       reviewCount: 1,
       overallAverage: 3,
-      clarityAverage: 5,
-      supportAverage: 3,
-      organizationAverage: 1,
+      courses: [
+        {
+          courseId: "course-one",
+          code: "CS101",
+          nameId: "Dasar Komputer",
+          nameEn: "Computer Basics",
+          overallAverage: 3,
+        },
+      ],
     });
-    expect(visibleProfessor?.reviews.map((review) => review.id)).toEqual(["visible-review"]);
-    expect(emptyProfessor).toMatchObject({
+    expect(JSON.stringify(visibleLecturer)).not.toContain("Published feedback");
+    expect(emptyLecturer).toMatchObject({
       reviewCount: 0,
       overallAverage: null,
-      clarityAverage: null,
-      supportAverage: null,
-      organizationAverage: null,
-      reviews: [],
+      courses: [],
     });
     expect(result.courses).toContainEqual({
       id: "course-one",
@@ -124,6 +127,18 @@ it("returns only published, non-deleted reviews in public professor metrics", as
       nameId: "Dasar Komputer",
       nameEn: "Computer Basics",
     });
+    const detail = await getLecturerDetail(database, "lecturer-visible");
+    expect(detail?.reviews.map((review) => review.id)).toEqual(["visible-review"]);
+    expect(detail?.lecturer).toMatchObject({
+      id: "lecturer-visible",
+      reviewCount: 1,
+      overallAverage: 3,
+      clarityAverage: 5,
+      supportAverage: 3,
+      organizationAverage: 1,
+    });
+    expect((await getLecturerDetail(database, "lecturer-empty"))?.reviews).toEqual([]);
+    expect(await getLecturerDetail(database, "missing-lecturer")).toBeNull();
   } finally {
     await platform.dispose();
   }

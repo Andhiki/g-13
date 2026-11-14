@@ -1,7 +1,9 @@
 import { AlignModal } from "../../ui/modal";
-import { ReviewSubmissionForm, type ReviewDraft } from "./ReviewSubmissionForm";
-
-type Data = Awaited<ReturnType<typeof import("./repository").getPublicProfessorReviews>>;
+import {
+  ReviewSubmissionForm,
+  type ReviewDraft,
+  type ReviewFormData,
+} from "./ReviewSubmissionForm";
 
 export function ReviewSubmissionDialog({
   data,
@@ -9,7 +11,7 @@ export function ReviewSubmissionDialog({
   onClose,
   onPublished,
 }: {
-  data: Data;
+  data: ReviewFormData;
   draft: ReviewDraft | null;
   onClose: () => void;
   onPublished: (reviewId: string) => Promise<void>;
@@ -26,7 +28,7 @@ export function ReviewSubmissionDialog({
           <ReviewSubmissionForm
             key={draft.request}
             data={data}
-            initialProfessorId={draft.professorId}
+            initialLecturerId={draft.lecturerId}
             initialCourseId={draft.courseId ?? ""}
             onClose={onClose}
             onPublished={onPublished}

@@ -1,5 +1,5 @@
 import { expect, it } from "bun:test";
-import { orderProfessors, orderReviews } from "./review-order";
+import { orderLecturers, orderReviews } from "./review-order";
 const review = (id: string, courseId: string, overall: number, day: number) => ({
   id,
   courseId,
@@ -34,21 +34,16 @@ it("orders reviews by publication date or equal-weight rating without changing i
   ]);
   expect(rows[0].id).toBe("old-high");
 });
-it("orders professors using reviews for the selected course and puts unrated entries last", () => {
-  const professors = [
-    { id: "z", name: "Zara", reviews: rows },
-    { id: "a", name: "Ari", reviews: [review("ari", "c2", 4, 3)] },
-    { id: "b", name: "Budi", reviews: [] },
+it("orders lecturers by name, review count, and rating with unrated entries last", () => {
+  const lecturers = [
+    { id: "z", name: "Zara", reviewCount: 3, overallAverage: 11 / 3 },
+    { id: "a", name: "Ari", reviewCount: 1, overallAverage: 4 },
+    { id: "b", name: "Budi", reviewCount: 0, overallAverage: null },
   ];
-  const ids = (order: "name" | "review-count" | "rating", course: string | null = null) =>
-    orderProfessors(professors, course, order, "newest").map((p) => p.id);
+  const ids = (order: "name" | "review-count" | "rating") =>
+    orderLecturers(lecturers, order).map((p) => p.id);
   expect(ids("name")).toEqual(["a", "b", "z"]);
   expect(ids("review-count")).toEqual(["z", "a", "b"]);
   expect(ids("rating")).toEqual(["a", "z", "b"]);
-  expect(ids("rating", "c2")).toEqual(["z", "a", "b"]);
-  expect(ids("review-count", "c2")).toEqual(["a", "z", "b"]);
-  const filtered = orderProfessors(professors, "c1", "rating", "oldest");
-  expect(filtered[0].reviews.map((r) => r.id)).toEqual(["old-high", "new-low"]);
-  expect(professors[0].reviews).toHaveLength(3);
-  expect(ids("rating", "missing")).toEqual(["a", "b", "z"]);
+  expect(lecturers[0].reviewCount).toBe(3);
 });

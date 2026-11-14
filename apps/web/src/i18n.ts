@@ -26,7 +26,9 @@ export function createI18n({
 }
 
 export function messageNamespace(pathname: string): MessageNamespace {
-  switch (pathname.replace(/\/+$/, "").toLowerCase()) {
+  const path = pathname.replace(/\/+$/, "").toLowerCase();
+  if (path === "/lecturers" || path.startsWith("/lecturers/")) return "lecturers";
+  switch (path) {
     case "/roadmap":
       return "roadmap";
     case "/exam":
@@ -37,8 +39,6 @@ export function messageNamespace(pathname: string): MessageNamespace {
       return "alumni";
     case "/alumni/all":
       return "alumni";
-    case "/professors":
-      return "professors";
     case "/faq":
       return "faq";
     default:

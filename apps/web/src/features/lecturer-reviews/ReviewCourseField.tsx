@@ -1,3 +1,4 @@
+import { Typography } from "../../ui/typography";
 import { useId, useState } from "react";
 import { RiCheckLine, RiSearchLine } from "@remixicon/react";
 import { AlignCommandMenu } from "../../ui/command-menu";
@@ -16,7 +17,7 @@ export function ReviewCourseField({
   onChange: (value: string) => void;
   error?: string;
 }) {
-  const { text, language } = useLocale("professors");
+  const { text, language } = useLocale("lecturers");
   const id = useId();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -32,9 +33,9 @@ export function ReviewCourseField({
         }
       }}
     >
-      <label htmlFor={id} className="text-label-sm">
+      <Typography as="label" variant="label" htmlFor={id}>
         {text("Course")}
-      </label>
+      </Typography>
       <AlignCommandMenu.Root
         shouldFilter={false}
         label={text("Course")}
@@ -102,12 +103,12 @@ export function ReviewCourseField({
                 className="min-h-11"
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block text-paragraph-sm">
+                  <Typography as="span" variant="paragraph" className="block">
                     {courseDisplayName(course, language)}
-                  </span>
-                  <span className="font-mono text-paragraph-xs text-text-sub-600">
+                  </Typography>
+                  <Typography as="span" variant="code" className="text-text-sub-600">
                     {course.code}
-                  </span>
+                  </Typography>
                 </span>
                 {value === course.id && (
                   <RiCheckLine aria-hidden="true" className="size-4 shrink-0 text-primary-base" />
@@ -117,12 +118,14 @@ export function ReviewCourseField({
           </AlignCommandMenu.List>
         )}
       </AlignCommandMenu.Root>
-      <p
+      <Typography
+        as="p"
+        variant="caption"
         id={error ? `${id}-error` : `${id}-hint`}
-        className={`mb-0 mt-1.5 text-paragraph-xs ${error ? "text-error-base" : "text-text-sub-600"}`}
+        className={`mb-0 mt-1.5 ${error ? "text-error-base" : "text-text-sub-600"}`}
       >
         {error ?? text("Search Indonesian or English names, or a course code.")}
-      </p>
+      </Typography>
     </div>
   );
 }
