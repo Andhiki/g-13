@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-14
 
+#### Changed
+
+- Navigasi alfabet pada direktori alumni kini ringkas saat tidak digunakan dan mengembang saat dihover atau disentuh; mengusap layar pada navigasi langsung mengikuti jari untuk melompat antar huruf.
+
 #### Fixed
 
 - Menggunakan cache data alumni yang sama saat membuka direktori dan mencoba ulang, serta menyajikan data lama saat pembaruan atau sumber data terganggu.
