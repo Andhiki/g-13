@@ -12,6 +12,13 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-14
+
+#### Changed
+
+- Menyimpan sementara halaman direktori alumni agar tetap tersedia saat sumber data mengalami gangguan sementara.
+- Mengganti pilihan angkatan pada direktori alumni dengan tab yang dapat digeser, serta menambahkan pintasan `/` dan animasi pada pencarian yang tetap terlihat saat menggulir.
+
 ### 2026-11-12
 
 #### Fixed

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseStatus } from "@tanstack/react-start/server";
 import { AlumniDirectory } from "../features/alumni/AlumniDirectory";
 import { Loading } from "../ui/loading";
 
@@ -7,10 +8,11 @@ const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { fetchAlumniPages, strapiToken } = await import("../features/alumni/upstream");
   const { collectAlumni } = await import("../features/alumni/directory");
   const token = strapiToken();
-  if (!token) return null;
   try {
+    if (!token) throw new Error("Strapi token not configured");
     return collectAlumni(await fetchAlumniPages(token));
   } catch {
+    setResponseStatus(503, "Service Unavailable");
     return null;
   }
 });
