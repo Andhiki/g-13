@@ -1,9 +1,11 @@
 import { Typography } from "../../../ui/typography";
-import { AlignFancyButton } from "../../../ui/fancy-button";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { RiArrowRightLine } from "@remixicon/react";
+import { RiArrowRightLine, RiUserLine } from "@remixicon/react";
 import { AlignSelect } from "../../../ui/select";
+import * as AlignSwitch from "../../../ui/switch";
+import { AlignFancyButton } from "../../../ui/fancy-button";
+import { reviewTerms } from "../client/review-terms";
 import { AlignButton } from "../../../ui/button";
 import { AlignModal } from "../../../ui/modal";
 import { useLocale } from "../../../useLocale";
@@ -14,16 +16,11 @@ import { getSubmissionErrors, type SubmissionErrors } from "../shared/submission
 import { publishLecturerReviewMutationOptions } from "../client/mutations";
 
 export type ReviewFormData = {
-  lecturers: { id: string; name: string }[];
   courses: { id: string; code: string; nameId: string; nameEn: string }[];
 };
-export type ReviewDraft = {
-  lecturerId: string;
-  courseId: string | null;
-  request: number;
-};
+const row = "grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6";
 const control =
-  "mt-2 block min-h-11 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
+  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
 const metrics = [
   {
     name: "clarity",
@@ -42,14 +39,16 @@ const metrics = [
   },
 ] as const;
 export function ReviewSubmissionForm({
-  data,
-  initialLecturerId,
+  courses,
+  lecturerId,
+  lecturerName,
   initialCourseId,
   onClose,
   onPublished,
 }: {
-  data: ReviewFormData;
-  initialLecturerId: string;
+  courses: ReviewFormData["courses"];
+  lecturerId: string;
+  lecturerName: string;
   initialCourseId: string;
   onClose: () => void;
   onPublished: (reviewId: string) => Promise<void>;
@@ -58,9 +57,11 @@ export function ReviewSubmissionForm({
   const queryClient = useQueryClient();
   const publishMutation = useMutation(publishLecturerReviewMutationOptions(queryClient));
   const form = useRef<HTMLFormElement>(null);
-  const [lecturerId, setLecturerId] = useState(initialLecturerId);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
+  const [authorName, setAuthorName] = useState("");
+  const [termLabel, setTermLabel] = useState("");
+  const [terms, setTerms] = useState<string[]>([]);
   const [body, setBody] = useState("");
   const [ratings, setRatings] = useState({
     clarity: 0,
@@ -70,12 +71,11 @@ export function ReviewSubmissionForm({
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [message, setMessage] = useState("");
   useEffect(() => {
+    setTerms(reviewTerms(new Date()));
     requestAnimationFrame(() => {
-      form.current
-        ?.querySelector<HTMLElement>(initialLecturerId ? "h2" : "#review-lecturer")
-        ?.focus({ preventScroll: true });
+      form.current?.querySelector<HTMLElement>("#review-anonymous")?.focus({ preventScroll: true });
     });
-  }, [initialLecturerId]);
+  }, []);
   const clearError = (name: keyof SubmissionErrors) =>
     setErrors((current) => ({ ...current, [name]: undefined }));
   const errorProps = (name: keyof SubmissionErrors) => ({
@@ -101,13 +101,12 @@ export function ReviewSubmissionForm({
       onSubmit={async (event) => {
         event.preventDefault();
         if (publishMutation.isPending) return;
-        const values = new FormData(event.currentTarget);
         const input: ReviewSubmission = {
           lecturerId,
           courseId,
-          termLabel: String(values.get("termLabel") ?? ""),
+          termLabel,
           anonymous,
-          authorName: String(values.get("authorName") ?? ""),
+          authorName,
           body,
           ...ratings,
         };
@@ -127,7 +126,7 @@ export function ReviewSubmissionForm({
               result.error === "rate-limit"
                 ? "Submission limit reached. Try again next hour."
                 : result.error === "invalid"
-                  ? "The lecturer or course may no longer be available. Choose them again and retry."
+                  ? "The lecturer or course may no longer be available. Refresh the page and try again."
                   : "Reviews are temporarily unavailable. Please try again later.",
             );
             return;
@@ -146,14 +145,9 @@ export function ReviewSubmissionForm({
             variant="subtitle1"
             className="m-0 font-display text-text-strong-950 outline-none"
           >
-            {text("Write a review")}
+            {text("Write a review for {{lecturerName}}", { lecturerName })}
           </Typography>
         </AlignModal.Title>
-        <AlignModal.Description asChild>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-1 text-text-sub-600">
-            {text("Share an experience to help other students choose their classes.")}
-          </Typography>
-        </AlignModal.Description>
       </header>
 
       <div className="min-h-0 overflow-y-auto px-4 pt-4 pb-3 sm:mb-3">
@@ -161,154 +155,144 @@ export function ReviewSubmissionForm({
           disabled={publishMutation.isPending}
           className="min-w-0 space-y-4 disabled:opacity-70"
         >
-          <div className="space-y-4">
+          <div className={row}>
             <div>
-              <Typography as="label" variant="label" htmlFor="review-lecturer">
-                {text("Lecturer")}
+              <Typography as="label" variant="label" htmlFor="review-author">
+                {text("Display name")}
               </Typography>
-              <AlignSelect.Root
-                name="lecturerId"
-                value={lecturerId}
-                onValueChange={(value) => {
-                  setLecturerId(value);
-                  clearError("lecturerId");
-                }}
-              >
-                <AlignSelect.Trigger
-                  id="review-lecturer"
-                  className="mt-2 min-h-11"
-                  {...errorProps("lecturerId")}
-                >
-                  <AlignSelect.Value placeholder={text("Select a lecturer")} />
-                </AlignSelect.Trigger>
-                <AlignSelect.Content>
-                  {data.lecturers.map((p) => (
-                    <AlignSelect.Item key={p.id} value={p.id}>
-                      {p.name}
-                    </AlignSelect.Item>
-                  ))}
-                </AlignSelect.Content>
-              </AlignSelect.Root>
-              {fieldError("lecturerId")}
+              <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
+                {text("1–80 characters. Avoid personal information.")}
+              </Typography>
             </div>
-            <ReviewCourseField
-              courses={data.courses}
-              value={courseId}
-              onChange={(value) => {
-                setCourseId(value);
-                clearError("courseId");
-              }}
-              error={errors.courseId ? text(errors.courseId) : undefined}
-            />
+            <div>
+              <label
+                htmlFor="review-anonymous"
+                className="mb-2 flex min-h-9 cursor-pointer items-center gap-3 text-paragraph-sm"
+              >
+                <AlignSwitch.Root
+                  id="review-anonymous"
+                  checked={anonymous}
+                  onCheckedChange={(checked) => {
+                    setAnonymous(checked);
+                    clearError("authorName");
+                  }}
+                />
+                {text("Publish as Anonymous")}
+              </label>
+              <div
+                className={`flex min-h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:outline-2 focus-within:outline-primary-base ${anonymous ? "cursor-not-allowed opacity-50" : ""}`}
+              >
+                <RiUserLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
+                <input
+                  id="review-author"
+                  className="min-h-9 min-w-0 w-full bg-transparent py-1.5 text-base outline-none disabled:cursor-not-allowed sm:text-paragraph-sm"
+                  name="authorName"
+                  maxLength={80}
+                  value={authorName}
+                  disabled={anonymous}
+                  required={!anonymous}
+                  {...errorProps("authorName")}
+                  onChange={(event) => {
+                    setAuthorName(event.target.value);
+                    clearError("authorName");
+                  }}
+                />
+              </div>
+              {fieldError("authorName")}
+            </div>
+          </div>
+          <ReviewCourseField
+            courses={courses}
+            value={courseId}
+            onChange={(value) => {
+              setCourseId(value);
+              clearError("courseId");
+            }}
+            error={errors.courseId ? text(errors.courseId) : undefined}
+          />
+          <div className={row}>
             <div>
               <Typography as="label" variant="label" htmlFor="review-term">
                 {text("Term")}
               </Typography>
-              <input
-                id="review-term"
-                className={control}
+            </div>
+            <div>
+              <AlignSelect.Root
+                variant="compact"
                 name="termLabel"
-                maxLength={60}
-                placeholder={text("e.g. 2026/2027 Ganjil")}
-                {...errorProps("termLabel")}
-                onChange={() => clearError("termLabel")}
-              />
+                value={termLabel}
+                onValueChange={(value) => {
+                  setTermLabel(value);
+                  clearError("termLabel");
+                }}
+              >
+                <AlignSelect.Trigger
+                  id="review-term"
+                  className="h-9 min-h-9"
+                  {...errorProps("termLabel")}
+                >
+                  <AlignSelect.Value placeholder={text("Select a term")} />
+                </AlignSelect.Trigger>
+                <AlignSelect.Content>
+                  {terms.map((term) => (
+                    <AlignSelect.Item key={term} value={term}>
+                      {term}
+                    </AlignSelect.Item>
+                  ))}
+                </AlignSelect.Content>
+              </AlignSelect.Root>
               {fieldError("termLabel")}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Typography as="h3" variant="subtitle2" className="m-0">
-                {text("Rate your experience")}
-              </Typography>
-              <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
-                {text("Choose a score for each: 1 (lowest) to 5 (highest).")}
-              </Typography>
-            </div>
-            <div className="space-y-3">
-              {metrics.map((metric) => (
-                <StarRatingField
-                  key={metric.name}
-                  name={metric.name}
-                  label={text(metric.label)}
-                  hint={text(metric.hint)}
-                  value={ratings[metric.name]}
-                  onChange={(value) => {
-                    setRatings((current) => ({
-                      ...current,
-                      [metric.name]: value,
-                    }));
-                    clearError(metric.name);
-                  }}
-                  error={errors[metric.name] ? text(errors[metric.name] ?? "") : undefined}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Typography as="label" variant="label" htmlFor="review-body">
-              {text("Your experience")}
-            </Typography>
-            <textarea
-              id="review-body"
-              className={control}
-              name="body"
-              maxLength={1000}
-              rows={4}
-              placeholder={text("What helped you learn? What could be improved?")}
-              value={body}
-              {...errorProps("body")}
-              onChange={(event) => {
-                setBody(event.target.value);
-                clearError("body");
-              }}
-            />
-            <div className="mt-1.5 flex justify-between gap-3 text-text-sub-600">
-              <Typography as="span" variant="caption">
-                {text("1–1,000 characters. Avoid personal information.")}
-              </Typography>
-              <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
-                {body.length}/1,000
-              </Typography>
-            </div>
-            {fieldError("body")}
-          </div>
-
-          <div>
-            <Typography
-              as="label"
-              variant="label"
-              className="flex min-h-11 cursor-pointer items-center gap-3"
-            >
-              <input
-                type="checkbox"
-                className="size-4 accent-primary-base"
-                checked={anonymous}
-                onChange={(event) => setAnonymous(event.target.checked)}
+          <div className="space-y-3 pt-2">
+            {metrics.map((metric) => (
+              <StarRatingField
+                key={metric.name}
+                name={metric.name}
+                label={text(metric.label)}
+                hint={text(metric.hint)}
+                value={ratings[metric.name]}
+                onChange={(value) => {
+                  setRatings((current) => ({
+                    ...current,
+                    [metric.name]: value,
+                  }));
+                  clearError(metric.name);
+                }}
+                error={errors[metric.name] ? text(errors[metric.name] ?? "") : undefined}
               />
-              {text("Publish as Anonymous")}
-            </Typography>
-            {!anonymous && (
-              <div className="mt-3">
-                <Typography as="label" variant="label" htmlFor="review-author">
-                  {text("Display name")}
+            ))}
+          </div>
+
+          <div className={row}>
+            <div>
+              <Typography as="label" variant="label" htmlFor="review-body">
+                {text("Your experience")}
+              </Typography>
+            </div>
+            <div>
+              <textarea
+                id="review-body"
+                className={control}
+                name="body"
+                maxLength={1000}
+                rows={4}
+                placeholder={text("What helped you learn? What could be improved?")}
+                value={body}
+                {...errorProps("body")}
+                onChange={(event) => {
+                  setBody(event.target.value);
+                  clearError("body");
+                }}
+              />
+              <div className="mt-1.5 text-text-sub-600">
+                <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
+                  {body.length}/1,000
                 </Typography>
-                <input
-                  id="review-author"
-                  className={control}
-                  name="authorName"
-                  maxLength={80}
-                  {...errorProps("authorName")}
-                  onChange={() => clearError("authorName")}
-                />
-                <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
-                  {text("1–80 characters. Avoid personal information.")}
-                </Typography>
-                {fieldError("authorName")}
               </div>
-            )}
+              {fieldError("body")}
+            </div>
           </div>
         </fieldset>
       </div>
@@ -321,22 +305,22 @@ export function ReviewSubmissionForm({
             </Typography>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:justify-end">
           <AlignButton.Root
             type="button"
             mode="stroke"
             variant="neutral"
-            className="min-h-11"
+            size="small"
             onClick={onClose}
           >
             {text("Cancel")}
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
-            disabled={publishMutation.isPending || !data.lecturers.length || !data.courses.length}
-            className="min-h-11 w-full"
+            disabled={publishMutation.isPending || !courses.length}
+            className="h-9 w-full text-paragraph-sm sm:w-auto"
           >
-            <Typography as="span" variant="caption" className="sm:text-label-sm">
+            <Typography as="span" variant="paragraph">
               {text(publishMutation.isPending ? "Publishing…" : "Publish review")}
             </Typography>
             <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />

@@ -1,13 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { RiArrowRightLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "../../../useLocale";
-import { AlignFancyButton } from "../../../ui/fancy-button";
 import { Typography } from "../../../ui/typography";
 import { LecturerReviewCard } from "./LecturerReviewCard";
 import { RatingGuidePopover } from "./RatingGuidePopover";
-import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
-import type { ReviewDraft } from "./ReviewSubmissionForm";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { orderLecturers, type LecturerOrder } from "../shared/review-order";
 import { searchLecturers } from "../shared/lecturer-search";
@@ -18,13 +15,10 @@ export function LecturerReviewsPage() {
   const { text } = useLocale("lecturers");
   const [query, setQuery] = useState("");
   const [lecturerOrder, setLecturerOrder] = useState<LecturerOrder>("name");
-  const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(null);
   const visibleLecturers = orderLecturers(
     searchLecturers(data.lecturers, data.courses, query),
     lecturerOrder,
   );
-  const startReview = (lecturerId: string, courseId: string | null = null) =>
-    setReviewDraft((current) => ({ lecturerId, courseId, request: (current?.request ?? 0) + 1 }));
 
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12">
@@ -37,10 +31,6 @@ export function LecturerReviewsPage() {
             {text("Browse community experiences with Ilmu Komputer UGM lecturers.")}
           </Typography>
           <div className="mt-4 flex items-center gap-2">
-            <AlignFancyButton.Root onClick={() => startReview("")}>
-              {text("Write a review")}
-              <RiArrowRightLine aria-hidden="true" className="size-5" />
-            </AlignFancyButton.Root>
             <RatingGuidePopover />
           </div>
         </header>
@@ -101,15 +91,6 @@ export function LecturerReviewsPage() {
           </section>
         </div>
       </div>
-      <ReviewSubmissionDialog
-        data={data}
-        draft={reviewDraft}
-        onClose={() => setReviewDraft(null)}
-        onPublished={async () => {
-          setReviewDraft(null);
-          setQuery("");
-        }}
-      />
     </main>
   );
 }

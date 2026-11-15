@@ -243,10 +243,11 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         </section>
       </div>
       <ReviewSubmissionDialog
-        data={{ courses: data.courses, lecturers: [data.lecturer] }}
-        draft={
-          reviewDialogOpen ? { lecturerId: data.lecturer.id, courseId: null, request: 1 } : null
-        }
+        courses={data.courses}
+        lecturerId={data.lecturer.id}
+        lecturerName={data.lecturer.name}
+        courseId={courseId ?? ""}
+        open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
         onPublished={async () => {
           setReviewDialogOpen(false);

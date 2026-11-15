@@ -24,70 +24,85 @@ export function StarRatingField({
   const id = useId();
   const [preview, setPreview] = useState(0);
   return (
-    <fieldset aria-describedby={`${id}-hint${error ? ` ${id}-error` : ""}`} className="min-w-0">
-      <legend>
-        <Typography as="span" variant="label">
-          {label}
-        </Typography>
-      </legend>
-      <Typography
-        as="p"
-        variant="caption"
-        id={`${id}-hint`}
-        className="mb-0 mt-1 text-text-sub-600"
-      >
-        {hint}
-      </Typography>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="flex" onPointerLeave={() => setPreview(0)}>
-          {[1, 2, 3, 4, 5].map((score) => {
-            const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
-            return (
-              <label
-                key={score}
-                className="relative flex size-11 cursor-pointer items-center justify-center rounded-10 has-checked:bg-primary-alpha-10 hover:bg-bg-weak-50"
-                onPointerEnter={(event) => {
-                  if (event.pointerType === "mouse") setPreview(score);
-                }}
-              >
-                <input
-                  className="peer sr-only"
-                  type="radio"
-                  name={name}
-                  value={score}
-                  checked={value === score}
-                  required
-                  aria-label={text("{{metric}}: {{value}} of 5", {
-                    metric: label,
-                    value: score,
-                  })}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? `${id}-error` : `${id}-hint`}
-                  onChange={() => onChange(score)}
-                />
-                <span className="absolute inset-0 rounded-10 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-base" />
-                <Star
-                  aria-hidden="true"
-                  className={`pointer-events-none size-5 ${score <= (preview || value) ? "text-primary-base" : "text-text-sub-600"}`}
-                />
-              </label>
-            );
-          })}
+    <fieldset
+      aria-describedby={`${id}-hint${error ? ` ${id}-error` : ""}`}
+      aria-labelledby={`${id}-label`}
+      className="min-w-0"
+    >
+      <div className="grid gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6">
+        <div>
+          <div id={`${id}-label`}>
+            <Typography as="span" variant="label">
+              {label}
+            </Typography>
+          </div>
+          <Typography
+            as="p"
+            variant="caption"
+            id={`${id}-hint`}
+            className="mb-0 mt-1 text-text-sub-600"
+          >
+            {hint}
+          </Typography>
         </div>
-        <Typography as="span" variant="caption" className="text-text-sub-600" aria-live="polite">
-          {value ? `${value}/5` : text("Not rated")}
-        </Typography>
+        <div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="flex" onPointerLeave={() => setPreview(0)}>
+              {[1, 2, 3, 4, 5].map((score) => {
+                const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
+                return (
+                  <label
+                    key={score}
+                    className="relative flex size-9 cursor-pointer items-center justify-center rounded-10 has-checked:bg-primary-alpha-10 hover:bg-bg-weak-50"
+                    onPointerEnter={(event) => {
+                      if (event.pointerType === "mouse") setPreview(score);
+                    }}
+                  >
+                    <input
+                      className="peer sr-only"
+                      type="radio"
+                      name={name}
+                      value={score}
+                      checked={value === score}
+                      required
+                      aria-label={text("{{metric}}: {{value}} of 5", {
+                        metric: label,
+                        value: score,
+                      })}
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? `${id}-error` : `${id}-hint`}
+                      onChange={() => onChange(score)}
+                    />
+                    <span className="absolute inset-0 rounded-10 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-base" />
+                    <Star
+                      aria-hidden="true"
+                      className={`pointer-events-none size-5 ${score <= (preview || value) ? "text-primary-base" : "text-text-sub-600"}`}
+                    />
+                  </label>
+                );
+              })}
+            </div>
+            <Typography
+              as="span"
+              variant="caption"
+              className="text-text-sub-600"
+              aria-live="polite"
+            >
+              {value ? `${value}/5` : text("Not rated")}
+            </Typography>
+          </div>
+          {error && (
+            <Typography
+              as="p"
+              variant="caption"
+              id={`${id}-error`}
+              className="mb-0 mt-1 text-error-base"
+            >
+              {error}
+            </Typography>
+          )}
+        </div>
       </div>
-      {error && (
-        <Typography
-          as="p"
-          variant="caption"
-          id={`${id}-error`}
-          className="mb-0 mt-1 text-error-base"
-        >
-          {error}
-        </Typography>
-      )}
     </fieldset>
   );
 }

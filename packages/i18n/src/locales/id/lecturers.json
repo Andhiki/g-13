@@ -25,6 +25,7 @@
   "Course filter": "Filter mata kuliah",
   "Lecturer search": "Pencarian dosen",
   "Write a review": "Tulis ulasan",
+  "Write a review for {{lecturerName}}": "Tulis ulasan untuk {{lecturerName}}",
   "Lecturer": "Dosen",
   "Select a lecturer": "Pilih dosen",
   "Course": "Mata kuliah",
@@ -63,7 +64,6 @@
   "Choose a score for each: 1 (lowest) to 5 (highest).": "Beri nilai untuk setiap aspek: 1 (terendah) hingga 5 (tertinggi).",
   "Your experience": "Pengalamanmu",
   "What helped you learn? What could be improved?": "Apa yang membantu kamu belajar? Apa yang bisa diperbaiki?",
-  "1–1,000 characters. Avoid personal information.": "1–1.000 karakter. Hindari informasi pribadi.",
   "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.": "Nama tampilanmu bersifat publik. Anonim menyembunyikannya, tetapi pengelola infrastruktur mungkin tetap dapat mengidentifikasimu.",
   "Display name": "Nama tampilan",
   "1–80 characters. Avoid personal information.": "1–80 karakter. Hindari informasi pribadi.",
@@ -110,5 +110,8 @@
   "Reviews": "Ulasan",
   "No reviews yet. Be the first to share your experience.": "Belum ada ulasan. Jadilah orang pertama yang berbagi pengalaman.",
   "Be the first to review!": "Jadilah yang pertama memberi ulasan!",
-  "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "Alamat IP digunakan untuk membatasi pengiriman ulasan dan suka. Alamat IP mentah tidak disimpan pada data ulasan atau suka."
+  "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "Alamat IP digunakan untuk membatasi pengiriman ulasan dan suka. Alamat IP mentah tidak disimpan pada data ulasan atau suka.",
+  "Optional. Leave blank to publish as Anonymous.": "Opsional. Kosongkan untuk terbit sebagai Anonim.",
+  "Select a term": "Pilih semester",
+  "The lecturer or course may no longer be available. Refresh the page and try again.": "Dosen atau mata kuliah mungkin sudah tidak tersedia. Muat ulang halaman dan coba lagi."
 }
