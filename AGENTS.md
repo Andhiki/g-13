@@ -10,6 +10,22 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When form labels are self-explanatory, omit redundant helper copy and put lecturer context in the review dialog title.
+
+- When reordering form fields, preserve existing explicit anonymity controls and submission semantics unless the user asks to change them.
+
+- When grouping review rating rows, use spacing and consistent label/control alignment rather than a redundant heading that competes with field labels.
+
+- When laying out dense review forms, place labels/help beside controls on desktop and display name first, with lecturer identity supplied by its detail page.
+
+- When building reusable empty states, expose left, center, and right alignment and center the lecturer review empty state.
+
+- When compacting a CTA, retain the requested FancyButton component and adjust its typography and size rather than replacing its visual style.
+
+- When adjacent controls both select one value, use the same selection primitive so menu typography, caret motion, and hover behavior stay consistent.
+
+- When building information-dense lecturer screens, use existing compact control variants and avoid forced large trigger or menu-item heights.
+
 - When placing filter and sort controls together, match rendered font family, size, weight, and color instead of relying on each primitive's defaults.
 
 - When using static imports in TanStack server handlers, keep server-only

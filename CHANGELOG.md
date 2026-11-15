@@ -14,13 +14,21 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-15
 
+#### Changed
+
+- Menampilkan nama dosen pada judul dialog ulasan, menambahkan ikon pengguna pada nama tampilan, serta menghapus deskripsi pembuka dan bantuan berulang pada mata kuliah, semester, dan pengalaman.
+
+- Merapikan tombol batal dan terbitkan ulasan menjadi selebar konten dan rata kanan di desktop, dengan lebar seimbang di ponsel tetap dipertahankan.
+- Menghapus judul penilaian yang berulang pada formulir ulasan; jarak antarbagian membedakan identitas kuliah dan penilaian tanpa mengganggu keselarasan label dan kontrol.
+- Membatasi formulir ulasan ke detail dosen, menempatkan nama tampilan di awal, serta menyusun label dan kontrol berdampingan di desktop. Mata kuliah dapat dicari dalam dua bahasa dan semester dipilih dari 2021/2022 hingga semester berjalan.
+- Mengganti kotak ulasan kosong pada detail dosen dengan tampilan ringkas berisi ikon, penjelasan, dan tombol tulis ulasan; pilihan mata kuliah tetap terbawa ke formulir.
+
 #### Fixed
 
-- Meringkas kontrol direktori dan detail ulasan dosen serta menyeragamkan pengurutan dan filter mata kuliah dengan komponen seleksi yang sama.
-
+- Mengembalikan sakelar anonim yang aktif secara bawaan pada formulir ulasan; nama tampilan wajib diisi hanya saat mode anonim dimatikan.
+- Meringkas tombol, pencarian, filter, dan pilihan menu pada direktori, detail, serta formulir ulasan dosen menggunakan ukuran kontrol kecil; tombol tulis ulasan tetap memakai gaya FancyButton dengan teks kecil.
+- Menyeragamkan pilihan pengurutan dosen dan ulasan dengan filter mata kuliah memakai komponen seleksi yang sama, termasuk ukuran teks menu, animasi panah, serta sorotan hover dan fokus.
 - Langsung memperbarui jumlah dan status suka ulasan dosen saat ditekan, serta mengembalikannya jika penyimpanan gagal.
-
-- Menyamakan tipografi dan warna teks pengurutan dengan filter mata kuliah pada detail dosen.
 
 ### 2026-11-14
 
