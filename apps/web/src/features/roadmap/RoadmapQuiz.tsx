@@ -61,7 +61,7 @@ export function RoadmapQuiz({
       >
         <m.div
           variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-          transition={{ duration: reducedMotion ? 0 : 0.32, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reducedMotion ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <Typography
             as="h1"
@@ -87,8 +87,8 @@ export function RoadmapQuiz({
             hidden: {},
             visible: {
               transition: {
-                delayChildren: reducedMotion ? 0 : 0.36,
-                staggerChildren: reducedMotion ? 0 : 0.07,
+                delayChildren: 0,
+                staggerChildren: reducedMotion ? 0 : 0.03,
               },
             },
           }}
@@ -104,7 +104,7 @@ export function RoadmapQuiz({
                 hidden: { opacity: 0, y: 20, scale: 0.98 },
                 visible: { opacity: 1, y: 0, scale: 1 },
               }}
-              transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: reducedMotion ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="min-w-0"
             >
               <AlignButton.Root
