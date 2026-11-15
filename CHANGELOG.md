@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Langsung memperbarui jumlah dan status suka ulasan dosen saat ditekan, serta mengembalikannya jika penyimpanan gagal.
+
 - Menyamakan tipografi dan warna teks pengurutan dengan filter mata kuliah pada detail dosen.
 
 ### 2026-11-14

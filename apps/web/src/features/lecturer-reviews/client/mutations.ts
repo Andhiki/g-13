@@ -40,7 +40,52 @@ export function updateReviewLikeMutationOptions(queryClient: QueryClient) {
       if (!result.ok) throw new Error(result.error);
       return result;
     },
-    onSuccess: async (_result, input) => {
+    onMutate: async (input) => {
+      const detailKey = lecturerDetailQueryOptions(input.lecturerId).queryKey;
+      const likesKey = lecturerBrowserLikesQueryOptions(input.browserId).queryKey;
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: detailKey, exact: true }),
+        queryClient.cancelQueries({ queryKey: likesKey, exact: true }),
+      ]);
+      const detail = queryClient.getQueryData(detailKey);
+      const likes = queryClient.getQueryData(likesKey);
+      const wasLiked = likes?.includes(input.reviewId) ?? false;
+      queryClient.setQueryData(detailKey, (data) =>
+        data
+          ? {
+              ...data,
+              reviews: data.reviews.map((review) =>
+                review.id === input.reviewId
+                  ? {
+                      ...review,
+                      likeCount: review.likeCount + Number(input.liked) - Number(wasLiked),
+                    }
+                  : review,
+              ),
+            }
+          : data,
+      );
+      queryClient.setQueryData(likesKey, (data) =>
+        data
+          ? input.liked
+            ? [...data.filter((id) => id !== input.reviewId), input.reviewId]
+            : data.filter((id) => id !== input.reviewId)
+          : data,
+      );
+      return { detail, likes };
+    },
+    onError: (_error, input, snapshot) => {
+      if (!snapshot) return;
+      queryClient.setQueryData(
+        lecturerDetailQueryOptions(input.lecturerId).queryKey,
+        snapshot.detail,
+      );
+      queryClient.setQueryData(
+        lecturerBrowserLikesQueryOptions(input.browserId).queryKey,
+        snapshot.likes,
+      );
+    },
+    onSettled: async (_result, _error, input) => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: lecturerDetailQueryOptions(input.lecturerId).queryKey,
