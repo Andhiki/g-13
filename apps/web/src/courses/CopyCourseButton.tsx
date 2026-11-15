@@ -54,7 +54,7 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
                   animate={{ opacity: 1, scale: 1 }}
                   exit={hidden}
                   transition={
-                    reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }
+                    reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.2, bounce: 0 }
                   }
                 >
                   <Icon className="size-4" />

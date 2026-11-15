@@ -16,7 +16,7 @@ function MenuIcon({ open }: { open: boolean }) {
   const reducedMotion = useReducedMotion();
   const transition = reducedMotion
     ? { duration: 0 }
-    : { type: "spring" as const, duration: 0.3, bounce: 0 };
+    : { type: "spring" as const, duration: 0.2, bounce: 0 };
   return (
     <svg
       aria-hidden="true"
