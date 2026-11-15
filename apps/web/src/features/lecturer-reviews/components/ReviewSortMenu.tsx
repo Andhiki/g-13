@@ -27,7 +27,13 @@ export function ReviewSortMenu({
           aria-label={text(lecturerOrder ? "Sort lecturers and reviews" : "Sort reviews")}
         >
           <RiSortDesc aria-hidden="true" className="hidden size-5 sm:block" />
-          <span>{text("Sort")}</span>
+          {lecturerOrder ? (
+            <span>{text("Sort")}</span>
+          ) : (
+            <Typography as="span" variant="paragraph" className="text-text-strong-950">
+              {text("Sort")}
+            </Typography>
+          )}
           <RiArrowDownSLine aria-hidden="true" className="hidden size-4 sm:block" />
         </AlignButton.Root>
       </AlignDropdown.Trigger>

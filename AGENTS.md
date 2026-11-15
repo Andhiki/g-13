@@ -10,6 +10,8 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When placing filter and sort controls together, match rendered font family, size, weight, and color instead of relying on each primitive's defaults.
+
 - When using static imports in TanStack server handlers, keep server-only
   references inside handler bodies and keep request-dependent work out of module
   initialization.
