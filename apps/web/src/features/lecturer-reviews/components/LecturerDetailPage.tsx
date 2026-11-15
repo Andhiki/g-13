@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
-import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine } from "@remixicon/react";
 import { useLocale } from "../../../useLocale";
 import { AlignFancyButton } from "../../../ui/fancy-button";
+import { AlignEmptyState } from "../../../ui/empty-state";
+import { AlignButton } from "../../../ui/button";
 import { AlignSelect } from "../../../ui/select";
 import { Typography } from "../../../ui/typography";
 import { toast, SuccessToast } from "../../../ui/toast";
@@ -194,11 +196,40 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           <ReviewList
             reviews={reviews}
             language={language}
-            emptyMessage={text(
-              courseId === null
-                ? "No reviews yet. Be the first to share your experience."
-                : "No reviews for this course",
-            )}
+            emptyState={
+              <AlignEmptyState.Root align="center">
+                <AlignEmptyState.Icon>
+                  <RiChatQuoteLine />
+                </AlignEmptyState.Icon>
+                <AlignEmptyState.Title>
+                  {text(courseId === null ? "No reviews yet" : "No reviews for this course")}
+                </AlignEmptyState.Title>
+                <AlignEmptyState.Description>
+                  {text("Share an experience to help other students choose their classes.")}
+                </AlignEmptyState.Description>
+                <AlignEmptyState.Actions>
+                  <AlignFancyButton.Root
+                    className="h-9 gap-2 px-3"
+                    onClick={() => setReviewDialogOpen(true)}
+                  >
+                    <Typography as="span" variant="paragraph">
+                      {text("Write a review")}
+                    </Typography>
+                    <RiArrowRightLine aria-hidden="true" className="size-4" />
+                  </AlignFancyButton.Root>
+                  {courseId !== null && (
+                    <AlignButton.Root
+                      variant="neutral"
+                      mode="ghost"
+                      size="small"
+                      onClick={() => setCourseId(null)}
+                    >
+                      {text("Clear course filter")}
+                    </AlignButton.Root>
+                  )}
+                </AlignEmptyState.Actions>
+              </AlignEmptyState.Root>
+            }
             likedReviews={likedReviews}
             canLike={browserId !== null && !likesQuery.isPending && !likesQuery.isError}
             likePending={likeMutation.isPending}

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { useLocale } from "../../../useLocale";
 import { Typography } from "../../../ui/typography";
@@ -12,7 +13,7 @@ type Review = Awaited<
 export function ReviewList({
   reviews,
   language,
-  emptyMessage,
+  emptyState,
   likedReviews,
   canLike,
   likePending,
@@ -20,7 +21,7 @@ export function ReviewList({
 }: {
   reviews: Review[];
   language: "id" | "en";
-  emptyMessage: string;
+  emptyState: ReactNode;
   likedReviews: string[];
   canLike: boolean;
   likePending: boolean;
@@ -28,13 +29,7 @@ export function ReviewList({
 }) {
   const { text } = useLocale("lecturers");
   if (!reviews.length) {
-    return (
-      <div className="rounded-10 border border-dashed border-stroke-soft-200 px-6 py-10 text-center">
-        <Typography as="p" variant="paragraph" className="m-0 text-text-sub-600">
-          {emptyMessage}
-        </Typography>
-      </div>
-    );
+    return emptyState;
   }
   return (
     <div className="space-y-3">
