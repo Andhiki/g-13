@@ -70,9 +70,14 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             />
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <AlignFancyButton.Root onClick={() => setReviewDialogOpen(true)}>
-              {text("Write a review")}
-              <RiArrowRightLine aria-hidden="true" className="size-5" />
+            <AlignFancyButton.Root
+              className="h-9 gap-2 px-3"
+              onClick={() => setReviewDialogOpen(true)}
+            >
+              <Typography as="span" variant="paragraph">
+                {text("Write a review")}
+              </Typography>
+              <RiArrowRightLine aria-hidden="true" className="size-4" />
             </AlignFancyButton.Root>
             <RatingGuidePopover />
             <Typography as="span" variant="caption" className="text-text-sub-600">
@@ -163,7 +168,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 <AlignSelect.Trigger
                   id={courseFilterId}
                   aria-label={text("Course filter")}
-                  className="min-h-11 max-w-44"
+                  className="h-9 min-h-9 max-w-44"
                 >
                   <AlignSelect.Value />
                 </AlignSelect.Trigger>
@@ -178,7 +183,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                   ))}
                 </AlignSelect.Content>
               </AlignSelect.Root>
-              <ReviewSortMenu reviewOrder={reviewOrder} onReviewOrder={setReviewOrder} />
+              <ReviewSortMenu kind="review" value={reviewOrder} onValueChange={setReviewOrder} />
             </div>
           </div>
           {likeError && (
@@ -226,7 +231,7 @@ function LinkBack() {
   return (
     <Link
       to="/lecturers"
-      className="inline-flex min-h-10 items-center gap-2 rounded-md text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
+      className="inline-flex h-9 items-center gap-2 rounded-md text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
     >
       <RiArrowLeftLine aria-hidden="true" className="size-4" />
       <Typography as="span" variant="label">

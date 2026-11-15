@@ -47,11 +47,11 @@ export function LecturerReviewsPage() {
         <div className="min-w-0">
           <section aria-label={text("Search and sort")}>
             <div className="flex items-center gap-2">
-              <label className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
+              <label className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
                 <span className="sr-only">{text("Search lecturers or courses")}</span>
                 <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
                 <input
-                  className="min-h-11 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:text-paragraph-sm"
+                  className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:text-paragraph-sm"
                   placeholder={text("Lecturer or course")}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
@@ -67,7 +67,11 @@ export function LecturerReviewsPage() {
                   </button>
                 )}
               </label>
-              <ReviewSortMenu lecturerOrder={lecturerOrder} onLecturerOrder={setLecturerOrder} />
+              <ReviewSortMenu
+                kind="lecturer"
+                value={lecturerOrder}
+                onValueChange={setLecturerOrder}
+              />
             </div>
             {query.trim() && (
               <Typography

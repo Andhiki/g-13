@@ -119,7 +119,7 @@ function ReviewLikeButton({
   return (
     <button
       type="button"
-      className="mt-1 inline-flex min-h-11 min-w-11 items-center gap-2 rounded-md px-2 text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base disabled:opacity-50"
+      className="mt-1 inline-flex h-9 min-w-9 items-center gap-2 rounded-md px-2 text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base disabled:opacity-50"
       aria-pressed={liked}
       aria-label={text(liked ? "Unlike review" : "Like review")}
       disabled={!canLike || pending}

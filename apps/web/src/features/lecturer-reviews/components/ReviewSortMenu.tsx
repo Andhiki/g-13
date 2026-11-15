@@ -1,116 +1,51 @@
-import { RiArrowDownSLine, RiSortDesc } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
-import { AlignDropdown } from "../../../ui/dropdown";
-import { Typography } from "../../../ui/typography";
+import { RiSortDesc } from "@remixicon/react";
+import { AlignSelect } from "../../../ui/select";
 import { useLocale } from "../../../useLocale";
 import type { LecturerOrder, ReviewOrder } from "../shared/review-order";
 
-export function ReviewSortMenu({
-  lecturerOrder,
-  reviewOrder,
-  onLecturerOrder,
-  onReviewOrder,
-}: {
-  lecturerOrder?: LecturerOrder;
-  reviewOrder?: ReviewOrder;
-  onLecturerOrder?: (order: LecturerOrder) => void;
-  onReviewOrder?: (order: ReviewOrder) => void;
-}) {
+const lecturerOptions = [
+  ["name", "Name A–Z"],
+  ["review-count", "Most reviews"],
+  ["rating", "Highest rating"],
+] as const;
+
+const reviewOptions = [
+  ["newest", "Newest first"],
+  ["oldest", "Oldest first"],
+  ["highest", "Highest rating"],
+  ["lowest", "Lowest rating"],
+] as const;
+
+type Props =
+  | { kind: "lecturer"; value: LecturerOrder; onValueChange: (value: LecturerOrder) => void }
+  | { kind: "review"; value: ReviewOrder; onValueChange: (value: ReviewOrder) => void };
+
+export function ReviewSortMenu(props: Props) {
   const { text } = useLocale("lecturers");
+  const isLecturer = props.kind === "lecturer";
   return (
-    <AlignDropdown.Root>
-      <AlignDropdown.Trigger asChild>
-        <AlignButton.Root
-          variant="neutral"
-          mode="stroke"
-          className="min-h-11 shrink-0 gap-2"
-          aria-label={text(lecturerOrder ? "Sort lecturers and reviews" : "Sort reviews")}
-        >
-          <RiSortDesc aria-hidden="true" className="hidden size-5 sm:block" />
-          {lecturerOrder ? (
-            <span>{text("Sort")}</span>
-          ) : (
-            <Typography as="span" variant="paragraph" className="text-text-strong-950">
-              {text("Sort")}
-            </Typography>
-          )}
-          <RiArrowDownSLine aria-hidden="true" className="hidden size-4 sm:block" />
-        </AlignButton.Root>
-      </AlignDropdown.Trigger>
-      <AlignDropdown.Content
-        align="end"
-        className="w-64 max-w-[calc(100vw-2rem)] motion-reduce:animate-none"
+    <AlignSelect.Root
+      variant="compact"
+      value={props.value}
+      onValueChange={(value) => {
+        if (props.kind === "lecturer") props.onValueChange(value as LecturerOrder);
+        else props.onValueChange(value as ReviewOrder);
+      }}
+    >
+      <AlignSelect.Trigger
+        className="h-9 min-h-9 gap-2"
+        aria-label={text(isLecturer ? "Lecturer order" : "Review order")}
       >
-        {lecturerOrder && onLecturerOrder && (
-          <>
-            <Typography
-              as="p"
-              variant="labelSmall"
-              id="lecturer-order-label"
-              className="mb-1 mt-1 px-2 text-text-sub-600"
-            >
-              {text("Lecturer order")}
-            </Typography>
-            <AlignDropdown.RadioGroup
-              aria-labelledby="lecturer-order-label"
-              value={lecturerOrder}
-              onValueChange={(value) => onLecturerOrder(value as LecturerOrder)}
-            >
-              {(
-                [
-                  ["name", "Name A–Z"],
-                  ["review-count", "Most reviews"],
-                  ["rating", "Highest rating"],
-                ] as const
-              ).map(([value, label]) => (
-                <AlignDropdown.RadioItem
-                  key={value}
-                  value={value}
-                  className="min-h-11"
-                  onSelect={(event) => event.preventDefault()}
-                >
-                  {text(label)}
-                </AlignDropdown.RadioItem>
-              ))}
-            </AlignDropdown.RadioGroup>
-          </>
-        )}
-        {reviewOrder && onReviewOrder && (
-          <>
-            <Typography
-              as="p"
-              variant="labelSmall"
-              id="review-order-label"
-              className={`mb-1 px-2 text-text-sub-600 ${lecturerOrder ? "mt-3" : "mt-1"}`}
-            >
-              {text("Review order")}
-            </Typography>
-            <AlignDropdown.RadioGroup
-              aria-labelledby="review-order-label"
-              value={reviewOrder}
-              onValueChange={(value) => onReviewOrder(value as ReviewOrder)}
-            >
-              {(
-                [
-                  ["newest", "Newest first"],
-                  ["oldest", "Oldest first"],
-                  ["highest", "Highest rating"],
-                  ["lowest", "Lowest rating"],
-                ] as const
-              ).map(([value, label]) => (
-                <AlignDropdown.RadioItem
-                  key={value}
-                  value={value}
-                  className="min-h-11"
-                  onSelect={(event) => event.preventDefault()}
-                >
-                  {text(label)}
-                </AlignDropdown.RadioItem>
-              ))}
-            </AlignDropdown.RadioGroup>
-          </>
-        )}
-      </AlignDropdown.Content>
-    </AlignDropdown.Root>
+        <RiSortDesc aria-hidden="true" className="hidden size-5 sm:block" />
+        <AlignSelect.Value>{text("Sort")}</AlignSelect.Value>
+      </AlignSelect.Trigger>
+      <AlignSelect.Content align="end">
+        {(isLecturer ? lecturerOptions : reviewOptions).map(([value, label]) => (
+          <AlignSelect.Item key={value} value={value}>
+            {text(label)}
+          </AlignSelect.Item>
+        ))}
+      </AlignSelect.Content>
+    </AlignSelect.Root>
   );
 }

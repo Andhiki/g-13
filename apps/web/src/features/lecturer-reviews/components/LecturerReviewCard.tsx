@@ -72,7 +72,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
               <li className="flex items-center">
                 <button
                   type="button"
-                  className="pointer-events-auto relative z-20 inline-flex min-w-11 items-center rounded-md bg-bg-weak-50 px-2 py-1 text-paragraph-xs text-text-sub-600 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
+                  className="pointer-events-auto relative z-20 inline-flex items-center rounded-md bg-bg-weak-50 px-2 py-1 text-paragraph-xs text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
                   aria-expanded={showAllCourses}
                   onClick={() => setShowAllCourses((current) => !current)}
                 >

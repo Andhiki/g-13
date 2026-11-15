@@ -36,7 +36,8 @@ export function RatingGuidePopover() {
       <AlignButton.Root
         variant="neutral"
         mode="stroke"
-        className="size-10 p-0"
+        size="small"
+        className="w-9 p-0"
         aria-expanded={open}
         aria-controls="rating-guide"
         aria-label={text("About ratings and reviews")}
