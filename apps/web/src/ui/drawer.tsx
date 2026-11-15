@@ -157,7 +157,7 @@ const focusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const drawerMotion =
-  "data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=open]:animate-in data-[state=closed]:duration-200 data-[state=closed]:ease-in data-[state=closed]:animate-out data-[state=closed]:[animation-fill-mode:forwards] data-[state=closed]:pointer-events-none motion-reduce:animate-none";
+  "data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=open]:animate-in data-[state=closed]:duration-200 data-[state=closed]:ease-out data-[state=closed]:animate-out data-[state=closed]:[animation-fill-mode:forwards] data-[state=closed]:pointer-events-none motion-reduce:animate-none";
 
 const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
   {

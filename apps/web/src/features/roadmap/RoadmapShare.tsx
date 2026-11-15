@@ -44,7 +44,7 @@ export function RoadmapShare({ selection }: { selection: string }) {
                       transition={
                         reducedMotion
                           ? { duration: 0 }
-                          : { type: "spring", duration: 0.3, bounce: 0 }
+                          : { type: "spring", duration: 0.2, bounce: 0 }
                       }
                     >
                       <Icon className="size-5" />
