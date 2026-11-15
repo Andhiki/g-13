@@ -23,6 +23,8 @@ Font Inter untuk web berasal dari [Inter Project](https://github.com/rsms/inter)
 
 ## Lisensi AlignUI
 
+Popover diadaptasi dari [AlignUI Next.js TypeScript starter, commit f37bd913](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/popover.tsx), sesuai [dokumentasi Popover v1.2](https://alignui.com/docs/v1.2/ui/popover). Adaptasi memakai `twMerge` dan ekspor namespace `AlignPopover`; perilaku tetap menggunakan Radix UI.
+
 MIT License
 
 Copyright (c) 2024 Doğukan Çavuş

@@ -10,6 +10,8 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
+- When adding a popover, reuse the AlignUI primitive instead of implementing positioning, dismissal, and focus management manually.
+
 - When form labels are self-explanatory, omit redundant helper copy and put lecturer context in the review dialog title.
 
 - When reordering form fields, preserve existing explicit anonymity controls and submission semantics unless the user asks to change them.

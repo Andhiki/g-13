@@ -25,6 +25,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menggunakan popover AlignUI untuk panduan penilaian dosen agar posisi mengikuti ruang layar, dapat ditutup dengan Escape atau klik di luar, dan fokus kembali ke tombol info.
+
 - Mengembalikan sakelar anonim yang aktif secara bawaan pada formulir ulasan; nama tampilan wajib diisi hanya saat mode anonim dimatikan.
 - Meringkas tombol, pencarian, filter, dan pilihan menu pada direktori, detail, serta formulir ulasan dosen menggunakan ukuran kontrol kecil; tombol tulis ulasan tetap memakai gaya FancyButton dengan teks kecil.
 - Menyeragamkan pilihan pengurutan dosen dan ulasan dengan filter mata kuliah memakai komponen seleksi yang sama, termasuk ukuran teks menu, animasi panah, serta sorotan hover dan fokus.
