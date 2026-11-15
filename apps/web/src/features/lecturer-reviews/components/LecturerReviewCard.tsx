@@ -14,7 +14,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
   const { text, language } = useLocale("lecturers");
   const [showAllCourses, setShowAllCourses] = useState(false);
   return (
-    <article className="group isolate relative cursor-pointer rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 sm:p-4">
+    <article className="group isolate relative cursor-pointer rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 focus-within:border-stroke-strong-950 sm:p-4">
       <Link
         to="/lecturers/$lecturerId"
         params={{ lecturerId: lecturer.id }}
@@ -53,7 +53,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
         {lecturer.courses.length > 0 && (
           <ul
             aria-label={text("Courses reviewed")}
-            className="mb-0 mt-2 flex min-w-0 flex-wrap gap-1.5 pl-0"
+            className="mb-0 mt-2 flex min-w-0 flex-wrap items-center gap-1.5 pl-0"
           >
             {(showAllCourses ? lecturer.courses : lecturer.courses.slice(0, 3)).map((course) => (
               <li
@@ -72,13 +72,15 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
               <li className="flex items-center">
                 <button
                   type="button"
-                  className="pointer-events-auto relative z-20 rounded px-1 py-1 text-paragraph-xs text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
+                  className="pointer-events-auto relative z-20 inline-flex min-w-11 items-center rounded-md bg-bg-weak-50 px-2 py-1 text-paragraph-xs text-text-sub-600 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base"
                   aria-expanded={showAllCourses}
                   onClick={() => setShowAllCourses((current) => !current)}
                 >
                   {showAllCourses
                     ? text("Show less")
-                    : text("{{count}} more", { count: lecturer.courses.length - 3 })}
+                    : text("{{count}} more", {
+                        count: lecturer.courses.length - 3,
+                      })}
                 </button>
               </li>
             )}
@@ -97,7 +99,9 @@ export function RatingStars({ value, label }: { value: number | null; label: str
           <RiStarFill className="size-full text-text-disabled-300" />
           <span
             className="absolute inset-y-0 left-0 overflow-hidden text-primary-base"
-            style={{ width: `${Math.max(0, Math.min(1, (value ?? 0) - index)) * 100}%` }}
+            style={{
+              width: `${Math.max(0, Math.min(1, (value ?? 0) - index)) * 100}%`,
+            }}
           >
             <RiStarFill className="size-4 max-w-none" />
           </span>

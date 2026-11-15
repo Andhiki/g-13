@@ -51,10 +51,10 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
       : "";
 
   return (
-    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12 lg:py-8">
+    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-5 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12 lg:py-8">
       <div className="mx-auto max-w-4xl">
         <LinkBack />
-        <header className="mt-6 lg:mt-4">
+        <header className="mt-3 sm:mt-4">
           <div className="flex flex-wrap items-center gap-2">
             <Typography as="h1" variant="subtitle1" className="m-0 min-w-0 flex-1">
               {data.lecturer.name}
@@ -69,30 +69,30 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               })}
             />
           </div>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
-            {text(data.lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {
-              count: data.lecturer.reviewCount,
-            })}
-          </Typography>
-          <div className="mt-5 flex flex-wrap items-center gap-2 lg:mt-3">
-            <RatingGuidePopover />
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <AlignFancyButton.Root onClick={() => setReviewDialogOpen(true)}>
               {text("Write a review")}
               <RiArrowRightLine aria-hidden="true" className="size-5" />
             </AlignFancyButton.Root>
+            <RatingGuidePopover />
+            <Typography as="span" variant="caption" className="text-text-sub-600">
+              {text(data.lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {
+                count: data.lecturer.reviewCount,
+              })}
+            </Typography>
           </div>
         </header>
 
-        <section aria-label={text("Courses reviewed")} className="mt-8 lg:mt-6">
+        <section aria-label={text("Courses reviewed")} className="mt-4 sm:mt-6">
           <Typography as="h2" variant="subtitle2" className="mb-0">
             {text("Courses reviewed")}
           </Typography>
           {data.lecturer.courses.length ? (
-            <ul className="mb-0 mt-3 flex flex-wrap gap-2 pl-0">
+            <ul className="mb-0 mt-2 flex flex-wrap gap-1.5 pl-0">
               {data.lecturer.courses.map((course) => (
                 <li
                   key={course.id}
-                  className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2.5 py-1.5"
+                  className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2.5 py-1"
                 >
                   <Typography as="span" variant="code" className="shrink-0 text-text-sub-600">
                     {course.code}
@@ -110,11 +110,11 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           )}
         </section>
 
-        <section aria-label={text("Average ratings")} className="mt-8 lg:mt-6">
+        <section aria-label={text("Average ratings")} className="mt-4 sm:mt-6">
           <Typography as="h2" variant="subtitle2" className="mb-0">
             {text("Average ratings")}
           </Typography>
-          <dl className="mb-0 mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <dl className="mb-0 mt-2 grid grid-cols-2 gap-x-4 gap-y-2 rounded-10 border border-stroke-soft-200 p-3 sm:gap-3 sm:border-0 sm:p-0">
             {(
               [
                 ["Overall", data.lecturer.overallAverage],
@@ -125,7 +125,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             ).map(([label, value]) => (
               <div
                 key={label}
-                className="flex min-w-0 items-center justify-between gap-2 rounded-10 border border-stroke-soft-200 px-3 py-2.5"
+                className="flex min-w-0 flex-col items-start gap-1 sm:grid sm:grid-cols-[140px_auto] sm:items-center sm:gap-3 sm:rounded-10 sm:border sm:border-stroke-soft-200 sm:px-3 sm:py-2.5"
               >
                 <Typography as="dt" variant="label" className="text-text-sub-600">
                   {text(label)}
@@ -141,8 +141,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           </dl>
         </section>
 
-        <section aria-label={text("Reviews")} className="mt-8 lg:mt-6">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <section aria-label={text("Reviews")} className="mt-4 sm:mt-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <Typography as="h2" variant="subtitle2" className="mb-0">
               {text("Reviews")}
             </Typography>
@@ -151,7 +151,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 as="label"
                 variant="labelSmall"
                 htmlFor={courseFilterId}
-                className="shrink-0 text-text-sub-600"
+                className="sr-only sm:not-sr-only sm:shrink-0 sm:text-text-sub-600"
               >
                 {text("Course")}
               </Typography>
@@ -163,7 +163,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 <AlignSelect.Trigger
                   id={courseFilterId}
                   aria-label={text("Course filter")}
-                  className="h-9 min-h-9 max-w-44"
+                  className="min-h-11 max-w-44"
                 >
                   <AlignSelect.Value />
                 </AlignSelect.Trigger>

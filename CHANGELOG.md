@@ -21,6 +21,11 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memusatkan daftar dosen dalam satu kolom dan merapikan pengantar direktori.
+- Meringkas ringkasan penilaian dosen di ponsel tanpa menyembunyikan informasi, mendekatkan label dengan bintang ringkasan pada desktop, serta merapikan ruang bawah kartu ulasan.
+- Menyelaraskan chip perluasan mata kuliah dengan area sentuh yang aman, memperjelas pengurutan di ponsel, dan memperbesar tombol suka.
+- Merapikan jarak formulir dan pilihan bintang tanpa mengurangi area sentuh, serta mempersingkat petunjuk pencarian mata kuliah.
+
 - Membuat pencarian alumni yang melekat transparan dengan efek kaca dan mempercepat animasinya menjadi 120 ms.
 
 - Menambahkan filter mata kuliah pada ulasan di halaman detail dosen.
@@ -42,7 +47,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Memadatkan kartu dosen, menampilkan rating sebagai lima bintang, membatasi tampilan awal mata kuliah menjadi tiga, dan menghapus petunjuk pencarian.
 - Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
 - Merapikan dialog ulasan dengan garis vertikal pada penilaian, petunjuk di placeholder, dan footer yang lebih rapat.
-- Memindahkan panduan rating dan catatan ulasan belum terverifikasi ke popover ikon info.
+- Memindahkan panduan rating dan catatan ulasan belum terverifikasi ke popover ikon info setelah tombol tulis ulasan pada direktori dan detail dosen.
 - Memindahkan formulir ulasan ke dialog AlignUI dan merangkum kartu dosen menjadi nama, jumlah ulasan, rating keseluruhan, serta mata kuliah yang diulas.
 - Menghapus keterangan batas pengiriman dan privasi dari formulir ulasan.
 - Menggabungkan pencarian dosen dan mata kuliah serta menu urutan, merangkum kartu dosen, dan menghaluskan buka-tutup formulir ulasan.

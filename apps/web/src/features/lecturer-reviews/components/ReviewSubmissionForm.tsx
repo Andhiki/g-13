@@ -17,11 +17,19 @@ export type ReviewFormData = {
   lecturers: { id: string; name: string }[];
   courses: { id: string; code: string; nameId: string; nameEn: string }[];
 };
-export type ReviewDraft = { lecturerId: string; courseId: string | null; request: number };
+export type ReviewDraft = {
+  lecturerId: string;
+  courseId: string | null;
+  request: number;
+};
 const control =
   "mt-2 block min-h-11 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
 const metrics = [
-  { name: "clarity", label: "Clarity", hint: "How easy were the explanations to understand?" },
+  {
+    name: "clarity",
+    label: "Clarity",
+    hint: "How easy were the explanations to understand?",
+  },
   {
     name: "support",
     label: "Support",
@@ -54,15 +62,17 @@ export function ReviewSubmissionForm({
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
   const [body, setBody] = useState("");
-  const [ratings, setRatings] = useState({ clarity: 0, support: 0, organization: 0 });
+  const [ratings, setRatings] = useState({
+    clarity: 0,
+    support: 0,
+    organization: 0,
+  });
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [message, setMessage] = useState("");
   useEffect(() => {
     requestAnimationFrame(() => {
       form.current
-        ?.querySelector<HTMLElement>(
-          initialLecturerId ? 'input[role="combobox"]' : "#review-lecturer",
-        )
+        ?.querySelector<HTMLElement>(initialLecturerId ? "h2" : "#review-lecturer")
         ?.focus({ preventScroll: true });
     });
   }, [initialLecturerId]);
@@ -128,9 +138,14 @@ export function ReviewSubmissionForm({
         }
       }}
     >
-      <header className="shrink-0 border-b border-stroke-soft-200 p-5 pr-14">
+      <header className="shrink-0 border-b border-stroke-soft-200 p-4 pr-12">
         <AlignModal.Title asChild>
-          <Typography as="h2" variant="subtitle1" className="m-0 font-display text-text-strong-950">
+          <Typography
+            as="h2"
+            tabIndex={-1}
+            variant="subtitle1"
+            className="m-0 font-display text-text-strong-950 outline-none"
+          >
             {text("Write a review")}
           </Typography>
         </AlignModal.Title>
@@ -141,10 +156,10 @@ export function ReviewSubmissionForm({
         </AlignModal.Description>
       </header>
 
-      <div className="min-h-0 overflow-y-auto px-5 pt-5 pb-3">
+      <div className="min-h-0 overflow-y-auto px-4 pt-4 pb-3 sm:mb-3">
         <fieldset
           disabled={publishMutation.isPending}
-          className="min-w-0 space-y-6 disabled:opacity-70"
+          className="min-w-0 space-y-4 disabled:opacity-70"
         >
           <div className="space-y-4">
             <div>
@@ -198,9 +213,6 @@ export function ReviewSubmissionForm({
                 {...errorProps("termLabel")}
                 onChange={() => clearError("termLabel")}
               />
-              <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
-                {text("When did you take this class? 1–60 characters.")}
-              </Typography>
               {fieldError("termLabel")}
             </div>
           </div>
@@ -214,7 +226,7 @@ export function ReviewSubmissionForm({
                 {text("Choose a score for each: 1 (lowest) to 5 (highest).")}
               </Typography>
             </div>
-            <div className="space-y-5 border-l border-stroke-soft-200 pl-4">
+            <div className="space-y-3">
               {metrics.map((metric) => (
                 <StarRatingField
                   key={metric.name}
@@ -223,7 +235,10 @@ export function ReviewSubmissionForm({
                   hint={text(metric.hint)}
                   value={ratings[metric.name]}
                   onChange={(value) => {
-                    setRatings((current) => ({ ...current, [metric.name]: value }));
+                    setRatings((current) => ({
+                      ...current,
+                      [metric.name]: value,
+                    }));
                     clearError(metric.name);
                   }}
                   error={errors[metric.name] ? text(errors[metric.name] ?? "") : undefined}
@@ -298,7 +313,7 @@ export function ReviewSubmissionForm({
         </fieldset>
       </div>
 
-      <footer className="shrink-0 border-t border-stroke-soft-200 p-5">
+      <footer className="shrink-0 border-t border-stroke-soft-200 p-4">
         {message && (
           <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
             <Typography as="p" variant="paragraph" className="m-0">

@@ -69,7 +69,7 @@ export function ReviewCourseField({
                   ? `${selected.code} · ${courseDisplayName(selected, language)}`
                   : ""
             }
-            placeholder={text("Search by course code or name")}
+            placeholder={text("Course code or name")}
             onFocus={() => setOpen(true)}
             onClick={() => setOpen(true)}
             onValueChange={(next) => {

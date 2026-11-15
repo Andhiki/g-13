@@ -42,7 +42,7 @@ export function ReviewList({
         <article
           key={review.id}
           id={`review-${review.id}`}
-          className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-5"
+          className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 pb-2 sm:p-5 sm:pb-2"
         >
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <Typography as="strong" variant="label">
@@ -64,7 +64,7 @@ export function ReviewList({
           >
             {review.body}
           </Typography>
-          <dl className="mb-0 mt-3 flex flex-wrap gap-x-4 gap-y-2">
+          <dl className="mb-0 mt-3 grid gap-2 sm:flex sm:flex-wrap sm:gap-x-6">
             {(
               [
                 ["Clarity", review.clarity],
@@ -72,7 +72,10 @@ export function ReviewList({
                 ["Organization", review.organization],
               ] as const
             ).map(([label, value]) => (
-              <div key={label} className="flex min-w-0 items-center gap-2">
+              <div
+                key={label}
+                className="grid min-w-0 grid-cols-[110px_auto] items-center gap-2 sm:flex"
+              >
                 <Typography as="dt" variant="caption" className="text-text-sub-600">
                   {text(label)}
                 </Typography>
@@ -116,14 +119,14 @@ function ReviewLikeButton({
   return (
     <button
       type="button"
-      className="mt-2 inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base disabled:opacity-50"
+      className="mt-1 inline-flex min-h-11 min-w-11 items-center gap-2 rounded-md px-2 text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base disabled:opacity-50"
       aria-pressed={liked}
       aria-label={text(liked ? "Unlike review" : "Like review")}
       disabled={!canLike || pending}
       onClick={() => onLike(reviewId, !liked)}
     >
       <Icon className="size-4" aria-hidden="true" />
-      <Typography as="span" variant="label">
+      <Typography as="span" variant="label" className="tabular-nums">
         {count}
       </Typography>
     </button>

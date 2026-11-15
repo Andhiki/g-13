@@ -27,21 +27,21 @@ export function LecturerReviewsPage() {
     setReviewDraft((current) => ({ lecturerId, courseId, request: (current?.request ?? 0) + 1 }));
 
   return (
-    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
-        <header className="lg:sticky lg:top-28 lg:self-start">
-          <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
+    <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12">
+      <div className="mx-auto grid max-w-4xl gap-6 sm:gap-8">
+        <header>
+          <Typography as="h1" variant="title" className="m-0">
             {text("Lecturers and reviews")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
+          <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
             {text("Browse community experiences with Ilmu Komputer UGM lecturers.")}
           </Typography>
-          <div className="mt-6 flex items-center gap-2">
-            <RatingGuidePopover />
+          <div className="mt-4 flex items-center gap-2">
             <AlignFancyButton.Root onClick={() => startReview("")}>
               {text("Write a review")}
               <RiArrowRightLine aria-hidden="true" className="size-5" />
             </AlignFancyButton.Root>
+            <RatingGuidePopover />
           </div>
         </header>
         <div className="min-w-0">
@@ -52,7 +52,7 @@ export function LecturerReviewsPage() {
                 <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
                 <input
                   className="min-h-11 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:text-paragraph-sm"
-                  placeholder={text("Search lecturers or courses")}
+                  placeholder={text("Lecturer or course")}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                 />

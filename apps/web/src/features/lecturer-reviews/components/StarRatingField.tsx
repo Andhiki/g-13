@@ -34,18 +34,18 @@ export function StarRatingField({
         as="p"
         variant="caption"
         id={`${id}-hint`}
-        className="mb-2 mt-1 text-text-sub-600"
+        className="mb-0 mt-1 text-text-sub-600"
       >
         {hint}
       </Typography>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="flex gap-1 sm:gap-1.5" onPointerLeave={() => setPreview(0)}>
+        <div className="flex" onPointerLeave={() => setPreview(0)}>
           {[1, 2, 3, 4, 5].map((score) => {
             const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
             return (
               <label
                 key={score}
-                className="relative flex size-10 cursor-pointer items-center justify-center rounded-10 border border-stroke-soft-200 bg-bg-white-0 transition duration-200 ease-out has-checked:border-primary-base has-checked:bg-primary-alpha-10 hover:border-stroke-strong-950"
+                className="relative flex size-11 cursor-pointer items-center justify-center rounded-10 has-checked:bg-primary-alpha-10 hover:bg-bg-weak-50"
                 onPointerEnter={(event) => {
                   if (event.pointerType === "mouse") setPreview(score);
                 }}
@@ -57,7 +57,10 @@ export function StarRatingField({
                   value={score}
                   checked={value === score}
                   required
-                  aria-label={text("{{metric}}: {{value}} of 5", { metric: label, value: score })}
+                  aria-label={text("{{metric}}: {{value}} of 5", {
+                    metric: label,
+                    value: score,
+                  })}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? `${id}-error` : `${id}-hint`}
                   onChange={() => onChange(score)}
