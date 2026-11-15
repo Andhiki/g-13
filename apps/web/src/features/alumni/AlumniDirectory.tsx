@@ -64,6 +64,14 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
   const listRef = useRef<HTMLUListElement>(null);
   const [current, setCurrent] = useState("");
   const [hovered, setHovered] = useState("");
+  const navRef = useRef<HTMLElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const draggingRef = useRef(false);
+  const lastDragLetterRef = useRef("");
+  // Browsers synthesise compat mouse pointer events right after a touch lift;
+  // ignore them so the rail does not spring back open after a scrub.
+  const lastTouchRef = useRef(0);
+  const recentTouch = () => Date.now() - lastTouchRef.current < 700;
   const letters = useMemo(
     () => [...new Set(filtered.map((item) => letterOf(item.name)))],
     [filtered],
@@ -90,6 +98,33 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
     ].find((card) => card.dataset.letter === letter);
     target?.scrollIntoView({ block: "start", behavior: "auto" });
     setCurrent(letter);
+  };
+  // Maps a thumb position to the letter whose button covers it, clamping
+  // overshoot above/below the rail so fast drags never lose the pointer.
+  const letterFromY = (clientY: number): string | null => {
+    const buttons = navRef.current?.querySelectorAll<HTMLButtonElement>("[data-letter]");
+    const count = buttons?.length ?? 0;
+    if (!count || !buttons) return null;
+    const first = buttons[0].getBoundingClientRect();
+    const last = buttons[count - 1].getBoundingClientRect();
+    const step = (last.bottom - first.top) / count;
+    const index = Math.min(count - 1, Math.max(0, Math.floor((clientY - first.top) / step)));
+    return buttons[index]?.dataset.letter ?? null;
+  };
+  const dragTo = (clientY: number) => {
+    const letter = letterFromY(clientY);
+    if (!letter || letter === lastDragLetterRef.current) return;
+    lastDragLetterRef.current = letter;
+    setHovered(letter);
+    jump(letter);
+  };
+  const endDrag = (collapse: boolean) => {
+    draggingRef.current = false;
+    lastDragLetterRef.current = "";
+    if (collapse) {
+      setHovered("");
+      setExpanded(false);
+    }
   };
 
   return (
@@ -217,20 +252,52 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
       </div>
       {letters.length > 1 && (
         <nav
+          ref={navRef}
           aria-label={text("Navigasi alfabet")}
-          className="fixed right-1 top-1/2 z-20 flex -translate-y-1/2 flex-col items-end py-2 sm:right-3"
-          onPointerLeave={() => setHovered("")}
+          className={`fixed right-0 top-1/2 z-20 flex -translate-y-1/2 touch-none flex-col items-end py-2 transition-transform duration-200 ${
+            expanded ? "translate-x-0" : "translate-x-7"
+          }`}
+          onPointerEnter={(event) => {
+            if (event.pointerType === "mouse" && !recentTouch()) setExpanded(true);
+          }}
+          onPointerLeave={() => {
+            if (!draggingRef.current) endDrag(true);
+          }}
+          onPointerDown={(event) => {
+            draggingRef.current = true;
+            lastDragLetterRef.current = "";
+            setExpanded(true);
+            navRef.current?.setPointerCapture(event.pointerId);
+            dragTo(event.clientY);
+          }}
+          onPointerMove={(event) => {
+            if (draggingRef.current) dragTo(event.clientY);
+          }}
+          onPointerUp={(event) => {
+            if (event.pointerType !== "mouse") lastTouchRef.current = Date.now();
+            endDrag(event.pointerType !== "mouse");
+          }}
+          onPointerCancel={() => endDrag(true)}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setHovered("");
+              setExpanded(false);
+            }
+          }}
         >
           {letters.map((letter, index) => (
             <button
               key={letter}
               type="button"
+              data-letter={letter}
               aria-label={text("Ke huruf {{v0}}", { v0: letter })}
               onPointerEnter={(event) => {
-                setHovered(letter);
-                if (event.buttons === 1) jump(letter);
+                if (event.pointerType !== "mouse" || !recentTouch()) setHovered(letter);
               }}
-              onFocus={() => setHovered(letter)}
+              onFocus={() => {
+                setExpanded(true);
+                setHovered(letter);
+              }}
               onBlur={() => setHovered("")}
               onClick={() => jump(letter)}
               className="group relative flex h-3 w-9 items-center justify-end pr-1 focus-visible:outline-2 focus-visible:outline-primary-base"
