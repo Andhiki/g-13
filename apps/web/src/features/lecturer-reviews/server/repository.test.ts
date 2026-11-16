@@ -3,6 +3,7 @@ import { expect, it } from "bun:test";
 import { getPlatformProxy } from "wrangler";
 import { createDatabase, courses, lecturers, reviews } from "@g13/db";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
+import { moderateReview } from "./repository";
 
 it("returns only published, non-deleted reviews in public lecturer metrics", async () => {
   const platform = await getPlatformProxy<{ DB: D1Database }>({
@@ -149,6 +150,50 @@ it("returns only published, non-deleted reviews in public lecturer metrics", asy
       courses: [],
     });
     expect(await getLecturerDetail(database, "missing-lecturer")).toBeNull();
+
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "hide" })).toBe(
+      true,
+    );
+    const hiddenDetail = await getLecturerDetail(database, "lecturer-visible");
+    expect(hiddenDetail?.reviews).toEqual([]);
+    expect(hiddenDetail?.lecturer.overallAverage).toBeNull();
+    const hiddenDirectory = await getLecturerDirectory(database);
+    expect(hiddenDirectory.lecturers.find((row) => row.id === "lecturer-visible")).toMatchObject({
+      reviewCount: 0,
+      overallAverage: null,
+      courses: [],
+    });
+
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "restore" })).toBe(
+      true,
+    );
+    expect((await getLecturerDetail(database, "lecturer-visible"))?.lecturer).toMatchObject({
+      reviewCount: 1,
+      overallAverage: 3,
+    });
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "delete" })).toBe(
+      true,
+    );
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "restore" })).toBe(
+      false,
+    );
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "hide" })).toBe(
+      false,
+    );
+    expect(await moderateReview(database, { reviewId: "visible-review", action: "delete" })).toBe(
+      false,
+    );
+    expect(await moderateReview(database, { reviewId: "missing-review", action: "restore" })).toBe(
+      false,
+    );
+    expect((await getLecturerDetail(database, "lecturer-visible"))?.reviews).toEqual([]);
+    expect(
+      (await getLecturerDirectory(database)).lecturers.find((row) => row.id === "lecturer-visible"),
+    ).toMatchObject({
+      reviewCount: 0,
+      overallAverage: null,
+      courses: [],
+    });
   } finally {
     await platform.dispose();
   }

@@ -1,0 +1,38 @@
+{
+  "name": "@g13/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./server": {
+      "types": "./dist/auth.d.mts",
+      "import": "./dist/auth.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bun --bun tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "lint": "oxlint --deny-warnings src tsdown.config.ts",
+    "lint:fix": "oxlint --fix src tsdown.config.ts",
+    "fmt": "oxfmt src tsdown.config.ts package.json tsconfig.json",
+    "fmt:check": "oxfmt --check src tsdown.config.ts package.json tsconfig.json"
+  },
+  "dependencies": {
+    "@g13/db": "workspace:*",
+    "better-auth": "1.7.25",
+    "drizzle-orm": "^0.45.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "tsdown": "^0.23.4",
+    "typescript": "^7.0.2"
+  }
+}

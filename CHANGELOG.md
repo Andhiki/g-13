@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-15
 
+#### Added
+
+- Menambahkan fondasi autentikasi GitHub, skema sesi, dan RPC moderasi dengan pemeriksaan sesi serta peran di server. Akun baru tetap tanpa hak istimewa sampai admin menyetujui dan menetapkan peran; ulasan publik tetap dapat diterbitkan tanpa akun. Integrasi rute dan antarmuka masih menunggu tinjauan terpisah; bootstrap admin dan verifikasi CPU Workers tetap menjadi penghalang peluncuran.
+
 #### Changed
 
 - Menampilkan nama dosen pada judul dialog ulasan, menambahkan ikon pengguna pada nama tampilan, serta menghapus deskripsi pembuka dan bantuan berulang pada mata kuliah, semester, dan pengalaman.

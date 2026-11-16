@@ -2,6 +2,8 @@ import { and, asc, eq, isNull, lt, lte, sql } from "drizzle-orm";
 import { courses, lecturers, reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db";
 import type { createDatabase } from "@g13/db";
 
+import type { ModerateReviewInput } from "../shared/moderation";
+
 type Database = ReturnType<typeof createDatabase>;
 const visibleReview = and(eq(reviews.status, "published"), isNull(reviews.deletedAt));
 
@@ -90,6 +92,19 @@ export async function getLecturerDetailData(db: Database, lecturerId: string) {
     courses: courseRows,
     reviews: reviewRows,
   };
+}
+
+export async function moderateReview(db: Database, input: ModerateReviewInput): Promise<boolean> {
+  const [updated] = await db
+    .update(reviews)
+    .set(
+      input.action === "delete"
+        ? { deletedAt: new Date() }
+        : { status: input.action === "hide" ? "hidden" : "published" },
+    )
+    .where(and(eq(reviews.id, input.reviewId), isNull(reviews.deletedAt)))
+    .returning({ id: reviews.id });
+  return updated !== undefined;
 }
 
 export async function hasReviewReferences(
