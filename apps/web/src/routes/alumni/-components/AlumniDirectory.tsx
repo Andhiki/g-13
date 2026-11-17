@@ -3,15 +3,15 @@ import { RiArrowLeftLine, RiSearchLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import * as Tabs from "@radix-ui/react-tabs";
 import { m, useReducedMotion } from "motion/react";
-import { useLocale } from "../../useLocale";
-import { AlignButton } from "../../ui/button";
-import { Loading } from "../../ui/loading";
-import { AlignKbd } from "../../ui/kbd";
-import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
-import { Typography } from "../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { AlignButton } from "@/ui/button";
+import { Loading } from "@/ui/loading";
+import { AlignKbd } from "@/ui/kbd";
+import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { Typography } from "@/ui/typography";
 import { AlumniDirectoryCard } from "./AlumniDirectoryCard";
-import { filterAlumni, type AlumniDirectoryData } from "./directory";
-import { useAlumniDirectory } from "./useAlumniDirectory";
+import { filterAlumni, type AlumniDirectoryData } from "../-shared/directory";
+import { useAlumniDirectory } from "../-client/useAlumniDirectory";
 
 const allBatches = "semua";
 const tabClassName =

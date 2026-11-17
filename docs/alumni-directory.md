@@ -121,5 +121,5 @@ bun run dev
 
 Then open `/alumni` and `/alumni/all`, and check both desktop and mobile layouts.
 Automated tests cover the sanitisation, URL normalisation and filtering
-logic in [`directory.test.ts`](../../apps/web/src/features/alumni/directory.test.ts);
+logic in [`directory.test.ts`](../../apps/web/src/routes/alumni/-shared/directory.test.ts);
 UI behaviour is verified manually as the contribution guide requires.

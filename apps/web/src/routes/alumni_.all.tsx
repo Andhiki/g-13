@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseStatus } from "@tanstack/react-start/server";
-import { AlumniDirectory } from "../features/alumni/AlumniDirectory";
-import type { AlumniDirectoryData } from "../features/alumni/directory";
+import { AlumniDirectory } from "./alumni/-components/AlumniDirectory";
+import type { AlumniDirectoryData } from "./alumni/-shared/directory";
 import { Loading } from "../ui/loading";
 
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {

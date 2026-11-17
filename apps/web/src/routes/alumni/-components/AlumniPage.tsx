@@ -1,9 +1,9 @@
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { RiLinkedinBoxFill, RiArrowRightLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-import { AlignFancyButton } from "../../ui/fancy-button";
-import { AlignButton } from "../../ui/button";
-import { Typography } from "../../ui/typography";
+import { AlignFancyButton } from "@/ui/fancy-button";
+import { AlignButton } from "@/ui/button";
+import { Typography } from "@/ui/typography";
 
 type AlumniProfile = {
   name: string;

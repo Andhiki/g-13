@@ -1,8 +1,8 @@
 import { RiBriefcaseLine, RiGraduationCapLine, RiLinkedinBoxFill } from "@remixicon/react";
-import { useLocale } from "../../useLocale";
-import { AlignButton } from "../../ui/button";
-import { alumniAvatarTone, alumniInitials, type AlumniCard } from "./directory";
-import { companyLogo } from "./company-logo";
+import { useLocale } from "@/useLocale";
+import { AlignButton } from "@/ui/button";
+import { alumniAvatarTone, alumniInitials, type AlumniCard } from "../-shared/directory";
+import { companyLogo } from "../-shared/company-logo";
 
 export function AlumniDirectoryCard({ alumnus }: { alumnus: AlumniCard }) {
   const { text } = useLocale("alumni");

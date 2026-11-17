@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { collectAlumni } from "../../features/alumni/directory";
+import { collectAlumni } from "../alumni/-shared/directory";
 import {
   alumniCache,
   alumniCdnCache,
   fetchAlumniPages,
   strapiToken,
-} from "../../features/alumni/upstream";
+} from "../alumni/-server/upstream";
 
 export const Route = createFileRoute("/api/alumni")({
   server: {

@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import type { StrapiAlumniResponse } from "./directory";
+import type { StrapiAlumniResponse } from "../-shared/directory";
 
 // Server-only configuration for the alumni directory.
 // The Strapi token is read from the environment at request time and is never

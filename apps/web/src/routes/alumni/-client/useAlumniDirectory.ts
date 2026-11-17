@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { AlumniDirectoryData } from "./directory";
+import type { AlumniDirectoryData } from "../-shared/directory";
 
 export type AlumniDirectoryState =
   | { status: "loading" }
