@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { RiCheckLine, RiCloseLine, RiShieldUserLine } from "@remixicon/react";
 import { canManageUsers, canModerate, type Role } from "@g13/auth";
-import { AlignAvatar } from "../../../ui/avatar";
-import { AlignBadge } from "../../../ui/badge";
-import { AlignFancyButton } from "../../../ui/fancy-button";
-import { AlignSelect } from "../../../ui/select";
-import { Typography } from "../../../ui/typography";
-import type { loadAdminUsers } from "../server/handler";
-import type { AssignRoleInput } from "../shared/schemas";
+import { AlignAvatar } from "@/ui/avatar";
+import { AlignBadge } from "@/ui/badge";
+import { AlignFancyButton } from "@/ui/fancy-button";
+import { AlignSelect } from "@/ui/select";
+import { Typography } from "@/ui/typography";
+import type { loadAdminUsers } from "../-server/handler";
+import type { AssignRoleInput } from "../-shared/schemas";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
 
@@ -24,11 +24,11 @@ export function UserAccessInspector({
   const [role, setRole] = useState<Role>(canModerate(user.role) ? user.role : "maintainer");
   const ownAccount = user.id === identityId;
   const previewRole = ownAccount ? user.role : role;
-  const permissions = [
+  const permissions: Array<[string, boolean]> = [
     ["Moderate reviews", canModerate(previewRole)],
     ["Approve accounts", canManageUsers(previewRole)],
     ["Assign roles", canManageUsers(previewRole)],
-  ] as const;
+  ];
   return (
     <aside
       id="moderation-inspector"

@@ -1,11 +1,11 @@
 import { canModerate } from "@g13/auth";
-import { AlignAvatar } from "../../../ui/avatar";
-import { AlignBadge } from "../../../ui/badge";
-import { AlignButton } from "../../../ui/button";
-import { AlignSelect } from "../../../ui/select";
-import { Typography } from "../../../ui/typography";
-import type { loadAdminUsers } from "../server/handler";
-import type { AssignRoleInput } from "../shared/schemas";
+import { AlignAvatar } from "@/ui/avatar";
+import { AlignBadge } from "@/ui/badge";
+import { AlignButton } from "@/ui/button";
+import { AlignSelect } from "@/ui/select";
+import { Typography } from "@/ui/typography";
+import type { loadAdminUsers } from "../-server/handler";
+import type { AssignRoleInput } from "../-shared/schemas";
 
 type Users = Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
 
@@ -34,7 +34,7 @@ export function AdminUserList({
         <div
           key={user.id}
           data-selected={selectedId === user.id}
-          className="grid grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-warning-lighter xl:data-[selected=true]:hover:bg-warning-lighter md:grid-cols-[minmax(0,1fr)_160px_104px_104px] md:items-center"
+          className="grid grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 md:grid-cols-[minmax(0,1fr)_160px_104px_104px] md:items-center"
         >
           <div className="flex min-w-0 items-center gap-2.5">
             <AlignAvatar.Root size="32" aria-hidden="true" className="text-label-xs">
