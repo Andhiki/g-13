@@ -7,8 +7,10 @@
     {
       "binding": "DB",
       "database_name": "lecturer-reviews",
-      "database_id": "00000000-0000-0000-0000-000000000001"
-    }
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "../../packages/db/migrations",
+      "migrations_pattern": "../../packages/db/migrations/*.sql",
+    },
   ],
   "main": "@tanstack/react-start/server-entry",
   "cache": { "enabled": true },
