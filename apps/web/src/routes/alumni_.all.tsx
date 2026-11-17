@@ -2,15 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseStatus } from "@tanstack/react-start/server";
 import { AlumniDirectory } from "../features/alumni/AlumniDirectory";
+import type { AlumniDirectoryData } from "../features/alumni/directory";
 import { Loading } from "../ui/loading";
 
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
-  const { fetchAlumniPages, strapiToken } = await import("../features/alumni/upstream");
-  const { collectAlumni } = await import("../features/alumni/directory");
-  const token = strapiToken();
+  const { env } = await import("cloudflare:workers");
   try {
-    if (!token) throw new Error("Strapi token not configured");
-    return collectAlumni(await fetchAlumniPages(token));
+    // Service-binding fetches share Workers Cache with browser requests to this endpoint.
+    const response = await env.ALUMNI.fetch("https://alumni.internal/api/alumni");
+    if (!response.ok) throw new Error("Directory unavailable");
+    const data: AlumniDirectoryData = await response.json();
+    return data;
   } catch {
     setResponseStatus(503, "Service Unavailable");
     return null;

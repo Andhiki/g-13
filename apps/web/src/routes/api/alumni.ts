@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { collectAlumni } from "../../features/alumni/directory";
-import { alumniCache, fetchAlumniPages, strapiToken } from "../../features/alumni/upstream";
+import {
+  alumniCache,
+  alumniCdnCache,
+  fetchAlumniPages,
+  strapiToken,
+} from "../../features/alumni/upstream";
 
 export const Route = createFileRoute("/api/alumni")({
   server: {
@@ -18,6 +23,7 @@ export const Route = createFileRoute("/api/alumni")({
           return Response.json(collectAlumni(await fetchAlumniPages(token)), {
             headers: {
               "cache-control": alumniCache,
+              "cdn-cache-control": alumniCdnCache,
               "content-type": "application/json; charset=utf-8",
             },
           });

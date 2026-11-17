@@ -41,7 +41,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Changed
 
 - Menampilkan nama dosen pada judul dialog ulasan, menambahkan ikon pengguna pada nama tampilan, serta menghapus deskripsi pembuka dan bantuan berulang pada mata kuliah, semester, dan pengalaman.
-
+- Mempercepat animasi kontrol, kuis roadmap, dan umpan balik salin serta memperhalus respons tab dan penutupan panel.
 - Merapikan tombol batal dan terbitkan ulasan menjadi selebar konten dan rata kanan di desktop, dengan lebar seimbang di ponsel tetap dipertahankan.
 - Menghapus judul penilaian yang berulang pada formulir ulasan; jarak antarbagian membedakan identitas kuliah dan penilaian tanpa mengganggu keselarasan label dan kontrol.
 - Membatasi formulir ulasan ke detail dosen, menempatkan nama tampilan di awal, serta menyusun label dan kontrol berdampingan di desktop. Mata kuliah dapat dicari dalam dua bahasa dan semester dipilih dari 2021/2022 hingga semester berjalan.
@@ -58,9 +58,14 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-14
 
+#### Changed
+
+- Navigasi alfabet pada direktori alumni kini ringkas saat tidak digunakan dan mengembang saat dihover atau disentuh; mengusap layar pada navigasi langsung mengikuti jari untuk melompat antar huruf.
+
 #### Fixed
 
 - Menyamakan ukuran teks tombol pada ajakan memberi bintang di GitHub dengan teks pesannya.
+- Menggunakan cache data alumni yang sama saat membuka direktori dan mencoba ulang, serta menyajikan data lama saat pembaruan atau sumber data terganggu.
 - Menyembunyikan scrollbar pada tab angkatan alumni tanpa menonaktifkan pengguliran horizontal.
 
 #### Changed

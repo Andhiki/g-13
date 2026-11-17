@@ -1,5 +1,5 @@
 import { expect, spyOn, test } from "bun:test";
-import { alumniCache, fetchAlumniPages, strapiOrigin } from "./upstream";
+import { alumniCache, alumniCdnCache, fetchAlumniPages, strapiOrigin } from "./upstream";
 
 test("Strapi origin falls back to the canonical host for empty or invalid values", () => {
   const original = process.env.STRAPI_ORIGIN;
@@ -58,9 +58,13 @@ test("rejects upstream errors without returning partial pages", async () => {
   }
 });
 
-test("the directory response is cacheable at the edge but revalidates in the browser", () => {
-  expect(alumniCache).toContain("public");
+test("directory policies allow stale serving with separate browser and edge freshness", () => {
   expect(alumniCache).toContain("max-age=300");
-  expect(alumniCache).toContain("s-maxage=3600");
-  expect(alumniCache).toContain("stale-while-revalidate");
+  expect(alumniCdnCache).toContain("max-age=3600");
+  for (const policy of [alumniCache, alumniCdnCache]) {
+    expect(policy).toContain("public");
+    expect(policy).toContain("stale-while-revalidate=86400");
+    expect(policy).toContain("stale-if-error=86400");
+    expect(policy).not.toMatch(/s-maxage|must-revalidate|proxy-revalidate/);
+  }
 });

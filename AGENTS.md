@@ -49,6 +49,8 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 - When aligning lecturer card headers, center the lecturer name, stars, and small action buttons in one row and inspect desktop and mobile screenshots before reporting completion.
 
 - When course records support two languages, store both Indonesian and English names, display the selected language, and search both names regardless of locale.
+
+- When diagnosing caching, reproduce client navigation and retry requests before treating document cache hits as proof the user flow works.
 - When labeling the alumni class tabs, use “All” or “Semua” for the unfiltered tab.
 
 - When acting as a review sub-agent, report findings only; let the parent agent apply fixes.

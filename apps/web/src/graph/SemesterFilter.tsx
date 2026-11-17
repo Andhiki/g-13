@@ -33,7 +33,7 @@ export function SemesterFilter({
           opacity: reducedMotion || entered ? 1 : 0,
         }}
         transition={{
-          duration: reducedMotion ? 0 : 0.45,
+          duration: reducedMotion ? 0 : 0.25,
           ease: [0.16, 1, 0.3, 1],
           opacity: { duration: 0 },
         }}
@@ -48,7 +48,7 @@ export function SemesterFilter({
         animate={{ scaleX: 1, opacity: 1 }}
         onAnimationComplete={() => setEntered(true)}
         transition={
-          reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0.25 }
+          reducedMotion ? { duration: 0 } : { type: "spring", duration: 0.25, bounce: 0.25 }
         }
         className="relative z-10 flex origin-center items-center gap-0.5 rounded-10 bg-bg-white-0 p-1 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 max-[1100px]:min-w-0 max-[1100px]:flex-1"
       >
