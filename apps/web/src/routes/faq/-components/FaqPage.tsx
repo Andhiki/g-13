@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { RiSearchLine } from "@remixicon/react";
-import { useLocale } from "../../useLocale";
-import * as Accordion from "../../ui/accordion";
-import { AlignKbd } from "../../ui/kbd";
-import { AlignLinkButton } from "../../ui/link-button";
-import { Typography } from "../../ui/typography";
+import { useLocale } from "@/useLocale";
+import * as Accordion from "@/ui/accordion";
+import { AlignKbd } from "@/ui/kbd";
+import { AlignLinkButton } from "@/ui/link-button";
+import { Typography } from "@/ui/typography";
 
 const sections = [
   { id: "graduation", title: "Credits & Graduation" },
