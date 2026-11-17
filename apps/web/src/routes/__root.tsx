@@ -11,6 +11,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useRouterState,
   Link,
 } from "@tanstack/react-router";
 import { useMemo, type ReactNode } from "react";
@@ -133,9 +134,12 @@ function ErrorPage({ reset }: { reset: () => void }) {
 }
 
 function AppLayout() {
+  const admin = useRouterState({
+    select: (state) => /^\/admin(?:\/|$)/.test(state.location.pathname),
+  });
   return (
-    <div className="min-h-dvh pt-[var(--app-header-height)]">
-      <AppHeader />
+    <div className={admin ? "h-dvh overflow-hidden" : "min-h-dvh pt-[var(--app-header-height)]"}>
+      {!admin && <AppHeader />}
       <Outlet />
       <Toaster />
     </div>

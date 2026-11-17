@@ -12,11 +12,31 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-17
+
+#### Added
+
+- Menyediakan login GitHub dan antarmuka moderasi terlindungi di `/admin` untuk meninjau, menyembunyikan, memulihkan ulasan tersembunyi, dan menyetujui akun serta menetapkan peran; login tidak memberi hak istimewa otomatis.
+
+#### Changed
+
+- Meratakan posisi vertikal isi baris moderasi dan memusatkan status persetujuan, tanggal bergabung, penilaian, peran, serta aksi sesuai kepala kolom.
+- Membedakan baris terpilih dengan isian hangat berwarna merek yang peka tema tanpa garis aksen, serta menyamakan jarak nama dosen, lencana status, dan metadata mata kuliah.
+- Memindahkan sakelar anonim ke bawah label nama tampilan; kolom tetap terlihat dengan nilai “Anonim” dan ikon samaran saat aktif, sementara draf nama tetap tersimpan dan tidak dikirim pada ulasan anonim.
+
+### 2026-11-16
+
+#### Changed
+
+- Merapikan sidebar moderasi menjadi navigasi tombol dengan wordmark SVG “Moderation”, memindahkan navigasi ponsel ke drawer, membedakan kepala tabel dari sidebar, serta menambahkan tombol buka/tutup panel detail desktop.
+- Memperhalus sorotan baris terpilih, memperjelas hierarki nama dan metadata, serta merapikan gaya aksi moderasi tanpa menyembunyikan label tindakan.
+- Menambatkan paginasi di panel daftar dan tindakan di bagian bawah panel detail, menjaga kepala kolom tetap terlihat saat daftar panjang digulir, serta menyelaraskan status peran akun sendiri dengan pilihan peran.
+
 ### 2026-11-15
 
 #### Added
 
-- Menambahkan fondasi autentikasi GitHub, skema sesi, dan RPC moderasi dengan pemeriksaan sesi serta peran di server. Akun baru tetap tanpa hak istimewa sampai admin menyetujui dan menetapkan peran; ulasan publik tetap dapat diterbitkan tanpa akun. Integrasi rute dan antarmuka masih menunggu tinjauan terpisah; bootstrap admin dan verifikasi CPU Workers tetap menjadi penghalang peluncuran.
+- Menambahkan fondasi autentikasi GitHub, skema sesi, dan RPC moderasi dengan pemeriksaan sesi serta peran di server. Akun baru tetap tanpa hak istimewa sampai admin menyetujui dan menetapkan peran; ulasan publik tetap dapat diterbitkan tanpa akun. Bootstrap admin dan verifikasi CPU Workers tetap menjadi penghalang peluncuran.
 
 #### Changed
 
@@ -29,8 +49,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Mempertahankan warna tombol dan pilihan saat memakai tipografi ringkas, sehingga penyesuaian ukuran teks tidak menghapus warna aksi atau status.
 - Menggunakan popover AlignUI untuk panduan penilaian dosen agar posisi mengikuti ruang layar, dapat ditutup dengan Escape atau klik di luar, dan fokus kembali ke tombol info.
-
 - Mengembalikan sakelar anonim yang aktif secara bawaan pada formulir ulasan; nama tampilan wajib diisi hanya saat mode anonim dimatikan.
 - Meringkas tombol, pencarian, filter, dan pilihan menu pada direktori, detail, serta formulir ulasan dosen menggunakan ukuran kontrol kecil; tombol tulis ulasan tetap memakai gaya FancyButton dengan teks kecil.
 - Menyeragamkan pilihan pengurutan dosen dan ulasan dengan filter mata kuliah memakai komponen seleksi yang sama, termasuk ukuran teks menu, animasi panah, serta sorotan hover dan fokus.

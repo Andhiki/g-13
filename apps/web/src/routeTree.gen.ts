@@ -10,20 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LecturersRouteImport } from './routes/lecturers'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
 import { Route as ApiAlumniRouteImport } from './routes/api/alumni'
 import { Route as LecturersIndexRouteImport } from './routes/lecturers.index'
 import { Route as LecturersLecturerIdRouteImport } from './routes/lecturers.$lecturerId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlumniRoute = AlumniRouteImport.update({
@@ -44,6 +52,11 @@ const FaqRoute = FaqRouteImport.update({
 const LecturersRoute = LecturersRouteImport.update({
   id: '/lecturers',
   path: '/lecturers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -76,97 +89,123 @@ const LecturersLecturerIdRoute = LecturersLecturerIdRouteImport.update({
   path: '/$lecturerId',
   getParentRoute: () => LecturersRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
   '/lecturers': typeof LecturersRouteWithChildren
+  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
   '/lecturers/': typeof LecturersIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
   '/lecturers': typeof LecturersIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
   '/lecturers': typeof LecturersRouteWithChildren
+  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni_/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
   '/lecturers/': typeof LecturersIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/alumni'
     | '/exam'
     | '/faq'
     | '/lecturers'
+    | '/login'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
     | '/lecturers/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/alumni'
     | '/exam'
     | '/faq'
+    | '/login'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
     | '/lecturers'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/alumni'
     | '/exam'
     | '/faq'
     | '/lecturers'
+    | '/login'
     | '/resources'
     | '/roadmap'
     | '/alumni_/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
     | '/lecturers/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
   FaqRoute: typeof FaqRoute
   LecturersRoute: typeof LecturersRouteWithChildren
+  LoginRoute: typeof LoginRoute
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
   AlumniAllRoute: typeof AlumniAllRoute
   ApiAlumniRoute: typeof ApiAlumniRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -176,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alumni': {
@@ -204,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/lecturers'
       fullPath: '/lecturers'
       preLoaderRoute: typeof LecturersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -248,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturersLecturerIdRouteImport
       parentRoute: typeof LecturersRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,14 +327,17 @@ const LecturersRouteWithChildren = LecturersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
   FaqRoute: FaqRoute,
   LecturersRoute: LecturersRouteWithChildren,
+  LoginRoute: LoginRoute,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
   AlumniAllRoute: AlumniAllRoute,
   ApiAlumniRoute: ApiAlumniRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

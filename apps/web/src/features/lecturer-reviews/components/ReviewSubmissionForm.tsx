@@ -1,7 +1,7 @@
 import { Typography } from "../../../ui/typography";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { RiArrowRightLine, RiUserLine } from "@remixicon/react";
+import { RiArrowRightLine, RiSpyLine, RiUserLine } from "@remixicon/react";
 import { AlignSelect } from "../../../ui/select";
 import * as AlignSwitch from "../../../ui/switch";
 import { AlignFancyButton } from "../../../ui/fancy-button";
@@ -93,6 +93,7 @@ export function ReviewSubmissionForm({
         {text(errors[name])}
       </Typography>
     );
+  const AuthorIcon = anonymous ? RiSpyLine : RiUserLine;
   return (
     <form
       ref={form}
@@ -106,7 +107,7 @@ export function ReviewSubmissionForm({
           courseId,
           termLabel,
           anonymous,
-          authorName,
+          authorName: anonymous ? "" : authorName,
           body,
           ...ratings,
         };
@@ -163,11 +164,9 @@ export function ReviewSubmissionForm({
               <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
                 {text("1–80 characters. Avoid personal information.")}
               </Typography>
-            </div>
-            <div>
               <label
                 htmlFor="review-anonymous"
-                className="mb-2 flex min-h-9 cursor-pointer items-center gap-3 text-paragraph-sm"
+                className="mt-2 flex min-h-9 cursor-pointer items-center gap-3 text-paragraph-sm sm:mt-1"
               >
                 <AlignSwitch.Root
                   id="review-anonymous"
@@ -179,16 +178,18 @@ export function ReviewSubmissionForm({
                 />
                 {text("Publish as Anonymous")}
               </label>
+            </div>
+            <div className="sm:pt-11">
               <div
                 className={`flex min-h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:outline-2 focus-within:outline-primary-base ${anonymous ? "cursor-not-allowed opacity-50" : ""}`}
               >
-                <RiUserLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
+                <AuthorIcon aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
                 <input
                   id="review-author"
                   className="min-h-9 min-w-0 w-full bg-transparent py-1.5 text-base outline-none disabled:cursor-not-allowed sm:text-paragraph-sm"
                   name="authorName"
                   maxLength={80}
-                  value={authorName}
+                  value={anonymous ? text("Anonymous") : authorName}
                   disabled={anonymous}
                   required={!anonymous}
                   {...errorProps("authorName")}

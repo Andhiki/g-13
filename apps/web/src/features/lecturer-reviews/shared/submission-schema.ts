@@ -36,5 +36,6 @@ export const submissionInputSchema = z
   })
   .transform((value): ReviewSubmission => ({
     ...value,
-    authorName: typeof value.authorName === "string" ? value.authorName.trim() : "",
+    authorName:
+      !value.anonymous && typeof value.authorName === "string" ? value.authorName.trim() : "",
   }));

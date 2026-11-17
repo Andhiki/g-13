@@ -21,6 +21,13 @@ it("validates required fields, integer ratings, limits and anonymous names", () 
   expect(
     submissionInputSchema.parse({ ...rawInput, anonymous: true, authorName: 42 }).authorName,
   ).toBe("");
+  expect(
+    submissionInputSchema.parse({
+      ...rawInput,
+      anonymous: true,
+      authorName: "Remembered display name",
+    }).authorName,
+  ).toBe("");
   for (const patch of [
     { clarity: 0 },
     { support: 6 },
@@ -30,6 +37,7 @@ it("validates required fields, integer ratings, limits and anonymous names", () 
     { body: "x".repeat(1001) },
     { termLabel: "" },
     { authorName: "" },
+    { authorName: "x".repeat(81) },
     { anonymous: "true" },
   ]) {
     expect(submissionInputSchema.safeParse({ ...rawInput, ...patch }).success).toBe(false);

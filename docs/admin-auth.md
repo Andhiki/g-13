@@ -6,10 +6,10 @@ Implementation for [#27](https://github.com/Andhiki/g-13/issues/27), following
 maintainer's subsequent approval of first-time signup supersede older login and
 onboarding proposals in the research notes.
 
-This backend commit contains the auth factory, schema, request authorization,
-and moderation RPCs. Login/admin screens, client integration, and the
-`/api/auth/$` route with its generated registration remain uncommitted pending
-UI review; the access behavior below describes the combined implementation.
+The implementation contains the auth factory, schema, request authorization,
+moderation RPCs, GitHub OAuth route, login page, protected `/admin` interface,
+and client integration. The access behavior below describes the complete
+implementation.
 
 ## Access
 

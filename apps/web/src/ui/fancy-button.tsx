@@ -1,7 +1,11 @@
 // Adapted from AlignUI FancyButton v0.0.0. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ComponentProps } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { tv } from "tailwind-variants";
+import { createTV } from "tailwind-variants";
+
+const tv = createTV({
+  twMergeConfig: { extend: { classGroups: { "font-size": ["text-label-sm", "text-label-xs"] } } },
+});
 
 const fancyButton = tv({
   base: [
