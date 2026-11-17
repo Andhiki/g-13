@@ -1,5 +1,13 @@
-import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
+  Link,
+  useRouter,
+  type AbsoluteToPath,
+  type RegisteredRouter,
+} from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  type RemixiconComponentType,
   RiChatCheckLine,
   RiCloseLine,
   RiExternalLinkLine,
@@ -7,16 +15,22 @@ import {
   RiLogoutBoxLine,
   RiMenuLine,
 } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
-import { AlignDrawer } from "../../../ui/drawer";
-import { AlignTabMenuVertical as Tabs } from "../../../ui/tab-menu-vertical";
+import { AlignButton } from "@/ui/button";
+import { AlignDrawer } from "@/ui/drawer";
+import { Typography } from "@/ui/typography";
+import { authClient } from "@/routes/-auth/client/auth";
 import { ModerationWordmark } from "./ModerationWordmark";
 
-type Section = "reviews" | "users";
+type ModerationSection = {
+  to: AbsoluteToPath<RegisteredRouter, string>;
+  label: string;
+  Icon: RemixiconComponentType;
+};
+
 const sections = [
-  { value: "reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
-  { value: "users", label: "User access", Icon: RiGroupLine },
-] as const;
+  { to: "/admin/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
+  { to: "/admin/users", label: "User access", Icon: RiGroupLine },
+] satisfies ModerationSection[];
 
 function Brand() {
   return (
@@ -36,13 +50,26 @@ function Brand() {
   );
 }
 
-function NavigationFooter({
-  onSignOut,
-  mobile = false,
-}: {
-  onSignOut: () => void;
-  mobile?: boolean;
-}) {
+function NavigationFooter({ mobile = false }: { mobile?: boolean }) {
+  const [signOutError, setSignOutError] = useState(false);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  async function signOut() {
+    setSignOutError(false);
+    try {
+      const result = await authClient.signOut();
+      if (result.error) {
+        setSignOutError(true);
+        return;
+      }
+      queryClient.clear();
+      await router.navigate({ to: "/login" });
+    } catch {
+      setSignOutError(true);
+    }
+  }
+
   const publicLink = (
     <AlignButton.Root
       asChild
@@ -57,68 +84,58 @@ function NavigationFooter({
       </Link>
     </AlignButton.Root>
   );
-  const signOut = (
+  const signOutButton = (
     <AlignButton.Root
       variant="neutral"
       mode="ghost"
       size="xsmall"
       className="w-full justify-start gap-2 px-2 text-label-xs"
-      onClick={onSignOut}
+      onClick={() => void signOut()}
     >
       <RiLogoutBoxLine className="size-4" />
       Sign out
     </AlignButton.Root>
   );
+
   return (
     <div className="mt-auto space-y-1 pt-4">
       {mobile ? <AlignDrawer.Close asChild>{publicLink}</AlignDrawer.Close> : publicLink}
-      {mobile ? <AlignDrawer.Close asChild>{signOut}</AlignDrawer.Close> : signOut}
+      {signOutButton}
+      {signOutError && (
+        <Typography role="alert" variant="caption" className="px-2 text-error-base">
+          Sign-out failed. Try again.
+        </Typography>
+      )}
     </div>
   );
 }
 
-export function ModerationSidebar({
-  manager,
-  onSignOut,
-}: {
-  manager: boolean;
-  onSignOut: () => void;
-}) {
+export function ModerationSidebar({ manager }: { manager: boolean }) {
   return (
     <aside className="hidden w-[224px] shrink-0 flex-col px-2 py-3 md:flex">
       <div className="px-2">
         <Brand />
       </div>
-      <Tabs.List aria-label="Moderation sections" className="mt-5 space-y-0.5">
+      <nav aria-label="Moderation sections" className="mt-5 space-y-0.5">
         {sections
-          .filter((section) => manager || section.value !== "users")
-          .map(({ value, label, Icon }) => (
-            <Tabs.Trigger
-              key={value}
-              value={value}
-              className="h-8 gap-2 rounded-md px-2 text-label-xs data-[state=active]:bg-bg-soft-200"
+          .filter((section) => manager || section.to !== "/admin/users")
+          .map(({ to, label, Icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-label-xs text-text-sub-600 hover:bg-bg-weak-50 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:text-text-strong-950"
             >
               <Icon className="size-4" />
               {label}
-            </Tabs.Trigger>
+            </Link>
           ))}
-      </Tabs.List>
-      <NavigationFooter onSignOut={onSignOut} />
+      </nav>
+      <NavigationFooter />
     </aside>
   );
 }
 
-export function MobileModerationMenu({
-  manager,
-  section,
-  onSelect,
-  onSignOut,
-}: {
-  manager: boolean;
-  section: string;
-  onSelect: (section: Section) => void;
-  onSignOut: () => void;
-}) {
+export function MobileModerationMenu({ manager }: { manager: boolean }) {
   return (
     <AlignDrawer.Root>
       <AlignDrawer.Trigger asChild>
@@ -154,24 +171,20 @@ export function MobileModerationMenu({
         <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-3 pb-4">
           <nav aria-label="Moderation sections" className="space-y-1">
             {sections
-              .filter((item) => manager || item.value !== "users")
-              .map(({ value, label, Icon }) => (
-                <AlignDrawer.Close asChild key={value}>
-                  <AlignButton.Root
-                    variant="neutral"
-                    mode="ghost"
-                    size="small"
-                    aria-pressed={section === value}
-                    className="w-full justify-start gap-2 px-2 text-label-xs aria-pressed:bg-bg-soft-200 aria-pressed:text-text-strong-950"
-                    onClick={() => onSelect(value)}
+              .filter((section) => manager || section.to !== "/admin/users")
+              .map(({ to, label, Icon }) => (
+                <AlignDrawer.Close asChild key={to}>
+                  <Link
+                    to={to}
+                    className="flex h-10 w-full items-center gap-2 rounded-md px-2 text-label-xs text-text-sub-600 hover:bg-bg-weak-50 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:text-text-strong-950"
                   >
                     <Icon className="size-4" />
                     {label}
-                  </AlignButton.Root>
+                  </Link>
                 </AlignDrawer.Close>
               ))}
           </nav>
-          <NavigationFooter mobile onSignOut={onSignOut} />
+          <NavigationFooter mobile />
         </AlignDrawer.Body>
       </AlignDrawer.Content>
     </AlignDrawer.Root>
