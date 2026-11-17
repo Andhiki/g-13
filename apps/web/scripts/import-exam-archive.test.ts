@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { normalizeArchive, parseCourses, parseFolder } from "./import-exam-archive";
-import type { ExamCourse } from "../src/features/exam-archive/contracts";
+import type { ExamCourse } from "@/routes/exam/-shared/contracts";
 
 const pdf = (id: string, name: string) => ({
   id,

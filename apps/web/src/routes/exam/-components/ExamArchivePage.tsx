@@ -1,5 +1,5 @@
 import { PaperPreview } from "./PaperPreview";
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -9,16 +9,16 @@ import {
   RiArrowRightSLine,
   RiSearchLine,
 } from "@remixicon/react";
-import { AlignBreadcrumb } from "../../ui/breadcrumb";
-import { AlignBadge } from "../../ui/badge";
-import { AlignKbd } from "../../ui/kbd";
-import { Typography } from "../../ui/typography";
-import { browseArchive, prepareCourseSearch, resolveArchive } from "./archive";
-import { folderSearch } from "./search";
-import { examArchive } from "./catalog";
-import { archiveUpdatedAt } from "./metadata";
-import { Route } from "../../routes/exam";
-import type { ArchiveLocation } from "./contracts";
+import { AlignBreadcrumb } from "@/ui/breadcrumb";
+import { AlignBadge } from "@/ui/badge";
+import { AlignKbd } from "@/ui/kbd";
+import { Typography } from "@/ui/typography";
+import { browseArchive, prepareCourseSearch, resolveArchive } from "../-shared/archive";
+import { folderSearch } from "../-shared/search";
+import { examArchive } from "../-shared/catalog";
+import { archiveUpdatedAt } from "../-shared/metadata";
+import { Route } from "@/routes/exam";
+import type { ArchiveLocation } from "../-shared/contracts";
 
 function ExamBadge({ exam }: { exam: "UTS" | "UAS" }) {
   const { text } = useLocale("exam");

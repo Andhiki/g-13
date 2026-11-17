@@ -1,7 +1,7 @@
-import { useSharedLink } from "../../ui/use-shared-link";
-import { useLocale } from "../../useLocale";
-import { AlignTooltip } from "../../ui/tooltip";
-import { toast, SuccessToast } from "../../ui/toast";
+import { useSharedLink } from "@/ui/use-shared-link";
+import { useLocale } from "@/useLocale";
+import { AlignTooltip } from "@/ui/tooltip";
+import { toast, SuccessToast } from "@/ui/toast";
 import { useRef } from "react";
 import {
   RiCheckLine,
@@ -10,11 +10,11 @@ import {
   RiFileCopyLine,
   RiDriveLine,
 } from "@remixicon/react";
-import { AlignButton, buttonVariants } from "../../ui/button";
-import { AlignModal } from "../../ui/modal";
-import { Typography } from "../../ui/typography";
-import { paperLinks } from "./archive";
-import type { ExamPaper, ArchiveLocation } from "./contracts";
+import { AlignButton, buttonVariants } from "@/ui/button";
+import { AlignModal } from "@/ui/modal";
+import { Typography } from "@/ui/typography";
+import { paperLinks } from "../-shared/archive";
+import type { ExamPaper, ArchiveLocation } from "../-shared/contracts";
 import type { RefObject } from "react";
 
 export function PaperPreview({
