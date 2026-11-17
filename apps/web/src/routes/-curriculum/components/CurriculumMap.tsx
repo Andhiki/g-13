@@ -1,5 +1,5 @@
-import { useLocale } from "../../../useLocale";
-import { Typography } from "../../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { Typography } from "@/ui/typography";
 import {
   useCallback,
   useContext,
@@ -21,16 +21,16 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 import type { CurriculumId } from "@g13/curriculum";
-import { AlignFancyButton } from "../../../ui/fancy-button";
-import { EdgeRouting, routedEdgeTypes } from "../../../graph/EdgeRouting";
-import { CourseNode, LaneNode } from "../../../graph/MapNodes";
-import { GraphOrigin, MotionGraph } from "../../../graph/MotionGraph";
-import { GraphFocus } from "../../../graph/GraphFocus";
-import { ZoomControls } from "../../../graph/ZoomControls";
-import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../../graph/model";
-import { courseLayout } from "../../../courses/layout";
-import { isCore } from "../../../courses/course-utils";
-import { mapConnections } from "../../../graph/map-connections";
+import { AlignFancyButton } from "@/ui/fancy-button";
+import { EdgeRouting, routedEdgeTypes } from "@/graph/EdgeRouting";
+import { CourseNode, LaneNode } from "@/graph/MapNodes";
+import { GraphOrigin, MotionGraph } from "@/graph/MotionGraph";
+import { GraphFocus } from "@/graph/GraphFocus";
+import { ZoomControls } from "@/graph/ZoomControls";
+import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "@/graph/model";
+import { courseLayout } from "@/courses/layout";
+import { isCore } from "@/courses/course-utils";
+import { mapConnections } from "@/graph/map-connections";
 
 const nodeTypes: NodeTypes = { course: CourseNode, lane: LaneNode };
 

@@ -1,7 +1,7 @@
-import { useLocale } from "../../../useLocale";
+import { useLocale } from "@/useLocale";
 import { RiListUnordered, RiNodeTree } from "@remixicon/react";
-import { AlignTooltip } from "../../../ui/tooltip";
-import { AlignButton } from "../../../ui/button";
+import { AlignTooltip } from "@/ui/tooltip";
+import { AlignButton } from "@/ui/button";
 
 export function ViewSwitch({
   view,

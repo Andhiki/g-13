@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { getCurriculum, getRelations, isCurriculumId, type CurriculumId } from "@g13/curriculum";
-import { getPreparedMap } from "./prepared-maps";
+import { getPreparedMap } from "../shared/prepared-maps";
 
 const route = getRouteApi("/");
 

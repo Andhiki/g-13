@@ -1,17 +1,17 @@
-import { useLocale } from "../../useLocale";
-import { Typography } from "../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { Typography } from "@/ui/typography";
 import { useCallback, useRef, useState, type CSSProperties } from "react";
-import { courseLayout } from "../../courses/layout";
-import { CourseDetails } from "../../courses/CourseDetails";
-import { CurriculumVersionFilter } from "./components/CourseFilters";
-import { CourseList } from "./components/CourseList";
-import { CourseSearch } from "./components/CourseSearch";
-import { CurriculumMap } from "./components/CurriculumMap";
-import { SemesterFilter } from "../../graph/SemesterFilter";
-import { ViewSwitch } from "./components/ViewSwitch";
-import { Overlay } from "../../graph/Overlay";
-import { useCurriculumExplorer } from "./useCurriculumExplorer";
-import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
+import { courseLayout } from "@/courses/layout";
+import { CourseDetails } from "@/courses/CourseDetails";
+import { CurriculumVersionFilter } from "./CourseFilters";
+import { CourseList } from "./CourseList";
+import { CourseSearch } from "./CourseSearch";
+import { CurriculumMap } from "./CurriculumMap";
+import { SemesterFilter } from "@/graph/SemesterFilter";
+import { ViewSwitch } from "./ViewSwitch";
+import { Overlay } from "@/graph/Overlay";
+import { useCurriculumExplorer } from "../client/useCurriculumExplorer";
+import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
 
 export function CurriculumPage() {
   const { text } = useLocale();

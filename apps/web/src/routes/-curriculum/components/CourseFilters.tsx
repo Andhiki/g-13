@@ -1,6 +1,6 @@
-import { useLocale } from "../../../useLocale";
-import { Typography } from "../../../ui/typography";
-import * as SegmentedControl from "../../../ui/segmented-control";
+import { useLocale } from "@/useLocale";
+import { Typography } from "@/ui/typography";
+import * as SegmentedControl from "@/ui/segmented-control";
 import { listCurricula, type CurriculumId } from "@g13/curriculum";
 
 export function CurriculumVersionFilter({

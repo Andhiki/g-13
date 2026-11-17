@@ -1,10 +1,10 @@
 import type { Edge } from "@xyflow/react";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
-import { mapCourseState } from "../../graph/map-state";
-import { assignedCoreSemester, isCore } from "../../courses/course-utils";
-import { semesterRelations } from "../../graph/semester-relations";
+import { mapCourseState } from "@/graph/map-state";
+import { assignedCoreSemester, isCore } from "@/courses/course-utils";
+import { semesterRelations } from "@/graph/semester-relations";
 
-import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "../../graph/model";
+import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "@/graph/model";
 const CHOICE_COLUMNS = 8;
 const CHOICE_ROWS = 6;
 const ROW_STEP = 120;

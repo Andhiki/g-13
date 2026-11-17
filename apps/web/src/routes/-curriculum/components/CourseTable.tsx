@@ -1,12 +1,12 @@
-import { useLocale } from "../../../useLocale";
-import { CopyCourseButton } from "../../../courses/CopyCourseButton";
-import { Typography } from "../../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { CopyCourseButton } from "@/courses/CopyCourseButton";
+import { Typography } from "@/ui/typography";
 import { useId } from "react";
-import { AlignBadge } from "../../../ui/badge";
-import { AlignButton } from "../../../ui/button";
-import { AlignTable } from "../../../ui/table";
-import { courseLabels, semesterLabel } from "../../../courses/course-utils";
-import type { CourseSection } from "../list-groups";
+import { AlignBadge } from "@/ui/badge";
+import { AlignButton } from "@/ui/button";
+import { AlignTable } from "@/ui/table";
+import { courseLabels, semesterLabel } from "@/courses/course-utils";
+import type { CourseSection } from "../shared/list-groups";
 
 export function CourseTable({
   section,

@@ -1,8 +1,8 @@
-import { useLocale } from "../../../useLocale";
-import { Typography } from "../../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { Typography } from "@/ui/typography";
 import { useEffect, useMemo } from "react";
 import type { Course } from "@g13/curriculum";
-import { groupCoursesForList } from "../list-groups";
+import { groupCoursesForList } from "../shared/list-groups";
 import { CourseTable } from "./CourseTable";
 
 export function CourseList({
