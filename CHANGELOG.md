@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-18
+
+#### Changed
+
+- Menata kode halaman, validasi, layanan, kueri, dan tes di sekitar rute masing-masing tanpa mengubah perilaku aplikasi.
+
 ### 2026-11-17
 
 #### Added

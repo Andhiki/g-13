@@ -10,47 +10,8 @@ For browser preview failures caused by missing Linux libraries, see [docs/browse
 
 ## Lessons
 
-- When adding a popover, reuse the AlignUI primitive instead of implementing positioning, dismissal, and focus management manually.
-
-- When form labels are self-explanatory, omit redundant helper copy and put lecturer context in the review dialog title.
-
-- When reordering form fields, preserve existing explicit anonymity controls and submission semantics unless the user asks to change them.
-
-- When grouping review rating rows, use spacing and consistent label/control alignment rather than a redundant heading that competes with field labels.
-
-- When laying out dense review forms, place labels/help beside controls on desktop and display name first, with lecturer identity supplied by its detail page.
-
-- When building reusable empty states, expose left, center, and right alignment and center the lecturer review empty state.
-
-- When compacting a CTA, retain the requested FancyButton component and adjust its typography and size rather than replacing its visual style.
-
-- When adjacent controls both select one value, use the same selection primitive so menu typography, caret motion, and hover behavior stay consistent.
-
-- When building information-dense lecturer screens, use existing compact control variants and avoid forced large trigger or menu-item heights.
-
-- When placing filter and sort controls together, match rendered font family, size, weight, and color instead of relying on each primitive's defaults.
-
-- When using static imports in TanStack server handlers, keep server-only
-  references inside handler bodies and keep request-dependent work out of module
-  initialization.
-
-- When a server-backed web feature grows, follow [docs/web-feature-structure.md](docs/web-feature-structure.md) and add only layers with real responsibilities.
-
-- When writing environment examples, comment only non-obvious defaults and secret requirements, using short lines.
-
-- When implementing review RPCs, validate untrusted input with Zod, keep SQL in repositories and business rules in services, and extract cryptographic identity hashing into a named function.
-
-- When tightening lecturer detail layouts, reduce desktop padding and section gaps while preserving mobile spacing.
-
-- When a lecturer detail name feels too dominant, use the subtitle1 style while keeping the semantic h1.
-
-- When naming the review domain, use lecturer (dosen) throughout schema, APIs, routes, modules, and copy; professor denotes a rank rather than every lecturer.
-
-- When aligning lecturer card headers, center the lecturer name, stars, and small action buttons in one row and inspect desktop and mobile screenshots before reporting completion.
-
-- When course records support two languages, store both Indonesian and English names, display the selected language, and search both names regardless of locale.
-
 - When diagnosing caching, reproduce client navigation and retry requests before treating document cache hits as proof the user flow works.
+
 - When labeling the alumni class tabs, use “All” or “Semua” for the unfiltered tab.
 
 - When acting as a review sub-agent, report findings only; let the parent agent apply fixes.

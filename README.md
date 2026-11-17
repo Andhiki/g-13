@@ -72,8 +72,8 @@ first. Before `bun run dev`, build the curriculum package once with
 
 ## Where to find things
 
-- `apps/web/src/features/` — website features, including the course map,
-  roadmap, and exam archive.
+- `apps/web/src/routes/` — route entries and colocated feature code in ignored
+  `-` folders, including the course map, roadmap, and exam archive.
 - `apps/web/src/ui/` — shared buttons, dialogs, and other interface pieces.
 - `packages/curriculum/src/curricula/` — data and rules for each curriculum.
 - `packages/curriculum/src/contracts/` — shared descriptions of the data’s shape.
