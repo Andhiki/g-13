@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -18,10 +18,13 @@ import { Route as LecturersRouteImport } from './routes/lecturers'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
 import { Route as ApiAlumniRouteImport } from './routes/api/alumni'
 import { Route as LecturersIndexRouteImport } from './routes/lecturers.index'
 import { Route as LecturersLecturerIdRouteImport } from './routes/lecturers.$lecturerId'
+import { Route as AdminLecturerReviewsIndexRouteImport } from './routes/admin/lecturer-reviews/index'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,7 +32,7 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
@@ -69,6 +72,11 @@ const RoadmapRoute = RoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AlumniAllRoute = AlumniAllRouteImport.update({
   id: '/alumni_/all',
   path: '/alumni/all',
@@ -89,6 +97,17 @@ const LecturersLecturerIdRoute = LecturersLecturerIdRouteImport.update({
   path: '/$lecturerId',
   getParentRoute: () => LecturersRoute,
 } as any)
+const AdminLecturerReviewsIndexRoute =
+  AdminLecturerReviewsIndexRouteImport.update({
+    id: '/lecturer-reviews/',
+    path: '/lecturer-reviews/',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -97,7 +116,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
@@ -108,12 +127,14 @@ export interface FileRoutesByFullPath {
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/lecturers/': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/lecturer-reviews/': typeof AdminLecturerReviewsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
@@ -123,13 +144,16 @@ export interface FileRoutesByTo {
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/admin': typeof AdminIndexRoute
   '/lecturers': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/lecturer-reviews': typeof AdminLecturerReviewsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
@@ -140,8 +164,11 @@ export interface FileRoutesById {
   '/alumni_/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/lecturers/': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/lecturer-reviews/': typeof AdminLecturerReviewsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,12 +185,14 @@ export interface FileRouteTypes {
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
+    | '/admin/'
     | '/lecturers/'
     | '/api/auth/$'
+    | '/admin/lecturer-reviews/'
+    | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/alumni'
     | '/exam'
     | '/faq'
@@ -173,8 +202,11 @@ export interface FileRouteTypes {
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
+    | '/admin'
     | '/lecturers'
     | '/api/auth/$'
+    | '/admin/lecturer-reviews'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -189,13 +221,16 @@ export interface FileRouteTypes {
     | '/alumni_/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
+    | '/admin/'
     | '/lecturers/'
     | '/api/auth/$'
+    | '/admin/lecturer-reviews/'
+    | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
   FaqRoute: typeof FaqRoute
@@ -221,7 +256,7 @@ declare module '@tanstack/react-router' {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alumni': {
@@ -273,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/alumni_/all': {
       id: '/alumni_/all'
       path: '/alumni/all'
@@ -301,6 +343,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturersLecturerIdRouteImport
       parentRoute: typeof LecturersRoute
     }
+    '/admin/lecturer-reviews/': {
+      id: '/admin/lecturer-reviews/'
+      path: '/lecturer-reviews'
+      fullPath: '/admin/lecturer-reviews/'
+      preLoaderRoute: typeof AdminLecturerReviewsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -310,6 +366,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminLecturerReviewsIndexRoute: typeof AdminLecturerReviewsIndexRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminLecturerReviewsIndexRoute: AdminLecturerReviewsIndexRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface LecturersRouteChildren {
   LecturersLecturerIdRoute: typeof LecturersLecturerIdRoute
@@ -327,7 +399,7 @@ const LecturersRouteWithChildren = LecturersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
   FaqRoute: FaqRoute,
