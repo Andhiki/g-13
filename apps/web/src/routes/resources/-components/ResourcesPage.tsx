@@ -1,7 +1,7 @@
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { RiExternalLinkLine } from "@remixicon/react";
-import { AlignLinkButton } from "../../ui/link-button";
-import { Typography } from "../../ui/typography";
+import { AlignLinkButton } from "@/ui/link-button";
+import { Typography } from "@/ui/typography";
 
 const resources = [
   {
