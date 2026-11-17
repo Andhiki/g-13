@@ -1,14 +1,14 @@
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { defaultCurriculumId } from "@g13/curriculum";
-import { Typography } from "../../ui/typography";
+import { Typography } from "@/ui/typography";
 import { useState } from "react";
-import { AlignButton } from "../../ui/button";
-import { AlignModal } from "../../ui/modal";
-import { AlignSelect } from "../../ui/select";
-import { creditsFor, requirementText, sourceLocation } from "../../courses/course-utils";
-import type { PlannedCourse, Roadmap } from "./planner";
-import { electiveOptions } from "./options";
-import type { RoadmapSearch } from "./search";
+import { AlignButton } from "@/ui/button";
+import { AlignModal } from "@/ui/modal";
+import { AlignSelect } from "@/ui/select";
+import { creditsFor, requirementText, sourceLocation } from "@/courses/course-utils";
+import type { PlannedCourse, Roadmap } from "../-shared/planner";
+import { electiveOptions } from "../-shared/options";
+import type { RoadmapSearch } from "../-shared/search";
 
 export function ElectiveReplacement({
   item,

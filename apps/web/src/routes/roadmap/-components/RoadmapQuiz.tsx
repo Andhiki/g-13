@@ -1,15 +1,15 @@
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { RiArrowLeftLine, RiCornerDownLeftLine } from "@remixicon/react";
-import { Typography } from "../../ui/typography";
+import { Typography } from "@/ui/typography";
 import { useEffect, useRef } from "react";
-import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
 import { m, useReducedMotion } from "motion/react";
-import { AlignKbd } from "../../ui/kbd";
-import { AlignButton } from "../../ui/button";
-import { answerQuestion, questionIndex, quizQuestions } from "./quiz";
-import { validateRoadmapSearch, type RoadmapSearch } from "./search";
-import { noteRoadmapCreated } from "../../ui/star-nudge";
-import { showStarNudgeToast } from "../../ui/star-nudge-toast";
+import { AlignKbd } from "@/ui/kbd";
+import { AlignButton } from "@/ui/button";
+import { answerQuestion, questionIndex, quizQuestions } from "../-shared/quiz";
+import { validateRoadmapSearch, type RoadmapSearch } from "../-shared/search";
+import { noteRoadmapCreated } from "@/ui/star-nudge";
+import { showStarNudgeToast } from "@/ui/star-nudge-toast";
 
 export function RoadmapQuiz({
   answers,

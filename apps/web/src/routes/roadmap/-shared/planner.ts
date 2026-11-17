@@ -5,7 +5,7 @@ import {
   type Course,
   type Relation,
 } from "@g13/curriculum";
-import { assignedCoreSemester, creditsFor } from "../../courses/course-utils";
+import { assignedCoreSemester, creditsFor } from "@/courses/course-utils";
 import { type PlanningInput } from "./planning-input";
 import { electiveOptions } from "./options";
 import { planActivities } from "./activities";

@@ -1,12 +1,12 @@
-import { useSharedLink } from "../../ui/use-shared-link";
-import { useLocale } from "../../useLocale";
-import { AlignTooltip } from "../../ui/tooltip";
-import { toast, SuccessToast } from "../../ui/toast";
+import { useSharedLink } from "@/ui/use-shared-link";
+import { useLocale } from "@/useLocale";
+import { AlignTooltip } from "@/ui/tooltip";
+import { toast, SuccessToast } from "@/ui/toast";
 import { m, useReducedMotion } from "motion/react";
-import { Typography } from "../../ui/typography";
+import { Typography } from "@/ui/typography";
 import { RiShareLine, RiCheckLine } from "@remixicon/react";
-import { AlignModal } from "../../ui/modal";
-import { AlignButton } from "../../ui/button";
+import { AlignModal } from "@/ui/modal";
+import { AlignButton } from "@/ui/button";
 
 export function RoadmapShare({ selection }: { selection: string }) {
   const { text } = useLocale("roadmap");

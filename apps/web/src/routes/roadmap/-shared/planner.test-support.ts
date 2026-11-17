@@ -1,4 +1,4 @@
-import { createI18n } from "../../i18n";
+import { createI18n } from "@/i18n";
 import { loadMessages } from "@g13/i18n/messages";
 import { courseTitle } from "@g13/i18n";
 import { planningInput } from "./planning-input";

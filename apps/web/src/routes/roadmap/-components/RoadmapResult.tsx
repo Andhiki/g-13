@@ -1,22 +1,22 @@
 import { RoadmapShare } from "./RoadmapShare";
-import { useLocale } from "../../useLocale";
+import { useLocale } from "@/useLocale";
 import { getCurriculum } from "@g13/curriculum";
-import { Typography } from "../../ui/typography";
+import { Typography } from "@/ui/typography";
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiFilter3Line } from "@remixicon/react";
-import { Overlay } from "../../graph/Overlay";
-import { SemesterFilter } from "../../graph/SemesterFilter";
+import { Overlay } from "@/graph/Overlay";
+import { SemesterFilter } from "@/graph/SemesterFilter";
 import { RoadmapFilters } from "./RoadmapFilters";
 import { RoadmapNotes } from "./RoadmapNotes";
-import { buttonVariants } from "../../ui/button";
-import { CourseDetails } from "../../courses/CourseDetails";
-import { getRoadmap } from "./roadmap-cache";
+import { buttonVariants } from "@/ui/button";
+import { CourseDetails } from "@/courses/CourseDetails";
+import { getRoadmap } from "../-shared/roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
-import { useKeyboardShortcuts } from "../../ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
 import { ElectiveReplacement } from "./ElectiveReplacement";
-import type { PlanningInput } from "./planning-input";
-import type { RoadmapSearch } from "./search";
+import type { PlanningInput } from "../-shared/planning-input";
+import type { RoadmapSearch } from "../-shared/search";
 
 const kinds = {
   required: "Wajib",

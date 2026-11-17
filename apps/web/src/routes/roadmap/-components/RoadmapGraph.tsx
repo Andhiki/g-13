@@ -1,8 +1,8 @@
 import { RiRefreshLine } from "@remixicon/react";
-import { mapCourseState } from "../../graph/map-state";
-import { useLocale } from "../../useLocale";
-import { AlignButton } from "../../ui/button";
-import { Typography } from "../../ui/typography";
+import { mapCourseState } from "@/graph/map-state";
+import { useLocale } from "@/useLocale";
+import { AlignButton } from "@/ui/button";
+import { Typography } from "@/ui/typography";
 import {
   createContext,
   useContext,
@@ -13,21 +13,21 @@ import {
   type ReactNode,
 } from "react";
 import { Background, BackgroundVariant, useReactFlow, type NodeProps } from "@xyflow/react";
-import { ZoomControls } from "../../graph/ZoomControls";
-import { MotionGraph } from "../../graph/MotionGraph";
-import { GraphFocus } from "../../graph/GraphFocus";
-import { EdgeRouting, routedEdgeTypes } from "../../graph/EdgeRouting";
-import { CourseNode, LaneNode } from "../../graph/MapNodes";
-import { mapConnections } from "../../graph/map-connections";
-import { LANE_X, LANE_STEP, LANE_WIDTH } from "../../graph/model";
-import { courseLayout } from "../../courses/layout";
-import type { Roadmap } from "./planner";
+import { ZoomControls } from "@/graph/ZoomControls";
+import { MotionGraph } from "@/graph/MotionGraph";
+import { GraphFocus } from "@/graph/GraphFocus";
+import { EdgeRouting, routedEdgeTypes } from "@/graph/EdgeRouting";
+import { CourseNode, LaneNode } from "@/graph/MapNodes";
+import { mapConnections } from "@/graph/map-connections";
+import { LANE_X, LANE_STEP, LANE_WIDTH } from "@/graph/model";
+import { courseLayout } from "@/courses/layout";
+import type { Roadmap } from "../-shared/planner";
 import {
   getRoadmapGraph,
   type ActivityNode,
   type TitleNode,
   type RoadmapNode,
-} from "./graph-layout";
+} from "../-shared/graph-layout";
 
 const RoadmapTitleContext = createContext<{
   heading: RefObject<HTMLHeadingElement | null>;

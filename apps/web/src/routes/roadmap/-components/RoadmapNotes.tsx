@@ -1,11 +1,11 @@
-import { useLocale } from "../../useLocale";
-import { AlignTooltip } from "../../ui/tooltip";
-import { Typography } from "../../ui/typography";
+import { useLocale } from "@/useLocale";
+import { AlignTooltip } from "@/ui/tooltip";
+import { Typography } from "@/ui/typography";
 import { RiInformationLine } from "@remixicon/react";
-import { AlignButton } from "../../ui/button";
-import { AlignModal } from "../../ui/modal";
-import { formatConflict } from "./conflict-format";
-import type { Roadmap } from "./planner";
+import { AlignButton } from "@/ui/button";
+import { AlignModal } from "@/ui/modal";
+import { formatConflict } from "../-shared/conflict-format";
+import type { Roadmap } from "../-shared/planner";
 
 export function RoadmapNotes({
   plan,

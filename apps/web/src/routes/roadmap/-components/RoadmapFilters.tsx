@@ -1,8 +1,8 @@
-import { useLocale } from "../../useLocale";
-import { Typography } from "../../ui/typography";
-import * as SegmentedControl from "../../ui/segmented-control";
-import { AlignSelect } from "../../ui/select";
-import type { RoadmapSearch } from "./search";
+import { useLocale } from "@/useLocale";
+import { Typography } from "@/ui/typography";
+import * as SegmentedControl from "@/ui/segmented-control";
+import { AlignSelect } from "@/ui/select";
+import type { RoadmapSearch } from "../-shared/search";
 
 export function RoadmapFilters({
   answers,

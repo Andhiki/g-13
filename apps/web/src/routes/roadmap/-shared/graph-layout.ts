@@ -1,9 +1,9 @@
 import type { Language } from "@g13/i18n";
 import type { Edge, Node } from "@xyflow/react";
-import { mapCourseState } from "../../graph/map-state";
-import { semesterRelations } from "../../graph/semester-relations";
-import { creditsFor, isCore } from "../../courses/course-utils";
-import { LANE_X, LANE_STEP, type MapNode } from "../../graph/model";
+import { mapCourseState } from "@/graph/map-state";
+import { semesterRelations } from "@/graph/semester-relations";
+import { creditsFor, isCore } from "@/courses/course-utils";
+import { LANE_X, LANE_STEP, type MapNode } from "@/graph/model";
 import { lastPlanningSemester } from "./schedule";
 import type { Activity, Roadmap } from "./planner";
 

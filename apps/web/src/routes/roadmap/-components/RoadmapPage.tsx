@@ -1,10 +1,10 @@
 import { lazy, useEffect, useRef } from "react";
-import { DeferredContent } from "../../ui/deferred-content";
-import { Route } from "../../routes/roadmap";
-import { planningInput } from "./planning-input";
+import { DeferredContent } from "@/ui/deferred-content";
+import { Route } from "@/routes/roadmap";
+import { planningInput } from "../-shared/planning-input";
 import { RoadmapQuiz } from "./RoadmapQuiz";
-import { Loading } from "../../ui/loading";
-import { validateRoadmapSearch, type RoadmapSearch } from "./search";
+import { Loading } from "@/ui/loading";
+import { validateRoadmapSearch, type RoadmapSearch } from "../-shared/search";
 
 const RoadmapResult = lazy(() =>
   import("./RoadmapResult").then((module) => ({ default: module.RoadmapResult })),

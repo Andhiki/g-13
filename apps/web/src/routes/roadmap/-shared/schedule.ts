@@ -1,5 +1,5 @@
 import { getAcademicRules, type Relation } from "@g13/curriculum";
-import { creditsFor } from "../../courses/course-utils";
+import { creditsFor } from "@/courses/course-utils";
 import type { Activity, PlannedCourse } from "./planner";
 import type { PlanningInput } from "./planning-input";
 

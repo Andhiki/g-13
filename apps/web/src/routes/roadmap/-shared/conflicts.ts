@@ -1,5 +1,5 @@
 import { getAcademicRules, getCurriculum } from "@g13/curriculum";
-import { creditsFor } from "../../courses/course-utils";
+import { creditsFor } from "@/courses/course-utils";
 import { planningLimit } from "./schedule";
 import type { Course } from "@g13/curriculum";
 import type { Roadmap } from "./planner";
