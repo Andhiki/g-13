@@ -3,7 +3,7 @@ import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import type { QueryClient } from "@tanstack/react-query";
 import type { Auth } from "@g13/auth/server";
-import { loadAdminIdentity } from "../server/handler";
+import { loadAdminIdentity } from "../server/identity";
 
 export const authClient = createAuthClient({ plugins: [inferAdditionalFields<Auth>()] });
 

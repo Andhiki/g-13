@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { RiGithubFill } from "@remixicon/react";
 import { canModerate } from "@g13/auth";
-import { AlignFancyButton } from "../../../ui/fancy-button";
-import { AlignButton } from "../../../ui/button";
-import { Typography } from "../../../ui/typography";
-import { authClient } from "../client/auth";
-import type { loadAdminIdentity } from "../server/handler";
+import { AlignFancyButton } from "@/ui/fancy-button";
+import { AlignButton } from "@/ui/button";
+import { Typography } from "@/ui/typography";
+import { authClient } from "@/routes/-auth/client/auth";
+import type { loadAdminIdentity } from "@/routes/-auth/server/identity";
 
 type Identity = Awaited<ReturnType<typeof loadAdminIdentity>>;
 
@@ -20,7 +20,10 @@ export function LoginPage({ identity }: { identity: Identity }) {
     setPending(true);
     setError(false);
     try {
-      const result = await authClient.signIn.social({ provider: "github", callbackURL: "/admin" });
+      const result = await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/admin/lecturer-reviews",
+      });
       if (result.error) {
         setError(true);
         setPending(false);
@@ -44,7 +47,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
       <div className="mt-6 flex flex-wrap items-center gap-3">
         {approved ? (
           <AlignFancyButton.Root asChild className="h-9 text-label-xs">
-            <Link to="/admin">Open admin</Link>
+            <Link to="/admin/lecturer-reviews">Open admin</Link>
           </AlignFancyButton.Root>
         ) : (
           !identity && (

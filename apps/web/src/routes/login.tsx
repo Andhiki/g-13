@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAdminIdentity } from "../features/admin/client/auth";
-import { LoginPage } from "../features/admin/components/LoginPage";
+import { getAdminIdentity } from "./-auth/client/auth";
+import { LoginPage } from "./login/-components/LoginPage";
 import { Typography } from "../ui/typography";
 
 export const Route = createFileRoute("/login")({

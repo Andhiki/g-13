@@ -1,16 +1,12 @@
-import { fileURLToPath } from "node:url";
 import { expect, it, spyOn } from "bun:test";
-import { getPlatformProxy } from "wrangler";
 import { z } from "zod";
 import { createAuth } from "@g13/auth/server";
 import { authRateLimits, authSession, authUser, createDatabase } from "@g13/db";
 import { eq } from "drizzle-orm";
+import { createTestPlatformProxy } from "@/test/database";
 
 it("creates only unprivileged GitHub accounts and rejects forged OAuth state", async () => {
-  const platform = await getPlatformProxy<{ DB: D1Database }>({
-    configPath: fileURLToPath(new URL("../../../../wrangler.jsonc", import.meta.url)),
-    persist: false,
-  });
+  const platform = await createTestPlatformProxy();
   let githubId = 12345;
   let githubEmail = "github@example.test";
   const realFetch = globalThis.fetch;
@@ -42,15 +38,6 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
   );
   const mockFetch = spyOn(globalThis, "fetch").mockImplementation(fetchFixture);
   try {
-    const schema = await Bun.file(
-      new URL("../../../../../../packages/db/schema.sql", import.meta.url),
-    ).text();
-    for (const statement of schema
-      .split(";")
-      .map((part) => part.trim())
-      .filter(Boolean)) {
-      await platform.env.DB.prepare(statement).run();
-    }
     const db = createDatabase(platform.env.DB);
     const auth = createAuth(db, {
       secret: crypto.randomUUID(),
