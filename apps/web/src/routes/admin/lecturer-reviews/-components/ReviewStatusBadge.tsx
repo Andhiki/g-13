@@ -1,4 +1,4 @@
-import { AlignBadge } from "../../../ui/badge";
+import { AlignBadge } from "@/ui/badge";
 
 export function ReviewStatusBadge({
   status,

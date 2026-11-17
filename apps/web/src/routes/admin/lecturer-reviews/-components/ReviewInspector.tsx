@@ -5,11 +5,11 @@ import {
   RiEyeOffLine,
   RiLockLine,
 } from "@remixicon/react";
-import { AlignButton } from "../../../ui/button";
-import { AlignProgressBar } from "../../../ui/progress-bar";
-import { Typography } from "../../../ui/typography";
-import type { loadModerationReviews } from "../server/handler";
-import type { ModerateReviewInput } from "../../lecturer-reviews/shared/moderation";
+import { AlignButton } from "@/ui/button";
+import { AlignProgressBar } from "@/ui/progress-bar";
+import { Typography } from "@/ui/typography";
+import type { loadModerationReviews } from "../-server/handler";
+import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
 
 type Review = Awaited<ReturnType<typeof loadModerationReviews>>["rows"][number];

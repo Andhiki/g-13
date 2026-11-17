@@ -1,10 +1,10 @@
 import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine } from "@remixicon/react";
-import { AlignBadge } from "../../../ui/badge";
-import { AlignButton } from "../../../ui/button";
-import { AlignProgressBar } from "../../../ui/progress-bar";
-import { Typography } from "../../../ui/typography";
-import type { loadModerationReviews } from "../server/handler";
-import type { ModerateReviewInput } from "../../lecturer-reviews/shared/moderation";
+import { AlignBadge } from "@/ui/badge";
+import { AlignButton } from "@/ui/button";
+import { AlignProgressBar } from "@/ui/progress-bar";
+import { Typography } from "@/ui/typography";
+import type { loadModerationReviews } from "../-server/handler";
+import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
 
 type Review = Awaited<ReturnType<typeof loadModerationReviews>>["rows"][number];
@@ -26,7 +26,7 @@ export function AdminReviewRow({
   return (
     <article
       data-selected={selected}
-      className="grid gap-3 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(150px,0.9fr)_minmax(0,2fr)_184px_160px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-warning-lighter xl:data-[selected=true]:hover:bg-warning-lighter"
+      className="grid gap-3 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(150px,0.9fr)_minmax(0,2fr)_184px_160px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16"
     >
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 lg:flex lg:flex-col lg:items-start lg:gap-1.5">
         <Typography as="h3" variant="label" className="min-w-0 font-semibold">
