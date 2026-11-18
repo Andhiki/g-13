@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memindahkan halaman moderasi ke `/dashboard` dan halaman login ke `/dashboard/login`; login tetap dapat diakses tanpa autentikasi.
 - Menata kode halaman, validasi, layanan, kueri, dan tes di sekitar rute masing-masing tanpa mengubah perilaku aplikasi.
 
 ### 2026-11-17

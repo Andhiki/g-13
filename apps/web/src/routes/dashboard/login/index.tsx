@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAdminIdentity } from "./-auth/client/auth";
-import { LoginPage } from "./login/-components/LoginPage";
-import { Typography } from "../ui/typography";
+import { getAdminIdentity } from "@/routes/-auth/client/auth";
+import { LoginPage } from "./-components/LoginPage";
+import { Typography } from "@/ui/typography";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/dashboard/login/")({
   head: () => ({
     meta: [{ title: "Admin sign-in" }, { name: "robots", content: "noindex, nofollow" }],
   }),

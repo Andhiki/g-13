@@ -16,9 +16,9 @@ import { AdminPagination } from "../-components/AdminPagination";
 import { AdminUserList } from "./-components/AdminUserList";
 import { UserAccessInspector } from "./-components/UserAccessInspector";
 
-export const Route = createFileRoute("/admin/users/")({
+export const Route = createFileRoute("/dashboard/_authenticated/users/")({
   beforeLoad: ({ context }) => {
-    if (!canManageUsers(context.identity.role)) throw redirect({ to: "/admin/lecturer-reviews" });
+    if (!canManageUsers(context.identity.role)) throw redirect({ to: "/dashboard/lecturer-reviews" });
   },
   loader: ({ context }) => context.queryClient.fetchQuery(adminUsersQuery()),
   component: AdminUsersPage,

@@ -16,7 +16,10 @@ export const loadAdminUsers = createServerFn({ method: "GET" })
       inspectUsers(createDatabase(env.DB), session.user, data.offset, data.status),
     );
     if (result.error !== null) rejectUserOperation(result.error);
-    return result.data;
+    return {
+      ...result.data,
+      identity: { id: session.user.id, name: session.user.name, role: session.user.role },
+    };
   });
 
 export const changeUserRole = createServerFn({ method: "POST" })

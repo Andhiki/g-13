@@ -134,12 +134,14 @@ function ErrorPage({ reset }: { reset: () => void }) {
 }
 
 function AppLayout() {
-  const admin = useRouterState({
-    select: (state) => /^\/admin(?:\/|$)/.test(state.location.pathname),
+  const dashboard = useRouterState({
+    select: (state) => /^\/dashboard(?:\/(?!login(?:\/|$))|$)/.test(state.location.pathname),
   });
   return (
-    <div className={admin ? "h-dvh overflow-hidden" : "min-h-dvh pt-[var(--app-header-height)]"}>
-      {!admin && <AppHeader />}
+    <div
+      className={dashboard ? "h-dvh overflow-hidden" : "min-h-dvh pt-[var(--app-header-height)]"}
+    >
+      {!dashboard && <AppHeader />}
       <Outlet />
       <Toaster />
     </div>

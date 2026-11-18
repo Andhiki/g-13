@@ -10,36 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AlumniRouteImport } from './routes/alumni'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LecturersRouteImport } from './routes/lecturers'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AlumniAllRouteImport } from './routes/alumni_.all'
 import { Route as ApiAlumniRouteImport } from './routes/api/alumni'
+import { Route as DashboardAuthenticatedRouteRouteImport } from './routes/dashboard/_authenticated/route'
 import { Route as LecturersIndexRouteImport } from './routes/lecturers.index'
 import { Route as LecturersLecturerIdRouteImport } from './routes/lecturers.$lecturerId'
-import { Route as AdminLecturerReviewsIndexRouteImport } from './routes/admin/lecturer-reviews/index'
-import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardAuthenticatedIndexRouteImport } from './routes/dashboard/_authenticated/index'
+import { Route as DashboardLoginIndexRouteImport } from './routes/dashboard/login/index'
+import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from './routes/dashboard/_authenticated/lecturer-reviews/index'
+import { Route as DashboardAuthenticatedUsersIndexRouteImport } from './routes/dashboard/_authenticated/users/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AlumniRoute = AlumniRouteImport.update({
   id: '/alumni',
   path: '/alumni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamRoute = ExamRouteImport.update({
@@ -57,11 +58,6 @@ const LecturersRoute = LecturersRouteImport.update({
   path: '/lecturers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -71,11 +67,6 @@ const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AlumniAllRoute = AlumniAllRouteImport.update({
   id: '/alumni_/all',
@@ -87,6 +78,11 @@ const ApiAlumniRoute = ApiAlumniRouteImport.update({
   path: '/api/alumni',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAuthenticatedRouteRoute =
+  DashboardAuthenticatedRouteRouteImport.update({
+    id: '/_authenticated',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const LecturersIndexRoute = LecturersIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -97,145 +93,158 @@ const LecturersLecturerIdRoute = LecturersLecturerIdRouteImport.update({
   path: '/$lecturerId',
   getParentRoute: () => LecturersRoute,
 } as any)
-const AdminLecturerReviewsIndexRoute =
-  AdminLecturerReviewsIndexRouteImport.update({
-    id: '/lecturer-reviews/',
-    path: '/lecturer-reviews/',
-    getParentRoute: () => AdminRouteRoute,
-  } as any)
-const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAuthenticatedIndexRoute =
+  DashboardAuthenticatedIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
+const DashboardLoginIndexRoute = DashboardLoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAuthenticatedLecturerReviewsIndexRoute =
+  DashboardAuthenticatedLecturerReviewsIndexRouteImport.update({
+    id: '/lecturer-reviews/',
+    path: '/lecturer-reviews/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
+const DashboardAuthenticatedUsersIndexRoute =
+  DashboardAuthenticatedUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
   '/lecturers': typeof LecturersRouteWithChildren
-  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
-  '/admin/': typeof AdminIndexRoute
   '/lecturers/': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/lecturer-reviews/': typeof AdminLecturerReviewsIndexRoute
-  '/admin/users/': typeof AdminUsersIndexRoute
+  '/dashboard/': typeof DashboardAuthenticatedIndexRoute
+  '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardAuthenticatedIndexRoute
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
-  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
   '/alumni/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
-  '/admin': typeof AdminIndexRoute
   '/lecturers': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/lecturer-reviews': typeof AdminLecturerReviewsIndexRoute
-  '/admin/users': typeof AdminUsersIndexRoute
+  '/dashboard/login': typeof DashboardLoginIndexRoute
+  '/dashboard/lecturer-reviews': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/users': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/alumni': typeof AlumniRoute
   '/exam': typeof ExamRoute
   '/faq': typeof FaqRoute
   '/lecturers': typeof LecturersRouteWithChildren
-  '/login': typeof LoginRoute
   '/resources': typeof ResourcesRoute
   '/roadmap': typeof RoadmapRoute
+  '/dashboard/_authenticated': typeof DashboardAuthenticatedRouteRouteWithChildren
   '/alumni_/all': typeof AlumniAllRoute
   '/api/alumni': typeof ApiAlumniRoute
   '/lecturers/$lecturerId': typeof LecturersLecturerIdRoute
-  '/admin/': typeof AdminIndexRoute
   '/lecturers/': typeof LecturersIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/lecturer-reviews/': typeof AdminLecturerReviewsIndexRoute
-  '/admin/users/': typeof AdminUsersIndexRoute
+  '/dashboard/_authenticated/': typeof DashboardAuthenticatedIndexRoute
+  '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/_authenticated/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/_authenticated/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
+    | '/dashboard'
     | '/alumni'
     | '/exam'
     | '/faq'
     | '/lecturers'
-    | '/login'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
-    | '/admin/'
     | '/lecturers/'
     | '/api/auth/$'
-    | '/admin/lecturer-reviews/'
-    | '/admin/users/'
+    | '/dashboard/'
+    | '/dashboard/login/'
+    | '/dashboard/lecturer-reviews/'
+    | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/alumni'
     | '/exam'
     | '/faq'
-    | '/login'
     | '/resources'
     | '/roadmap'
     | '/alumni/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
-    | '/admin'
     | '/lecturers'
     | '/api/auth/$'
-    | '/admin/lecturer-reviews'
-    | '/admin/users'
+    | '/dashboard/login'
+    | '/dashboard/lecturer-reviews'
+    | '/dashboard/users'
   id:
     | '__root__'
     | '/'
-    | '/admin'
+    | '/dashboard'
     | '/alumni'
     | '/exam'
     | '/faq'
     | '/lecturers'
-    | '/login'
     | '/resources'
     | '/roadmap'
+    | '/dashboard/_authenticated'
     | '/alumni_/all'
     | '/api/alumni'
     | '/lecturers/$lecturerId'
-    | '/admin/'
     | '/lecturers/'
     | '/api/auth/$'
-    | '/admin/lecturer-reviews/'
-    | '/admin/users/'
+    | '/dashboard/_authenticated/'
+    | '/dashboard/login/'
+    | '/dashboard/_authenticated/lecturer-reviews/'
+    | '/dashboard/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AlumniRoute: typeof AlumniRoute
   ExamRoute: typeof ExamRoute
   FaqRoute: typeof FaqRoute
   LecturersRoute: typeof LecturersRouteWithChildren
-  LoginRoute: typeof LoginRoute
   ResourcesRoute: typeof ResourcesRoute
   RoadmapRoute: typeof RoadmapRoute
   AlumniAllRoute: typeof AlumniAllRoute
@@ -252,18 +261,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/alumni': {
       id: '/alumni'
       path: '/alumni'
       fullPath: '/alumni'
       preLoaderRoute: typeof AlumniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exam': {
@@ -287,13 +296,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -307,13 +309,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/roadmap'
       preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
     }
     '/alumni_/all': {
       id: '/alumni_/all'
@@ -329,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAlumniRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/_authenticated': {
+      id: '/dashboard/_authenticated'
+      path: ''
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardAuthenticatedRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/lecturers/': {
       id: '/lecturers/'
       path: '/'
@@ -343,20 +345,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturersLecturerIdRouteImport
       parentRoute: typeof LecturersRoute
     }
-    '/admin/lecturer-reviews/': {
-      id: '/admin/lecturer-reviews/'
-      path: '/lecturer-reviews'
-      fullPath: '/admin/lecturer-reviews/'
-      preLoaderRoute: typeof AdminLecturerReviewsIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/users/': {
-      id: '/admin/users/'
-      path: '/users'
-      fullPath: '/admin/users/'
-      preLoaderRoute: typeof AdminUsersIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -364,23 +352,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/_authenticated/': {
+      id: '/dashboard/_authenticated/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardAuthenticatedIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
+    '/dashboard/login/': {
+      id: '/dashboard/login/'
+      path: '/login'
+      fullPath: '/dashboard/login/'
+      preLoaderRoute: typeof DashboardLoginIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/_authenticated/lecturer-reviews/': {
+      id: '/dashboard/_authenticated/lecturer-reviews/'
+      path: '/lecturer-reviews'
+      fullPath: '/dashboard/lecturer-reviews/'
+      preLoaderRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
+    '/dashboard/_authenticated/users/': {
+      id: '/dashboard/_authenticated/users/'
+      path: '/users'
+      fullPath: '/dashboard/users/'
+      preLoaderRoute: typeof DashboardAuthenticatedUsersIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
   }
 }
 
-interface AdminRouteRouteChildren {
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminLecturerReviewsIndexRoute: typeof AdminLecturerReviewsIndexRoute
-  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
+interface DashboardAuthenticatedRouteRouteChildren {
+  DashboardAuthenticatedIndexRoute: typeof DashboardAuthenticatedIndexRoute
+  DashboardAuthenticatedLecturerReviewsIndexRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  DashboardAuthenticatedUsersIndexRoute: typeof DashboardAuthenticatedUsersIndexRoute
 }
 
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminIndexRoute: AdminIndexRoute,
-  AdminLecturerReviewsIndexRoute: AdminLecturerReviewsIndexRoute,
-  AdminUsersIndexRoute: AdminUsersIndexRoute,
+const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRouteChildren =
+  {
+    DashboardAuthenticatedIndexRoute: DashboardAuthenticatedIndexRoute,
+    DashboardAuthenticatedLecturerReviewsIndexRoute:
+      DashboardAuthenticatedLecturerReviewsIndexRoute,
+    DashboardAuthenticatedUsersIndexRoute:
+      DashboardAuthenticatedUsersIndexRoute,
+  }
+
+const DashboardAuthenticatedRouteRouteWithChildren =
+  DashboardAuthenticatedRouteRoute._addFileChildren(
+    DashboardAuthenticatedRouteRouteChildren,
+  )
+
+interface DashboardRouteRouteChildren {
+  DashboardAuthenticatedRouteRoute: typeof DashboardAuthenticatedRouteRouteWithChildren
+  DashboardLoginIndexRoute: typeof DashboardLoginIndexRoute
 }
 
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardAuthenticatedRouteRoute:
+    DashboardAuthenticatedRouteRouteWithChildren,
+  DashboardLoginIndexRoute: DashboardLoginIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
 )
 
 interface LecturersRouteChildren {
@@ -399,12 +434,11 @@ const LecturersRouteWithChildren = LecturersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AlumniRoute: AlumniRoute,
   ExamRoute: ExamRoute,
   FaqRoute: FaqRoute,
   LecturersRoute: LecturersRouteWithChildren,
-  LoginRoute: LoginRoute,
   ResourcesRoute: ResourcesRoute,
   RoadmapRoute: RoadmapRoute,
   AlumniAllRoute: AlumniAllRoute,

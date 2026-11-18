@@ -17,7 +17,7 @@ import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminReviewRow } from "./-components/AdminReviewRow";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
-export const Route = createFileRoute("/admin/lecturer-reviews/")({
+export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews/")({
   loader: ({ context }) => context.queryClient.fetchQuery(moderationReviewsQuery()),
   component: LecturerReviewsPage,
 });

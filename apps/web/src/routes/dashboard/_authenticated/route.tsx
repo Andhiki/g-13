@@ -1,17 +1,17 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { canManageUsers, canModerate } from "@g13/auth";
-import { getAdminIdentity } from "../-auth/client/auth";
+import { getAdminIdentity } from "../../-auth/client/auth";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
 import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
 import { Typography } from "@/ui/typography";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/dashboard/_authenticated")({
   head: () => ({
     meta: [{ title: "Moderation" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   beforeLoad: async ({ context }) => {
     const identity = await getAdminIdentity(context.queryClient);
-    if (!identity || !canModerate(identity.role)) throw redirect({ to: "/login" });
+    if (!identity || !canModerate(identity.role)) throw redirect({ to: "/dashboard/login" });
     return { identity };
   },
   errorComponent: () => (

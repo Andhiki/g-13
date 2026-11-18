@@ -28,8 +28,8 @@ type ModerationSection = {
 };
 
 const sections = [
-  { to: "/admin/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
-  { to: "/admin/users", label: "User access", Icon: RiGroupLine },
+  { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
+  { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
 ] satisfies ModerationSection[];
 
 function Brand() {
@@ -64,7 +64,7 @@ function NavigationFooter({ mobile = false }: { mobile?: boolean }) {
         return;
       }
       queryClient.clear();
-      await router.navigate({ to: "/login" });
+      await router.navigate({ to: "/dashboard/login" });
     } catch {
       setSignOutError(true);
     }
@@ -118,7 +118,7 @@ export function ModerationSidebar({ manager }: { manager: boolean }) {
       </div>
       <nav aria-label="Moderation sections" className="mt-5 space-y-0.5">
         {sections
-          .filter((section) => manager || section.to !== "/admin/users")
+          .filter((section) => manager || section.to !== "/dashboard/users")
           .map(({ to, label, Icon }) => (
             <Link
               key={to}
@@ -171,7 +171,7 @@ export function MobileModerationMenu({ manager }: { manager: boolean }) {
         <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-3 pb-4">
           <nav aria-label="Moderation sections" className="space-y-1">
             {sections
-              .filter((section) => manager || section.to !== "/admin/users")
+              .filter((section) => manager || section.to !== "/dashboard/users")
               .map(({ to, label, Icon }) => (
                 <AlignDrawer.Close asChild key={to}>
                   <Link

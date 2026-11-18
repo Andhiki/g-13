@@ -17,7 +17,10 @@ export const loadModerationReviews = createServerFn({ method: "GET" })
       inspectReviews(createDatabase(env.DB), session.user, data.offset, data.status),
     );
     if (result.error !== null) rejectModerationOperation(result.error);
-    return result.data;
+    return {
+      ...result.data,
+      identity: { id: session.user.id, name: session.user.name, role: session.user.role },
+    };
   });
 
 export const changeReviewVisibility = createServerFn({ method: "POST" })

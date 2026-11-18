@@ -22,7 +22,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
     try {
       const result = await authClient.signIn.social({
         provider: "github",
-        callbackURL: "/admin/lecturer-reviews",
+        callbackURL: "/dashboard/lecturer-reviews",
       });
       if (result.error) {
         setError(true);
@@ -47,7 +47,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
       <div className="mt-6 flex flex-wrap items-center gap-3">
         {approved ? (
           <AlignFancyButton.Root asChild className="h-9 text-label-xs">
-            <Link to="/admin/lecturer-reviews">Open admin</Link>
+            <Link to="/dashboard/lecturer-reviews">Open admin</Link>
           </AlignFancyButton.Root>
         ) : (
           !identity && (

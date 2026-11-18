@@ -55,7 +55,7 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
         },
         body: JSON.stringify({
           provider: "github",
-          callbackURL: "/admin",
+          callbackURL: "/dashboard/lecturer-reviews",
           additionalData: { role: "admin" },
         }),
       }),
@@ -84,7 +84,7 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
       ),
     );
     expect(callback.status).toBe(302);
-    expect(callback.headers.get("location")).toBe("/admin");
+    expect(callback.headers.get("location")).toBe("/dashboard/lecturer-reviews");
     const [user] = await db.select().from(authUser);
     expect(user.role).toBe("user");
     expect(user.emailVerified).toBe(true);
@@ -110,7 +110,7 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
           origin: "https://untrusted.example.test",
           cookie: sessionCookies,
         },
-        body: JSON.stringify({ provider: "github", callbackURL: "/admin" }),
+        body: JSON.stringify({ provider: "github", callbackURL: "/dashboard/lecturer-reviews" }),
       }),
     );
     expect(untrusted.status).toBe(403);
@@ -134,7 +134,7 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
           origin: "http://localhost:3000",
           "cf-connecting-ip": "192.0.2.3",
         },
-        body: JSON.stringify({ provider: "github", callbackURL: "/admin" }),
+        body: JSON.stringify({ provider: "github", callbackURL: "/dashboard/lecturer-reviews" }),
       }),
     );
     const linkingData = z.object({ url: z.string() }).parse(await linkingAttempt.json());
@@ -164,7 +164,7 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
             origin: "http://localhost:3000",
             "cf-connecting-ip": "192.0.2.2",
           },
-          body: JSON.stringify({ provider: "github", callbackURL: "/admin" }),
+          body: JSON.stringify({ provider: "github", callbackURL: "/dashboard/lecturer-reviews" }),
         }),
       );
       expect(limited.status).toBe(attempt < 10 ? 200 : 429);
