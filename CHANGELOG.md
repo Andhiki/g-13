@@ -17,6 +17,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 #### Changed
 
 - Memindahkan halaman moderasi ke `/dashboard` dan halaman login ke `/dashboard/login`; login tetap dapat diakses tanpa autentikasi.
+- Mengalihkan permintaan dashboard tanpa cookie sesi langsung ke login; RPC terlindungi tetap memeriksa sesi dan peran terbaru di server.
 - Menata kode halaman, validasi, layanan, kueri, dan tes di sekitar rute masing-masing tanpa mengubah perilaku aplikasi.
 
 ### 2026-11-17

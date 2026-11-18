@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
 import { RiChatCheckLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
@@ -18,12 +18,20 @@ import { AdminReviewRow } from "./-components/AdminReviewRow";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
 export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews/")({
-  loader: ({ context }) => context.queryClient.fetchQuery(moderationReviewsQuery()),
+  loader: async ({ context }) => {
+    try {
+      return await context.queryClient.fetchQuery(moderationReviewsQuery());
+    } catch (error) {
+      if (error instanceof Response && (error.status === 401 || error.status === 403))
+        throw redirect({ to: "/dashboard/login" });
+      throw error;
+    }
+  },
   component: LecturerReviewsPage,
 });
 
 function LecturerReviewsPage() {
-  const { identity } = Route.useRouteContext();
+  const { identity } = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<ReviewStatus>("all");

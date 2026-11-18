@@ -1,18 +1,13 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { canManageUsers, canModerate } from "@g13/auth";
-import { getAdminIdentity } from "../../-auth/client/auth";
+import { createFileRoute, isMatch, Outlet, redirect, useMatches } from "@tanstack/react-router";
+import { canManageUsers } from "@g13/auth";
+import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
 import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
 import { Typography } from "@/ui/typography";
 
 export const Route = createFileRoute("/dashboard/_authenticated")({
-  head: () => ({
-    meta: [{ title: "Moderation" }, { name: "robots", content: "noindex, nofollow" }],
-  }),
-  beforeLoad: async ({ context }) => {
-    const identity = await getAdminIdentity(context.queryClient);
-    if (!identity || !canModerate(identity.role)) throw redirect({ to: "/dashboard/login" });
-    return { identity };
+  beforeLoad: () => {
+    if (hasDashboardSessionCookie() === false) throw redirect({ to: "/dashboard/login" });
   },
   errorComponent: () => (
     <main className="mx-auto max-w-xl px-5 py-12">
@@ -25,7 +20,9 @@ export const Route = createFileRoute("/dashboard/_authenticated")({
 });
 
 function AdminLayout() {
-  const { identity } = Route.useRouteContext();
+  const identityMatch = useMatches().find((match) => isMatch(match, "loaderData.identity"));
+  const identity = identityMatch?.loaderData?.identity;
+  if (!identity) return <Outlet />;
   return (
     <AdminLayoutProvider>
       <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">

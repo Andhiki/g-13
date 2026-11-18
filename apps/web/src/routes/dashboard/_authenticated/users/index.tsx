@@ -17,15 +17,22 @@ import { AdminUserList } from "./-components/AdminUserList";
 import { UserAccessInspector } from "./-components/UserAccessInspector";
 
 export const Route = createFileRoute("/dashboard/_authenticated/users/")({
-  beforeLoad: ({ context }) => {
-    if (!canManageUsers(context.identity.role)) throw redirect({ to: "/dashboard/lecturer-reviews" });
+  loader: async ({ context }) => {
+    try {
+      return await context.queryClient.fetchQuery(adminUsersQuery());
+    } catch (error) {
+      if (error instanceof Response && error.status === 401)
+        throw redirect({ to: "/dashboard/login" });
+      if (error instanceof Response && error.status === 403)
+        throw redirect({ to: "/dashboard/lecturer-reviews" });
+      throw error;
+    }
   },
-  loader: ({ context }) => context.queryClient.fetchQuery(adminUsersQuery()),
   component: AdminUsersPage,
 });
 
 function AdminUsersPage() {
-  const { identity } = Route.useRouteContext();
+  const { identity } = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [userStatus, setUserStatus] = useState<UserStatus>("all");
