@@ -2,7 +2,7 @@
 
 Run `python scripts/optimize-fonts.py` in a Python environment with
 `fonttools==4.68.0` and `brotli==1.2.1`, after `bun install --frozen-lockfile`.
-Then run `bun run --cwd apps/web fmt`, review the audit and pixel comparisons,
+Then run `bun run --cwd apps/web format`, review the audit and pixel comparisons,
 and commit `apps/web/src/fonts/` with the changes. Processing is manual; the
 build consumes committed assets.
 

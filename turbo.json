@@ -16,8 +16,8 @@
       "dependsOn": ["^build"]
     },
     "lint": {},
-    "fmt:check": {},
-    "fmt": {
+    "format:check": {},
+    "format": {
       "cache": false
     },
     "lint:fix": {
@@ -30,5 +30,5 @@
       "dependsOn": ["build"]
     }
   },
-  "globalDependencies": [".oxfmtrc.json"]
+  "globalDependencies": ["bunfig.toml"]
 }
