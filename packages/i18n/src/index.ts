@@ -137,6 +137,7 @@ declare module "i18next" {
       resources: Record<string, string>;
       alumni: Record<string, string>;
       lecturers: Record<string, string>;
+      notifications: Record<string, string>;
       faq: Record<string, string>;
     };
   }

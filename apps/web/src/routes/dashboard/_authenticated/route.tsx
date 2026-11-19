@@ -27,7 +27,7 @@ function AdminLayout() {
     <AdminLayoutProvider>
       <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
         <div className="flex h-full min-h-0 flex-col md:flex-row">
-          <ModerationSidebar manager={canManageUsers(identity.role)} />
+          <ModerationSidebar manager={canManageUsers(identity.role)} userName={identity.name} />
           <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-stroke-soft-200 bg-bg-white-0 md:rounded-xl md:border">
             <Outlet />
           </section>

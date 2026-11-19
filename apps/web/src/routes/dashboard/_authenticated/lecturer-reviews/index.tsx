@@ -70,6 +70,7 @@ function LecturerReviewsPage() {
         title="Lecturer reviews"
         icon={<RiChatCheckLine className="hidden size-4 text-text-sub-600 md:block" />}
         manager={canManageUsers(identity.role)}
+        userName={identity.name}
         detailsAvailable={!!selectedReview}
         detailsVisible={detailsVisible}
         isFetching={reviews.isFetching}

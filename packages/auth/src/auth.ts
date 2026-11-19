@@ -8,6 +8,12 @@ export type AuthConfiguration = {
   baseURL: string;
   githubClientId: string;
   githubClientSecret: string;
+  onUserCreated?: (user: {
+    id: string;
+    name: string;
+    email: string;
+    role?: string | null;
+  }) => Promise<void> | void;
 };
 
 export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthConfiguration) {
@@ -48,6 +54,20 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       cookieCache: { enabled: false },
     },
     databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            if (!config.onUserCreated) return;
+            const role = "role" in user && typeof user.role === "string" ? user.role : null;
+            await config.onUserCreated({
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role,
+            });
+          },
+        },
+      },
       session: {
         create: {
           before: async (session) => ({ data: { ...session, ipAddress: null, userAgent: null } }),

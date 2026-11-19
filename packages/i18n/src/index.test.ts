@@ -10,6 +10,7 @@ const namespaces: MessageNamespace[] = [
   "resources",
   "alumni",
   "lecturers",
+  "notifications",
 ];
 for (const namespace of namespaces) {
   test(`${namespace} has matching ID/EN keys and interpolation values`, async () => {

@@ -8,6 +8,7 @@ export function AdminPageHeader({
   title,
   icon,
   manager,
+  userName,
   detailsAvailable,
   detailsVisible,
   isFetching,
@@ -17,6 +18,7 @@ export function AdminPageHeader({
   title: string;
   icon: ReactNode;
   manager: boolean;
+  userName: string;
   detailsAvailable: boolean;
   detailsVisible: boolean;
   isFetching: boolean;
@@ -26,7 +28,7 @@ export function AdminPageHeader({
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 px-4">
       <div className="flex min-w-0 items-center gap-2.5">
-        <MobileModerationMenu manager={manager} />
+        <MobileModerationMenu manager={manager} userName={userName} />
         {icon}
         <Typography as="h1" variant="label" className="truncate">
           {title}

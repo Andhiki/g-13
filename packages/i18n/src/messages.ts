@@ -7,6 +7,7 @@ export type MessageNamespace =
   | "resources"
   | "alumni"
   | "lecturers"
+  | "notifications"
   | "faq";
 export type Messages = Record<string, string>;
 
@@ -18,6 +19,7 @@ const loaders = {
     resources: () => import("./locales/id/resources.json").then((module) => module.default),
     alumni: () => import("./locales/id/alumni.json").then((module) => module.default),
     lecturers: () => import("./locales/id/lecturers.json").then((module) => module.default),
+    notifications: () => import("./locales/id/notifications.json").then((module) => module.default),
     faq: () => import("./locales/id/faq.json").then((module) => module.default),
   },
   en: {
@@ -27,6 +29,7 @@ const loaders = {
     resources: () => import("./locales/en/resources.json").then((module) => module.default),
     alumni: () => import("./locales/en/alumni.json").then((module) => module.default),
     lecturers: () => import("./locales/en/lecturers.json").then((module) => module.default),
+    notifications: () => import("./locales/en/notifications.json").then((module) => module.default),
     faq: () => import("./locales/en/faq.json").then((module) => module.default),
   },
 };

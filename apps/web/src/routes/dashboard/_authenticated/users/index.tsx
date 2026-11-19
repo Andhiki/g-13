@@ -74,6 +74,7 @@ function AdminUsersPage() {
         title="User access"
         icon={<RiGroupLine className="hidden size-4 text-text-sub-600 md:block" />}
         manager={canManageUsers(identity.role)}
+        userName={identity.name}
         detailsAvailable={!!selectedUser}
         detailsVisible={detailsVisible}
         isFetching={users.isFetching}

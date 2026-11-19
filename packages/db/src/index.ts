@@ -19,4 +19,8 @@ export {
   authAccount,
   authVerification,
   authRateLimits,
+  notificationEvents,
+  notifications,
+  type NotificationPayload,
+  type NotificationPayloadValue,
 } from "./schema";

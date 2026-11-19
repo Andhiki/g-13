@@ -26,6 +26,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardAuthenticatedIndexRouteImport } from './routes/dashboard/_authenticated/index'
 import { Route as DashboardLoginIndexRouteImport } from './routes/dashboard/login/index'
 import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from './routes/dashboard/_authenticated/lecturer-reviews/index'
+import { Route as DashboardAuthenticatedNotificationsIndexRouteImport } from './routes/dashboard/_authenticated/notifications/index'
 import { Route as DashboardAuthenticatedUsersIndexRouteImport } from './routes/dashboard/_authenticated/users/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -115,6 +116,12 @@ const DashboardAuthenticatedLecturerReviewsIndexRoute =
     path: '/lecturer-reviews/',
     getParentRoute: () => DashboardAuthenticatedRouteRoute,
   } as any)
+const DashboardAuthenticatedNotificationsIndexRoute =
+  DashboardAuthenticatedNotificationsIndexRouteImport.update({
+    id: '/notifications/',
+    path: '/notifications/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
 const DashboardAuthenticatedUsersIndexRoute =
   DashboardAuthenticatedUsersIndexRouteImport.update({
     id: '/users/',
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
   '/dashboard/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/login': typeof DashboardLoginIndexRoute
   '/dashboard/lecturer-reviews': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/notifications': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/users': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/dashboard/_authenticated/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
   '/dashboard/_authenticated/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/_authenticated/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/_authenticated/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/login/'
     | '/dashboard/lecturer-reviews/'
+    | '/dashboard/notifications/'
     | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/dashboard/login'
     | '/dashboard/lecturer-reviews'
+    | '/dashboard/notifications'
     | '/dashboard/users'
   id:
     | '__root__'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/dashboard/_authenticated/'
     | '/dashboard/login/'
     | '/dashboard/_authenticated/lecturer-reviews/'
+    | '/dashboard/_authenticated/notifications/'
     | '/dashboard/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
@@ -373,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRouteImport
       parentRoute: typeof DashboardAuthenticatedRouteRoute
     }
+    '/dashboard/_authenticated/notifications/': {
+      id: '/dashboard/_authenticated/notifications/'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications/'
+      preLoaderRoute: typeof DashboardAuthenticatedNotificationsIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
     '/dashboard/_authenticated/users/': {
       id: '/dashboard/_authenticated/users/'
       path: '/users'
@@ -386,6 +406,7 @@ declare module '@tanstack/react-router' {
 interface DashboardAuthenticatedRouteRouteChildren {
   DashboardAuthenticatedIndexRoute: typeof DashboardAuthenticatedIndexRoute
   DashboardAuthenticatedLecturerReviewsIndexRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  DashboardAuthenticatedNotificationsIndexRoute: typeof DashboardAuthenticatedNotificationsIndexRoute
   DashboardAuthenticatedUsersIndexRoute: typeof DashboardAuthenticatedUsersIndexRoute
 }
 
@@ -394,6 +415,8 @@ const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRoute
     DashboardAuthenticatedIndexRoute: DashboardAuthenticatedIndexRoute,
     DashboardAuthenticatedLecturerReviewsIndexRoute:
       DashboardAuthenticatedLecturerReviewsIndexRoute,
+    DashboardAuthenticatedNotificationsIndexRoute:
+      DashboardAuthenticatedNotificationsIndexRoute,
     DashboardAuthenticatedUsersIndexRoute:
       DashboardAuthenticatedUsersIndexRoute,
   }
