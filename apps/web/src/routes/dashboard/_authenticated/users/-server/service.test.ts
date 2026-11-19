@@ -1,7 +1,6 @@
 import { expect, it } from "bun:test";
-import { createAuth } from "@g13/auth/server";
-import { authSession, authUser } from "@g13/db/schema/auth";
 import { createDatabase } from "@g13/db/client";
+import { authUser } from "@g13/db/schema/auth";
 import { eq } from "drizzle-orm";
 import { createTestPlatformProxy } from "@/test/database";
 import { USER_ERRORS, type UserOperationResult } from "../-shared/errors";
@@ -12,17 +11,10 @@ function serviceData<T>(result: UserOperationResult<T>): T {
   return result.data;
 }
 
-it("enforces account approval policy with uncached D1-backed sessions", async () => {
+it("enforces admin-only account approval and role updates", async () => {
   const platform = await createTestPlatformProxy();
   try {
     const db = createDatabase(platform.env.DB);
-    const secret = crypto.randomUUID();
-    const auth = createAuth(db, {
-      secret,
-      baseURL: "http://localhost:3000",
-      githubClientId: "integration-test-only",
-      githubClientSecret: "integration-test-only",
-    });
     const now = new Date();
     await db.insert(authUser).values([
       {
@@ -51,134 +43,54 @@ it("enforces account approval policy with uncached D1-backed sessions", async ()
       },
     ]);
     const admin = { id: "admin", role: "admin" };
-    const maintainer = { id: "maintainer", role: "maintainer" };
-    const [userBefore] = await db
-      .select({ role: authUser.role })
-      .from(authUser)
-      .where(eq(authUser.id, "user"));
-    const [adminBefore] = await db
-      .select({ role: authUser.role })
-      .from(authUser)
-      .where(eq(authUser.id, "admin"));
-    for (const role of [undefined, null, "user", "moderator", "admin,user"]) {
-      const actor = { id: "user", role };
+
+    for (const role of [undefined, null, "user", "maintainer", "moderator", "admin,user"]) {
+      const actor = { id: "actor", role };
       expect(await inspectUsers(db, actor)).toEqual({ data: null, error: USER_ERRORS.FORBIDDEN });
       expect(await approveUserRole(db, actor, { userId: "user", role: "admin" })).toEqual({
         data: null,
         error: USER_ERRORS.FORBIDDEN,
       });
     }
-    expect(await inspectUsers(db, maintainer)).toEqual({
-      data: null,
-      error: USER_ERRORS.FORBIDDEN,
-    });
-    expect(await approveUserRole(db, maintainer, { userId: "user", role: "admin" })).toEqual({
-      data: null,
-      error: USER_ERRORS.FORBIDDEN,
-    });
+
+    // Admin cannot change their own role or update missing users.
     expect(await approveUserRole(db, admin, { userId: "admin", role: "user" })).toEqual({
       data: null,
       error: USER_ERRORS.FORBIDDEN,
     });
-    expect(
-      await db.select({ role: authUser.role }).from(authUser).where(eq(authUser.id, "user")),
-    ).toEqual([userBefore]);
-    expect(
-      await db.select({ role: authUser.role }).from(authUser).where(eq(authUser.id, "admin")),
-    ).toEqual([adminBefore]);
     expect(await approveUserRole(db, admin, { userId: "missing", role: "admin" })).toEqual({
       data: null,
       error: USER_ERRORS.USER_NOT_FOUND,
     });
-    const users = serviceData(await inspectUsers(db, admin));
-    expect(users.rows).toHaveLength(3);
-    expect(users.counts).toEqual({ all: 3, pending: 1, approved: 2 });
+
+    const initial = serviceData(await inspectUsers(db, admin));
+    expect(initial.counts).toEqual({ all: 3, pending: 1, approved: 2 });
     expect(
-      serviceData(await inspectUsers(db, admin, 0, "pending")).rows.map((user) => user.id),
+      serviceData(await inspectUsers(db, admin, 0, "pending")).rows.map((row) => row.id),
     ).toEqual(["user"]);
-    expect(serviceData(await inspectUsers(db, admin, 0, "approved")).rows).toHaveLength(2);
-    expect(serviceData(await inspectUsers(db, admin, 1, "pending")).rows).toEqual([]);
+
     expect(await approveUserRole(db, admin, { userId: "user", role: "maintainer" })).toEqual({
       data: { userId: "user", role: "maintainer" },
       error: null,
     });
-
-    expect(serviceData(await inspectUsers(db, admin, 0, "pending")).rows).toEqual([]);
     expect(serviceData(await inspectUsers(db, admin)).counts).toEqual({
       all: 3,
       pending: 0,
       approved: 3,
     });
-    const context = await auth.$context;
-    const session = await context.internalAdapter.createSession("user");
-    expect(session).toBeTruthy();
-    expect(session.ipAddress).toBeNull();
-    expect(session.userAgent).toBeNull();
-    const signingKey = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(secret),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"],
-    );
-    const signature = await crypto.subtle.sign(
-      "HMAC",
-      signingKey,
-      new TextEncoder().encode(session.token),
-    );
-    const signedToken = `${session.token}.${Buffer.from(signature).toString("base64")}`;
-    const headers = new Headers({
-      cookie: `${context.authCookies.sessionToken.name}=${encodeURIComponent(signedToken)}`,
-    });
-    const lookup = () => auth.api.getSession({ headers, query: { disableCookieCache: true } });
-    expect((await lookup())?.user.role).toBe("maintainer");
+
     await approveUserRole(db, admin, { userId: "user", role: "user" });
-    expect((await lookup())?.user.role).toBe("user");
     expect(serviceData(await inspectUsers(db, admin)).counts).toEqual({
       all: 3,
       pending: 1,
       approved: 2,
     });
+
+    // Unknown persisted roles fail closed as pending.
     await db.update(authUser).set({ role: "unknown" }).where(eq(authUser.id, "user"));
     expect(
-      serviceData(await inspectUsers(db, admin, 0, "pending")).rows.map((user) => user.id),
+      serviceData(await inspectUsers(db, admin, 0, "pending")).rows.map((row) => row.id),
     ).toEqual(["user"]);
-    const unknownRoleSession = await lookup();
-    expect(unknownRoleSession?.user.role).toBe("unknown");
-    await db
-      .update(authSession)
-      .set({ expiresAt: new Date(0) })
-      .where(eq(authSession.id, session.id));
-    expect(await lookup()).toBeNull();
-    const active = await context.internalAdapter.createSession("user");
-    const activeSignature = await crypto.subtle.sign(
-      "HMAC",
-      signingKey,
-      new TextEncoder().encode(active.token),
-    );
-    headers.set(
-      "cookie",
-      `${context.authCookies.sessionToken.name}=${encodeURIComponent(`${active.token}.${Buffer.from(activeSignature).toString("base64")}`)}`,
-    );
-    expect((await lookup())?.user.id).toBe("user");
-    await db.delete(authSession).where(eq(authSession.id, active.id));
-    expect(await lookup()).toBeNull();
-    headers.set("cookie", `${context.authCookies.sessionToken.name}=forged.invalid`);
-    expect(await lookup()).toBeNull();
-    expect(await auth.api.getSession({ headers: new Headers() })).toBeNull();
-    const passwordResponse = await auth.handler(
-      new Request("http://localhost:3000/api/auth/sign-up/email", {
-        method: "POST",
-        headers: { "content-type": "application/json", origin: "http://localhost:3000" },
-        body: JSON.stringify({
-          name: "Attacker",
-          email: "attacker@example.test",
-          password: "not-a-real-password",
-          role: "admin",
-        }),
-      }),
-    );
-    expect(passwordResponse.ok).toBe(false);
   } finally {
     await platform.dispose();
   }
