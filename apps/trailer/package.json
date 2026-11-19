@@ -8,7 +8,7 @@
     "studio": "remotionb studio",
     "build": "remotionb bundle --out-dir=dist",
     "render": "remotionb render G13Trailer out/trailer.mp4",
-    "typecheck": "tsc",
+    "typecheck": "bun check --no-script",
     "lint": "oxlint --deny-warnings src remotion.config.ts",
     "fmt": "oxfmt src remotion.config.ts package.json tsconfig.json",
     "fmt:check": "oxfmt --check src remotion.config.ts package.json tsconfig.json",

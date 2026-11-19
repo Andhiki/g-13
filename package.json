@@ -14,9 +14,9 @@
     "preview": "bun run --cwd apps/web preview",
     "deploy": "bun run --cwd apps/web deploy",
     "db:generate": "bun run --cwd packages/db db:generate",
-    "db:migrate:local": "wrangler d1 migrations apply lecturer-reviews --config apps/web/wrangler.jsonc --local",
-    "db:migrate:remote": "wrangler d1 migrations apply lecturer-reviews --config apps/web/wrangler.jsonc --remote",
-    "db:seed": "wrangler d1 execute lecturer-reviews --config apps/web/wrangler.jsonc --local --file packages/db/seed.sql",
+    "db:migrate:local": "cf d1 migrations apply 00000000-0000-4000-8000-000000000001 --local --dir packages/db/migrations --persist-to apps/web/.cloudflare/state",
+    "db:migrate:remote": "cf d1 migrations apply 00000000-0000-4000-8000-000000000001 --dir packages/db/migrations",
+    "db:seed": "cf d1 query 00000000-0000-4000-8000-000000000001 --local --persist-to apps/web/.cloudflare/state --sql \"$(cat packages/db/seed.sql)\"",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
@@ -28,5 +28,5 @@
   "devDependencies": {
     "turbo": "^2.11.10"
   },
-  "packageManager": "bun@1.4.3"
+  "packageManager": "bun@1.4.4"
 }

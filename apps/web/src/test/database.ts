@@ -2,10 +2,11 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getPlatformProxy } from "wrangler";
+import { Miniflare } from "miniflare";
 
-const repositoryRoot = fileURLToPath(new URL("../../../../", import.meta.url));
-const configPath = fileURLToPath(new URL("../../wrangler.jsonc", import.meta.url));
+const webRoot = fileURLToPath(new URL("../../", import.meta.url));
+const migrationsDir = fileURLToPath(new URL("../../../../packages/db/migrations", import.meta.url));
+const testDatabaseId = "00000000-0000-4000-8000-000000000001";
 
 export async function createTestPlatformProxy() {
   const persistenceRoot = await mkdtemp(join(tmpdir(), "g13-d1-test-"));
@@ -15,19 +16,19 @@ export async function createTestPlatformProxy() {
       [
         process.execPath,
         "x",
-        "wrangler",
+        "cf",
         "d1",
         "migrations",
         "apply",
-        "lecturer-reviews",
-        "--config",
-        configPath,
+        testDatabaseId,
         "--local",
+        "--dir",
+        migrationsDir,
         "--persist-to",
         persistenceRoot,
       ],
       {
-        cwd: repositoryRoot,
+        cwd: webRoot,
         env: { ...process.env, CI: "1" },
         stdout: "pipe",
         stderr: "pipe",
@@ -43,17 +44,43 @@ export async function createTestPlatformProxy() {
       throw new Error(`Applying test D1 migrations failed:\n${stdout}\n${stderr}`);
     }
 
-    const platform = await getPlatformProxy<{ DB: D1Database }>({
-      configPath,
-      persist: { path: join(persistenceRoot, "v3") },
-      remoteBindings: false,
+    const miniflare = new Miniflare({
+      cf: false,
+      resourcePersistencePath: join(persistenceRoot, "v3"),
+      workers: [
+        {
+          config: {
+            name: "g-13-test",
+            compatibilityDate: "2026-10-19",
+            manifest: {
+              mainModule: "worker.mjs",
+              modules: {
+                "worker.mjs": {
+                  type: "esm",
+                  contents:
+                    "export default { fetch() { return new Response(null, { status: 404 }); } };",
+                },
+              },
+            },
+            env: {
+              DB: {
+                type: "d1",
+                id: testDatabaseId,
+                name: "lecturer-reviews",
+              },
+            },
+          },
+        },
+      ],
     });
 
+    const env = await miniflare.getBindings<{ DB: D1Database }>("g-13-test");
+
     return {
-      ...platform,
+      env,
       dispose: async () => {
         try {
-          await platform.dispose();
+          await miniflare.dispose();
         } finally {
           await rm(persistenceRoot, { recursive: true, force: true });
         }

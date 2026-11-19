@@ -6,7 +6,7 @@ dist/
 .nitro/
 .tanstack/
 .dev.vars
-.wrangler/
+.cloudflare/
 test-results/
 playwright-report/
 test-results-*/

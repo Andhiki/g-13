@@ -15,7 +15,7 @@ its first uncached alumni document is rendered on request.
 Cloudflare now provides **Workers Cache**, enabled with `cache.enabled: true` in
 Wrangler. It checks before executing the Worker, caches GET/HEAD responses, and
 supports stale-while-revalidate. The app already enables this facility in
-`apps/web/wrangler.jsonc`. Therefore a custom `caches.default` wrapper is not
+`apps/web/cloudflare.config.ts`. Therefore a custom `caches.default` wrapper is not
 required to make these responses cacheable.
 [Workers Cache](https://developers.cloudflare.com/workers/cache/),
 [configuration](https://developers.cloudflare.com/workers/cache/configuration/)
