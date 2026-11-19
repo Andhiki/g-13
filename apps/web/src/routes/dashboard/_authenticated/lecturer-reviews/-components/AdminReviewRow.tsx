@@ -1,8 +1,9 @@
-import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine } from "@remixicon/react";
+import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine, RiStarFill } from "@remixicon/react";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
-import { AlignProgressBar } from "@/ui/progress-bar";
 import { Typography } from "@/ui/typography";
+import { useLocale } from "@/useLocale";
+import { formatAbsoluteTime, formatRelativeTime } from "../../notifications/-shared/time";
 import type { loadModerationReviews } from "../-server/handler";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
@@ -20,77 +21,71 @@ export function AdminReviewRow({
   onSelect: () => void;
   onAction: (input: ModerateReviewInput, label: string) => void;
 }) {
+  const { language } = useLocale("notifications");
   const deleted = review.deletedAt !== null;
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
+  const overall = (review.clarity + review.support + review.organization) / 3;
+  const createdMs = review.createdAt.getTime();
+
   return (
     <article
       data-selected={selected}
-      className="grid gap-3 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(150px,0.9fr)_minmax(0,2fr)_184px_160px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16"
+      className="grid gap-3 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-bg-weak-50 xl:data-[selected=true]:hover:bg-bg-weak-50"
     >
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 lg:flex lg:flex-col lg:items-start lg:gap-1.5">
-        <Typography as="h3" variant="label" className="min-w-0 font-semibold">
-          <AlignButton.Root
-            variant="neutral"
-            mode="ghost"
-            size="xxsmall"
-            onClick={onSelect}
-            className="hidden h-auto max-w-full justify-start truncate rounded-sm p-0 text-left text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
-            aria-label={`Inspect ${label}`}
-            aria-pressed={selected}
-          >
-            {review.lecturerName}
-          </AlignButton.Root>
-          <span className="xl:hidden">{review.lecturerName}</span>
-        </Typography>
-        <ReviewStatusBadge status={review.status} deleted={deleted} />
-        <Typography variant="caption" className="col-span-2 text-text-sub-600">
+      <div className="min-w-0 space-y-1">
+        <div className="flex items-center gap-2">
+          <Typography as="h3" variant="label" className="min-w-0 font-medium">
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              size="xxsmall"
+              onClick={onSelect}
+              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+              aria-label={`Inspect ${label}`}
+              aria-pressed={selected}
+            >
+              {review.lecturerName}
+            </AlignButton.Root>
+            <span className="block truncate xl:hidden">{review.lecturerName}</span>
+          </Typography>
+          <ReviewStatusBadge status={review.status} deleted={deleted} />
+        </div>
+        <Typography variant="caption" className="block truncate text-text-sub-600">
           {review.courseCode} · {review.termLabel}
         </Typography>
       </div>
+
       <div className="min-w-0">
-        <Typography className="whitespace-pre-wrap break-words text-[13px] leading-5 xl:line-clamp-2">
+        <Typography className="whitespace-pre-wrap break-words text-[13px] leading-5 text-text-strong-950 xl:line-clamp-2">
           {review.body}
         </Typography>
-        <Typography variant="caption" className="mt-1.5 text-text-sub-600">
-          {review.authorName} · {review.createdAt.toISOString().slice(0, 10)}
+        <Typography variant="caption" className="mt-1 block text-text-sub-600">
+          <span>{review.authorName}</span>
+          <span title={formatAbsoluteTime(createdMs, language)}>
+            {" "}
+            · {formatRelativeTime(createdMs, language)}
+          </span>
         </Typography>
       </div>
-      <dl className="flex gap-4 text-paragraph-xs tabular-nums lg:mx-auto lg:block lg:w-fit lg:space-y-1 lg:border-r lg:border-stroke-soft-200 lg:pr-3">
-        {[
-          ["Clarity", review.clarity],
-          ["Support", review.support],
-          ["Organization", review.organization],
-        ].map(([name, rating]) => (
-          <div
-            key={name}
-            className="flex items-center gap-1.5 lg:grid lg:grid-cols-[76px_minmax(0,1fr)] lg:gap-2"
-          >
-            <dt className="text-text-strong-950">{name}</dt>
-            <dd className="flex items-center gap-2">
-              <span className="w-6 shrink-0 text-right">
-                {rating}
-                <span className="text-text-sub-600">/5</span>
-              </span>
-              <AlignProgressBar.Root
-                color="orange"
-                value={Number(rating)}
-                max={5}
-                aria-label={`${name} rating`}
-                className="hidden h-1.5 w-12 shrink-0 bg-text-disabled-300 lg:block"
-              />
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <div className="flex items-start justify-end gap-1.5 lg:items-center lg:justify-center">
+
+      <div
+        className="flex items-center gap-1 text-label-sm text-text-strong-950 tabular-nums"
+        title={`Clarity ${review.clarity}/5 · Support ${review.support}/5 · Organization ${review.organization}/5`}
+      >
+        <RiStarFill className="size-3.5 text-warning-base" aria-hidden="true" />
+        <span>{overall.toFixed(1)}</span>
+        <span className="font-normal text-text-sub-600">/ 5</span>
+      </div>
+
+      <div className="flex items-center justify-end gap-1">
         {!deleted && (
           <>
             <AlignButton.Root
-              size="xsmall"
+              size="xxsmall"
               variant="neutral"
               mode="ghost"
-              className="w-20 gap-1 text-label-xs"
+              className="gap-1 text-label-xs"
               onClick={() =>
                 onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
               }
@@ -99,10 +94,10 @@ export function AdminReviewRow({
               {hidden ? "Restore" : "Hide"}
             </AlignButton.Root>
             <AlignButton.Root
-              size="xsmall"
+              size="xxsmall"
               variant="error"
               mode="ghost"
-              className="w-18 gap-1 text-label-xs text-error-dark"
+              className="gap-1 text-label-xs text-error-dark"
               onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
             >
               <RiDeleteBinLine className="size-3.5" />
@@ -111,11 +106,7 @@ export function AdminReviewRow({
           </>
         )}
         {deleted && (
-          <AlignBadge.Root
-            size="medium"
-            variant="lighter"
-            className="mt-1 gap-1 text-label-xs lg:mt-0"
-          >
+          <AlignBadge.Root size="medium" variant="lighter" className="gap-1 text-label-xs">
             <RiLockLine aria-hidden="true" className="size-3" />
             Read only
           </AlignBadge.Root>

@@ -7,7 +7,6 @@ import {
   RiCheckDoubleLine,
   RiCheckLine,
   RiExternalLinkLine,
-  RiNotification3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
@@ -105,7 +104,7 @@ function NotificationRow({
             mode="stroke"
             className="gap-1 text-label-xs"
           >
-            <Link to={linkTarget.to}>
+            <Link to={linkTarget.to} search={linkTarget.search}>
               <RiExternalLinkLine className="size-3.5" />
               {text("action.open")}
             </Link>
@@ -182,14 +181,8 @@ function NotificationsPage() {
     <>
       <AdminPageHeader
         title={text("title")}
-        icon={<RiNotification3Line className="hidden size-4 text-text-sub-600 md:block" />}
         manager={canManageUsers(identity.role)}
         userName={identity.name}
-        detailsAvailable={false}
-        detailsVisible={false}
-        isFetching={list.isFetching}
-        onToggleDetails={() => {}}
-        onRefresh={() => void list.refetch()}
       />
       <div
         className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"

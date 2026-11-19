@@ -15,17 +15,17 @@ export const notificationIdSchema = z.object({
 export type NotificationIdInput = z.infer<typeof notificationIdSchema>;
 
 export type NotificationLinkTarget =
-  | { to: "/dashboard/lecturer-reviews" }
-  | { to: "/dashboard/users" }
+  | { to: "/dashboard/lecturer-reviews"; search?: { review?: string } }
+  | { to: "/dashboard/users"; search?: undefined }
   | null;
 
 export function resolveNotificationLink(
   resourceType: string,
-  _resourceId: string,
+  resourceId: string,
 ): NotificationLinkTarget {
   switch (resourceType) {
     case "lecturer_review":
-      return { to: "/dashboard/lecturer-reviews" };
+      return { to: "/dashboard/lecturer-reviews", search: { review: resourceId } };
     case "user":
       return { to: "/dashboard/users" };
     default:

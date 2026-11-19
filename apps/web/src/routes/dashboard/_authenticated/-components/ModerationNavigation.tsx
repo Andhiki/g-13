@@ -14,10 +14,11 @@ import {
   RiGroupLine,
   RiLogoutBoxLine,
   RiMenuLine,
+  RiUser3Line,
 } from "@remixicon/react";
-import { AlignAvatar } from "@/ui/avatar";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
+import { AlignDropdown } from "@/ui/dropdown";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
 import { NotificationsPopover } from "./NotificationsPopover";
@@ -28,17 +29,20 @@ type ModerationSection = {
   Icon: RemixiconComponentType;
 };
 
-const sections = [
-  { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
-  { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
-] satisfies ModerationSection[];
+type ModerationSectionGroup = {
+  heading: string;
+  items: ModerationSection[];
+};
 
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
-}
+const sectionGroups = [
+  {
+    heading: "Moderation",
+    items: [
+      { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
+      { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
+    ],
+  },
+] satisfies ModerationSectionGroup[];
 
 function NavigationFooter({ userName, mobile = false }: { userName: string; mobile?: boolean }) {
   const [signOutError, setSignOutError] = useState(false);
@@ -60,49 +64,49 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
     }
   }
 
-  const publicLink = (
-    <AlignButton.Root
-      asChild
-      variant="neutral"
-      mode="ghost"
-      size="xsmall"
-      className="h-8 w-full justify-start gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600"
-    >
-      <Link to="/lecturers">
-        <RiExternalLinkLine className="size-4 shrink-0" />
-        Public reviews
-      </Link>
-    </AlignButton.Root>
-  );
-  const signOutButton = (
-    <AlignButton.Root
-      variant="neutral"
-      mode="ghost"
-      size="xsmall"
-      className="h-8 w-full justify-start gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600"
-      onClick={() => void signOut()}
-    >
-      <RiLogoutBoxLine className="size-4 shrink-0" />
-      Sign out
-    </AlignButton.Root>
-  );
-
   return (
-    <div className="mt-auto space-y-2 pt-4">
-      <div className="space-y-0.5">
-        {mobile ? <AlignDrawer.Close asChild>{publicLink}</AlignDrawer.Close> : publicLink}
-        {signOutButton}
-        {signOutError && (
-          <Typography role="alert" variant="caption" className="px-2.5 text-error-base">
-            Sign-out failed. Try again.
-          </Typography>
-        )}
-      </div>
-      <div className="flex items-center gap-2 border-t border-stroke-soft-200 px-1.5 pt-2.5">
-        <AlignAvatar.Root size="24">{getInitials(userName)}</AlignAvatar.Root>
-        <span className="min-w-0 flex-1 truncate text-label-xs font-medium text-text-strong-950">
-          {userName}
-        </span>
+    <div className="mt-auto pt-4">
+      {signOutError && (
+        <Typography role="alert" variant="caption" className="mb-1.5 block px-2 text-error-base">
+          Sign-out failed. Try again.
+        </Typography>
+      )}
+      <div className="flex items-center gap-1 border-t border-stroke-soft-200 pt-2">
+        <AlignDropdown.Root>
+          <AlignDropdown.Trigger asChild>
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              size="xsmall"
+              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg px-2 text-label-xs text-text-strong-950"
+              aria-label="Account menu"
+            >
+              <RiUser3Line className="size-4 shrink-0 text-text-sub-600" />
+              <span className="truncate font-medium">{userName}</span>
+            </AlignButton.Root>
+          </AlignDropdown.Trigger>
+          <AlignDropdown.Content
+            side={mobile ? "top" : "right"}
+            align="end"
+            sideOffset={8}
+            className="w-[180px] rounded-xl p-1.5"
+          >
+            <AlignDropdown.Item asChild className="px-2 py-1.5">
+              <Link to="/lecturers">
+                <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
+                Public reviews
+              </Link>
+            </AlignDropdown.Item>
+            <AlignDropdown.Separator />
+            <AlignDropdown.Item
+              className="px-2 py-1.5 text-error-base data-[highlighted]:bg-error-lighter"
+              onSelect={() => void signOut()}
+            >
+              <RiLogoutBoxLine className="size-4 shrink-0" />
+              Sign out
+            </AlignDropdown.Item>
+          </AlignDropdown.Content>
+        </AlignDropdown.Root>
         <NotificationsPopover side={mobile ? "top" : "right"} />
       </div>
     </div>
@@ -111,20 +115,33 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
 
 export function ModerationSidebar({ manager, userName }: { manager: boolean; userName: string }) {
   return (
-    <aside className="hidden w-[220px] shrink-0 flex-col px-2 py-2 md:flex">
-      <nav aria-label="Moderation sections" className="space-y-0.5">
-        {sections
-          .filter((section) => manager || section.to !== "/dashboard/users")
-          .map(({ to, label, Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
-            >
-              <Icon className="size-4 shrink-0" />
-              <span className="truncate">{label}</span>
-            </Link>
-          ))}
+    <aside className="hidden w-[220px] shrink-0 flex-col px-2 py-2.5 md:flex">
+      <nav aria-label="Moderation sections" className="space-y-4">
+        {sectionGroups.map((group) => {
+          const items = group.items.filter(
+            (section) => manager || section.to !== "/dashboard/users",
+          );
+          if (items.length === 0) return null;
+          return (
+            <div key={group.heading} className="space-y-1">
+              <Typography variant="caption" className="px-2.5 text-text-sub-600">
+                {group.heading}
+              </Typography>
+              <div className="space-y-0.5">
+                {items.map(({ to, label, Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </nav>
       <NavigationFooter userName={userName} />
     </aside>
@@ -170,20 +187,33 @@ export function MobileModerationMenu({
           </AlignDrawer.Close>
         </AlignDrawer.Header>
         <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2.5 pb-3">
-          <nav aria-label="Moderation sections" className="space-y-1">
-            {sections
-              .filter((section) => manager || section.to !== "/dashboard/users")
-              .map(({ to, label, Icon }) => (
-                <AlignDrawer.Close asChild key={to}>
-                  <Link
-                    to={to}
-                    className="flex h-10 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
-                  >
-                    <Icon className="size-4 shrink-0" />
-                    <span className="truncate">{label}</span>
-                  </Link>
-                </AlignDrawer.Close>
-              ))}
+          <nav aria-label="Moderation sections" className="space-y-4">
+            {sectionGroups.map((group) => {
+              const items = group.items.filter(
+                (section) => manager || section.to !== "/dashboard/users",
+              );
+              if (items.length === 0) return null;
+              return (
+                <div key={group.heading} className="space-y-1">
+                  <Typography variant="caption" className="px-2.5 text-text-sub-600">
+                    {group.heading}
+                  </Typography>
+                  <div className="space-y-0.5">
+                    {items.map(({ to, label, Icon }) => (
+                      <AlignDrawer.Close asChild key={to}>
+                        <Link
+                          to={to}
+                          className="flex h-10 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
+                        >
+                          <Icon className="size-4 shrink-0" />
+                          <span className="truncate">{label}</span>
+                        </Link>
+                      </AlignDrawer.Close>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
           <NavigationFooter userName={userName} mobile />
         </AlignDrawer.Body>

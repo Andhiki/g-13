@@ -180,7 +180,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
                           title={text("action.open")}
                           onClick={() => setOpen(false)}
                         >
-                          <Link to={linkTarget.to}>
+                          <Link to={linkTarget.to} search={linkTarget.search}>
                             <RiExternalLinkLine className="size-3.5" />
                           </Link>
                         </AlignButton.Root>
