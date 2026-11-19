@@ -30,7 +30,7 @@ The browser only ever sees `/api/alumni`.
 Local development: copy [`apps/web/.dev.vars.example`](../../apps/web/.dev.vars.example)
 to `apps/web/.dev.vars` and fill in the token. `.dev.vars` is ignored by git.
 
-Production: `bunx wrangler secret put STRAPI_API_TOKEN` from `apps/web`.
+Production: `bunx cf workers secrets update STRAPI_API_TOKEN` from `apps/web`.
 
 Never commit a token, and never paste one into an issue or chat. If a token leaks,
 revoke it in Strapi admin under **Settings → API Tokens** and issue a new one. Give it
@@ -88,7 +88,7 @@ with the person's consent; do not derive photos from LinkedIn URLs.
 The route loader and Retry both read `/api/alumni`. The server loader uses the
 `ALUMNI` self-service binding, so SSR and client navigation consult the same
 Workers Cache entry as browser requests. Only the API handler fetches Strapi.
-Workers Cache is enabled in `wrangler.jsonc`; its cache is shared across service
+Workers Cache is enabled in `cloudflare.config.ts`; its cache is shared across service
 bindings and public requests, independent of hostname.
 [Cloudflare Workers Cache](https://developers.cloudflare.com/workers/cache/)
 
