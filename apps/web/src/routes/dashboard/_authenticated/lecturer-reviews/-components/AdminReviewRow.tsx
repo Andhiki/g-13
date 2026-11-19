@@ -29,9 +29,13 @@ export function AdminReviewRow({
   const createdMs = review.createdAt.getTime();
 
   return (
+    // The whole row selects for pointer users; the name button keeps keyboard access.
     <article
       data-selected={selected}
-      className="grid gap-3 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-bg-weak-50 xl:data-[selected=true]:hover:bg-bg-weak-50"
+      onClick={() => {
+        if (!window.getSelection()?.toString()) onSelect();
+      }}
+      className="grid gap-3 xl:cursor-pointer border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-bg-weak-50 xl:data-[selected=true]:hover:bg-bg-weak-50"
     >
       <div className="min-w-0 space-y-1">
         <div className="flex items-center gap-2">
