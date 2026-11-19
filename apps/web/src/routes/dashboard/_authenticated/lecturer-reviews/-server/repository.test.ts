@@ -2,7 +2,7 @@ import { expect, it } from "bun:test";
 import { createDatabase, courses, lecturers, reviews } from "@g13/db";
 import { createTestPlatformProxy } from "@/test/database";
 import { getLecturerDetail, getLecturerDirectory } from "@/routes/lecturers/-server/read.service";
-import { moderateReview } from "./repository";
+import { getModerationReview, moderateReview } from "./repository";
 
 it("hides, restores, and soft-deletes reviews without restoring deleted data", async () => {
   const platform = await createTestPlatformProxy();
@@ -26,6 +26,12 @@ it("hides, restores, and soft-deletes reviews without restoring deleted data", a
     });
 
     expect((await getLecturerDetail(database, "lecturer"))?.reviews).toHaveLength(1);
+    expect(await getModerationReview(database, "review")).toMatchObject({
+      id: "review",
+      lecturerName: "Lecturer",
+      courseCode: "CS",
+    });
+    expect(await getModerationReview(database, "missing-review")).toBeNull();
     expect(await moderateReview(database, { reviewId: "review", action: "hide" })).toBe(true);
     expect((await getLecturerDetail(database, "lecturer"))?.reviews).toEqual([]);
     expect((await getLecturerDetail(database, "lecturer"))?.lecturer.overallAverage).toBeNull();

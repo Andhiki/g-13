@@ -12,6 +12,13 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-19
+
+#### Fixed
+
+- Tautan notifikasi ke ulasan yang berada di luar halaman pertama moderasi kini membuka ulasan tersebut di panel detail, bukan ulasan lain.
+- Akun yang perannya diturunkan tidak lagi melihat notifikasi moderasi atau persetujuan akun yang diterima sebelumnya.
+
 ### 2026-11-18
 
 #### Changed

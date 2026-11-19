@@ -6,7 +6,7 @@ import { canManageUsers } from "@g13/auth";
 import { RiChatCheckLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility } from "./-server/handler";
-import { moderationReviewsQuery } from "./-client/queries";
+import { moderationReviewQuery, moderationReviewsQuery } from "./-client/queries";
 import { reviewStatusSchema, type ReviewStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -44,6 +44,11 @@ function LecturerReviewsPage() {
   const [status, setStatus] = useState<ReviewStatus>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
+  const [syncedLinkId, setSyncedLinkId] = useState(linkedReviewId);
+  if (syncedLinkId !== linkedReviewId) {
+    setSyncedLinkId(linkedReviewId);
+    setSelectedId(linkedReviewId ?? null);
+  }
   const [confirmation, setConfirmation] = useState<{
     input: ModerateReviewInput;
     label: string;
@@ -62,8 +67,20 @@ function LecturerReviewsPage() {
     : pageRows;
   const count = visibleRows.length;
   const total = needle ? visibleRows.length : (reviews.data?.counts[status] ?? 0);
-  const activeId = selectedId ?? linkedReviewId ?? null;
-  const selectedReview = visibleRows.find((review) => review.id === activeId) ?? visibleRows[0];
+  // A notification can link to a review outside the loaded page; load it directly rather
+  // than falling back to an unrelated row the moderator might act on by mistake.
+  const linkedOffPage =
+    selectedId !== null &&
+    selectedId === linkedReviewId &&
+    reviews.isSuccess &&
+    !pageRows.some((review) => review.id === selectedId);
+  const linkedReview = useQuery({
+    ...moderationReviewQuery(selectedId ?? ""),
+    enabled: linkedOffPage,
+  });
+  const selectedReview = linkedOffPage
+    ? (linkedReview.data ?? undefined)
+    : (visibleRows.find((review) => review.id === selectedId) ?? visibleRows[0]);
   const detailsVisible = detailsOpen && !!selectedReview && !reviews.isPending && !reviews.isError;
   const mutation = useMutation({
     mutationFn: (input: ModerateReviewInput) => changeReviewVisibility({ data: input }),

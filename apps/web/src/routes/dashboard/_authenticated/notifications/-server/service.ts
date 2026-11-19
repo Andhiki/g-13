@@ -1,5 +1,6 @@
 import type { createDatabase } from "@g13/db";
 import { NOTIFICATION_ERRORS, type NotificationOperationResult } from "../-shared/errors";
+import type { NotificationViewer } from "../-shared/audience";
 import type { NotificationFilter } from "../-shared/schemas";
 import {
   archiveNotification,
@@ -13,7 +14,7 @@ import {
 } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
-type Actor = { id: string };
+type Actor = NotificationViewer;
 
 export type NotificationListData = {
   rows: NotificationItem[];
@@ -27,8 +28,8 @@ export async function inspectNotifications(
   filter: NotificationFilter = "all",
 ): Promise<NotificationOperationResult<NotificationListData>> {
   const [rows, counts] = await Promise.all([
-    listUserNotifications(db, actor.id, offset, filter),
-    getNotificationCounts(db, actor.id),
+    listUserNotifications(db, actor, offset, filter),
+    getNotificationCounts(db, actor),
   ]);
   return { data: { rows, counts }, error: null };
 }
@@ -37,7 +38,7 @@ export async function getUnreadNotificationCount(
   db: Database,
   actor: Actor,
 ): Promise<NotificationOperationResult<{ unread: number }>> {
-  const unread = await countUnreadNotifications(db, actor.id);
+  const unread = await countUnreadNotifications(db, actor);
   return { data: { unread }, error: null };
 }
 
@@ -47,7 +48,7 @@ export async function readNotification(
   notificationId: string,
   now?: number,
 ): Promise<NotificationOperationResult<{ notificationId: string }>> {
-  const updated = await markNotificationRead(db, actor.id, notificationId, now);
+  const updated = await markNotificationRead(db, actor, notificationId, now);
   if (!updated) return { data: null, error: NOTIFICATION_ERRORS.NOT_FOUND };
   return { data: { notificationId }, error: null };
 }
@@ -57,7 +58,7 @@ export async function readAllNotifications(
   actor: Actor,
   now?: number,
 ): Promise<NotificationOperationResult<{ ok: true }>> {
-  await markAllNotificationsRead(db, actor.id, now);
+  await markAllNotificationsRead(db, actor, now);
   return { data: { ok: true }, error: null };
 }
 
@@ -67,7 +68,7 @@ export async function archiveUserNotification(
   notificationId: string,
   now?: number,
 ): Promise<NotificationOperationResult<{ notificationId: string }>> {
-  const archived = await archiveNotification(db, actor.id, notificationId, now);
+  const archived = await archiveNotification(db, actor, notificationId, now);
   if (!archived) return { data: null, error: NOTIFICATION_ERRORS.NOT_FOUND };
   return { data: { notificationId }, error: null };
 }

@@ -5,22 +5,24 @@ import type { ReviewStatus } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
 
+const moderationReviewColumns = {
+  id: reviews.id,
+  lecturerName: lecturers.name,
+  courseCode: courses.code,
+  authorName: reviews.authorName,
+  termLabel: reviews.termLabel,
+  body: reviews.body,
+  clarity: reviews.clarity,
+  support: reviews.support,
+  organization: reviews.organization,
+  status: reviews.status,
+  deletedAt: reviews.deletedAt,
+  createdAt: reviews.createdAt,
+};
+
 export async function listModerationReviews(db: Database, offset: number, status: ReviewStatus) {
   return db
-    .select({
-      id: reviews.id,
-      lecturerName: lecturers.name,
-      courseCode: courses.code,
-      authorName: reviews.authorName,
-      termLabel: reviews.termLabel,
-      body: reviews.body,
-      clarity: reviews.clarity,
-      support: reviews.support,
-      organization: reviews.organization,
-      status: reviews.status,
-      deletedAt: reviews.deletedAt,
-      createdAt: reviews.createdAt,
-    })
+    .select(moderationReviewColumns)
     .from(reviews)
     .innerJoin(lecturers, eq(lecturers.id, reviews.lecturerId))
     .innerJoin(courses, eq(courses.id, reviews.courseId))
@@ -34,6 +36,16 @@ export async function listModerationReviews(db: Database, offset: number, status
     .orderBy(desc(reviews.createdAt), desc(reviews.id))
     .limit(51)
     .offset(offset);
+}
+
+export async function getModerationReview(db: Database, reviewId: string) {
+  const [review] = await db
+    .select(moderationReviewColumns)
+    .from(reviews)
+    .innerJoin(lecturers, eq(lecturers.id, reviews.lecturerId))
+    .innerJoin(courses, eq(courses.id, reviews.courseId))
+    .where(eq(reviews.id, reviewId));
+  return review ?? null;
 }
 
 export async function getModerationCounts(db: Database) {

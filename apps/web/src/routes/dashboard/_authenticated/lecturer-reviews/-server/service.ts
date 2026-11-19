@@ -3,7 +3,12 @@ import type { createDatabase } from "@g13/db";
 import { MODERATION_ERRORS, type ModerationOperationResult } from "../-shared/errors";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import type { ReviewStatus } from "../-shared/schemas";
-import { getModerationCounts, listModerationReviews, moderateReview } from "./repository";
+import {
+  getModerationCounts,
+  getModerationReview,
+  listModerationReviews,
+  moderateReview,
+} from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
@@ -25,6 +30,15 @@ export async function inspectReviews(
     getModerationCounts(db),
   ]);
   return { data: { rows, counts }, error: null };
+}
+
+export async function inspectReview(
+  db: Database,
+  actor: Actor,
+  reviewId: string,
+): Promise<ModerationOperationResult<Awaited<ReturnType<typeof getModerationReview>>>> {
+  if (!canModerate(actor.role)) return { data: null, error: MODERATION_ERRORS.FORBIDDEN };
+  return { data: await getModerationReview(db, reviewId), error: null };
 }
 
 export async function moderateLecturerReview(

@@ -5,7 +5,16 @@ import { parseAuthEnvironment } from "@g13/env";
 import { env } from "cloudflare:workers";
 import { dispatchNotification } from "./notifications";
 
+let cachedAuth: ReturnType<typeof buildAuth> | undefined;
+
+// Bindings and secrets are fixed for the isolate, so build Better Auth once and reuse it
+// instead of paying its setup cost on every protected request.
 export function requestAuth() {
+  cachedAuth ??= buildAuth();
+  return cachedAuth;
+}
+
+function buildAuth() {
   const config = parseAuthEnvironment(env);
   const db = createDatabase(env.DB);
   return createAuth(db, {

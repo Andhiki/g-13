@@ -1,10 +1,11 @@
-import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } from "drizzle-orm";
 import {
   notificationEvents,
   notifications,
   type createDatabase,
   type NotificationPayload,
 } from "@g13/db";
+import { hiddenNotificationTypes, type NotificationViewer } from "../-shared/audience";
 import type { NotificationFilter } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
@@ -30,24 +31,37 @@ export type NotificationCounts = {
   archived: number;
 };
 
-function filterCondition(recipientId: string, filter: NotificationFilter) {
+function visibleTo(viewer: NotificationViewer): SQL | undefined {
+  const hidden = hiddenNotificationTypes(viewer.role);
+  return and(
+    eq(notifications.recipientId, viewer.id),
+    hidden.length ? notInArray(notificationEvents.type, hidden) : undefined,
+  );
+}
+
+// Visible notification ids for single-row mutations, which cannot join in an UPDATE.
+function visibleNotificationIds(db: Database, viewer: NotificationViewer) {
+  return db
+    .select({ id: notifications.id })
+    .from(notifications)
+    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
+    .where(visibleTo(viewer));
+}
+
+function filterCondition(viewer: NotificationViewer, filter: NotificationFilter) {
   switch (filter) {
     case "unread":
-      return and(
-        eq(notifications.recipientId, recipientId),
-        isNull(notifications.archivedAt),
-        isNull(notifications.readAt),
-      );
+      return and(visibleTo(viewer), isNull(notifications.archivedAt), isNull(notifications.readAt));
     case "archived":
-      return and(eq(notifications.recipientId, recipientId), isNotNull(notifications.archivedAt));
+      return and(visibleTo(viewer), isNotNull(notifications.archivedAt));
     case "all":
-      return and(eq(notifications.recipientId, recipientId), isNull(notifications.archivedAt));
+      return and(visibleTo(viewer), isNull(notifications.archivedAt));
   }
 }
 
 export async function listUserNotifications(
   db: Database,
-  recipientId: string,
+  viewer: NotificationViewer,
   offset = 0,
   filter: NotificationFilter = "all",
   limit = NOTIFICATIONS_PAGE_SIZE,
@@ -67,7 +81,7 @@ export async function listUserNotifications(
     })
     .from(notifications)
     .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
-    .where(filterCondition(recipientId, filter))
+    .where(filterCondition(viewer, filter))
     .orderBy(desc(notifications.createdAt), desc(notifications.id))
     .limit(limit + 1)
     .offset(offset);
@@ -83,7 +97,7 @@ export async function listUserNotifications(
 
 export async function getNotificationCounts(
   db: Database,
-  recipientId: string,
+  viewer: NotificationViewer,
 ): Promise<NotificationCounts> {
   const [row] = await db
     .select({
@@ -92,7 +106,8 @@ export async function getNotificationCounts(
       archived: sql<number>`coalesce(sum(case when ${notifications.archivedAt} is not null then 1 else 0 end), 0)`,
     })
     .from(notifications)
-    .where(eq(notifications.recipientId, recipientId));
+    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
+    .where(visibleTo(viewer));
 
   return {
     all: Number(row?.all ?? 0),
@@ -101,30 +116,29 @@ export async function getNotificationCounts(
   };
 }
 
-export async function countUnreadNotifications(db: Database, recipientId: string): Promise<number> {
+export async function countUnreadNotifications(
+  db: Database,
+  viewer: NotificationViewer,
+): Promise<number> {
   const [row] = await db
     .select({ count: sql<number>`count(*)` })
     .from(notifications)
-    .where(
-      and(
-        eq(notifications.recipientId, recipientId),
-        isNull(notifications.archivedAt),
-        isNull(notifications.readAt),
-      ),
-    );
+    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
+    .where(filterCondition(viewer, "unread"));
   return Number(row?.count ?? 0);
 }
 
 export async function markNotificationRead(
   db: Database,
-  recipientId: string,
+  viewer: NotificationViewer,
   notificationId: string,
   now = Date.now(),
 ): Promise<boolean> {
   const [existing] = await db
     .select({ id: notifications.id, readAt: notifications.readAt })
     .from(notifications)
-    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, recipientId)))
+    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
+    .where(and(eq(notifications.id, notificationId), visibleTo(viewer)))
     .limit(1);
 
   if (!existing) return false;
@@ -133,13 +147,13 @@ export async function markNotificationRead(
   await db
     .update(notifications)
     .set({ readAt: new Date(now) })
-    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, recipientId)));
+    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, viewer.id)));
   return true;
 }
 
 export async function markAllNotificationsRead(
   db: Database,
-  recipientId: string,
+  viewer: NotificationViewer,
   now = Date.now(),
 ): Promise<void> {
   await db
@@ -147,16 +161,16 @@ export async function markAllNotificationsRead(
     .set({ readAt: new Date(now) })
     .where(
       and(
-        eq(notifications.recipientId, recipientId),
         isNull(notifications.archivedAt),
         isNull(notifications.readAt),
+        inArray(notifications.id, visibleNotificationIds(db, viewer)),
       ),
     );
 }
 
 export async function archiveNotification(
   db: Database,
-  recipientId: string,
+  viewer: NotificationViewer,
   notificationId: string,
   now = Date.now(),
 ): Promise<boolean> {
@@ -167,7 +181,8 @@ export async function archiveNotification(
       archivedAt: notifications.archivedAt,
     })
     .from(notifications)
-    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, recipientId)))
+    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
+    .where(and(eq(notifications.id, notificationId), visibleTo(viewer)))
     .limit(1);
 
   if (!existing) return false;
@@ -180,6 +195,6 @@ export async function archiveNotification(
       archivedAt: timestamp,
       readAt: existing.readAt ?? timestamp,
     })
-    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, recipientId)));
+    .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, viewer.id)));
   return true;
 }

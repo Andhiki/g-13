@@ -72,23 +72,34 @@ test("emits notifications on review submission and role update, and enforces rec
     );
     expect(reviewResult.error).toBeNull();
 
-    const adminInbox = await inspectNotifications(db, { id: "admin-1" });
+    const adminInbox = await inspectNotifications(db, { id: "admin-1", role: "admin" });
     expect(adminInbox.error).toBeNull();
     expect(adminInbox.data?.counts).toEqual({ all: 1, unread: 1, archived: 0 });
     expect(adminInbox.data?.rows[0]?.type).toBe("review.created");
     expect(adminInbox.data?.rows[0]?.payload.lecturerName).toBe("Afiahayati");
 
-    const maintainerInbox = await inspectNotifications(db, { id: "maintainer-1" });
+    const maintainerInbox = await inspectNotifications(db, {
+      id: "maintainer-1",
+      role: "maintainer",
+    });
     expect(maintainerInbox.data?.counts.unread).toBe(1);
 
-    const userInboxBefore = await inspectNotifications(db, { id: "user-1" });
+    const userInboxBefore = await inspectNotifications(db, { id: "user-1", role: "user" });
     expect(userInboxBefore.data?.counts.all).toBe(0);
 
     // Recipient isolation: user-1 cannot mark admin-1's notification as read or archive it
     const adminNotificationId = adminInbox.data!.rows[0]!.id;
-    const crossRead = await readNotification(db, { id: "user-1" }, adminNotificationId);
+    const crossRead = await readNotification(
+      db,
+      { id: "user-1", role: "user" },
+      adminNotificationId,
+    );
     expect(crossRead.error).toBe(NOTIFICATION_ERRORS.NOT_FOUND);
-    const crossArchive = await archiveUserNotification(db, { id: "user-1" }, adminNotificationId);
+    const crossArchive = await archiveUserNotification(
+      db,
+      { id: "user-1", role: "user" },
+      adminNotificationId,
+    );
     expect(crossArchive.error).toBe(NOTIFICATION_ERRORS.NOT_FOUND);
 
     // Role update notifies target user
@@ -99,7 +110,7 @@ test("emits notifications on review submission and role update, and enforces rec
     );
     expect(roleResult.error).toBeNull();
 
-    const userInboxAfter = await inspectNotifications(db, { id: "user-1" });
+    const userInboxAfter = await inspectNotifications(db, { id: "user-1", role: "maintainer" });
     expect(userInboxAfter.data?.counts).toEqual({ all: 1, unread: 1, archived: 0 });
     expect(userInboxAfter.data?.rows[0]?.type).toBe("user.role_updated");
     expect(userInboxAfter.data?.rows[0]?.payload.role).toBe("maintainer");
@@ -133,32 +144,98 @@ test("supports read, mark-all-read, archive, and filtered views", async () => {
       );
     }
 
-    const before = await inspectNotifications(db, { id: "admin-1" }, 0, "all");
+    const before = await inspectNotifications(db, { id: "admin-1", role: "admin" }, 0, "all");
     expect(before.data?.counts).toEqual({ all: 2, unread: 2, archived: 0 });
     const firstId = before.data!.rows[0]!.id;
     const secondId = before.data!.rows[1]!.id;
 
     // Mark single as read
-    const readOne = await readNotification(db, { id: "admin-1" }, firstId);
+    const readOne = await readNotification(db, { id: "admin-1", role: "admin" }, firstId);
     expect(readOne.error).toBeNull();
 
-    const unreadCount = await getUnreadNotificationCount(db, { id: "admin-1" });
+    const unreadCount = await getUnreadNotificationCount(db, { id: "admin-1", role: "admin" });
     expect(unreadCount.data?.unread).toBe(1);
 
-    const unreadOnly = await inspectNotifications(db, { id: "admin-1" }, 0, "unread");
+    const unreadOnly = await inspectNotifications(
+      db,
+      { id: "admin-1", role: "admin" },
+      0,
+      "unread",
+    );
     expect(unreadOnly.data?.rows.map((r) => r.id)).toEqual([secondId]);
 
     // Mark all read
-    await readAllNotifications(db, { id: "admin-1" });
-    expect((await getUnreadNotificationCount(db, { id: "admin-1" })).data?.unread).toBe(0);
+    await readAllNotifications(db, { id: "admin-1", role: "admin" });
+    expect(
+      (await getUnreadNotificationCount(db, { id: "admin-1", role: "admin" })).data?.unread,
+    ).toBe(0);
 
     // Archive one
-    const archived = await archiveUserNotification(db, { id: "admin-1" }, firstId);
+    const archived = await archiveUserNotification(db, { id: "admin-1", role: "admin" }, firstId);
     expect(archived.error).toBeNull();
 
-    const afterArchive = await inspectNotifications(db, { id: "admin-1" }, 0, "archived");
+    const afterArchive = await inspectNotifications(
+      db,
+      { id: "admin-1", role: "admin" },
+      0,
+      "archived",
+    );
     expect(afterArchive.data?.counts).toEqual({ all: 1, unread: 0, archived: 1 });
     expect(afterArchive.data?.rows.map((r) => r.id)).toEqual([firstId]);
+  } finally {
+    await platform.dispose();
+  }
+});
+
+test("hides privileged notifications once the recipient loses the role", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedFixtures(db);
+    await submitReview(
+      db,
+      {
+        lecturerId: "afiahayati",
+        courseId: "review-2026-PACS262102",
+        termLabel: "2026/2027 Ganjil",
+        anonymous: false,
+        authorName: "Named Student",
+        clarity: 4,
+        support: 4,
+        organization: 4,
+        body: "Named review that only moderators should see in notifications.",
+      },
+      { ip: "127.0.0.1", secret: "a".repeat(32), now: Date.parse("2026-11-19T03:00:00Z") },
+    );
+    await approveUserRole(
+      db,
+      { id: "admin-1", role: "admin" },
+      { userId: "maintainer-1", role: "user" },
+    );
+
+    const demoted = { id: "maintainer-1", role: "user" };
+    const inbox = await inspectNotifications(db, demoted);
+    expect(inbox.data?.rows.map((row) => row.type)).toEqual(["user.role_updated"]);
+    expect(inbox.data?.counts).toEqual({ all: 1, unread: 1, archived: 0 });
+    expect((await getUnreadNotificationCount(db, demoted)).data?.unread).toBe(1);
+
+    const stillMaintainer = await inspectNotifications(db, {
+      id: "maintainer-1",
+      role: "maintainer",
+    });
+    const reviewNotification = stillMaintainer.data!.rows.find(
+      (row) => row.type === "review.created",
+    )!;
+    expect((await readNotification(db, demoted, reviewNotification.id)).error).toBe(
+      NOTIFICATION_ERRORS.NOT_FOUND,
+    );
+    expect((await archiveUserNotification(db, demoted, reviewNotification.id)).error).toBe(
+      NOTIFICATION_ERRORS.NOT_FOUND,
+    );
+
+    await readAllNotifications(db, demoted);
+    const restored = await inspectNotifications(db, { id: "maintainer-1", role: "maintainer" });
+    expect(restored.data?.counts.unread).toBe(1);
   } finally {
     await platform.dispose();
   }
