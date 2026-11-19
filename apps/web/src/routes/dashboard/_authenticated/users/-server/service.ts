@@ -1,5 +1,6 @@
 import { canManageUsers } from "@g13/auth";
 import type { createDatabase } from "@g13/db";
+import { dispatchNotification } from "@/server/notifications";
 import type { AssignRoleInput, UserStatus } from "../-shared/schemas";
 import { USER_ERRORS, type UserOperationResult } from "../-shared/errors";
 import { assignUserRole, getUserCounts, listAdminUsers } from "./repository";
@@ -33,6 +34,18 @@ export async function approveUserRole(
   }
   if (!(await assignUserRole(db, input))) {
     return { data: null, error: USER_ERRORS.USER_NOT_FOUND };
+  }
+  try {
+    await dispatchNotification(db, {
+      type: "user.role_updated",
+      resourceType: "user",
+      resourceId: input.userId,
+      actorId: actor.id,
+      payload: { role: input.role },
+      recipients: { userIds: [input.userId], excludeUserIds: [actor.id] },
+    });
+  } catch {
+    // Notification delivery is non-blocking for role assignment.
   }
   return { data: { userId: input.userId, role: input.role }, error: null };
 }

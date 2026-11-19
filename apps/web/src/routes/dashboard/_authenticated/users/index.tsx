@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { canManageUsers, canModerate } from "@g13/auth";
-import { RiGroupLine } from "@remixicon/react";
 import { changeUserRole } from "./-server/handler";
 import { adminUsersQuery } from "./-client/queries";
 import { userStatusSchema, type AssignRoleInput, type UserStatus } from "./-shared/schemas";
@@ -72,13 +71,11 @@ function AdminUsersPage() {
     <>
       <AdminPageHeader
         title="User access"
-        icon={<RiGroupLine className="hidden size-4 text-text-sub-600 md:block" />}
         manager={canManageUsers(identity.role)}
+        userName={identity.name}
         detailsAvailable={!!selectedUser}
         detailsVisible={detailsVisible}
-        isFetching={users.isFetching}
         onToggleDetails={() => setDetailsOpen((open) => !open)}
-        onRefresh={() => void users.refetch()}
       />
       <div
         className="flex min-h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-stroke-soft-200 px-3 py-1.5"

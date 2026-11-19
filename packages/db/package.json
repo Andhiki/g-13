@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "bun --bun tsdown",
+    "db:export": "drizzle-kit export --config drizzle.config.ts",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "typecheck": "bun check --no-script",
     "lint": "oxlint --deny-warnings src tsdown.config.ts drizzle.config.ts",

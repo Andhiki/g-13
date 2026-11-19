@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 import { canManageUsers } from "@g13/auth";
-import { RiChatCheckLine } from "@remixicon/react";
+import { RiChatCheckLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility } from "./-server/handler";
 import { moderationReviewsQuery } from "./-client/queries";
@@ -17,7 +18,12 @@ import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminReviewRow } from "./-components/AdminReviewRow";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
+const reviewsSearchSchema = z.object({
+  review: z.string().optional(),
+});
+
 export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews/")({
+  validateSearch: reviewsSearchSchema,
   loader: async ({ context }) => {
     try {
       return await context.queryClient.fetchQuery(moderationReviewsQuery());
@@ -32,10 +38,12 @@ export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews
 
 function LecturerReviewsPage() {
   const { identity } = Route.useLoaderData();
+  const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<ReviewStatus>("all");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
   const [confirmation, setConfirmation] = useState<{
     input: ModerateReviewInput;
     label: string;
@@ -43,10 +51,19 @@ function LecturerReviewsPage() {
   const queryClient = useQueryClient();
   const reviews = useQuery(moderationReviewsQuery(offset, status));
   const reviewRows = reviews.data?.rows ?? [];
-  const visibleRows = reviewRows.slice(0, 50);
+  const pageRows = reviewRows.slice(0, 50);
+  const needle = query.trim().toLowerCase();
+  const visibleRows = needle
+    ? pageRows.filter((row) =>
+        `${row.lecturerName} ${row.courseCode} ${row.termLabel} ${row.authorName} ${row.body}`
+          .toLowerCase()
+          .includes(needle),
+      )
+    : pageRows;
   const count = visibleRows.length;
-  const total = reviews.data?.counts[status] ?? 0;
-  const selectedReview = visibleRows.find((review) => review.id === selectedId) ?? visibleRows[0];
+  const total = needle ? visibleRows.length : (reviews.data?.counts[status] ?? 0);
+  const activeId = selectedId ?? linkedReviewId ?? null;
+  const selectedReview = visibleRows.find((review) => review.id === activeId) ?? visibleRows[0];
   const detailsVisible = detailsOpen && !!selectedReview && !reviews.isPending && !reviews.isError;
   const mutation = useMutation({
     mutationFn: (input: ModerateReviewInput) => changeReviewVisibility({ data: input }),
@@ -68,41 +85,76 @@ function LecturerReviewsPage() {
     <>
       <AdminPageHeader
         title="Lecturer reviews"
-        icon={<RiChatCheckLine className="hidden size-4 text-text-sub-600 md:block" />}
         manager={canManageUsers(identity.role)}
+        userName={identity.name}
         detailsAvailable={!!selectedReview}
         detailsVisible={detailsVisible}
-        isFetching={reviews.isFetching}
         onToggleDetails={() => setDetailsOpen((open) => !open)}
-        onRefresh={() => void reviews.refetch()}
       />
       <div
-        className="flex min-h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-stroke-soft-200 px-3 py-1.5"
+        className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
         aria-label="Review status filters"
       >
-        {reviewStatusSchema.options.map((value) => (
-          <AlignButton.Root
-            key={value}
-            size="xxsmall"
-            variant="neutral"
-            mode={status === value ? "lighter" : "ghost"}
-            className="gap-2 text-label-xs"
-            aria-pressed={status === value}
-            onClick={() => {
-              setStatus(value);
-              setOffset(0);
-              setSelectedId(null);
-            }}
-          >
-            <span className="capitalize">{value === "all" ? "All reviews" : value}</span>
-            <span className="text-text-sub-600 tabular-nums">
-              {reviews.data?.counts[value] ?? "—"}
-            </span>
-          </AlignButton.Root>
-        ))}
+        <div className="flex items-center gap-1 overflow-x-auto">
+          {reviewStatusSchema.options.map((value) => (
+            <AlignButton.Root
+              key={value}
+              size="xxsmall"
+              variant="neutral"
+              mode={status === value ? "lighter" : "ghost"}
+              className="gap-2 text-label-xs"
+              aria-pressed={status === value}
+              onClick={() => {
+                setStatus(value);
+                setOffset(0);
+                setSelectedId(null);
+              }}
+            >
+              <span className="capitalize">{value === "all" ? "All reviews" : value}</span>
+              <span className="text-text-sub-600 tabular-nums">
+                {reviews.data?.counts[value] ?? "—"}
+              </span>
+            </AlignButton.Root>
+          ))}
+        </div>
+        <label className="relative flex w-full items-center sm:w-60">
+          <RiSearchLine
+            className="pointer-events-none absolute left-2.5 size-3.5 text-text-sub-600"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Filter lecturer, course, text…"
+            aria-label="Filter reviews"
+            className="h-7 w-full rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-8 pr-7 text-paragraph-xs text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Clear filter"
+              className="absolute right-1.5 inline-flex size-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950"
+            >
+              <RiCloseLine className="size-3.5" />
+            </button>
+          )}
+        </label>
       </div>
       <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-weak-50">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+          {!reviews.isPending && !reviews.isError && (
+            <AdminPagination
+              count={count}
+              offset={needle ? 0 : offset}
+              total={total}
+              label="reviews"
+              hasNext={!needle && reviewRows.length > 50}
+              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
+              onNext={() => setOffset((current) => current + 50)}
+            />
+          )}
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
             {reviews.isError ? (
               <Typography role="alert" className="p-4">
@@ -114,22 +166,28 @@ function LecturerReviewsPage() {
               </Typography>
             ) : (
               <>
-                <div className="hidden grid-cols-[minmax(150px,0.9fr)_minmax(0,2fr)_184px_160px] gap-4 border-b border-stroke-soft-200 bg-bg-white-0 px-4 py-2 text-label-xs text-text-strong-950 lg:sticky lg:top-0 lg:z-10 lg:grid">
+                <div className="hidden grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] gap-4 border-b border-stroke-soft-200 bg-bg-weak-50/60 px-4 py-2 text-label-xs text-text-sub-600 lg:sticky lg:top-0 lg:z-10 lg:grid">
                   <span>Lecturer / course</span>
                   <span>Review</span>
-                  <span className="text-center">Ratings</span>
-                  <span className="text-center">Actions</span>
+                  <span>Rating</span>
+                  <span className="text-right">Actions</span>
                 </div>
-                {!reviewRows.length && (
+                {!visibleRows.length && (
                   <div className="flex min-h-64 flex-col items-center justify-center gap-2 px-4">
                     <RiChatCheckLine className="size-7 text-text-sub-600" />
                     <Typography variant="labelSmall">
-                      {status === "all" ? "No lecturer reviews yet" : `No ${status} reviews`}
+                      {needle
+                        ? "No matching reviews"
+                        : status === "all"
+                          ? "No lecturer reviews yet"
+                          : `No ${status} reviews`}
                     </Typography>
                     <Typography variant="caption" className="text-text-sub-600">
-                      {status === "all"
-                        ? "New public reviews will appear here for moderation."
-                        : "Choose another status to inspect other reviews."}
+                      {needle
+                        ? "Try another lecturer name, course code, or keyword."
+                        : status === "all"
+                          ? "New public reviews will appear here for moderation."
+                          : "Choose another status to inspect other reviews."}
                     </Typography>
                   </div>
                 )}
@@ -148,17 +206,6 @@ function LecturerReviewsPage() {
               </>
             )}
           </div>
-          {!reviews.isPending && !reviews.isError && (
-            <AdminPagination
-              count={count}
-              offset={offset}
-              total={total}
-              label="reviews"
-              hasNext={reviewRows.length > 50}
-              onPrevious={() => setOffset((current) => current - 50)}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
         </div>
         {selectedReview && detailsVisible && (
           <ReviewInspector review={selectedReview} onAction={confirmReview} />

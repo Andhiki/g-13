@@ -27,6 +27,29 @@ function Content({
   );
 }
 
+function Item({ className, children, ...props }: ComponentProps<typeof DropdownPrimitive.Item>) {
+  return (
+    <DropdownPrimitive.Item
+      className={twMerge(
+        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-xs font-medium text-text-strong-950 outline-none transition duration-200 ease-out data-[highlighted]:bg-bg-weak-50 data-[disabled]:text-text-disabled-300",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </DropdownPrimitive.Item>
+  );
+}
+
+function Separator({ className, ...props }: ComponentProps<typeof DropdownPrimitive.Separator>) {
+  return (
+    <DropdownPrimitive.Separator
+      className={twMerge("my-1 h-px bg-stroke-soft-200", className)}
+      {...props}
+    />
+  );
+}
+
 function RadioItem({
   className,
   children,
@@ -58,4 +81,13 @@ function ItemIcon({ children, ...props }: ComponentProps<"div">) {
   );
 }
 
-export const AlignDropdown = { Root, Trigger, RadioGroup, Content, RadioItem, ItemIcon };
+export const AlignDropdown = {
+  Root,
+  Trigger,
+  RadioGroup,
+  Content,
+  Item,
+  Separator,
+  RadioItem,
+  ItemIcon,
+};

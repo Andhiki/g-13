@@ -4,46 +4,42 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Miniflare } from "miniflare";
 
-const webRoot = fileURLToPath(new URL("../../", import.meta.url));
-const migrationsDir = fileURLToPath(new URL("../../../../packages/db/migrations", import.meta.url));
+const dbPackageRoot = fileURLToPath(new URL("../../../../packages/db", import.meta.url));
 const testDatabaseId = "00000000-0000-4000-8000-000000000001";
+
+let exportedSchemaSql: Promise<string> | undefined;
+
+function loadSchemaSql(): Promise<string> {
+  if (!exportedSchemaSql) {
+    exportedSchemaSql = (async () => {
+      const proc = Bun.spawn(
+        [process.execPath, "x", "drizzle-kit", "export", "--config", "drizzle.config.ts"],
+        {
+          cwd: dbPackageRoot,
+          env: { ...process.env, CI: "1" },
+          stdout: "pipe",
+          stderr: "pipe",
+        },
+      );
+      const [exitCode, stdout, stderr] = await Promise.all([
+        proc.exited,
+        new Response(proc.stdout).text(),
+        new Response(proc.stderr).text(),
+      ]);
+      if (exitCode !== 0) {
+        throw new Error(`Exporting Drizzle test schema failed:\n${stdout}\n${stderr}`);
+      }
+      return stdout;
+    })();
+  }
+  return exportedSchemaSql;
+}
 
 export async function createTestPlatformProxy() {
   const persistenceRoot = await mkdtemp(join(tmpdir(), "g13-d1-test-"));
 
   try {
-    const migration = Bun.spawn(
-      [
-        process.execPath,
-        "x",
-        "cf",
-        "d1",
-        "migrations",
-        "apply",
-        testDatabaseId,
-        "--local",
-        "--dir",
-        migrationsDir,
-        "--persist-to",
-        persistenceRoot,
-      ],
-      {
-        cwd: webRoot,
-        env: { ...process.env, CI: "1" },
-        stdout: "pipe",
-        stderr: "pipe",
-      },
-    );
-    const [exitCode, stdout, stderr] = await Promise.all([
-      migration.exited,
-      new Response(migration.stdout).text(),
-      new Response(migration.stderr).text(),
-    ]);
-
-    if (exitCode !== 0) {
-      throw new Error(`Applying test D1 migrations failed:\n${stdout}\n${stderr}`);
-    }
-
+    const schemaSql = await loadSchemaSql();
     const miniflare = new Miniflare({
       cf: false,
       resourcePersistencePath: join(persistenceRoot, "v3"),
@@ -75,6 +71,11 @@ export async function createTestPlatformProxy() {
     });
 
     const env = await miniflare.getBindings<{ DB: D1Database }>("g-13-test");
+    const statements = schemaSql
+      .split(/;\s*(?:\r?\n|$)/)
+      .map((statement) => statement.trim())
+      .filter((statement) => statement.length > 0);
+    await env.DB.batch(statements.map((statement) => env.DB.prepare(statement)));
 
     return {
       env,

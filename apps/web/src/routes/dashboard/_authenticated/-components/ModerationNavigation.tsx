@@ -14,12 +14,14 @@ import {
   RiGroupLine,
   RiLogoutBoxLine,
   RiMenuLine,
+  RiUser3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
+import { AlignDropdown } from "@/ui/dropdown";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
-import { ModerationWordmark } from "./ModerationWordmark";
+import { NotificationsPopover } from "./NotificationsPopover";
 
 type ModerationSection = {
   to: AbsoluteToPath<RegisteredRouter, string>;
@@ -27,30 +29,22 @@ type ModerationSection = {
   Icon: RemixiconComponentType;
 };
 
-const sections = [
-  { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
-  { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
-] satisfies ModerationSection[];
+type ModerationSectionGroup = {
+  heading: string;
+  items: ModerationSection[];
+};
 
-function Brand() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <img
-        src="/brand/omahti-light.svg"
-        alt="OmahTI"
-        className="h-5 w-[50px] shrink-0 dark:hidden"
-      />
-      <img
-        src="/brand/omahti-dark.svg"
-        alt="OmahTI"
-        className="hidden h-5 w-[50px] shrink-0 dark:block"
-      />
-      <ModerationWordmark className="h-4 w-auto" />
-    </div>
-  );
-}
+const sectionGroups = [
+  {
+    heading: "Moderation",
+    items: [
+      { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
+      { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
+    ],
+  },
+] satisfies ModerationSectionGroup[];
 
-function NavigationFooter({ mobile = false }: { mobile?: boolean }) {
+function NavigationFooter({ userName, mobile = false }: { userName: string; mobile?: boolean }) {
   const [signOutError, setSignOutError] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -70,72 +64,97 @@ function NavigationFooter({ mobile = false }: { mobile?: boolean }) {
     }
   }
 
-  const publicLink = (
-    <AlignButton.Root
-      asChild
-      variant="neutral"
-      mode="ghost"
-      size="xsmall"
-      className="w-full justify-start gap-2 px-2 text-label-xs"
-    >
-      <Link to="/lecturers">
-        <RiExternalLinkLine className="size-4" />
-        Public reviews
-      </Link>
-    </AlignButton.Root>
-  );
-  const signOutButton = (
-    <AlignButton.Root
-      variant="neutral"
-      mode="ghost"
-      size="xsmall"
-      className="w-full justify-start gap-2 px-2 text-label-xs"
-      onClick={() => void signOut()}
-    >
-      <RiLogoutBoxLine className="size-4" />
-      Sign out
-    </AlignButton.Root>
-  );
-
   return (
-    <div className="mt-auto space-y-1 pt-4">
-      {mobile ? <AlignDrawer.Close asChild>{publicLink}</AlignDrawer.Close> : publicLink}
-      {signOutButton}
+    <div className="mt-auto pt-4">
       {signOutError && (
-        <Typography role="alert" variant="caption" className="px-2 text-error-base">
+        <Typography role="alert" variant="caption" className="mb-1.5 block px-2 text-error-base">
           Sign-out failed. Try again.
         </Typography>
       )}
+      <div className="flex items-center gap-1 border-t border-stroke-soft-200 pt-2">
+        <AlignDropdown.Root>
+          <AlignDropdown.Trigger asChild>
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              size="xsmall"
+              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg px-2 text-label-xs text-text-strong-950"
+              aria-label="Account menu"
+            >
+              <RiUser3Line className="size-4 shrink-0 text-text-sub-600" />
+              <span className="truncate font-medium">{userName}</span>
+            </AlignButton.Root>
+          </AlignDropdown.Trigger>
+          <AlignDropdown.Content
+            side={mobile ? "top" : "right"}
+            align="end"
+            sideOffset={8}
+            className="w-[180px] rounded-xl p-1.5"
+          >
+            <AlignDropdown.Item asChild className="px-2 py-1.5">
+              <Link to="/lecturers">
+                <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
+                Public reviews
+              </Link>
+            </AlignDropdown.Item>
+            <AlignDropdown.Separator />
+            <AlignDropdown.Item
+              className="px-2 py-1.5 text-error-base data-[highlighted]:bg-error-lighter"
+              onSelect={() => void signOut()}
+            >
+              <RiLogoutBoxLine className="size-4 shrink-0" />
+              Sign out
+            </AlignDropdown.Item>
+          </AlignDropdown.Content>
+        </AlignDropdown.Root>
+        <NotificationsPopover side={mobile ? "top" : "right"} />
+      </div>
     </div>
   );
 }
 
-export function ModerationSidebar({ manager }: { manager: boolean }) {
+export function ModerationSidebar({ manager, userName }: { manager: boolean; userName: string }) {
   return (
-    <aside className="hidden w-[224px] shrink-0 flex-col px-2 py-3 md:flex">
-      <div className="px-2">
-        <Brand />
-      </div>
-      <nav aria-label="Moderation sections" className="mt-5 space-y-0.5">
-        {sections
-          .filter((section) => manager || section.to !== "/dashboard/users")
-          .map(({ to, label, Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-label-xs text-text-sub-600 hover:bg-bg-weak-50 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:text-text-strong-950"
-            >
-              <Icon className="size-4" />
-              {label}
-            </Link>
-          ))}
+    <aside className="hidden w-[220px] shrink-0 flex-col px-2 py-2.5 md:flex">
+      <nav aria-label="Moderation sections" className="space-y-4">
+        {sectionGroups.map((group) => {
+          const items = group.items.filter(
+            (section) => manager || section.to !== "/dashboard/users",
+          );
+          if (items.length === 0) return null;
+          return (
+            <div key={group.heading} className="space-y-1">
+              <Typography variant="caption" className="px-2.5 text-text-sub-600">
+                {group.heading}
+              </Typography>
+              <div className="space-y-0.5">
+                {items.map(({ to, label, Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </nav>
-      <NavigationFooter />
+      <NavigationFooter userName={userName} />
     </aside>
   );
 }
 
-export function MobileModerationMenu({ manager }: { manager: boolean }) {
+export function MobileModerationMenu({
+  manager,
+  userName,
+}: {
+  manager: boolean;
+  userName: string;
+}) {
   return (
     <AlignDrawer.Root>
       <AlignDrawer.Trigger asChild>
@@ -154,8 +173,7 @@ export function MobileModerationMenu({ manager }: { manager: boolean }) {
         <AlignDrawer.Description className="sr-only">
           Choose a moderation section or return to public reviews.
         </AlignDrawer.Description>
-        <AlignDrawer.Header className="justify-between gap-2 px-4 py-4">
-          <Brand />
+        <AlignDrawer.Header className="justify-end px-3 py-2.5">
           <AlignDrawer.Close asChild>
             <AlignButton.Root
               variant="neutral"
@@ -168,23 +186,36 @@ export function MobileModerationMenu({ manager }: { manager: boolean }) {
             </AlignButton.Root>
           </AlignDrawer.Close>
         </AlignDrawer.Header>
-        <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-3 pb-4">
-          <nav aria-label="Moderation sections" className="space-y-1">
-            {sections
-              .filter((section) => manager || section.to !== "/dashboard/users")
-              .map(({ to, label, Icon }) => (
-                <AlignDrawer.Close asChild key={to}>
-                  <Link
-                    to={to}
-                    className="flex h-10 w-full items-center gap-2 rounded-md px-2 text-label-xs text-text-sub-600 hover:bg-bg-weak-50 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:text-text-strong-950"
-                  >
-                    <Icon className="size-4" />
-                    {label}
-                  </Link>
-                </AlignDrawer.Close>
-              ))}
+        <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2.5 pb-3">
+          <nav aria-label="Moderation sections" className="space-y-4">
+            {sectionGroups.map((group) => {
+              const items = group.items.filter(
+                (section) => manager || section.to !== "/dashboard/users",
+              );
+              if (items.length === 0) return null;
+              return (
+                <div key={group.heading} className="space-y-1">
+                  <Typography variant="caption" className="px-2.5 text-text-sub-600">
+                    {group.heading}
+                  </Typography>
+                  <div className="space-y-0.5">
+                    {items.map(({ to, label, Icon }) => (
+                      <AlignDrawer.Close asChild key={to}>
+                        <Link
+                          to={to}
+                          className="flex h-10 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
+                        >
+                          <Icon className="size-4 shrink-0" />
+                          <span className="truncate">{label}</span>
+                        </Link>
+                      </AlignDrawer.Close>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
-          <NavigationFooter mobile />
+          <NavigationFooter userName={userName} mobile />
         </AlignDrawer.Body>
       </AlignDrawer.Content>
     </AlignDrawer.Root>

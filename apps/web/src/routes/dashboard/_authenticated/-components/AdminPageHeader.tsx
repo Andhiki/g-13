@@ -1,63 +1,46 @@
-import type { ReactNode } from "react";
-import { RiLayoutRightLine, RiRefreshLine } from "@remixicon/react";
+import { RiLayoutRightLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import { MobileModerationMenu } from "./ModerationNavigation";
 
 export function AdminPageHeader({
   title,
-  icon,
   manager,
-  detailsAvailable,
-  detailsVisible,
-  isFetching,
+  userName,
+  detailsAvailable = false,
+  detailsVisible = false,
   onToggleDetails,
-  onRefresh,
 }: {
   title: string;
-  icon: ReactNode;
   manager: boolean;
-  detailsAvailable: boolean;
-  detailsVisible: boolean;
-  isFetching: boolean;
-  onToggleDetails: () => void;
-  onRefresh: () => void;
+  userName: string;
+  detailsAvailable?: boolean;
+  detailsVisible?: boolean;
+  onToggleDetails?: () => void;
 }) {
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 px-4">
-      <div className="flex min-w-0 items-center gap-2.5">
-        <MobileModerationMenu manager={manager} />
-        {icon}
-        <Typography as="h1" variant="label" className="truncate">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 px-3">
+      <div className="flex min-w-0 items-center gap-2">
+        <MobileModerationMenu manager={manager} userName={userName} />
+        {onToggleDetails && (
+          <AlignButton.Root
+            size="xsmall"
+            variant="neutral"
+            mode="ghost"
+            className="hidden size-7 shrink-0 px-0 aria-expanded:bg-bg-weak-50 xl:inline-flex"
+            disabled={!detailsAvailable}
+            aria-label={detailsVisible ? "Hide details" : "Show details"}
+            title={detailsVisible ? "Hide details" : "Show details"}
+            aria-expanded={detailsVisible}
+            aria-controls="moderation-inspector"
+            onClick={onToggleDetails}
+          >
+            <RiLayoutRightLine className="size-4 text-text-sub-600" />
+          </AlignButton.Root>
+        )}
+        <Typography as="h1" variant="label" className="truncate px-1">
           {title}
         </Typography>
-      </div>
-      <div className="flex items-center gap-1">
-        <AlignButton.Root
-          size="xsmall"
-          variant="neutral"
-          mode="ghost"
-          className="hidden w-8 px-0 aria-expanded:bg-bg-weak-50 xl:inline-flex"
-          disabled={!detailsAvailable}
-          aria-label={detailsVisible ? "Hide details" : "Show details"}
-          title={detailsVisible ? "Hide details" : "Show details"}
-          aria-expanded={detailsVisible}
-          aria-controls="moderation-inspector"
-          onClick={onToggleDetails}
-        >
-          <RiLayoutRightLine className="size-4" />
-        </AlignButton.Root>
-        <AlignButton.Root
-          size="xsmall"
-          variant="neutral"
-          mode="ghost"
-          className="gap-1.5 text-label-xs"
-          disabled={isFetching}
-          onClick={onRefresh}
-        >
-          <RiRefreshLine className="size-3.5" />
-          Refresh
-        </AlignButton.Root>
       </div>
     </header>
   );

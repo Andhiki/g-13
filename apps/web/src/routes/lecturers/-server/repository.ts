@@ -92,15 +92,29 @@ export async function getLecturerDetailData(db: Database, lecturerId: string) {
   };
 }
 
+export async function getReviewReferences(
+  db: Database,
+  references: { lecturerId: string; courseId: string },
+): Promise<{ lecturerName: string; courseCode: string } | null> {
+  const [[lecturer], [course]] = await Promise.all([
+    db
+      .select({ id: lecturers.id, name: lecturers.name })
+      .from(lecturers)
+      .where(eq(lecturers.id, references.lecturerId)),
+    db
+      .select({ id: courses.id, code: courses.code })
+      .from(courses)
+      .where(eq(courses.id, references.courseId)),
+  ]);
+  if (!lecturer || !course) return null;
+  return { lecturerName: lecturer.name, courseCode: course.code };
+}
+
 export async function hasReviewReferences(
   db: Database,
   references: { lecturerId: string; courseId: string },
 ): Promise<boolean> {
-  const [lecturer, course] = await Promise.all([
-    db.select({ id: lecturers.id }).from(lecturers).where(eq(lecturers.id, references.lecturerId)),
-    db.select({ id: courses.id }).from(courses).where(eq(courses.id, references.courseId)),
-  ]);
-  return lecturer.length > 0 && course.length > 0;
+  return (await getReviewReferences(db, references)) !== null;
 }
 
 export async function createReview(

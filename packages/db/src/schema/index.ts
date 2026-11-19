@@ -2,6 +2,12 @@ import { authAccount, authRateLimits, authSession, authUser, authVerification } 
 import { courses } from "./courses";
 import { lecturers } from "./lecturers";
 import { reviewLikes, reviewSubmissionLimits, reviews } from "./lecturer-reviews";
+import {
+  notificationEvents,
+  notifications,
+  type NotificationPayload,
+  type NotificationPayloadValue,
+} from "./notifications";
 
 export {
   courses,
@@ -14,6 +20,10 @@ export {
   authAccount,
   authVerification,
   authRateLimits,
+  notificationEvents,
+  notifications,
+  type NotificationPayload,
+  type NotificationPayloadValue,
 };
 
 export const schema = {
@@ -27,4 +37,6 @@ export const schema = {
   authAccount,
   authVerification,
   authRateLimits,
+  notificationEvents,
+  notifications,
 };
