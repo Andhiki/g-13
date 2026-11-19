@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { RiGithubFill } from "@remixicon/react";
 import { canModerate } from "@g13/auth";
-import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
@@ -35,59 +34,68 @@ export function LoginPage({ identity }: { identity: Identity }) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-md px-5 py-12 sm:py-20">
-      <Typography as="h1" variant="subtitle1">
-        Admin access
-      </Typography>
-      <Typography className="mt-2 text-text-sub-600">
-        {identity && !approved
-          ? "Your account is awaiting administrator approval. GitHub sign-in alone does not grant access."
-          : "Sign in with GitHub to moderate lecturer reviews. Access requires administrator approval."}
-      </Typography>
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        {approved ? (
-          <AlignFancyButton.Root asChild className="h-9 text-label-xs">
-            <Link to="/dashboard/lecturer-reviews">Open admin</Link>
-          </AlignFancyButton.Root>
-        ) : (
-          !identity && (
-            <AlignFancyButton.Root
-              className="h-9 text-label-xs"
-              disabled={pending}
-              onClick={() => void signIn()}
+    <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
+      <div className="w-full max-w-[380px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-sm">
+        <div className="border-b border-stroke-soft-200 px-6 py-4 text-center">
+          <Typography as="h1" variant="label" className="text-text-strong-950">
+            Sign in to your account
+          </Typography>
+        </div>
+        <div className="space-y-3 p-6">
+          {identity && !approved && (
+            <Typography variant="caption" className="block text-center text-text-sub-600">
+              Your account is awaiting approval.
+            </Typography>
+          )}
+          {approved ? (
+            <AlignButton.Root asChild size="medium" variant="primary" className="w-full">
+              <Link to="/dashboard/lecturer-reviews">Continue to dashboard</Link>
+            </AlignButton.Root>
+          ) : (
+            !identity && (
+              <AlignButton.Root
+                size="medium"
+                variant="neutral"
+                mode="lighter"
+                className="w-full gap-2 text-text-strong-950"
+                disabled={pending}
+                onClick={() => void signIn()}
+              >
+                <RiGithubFill className="size-4.5" />
+                {pending ? "Redirecting…" : "Sign in with GitHub"}
+              </AlignButton.Root>
+            )
+          )}
+          {identity && (
+            <AlignButton.Root
+              size="medium"
+              variant="neutral"
+              mode="stroke"
+              className="w-full"
+              onClick={async () => {
+                const result = await authClient.signOut();
+                if (result.error) {
+                  setError(true);
+                  return;
+                }
+                router.options.context.queryClient.clear();
+                await router.invalidate();
+              }}
             >
-              <RiGithubFill className="size-4" />
-              {pending ? "Redirecting…" : "Continue with GitHub"}
-            </AlignFancyButton.Root>
-          )
-        )}
-        {identity && (
-          <AlignButton.Root
-            size="small"
-            variant="neutral"
-            mode="stroke"
-            onClick={async () => {
-              const result = await authClient.signOut();
-              if (result.error) {
-                setError(true);
-                return;
-              }
-              router.options.context.queryClient.clear();
-              await router.invalidate();
-            }}
-          >
-            Sign out
-          </AlignButton.Root>
-        )}
+              Sign out
+            </AlignButton.Root>
+          )}
+          {error && (
+            <Typography
+              role="alert"
+              variant="caption"
+              className="block text-center text-error-base"
+            >
+              Sign-in failed. Please try again.
+            </Typography>
+          )}
+        </div>
       </div>
-      {error && (
-        <Typography role="alert" className="mt-4 text-error-base">
-          Sign-in failed. Please try again.
-        </Typography>
-      )}
-      <Typography variant="caption" className="mt-6 text-text-sub-600">
-        Public reviews never require an account.
-      </Typography>
     </main>
   );
 }

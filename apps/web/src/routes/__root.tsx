@@ -135,7 +135,7 @@ function ErrorPage({ reset }: { reset: () => void }) {
 
 function AppLayout() {
   const dashboard = useRouterState({
-    select: (state) => /^\/dashboard(?:\/(?!login(?:\/|$))|$)/.test(state.location.pathname),
+    select: (state) => /^\/dashboard(?:\/|$)/.test(state.location.pathname),
   });
   return (
     <div

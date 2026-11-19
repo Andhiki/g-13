@@ -6,7 +6,7 @@ import { LoginPage } from "./-components/LoginPage";
 
 export const Route = createFileRoute("/dashboard/login/")({
   head: () => ({
-    meta: [{ title: "Admin sign-in" }, { name: "robots", content: "noindex, nofollow" }],
+    meta: [{ title: "Sign in" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   beforeLoad: async ({ context }) => {
     if (hasDashboardSessionCookie() === false) return { identity: null };
