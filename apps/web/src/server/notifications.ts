@@ -1,12 +1,12 @@
 import { and, eq, inArray, lt, notExists } from "drizzle-orm";
 import type { Role } from "@g13/auth";
+import { authUser } from "@g13/db/schema/auth";
 import {
-  authUser,
   notificationEvents,
   notifications,
-  type createDatabase,
   type NotificationPayload,
-} from "@g13/db";
+} from "@g13/db/schema/notifications";
+import type { createDatabase } from "@g13/db/client";
 
 type Database = ReturnType<typeof createDatabase>;
 

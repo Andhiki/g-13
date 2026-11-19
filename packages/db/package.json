@@ -4,9 +4,29 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
+    "./client": {
+      "types": "./dist/client.d.mts",
+      "import": "./dist/client.mjs"
+    },
+    "./schema/auth": {
+      "types": "./dist/schema/auth.d.mts",
+      "import": "./dist/schema/auth.mjs"
+    },
+    "./schema/courses": {
+      "types": "./dist/schema/courses.d.mts",
+      "import": "./dist/schema/courses.mjs"
+    },
+    "./schema/lecturers": {
+      "types": "./dist/schema/lecturers.d.mts",
+      "import": "./dist/schema/lecturers.mjs"
+    },
+    "./schema/lecturer-reviews": {
+      "types": "./dist/schema/lecturer-reviews.d.mts",
+      "import": "./dist/schema/lecturer-reviews.mjs"
+    },
+    "./schema/notifications": {
+      "types": "./dist/schema/notifications.d.mts",
+      "import": "./dist/schema/notifications.mjs"
     }
   },
   "scripts": {

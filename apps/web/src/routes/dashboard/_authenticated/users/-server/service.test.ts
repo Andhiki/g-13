@@ -1,6 +1,7 @@
 import { expect, it } from "bun:test";
 import { createAuth } from "@g13/auth/server";
-import { authSession, authUser, createDatabase } from "@g13/db";
+import { authSession, authUser } from "@g13/db/schema/auth";
+import { createDatabase } from "@g13/db/client";
 import { eq } from "drizzle-orm";
 import { createTestPlatformProxy } from "@/test/database";
 import { USER_ERRORS, type UserOperationResult } from "../-shared/errors";

@@ -1,5 +1,6 @@
 import { lt, lte, sql } from "drizzle-orm";
-import { authRateLimits, type createDatabase } from "@g13/db";
+import { authRateLimits } from "@g13/db/schema/auth";
+import type { createDatabase } from "@g13/db/client";
 
 type Database = ReturnType<typeof createDatabase>;
 

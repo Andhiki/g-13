@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
-import { authUser, createDatabase, notificationEvents, notifications } from "@g13/db";
+import { authUser } from "@g13/db/schema/auth";
+import { createDatabase } from "@g13/db/client";
+import { notificationEvents, notifications } from "@g13/db/schema/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { dispatchNotification, pruneOldNotifications } from "./notifications";
 

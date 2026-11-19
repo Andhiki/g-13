@@ -1,6 +1,6 @@
 import { createAuth } from "@g13/auth/server";
 import { canManageUsers, canModerate } from "@g13/auth";
-import { createDatabase } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
 import { parseAuthEnvironment } from "@g13/env";
 import { env } from "cloudflare:workers";
 import { dispatchNotification } from "./notifications";

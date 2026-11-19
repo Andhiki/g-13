@@ -1,5 +1,6 @@
 import { asc, eq, inArray, notInArray, sql } from "drizzle-orm";
-import { authUser, type createDatabase } from "@g13/db";
+import { authUser } from "@g13/db/schema/auth";
+import type { createDatabase } from "@g13/db/client";
 import type { AssignRoleInput, UserStatus } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;

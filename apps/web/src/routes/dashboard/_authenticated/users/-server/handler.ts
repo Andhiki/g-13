@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
 import { requireAdminSession } from "@/server/auth";
 import { runServerOperation } from "@/server/server-function-error";
 import { assignRoleSchema, userPageSchema } from "../-shared/schemas";

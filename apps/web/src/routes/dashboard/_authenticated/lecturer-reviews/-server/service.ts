@@ -1,5 +1,5 @@
 import { canModerate } from "@g13/auth";
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { MODERATION_ERRORS, type ModerationOperationResult } from "../-shared/errors";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import type { ReviewStatus } from "../-shared/schemas";

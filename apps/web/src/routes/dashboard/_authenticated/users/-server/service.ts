@@ -1,5 +1,5 @@
 import { canManageUsers } from "@g13/auth";
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { dispatchNotification } from "@/server/notifications";
 import type { AssignRoleInput, UserStatus } from "../-shared/schemas";
 import { USER_ERRORS, type UserOperationResult } from "../-shared/errors";

@@ -2,9 +2,9 @@ import { and, desc, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } 
 import {
   notificationEvents,
   notifications,
-  type createDatabase,
   type NotificationPayload,
-} from "@g13/db";
+} from "@g13/db/schema/notifications";
+import type { createDatabase } from "@g13/db/client";
 import { hiddenNotificationTypes, type NotificationViewer } from "../-shared/audience";
 import type { NotificationFilter } from "../-shared/schemas";
 

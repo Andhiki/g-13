@@ -1,6 +1,8 @@
 import { and, asc, eq, isNull, lt, lte, sql } from "drizzle-orm";
-import { courses, lecturers, reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db";
-import type { createDatabase } from "@g13/db";
+import { courses } from "@g13/db/schema/courses";
+import { lecturers } from "@g13/db/schema/lecturers";
+import { reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db/schema/lecturer-reviews";
+import type { createDatabase } from "@g13/db/client";
 
 type Database = ReturnType<typeof createDatabase>;
 const visibleReview = and(eq(reviews.status, "published"), isNull(reviews.deletedAt));

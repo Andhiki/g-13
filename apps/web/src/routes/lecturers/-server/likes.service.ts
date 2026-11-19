@@ -1,4 +1,4 @@
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { allowReviewAction } from "./rate-limit";
 import { addReviewLike, getVisibleReviewId, removeReviewLike } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";

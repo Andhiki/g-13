@@ -1,5 +1,8 @@
 import { expect, it } from "bun:test";
-import { createDatabase, courses, lecturers, reviews } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
+import { courses } from "@g13/db/schema/courses";
+import { lecturers } from "@g13/db/schema/lecturers";
+import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { createTestPlatformProxy } from "@/test/database";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 

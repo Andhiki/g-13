@@ -1,5 +1,8 @@
 import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
-import { courses, lecturers, reviews, type createDatabase } from "@g13/db";
+import { courses } from "@g13/db/schema/courses";
+import { lecturers } from "@g13/db/schema/lecturers";
+import { reviews } from "@g13/db/schema/lecturer-reviews";
+import type { createDatabase } from "@g13/db/client";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import type { ReviewStatus } from "../-shared/schemas";
 
