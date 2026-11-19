@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
 import { parseSubmissionEnvironment } from "@g13/env";
 import { reviewClientIp } from "@/server/request-identity";
 import { runServerOperation } from "@/server/server-function-error";

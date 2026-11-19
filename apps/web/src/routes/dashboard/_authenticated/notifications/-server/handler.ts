@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
 import { runServerOperation } from "@/server/server-function-error";
 import { authenticatedMiddleware } from "@/server/auth-middleware";
 import { notificationIdSchema, notificationsPageSchema } from "../-shared/schemas";

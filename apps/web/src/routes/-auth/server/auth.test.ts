@@ -1,7 +1,8 @@
 import { expect, it, spyOn } from "bun:test";
 import { z } from "zod";
 import { createAuth } from "@g13/auth/server";
-import { authRateLimits, authSession, authUser, createDatabase } from "@g13/db";
+import { authRateLimits, authSession, authUser } from "@g13/db/schema/auth";
+import { createDatabase } from "@g13/db/client";
 import { eq } from "drizzle-orm";
 import { createTestPlatformProxy } from "@/test/database";
 

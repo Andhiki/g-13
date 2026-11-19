@@ -1,6 +1,8 @@
 import { submissionInputSchema } from "../-shared/submission-schema";
 import { expect, it } from "bun:test";
-import { createDatabase, courses, lecturers } from "@g13/db";
+import { createDatabase } from "@g13/db/client";
+import { courses } from "@g13/db/schema/courses";
+import { lecturers } from "@g13/db/schema/lecturers";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";

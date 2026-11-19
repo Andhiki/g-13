@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { authAccount, authSession, authUser, authVerification, type createDatabase } from "@g13/db";
+import { authAccount, authSession, authUser, authVerification } from "@g13/db/schema/auth";
+import type { createDatabase } from "@g13/db/client";
 import { consumeAuthLimit } from "./repository";
 
 export type AuthConfiguration = {

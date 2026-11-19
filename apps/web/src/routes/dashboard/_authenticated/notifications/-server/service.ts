@@ -1,4 +1,4 @@
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { NOTIFICATION_ERRORS, type NotificationOperationResult } from "../-shared/errors";
 import type { NotificationViewer } from "../-shared/audience";
 import type { NotificationFilter } from "../-shared/schemas";

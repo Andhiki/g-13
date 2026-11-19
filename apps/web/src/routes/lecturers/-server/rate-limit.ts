@@ -1,4 +1,4 @@
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;

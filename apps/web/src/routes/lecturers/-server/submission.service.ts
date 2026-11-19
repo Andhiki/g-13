@@ -1,4 +1,4 @@
-import type { createDatabase } from "@g13/db";
+import type { createDatabase } from "@g13/db/client";
 import { dispatchNotification } from "@/server/notifications";
 
 import { allowReviewAction } from "./rate-limit";

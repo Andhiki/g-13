@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { authUser, courses, createDatabase, lecturers } from "@g13/db";
+import { authUser } from "@g13/db/schema/auth";
+import { courses } from "@g13/db/schema/courses";
+import { createDatabase } from "@g13/db/client";
+import { lecturers } from "@g13/db/schema/lecturers";
 import { createTestPlatformProxy } from "@/test/database";
 import { submitReview } from "@/routes/lecturers/-server/submission.service";
 import { approveUserRole } from "@/routes/dashboard/_authenticated/users/-server/service";
