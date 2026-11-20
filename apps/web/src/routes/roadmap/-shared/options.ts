@@ -19,13 +19,7 @@ export const interests = (curriculum: CurriculumId): Choice[] =>
     }));
 
 export type Exposure =
-  | "exchange"
-  | "internship"
-  | "course"
-  | "competition"
-  | "conference"
-  | "double"
-  | "undecided";
+  "exchange" | "internship" | "course" | "competition" | "conference" | "double" | "undecided";
 
 export function exposureOptions(curriculum: CurriculumId) {
   return [

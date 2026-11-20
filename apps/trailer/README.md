@@ -102,7 +102,7 @@ Run these checks before sharing code:
 
 ```sh
 bun run --cwd apps/trailer lint
-bun run --cwd apps/trailer fmt:check
+bun run --cwd apps/trailer format:check
 bun run --cwd apps/trailer typecheck
 bun run --cwd apps/trailer test
 ```

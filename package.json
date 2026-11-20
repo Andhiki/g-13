@@ -23,9 +23,9 @@
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "fmt": "turbo run fmt",
-    "fmt:check": "turbo run fmt:check",
-    "check": "turbo run lint fmt:check typecheck test",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "check": "turbo run lint format:check typecheck test",
     "test": "turbo run test"
   },
   "devDependencies": {
