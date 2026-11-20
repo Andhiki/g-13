@@ -194,6 +194,15 @@ function LecturerReviewsPage() {
                           ? "No reviews yet"
                           : `No ${status} reviews`
                     }
+                    description={
+                      needle
+                        ? "Try another search term or clear the search to see submitted reviews."
+                        : status === "all"
+                          ? "Reviews submitted from public lecturer pages appear here immediately; they are not held for admin approval."
+                          : status === "published"
+                            ? "New public submissions are published immediately and will appear here once visitors post them."
+                            : `Reviews appear here after an admin moves them to ${status}.`
+                    }
                     action={
                       needle || (status !== "all" && counts.all > 0) ? (
                         <AlignButton.Root

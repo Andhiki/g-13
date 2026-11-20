@@ -206,7 +206,7 @@ export function ModerationSidebar({
       data-open={sidebarOpen}
       className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
     >
-      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-2 pr-3.5">
+      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-1 pr-2.5">
         <ModerationNavSections manager={manager} />
         <NavigationFooter userName={userName} userImage={userImage} />
       </aside>

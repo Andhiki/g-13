@@ -242,7 +242,7 @@ function NotificationsPage() {
               )
             }
             title={text(`empty.${filter}.title`)}
-            description={text(`empty.${filter}.description`)}
+            description={text(`empty.${filter}.contextDescription`)}
             action={
               filter !== "all" && counts.all > 0 ? (
                 <AlignButton.Root

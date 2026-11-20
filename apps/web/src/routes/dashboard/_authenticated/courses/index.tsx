@@ -217,6 +217,13 @@ function AdminCoursesPage() {
                           ? "No courses yet"
                           : "No deleted courses"
                     }
+                    description={
+                      needle
+                        ? "Try another search term or clear the search to see catalogue courses."
+                        : status === "active"
+                          ? "Courses available for students to select in public reviews are managed here. Add a course if one is missing."
+                          : "Deleted courses are kept here and can be restored to the review form."
+                    }
                     action={
                       needle ? (
                         <AlignButton.Root

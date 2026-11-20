@@ -219,6 +219,13 @@ function AdminLecturersPage() {
                           ? "No lecturers yet"
                           : "No deleted lecturers"
                     }
+                    description={
+                      needle
+                        ? "Try another search term or clear the search to see catalogue lecturers."
+                        : status === "active"
+                          ? "Lecturers in the catalogue can be selected on public review pages. Add a lecturer if someone is missing."
+                          : "Deleted lecturers are kept here so they can be restored without removing their review history."
+                    }
                     action={
                       needle ? (
                         <AlignButton.Root
