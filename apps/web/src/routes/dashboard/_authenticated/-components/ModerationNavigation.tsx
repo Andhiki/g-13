@@ -92,7 +92,7 @@ function NavigationFooter({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
+              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2 text-label-xs text-text-strong-950 hover:border-stroke-strong-950/20 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200"
               aria-label="Account menu"
             >
               {userImage && userImage !== failedImage ? (
