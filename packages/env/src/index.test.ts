@@ -11,6 +11,7 @@ it("fails closed without complete server-only OAuth configuration", () => {
   expect(parseAuthEnvironment(config)).toEqual({
     ...config,
     BETTER_AUTH_ALLOWED_HOSTS: ["example.test"],
+    ADMIN_EMAILS: [],
   });
   expect(() => parseAuthEnvironment({})).toThrow();
   expect(() => parseAuthEnvironment({ ...config, BETTER_AUTH_SECRET: "short" })).toThrow();
@@ -49,4 +50,19 @@ it("requires a server rate-limit secret of at least 32 characters", () => {
     parseSubmissionEnvironment({ REVIEW_RATE_LIMIT_SECRET: "s".repeat(32) })
       .REVIEW_RATE_LIMIT_SECRET,
   ).toHaveLength(32);
+});
+
+it("parses the bootstrap admin allowlist", () => {
+  const config = {
+    BETTER_AUTH_SECRET: crypto.randomUUID(),
+    BETTER_AUTH_URL: "https://csugm.omahti.com",
+    ADMIN_EMAILS: "AndhikiAndre@Gmail.com, second@example.test",
+    GITHUB_CLIENT_ID: "test-only",
+    GITHUB_CLIENT_SECRET: "test-only",
+  };
+  expect(parseAuthEnvironment(config).ADMIN_EMAILS).toEqual([
+    "andhikiandre@gmail.com",
+    "second@example.test",
+  ]);
+  expect(() => parseAuthEnvironment({ ...config, ADMIN_EMAILS: "not-an-email" })).toThrow();
 });

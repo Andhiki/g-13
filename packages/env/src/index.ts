@@ -13,6 +13,7 @@ const authEnvironmentSchema = z.object({
     );
   }, "Use HTTPS except on localhost"),
   BETTER_AUTH_ALLOWED_HOSTS: z.string().optional(),
+  ADMIN_EMAILS: z.string().optional(),
   GITHUB_CLIENT_ID: z.string().min(1),
   GITHUB_CLIENT_SECRET: z.string().min(1),
 });
@@ -21,6 +22,7 @@ export type AuthEnvironment = {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   BETTER_AUTH_ALLOWED_HOSTS: string[];
+  ADMIN_EMAILS: string[];
   GITHUB_CLIENT_ID: string;
   GITHUB_CLIENT_SECRET: string;
 };
@@ -37,10 +39,19 @@ export function parseAuthEnvironment(input: unknown): AuthEnvironment {
   if (invalidHosts.length > 0) {
     throw new Error(`Invalid BETTER_AUTH_ALLOWED_HOSTS entry: ${invalidHosts.join(", ")}`);
   }
+  const adminEmails = (parsed.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const invalidEmails = adminEmails.filter((email) => !z.email().safeParse(email).success);
+  if (invalidEmails.length > 0) {
+    throw new Error(`Invalid ADMIN_EMAILS entry: ${invalidEmails.join(", ")}`);
+  }
   return {
     BETTER_AUTH_SECRET: parsed.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: parsed.BETTER_AUTH_URL,
     BETTER_AUTH_ALLOWED_HOSTS: allowedHosts,
+    ADMIN_EMAILS: adminEmails,
     GITHUB_CLIENT_ID: parsed.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: parsed.GITHUB_CLIENT_SECRET,
   };

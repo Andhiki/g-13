@@ -25,6 +25,7 @@ function buildAuth() {
       protocol: "auto",
     },
     secureCookies: new URL(config.BETTER_AUTH_URL).protocol === "https:",
+    adminEmails: config.ADMIN_EMAILS,
     githubClientId: config.GITHUB_CLIENT_ID,
     githubClientSecret: config.GITHUB_CLIENT_SECRET,
     onUserCreated: async (user) => {

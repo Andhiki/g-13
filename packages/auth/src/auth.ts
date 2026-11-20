@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { eq } from "drizzle-orm";
 import { authAccount, authSession, authUser, authVerification } from "@g13/db/schema/auth";
 import type { createDatabase } from "@g13/db/client";
+import { isAllowlistedAdmin } from "./index";
 import { consumeAuthLimit } from "./repository";
 
 export type AuthBaseURL =
@@ -19,6 +21,7 @@ export type AuthConfiguration = {
   secureCookies?: boolean;
   githubClientId: string;
   githubClientSecret: string;
+  adminEmails?: string[];
   onUserCreated?: (user: {
     id: string;
     name: string;
@@ -46,6 +49,21 @@ function defaultSecureCookies(baseURL: AuthBaseURL) {
 }
 
 export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthConfiguration) {
+  const adminEmails = (config.adminEmails ?? [])
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+
+  async function promoteAllowlistedAdmin(userId: string) {
+    if (adminEmails.length === 0) return;
+    const [user] = await db
+      .select({ email: authUser.email, role: authUser.role })
+      .from(authUser)
+      .where(eq(authUser.id, userId))
+      .limit(1);
+    if (!user || user.role === "admin" || !isAllowlistedAdmin(user.email, adminEmails)) return;
+    await db.update(authUser).set({ role: "admin" }).where(eq(authUser.id, userId));
+  }
+
   return betterAuth({
     secret: config.secret,
     baseURL: config.baseURL,
@@ -85,6 +103,10 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
     databaseHooks: {
       user: {
         create: {
+          before: async (user) =>
+            isAllowlistedAdmin(user.email, adminEmails)
+              ? { data: { ...user, role: "admin" } }
+              : undefined,
           after: async (user) => {
             if (!config.onUserCreated) return;
             const role = "role" in user && typeof user.role === "string" ? user.role : null;
@@ -99,7 +121,10 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       },
       session: {
         create: {
-          before: async (session) => ({ data: { ...session, ipAddress: null, userAgent: null } }),
+          before: async (session) => {
+            await promoteAllowlistedAdmin(session.userId);
+            return { data: { ...session, ipAddress: null, userAgent: null } };
+          },
         },
         update: {
           before: async (session) => ({ data: { ...session, ipAddress: null, userAgent: null } }),
