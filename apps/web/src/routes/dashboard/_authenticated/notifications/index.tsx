@@ -189,6 +189,7 @@ function NotificationsPage() {
         title={text("title")}
         manager={canManageUsers(identity.role)}
         userName={identity.name}
+        userEmail={identity.email}
         userImage={identity.image}
       />
       <AdminFilterBar

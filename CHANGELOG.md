@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-21
+
+#### Changed
+
+- Tombol akun di sidebar dashboard kini memakai gaya ghost selebar nama depan dengan ikon panah bawah, dan menu akun tampil lebih lebar serta ringkas di atas kiri dengan alamat email di bagian atas.
+
 ### 2026-11-20
 
 #### Added

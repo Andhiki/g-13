@@ -31,6 +31,7 @@ export const loadAdminLecturers = createServerFn({ method: "GET" })
       identity: {
         id: session.user.id,
         name: session.user.name,
+        email: session.user.email,
         role: session.user.role,
         image: session.user.image,
       },
