@@ -29,7 +29,7 @@ import {
   resolveNotificationLink,
   type NotificationFilter,
 } from "./-shared/schemas";
-import { formatAbsoluteTime, formatRelativeTime } from "./-shared/time";
+import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 
 export const Route = createFileRoute("/dashboard/_authenticated/notifications/")({
   loader: async ({ context }) => {

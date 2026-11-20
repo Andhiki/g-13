@@ -24,9 +24,9 @@ import {
   markNotificationAsRead,
 } from "../notifications/-server/handler";
 import { resolveNotificationLink } from "../notifications/-shared/schemas";
-import { formatAbsoluteTime, formatRelativeTime } from "../notifications/-shared/time";
+import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 
-export function NotificationsPopover({ side = "right" }: { side?: "right" | "top" }) {
+export function NotificationsPopover({ side = "right" }: { side?: "right" | "bottom" }) {
   const [open, setOpen] = useState(false);
   const { text, language } = useLocale("notifications");
   const queryClient = useQueryClient();

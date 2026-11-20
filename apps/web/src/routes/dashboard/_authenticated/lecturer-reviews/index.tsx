@@ -11,6 +11,7 @@ import { reviewStatusSchema, type ReviewStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
+import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminTableHeader } from "../-components/AdminTable";
 import { AdminPagination } from "../-components/AdminPagination";
@@ -54,9 +55,11 @@ function LecturerReviewsPage() {
   const [status, setStatus] = useState<ReviewStatus>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(!!linkedReviewId);
   const [syncedLinkId, setSyncedLinkId] = useState(linkedReviewId);
   if (syncedLinkId !== linkedReviewId) {
     setSyncedLinkId(linkedReviewId);
+    setMobileDetailsOpen(!!linkedReviewId);
     setSelectedId(linkedReviewId ?? null);
   }
   const [confirmation, setConfirmation] = useState<{
@@ -159,7 +162,7 @@ function LecturerReviewsPage() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Filter lecturer, course, text…"
               aria-label="Filter reviews"
-              className="h-7 w-full rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-8 pr-7 text-paragraph-xs text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none"
+              className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-base sm:pointer-fine:h-7 sm:pointer-fine:pl-8 sm:pointer-fine:pr-7 sm:pointer-fine:text-paragraph-xs [&::-webkit-search-cancel-button]:appearance-none text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none"
             />
             {query && (
               <button
@@ -252,6 +255,7 @@ function LecturerReviewsPage() {
                     onSelect={() => {
                       setSelectedId(review.id);
                       setDetailsOpen(true);
+                      setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
                     }}
                     onAction={confirmReview}
                   />
@@ -260,10 +264,11 @@ function LecturerReviewsPage() {
             )}
           </div>
         </div>
-        <div
-          inert={!detailsVisible}
-          data-open={detailsVisible}
-          className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[320px] xl:block motion-reduce:transition-none"
+        <AdminInspector
+          title="Review details"
+          desktopOpen={detailsVisible}
+          mobileOpen={mobileDetailsOpen}
+          onMobileOpenChange={setMobileDetailsOpen}
         >
           {selectedReview && !reviews.isPending && !reviews.isError && (
             <ReviewInspector
@@ -272,7 +277,7 @@ function LecturerReviewsPage() {
               onAction={confirmReview}
             />
           )}
-        </div>
+        </AdminInspector>
       </div>
       <ConfirmActionModal
         open={confirmation !== null}

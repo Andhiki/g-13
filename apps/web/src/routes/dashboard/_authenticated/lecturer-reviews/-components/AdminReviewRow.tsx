@@ -43,13 +43,12 @@ export function AdminReviewRow({
               mode="ghost"
               size="xxsmall"
               onClick={onSelect}
-              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+              className="block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline"
               aria-label={`Inspect ${label}`}
               aria-pressed={selected}
             >
               {review.lecturerName}
             </AlignButton.Root>
-            <span className="block truncate xl:hidden">{review.lecturerName}</span>
           </Typography>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>

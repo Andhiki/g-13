@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Dashboard mendukung moderasi dan notifikasi di layar kecil. Tanggal akun memakai bulan dan tahun, daftar dosen memakai dua kolom di layar lebar, dan ulasan ditampilkan lebih ringkas.
+
 - Ukuran teks pada lencana dan label mata kuliah diperkecil agar nama dosen lebih menonjol pada tabel moderasi.
 
 - Kartu ulasan menempatkan isi ulasan di atas, memakai label mata kuliah yang seragam, dan meringkas skor penilaian.
@@ -43,6 +45,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 - Merapikan antarmuka dashboard moderasi: pengalihan otomatis dari `/dashboard/login` bagi akun terverifikasi, tampilan menunggu persetujuan tanpa tombol keluar dengan arahan menghubungi maintainer/admin, tombol buka/tutup sidebar kiri dan panel detail kanan, paginasi di bagian atas, tampilan rating bintang serta teks pengalaman yang dapat diperluas di panel detail ulasan, kursor baris mengikuti pengaturan kursor, indikator muat Sonic GIF, cache tab filter agar perpindahan tab tidak memuat ulang, menu Pengaturan di dashboard, manajemen peran dua langkah di panel detail akun, status muat tombol universal (`isLoading`), penyempurnaan cincin fokus tombol/tautan, serta penyelarasan dialog konfirmasi.
 
 #### Fixed
+
+- Kartu mata kuliah memakai tampilan detail saat peta pertama kali dimuat, dan ketukan pada latar menu samping hanya menutup menu.
 
 - Nama mata kuliah yang panjang tidak lagi meluap dari filter ulasan di layar kecil.
 

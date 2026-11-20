@@ -2,6 +2,7 @@ import { RiLayoutLeftLine, RiLayoutRightLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import { useAdminLayout } from "./AdminLayoutContext";
+import { NotificationsPopover } from "./NotificationsPopover";
 import { MobileModerationMenu } from "./ModerationNavigation";
 
 export function AdminPageHeader({
@@ -37,6 +38,9 @@ export function AdminPageHeader({
         <Typography as="h1" variant="label" className="truncate px-1">
           {title}
         </Typography>
+      </div>
+      <div className="md:hidden">
+        <NotificationsPopover side="bottom" />
       </div>
     </header>
   );

@@ -37,11 +37,11 @@ export function LecturerReviewsPage() {
         <div className="min-w-0">
           <section aria-label={text("Search and sort")}>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="flex h-9 min-w-32 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
+              <label className="flex h-10 min-w-32 sm:pointer-fine:h-9 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
                 <span className="sr-only">{text("Search lecturers or courses")}</span>
                 <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
                 <input
-                  className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:text-paragraph-sm"
+                  className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:pointer-fine:text-paragraph-sm"
                   placeholder={text("Lecturer or course")}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
@@ -74,13 +74,16 @@ export function LecturerReviewsPage() {
               </Typography>
             )}
           </section>
-          <section aria-label={text("Lecturers and reviews")} className="mt-4 space-y-3">
+          <section
+            aria-label={text("Lecturers and reviews")}
+            className="mt-4 grid gap-3 sm:grid-cols-2"
+          >
             {visibleLecturers.length ? (
               visibleLecturers.map((lecturer) => (
                 <LecturerReviewCard key={lecturer.id} lecturer={lecturer} />
               ))
             ) : (
-              <div className="rounded-10 border border-dashed border-stroke-soft-200 px-6 py-10 text-center">
+              <div className="rounded-10 border border-dashed sm:col-span-2 border-stroke-soft-200 px-6 py-10 text-center">
                 <Typography as="p" variant="paragraph" className="m-0 text-text-sub-600">
                   {text(
                     "No lecturers or reviewed courses match this search. Try another name or clear your search.",

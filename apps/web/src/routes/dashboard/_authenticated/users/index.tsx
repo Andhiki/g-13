@@ -10,6 +10,7 @@ import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
+import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
 import { ConfirmationChange } from "../-components/ConfirmationChange";
@@ -46,6 +47,7 @@ function AdminUsersPage() {
   const [offset, setOffset] = useState(0);
   const [userStatus, setUserStatus] = useState<UserStatus>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [confirmation, setConfirmation] = useState<{
     input: AssignRoleInput;
     label: string;
@@ -159,6 +161,7 @@ function AdminUsersPage() {
                   onSelect={(id) => {
                     setSelectedUserId(id);
                     setDetailsOpen(true);
+                    setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
                   }}
                 />
                 {!count && (
@@ -186,10 +189,11 @@ function AdminUsersPage() {
             )}
           </div>
         </div>
-        <div
-          inert={!detailsVisible}
-          data-open={detailsVisible}
-          className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[320px] xl:block motion-reduce:transition-none"
+        <AdminInspector
+          title="Account details"
+          desktopOpen={detailsVisible}
+          mobileOpen={mobileDetailsOpen}
+          onMobileOpenChange={setMobileDetailsOpen}
         >
           {selectedUser && !users.isPending && !users.isError && (
             <UserAccessInspector
@@ -199,7 +203,7 @@ function AdminUsersPage() {
               onAssign={confirmRole}
             />
           )}
-        </div>
+        </AdminInspector>
       </div>
       <ConfirmActionModal
         open={confirmation !== null}

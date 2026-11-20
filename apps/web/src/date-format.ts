@@ -31,3 +31,11 @@ export function formatAbsoluteTime(ms: number, locale: string): string {
     timeStyle: "short",
   }).format(new Date(ms));
 }
+
+export function formatMonthYear(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "id-ID", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}

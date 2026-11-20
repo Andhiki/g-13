@@ -4,7 +4,7 @@ import { AlignButton } from "@/ui/button";
 import { RatingStars } from "@/ui/rating-stars";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import { formatAbsoluteTime, formatRelativeTime } from "../../notifications/-shared/time";
+import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 import type { loadModerationReviews } from "../-server/handler";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";

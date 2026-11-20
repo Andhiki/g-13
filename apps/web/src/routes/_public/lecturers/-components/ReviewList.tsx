@@ -33,20 +33,16 @@ export function ReviewList({
     return emptyState;
   }
   return (
-    <div className="space-y-3">
+    <div className="divide-y divide-stroke-soft-200 border-y border-stroke-soft-200">
       {reviews.map((review) => (
-        <article
-          key={review.id}
-          id={`review-${review.id}`}
-          className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-5"
-        >
+        <article key={review.id} id={`review-${review.id}`} className="min-w-0 py-3 sm:py-4">
           <Typography as="p" className="m-0 whitespace-pre-wrap break-words leading-relaxed">
             {review.body}
           </Typography>
-          <div className="mt-3">
+          <div className="mt-2">
             <CourseChip code={review.code} name={courseDisplayName(review, language)} />
           </div>
-          <dl className="mb-0 mt-3 flex flex-wrap gap-x-4 gap-y-2">
+          <dl className="mb-0 mt-2 flex flex-wrap gap-x-4 gap-y-1">
             {(
               [
                 ["Clarity", review.clarity],
@@ -65,7 +61,7 @@ export function ReviewList({
               </div>
             ))}
           </dl>
-          <footer className="mt-4 flex items-center justify-between gap-3 border-t border-stroke-soft-200 pt-3">
+          <footer className="mt-2 flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
               <Typography as="span" variant="labelSmall" className="min-w-0 wrap-anywhere">
                 {review.authorName.toLowerCase() === "anonymous"

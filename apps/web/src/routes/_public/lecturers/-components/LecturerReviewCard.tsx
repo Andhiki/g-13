@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useLocale } from "@/useLocale";
 import { RatingStars } from "@/ui/rating-stars";
+import { CourseChip } from "@/ui/course-chip";
 import { Typography } from "@/ui/typography";
 import type { lecturerDirectoryQueryOptions } from "../-client/queries";
 import { courseDisplayName } from "../-shared/course-search";
@@ -58,16 +59,8 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
             className="mb-0 mt-2 flex min-w-0 flex-wrap items-center gap-1.5 pl-0"
           >
             {(showAllCourses ? lecturer.courses : lecturer.courses.slice(0, 3)).map((course) => (
-              <li
-                key={course.courseId}
-                className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-1"
-              >
-                <Typography as="span" variant="code" className="shrink-0 text-text-sub-600">
-                  {course.code}
-                </Typography>
-                <Typography as="span" variant="caption" className="truncate">
-                  {courseDisplayName(course, language)}
-                </Typography>
+              <li key={course.courseId} className="min-w-0 max-w-full">
+                <CourseChip code={course.code} name={courseDisplayName(course, language)} />
               </li>
             ))}
             {lecturer.courses.length > 3 && (

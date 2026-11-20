@@ -4,6 +4,8 @@ import { canManageUsers, canModerate } from "@g13/auth";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
+import { formatMonthYear } from "@/date-format";
+import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
@@ -21,6 +23,7 @@ export function UserAccessInspector({
   identityId: string;
   onAssign: (input: AssignRoleInput, label: string) => void;
 }) {
+  const { language } = useLocale();
   const approved = canModerate(user.role);
   const [step, setStep] = useState<"idle" | "choose-role">("idle");
   const [role, setRole] = useState<AssignableRole>(user.role === "admin" ? "admin" : "maintainer");
@@ -62,7 +65,7 @@ export function UserAccessInspector({
           <dl className="space-y-2.5 text-paragraph-xs">
             <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
               <dt className="text-text-sub-600">Joined</dt>
-              <dd className="tabular-nums">{user.createdAt.toISOString().slice(0, 10)}</dd>
+              <dd className="tabular-nums">{formatMonthYear(user.createdAt, language)}</dd>
             </div>
             <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
               <dt className="text-text-sub-600">Role</dt>

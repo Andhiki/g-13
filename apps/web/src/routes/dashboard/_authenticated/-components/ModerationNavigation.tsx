@@ -138,7 +138,7 @@ function NavigationFooter({
           </AlignDropdown.Content>
         </AlignDropdown.Root>
         <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
-        <NotificationsPopover side={mobile ? "top" : "right"} />
+        {!mobile && <NotificationsPopover />}
       </div>
     </div>
   );
@@ -204,12 +204,12 @@ export function MobileModerationMenu({
           <RiMenuLine className="size-5" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <AlignDrawer.Content side="left" className="max-w-[280px]">
+      <AlignDrawer.Content side="left" className="max-w-[220px]">
         <AlignDrawer.Title className="sr-only">Moderation navigation</AlignDrawer.Title>
         <AlignDrawer.Description className="sr-only">
           Choose a moderation section or return to public reviews.
         </AlignDrawer.Description>
-        <AlignDrawer.Header className="justify-end px-3 py-2.5">
+        <AlignDrawer.Header className="justify-end px-2 py-1.5">
           <AlignDrawer.Close asChild>
             <AlignButton.Root
               variant="neutral"
@@ -222,7 +222,7 @@ export function MobileModerationMenu({
             </AlignButton.Root>
           </AlignDrawer.Close>
         </AlignDrawer.Header>
-        <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2.5 pb-3">
+        <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
           <nav aria-label="Moderation sections" className="space-y-4">
             {sectionGroups.map((group) => {
               const items = group.items.filter(
@@ -237,7 +237,7 @@ export function MobileModerationMenu({
                   <div className="space-y-0.5">
                     {items.map(({ to, label, Icon }) => (
                       <AlignDrawer.Close asChild key={to}>
-                        <Link to={to} className={`${navLinkClass} h-10`}>
+                        <Link to={to} className={`${navLinkClass} h-8`}>
                           <Icon className="size-4 shrink-0" />
                           <span className="truncate">{label}</span>
                         </Link>

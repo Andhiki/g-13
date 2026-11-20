@@ -5,6 +5,8 @@ import {
   AdminTableHeader,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import { formatMonthYear } from "@/date-format";
+import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import { AccountAvatar } from "./AccountAvatar";
@@ -24,6 +26,7 @@ export function AdminUserList({
   selectedId?: string;
   onSelect: (userId: string) => void;
 }) {
+  const { language } = useLocale();
   return (
     <>
       <AdminTableHeader className={`grid md:sticky md:top-0 md:z-10 ${userTableColumns}`}>
@@ -48,14 +51,13 @@ export function AdminUserList({
                     variant="neutral"
                     mode="ghost"
                     size="xxsmall"
-                    className="hidden h-auto max-w-full truncate rounded-sm p-0 text-label-xs text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+                    className="block h-auto max-w-full truncate rounded-sm p-0 text-label-xs text-text-strong-950 hover:bg-transparent hover:underline"
                     aria-label={`Inspect account ${user.name}`}
                     aria-pressed={selectedId === user.id}
                     onClick={() => onSelect(user.id)}
                   >
                     {user.name}
                   </AlignButton.Root>
-                  <span className="xl:hidden">{user.name}</span>
                 </Typography>
                 <Typography variant="caption" className="truncate text-text-sub-600">
                   {user.email}
@@ -64,7 +66,7 @@ export function AdminUserList({
                   variant="caption"
                   className="mt-1 text-text-sub-600 tabular-nums md:hidden"
                 >
-                  {user.createdAt.toISOString().slice(0, 10)}
+                  {formatMonthYear(user.createdAt, language)}
                 </Typography>
               </div>
             </div>
@@ -72,7 +74,7 @@ export function AdminUserList({
               variant="caption"
               className="hidden text-center text-text-strong-950 tabular-nums md:block"
             >
-              {user.createdAt.toISOString().slice(0, 10)}
+              {formatMonthYear(user.createdAt, language)}
             </Typography>
             <div className="flex justify-end md:justify-center">
               <AlignBadge.Root

@@ -58,7 +58,7 @@ export function LanguageSwitch() {
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
           <Typography as="span" variant="label">
-            English
+            EN
           </Typography>
         </SegmentedControl.Trigger>
         <SegmentedControl.Trigger
@@ -69,7 +69,7 @@ export function LanguageSwitch() {
           className="focus-visible:ring-2 focus-visible:ring-primary-base"
         >
           <Typography as="span" variant="label">
-            Bahasa Indonesia
+            ID
           </Typography>
         </SegmentedControl.Trigger>
       </SegmentedControl.List>

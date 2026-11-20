@@ -150,7 +150,7 @@ type ContentProps = Omit<ComponentPropsWithoutRef<"div">, "onOpenAutoFocus"> & {
   modal?: boolean;
   side?: "left" | "bottom";
   onOpenAutoFocus?: (event: CancelableEvent) => void;
-  onInteractOutside?: (event: PointerEvent) => void;
+  onInteractOutside?: (event: MouseEvent) => void;
 };
 
 const focusableSelector =
@@ -310,8 +310,9 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
     };
   }, [context.triggerRef, isModal, mounted, open, present]);
 
-  const handleOverlayPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
+    event.stopPropagation();
     onInteractOutsideRef.current?.(event.nativeEvent);
     if (!event.defaultPrevented && !event.nativeEvent.defaultPrevented) setOpen(false);
   };
@@ -366,7 +367,7 @@ const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
             bottom && "items-end",
           )}
           data-state={state}
-          onPointerDown={handleOverlayPointerDown}
+          onClick={handleOverlayClick}
         >
           {panel}
         </div>

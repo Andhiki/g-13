@@ -242,7 +242,7 @@ export function CurriculumMap({
         edges={revealedEdges}
         edgeTypes={routedEdgeTypes}
         nodeTypes={nodeTypes}
-        defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
+        defaultViewport={{ x: 10, y: 0, zoom: 0.8 }}
         minZoom={0.05}
         maxZoom={1.35}
         nodesDraggable={false}
