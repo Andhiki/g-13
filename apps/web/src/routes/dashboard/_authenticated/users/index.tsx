@@ -160,14 +160,20 @@ function AdminUsersPage() {
             )}
           </div>
         </div>
-        {selectedUser && detailsVisible && (
-          <UserAccessInspector
-            key={selectedUser.id}
-            user={selectedUser}
-            identityId={identity.id}
-            onAssign={confirmRole}
-          />
-        )}
+        <div
+          inert={!detailsVisible}
+          data-open={detailsVisible}
+          className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[320px] xl:block motion-reduce:transition-none"
+        >
+          {selectedUser && !users.isPending && !users.isError && (
+            <UserAccessInspector
+              key={selectedUser.id}
+              user={selectedUser}
+              identityId={identity.id}
+              onAssign={confirmRole}
+            />
+          )}
+        </div>
       </div>
       <ConfirmActionModal
         open={confirmation !== null}

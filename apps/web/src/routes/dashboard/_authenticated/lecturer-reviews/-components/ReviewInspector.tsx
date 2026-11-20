@@ -45,7 +45,7 @@ export function ReviewInspector({
     <aside
       id="moderation-inspector"
       aria-label="Selected review details"
-      className="hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0 xl:flex"
+      className="ml-auto flex h-full w-[320px] flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0"
     >
       <div className="flex h-11 shrink-0 items-center border-b border-stroke-soft-200 px-4 text-label-xs">
         Review details

@@ -127,37 +127,39 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
 
 export function ModerationSidebar({ manager, userName }: { manager: boolean; userName: string }) {
   const { sidebarOpen } = useAdminLayout();
-  if (!sidebarOpen) return null;
   return (
-    <aside
-      id="moderation-sidebar"
-      className="hidden w-[220px] shrink-0 flex-col px-2 py-2.5 md:flex"
+    <div
+      inert={!sidebarOpen}
+      data-open={sidebarOpen}
+      className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
     >
-      <nav aria-label="Moderation sections" className="space-y-4">
-        {sectionGroups.map((group) => {
-          const items = group.items.filter(
-            (section) => manager || section.to !== "/dashboard/users",
-          );
-          if (items.length === 0) return null;
-          return (
-            <div key={group.heading} className="space-y-1">
-              <Typography variant="caption" className="px-2.5 text-text-sub-600">
-                {group.heading}
-              </Typography>
-              <div className="space-y-0.5">
-                {items.map(({ to, label, Icon }) => (
-                  <Link key={to} to={to} className={`${navLinkClass} h-8`}>
-                    <Icon className="size-4 shrink-0" />
-                    <span className="truncate">{label}</span>
-                  </Link>
-                ))}
+      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col px-2 py-2.5">
+        <nav aria-label="Moderation sections" className="space-y-4">
+          {sectionGroups.map((group) => {
+            const items = group.items.filter(
+              (section) => manager || section.to !== "/dashboard/users",
+            );
+            if (items.length === 0) return null;
+            return (
+              <div key={group.heading} className="space-y-1">
+                <Typography variant="caption" className="px-2.5 text-text-sub-600">
+                  {group.heading}
+                </Typography>
+                <div className="space-y-0.5">
+                  {items.map(({ to, label, Icon }) => (
+                    <Link key={to} to={to} className={`${navLinkClass} h-8`}>
+                      <Icon className="size-4 shrink-0" />
+                      <span className="truncate">{label}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </nav>
-      <NavigationFooter userName={userName} />
-    </aside>
+            );
+          })}
+        </nav>
+        <NavigationFooter userName={userName} />
+      </aside>
+    </div>
   );
 }
 

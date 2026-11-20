@@ -230,13 +230,19 @@ function LecturerReviewsPage() {
             )}
           </div>
         </div>
-        {selectedReview && detailsVisible && (
-          <ReviewInspector
-            key={selectedReview.id}
-            review={selectedReview}
-            onAction={confirmReview}
-          />
-        )}
+        <div
+          inert={!detailsVisible}
+          data-open={detailsVisible}
+          className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[320px] xl:block motion-reduce:transition-none"
+        >
+          {selectedReview && !reviews.isPending && !reviews.isError && (
+            <ReviewInspector
+              key={selectedReview.id}
+              review={selectedReview}
+              onAction={confirmReview}
+            />
+          )}
+        </div>
       </div>
       <ConfirmActionModal
         open={confirmation !== null}

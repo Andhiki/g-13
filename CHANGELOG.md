@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Sidebar, panel detail, dan pemilih peran dashboard kini membuka dan menutup dengan transisi.
+
 - Panel notifikasi menggunakan indikator muat ringkas.
 
 - Memperjelas pengurutan dan ringkasan rating ulasan dosen, serta menampilkan semester berjalan di bagian atas pilihan semester.
