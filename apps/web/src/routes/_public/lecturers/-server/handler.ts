@@ -29,10 +29,12 @@ export const loadLecturerDetail = createServerFn({ method: "GET" })
     runServerOperation(() => getLecturerDetail(createDatabase(env.DB), data.lecturerId)),
   );
 
-export const loadTurnstileSiteKey = createServerFn({ method: "GET" }).handler(async () => {
-  const { TURNSTILE_SITE_KEY: siteKey } = parseSubmissionEnvironment(env);
-  return { siteKey };
-});
+export const loadTurnstileSiteKey = createServerFn({ method: "GET" }).handler(async () =>
+  runServerOperation(async () => {
+    const { TURNSTILE_SITE_KEY: siteKey } = parseSubmissionEnvironment(env);
+    return { siteKey };
+  }),
+);
 
 export const publishLecturerReview = createServerFn({ method: "POST" })
   .validator(publishReviewInputSchema)

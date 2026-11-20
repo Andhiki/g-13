@@ -73,6 +73,7 @@ export function ReviewSubmissionForm({
   const [ratings, setRatings] = useState(initialRatings);
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setTerms(reviewTerms(new Date()));
     requestAnimationFrame(() => {
@@ -97,6 +98,7 @@ export function ReviewSubmissionForm({
       </Typography>
     );
   const AuthorIcon = anonymous ? RiSpyLine : RiUserLine;
+  const isSubmitting = submitting || publishMutation.isPending;
   return (
     <form
       ref={form}
@@ -104,7 +106,7 @@ export function ReviewSubmissionForm({
       className="flex max-h-[calc(100dvh-2rem)] min-h-0 flex-col"
       onSubmit={async (event) => {
         event.preventDefault();
-        if (publishMutation.isPending) return;
+        if (isSubmitting) return;
         const submission = { lecturerId, courseId, termLabel, body, ...ratings };
         const input: ReviewSubmissionInput = anonymous
           ? { ...submission, anonymous: true }
@@ -118,6 +120,7 @@ export function ReviewSubmissionForm({
           );
           return;
         }
+        setSubmitting(true);
         try {
           const turnstileToken = siteKey ? await turnstileRef.current?.execute() : "";
           if (!turnstileToken) {
@@ -139,6 +142,8 @@ export function ReviewSubmissionForm({
                     ? "Reviews are temporarily unavailable. Please try again later."
                     : "Could not confirm publication. Refresh the page before trying again.",
           );
+        } finally {
+          setSubmitting(false);
         }
       }}
     >
@@ -156,10 +161,7 @@ export function ReviewSubmissionForm({
       </header>
 
       <div className="min-h-0 overflow-y-auto px-4 pt-4 pb-3 sm:mb-3">
-        <fieldset
-          disabled={publishMutation.isPending}
-          className="min-w-0 space-y-4 disabled:opacity-70"
-        >
+        <fieldset disabled={isSubmitting} className="min-w-0 space-y-4 disabled:opacity-70">
           <div className={row}>
             <div>
               <Typography as="label" variant="label" htmlFor="review-author">
@@ -319,16 +321,17 @@ export function ReviewSubmissionForm({
             variant="neutral"
             size="small"
             onClick={onClose}
+            disabled={isSubmitting}
           >
             {text("Cancel")}
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
             size="small"
-            isLoading={publishMutation.isPending}
+            isLoading={isSubmitting}
             icon={<RiArrowRightLine className="size-5" />}
             iconPosition="end"
-            disabled={!courses.length}
+            disabled={!courses.length || isSubmitting}
             className="w-full text-paragraph-sm sm:w-auto"
           >
             <Typography as="span" variant="paragraph">
