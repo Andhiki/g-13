@@ -18,7 +18,7 @@ export const Route = createFileRoute("/dashboard/login/")({
   },
   pendingComponent: () => (
     <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
-      <Loading />
+      <Loading tone="neutral" />
     </main>
   ),
   errorComponent: () => (

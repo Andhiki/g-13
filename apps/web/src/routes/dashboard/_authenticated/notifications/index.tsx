@@ -44,7 +44,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
   },
   pendingComponent: () => (
     <div className="flex flex-1 items-center justify-center p-6">
-      <Loading />
+      <Loading tone="neutral" />
     </div>
   ),
   component: NotificationsPage,
@@ -279,7 +279,7 @@ function NotificationsPage() {
         )}
         {list.isPending ? (
           <div className="flex h-full min-h-64 items-center justify-center p-6">
-            <Loading />
+            <Loading tone="neutral" />
           </div>
         ) : displayedRows.length === 0 ? (
           <DashboardEmptyState

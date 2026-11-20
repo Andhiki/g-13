@@ -17,14 +17,14 @@ const messages = [
   "Menyusun bintang satu per satu…",
 ];
 
-export function Loading() {
+export function Loading({ tone = "accent" }: { tone?: "accent" | "neutral" }) {
   const { text } = useLocale();
   const [message] = useState(() => messages[Math.floor(Math.random() * messages.length)]!);
 
   return (
     <div
       role="status"
-      className="flex flex-1 flex-col items-center justify-center gap-4 text-center text-primary-base"
+      className={`flex flex-1 flex-col items-center justify-center gap-4 text-center ${tone === "neutral" ? "text-text-sub-600" : "text-primary-base"}`}
     >
       <span
         aria-hidden="true"

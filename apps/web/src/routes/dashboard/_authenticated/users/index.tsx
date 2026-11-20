@@ -33,7 +33,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/users/")({
   },
   pendingComponent: () => (
     <div className="flex flex-1 items-center justify-center p-6">
-      <Loading />
+      <Loading tone="neutral" />
     </div>
   ),
   component: AdminUsersPage,
@@ -148,7 +148,7 @@ function AdminUsersPage() {
               </Typography>
             ) : users.isPending ? (
               <div className="flex h-full min-h-64 items-center justify-center p-6">
-                <Loading />
+                <Loading tone="neutral" />
               </div>
             ) : (
               <>
