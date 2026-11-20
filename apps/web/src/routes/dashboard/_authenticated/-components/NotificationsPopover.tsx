@@ -9,8 +9,8 @@ import {
   RiNotification3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
-import { Loading } from "@/ui/loading";
 import { AlignPopover } from "@/ui/popover";
+import { SmallLoading } from "@/ui/small-loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { notificationsQuery, unreadNotificationCountQuery } from "../notifications/-client/queries";
@@ -118,8 +118,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
               </Typography>
             </div>
           ) : listQuery.isPending ? (
-            <div className="px-3.5 py-8">
-              <Loading />
+            <div className="flex justify-center px-3.5 py-6">
+              <SmallLoading label={text("status.loading")} />
             </div>
           ) : items.length === 0 ? (
             <div className="px-3.5 py-8 text-center">

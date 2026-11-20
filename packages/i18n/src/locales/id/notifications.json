@@ -12,6 +12,7 @@
   "empty.all": "Belum ada notifikasi.",
   "empty.unread": "Semua notifikasi sudah dibaca.",
   "empty.archived": "Belum ada notifikasi yang diarsipkan.",
+  "status.loading": "Memuat notifikasi…",
   "status.unread": "Belum dibaca",
   "status.read": "Dibaca",
   "error.load": "Notifikasi gagal dimuat. Coba muat ulang.",

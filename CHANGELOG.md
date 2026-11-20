@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Panel notifikasi menggunakan indikator muat ringkas.
+
 - Memperjelas pengurutan dan ringkasan rating ulasan dosen, serta menampilkan semester berjalan di bagian atas pilihan semester.
 
 - Halaman publik statis (beranda, arsip ujian, FAQ, resources, roadmap) kini di-prerender saat build; halaman dosen dan dashboard dirender di klien agar hemat CPU.

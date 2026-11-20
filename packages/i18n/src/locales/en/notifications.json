@@ -12,6 +12,7 @@
   "empty.all": "No notifications yet.",
   "empty.unread": "No unread notifications.",
   "empty.archived": "No archived notifications.",
+  "status.loading": "Loading notifications…",
   "status.unread": "Unread",
   "status.read": "Read",
   "error.load": "Notifications could not be loaded. Try refreshing.",
