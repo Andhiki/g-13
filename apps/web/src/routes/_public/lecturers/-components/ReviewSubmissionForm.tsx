@@ -1,6 +1,6 @@
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RiArrowRightLine, RiSpyLine, RiUserLine } from "@remixicon/react";
 import { AlignSelect } from "@/ui/select";
 import * as AlignSwitch from "@/ui/switch";
@@ -11,10 +11,12 @@ import { AlignModal } from "@/ui/modal";
 import { useLocale } from "@/useLocale";
 import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
+import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import type { ReviewSubmissionInput } from "../-shared/submission-schema";
 import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submission-errors";
 import { publishLecturerReviewMutationOptions } from "../-client/mutations";
+import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
 export type ReviewFormData = {
   courses: { id: string; code: string; nameId: string; nameEn: string }[];
@@ -58,6 +60,9 @@ export function ReviewSubmissionForm({
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
   const publishMutation = useMutation(publishLecturerReviewMutationOptions(queryClient));
+  const siteKeyQuery = useQuery(turnstileSiteKeyQueryOptions());
+  const siteKey = siteKeyQuery.data?.siteKey ?? "";
+  const turnstileRef = useRef<TurnstileFieldHandle>(null);
   const form = useRef<HTMLFormElement>(null);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
@@ -68,6 +73,7 @@ export function ReviewSubmissionForm({
   const [ratings, setRatings] = useState(initialRatings);
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setTerms(reviewTerms(new Date()));
     requestAnimationFrame(() => {
@@ -92,6 +98,7 @@ export function ReviewSubmissionForm({
       </Typography>
     );
   const AuthorIcon = anonymous ? RiSpyLine : RiUserLine;
+  const isSubmitting = submitting || publishMutation.isPending;
   return (
     <form
       ref={form}
@@ -99,7 +106,7 @@ export function ReviewSubmissionForm({
       className="flex max-h-[calc(100dvh-2rem)] min-h-0 flex-col"
       onSubmit={async (event) => {
         event.preventDefault();
-        if (publishMutation.isPending) return;
+        if (isSubmitting) return;
         const submission = { lecturerId, courseId, termLabel, body, ...ratings };
         const input: ReviewSubmissionInput = anonymous
           ? { ...submission, anonymous: true }
@@ -113,20 +120,30 @@ export function ReviewSubmissionForm({
           );
           return;
         }
+        setSubmitting(true);
         try {
-          const result = await publishMutation.mutateAsync(input);
+          const turnstileToken = siteKey ? await turnstileRef.current?.execute() : "";
+          if (!turnstileToken) {
+            setMessage("Complete the security check and try again.");
+            return;
+          }
+          const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
           await onPublished(result.reviewId);
         } catch (error: unknown) {
           const code = error instanceof Error ? error.message : null;
           setMessage(
             code === REVIEW_ERRORS.RATE_LIMIT
               ? "Submission limit reached. Try again next hour."
-              : code === REVIEW_ERRORS.INVALID
-                ? "The lecturer or course may no longer be available. Refresh the page and try again."
-                : code === REVIEW_ERRORS.UNAVAILABLE
-                  ? "Reviews are temporarily unavailable. Please try again later."
-                  : "Could not confirm publication. Refresh the page before trying again.",
+              : code === REVIEW_ERRORS.CAPTCHA
+                ? "Security verification failed. Please try again."
+                : code === REVIEW_ERRORS.INVALID
+                  ? "The lecturer or course may no longer be available. Refresh the page and try again."
+                  : code === REVIEW_ERRORS.UNAVAILABLE
+                    ? "Reviews are temporarily unavailable. Please try again later."
+                    : "Could not confirm publication. Refresh the page before trying again.",
           );
+        } finally {
+          setSubmitting(false);
         }
       }}
     >
@@ -144,10 +161,7 @@ export function ReviewSubmissionForm({
       </header>
 
       <div className="min-h-0 overflow-y-auto px-4 pt-4 pb-3 sm:mb-3">
-        <fieldset
-          disabled={publishMutation.isPending}
-          className="min-w-0 space-y-4 disabled:opacity-70"
-        >
+        <fieldset disabled={isSubmitting} className="min-w-0 space-y-4 disabled:opacity-70">
           <div className={row}>
             <div>
               <Typography as="label" variant="label" htmlFor="review-author">
@@ -290,6 +304,8 @@ export function ReviewSubmissionForm({
         </fieldset>
       </div>
 
+      <TurnstileField ref={turnstileRef} siteKey={siteKey} />
+
       <footer className="shrink-0 border-t border-stroke-soft-200 p-4">
         {message && (
           <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
@@ -305,16 +321,17 @@ export function ReviewSubmissionForm({
             variant="neutral"
             size="small"
             onClick={onClose}
+            disabled={isSubmitting}
           >
             {text("Cancel")}
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
             size="small"
-            isLoading={publishMutation.isPending}
+            isLoading={isSubmitting}
             icon={<RiArrowRightLine className="size-5" />}
             iconPosition="end"
-            disabled={!courses.length}
+            disabled={!courses.length || isSubmitting}
             className="w-full text-paragraph-sm sm:w-auto"
           >
             <Typography as="span" variant="paragraph">

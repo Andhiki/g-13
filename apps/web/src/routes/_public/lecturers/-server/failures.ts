@@ -5,12 +5,14 @@ const submissionErrorStatuses = {
   [REVIEW_ERRORS.INVALID]: 400,
   [REVIEW_ERRORS.UNAVAILABLE]: 503,
   [REVIEW_ERRORS.RATE_LIMIT]: 429,
+  [REVIEW_ERRORS.CAPTCHA]: 400,
 } satisfies Record<ReviewOperationError, number>;
 
 const likeErrorStatuses = {
   [REVIEW_ERRORS.INVALID]: 404,
   [REVIEW_ERRORS.UNAVAILABLE]: 503,
   [REVIEW_ERRORS.RATE_LIMIT]: 429,
+  [REVIEW_ERRORS.CAPTCHA]: 400,
 } satisfies Record<ReviewOperationError, number>;
 
 export function rejectSubmissionOperation(error: ReviewOperationError): never {

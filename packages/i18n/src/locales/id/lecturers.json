@@ -43,6 +43,8 @@
   "Check all fields and select a lecturer and course.": "Periksa semua kolom dan pilih dosen serta mata kuliah.",
   "Reviews are temporarily unavailable. Please try again later.": "Ulasan sementara tidak tersedia. Silakan coba lagi nanti.",
   "Could not confirm publication. Refresh the page before trying again.": "Penerbitan belum dapat dipastikan. Muat ulang halaman sebelum mencoba lagi.",
+  "Complete the security check and try again.": "Selesaikan verifikasi keamanan lalu coba lagi.",
+  "Security verification failed. Please try again.": "Verifikasi keamanan gagal. Silakan coba lagi.",
   "{{metric}}: {{value}} of 5": "{{metric}}: {{value}} dari 5",
   "Not rated": "Belum dinilai",
   "Courses": "Mata kuliah",

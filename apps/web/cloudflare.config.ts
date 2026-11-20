@@ -66,6 +66,8 @@ export default defineConfig(({ mode }) => {
 				GITHUB_CLIENT_ID: bindings.secret(),
 				GITHUB_CLIENT_SECRET: bindings.secret(),
 				REVIEW_RATE_LIMIT_SECRET: bindings.secret(),
+				TURNSTILE_SITE_KEY: bindings.secret(),
+				TURNSTILE_SECRET_KEY: bindings.secret(),
 			},
 		},
 	};

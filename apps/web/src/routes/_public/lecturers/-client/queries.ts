@@ -1,8 +1,22 @@
 import { queryOptions } from "@tanstack/react-query";
 import { notFound } from "@tanstack/react-router";
-import { loadBrowserLikes, loadLecturerDetail, loadLecturerDirectory } from "../-server/handler";
+import {
+  loadBrowserLikes,
+  loadLecturerDetail,
+  loadLecturerDirectory,
+  loadTurnstileSiteKey,
+} from "../-server/handler";
 
 const publicDataStaleTime = 5 * 60 * 1000;
+
+export function turnstileSiteKeyQueryOptions() {
+  return queryOptions({
+    queryKey: ["turnstile", "site-key"],
+    queryFn: () => loadTurnstileSiteKey(),
+    staleTime: publicDataStaleTime,
+    refetchOnWindowFocus: false,
+  });
+}
 
 export function lecturerDirectoryQueryOptions() {
   return queryOptions({
