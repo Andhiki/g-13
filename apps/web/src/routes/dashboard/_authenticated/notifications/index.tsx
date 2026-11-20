@@ -7,14 +7,17 @@ import {
   RiCheckDoubleLine,
   RiCheckLine,
   RiExternalLinkLine,
+  RiNotification3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { AdminPageHeader } from "../-components/AdminPageHeader";
+import { DashboardEmptyState } from "../-components/DashboardEmptyState";
 import { SmallLoading } from "@/ui/small-loading";
-import { notificationsQuery } from "./-client/queries";
+import { notificationReadMutationKey, notificationsQuery } from "./-client/queries";
+import { usePendingNotificationReadIds } from "./-client/usePendingNotificationReads";
 import {
   archiveNotificationAction,
   markAllNotificationsAsRead,
@@ -50,14 +53,14 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
 function NotificationRow({
   item,
   busy,
-  markingRead,
+  optimisticallyRead,
   archiving,
   onMarkRead,
   onArchive,
 }: {
   item: NotificationItem;
   busy: boolean;
-  markingRead: boolean;
+  optimisticallyRead: boolean;
   archiving: boolean;
   onMarkRead: (id: string) => void;
   onArchive: (id: string) => void;
@@ -75,7 +78,7 @@ function NotificationRow({
     resourceId: item.resourceId,
   };
   const linkTarget = resolveNotificationLink(item.resourceType, item.resourceId);
-  const unread = item.readAt === null && item.archivedAt === null;
+  const unread = !optimisticallyRead && item.readAt === null && item.archivedAt === null;
 
   return (
     <li
@@ -127,7 +130,6 @@ function NotificationRow({
             variant="neutral"
             mode="ghost"
             className="gap-1 text-label-xs"
-            isLoading={markingRead}
             icon={<RiCheckLine className="size-3.5" />}
             disabled={busy}
             onClick={() => onMarkRead(item.id)}
@@ -163,9 +165,25 @@ function NotificationsPage() {
   const [filter, setFilter] = useState<NotificationFilter>("all");
   const queryClient = useQueryClient();
   const list = useInfiniteQuery(notificationsQuery(filter));
+  const pendingReadIdSet = usePendingNotificationReadIds();
 
   const visibleRows = list.data?.pages.flatMap((page) => page.rows) ?? [];
   const counts = list.data?.pages[0]?.counts ?? initialData.counts;
+  const pendingUnreadCount = new Set(
+    visibleRows
+      .filter(
+        (item) => pendingReadIdSet.has(item.id) && item.readAt === null && item.archivedAt === null,
+      )
+      .map((item) => item.id),
+  ).size;
+  const visibleCounts = {
+    ...counts,
+    unread: Math.max(0, counts.unread - pendingUnreadCount),
+  };
+  const displayedRows =
+    filter === "unread"
+      ? visibleRows.filter((item) => !pendingReadIdSet.has(item.id))
+      : visibleRows;
   const { fetchNextPage, hasNextPage, isFetching, isFetchNextPageError } = list;
 
   useEffect(() => {
@@ -186,6 +204,7 @@ function NotificationsPage() {
   }
 
   const readMutation = useMutation({
+    mutationKey: notificationReadMutationKey,
     mutationFn: (notificationId: string) => markNotificationAsRead({ data: { notificationId } }),
     onSuccess: invalidateNotifications,
   });
@@ -230,7 +249,7 @@ function NotificationsPage() {
               }}
             >
               <span>{text(`filter.${value}`)}</span>
-              <span className="tabular-nums text-text-sub-600">{counts[value]}</span>
+              <span className="tabular-nums text-text-sub-600">{visibleCounts[value]}</span>
             </AlignButton.Root>
           ))}
         </div>
@@ -241,13 +260,16 @@ function NotificationsPage() {
           className="gap-1.5 text-label-xs"
           isLoading={readAllMutation.isPending}
           icon={<RiCheckDoubleLine className="size-3.5" />}
-          disabled={busy || counts.unread === 0}
+          disabled={busy || visibleCounts.unread === 0}
           onClick={() => readAllMutation.mutate()}
         >
           {text("action.markAllRead")}
         </AlignButton.Root>
       </div>
-      <div ref={scrollArea} className="min-h-0 flex-1 overflow-y-auto">
+      <div
+        ref={scrollArea}
+        className={`min-h-0 flex-1 overflow-y-auto ${displayedRows.length === 0 ? "flex flex-col" : ""}`}
+      >
         {((list.isError && !isFetchNextPageError) || mutationError) && (
           <div className="border-b border-stroke-soft-200 bg-error-lighter px-4 py-2.5">
             <Typography role="alert" variant="caption" className="text-error-base">
@@ -259,20 +281,43 @@ function NotificationsPage() {
           <div className="flex h-full min-h-64 items-center justify-center p-6">
             <Loading />
           </div>
-        ) : visibleRows.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-            <Typography variant="paragraph" className="text-text-sub-600">
-              {text(`empty.${filter}`)}
-            </Typography>
-          </div>
+        ) : displayedRows.length === 0 ? (
+          <DashboardEmptyState
+            icon={
+              filter === "archived" ? (
+                <RiArchiveLine className="size-5" />
+              ) : filter === "unread" ? (
+                <RiCheckDoubleLine className="size-5" />
+              ) : (
+                <RiNotification3Line className="size-5" />
+              )
+            }
+            title={text(`empty.${filter}.title`)}
+            description={text(`empty.${filter}.description`)}
+            action={
+              filter !== "all" && counts.all > 0 ? (
+                <AlignButton.Root
+                  size="small"
+                  variant="neutral"
+                  mode="stroke"
+                  onClick={() => {
+                    setFilter("all");
+                    scrollArea.current?.scrollTo({ top: 0 });
+                  }}
+                >
+                  {text("action.viewAll")}
+                </AlignButton.Root>
+              ) : undefined
+            }
+          />
         ) : (
           <ul>
-            {visibleRows.map((item) => (
+            {displayedRows.map((item) => (
               <NotificationRow
                 key={item.id}
                 item={item}
                 busy={busy}
-                markingRead={readMutation.isPending && readMutation.variables === item.id}
+                optimisticallyRead={pendingReadIdSet.has(item.id)}
                 archiving={archiveMutation.isPending && archiveMutation.variables === item.id}
                 onMarkRead={(id) => readMutation.mutate(id)}
                 onArchive={(id) => archiveMutation.mutate(id)}

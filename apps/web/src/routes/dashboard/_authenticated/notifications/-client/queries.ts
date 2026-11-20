@@ -5,6 +5,8 @@ import type { NotificationCursor, NotificationFilter } from "../-shared/schemas"
 const dashboardStaleTime = 5 * 60 * 1000;
 const firstPage: NotificationCursor | null = null;
 
+export const notificationReadMutationKey = ["notifications", "mark-read"];
+
 export function notificationsQuery(filter: NotificationFilter = "all") {
   return infiniteQueryOptions({
     queryKey: ["notifications", "list", filter],

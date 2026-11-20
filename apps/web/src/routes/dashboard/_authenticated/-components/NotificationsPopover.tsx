@@ -13,7 +13,11 @@ import { AlignPopover } from "@/ui/popover";
 import { SmallLoading } from "@/ui/small-loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import { notificationPopoverQuery } from "../notifications/-client/queries";
+import {
+  notificationPopoverQuery,
+  notificationReadMutationKey,
+} from "../notifications/-client/queries";
+import { usePendingNotificationReadIds } from "../notifications/-client/usePendingNotificationReads";
 import {
   archiveNotificationAction,
   markAllNotificationsAsRead,
@@ -28,14 +32,22 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({ ...notificationPopoverQuery(), enabled: false });
-  const unreadCount = listQuery.data?.counts.unread ?? 0;
-  const items = (listQuery.data?.rows ?? []).slice(0, 8);
+  const pendingReadIdSet = usePendingNotificationReadIds();
+  const serverRows = listQuery.data?.rows ?? [];
+  const pendingUnreadCount = new Set(
+    serverRows
+      .filter((item) => pendingReadIdSet.has(item.id) && item.readAt === null)
+      .map((item) => item.id),
+  ).size;
+  const unreadCount = Math.max(0, (listQuery.data?.counts.unread ?? 0) - pendingUnreadCount);
+  const items = serverRows.filter((item) => !pendingReadIdSet.has(item.id)).slice(0, 8);
 
   async function invalidateNotifications() {
     await queryClient.invalidateQueries({ queryKey: ["notifications"] });
   }
 
   const readMutation = useMutation({
+    mutationKey: notificationReadMutationKey,
     mutationFn: (notificationId: string) => markNotificationAsRead({ data: { notificationId } }),
     onSuccess: invalidateNotifications,
   });
@@ -51,6 +63,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
   });
 
   const busy = readMutation.isPending || readAllMutation.isPending || archiveMutation.isPending;
+  const readMutationError = readMutation.isError;
 
   return (
     <AlignPopover.Root open={open} onOpenChange={setOpen}>
@@ -104,6 +117,14 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
             </AlignButton.Root>
           )}
         </div>
+
+        {readMutationError && (
+          <div className="border-b border-stroke-soft-200 bg-error-lighter px-3.5 py-2">
+            <Typography role="alert" variant="caption" className="text-error-base">
+              {text("error.update")}
+            </Typography>
+          </div>
+        )}
 
         <div className="max-h-[340px] overflow-y-auto">
           {listQuery.isError ? (

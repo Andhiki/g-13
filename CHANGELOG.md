@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menandai notifikasi sebagai dibaca langsung memperbarui daftar dan indikator belum dibaca sambil menunggu server.
+
 - Dashboard menampilkan kondisi kosong yang seragam dan pratinjau sebelum dan sesudah untuk perubahan peran dan status ulasan.
 
 - Notifikasi dashboard dapat digulir tanpa tombol halaman, menu akun menampilkan avatar GitHub, dan pilihan peran memakai ikon akses.
