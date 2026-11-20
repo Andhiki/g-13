@@ -223,9 +223,6 @@ function LecturerReviewsPage() {
                           ? "No reviews yet"
                           : `No ${status} reviews`
                     }
-                    description={
-                      status === "all" && !needle ? "Submitted reviews appear here." : undefined
-                    }
                     action={
                       needle || (status !== "all" && counts.all > 0) ? (
                         <AlignButton.Root

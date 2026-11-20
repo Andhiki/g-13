@@ -1,4 +1,3 @@
-import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 
@@ -33,7 +32,6 @@ export function AdminPagination({
           disabled={!offset}
           onClick={onPrevious}
         >
-          <RiArrowLeftLine className="size-3.5" />
           Previous
         </AlignButton.Root>
         <AlignButton.Root
@@ -45,7 +43,6 @@ export function AdminPagination({
           onClick={onNext}
         >
           Next
-          <RiArrowRightLine className="size-3.5" />
         </AlignButton.Root>
       </div>
     </footer>

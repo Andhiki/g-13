@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menyederhanakan teks dan ikon pada tabel dashboard.
+
 - Indikator muat dashboard menggunakan warna teks netral.
 
 - Menandai notifikasi sebagai dibaca langsung memperbarui daftar dan indikator belum dibaca sambil menunggu server.

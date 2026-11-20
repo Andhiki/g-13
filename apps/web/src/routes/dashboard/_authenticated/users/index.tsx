@@ -165,9 +165,6 @@ function AdminUsersPage() {
                   <DashboardEmptyState
                     icon={<RiGroupLine />}
                     title={userStatus === "all" ? "No accounts yet" : `No ${userStatus} accounts`}
-                    description={
-                      userStatus === "all" ? "Accounts appear here after users sign in." : undefined
-                    }
                     action={
                       userStatus !== "all" && counts.all > 0 ? (
                         <AlignButton.Root

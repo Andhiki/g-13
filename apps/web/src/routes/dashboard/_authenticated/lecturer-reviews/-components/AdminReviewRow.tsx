@@ -1,11 +1,9 @@
-import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine, RiStarFill } from "@remixicon/react";
-import { AlignBadge } from "@/ui/badge";
+import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiStarFill } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import { AdminTableRow } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import { formatAbsoluteTime, formatRelativeTime } from "../../notifications/-shared/time";
 import type { loadModerationReviews } from "../-server/handler";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
@@ -30,7 +28,6 @@ export function AdminReviewRow({
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
-  const createdMs = review.createdAt.getTime();
 
   return (
     <AdminTableRow
@@ -70,11 +67,7 @@ export function AdminReviewRow({
           {review.body}
         </Typography>
         <Typography variant="caption" className="mt-1 block text-text-sub-600">
-          <span>{review.authorName}</span>
-          <span title={formatAbsoluteTime(createdMs, language)}>
-            {" "}
-            · {formatRelativeTime(createdMs, language)}
-          </span>
+          {review.authorName}
         </Typography>
       </div>
 
@@ -86,40 +79,32 @@ export function AdminReviewRow({
         <span>{overall.toFixed(1)}</span>
       </div>
 
-      <div className="flex items-center justify-end gap-1">
-        {!deleted && (
-          <>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="neutral"
-              mode="ghost"
-              className="gap-1 text-label-xs"
-              onClick={() =>
-                onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
-              }
-            >
-              {hidden ? <RiEyeLine className="size-3.5" /> : <RiEyeOffLine className="size-3.5" />}
-              {hidden ? "Restore" : "Hide"}
-            </AlignButton.Root>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="error"
-              mode="ghost"
-              className="gap-1 text-label-xs text-error-dark"
-              onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
-            >
-              <RiDeleteBinLine className="size-3.5" />
-              Delete
-            </AlignButton.Root>
-          </>
-        )}
-        {deleted && (
-          <AlignBadge.Root size="medium" variant="lighter" className="gap-1 text-label-xs">
-            <RiLockLine aria-hidden="true" className="size-3" />
-            Read only
-          </AlignBadge.Root>
-        )}
-      </div>
+      {!deleted && (
+        <div className="flex items-center justify-end gap-1">
+          <AlignButton.Root
+            size="xxsmall"
+            variant="neutral"
+            mode="ghost"
+            className="gap-1 text-label-xs"
+            onClick={() =>
+              onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
+            }
+          >
+            {hidden ? <RiEyeLine className="size-3.5" /> : <RiEyeOffLine className="size-3.5" />}
+            {hidden ? "Restore" : "Hide"}
+          </AlignButton.Root>
+          <AlignButton.Root
+            size="xxsmall"
+            variant="error"
+            mode="ghost"
+            className="gap-1 text-label-xs text-error-dark"
+            onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
+          >
+            <RiDeleteBinLine className="size-3.5" />
+            Delete
+          </AlignButton.Root>
+        </div>
+      )}
     </AdminTableRow>
   );
 }
