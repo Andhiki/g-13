@@ -41,6 +41,7 @@ function loadTurnstile(): Promise<TurnstileApi> {
       () => {
         if (window.turnstile) resolve(window.turnstile);
         else {
+          script.remove();
           scriptPromise = null;
           reject(new Error("Turnstile script loaded without exposing an API"));
         }
