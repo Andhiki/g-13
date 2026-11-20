@@ -1,8 +1,8 @@
 import { canModerate } from "@g13/auth";
 import { AlignBadge } from "@/ui/badge";
-import { AlignButton } from "@/ui/button";
 import {
   AdminTableHeader,
+  AdminTableInspectButton,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { formatMonthYear } from "@/date-format";
@@ -46,19 +46,16 @@ export function AdminUserList({
             <div className="flex min-w-0 items-center gap-2.5">
               <AccountAvatar name={user.name} image={user.image} />
               <div className="min-w-0">
-                <Typography variant="labelSmall" className="truncate font-medium">
-                  <AlignButton.Root
-                    variant="neutral"
-                    mode="ghost"
-                    size="xxsmall"
-                    className="block h-auto max-w-full truncate rounded-sm p-0 text-label-xs text-text-strong-950 hover:bg-transparent hover:underline"
-                    aria-label={`Inspect account ${user.name}`}
-                    aria-pressed={selectedId === user.id}
-                    onClick={() => onSelect(user.id)}
-                  >
-                    {user.name}
-                  </AlignButton.Root>
-                </Typography>
+                <AdminTableInspectButton
+                  as="p"
+                  ariaLabel={`Inspect account ${user.name}`}
+                  selected={selectedId === user.id}
+                  onSelect={() => onSelect(user.id)}
+                  className="truncate font-medium"
+                  buttonClassName=""
+                >
+                  {user.name}
+                </AdminTableInspectButton>
                 <Typography variant="caption" className="truncate text-text-sub-600">
                   {user.email}
                 </Typography>

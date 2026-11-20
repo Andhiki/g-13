@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   RiArchiveLine,
@@ -13,23 +13,15 @@ import { AlignPopover } from "@/ui/popover";
 import { SmallLoading } from "@/ui/small-loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import {
-  notificationPopoverQuery,
-  notificationReadMutationKey,
-} from "../notifications/-client/queries";
+import { notificationPopoverQuery } from "../notifications/-client/queries";
+import { useNotificationActions } from "../notifications/-client/useNotificationActions";
 import { usePendingNotificationReadIds } from "../notifications/-client/usePendingNotificationReads";
-import {
-  archiveNotificationAction,
-  markAllNotificationsAsRead,
-  markNotificationAsRead,
-} from "../notifications/-server/handler";
-import { resolveNotificationLink } from "../notifications/-shared/schemas";
+import { getNotificationPresentation } from "../notifications/-shared/schemas";
 import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 
 export function NotificationsPopover({ side = "right" }: { side?: "right" | "bottom" }) {
   const [open, setOpen] = useState(false);
   const { text, language } = useLocale("notifications");
-  const queryClient = useQueryClient();
 
   const listQuery = useQuery({ ...notificationPopoverQuery(), enabled: false });
   const pendingReadIdSet = usePendingNotificationReadIds();
@@ -42,27 +34,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
   const unreadCount = Math.max(0, (listQuery.data?.counts.unread ?? 0) - pendingUnreadCount);
   const items = serverRows.filter((item) => !pendingReadIdSet.has(item.id)).slice(0, 8);
 
-  async function invalidateNotifications() {
-    await queryClient.invalidateQueries({ queryKey: ["notifications"] });
-  }
-
-  const readMutation = useMutation({
-    mutationKey: notificationReadMutationKey,
-    mutationFn: (notificationId: string) => markNotificationAsRead({ data: { notificationId } }),
-    onSuccess: invalidateNotifications,
-  });
-
-  const readAllMutation = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(),
-    onSuccess: invalidateNotifications,
-  });
-
-  const archiveMutation = useMutation({
-    mutationFn: (notificationId: string) => archiveNotificationAction({ data: { notificationId } }),
-    onSuccess: invalidateNotifications,
-  });
-
-  const busy = readMutation.isPending || readAllMutation.isPending || archiveMutation.isPending;
+  const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
   const readMutationError = readMutation.isError;
 
   return (
@@ -146,18 +118,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
           ) : (
             <ul className="divide-y divide-stroke-soft-200">
               {items.map((item) => {
-                const isKnown =
-                  item.type === "review.created" ||
-                  item.type === "user.pending_approval" ||
-                  item.type === "user.role_updated";
-                const titleKey = isKnown ? `event.${item.type}.title` : "event.unknown.title";
-                const bodyKey = isKnown ? `event.${item.type}.body` : "event.unknown.body";
-                const interpolation = {
-                  ...item.payload,
-                  resourceType: item.resourceType,
-                  resourceId: item.resourceId,
-                };
-                const linkTarget = resolveNotificationLink(item.resourceType, item.resourceId);
+                const { titleKey, bodyKey, interpolation, linkTarget } =
+                  getNotificationPresentation(item);
 
                 return (
                   <li

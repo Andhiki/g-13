@@ -1,7 +1,10 @@
 import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiStarFill } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
-import { AdminTableRow } from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import {
+  AdminTableInspectButton,
+  AdminTableRow,
+} from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import type { loadModerationReviews } from "../-server/handler";
@@ -37,19 +40,13 @@ export function AdminReviewRow({
     >
       <div className="min-w-0 space-y-1">
         <div className="flex items-center gap-2">
-          <Typography as="h3" variant="labelSmall" className="min-w-0 font-semibold">
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xxsmall"
-              onClick={onSelect}
-              className="block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline"
-              aria-label={`Inspect ${label}`}
-              aria-pressed={selected}
-            >
-              {review.lecturerName}
-            </AlignButton.Root>
-          </Typography>
+          <AdminTableInspectButton
+            ariaLabel={`Inspect ${label}`}
+            selected={selected}
+            onSelect={onSelect}
+          >
+            {review.lecturerName}
+          </AdminTableInspectButton>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
         <CourseChip

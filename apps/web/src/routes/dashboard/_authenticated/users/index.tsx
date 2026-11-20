@@ -7,14 +7,15 @@ import { changeUserRole } from "./-server/handler";
 import { adminUsersQuery } from "./-client/queries";
 import { userStatusSchema, type AssignRoleInput, type UserStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
-import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
+import { AdminFilterBar } from "../-components/AdminFilterBar";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
 import { ConfirmationChange } from "../-components/ConfirmationChange";
 import { DashboardEmptyState } from "../-components/DashboardEmptyState";
+import { DashboardPending, DashboardRoutePending } from "../-components/DashboardPending";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { AdminUserList } from "./-components/AdminUserList";
 import { roleOptions, type AssignableRole } from "./-components/role-options";
@@ -32,11 +33,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/users/")({
       throw error;
     }
   },
-  pendingComponent: () => (
-    <div className="flex flex-1 items-center justify-center p-6">
-      <Loading tone="neutral" />
-    </div>
-  ),
+  pendingComponent: DashboardRoutePending,
   component: AdminUsersPage,
 });
 
@@ -94,40 +91,31 @@ function AdminUsersPage() {
         userName={identity.name}
         userImage={identity.image}
       />
-      <div
-        className="flex min-h-11 shrink-0 items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
-        aria-label="Account approval filters"
+      <AdminFilterBar
+        ariaLabel="Account approval filters"
+        tabs={userStatusSchema.options.map((value) => ({
+          value,
+          label:
+            value === "all"
+              ? "All accounts"
+              : value === "pending"
+                ? "Pending approval"
+                : "Approved",
+          count: counts[value],
+        }))}
+        activeTab={userStatus}
+        onTabChange={(value) => {
+          setUserStatus(value);
+          setOffset(0);
+          setSelectedUserId(null);
+        }}
       >
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {userStatusSchema.options.map((value) => (
-            <AlignButton.Root
-              key={value}
-              size="xxsmall"
-              variant="neutral"
-              mode={userStatus === value ? "lighter" : "ghost"}
-              className="gap-2 text-label-xs"
-              aria-pressed={userStatus === value}
-              onClick={() => {
-                setUserStatus(value);
-                setOffset(0);
-                setSelectedUserId(null);
-              }}
-            >
-              {value === "all"
-                ? "All accounts"
-                : value === "pending"
-                  ? "Pending approval"
-                  : "Approved"}
-              <span className="text-text-sub-600 tabular-nums">{counts[value]}</span>
-            </AlignButton.Root>
-          ))}
-        </div>
         <DetailsToggleButton
           available={!!selectedUser}
           visible={detailsVisible}
           onToggle={() => setDetailsOpen((open) => !open)}
         />
-      </div>
+      </AdminFilterBar>
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
           {!users.isPending && !users.isError && (
@@ -149,9 +137,7 @@ function AdminUsersPage() {
                 Could not load accounts. Refresh or sign in again.
               </Typography>
             ) : users.isPending ? (
-              <div className="flex h-full min-h-64 items-center justify-center p-6">
-                <Loading tone="neutral" />
-              </div>
+              <DashboardPending />
             ) : (
               <>
                 <AdminUserList

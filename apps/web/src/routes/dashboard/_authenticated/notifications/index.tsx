@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
 import {
@@ -10,23 +10,20 @@ import {
   RiNotification3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
-import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
+import { AdminFilterBar } from "../-components/AdminFilterBar";
 import { AdminPageHeader } from "../-components/AdminPageHeader";
 import { DashboardEmptyState } from "../-components/DashboardEmptyState";
+import { DashboardPending, DashboardRoutePending } from "../-components/DashboardPending";
 import { SmallLoading } from "@/ui/small-loading";
-import { notificationReadMutationKey, notificationsQuery } from "./-client/queries";
+import { notificationsQuery } from "./-client/queries";
+import { useNotificationActions } from "./-client/useNotificationActions";
 import { usePendingNotificationReadIds } from "./-client/usePendingNotificationReads";
-import {
-  archiveNotificationAction,
-  markAllNotificationsAsRead,
-  markNotificationAsRead,
-} from "./-server/handler";
 import type { NotificationItem } from "./-server/repository";
 import {
+  getNotificationPresentation,
   notificationFilterSchema,
-  resolveNotificationLink,
   type NotificationFilter,
 } from "./-shared/schemas";
 import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
@@ -42,11 +39,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
       throw error;
     }
   },
-  pendingComponent: () => (
-    <div className="flex flex-1 items-center justify-center p-6">
-      <Loading tone="neutral" />
-    </div>
-  ),
+  pendingComponent: DashboardRoutePending,
   component: NotificationsPage,
 });
 
@@ -66,18 +59,7 @@ function NotificationRow({
   onArchive: (id: string) => void;
 }) {
   const { text, language } = useLocale("notifications");
-  const isKnown =
-    item.type === "review.created" ||
-    item.type === "user.pending_approval" ||
-    item.type === "user.role_updated";
-  const titleKey = isKnown ? `event.${item.type}.title` : "event.unknown.title";
-  const bodyKey = isKnown ? `event.${item.type}.body` : "event.unknown.body";
-  const interpolation = {
-    ...item.payload,
-    resourceType: item.resourceType,
-    resourceId: item.resourceId,
-  };
-  const linkTarget = resolveNotificationLink(item.resourceType, item.resourceId);
+  const { titleKey, bodyKey, interpolation, linkTarget } = getNotificationPresentation(item);
   const unread = !optimisticallyRead && item.readAt === null && item.archivedAt === null;
 
   return (
@@ -163,7 +145,6 @@ function NotificationsPage() {
   const scrollArea = useRef<HTMLDivElement>(null);
   const nextPage = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<NotificationFilter>("all");
-  const queryClient = useQueryClient();
   const list = useInfiniteQuery(notificationsQuery(filter));
   const pendingReadIdSet = usePendingNotificationReadIds();
 
@@ -199,27 +180,7 @@ function NotificationsPage() {
     return () => observer.disconnect();
   }, [filter, fetchNextPage, hasNextPage, isFetching, isFetchNextPageError]);
 
-  async function invalidateNotifications() {
-    await queryClient.invalidateQueries({ queryKey: ["notifications"] });
-  }
-
-  const readMutation = useMutation({
-    mutationKey: notificationReadMutationKey,
-    mutationFn: (notificationId: string) => markNotificationAsRead({ data: { notificationId } }),
-    onSuccess: invalidateNotifications,
-  });
-
-  const readAllMutation = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(),
-    onSuccess: invalidateNotifications,
-  });
-
-  const archiveMutation = useMutation({
-    mutationFn: (notificationId: string) => archiveNotificationAction({ data: { notificationId } }),
-    onSuccess: invalidateNotifications,
-  });
-
-  const busy = readMutation.isPending || readAllMutation.isPending || archiveMutation.isPending;
+  const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
   const mutationError = readMutation.isError || readAllMutation.isError || archiveMutation.isError;
 
   return (
@@ -230,29 +191,19 @@ function NotificationsPage() {
         userName={identity.name}
         userImage={identity.image}
       />
-      <div
-        className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
-        aria-label="Notification filters"
+      <AdminFilterBar
+        ariaLabel="Notification filters"
+        tabs={notificationFilterSchema.options.map((value) => ({
+          value,
+          label: text(`filter.${value}`),
+          count: visibleCounts[value],
+        }))}
+        activeTab={filter}
+        onTabChange={(value) => {
+          setFilter(value);
+          scrollArea.current?.scrollTo({ top: 0 });
+        }}
       >
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {notificationFilterSchema.options.map((value) => (
-            <AlignButton.Root
-              key={value}
-              size="xxsmall"
-              variant="neutral"
-              mode={filter === value ? "lighter" : "ghost"}
-              className="gap-2 text-label-xs"
-              aria-pressed={filter === value}
-              onClick={() => {
-                setFilter(value);
-                scrollArea.current?.scrollTo({ top: 0 });
-              }}
-            >
-              <span>{text(`filter.${value}`)}</span>
-              <span className="tabular-nums text-text-sub-600">{visibleCounts[value]}</span>
-            </AlignButton.Root>
-          ))}
-        </div>
         <AlignButton.Root
           size="xxsmall"
           variant="neutral"
@@ -265,7 +216,7 @@ function NotificationsPage() {
         >
           {text("action.markAllRead")}
         </AlignButton.Root>
-      </div>
+      </AdminFilterBar>
       <div
         ref={scrollArea}
         className={`min-h-0 flex-1 overflow-y-auto ${displayedRows.length === 0 ? "flex flex-col" : ""}`}
@@ -278,9 +229,7 @@ function NotificationsPage() {
           </div>
         )}
         {list.isPending ? (
-          <div className="flex h-full min-h-64 items-center justify-center p-6">
-            <Loading tone="neutral" />
-          </div>
+          <DashboardPending />
         ) : displayedRows.length === 0 ? (
           <DashboardEmptyState
             icon={

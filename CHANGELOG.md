@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-20
 
+#### Added
+
+- Menambahkan halaman dashboard untuk mengelola data mata kuliah dan dosen dengan dukungan tambah, ubah, hapus sementara (`deletedAt`), dan pemulihan data agar riwayat ulasan tetap terjaga.
+
 #### Changed
 
 - Menghapus garis bawah pada nama di kartu dosen.

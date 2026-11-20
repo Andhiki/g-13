@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { AlignButton } from "@/ui/button";
+import { Typography } from "@/ui/typography";
 
 export function AdminTableHeader({
   className,
@@ -38,5 +40,39 @@ export function AdminTableRow({
     >
       {children}
     </article>
+  );
+}
+
+export function AdminTableInspectButton({
+  as = "h3",
+  ariaLabel,
+  selected,
+  onSelect,
+  className = "min-w-0 font-semibold",
+  buttonClassName = "font-semibold",
+  children,
+}: {
+  as?: "h3" | "p";
+  ariaLabel: string;
+  selected: boolean;
+  onSelect: () => void;
+  className?: string;
+  buttonClassName?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Typography as={as} variant="labelSmall" className={className}>
+      <AlignButton.Root
+        variant="neutral"
+        mode="ghost"
+        size="xxsmall"
+        onClick={onSelect}
+        className={`block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs text-text-strong-950 hover:bg-transparent hover:underline${buttonClassName ? ` ${buttonClassName}` : ""}`}
+        aria-label={ariaLabel}
+        aria-pressed={selected}
+      >
+        {children}
+      </AlignButton.Root>
+    </Typography>
   );
 }

@@ -8,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   type RemixiconComponentType,
+  RiBookOpenLine,
   RiChatCheckLine,
   RiCloseLine,
   RiExternalLinkLine,
@@ -16,6 +17,7 @@ import {
   RiMenuLine,
   RiSettings3Line,
   RiUser3Line,
+  RiUserVoiceLine,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
@@ -43,6 +45,13 @@ const sectionGroups = [
     items: [
       { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
       { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
+    ],
+  },
+  {
+    heading: "Catalog",
+    items: [
+      { to: "/dashboard/courses", label: "Courses", Icon: RiBookOpenLine },
+      { to: "/dashboard/lecturers", label: "Lecturers", Icon: RiUserVoiceLine },
     ],
   },
 ] satisfies ModerationSectionGroup[];
@@ -144,6 +153,47 @@ function NavigationFooter({
   );
 }
 
+function ModerationNavSections({
+  manager,
+  closeOnNavigate = false,
+}: {
+  manager: boolean;
+  closeOnNavigate?: boolean;
+}) {
+  return (
+    <nav aria-label="Moderation sections" className="space-y-4">
+      {sectionGroups.map((group) => {
+        const items = group.items.filter((section) => manager || section.to !== "/dashboard/users");
+        if (items.length === 0) return null;
+        return (
+          <div key={group.heading} className="space-y-1">
+            <Typography variant="caption" className="px-2.5 text-text-sub-600">
+              {group.heading}
+            </Typography>
+            <div className="space-y-0.5">
+              {items.map(({ to, label, Icon }) => {
+                const link = (
+                  <Link key={to} to={to} className={`${navLinkClass} h-8`}>
+                    <Icon className="size-4 shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                );
+                return closeOnNavigate ? (
+                  <AlignDrawer.Close asChild key={to}>
+                    {link}
+                  </AlignDrawer.Close>
+                ) : (
+                  link
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </nav>
+  );
+}
+
 export function ModerationSidebar({
   manager,
   userName,
@@ -157,29 +207,7 @@ export function ModerationSidebar({
       className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
     >
       <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-2 pr-3.5">
-        <nav aria-label="Moderation sections" className="space-y-4">
-          {sectionGroups.map((group) => {
-            const items = group.items.filter(
-              (section) => manager || section.to !== "/dashboard/users",
-            );
-            if (items.length === 0) return null;
-            return (
-              <div key={group.heading} className="space-y-1">
-                <Typography variant="caption" className="px-2.5 text-text-sub-600">
-                  {group.heading}
-                </Typography>
-                <div className="space-y-0.5">
-                  {items.map(({ to, label, Icon }) => (
-                    <Link key={to} to={to} className={`${navLinkClass} h-8`}>
-                      <Icon className="size-4 shrink-0" />
-                      <span className="truncate">{label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </nav>
+        <ModerationNavSections manager={manager} />
         <NavigationFooter userName={userName} userImage={userImage} />
       </aside>
     </div>
@@ -223,31 +251,7 @@ export function MobileModerationMenu({
           </AlignDrawer.Close>
         </AlignDrawer.Header>
         <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
-          <nav aria-label="Moderation sections" className="space-y-4">
-            {sectionGroups.map((group) => {
-              const items = group.items.filter(
-                (section) => manager || section.to !== "/dashboard/users",
-              );
-              if (items.length === 0) return null;
-              return (
-                <div key={group.heading} className="space-y-1">
-                  <Typography variant="caption" className="px-2.5 text-text-sub-600">
-                    {group.heading}
-                  </Typography>
-                  <div className="space-y-0.5">
-                    {items.map(({ to, label, Icon }) => (
-                      <AlignDrawer.Close asChild key={to}>
-                        <Link to={to} className={`${navLinkClass} h-8`}>
-                          <Icon className="size-4 shrink-0" />
-                          <span className="truncate">{label}</span>
-                        </Link>
-                      </AlignDrawer.Close>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </nav>
+          <ModerationNavSections manager={manager} closeOnNavigate />
           <NavigationFooter userName={userName} userImage={userImage} mobile />
         </AlignDrawer.Body>
       </AlignDrawer.Content>

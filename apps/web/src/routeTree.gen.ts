@@ -26,7 +26,9 @@ import { Route as PublicLecturersLecturerIdRouteImport } from './routes/_public/
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardAuthenticatedIndexRouteImport } from './routes/dashboard/_authenticated/index'
 import { Route as DashboardLoginIndexRouteImport } from './routes/dashboard/login/index'
+import { Route as DashboardAuthenticatedCoursesIndexRouteImport } from './routes/dashboard/_authenticated/courses/index'
 import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from './routes/dashboard/_authenticated/lecturer-reviews/index'
+import { Route as DashboardAuthenticatedLecturersIndexRouteImport } from './routes/dashboard/_authenticated/lecturers/index'
 import { Route as DashboardAuthenticatedNotificationsIndexRouteImport } from './routes/dashboard/_authenticated/notifications/index'
 import { Route as DashboardAuthenticatedUsersIndexRouteImport } from './routes/dashboard/_authenticated/users/index'
 
@@ -116,10 +118,22 @@ const DashboardLoginIndexRoute = DashboardLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardAuthenticatedCoursesIndexRoute =
+  DashboardAuthenticatedCoursesIndexRouteImport.update({
+    id: '/courses/',
+    path: '/courses/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
 const DashboardAuthenticatedLecturerReviewsIndexRoute =
   DashboardAuthenticatedLecturerReviewsIndexRouteImport.update({
     id: '/lecturer-reviews/',
     path: '/lecturer-reviews/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
+const DashboardAuthenticatedLecturersIndexRoute =
+  DashboardAuthenticatedLecturersIndexRouteImport.update({
+    id: '/lecturers/',
+    path: '/lecturers/',
     getParentRoute: () => DashboardAuthenticatedRouteRoute,
   } as any)
 const DashboardAuthenticatedNotificationsIndexRoute =
@@ -151,7 +165,9 @@ export interface FileRoutesByFullPath {
   '/lecturers/': typeof PublicLecturersIndexRoute
   '/dashboard/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/courses/': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
@@ -169,7 +185,9 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/lecturers': typeof PublicLecturersIndexRoute
   '/dashboard/login': typeof DashboardLoginIndexRoute
+  '/dashboard/courses': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/lecturer-reviews': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/lecturers': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/users': typeof DashboardAuthenticatedUsersIndexRoute
 }
@@ -192,7 +210,9 @@ export interface FileRoutesById {
   '/_public/lecturers/': typeof PublicLecturersIndexRoute
   '/dashboard/_authenticated/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/_authenticated/courses/': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/_authenticated/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  '/dashboard/_authenticated/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/_authenticated/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/_authenticated/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
@@ -214,7 +234,9 @@ export interface FileRouteTypes {
     | '/lecturers/'
     | '/dashboard/'
     | '/dashboard/login/'
+    | '/dashboard/courses/'
     | '/dashboard/lecturer-reviews/'
+    | '/dashboard/lecturers/'
     | '/dashboard/notifications/'
     | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -232,7 +254,9 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/lecturers'
     | '/dashboard/login'
+    | '/dashboard/courses'
     | '/dashboard/lecturer-reviews'
+    | '/dashboard/lecturers'
     | '/dashboard/notifications'
     | '/dashboard/users'
   id:
@@ -254,7 +278,9 @@ export interface FileRouteTypes {
     | '/_public/lecturers/'
     | '/dashboard/_authenticated/'
     | '/dashboard/login/'
+    | '/dashboard/_authenticated/courses/'
     | '/dashboard/_authenticated/lecturer-reviews/'
+    | '/dashboard/_authenticated/lecturers/'
     | '/dashboard/_authenticated/notifications/'
     | '/dashboard/_authenticated/users/'
   fileRoutesById: FileRoutesById
@@ -387,11 +413,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLoginIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/_authenticated/courses/': {
+      id: '/dashboard/_authenticated/courses/'
+      path: '/courses'
+      fullPath: '/dashboard/courses/'
+      preLoaderRoute: typeof DashboardAuthenticatedCoursesIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
     '/dashboard/_authenticated/lecturer-reviews/': {
       id: '/dashboard/_authenticated/lecturer-reviews/'
       path: '/lecturer-reviews'
       fullPath: '/dashboard/lecturer-reviews/'
       preLoaderRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
+    '/dashboard/_authenticated/lecturers/': {
+      id: '/dashboard/_authenticated/lecturers/'
+      path: '/lecturers'
+      fullPath: '/dashboard/lecturers/'
+      preLoaderRoute: typeof DashboardAuthenticatedLecturersIndexRouteImport
       parentRoute: typeof DashboardAuthenticatedRouteRoute
     }
     '/dashboard/_authenticated/notifications/': {
@@ -453,7 +493,9 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 
 interface DashboardAuthenticatedRouteRouteChildren {
   DashboardAuthenticatedIndexRoute: typeof DashboardAuthenticatedIndexRoute
+  DashboardAuthenticatedCoursesIndexRoute: typeof DashboardAuthenticatedCoursesIndexRoute
   DashboardAuthenticatedLecturerReviewsIndexRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRoute
+  DashboardAuthenticatedLecturersIndexRoute: typeof DashboardAuthenticatedLecturersIndexRoute
   DashboardAuthenticatedNotificationsIndexRoute: typeof DashboardAuthenticatedNotificationsIndexRoute
   DashboardAuthenticatedUsersIndexRoute: typeof DashboardAuthenticatedUsersIndexRoute
 }
@@ -461,8 +503,12 @@ interface DashboardAuthenticatedRouteRouteChildren {
 const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRouteChildren =
   {
     DashboardAuthenticatedIndexRoute: DashboardAuthenticatedIndexRoute,
+    DashboardAuthenticatedCoursesIndexRoute:
+      DashboardAuthenticatedCoursesIndexRoute,
     DashboardAuthenticatedLecturerReviewsIndexRoute:
       DashboardAuthenticatedLecturerReviewsIndexRoute,
+    DashboardAuthenticatedLecturersIndexRoute:
+      DashboardAuthenticatedLecturersIndexRoute,
     DashboardAuthenticatedNotificationsIndexRoute:
       DashboardAuthenticatedNotificationsIndexRoute,
     DashboardAuthenticatedUsersIndexRoute:

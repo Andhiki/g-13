@@ -1,0 +1,154 @@
+import { useRef, type ReactNode } from "react";
+import { AlignButton } from "@/ui/button";
+import { AlignFancyButton } from "@/ui/fancy-button";
+import { AlignModal } from "@/ui/modal";
+import { Typography } from "@/ui/typography";
+
+const fieldControlClass =
+  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
+
+export function AdminFormModal({
+  open,
+  pending,
+  contentClassName = "max-w-[460px]",
+  onClose,
+  children,
+}: {
+  open: boolean;
+  pending: boolean;
+  contentClassName?: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <AlignModal.Root
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen && !pending) onClose();
+      }}
+    >
+      <AlignModal.Content className={`${contentClassName} p-0`} aria-describedby={undefined}>
+        {open && children}
+      </AlignModal.Content>
+    </AlignModal.Root>
+  );
+}
+
+export function AdminForm({
+  title,
+  submitLabel,
+  pending,
+  error,
+  onClose,
+  onSubmit,
+  children,
+}: {
+  title: string;
+  submitLabel: string;
+  pending: boolean;
+  error?: string;
+  onClose: () => void;
+  onSubmit: () => boolean | void;
+  children: ReactNode;
+}) {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  return (
+    <form
+      ref={formRef}
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (pending) return;
+        if (onSubmit() === false) {
+          requestAnimationFrame(() =>
+            formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
+          );
+        }
+      }}
+    >
+      <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
+        <AlignModal.Title asChild>
+          <Typography as="h2" variant="subtitle2" className="text-text-strong-950">
+            {title}
+          </Typography>
+        </AlignModal.Title>
+      </header>
+      <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
+        {children}
+        {error && (
+          <Typography role="alert" variant="caption" className="text-error-base">
+            {error}
+          </Typography>
+        )}
+      </fieldset>
+      <footer className="flex items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
+        <AlignButton.Root
+          size="xsmall"
+          variant="neutral"
+          mode="stroke"
+          className="px-3"
+          disabled={pending}
+          onClick={onClose}
+        >
+          Cancel
+        </AlignButton.Root>
+        <AlignFancyButton.Root type="submit" size="xsmall" isLoading={pending}>
+          {submitLabel}
+        </AlignFancyButton.Root>
+      </footer>
+    </form>
+  );
+}
+
+export function AdminFormField({
+  id,
+  name,
+  label,
+  value,
+  maxLength,
+  placeholder,
+  error,
+  onChange,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  value: string;
+  maxLength: number;
+  placeholder: string;
+  error?: string;
+  onChange: (value: string) => void;
+}) {
+  const errorId = `${id}-error`;
+
+  return (
+    <div>
+      <Typography
+        as="label"
+        variant="labelSmall"
+        htmlFor={id}
+        className="mb-1.5 block text-text-strong-950"
+      >
+        {label}
+      </Typography>
+      <input
+        id={id}
+        name={name}
+        type="text"
+        maxLength={maxLength}
+        placeholder={placeholder}
+        value={value}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={fieldControlClass}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      {error && (
+        <Typography variant="caption" id={errorId} className="mt-1.5 text-error-base">
+          {error}
+        </Typography>
+      )}
+    </div>
+  );
+}

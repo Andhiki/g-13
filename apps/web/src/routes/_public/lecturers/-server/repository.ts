@@ -6,11 +6,14 @@ import type { createDatabase } from "@g13/db/client";
 
 type Database = ReturnType<typeof createDatabase>;
 const visibleReview = and(eq(reviews.status, "published"), isNull(reviews.deletedAt));
+const activeCourse = isNull(courses.deletedAt);
+const activeLecturer = isNull(lecturers.deletedAt);
 
 async function getCourseCatalog(db: Database) {
   return db
     .select({ id: courses.id, code: courses.code, nameId: courses.nameId, nameEn: courses.nameEn })
     .from(courses)
+    .where(activeCourse)
     .orderBy(asc(courses.code));
 }
 
@@ -28,6 +31,7 @@ export async function getLecturerDirectoryData(db: Database) {
       })
       .from(lecturers)
       .leftJoin(reviews, and(eq(reviews.lecturerId, lecturers.id), visibleReview))
+      .where(activeLecturer)
       .groupBy(lecturers.id)
       .orderBy(asc(lecturers.name)),
     db
@@ -42,6 +46,7 @@ export async function getLecturerDirectoryData(db: Database) {
         organizationAverage: sql<number>`avg(${reviews.organization})`,
       })
       .from(reviews)
+      .innerJoin(lecturers, and(eq(lecturers.id, reviews.lecturerId), activeLecturer))
       .innerJoin(courses, eq(courses.id, reviews.courseId))
       .where(visibleReview)
       .groupBy(reviews.lecturerId, courses.id)
@@ -59,7 +64,7 @@ export async function getLecturerDetailData(db: Database, lecturerId: string) {
   const [lecturer] = await db
     .select({ id: lecturers.id, name: lecturers.name })
     .from(lecturers)
-    .where(eq(lecturers.id, lecturerId));
+    .where(and(eq(lecturers.id, lecturerId), activeLecturer));
   if (!lecturer) return null;
 
   const [courseRows, reviewRows] = await Promise.all([
@@ -102,11 +107,11 @@ export async function getReviewReferences(
     db
       .select({ id: lecturers.id, name: lecturers.name })
       .from(lecturers)
-      .where(eq(lecturers.id, references.lecturerId)),
+      .where(and(eq(lecturers.id, references.lecturerId), activeLecturer)),
     db
       .select({ id: courses.id, code: courses.code })
       .from(courses)
-      .where(eq(courses.id, references.courseId)),
+      .where(and(eq(courses.id, references.courseId), activeCourse)),
   ]);
   if (!lecturer || !course) return null;
   return { lecturerName: lecturer.name, courseCode: course.code };
@@ -141,6 +146,7 @@ export async function getVisibleReviewId(db: Database, reviewId: string): Promis
   const [review] = await db
     .select({ id: reviews.id })
     .from(reviews)
+    .innerJoin(lecturers, and(eq(lecturers.id, reviews.lecturerId), activeLecturer))
     .where(and(eq(reviews.id, reviewId), visibleReview));
   return review?.id ?? null;
 }
@@ -150,6 +156,7 @@ export async function getBrowserReviewLikes(db: Database, browserId: string): Pr
     .select({ reviewId: reviewLikes.reviewId })
     .from(reviewLikes)
     .innerJoin(reviews, eq(reviews.id, reviewLikes.reviewId))
+    .innerJoin(lecturers, and(eq(lecturers.id, reviews.lecturerId), activeLecturer))
     .where(and(eq(reviewLikes.browserId, browserId), visibleReview));
   return rows.map((row) => row.reviewId);
 }

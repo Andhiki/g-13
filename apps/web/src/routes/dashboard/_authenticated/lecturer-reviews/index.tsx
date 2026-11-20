@@ -3,20 +3,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { canManageUsers } from "@g13/auth";
-import { RiChatCheckLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { RiChatCheckLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility } from "./-server/handler";
 import { moderationReviewQuery, moderationReviewsQuery } from "./-client/queries";
 import { reviewStatusSchema, type ReviewStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
-import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
+import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
 import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminTableHeader } from "../-components/AdminTable";
 import { AdminPagination } from "../-components/AdminPagination";
 import { ConfirmationChange } from "../-components/ConfirmationChange";
 import { DashboardEmptyState } from "../-components/DashboardEmptyState";
+import { DashboardPending, DashboardRoutePending } from "../-components/DashboardPending";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminReviewRow, reviewTableColumns } from "./-components/AdminReviewRow";
@@ -38,11 +39,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews
       throw error;
     }
   },
-  pendingComponent: () => (
-    <div className="flex flex-1 items-center justify-center p-6">
-      <Loading tone="neutral" />
-    </div>
-  ),
+  pendingComponent: DashboardRoutePending,
   component: LecturerReviewsPage,
 });
 
@@ -126,62 +123,35 @@ function LecturerReviewsPage() {
         userName={identity.name}
         userImage={identity.image}
       />
-      <div
-        className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
-        aria-label="Review status filters"
+      <AdminFilterBar
+        ariaLabel="Review status filters"
+        tabs={reviewStatusSchema.options.map((value) => ({
+          value,
+          label: value === "all" ? "All reviews" : value,
+          count: counts[value],
+        }))}
+        activeTab={status}
+        tabLabelClassName="capitalize"
+        onTabChange={(value) => {
+          setStatus(value);
+          setOffset(0);
+          setSelectedId(null);
+        }}
       >
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {reviewStatusSchema.options.map((value) => (
-            <AlignButton.Root
-              key={value}
-              size="xxsmall"
-              variant="neutral"
-              mode={status === value ? "lighter" : "ghost"}
-              className="gap-2 text-label-xs"
-              aria-pressed={status === value}
-              onClick={() => {
-                setStatus(value);
-                setOffset(0);
-                setSelectedId(null);
-              }}
-            >
-              <span className="capitalize">{value === "all" ? "All reviews" : value}</span>
-              <span className="text-text-sub-600 tabular-nums">{counts[value]}</span>
-            </AlignButton.Root>
-          ))}
-        </div>
         <div className="flex w-full items-center gap-2 sm:w-auto">
-          <label className="relative flex flex-1 items-center sm:w-60">
-            <RiSearchLine
-              className="pointer-events-none absolute left-2.5 size-3.5 text-text-sub-600"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Filter lecturer, course, text…"
-              aria-label="Filter reviews"
-              className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-base sm:pointer-fine:h-7 sm:pointer-fine:pl-8 sm:pointer-fine:pr-7 sm:pointer-fine:text-paragraph-xs [&::-webkit-search-cancel-button]:appearance-none text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label="Clear filter"
-                className="absolute right-1.5 inline-flex size-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950"
-              >
-                <RiCloseLine className="size-3.5" />
-              </button>
-            )}
-          </label>
+          <AdminSearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="Filter lecturer, course, text…"
+            ariaLabel="Filter reviews"
+          />
           <DetailsToggleButton
             available={!!selectedReview}
             visible={detailsVisible}
             onToggle={() => setDetailsOpen((open) => !open)}
           />
         </div>
-      </div>
+      </AdminFilterBar>
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
           {!reviews.isPending && !reviews.isError && (
@@ -203,9 +173,7 @@ function LecturerReviewsPage() {
                 Could not load reviews. Refresh or sign in again.
               </Typography>
             ) : reviews.isPending ? (
-              <div className="flex h-full min-h-64 items-center justify-center p-6">
-                <Loading tone="neutral" />
-              </div>
+              <DashboardPending />
             ) : (
               <>
                 <AdminTableHeader
