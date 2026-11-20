@@ -14,11 +14,13 @@ import {
   RiGroupLine,
   RiLogoutBoxLine,
   RiMenuLine,
+  RiSettings3Line,
   RiUser3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
 import { AlignDropdown } from "@/ui/dropdown";
+import { SettingsModal } from "@/ui/settings";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
 import { useAdminLayout } from "./AdminLayoutContext";
@@ -45,8 +47,12 @@ const sectionGroups = [
   },
 ] satisfies ModerationSectionGroup[];
 
+const navLinkClass =
+  "flex w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 outline-none transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 focus-visible:outline-[1.5px] focus-visible:outline-offset-0 focus-visible:outline-stroke-strong-950/35 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950";
+
 function NavigationFooter({ userName, mobile = false }: { userName: string; mobile?: boolean }) {
   const [signOutError, setSignOutError] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -98,6 +104,10 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
                 Public reviews
               </Link>
             </AlignDropdown.Item>
+            <AlignDropdown.Item className="px-2 py-1.5" onSelect={() => setSettingsOpen(true)}>
+              <RiSettings3Line className="size-4 shrink-0 text-text-sub-600" />
+              Settings
+            </AlignDropdown.Item>
             <AlignDropdown.Separator />
             <AlignDropdown.Item
               className="px-2 py-1.5 text-error-base data-[highlighted]:bg-error-lighter"
@@ -108,6 +118,7 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
             </AlignDropdown.Item>
           </AlignDropdown.Content>
         </AlignDropdown.Root>
+        <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
         <NotificationsPopover side={mobile ? "top" : "right"} />
       </div>
     </div>
@@ -135,11 +146,7 @@ export function ModerationSidebar({ manager, userName }: { manager: boolean; use
               </Typography>
               <div className="space-y-0.5">
                 {items.map(({ to, label, Icon }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
-                  >
+                  <Link key={to} to={to} className={`${navLinkClass} h-8`}>
                     <Icon className="size-4 shrink-0" />
                     <span className="truncate">{label}</span>
                   </Link>
@@ -207,10 +214,7 @@ export function MobileModerationMenu({
                   <div className="space-y-0.5">
                     {items.map(({ to, label, Icon }) => (
                       <AlignDrawer.Close asChild key={to}>
-                        <Link
-                          to={to}
-                          className="flex h-10 w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950"
-                        >
+                        <Link to={to} className={`${navLinkClass} h-10`}>
                           <Icon className="size-4 shrink-0" />
                           <span className="truncate">{label}</span>
                         </Link>

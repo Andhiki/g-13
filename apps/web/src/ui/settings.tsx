@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { RiSettings3Line } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import { AlignButton } from "./button";
@@ -10,9 +10,15 @@ import * as Switch from "./switch";
 import { useCursorPreference } from "./cursor-preference";
 import { Typography } from "./typography";
 
-export function Settings() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+export function SettingsModal({
+  open,
+  onOpenChange,
+  children,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: ReactNode;
+}) {
   const { t } = useTranslation();
   const { cursor, setCursor } = useCursorPreference();
   const [blur, setBlur] = useState(true);
@@ -31,21 +37,11 @@ export function Settings() {
   }
 
   return (
-    <AlignModal.Root>
-      <AlignModal.Trigger asChild>
-        <AlignButton.Root
-          variant="neutral"
-          mode="stroke"
-          className="size-10 p-2.5"
-          aria-label={t("settings.title")}
-          disabled={!mounted}
-        >
-          <RiSettings3Line aria-hidden="true" className="size-5" />
-        </AlignButton.Root>
-      </AlignModal.Trigger>
+    <AlignModal.Root open={open} onOpenChange={onOpenChange}>
+      {children}
       <AlignModal.Content
         aria-describedby={undefined}
-        className="flex max-w-[640px] max-h-[calc(100dvh-2rem)] flex-col overflow-hidden"
+        className="flex max-h-[calc(100dvh-2rem)] max-w-[640px] flex-col overflow-hidden"
       >
         <div className="shrink-0 border-b border-stroke-soft-200 px-5 py-4 pr-14">
           <AlignModal.Title asChild>
@@ -116,5 +112,27 @@ export function Settings() {
         </div>
       </AlignModal.Content>
     </AlignModal.Root>
+  );
+}
+
+export function Settings() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const { t } = useTranslation();
+
+  return (
+    <SettingsModal>
+      <AlignModal.Trigger asChild>
+        <AlignButton.Root
+          variant="neutral"
+          mode="stroke"
+          className="size-10 p-2.5"
+          aria-label={t("settings.title")}
+          disabled={!mounted}
+        >
+          <RiSettings3Line aria-hidden="true" className="size-5" />
+        </AlignButton.Root>
+      </AlignModal.Trigger>
+    </SettingsModal>
   );
 }

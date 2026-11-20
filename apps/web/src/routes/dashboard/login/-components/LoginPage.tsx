@@ -17,9 +17,14 @@ export function LoginPage({ identity }: { identity: Identity }) {
   if (identity) {
     return (
       <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
-        <Typography variant="paragraph" className="text-center text-text-sub-600">
-          Your account is awaiting approval.
-        </Typography>
+        <div className="max-w-sm space-y-1.5 text-center">
+          <Typography variant="paragraph" className="text-text-strong-950">
+            Your account is awaiting approval.
+          </Typography>
+          <Typography variant="caption" className="text-text-sub-600">
+            Contact maintainers or admin to help get your account approved.
+          </Typography>
+        </div>
       </main>
     );
   }
@@ -56,11 +61,11 @@ export function LoginPage({ identity }: { identity: Identity }) {
             variant="neutral"
             mode="lighter"
             className="w-full gap-2 text-text-strong-950"
-            disabled={pending}
+            isLoading={pending}
             onClick={() => void signIn()}
           >
             <RiGithubFill className="size-4.5" />
-            {pending ? "Redirecting…" : "Sign in with GitHub"}
+            Sign in with GitHub
           </AlignButton.Root>
           {error && (
             <Typography

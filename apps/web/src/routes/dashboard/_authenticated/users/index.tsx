@@ -147,7 +147,6 @@ function AdminUsersPage() {
                     setSelectedUserId(id);
                     setDetailsOpen(true);
                   }}
-                  onAssign={confirmRole}
                 />
                 {!userRows.length && (
                   <Typography

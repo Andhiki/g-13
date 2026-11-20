@@ -48,18 +48,14 @@ export function ConfirmActionModal({
             size="xsmall"
             variant="neutral"
             mode="stroke"
-            className="h-8 rounded-lg px-3 text-label-sm"
+            className="px-3"
             disabled={pending}
             onClick={onClose}
           >
             Cancel
           </AlignButton.Root>
-          <AlignFancyButton.Root
-            className="h-8 rounded-lg px-3 text-label-sm"
-            disabled={pending}
-            onClick={onConfirm}
-          >
-            {pending ? "Saving…" : "Confirm"}
+          <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
+            Confirm
           </AlignFancyButton.Root>
         </div>
       </AlignModal.Content>

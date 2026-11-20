@@ -1,15 +1,35 @@
 import { useState } from "react";
-import { RiCheckLine, RiCloseLine, RiShieldUserLine } from "@remixicon/react";
+import {
+  RiCheckLine,
+  RiCloseLine,
+  RiShieldUserLine,
+  RiUserForbidLine,
+  RiUserSettingsLine,
+} from "@remixicon/react";
 import { canManageUsers, canModerate, type Role } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
+import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignSelect } from "@/ui/select";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
+type PrivilegedRole = Extract<Role, "maintainer" | "admin">;
+
+const roleOptions: Array<{ value: PrivilegedRole; label: string; description: string }> = [
+  {
+    value: "maintainer",
+    label: "Maintainer",
+    description: "Inspect, hide, restore, and soft-delete reviews.",
+  },
+  {
+    value: "admin",
+    label: "Admin",
+    description: "Full moderation access, plus approving accounts and assigning roles.",
+  },
+];
 
 export function UserAccessInspector({
   user,
@@ -21,14 +41,16 @@ export function UserAccessInspector({
   onAssign: (input: AssignRoleInput, label: string) => void;
 }) {
   const approved = canModerate(user.role);
-  const [role, setRole] = useState<Role>(canModerate(user.role) ? user.role : "maintainer");
+  const [step, setStep] = useState<"idle" | "choose-role">("idle");
+  const [role, setRole] = useState<PrivilegedRole>(user.role === "admin" ? "admin" : "maintainer");
   const ownAccount = user.id === identityId;
-  const previewRole = ownAccount ? user.role : role;
+  const previewRole = ownAccount || step === "idle" ? user.role : role;
   const permissions: Array<[string, boolean]> = [
     ["Moderate reviews", canModerate(previewRole)],
     ["Approve accounts", canManageUsers(previewRole)],
     ["Assign roles", canManageUsers(previewRole)],
   ];
+
   return (
     <aside
       id="moderation-inspector"
@@ -93,7 +115,11 @@ export function UserAccessInspector({
           )}
           <section className="border-t border-stroke-soft-200 pt-4">
             <Typography as="h3" variant="labelSmall">
-              Permissions {ownAccount ? "for your role" : "after confirmation"}
+              {ownAccount
+                ? "Permissions for your role"
+                : step === "choose-role"
+                  ? "Permissions after confirmation"
+                  : "Current permissions"}
             </Typography>
             <dl className="mt-3 space-y-3 text-paragraph-xs">
               {permissions.map(([name, allowed]) => (
@@ -114,59 +140,106 @@ export function UserAccessInspector({
         </div>
       </div>
       {!ownAccount && (
-        <section className="shrink-0 border-t border-stroke-soft-200 p-4">
-          <Typography as="h3" variant="labelSmall">
-            {approved ? "Manage access" : "Approve account"}
-          </Typography>
-          <Typography variant="caption" className="mt-1 break-words text-text-sub-600">
-            {user.name}
-          </Typography>
-          <Typography variant="caption" className="mt-2 text-text-sub-600">
-            Verify this person before granting access. GitHub sign-in and a verified email do not
-            establish administrator approval.
-          </Typography>
-          <Typography
-            as="label"
-            htmlFor="account-role"
-            variant="labelSmall"
-            className="mb-2 mt-3 block"
-          >
-            Assign role
-          </Typography>
-          <AlignSelect.Root
-            variant="compact"
-            value={role}
-            onValueChange={(value) => {
-              if (value === "user" || value === "maintainer" || value === "admin") setRole(value);
-            }}
-          >
-            <AlignSelect.Trigger id="account-role" className="h-8 min-h-8 w-full text-paragraph-xs">
-              <AlignSelect.Value />
-            </AlignSelect.Trigger>
-            <AlignSelect.Content>
-              {(approved ? ["user", "maintainer", "admin"] : ["maintainer", "admin"]).map(
-                (value) => (
-                  <AlignSelect.Item key={value} value={value}>
-                    {value}
-                  </AlignSelect.Item>
-                ),
-              )}
-            </AlignSelect.Content>
-          </AlignSelect.Root>
-          <AlignFancyButton.Root
-            className="mt-3 h-8 w-full text-label-xs"
-            disabled={role === user.role}
-            onClick={() => onAssign({ userId: user.id, role }, user.name)}
-          >
-            {role === "user"
-              ? "Revoke privileged access"
-              : approved
-                ? "Confirm role change"
-                : "Approve & assign role"}
-          </AlignFancyButton.Root>
-          <Typography variant="caption" className="mt-2 text-text-sub-600">
-            A confirmation is required. Access changes take effect on the next protected request.
-          </Typography>
+        <section className="shrink-0 border-t border-stroke-soft-200 p-3">
+          {step === "idle" ? (
+            approved ? (
+              <div className="grid grid-cols-2 gap-2">
+                <AlignButton.Root
+                  size="small"
+                  variant="neutral"
+                  mode="stroke"
+                  className="w-full gap-1.5 text-label-xs"
+                  onClick={() => {
+                    setRole(user.role === "admin" ? "admin" : "maintainer");
+                    setStep("choose-role");
+                  }}
+                >
+                  <RiUserSettingsLine className="size-3.5" />
+                  Change role
+                </AlignButton.Root>
+                <AlignButton.Root
+                  size="small"
+                  variant="error"
+                  mode="lighter"
+                  className="w-full gap-1.5 text-label-xs"
+                  onClick={() => onAssign({ userId: user.id, role: "user" }, user.name)}
+                >
+                  <RiUserForbidLine className="size-3.5" />
+                  Revoke
+                </AlignButton.Root>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                <Typography variant="caption" className="block text-text-sub-600">
+                  Verify this person before granting access.
+                </Typography>
+                <AlignFancyButton.Root
+                  size="small"
+                  className="w-full text-label-xs"
+                  onClick={() => {
+                    setRole("maintainer");
+                    setStep("choose-role");
+                  }}
+                >
+                  Approve account
+                </AlignFancyButton.Root>
+              </div>
+            )
+          ) : (
+            <div className="space-y-3">
+              <Typography as="h3" variant="labelSmall" className="text-text-strong-950">
+                Choose role
+              </Typography>
+              <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
+                {roleOptions.map((option) => {
+                  const selected = role === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => setRole(option.value)}
+                      className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
+                        selected
+                          ? "border-primary-base bg-primary-alpha-10"
+                          : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Typography as="span" variant="labelSmall" className="text-text-strong-950">
+                          {option.label}
+                        </Typography>
+                        {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
+                      </div>
+                      <Typography variant="caption" className="mt-0.5 block text-text-sub-600">
+                        {option.description}
+                      </Typography>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <AlignButton.Root
+                  size="small"
+                  variant="neutral"
+                  mode="stroke"
+                  className="w-full text-label-xs"
+                  onClick={() => setStep("idle")}
+                >
+                  Cancel
+                </AlignButton.Root>
+                <AlignFancyButton.Root
+                  size="small"
+                  className="w-full text-label-xs"
+                  disabled={approved && role === user.role}
+                  onClick={() => onAssign({ userId: user.id, role }, user.name)}
+                >
+                  {approved ? "Save role" : "Approve"}
+                </AlignFancyButton.Root>
+              </div>
+            </div>
+          )}
         </section>
       )}
     </aside>

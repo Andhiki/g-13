@@ -2,10 +2,8 @@ import { canModerate } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
-import { AlignSelect } from "@/ui/select";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
-import type { AssignRoleInput } from "../-shared/schemas";
 
 type Users = Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
 
@@ -14,13 +12,11 @@ export function AdminUserList({
   identityId,
   selectedId,
   onSelect,
-  onAssign,
 }: {
   users: Users;
   identityId: string;
   selectedId?: string;
   onSelect: (userId: string) => void;
-  onAssign: (input: AssignRoleInput, label: string) => void;
 }) {
   return (
     <>
@@ -86,43 +82,22 @@ export function AdminUserList({
           >
             {user.createdAt.toISOString().slice(0, 10)}
           </Typography>
-          <div className="w-full md:w-fit md:justify-self-center">
-            {user.id === identityId ? (
-              <AlignBadge.Root
-                size="medium"
-                variant="light"
-                className="h-7 w-full justify-center gap-1.5 text-label-xs text-text-strong-950 md:w-auto"
-              >
-                <span className="capitalize">{user.role}</span>
-                <span aria-hidden="true" className="text-text-sub-600">
-                  ·
-                </span>
-                <span className="text-text-sub-600">You</span>
-              </AlignBadge.Root>
-            ) : (
-              <AlignSelect.Root
-                variant="compact"
-                value={user.role}
-                onValueChange={(role) => {
-                  if (role === "user" || role === "maintainer" || role === "admin")
-                    onAssign({ userId: user.id, role }, user.name);
-                }}
-              >
-                <AlignSelect.Trigger
-                  aria-label={`Role for ${user.name}`}
-                  className="h-7 min-h-7 w-full text-paragraph-xs md:w-auto"
-                >
-                  <AlignSelect.Value />
-                </AlignSelect.Trigger>
-                <AlignSelect.Content>
-                  {["user", "maintainer", "admin"].map((role) => (
-                    <AlignSelect.Item key={role} value={role}>
-                      {role}
-                    </AlignSelect.Item>
-                  ))}
-                </AlignSelect.Content>
-              </AlignSelect.Root>
-            )}
+          <div className="flex justify-end md:justify-center">
+            <AlignBadge.Root
+              size="medium"
+              variant="light"
+              className="h-6 justify-center gap-1.5 text-label-xs text-text-strong-950"
+            >
+              <span className="capitalize">{user.role}</span>
+              {user.id === identityId && (
+                <>
+                  <span aria-hidden="true" className="text-text-sub-600">
+                    ·
+                  </span>
+                  <span className="text-text-sub-600">You</span>
+                </>
+              )}
+            </AlignBadge.Root>
           </div>
         </div>
       ))}

@@ -11,7 +11,7 @@ const Root = React.forwardRef<
     ref={ref}
     disabled={disabled}
     className={clsx(
-      "group/switch block h-5 w-8 shrink-0 p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2",
+      "group/switch block h-5 w-8 shrink-0 rounded-full p-0.5 outline-none focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55",
       className,
     )}
     {...props}

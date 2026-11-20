@@ -49,11 +49,15 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
 function NotificationRow({
   item,
   busy,
+  markingRead,
+  archiving,
   onMarkRead,
   onArchive,
 }: {
   item: NotificationItem;
   busy: boolean;
+  markingRead: boolean;
+  archiving: boolean;
   onMarkRead: (id: string) => void;
   onArchive: (id: string) => void;
 }) {
@@ -122,6 +126,7 @@ function NotificationRow({
             variant="neutral"
             mode="ghost"
             className="gap-1 text-label-xs"
+            isLoading={markingRead}
             disabled={busy}
             onClick={() => onMarkRead(item.id)}
           >
@@ -135,6 +140,7 @@ function NotificationRow({
             variant="neutral"
             mode="ghost"
             className="gap-1 text-label-xs"
+            isLoading={archiving}
             disabled={busy}
             onClick={() => onArchive(item.id)}
           >
@@ -219,6 +225,7 @@ function NotificationsPage() {
           variant="neutral"
           mode="ghost"
           className="gap-1.5 text-label-xs"
+          isLoading={readAllMutation.isPending}
           disabled={busy || counts.unread === 0}
           onClick={() => readAllMutation.mutate()}
         >
@@ -262,6 +269,8 @@ function NotificationsPage() {
                 key={item.id}
                 item={item}
                 busy={busy}
+                markingRead={readMutation.isPending && readMutation.variables === item.id}
+                archiving={archiveMutation.isPending && archiveMutation.variables === item.id}
                 onMarkRead={(id) => readMutation.mutate(id)}
                 onArchive={(id) => archiveMutation.mutate(id)}
               />

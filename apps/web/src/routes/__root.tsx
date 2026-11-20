@@ -166,7 +166,7 @@ function RootDocument({ children }: { children: ReactNode }) {
     <html
       lang={language}
       suppressHydrationWarning
-      className="m-0 h-full w-full min-w-80 bg-bg-white-0 font-sans text-text-strong-950 [&_.remixicon_path]:origin-center [&_.remixicon_path]:scale-[0.8996] [font-synthesis:none] [text-rendering:optimizeLegibility] [&_a:focus-visible]:outline-3 [&_a:focus-visible]:outline-offset-3 [&_a:focus-visible]:outline-primary-base"
+      className="m-0 h-full w-full min-w-80 bg-bg-white-0 font-sans text-text-strong-950 [&_.remixicon_path]:origin-center [&_.remixicon_path]:scale-[0.8996] [font-synthesis:none] [text-rendering:optimizeLegibility] [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-1 [&_a:focus-visible]:outline-primary-base/50"
     >
       <head>
         <HeadContent />
