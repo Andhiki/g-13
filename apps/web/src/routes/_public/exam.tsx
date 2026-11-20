@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ExamArchivePage } from "./exam/-components/ExamArchivePage";
 import { validateArchiveSearch } from "./exam/-shared/search";
 
-export const Route = createFileRoute("/exam")({
+export const Route = createFileRoute("/_public/exam")({
   validateSearch: validateArchiveSearch,
   head: ({ match }) => ({
     meta: [

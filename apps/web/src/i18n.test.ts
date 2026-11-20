@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { loadMessages } from "@g13/i18n/messages";
 import { createI18n, messageNamespace } from "./i18n";
-import { examArchive } from "./routes/exam/-shared/catalog";
-import { browseArchive } from "./routes/exam/-shared/archive";
+import { examArchive } from "./routes/_public/exam/-shared/catalog";
+import { browseArchive } from "./routes/_public/exam/-shared/archive";
 
 const common = await loadMessages("en", "common");
 const roadmap = await loadMessages("en", "roadmap");

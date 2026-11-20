@@ -1,6 +1,6 @@
 import { lazy, useEffect, useRef } from "react";
 import { DeferredContent } from "@/ui/deferred-content";
-import { Route } from "@/routes/roadmap";
+import { Route } from "@/routes/_public/roadmap";
 import { planningInput } from "../-shared/planning-input";
 import { RoadmapQuiz } from "./RoadmapQuiz";
 import { Loading } from "@/ui/loading";

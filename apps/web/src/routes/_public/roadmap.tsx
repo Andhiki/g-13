@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RoadmapPage } from "./roadmap/-components/RoadmapPage";
 import { validateRoadmapSearch } from "./roadmap/-shared/search";
 
-export const Route = createFileRoute("/roadmap")({
+export const Route = createFileRoute("/_public/roadmap")({
   validateSearch: validateRoadmapSearch,
   head: ({ match }) => ({
     meta: [

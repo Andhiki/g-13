@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { setResponseStatus } from "@tanstack/react-start/server";
 import { AlumniDirectory } from "./alumni/-components/AlumniDirectory";
 import type { AlumniDirectoryData } from "./alumni/-shared/directory";
-import { Loading } from "../ui/loading";
+import { Loading } from "@/ui/loading";
 
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { env } = await import("cloudflare:workers");
@@ -21,7 +21,7 @@ const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
 
 // The trailing underscore keeps this route outside the `/alumni` layout, so the
 // featured page keeps its own header and this directory owns a full-width view.
-export const Route = createFileRoute("/alumni_/all")({
+export const Route = createFileRoute("/_public/alumni_/all")({
   loader: () => loadDirectory(),
   pendingMs: 150,
   pendingMinMs: 300,

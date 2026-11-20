@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ResourcesPage } from "./resources/-components/ResourcesPage";
 
-export const Route = createFileRoute("/resources")({
+export const Route = createFileRoute("/_public/resources")({
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["Helpful Resources"] },

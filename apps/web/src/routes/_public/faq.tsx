@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FaqPage } from "./faq/-components/FaqPage";
 
-export const Route = createFileRoute("/faq")({
+export const Route = createFileRoute("/_public/faq")({
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["FAQ"] },

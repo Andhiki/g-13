@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LecturerReviewsPage } from "./lecturers/-components/LecturerReviewsPage";
 import { lecturerDirectoryQueryOptions } from "./lecturers/-client/queries";
 
-export const Route = createFileRoute("/lecturers/")({
+export const Route = createFileRoute("/_public/lecturers/")({
   loader: async ({ context }) => {
     await context.queryClient.query(lecturerDirectoryQueryOptions());
   },

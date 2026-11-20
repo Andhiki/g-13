@@ -17,7 +17,7 @@ import { browseArchive, prepareCourseSearch, resolveArchive } from "../-shared/a
 import { folderSearch } from "../-shared/search";
 import { examArchive } from "../-shared/catalog";
 import { archiveUpdatedAt } from "../-shared/metadata";
-import { Route } from "@/routes/exam";
+import { Route } from "@/routes/_public/exam";
 import type { ArchiveLocation } from "../-shared/contracts";
 
 function ExamBadge({ exam }: { exam: "UTS" | "UAS" }) {

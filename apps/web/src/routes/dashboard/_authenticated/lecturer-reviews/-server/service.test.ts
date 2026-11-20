@@ -3,7 +3,10 @@ import { createDatabase } from "@g13/db/client";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { lecturers } from "@g13/db/schema/lecturers";
-import { getLecturerDetail, getLecturerDirectory } from "@/routes/lecturers/-server/read.service";
+import {
+  getLecturerDetail,
+  getLecturerDirectory,
+} from "@/routes/_public/lecturers/-server/read.service";
 import { createTestPlatformProxy } from "@/test/database";
 import { MODERATION_ERRORS, type ModerationOperationResult } from "../-shared/errors";
 import { inspectReview, inspectReviews, moderateLecturerReview } from "./service";

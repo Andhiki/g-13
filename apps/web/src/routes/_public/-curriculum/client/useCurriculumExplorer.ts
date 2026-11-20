@@ -3,7 +3,7 @@ import { getRouteApi } from "@tanstack/react-router";
 import { getCurriculum, getRelations, isCurriculumId, type CurriculumId } from "@g13/curriculum";
 import { getPreparedMap } from "../shared/prepared-maps";
 
-const route = getRouteApi("/");
+const route = getRouteApi("/_public/");
 
 export function useCurriculumExplorer() {
   const { kurikulum: curriculum, mk: courseId } = route.useSearch();

@@ -5,7 +5,7 @@ import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { notificationEvents, notifications } from "@g13/db/schema/notifications";
 import { approveUserRole } from "@/routes/dashboard/_authenticated/users/-server/service";
-import { submitReview } from "@/routes/lecturers/-server/submission.service";
+import { submitReview } from "@/routes/_public/lecturers/-server/submission.service";
 import { dispatchNotification, pruneOldNotifications } from "@/server/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { NOTIFICATION_ERRORS } from "../-shared/errors";
