@@ -7,8 +7,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "preview": "vite preview",
     "deploy": "cf deploy --prebuilt",
+    "deploy:staging": "cf deploy --prebuilt --mode staging",
     "typecheck": "bun check --no-script",
     "lint": "oxlint --deny-warnings src scripts vite.config.ts",
     "lint:fix": "oxlint --fix src scripts vite.config.ts",
