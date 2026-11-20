@@ -11,7 +11,7 @@ export function ReviewStatusBadge({
     <AlignBadge.Root
       size="medium"
       variant={status === "hidden" && !deleted ? "warning" : "light"}
-      className={`shrink-0 text-label-xs ${deleted ? "bg-error-lighter text-error-dark" : status === "hidden" ? "" : "bg-success-lighter text-success-dark"}`}
+      className={`shrink-0 ${deleted ? "bg-error-lighter text-error-dark" : status === "hidden" ? "" : "bg-success-lighter text-success-dark"}`}
     >
       {deleted ? "Deleted" : status === "hidden" ? "Hidden" : "Published"}
     </AlignBadge.Root>

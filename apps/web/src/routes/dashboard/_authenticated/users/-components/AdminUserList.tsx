@@ -78,7 +78,7 @@ export function AdminUserList({
               <AlignBadge.Root
                 size="medium"
                 variant={approved ? "light" : "warning"}
-                className={`h-6 justify-center gap-1.5 text-label-xs ${approved ? "text-text-strong-950" : ""}`}
+                className={`h-6 justify-center gap-1.5 ${approved ? "text-text-strong-950" : ""}`}
               >
                 <span className="capitalize">{approved ? user.role : "Pending"}</span>
                 {approved && user.id === identityId && (

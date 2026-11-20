@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Ukuran teks pada lencana dan label mata kuliah diperkecil agar nama dosen lebih menonjol pada tabel moderasi.
+
 - Kartu ulasan menempatkan isi ulasan di atas, memakai label mata kuliah yang seragam, dan meringkas skor penilaian.
 
 - Menyederhanakan teks dan ikon pada tabel dashboard.

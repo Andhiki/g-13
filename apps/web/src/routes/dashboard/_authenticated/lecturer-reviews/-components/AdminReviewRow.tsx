@@ -37,13 +37,13 @@ export function AdminReviewRow({
     >
       <div className="min-w-0 space-y-1">
         <div className="flex items-center gap-2">
-          <Typography as="h3" variant="labelSmall" className="min-w-0 font-medium">
+          <Typography as="h3" variant="labelSmall" className="min-w-0 font-semibold">
             <AlignButton.Root
               variant="neutral"
               mode="ghost"
               size="xxsmall"
               onClick={onSelect}
-              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline xl:block"
               aria-label={`Inspect ${label}`}
               aria-pressed={selected}
             >
@@ -54,6 +54,7 @@ export function AdminReviewRow({
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
         <CourseChip
+          muted
           code={review.courseCode}
           name={language === "en" ? review.courseNameEn : review.courseNameId}
         />

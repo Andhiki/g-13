@@ -1,17 +1,19 @@
-import { Typography } from "./typography";
-
-export function CourseChip({ code, name }: { code: string; name: string }) {
+export function CourseChip({
+  code,
+  name,
+  muted = false,
+}: {
+  code: string;
+  name: string;
+  muted?: boolean;
+}) {
   return (
     <span
       title={`${code} · ${name}`}
-      className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2.5 py-1 align-middle"
+      className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2.5 py-1 align-middle text-label-2xs font-normal"
     >
-      <Typography as="span" variant="code" className="shrink-0 text-text-sub-600">
-        {code}
-      </Typography>
-      <Typography as="span" variant="caption" className="truncate">
-        {name}
-      </Typography>
+      <span className="shrink-0 font-mono text-text-sub-600">{code}</span>
+      <span className={muted ? "truncate text-text-sub-600" : "truncate"}>{name}</span>
     </span>
   );
 }

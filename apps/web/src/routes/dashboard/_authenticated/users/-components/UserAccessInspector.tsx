@@ -55,11 +55,7 @@ export function UserAccessInspector({
                 </Typography>
               </div>
             </div>
-            <AlignBadge.Root
-              size="medium"
-              variant={approved ? "light" : "warning"}
-              className="text-label-xs"
-            >
+            <AlignBadge.Root size="medium" variant={approved ? "light" : "warning"}>
               {approved ? "Approved" : "Awaiting approval"}
             </AlignBadge.Root>
           </div>

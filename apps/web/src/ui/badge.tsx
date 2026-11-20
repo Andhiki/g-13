@@ -8,7 +8,7 @@ const badgeVariants = tv(
     variants: {
       size: {
         small: "h-4 gap-1 px-1.5 text-[10px] leading-3",
-        medium: "h-5 gap-1.5 px-2 text-label-xs",
+        medium: "h-5 gap-1.5 px-2 text-label-2xs",
       },
       variant: {
         filled: "bg-faded-base text-static-white",
@@ -21,7 +21,11 @@ const badgeVariants = tv(
     },
     defaultVariants: { variant: "filled", size: "small" },
   },
-  { twMergeConfig: { extend: { classGroups: { "font-size": ["text-label-xs"] } } } },
+  {
+    twMergeConfig: {
+      extend: { classGroups: { "font-size": ["text-label-xs", "text-label-2xs"] } },
+    },
+  },
 );
 
 type BadgeProps = ComponentProps<"div"> & VariantProps<typeof badgeVariants>;
