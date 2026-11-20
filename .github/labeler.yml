@@ -1,0 +1,47 @@
+web:
+  - changed-files:
+      - any-glob-to-any-file: apps/web/**
+
+trailer:
+  - changed-files:
+      - any-glob-to-any-file: apps/trailer/**
+
+curriculum:
+  - changed-files:
+      - any-glob-to-any-file: packages/curriculum/**
+
+db:
+  - changed-files:
+      - any-glob-to-any-file: packages/db/**
+
+auth:
+  - changed-files:
+      - any-glob-to-any-file: packages/auth/**
+
+env:
+  - changed-files:
+      - any-glob-to-any-file: packages/env/**
+
+i18n:
+  - changed-files:
+      - any-glob-to-any-file: packages/i18n/**
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.md", "**/*.{md,mdx,markdown}"]
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: ["**/package.json", "bun.lock"]
+
+github_actions:
+  - changed-files:
+      - any-glob-to-any-file: .github/**
+
+# Add 'enhancement' label to any PR whose head branch starts with `feat/` or contains `feature`
+enhancement:
+  - head-branch: ["^feat/", "^feature", "feature"]
+
+# Add 'release' label to any PR that is opened against the `main` branch
+release:
+  - base-branch: "main"
