@@ -12,7 +12,19 @@ export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+        failOnError: false,
+        filter: ({ path }) =>
+          !path.includes("?") &&
+          !path.startsWith("/dashboard") &&
+          !path.startsWith("/lecturers") &&
+          !path.startsWith("/alumni") &&
+          !path.startsWith("/api"),
+      },
+    }),
     react(),
   ],
 });

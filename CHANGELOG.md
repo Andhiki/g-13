@@ -16,6 +16,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Halaman publik statis (beranda, arsip ujian, FAQ, resources, roadmap) kini di-prerender saat build; halaman dosen dan dashboard dirender di klien agar hemat CPU.
 - Login produksi kini berfungsi di kedua domain (`csugm.omahti.com` dan `csugm.andhiki.tech`) dengan satu aplikasi OAuth GitHub; sesi tetap terpisah di masing-masing domain.
 
 #### Fixed
