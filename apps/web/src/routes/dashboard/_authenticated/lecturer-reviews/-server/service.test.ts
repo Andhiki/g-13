@@ -85,6 +85,12 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
       overallAverage: 3,
     });
 
+    for (const status of ["all", "published"] as const) {
+      const { rows } = resultData(await inspectReviews(db, admin, 0, status));
+      expect(rows.map(({ id }) => id)).toEqual(["review"]);
+    }
+    expect(resultData(await inspectReviews(db, admin, 0, "hidden")).rows).toEqual([]);
+
     // Soft-delete is permanent and rejects subsequent actions.
     expect(
       await moderateLecturerReview(db, admin, { reviewId: "review", action: "delete" }),

@@ -61,11 +61,11 @@ function AdminUsersPage() {
   const mutation = useMutation({
     mutationFn: (input: AssignRoleInput) => changeUserRole({ data: input }),
     onSuccess: async () => {
-      setConfirmation(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin"] }),
         queryClient.invalidateQueries({ queryKey: ["lecturer-reviews"] }),
       ]);
+      setConfirmation(null);
     },
   });
 

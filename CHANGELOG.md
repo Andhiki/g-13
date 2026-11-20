@@ -24,6 +24,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Dialog moderasi tetap menampilkan status muat sampai data dashboard selesai diperbarui.
+
 - Ikon tombol berganti menjadi indikator muat di posisi yang sama, lalu kembali setelah proses selesai.
 
 - Header dan tata letak dashboard kini mengikuti rute yang sudah siap ditampilkan agar perpindahan halaman lebih mulus.

@@ -92,11 +92,11 @@ function LecturerReviewsPage() {
   const mutation = useMutation({
     mutationFn: (input: ModerateReviewInput) => changeReviewVisibility({ data: input }),
     onSuccess: async () => {
-      setConfirmation(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin"] }),
         queryClient.invalidateQueries({ queryKey: ["lecturer-reviews"] }),
       ]);
+      setConfirmation(null);
     },
   });
 
