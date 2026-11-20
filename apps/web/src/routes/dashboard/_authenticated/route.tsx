@@ -12,7 +12,7 @@ export const Route = createFileRoute("/dashboard/_authenticated")({
   errorComponent: () => (
     <main className="mx-auto max-w-xl px-5 py-12">
       <Typography role="alert">
-        Admin access could not be verified. Sign in again or contact an administrator.
+        Could not verify your access. Sign in again or contact an admin.
       </Typography>
     </main>
   ),

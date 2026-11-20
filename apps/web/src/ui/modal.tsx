@@ -3,8 +3,23 @@ import { useLocale } from "../useLocale";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { RiCloseLine } from "@remixicon/react";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
 import { CompactButton } from "./compact-button";
+
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": [
+        {
+          text: [
+            (value: string) =>
+              /^(title-h[1-6]|label-(2xs|xs|sm|md|lg|xl)|paragraph-(xs|sm|md|lg|xl))$/.test(value),
+          ],
+        },
+      ],
+    },
+  },
+});
 
 const Root = DialogPrimitive.Root;
 const Title = React.forwardRef<

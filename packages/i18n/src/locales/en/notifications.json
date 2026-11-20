@@ -10,7 +10,7 @@
   "action.open": "Open details",
   "action.viewAll": "View all notifications",
   "empty.all": "No notifications yet.",
-  "empty.unread": "You're all caught up.",
+  "empty.unread": "No unread notifications.",
   "empty.archived": "No archived notifications.",
   "status.unread": "Unread",
   "status.read": "Read",

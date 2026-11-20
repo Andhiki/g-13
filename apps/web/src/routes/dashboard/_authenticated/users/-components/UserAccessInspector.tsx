@@ -1,15 +1,29 @@
 import { useState } from "react";
-import { RiCheckLine, RiCloseLine, RiShieldUserLine } from "@remixicon/react";
+import { RiCheckLine, RiCloseLine, RiUserForbidLine, RiUserSettingsLine } from "@remixicon/react";
 import { canManageUsers, canModerate, type Role } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
+import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignSelect } from "@/ui/select";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
+type PrivilegedRole = Extract<Role, "maintainer" | "admin">;
+
+const roleOptions: Array<{ value: PrivilegedRole; label: string; description: string }> = [
+  {
+    value: "maintainer",
+    label: "Maintainer",
+    description: "Moderate lecturer reviews.",
+  },
+  {
+    value: "admin",
+    label: "Admin",
+    description: "Moderate reviews and manage users.",
+  },
+];
 
 export function UserAccessInspector({
   user,
@@ -21,22 +35,22 @@ export function UserAccessInspector({
   onAssign: (input: AssignRoleInput, label: string) => void;
 }) {
   const approved = canModerate(user.role);
-  const [role, setRole] = useState<Role>(canModerate(user.role) ? user.role : "maintainer");
+  const [step, setStep] = useState<"idle" | "choose-role">("idle");
+  const [role, setRole] = useState<PrivilegedRole>(user.role === "admin" ? "admin" : "maintainer");
   const ownAccount = user.id === identityId;
-  const previewRole = ownAccount ? user.role : role;
+  const previewRole = ownAccount || step === "idle" ? user.role : role;
   const permissions: Array<[string, boolean]> = [
     ["Moderate reviews", canModerate(previewRole)],
-    ["Approve accounts", canManageUsers(previewRole)],
-    ["Assign roles", canManageUsers(previewRole)],
+    ["Manage user access", canManageUsers(previewRole)],
   ];
+
   return (
     <aside
       id="moderation-inspector"
       aria-label="Selected account details"
       className="hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0 xl:flex"
     >
-      <div className="flex h-8 items-center gap-2 border-b border-stroke-soft-200 px-4 text-label-xs">
-        <RiShieldUserLine className="size-3.5 text-text-sub-600" />
+      <div className="flex h-11 shrink-0 items-center border-b border-stroke-soft-200 px-4 text-label-xs">
         Account details
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -68,34 +82,20 @@ export function UserAccessInspector({
             </AlignBadge.Root>
           </div>
           <dl className="space-y-2.5 text-paragraph-xs">
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
+            <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
               <dt className="text-text-sub-600">Joined</dt>
-              <dd>{user.createdAt.toISOString().slice(0, 10)}</dd>
+              <dd className="tabular-nums">{user.createdAt.toISOString().slice(0, 10)}</dd>
             </div>
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
-              <dt className="text-text-sub-600">Current role</dt>
+            <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
+              <dt className="text-text-sub-600">Role</dt>
               <dd className="capitalize">{user.role}</dd>
             </div>
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
-              <dt className="text-text-sub-600">Admin access</dt>
-              <dd>{approved ? "Allowed" : "Not granted"}</dd>
-            </div>
           </dl>
-          {ownAccount && (
-            <section className="border-t border-stroke-soft-200 pt-4">
-              <Typography as="h3" variant="labelSmall">
-                Manage access
-              </Typography>
-              <Typography variant="caption" className="mt-2 text-text-sub-600">
-                Another administrator must manage your role.
-              </Typography>
-            </section>
-          )}
           <section className="border-t border-stroke-soft-200 pt-4">
             <Typography as="h3" variant="labelSmall">
-              Permissions {ownAccount ? "for your role" : "after confirmation"}
+              {step === "choose-role" ? "Permissions after change" : "Permissions"}
             </Typography>
-            <dl className="mt-3 space-y-3 text-paragraph-xs">
+            <dl className="mt-3 space-y-2.5 text-paragraph-xs">
               {permissions.map(([name, allowed]) => (
                 <div key={name} className="flex items-center justify-between gap-2">
                   <dt className="text-text-sub-600">{name}</dt>
@@ -111,62 +111,112 @@ export function UserAccessInspector({
               ))}
             </dl>
           </section>
+          {ownAccount && (
+            <Typography
+              variant="caption"
+              className="border-t border-stroke-soft-200 pt-4 text-text-sub-600"
+            >
+              Another admin must change your role.
+            </Typography>
+          )}
         </div>
       </div>
       {!ownAccount && (
-        <section className="shrink-0 border-t border-stroke-soft-200 p-4">
-          <Typography as="h3" variant="labelSmall">
-            {approved ? "Manage access" : "Approve account"}
-          </Typography>
-          <Typography variant="caption" className="mt-1 break-words text-text-sub-600">
-            {user.name}
-          </Typography>
-          <Typography variant="caption" className="mt-2 text-text-sub-600">
-            Verify this person before granting access. GitHub sign-in and a verified email do not
-            establish administrator approval.
-          </Typography>
-          <Typography
-            as="label"
-            htmlFor="account-role"
-            variant="labelSmall"
-            className="mb-2 mt-3 block"
-          >
-            Assign role
-          </Typography>
-          <AlignSelect.Root
-            variant="compact"
-            value={role}
-            onValueChange={(value) => {
-              if (value === "user" || value === "maintainer" || value === "admin") setRole(value);
-            }}
-          >
-            <AlignSelect.Trigger id="account-role" className="h-8 min-h-8 w-full text-paragraph-xs">
-              <AlignSelect.Value />
-            </AlignSelect.Trigger>
-            <AlignSelect.Content>
-              {(approved ? ["user", "maintainer", "admin"] : ["maintainer", "admin"]).map(
-                (value) => (
-                  <AlignSelect.Item key={value} value={value}>
-                    {value}
-                  </AlignSelect.Item>
-                ),
-              )}
-            </AlignSelect.Content>
-          </AlignSelect.Root>
-          <AlignFancyButton.Root
-            className="mt-3 h-8 w-full text-label-xs"
-            disabled={role === user.role}
-            onClick={() => onAssign({ userId: user.id, role }, user.name)}
-          >
-            {role === "user"
-              ? "Revoke privileged access"
-              : approved
-                ? "Confirm role change"
-                : "Approve & assign role"}
-          </AlignFancyButton.Root>
-          <Typography variant="caption" className="mt-2 text-text-sub-600">
-            A confirmation is required. Access changes take effect on the next protected request.
-          </Typography>
+        <section className="shrink-0 border-t border-stroke-soft-200 p-3">
+          {step === "idle" ? (
+            approved ? (
+              <div className="grid grid-cols-2 gap-2">
+                <AlignButton.Root
+                  size="small"
+                  variant="neutral"
+                  mode="stroke"
+                  className="w-full gap-1.5 text-label-xs"
+                  onClick={() => {
+                    setRole(user.role === "admin" ? "admin" : "maintainer");
+                    setStep("choose-role");
+                  }}
+                >
+                  <RiUserSettingsLine className="size-3.5" />
+                  Change role
+                </AlignButton.Root>
+                <AlignButton.Root
+                  size="small"
+                  variant="error"
+                  mode="lighter"
+                  className="w-full gap-1.5 text-label-xs"
+                  onClick={() => onAssign({ userId: user.id, role: "user" }, user.name)}
+                >
+                  <RiUserForbidLine className="size-3.5" />
+                  Revoke
+                </AlignButton.Root>
+              </div>
+            ) : (
+              <AlignFancyButton.Root
+                size="small"
+                className="w-full text-label-xs"
+                onClick={() => {
+                  setRole("maintainer");
+                  setStep("choose-role");
+                }}
+              >
+                Approve account
+              </AlignFancyButton.Root>
+            )
+          ) : (
+            <div className="space-y-3">
+              <Typography as="h3" variant="labelSmall" className="text-text-strong-950">
+                Choose role
+              </Typography>
+              <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
+                {roleOptions.map((option) => {
+                  const selected = role === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => setRole(option.value)}
+                      className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
+                        selected
+                          ? "border-primary-base bg-primary-alpha-10"
+                          : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Typography as="span" variant="labelSmall" className="text-text-strong-950">
+                          {option.label}
+                        </Typography>
+                        {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
+                      </div>
+                      <Typography variant="caption" className="mt-0.5 block text-text-sub-600">
+                        {option.description}
+                      </Typography>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <AlignButton.Root
+                  size="small"
+                  variant="neutral"
+                  mode="stroke"
+                  className="w-full text-label-xs"
+                  onClick={() => setStep("idle")}
+                >
+                  Cancel
+                </AlignButton.Root>
+                <AlignFancyButton.Root
+                  size="small"
+                  className="w-full text-label-xs"
+                  disabled={approved && role === user.role}
+                  onClick={() => onAssign({ userId: user.id, role }, user.name)}
+                >
+                  {approved ? "Save role" : "Approve"}
+                </AlignFancyButton.Root>
+              </div>
+            </div>
+          )}
         </section>
       )}
     </aside>

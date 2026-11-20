@@ -22,7 +22,7 @@ export function AdminPagination({
   return (
     <footer className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 bg-bg-white-0 px-4">
       <Typography variant="caption" className="text-text-sub-600 tabular-nums">
-        {count ? `${offset + 1}–${offset + count} of ${total} ${label}` : "0 records"}
+        {count ? `${offset + 1}–${offset + count} of ${total} ${label}` : `0 ${label}`}
       </Typography>
       <div className="flex gap-1.5">
         <AlignButton.Root

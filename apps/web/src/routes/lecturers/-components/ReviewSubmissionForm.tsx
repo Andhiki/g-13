@@ -310,11 +310,13 @@ export function ReviewSubmissionForm({
           </AlignButton.Root>
           <AlignFancyButton.Root
             type="submit"
-            disabled={publishMutation.isPending || !courses.length}
-            className="h-9 w-full text-paragraph-sm sm:w-auto"
+            size="small"
+            isLoading={publishMutation.isPending}
+            disabled={!courses.length}
+            className="w-full text-paragraph-sm sm:w-auto"
           >
             <Typography as="span" variant="paragraph">
-              {text(publishMutation.isPending ? "Publishing…" : "Publish review")}
+              {text("Publish review")}
             </Typography>
             <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />
           </AlignFancyButton.Root>
