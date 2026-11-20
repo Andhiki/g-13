@@ -4,9 +4,19 @@ import { authAccount, authSession, authUser, authVerification } from "@g13/db/sc
 import type { createDatabase } from "@g13/db/client";
 import { consumeAuthLimit } from "./repository";
 
+export type AuthBaseURL =
+  | string
+  | {
+      allowedHosts: string[];
+      fallback?: string;
+      protocol?: "http" | "https" | "auto";
+    };
+
 export type AuthConfiguration = {
   secret: string;
-  baseURL: string;
+  baseURL: AuthBaseURL;
+  trustedOrigins?: string[];
+  secureCookies?: boolean;
   githubClientId: string;
   githubClientSecret: string;
   onUserCreated?: (user: {
@@ -17,11 +27,29 @@ export type AuthConfiguration = {
   }) => Promise<void> | void;
 };
 
+function originForHost(host: string) {
+  const local = host.startsWith("localhost") || host.startsWith("127.0.0.1");
+  return `${local ? "http" : "https"}://${host}`;
+}
+
+function defaultTrustedOrigins(baseURL: AuthBaseURL) {
+  return typeof baseURL === "string"
+    ? [new URL(baseURL).origin]
+    : baseURL.allowedHosts.map(originForHost);
+}
+
+function defaultSecureCookies(baseURL: AuthBaseURL) {
+  if (typeof baseURL === "string") return new URL(baseURL).protocol === "https:";
+  if (baseURL.protocol === "http") return false;
+  if (baseURL.protocol === "https") return true;
+  return baseURL.fallback ? new URL(baseURL.fallback).protocol === "https:" : true;
+}
+
 export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthConfiguration) {
   return betterAuth({
     secret: config.secret,
     baseURL: config.baseURL,
-    trustedOrigins: [new URL(config.baseURL).origin],
+    trustedOrigins: config.trustedOrigins ?? defaultTrustedOrigins(config.baseURL),
     database: drizzleAdapter(db, {
       provider: "sqlite",
       transaction: false,
@@ -85,7 +113,7 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       defaultCookieAttributes: {
         httpOnly: true,
         sameSite: "lax",
-        secure: new URL(config.baseURL).protocol === "https:",
+        secure: config.secureCookies ?? defaultSecureCookies(config.baseURL),
       },
     },
     rateLimit: {

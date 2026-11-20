@@ -19,7 +19,12 @@ function buildAuth() {
   const db = createDatabase(env.DB);
   return createAuth(db, {
     secret: config.BETTER_AUTH_SECRET,
-    baseURL: config.BETTER_AUTH_URL,
+    baseURL: {
+      allowedHosts: config.BETTER_AUTH_ALLOWED_HOSTS,
+      fallback: config.BETTER_AUTH_URL,
+      protocol: "auto",
+    },
+    secureCookies: new URL(config.BETTER_AUTH_URL).protocol === "https:",
     githubClientId: config.GITHUB_CLIENT_ID,
     githubClientSecret: config.GITHUB_CLIENT_SECRET,
     onUserCreated: async (user) => {

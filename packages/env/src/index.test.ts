@@ -8,7 +8,10 @@ it("fails closed without complete server-only OAuth configuration", () => {
     GITHUB_CLIENT_ID: "test-only",
     GITHUB_CLIENT_SECRET: "test-only",
   };
-  expect(parseAuthEnvironment(config)).toEqual(config);
+  expect(parseAuthEnvironment(config)).toEqual({
+    ...config,
+    BETTER_AUTH_ALLOWED_HOSTS: ["example.test"],
+  });
   expect(() => parseAuthEnvironment({})).toThrow();
   expect(() => parseAuthEnvironment({ ...config, BETTER_AUTH_SECRET: "short" })).toThrow();
   expect(() => parseAuthEnvironment({ ...config, GITHUB_CLIENT_SECRET: "" })).toThrow();
@@ -18,6 +21,23 @@ it("fails closed without complete server-only OAuth configuration", () => {
   expect(() =>
     parseAuthEnvironment({ ...config, BETTER_AUTH_URL: "http://localhost:5173" }),
   ).not.toThrow();
+});
+
+it("parses additional auth hosts for multi-domain deployments", () => {
+  const config = {
+    BETTER_AUTH_SECRET: crypto.randomUUID(),
+    BETTER_AUTH_URL: "https://csugm.omahti.com",
+    BETTER_AUTH_ALLOWED_HOSTS: "csugm.omahti.com, csugm.andhiki.tech",
+    GITHUB_CLIENT_ID: "test-only",
+    GITHUB_CLIENT_SECRET: "test-only",
+  };
+  expect(parseAuthEnvironment(config).BETTER_AUTH_ALLOWED_HOSTS).toEqual([
+    "csugm.omahti.com",
+    "csugm.andhiki.tech",
+  ]);
+  expect(() =>
+    parseAuthEnvironment({ ...config, BETTER_AUTH_ALLOWED_HOSTS: "https://example.test" }),
+  ).toThrow();
 });
 
 it("requires a server rate-limit secret of at least 32 characters", () => {

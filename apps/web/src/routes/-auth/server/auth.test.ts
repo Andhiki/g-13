@@ -178,3 +178,40 @@ it("creates only unprivileged GitHub accounts and rejects forged OAuth state", a
     await platform.dispose();
   }
 }, 30_000);
+
+it("derives the OAuth callback from the request host for each allowed domain", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    const auth = createAuth(db, {
+      secret: crypto.randomUUID(),
+      baseURL: {
+        allowedHosts: ["csugm.omahti.com", "csugm.andhiki.tech"],
+        fallback: "https://csugm.omahti.com",
+      },
+      secureCookies: true,
+      githubClientId: "integration-test-only",
+      githubClientSecret: "integration-test-only",
+    });
+    for (const host of ["csugm.omahti.com", "csugm.andhiki.tech"]) {
+      const response = await auth.handler(
+        new Request(`https://${host}/api/auth/sign-in/social`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: `https://${host}`,
+            "cf-connecting-ip": "192.0.2.10",
+          },
+          body: JSON.stringify({ provider: "github", callbackURL: "/dashboard" }),
+        }),
+      );
+      expect(response.status).toBe(200);
+      const { url } = z.object({ url: z.string() }).parse(await response.json());
+      expect(new URL(url).searchParams.get("redirect_uri")).toBe(
+        `https://${host}/api/auth/callback/github`,
+      );
+    }
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);

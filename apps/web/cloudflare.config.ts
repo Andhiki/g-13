@@ -57,6 +57,11 @@ export default defineConfig(({ mode }) => {
 				}),
 				BETTER_AUTH_SECRET: bindings.secret(),
 				BETTER_AUTH_URL: bindings.secret(),
+				BETTER_AUTH_ALLOWED_HOSTS: bindings.text(
+					isStaging
+						? "g-13-staging.andhikiandre.workers.dev"
+						: "csugm.omahti.com,csugm.andhiki.tech",
+				),
 				GITHUB_CLIENT_ID: bindings.secret(),
 				GITHUB_CLIENT_SECRET: bindings.secret(),
 				REVIEW_RATE_LIMIT_SECRET: bindings.secret(),

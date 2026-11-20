@@ -14,6 +14,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-20
 
+#### Changed
+
+- Login produksi kini berfungsi di kedua domain (`csugm.omahti.com` dan `csugm.andhiki.tech`) dengan satu aplikasi OAuth GitHub; sesi tetap terpisah di masing-masing domain.
+
 #### Fixed
 
 - Halaman `/dashboard/login` tidak lagi menampilkan pesan galat autentikasi bagi pengunjung yang sudah memiliki sesi; halaman menampilkan tombol lanjut ke dashboard atau keluar.
