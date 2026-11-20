@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { loadMessages } from "@g13/i18n/messages";
 import { createI18n, messageNamespace } from "./i18n";
-import { examArchive } from "./features/exam-archive/catalog";
-import { browseArchive } from "./features/exam-archive/archive";
+import { examArchive } from "./routes/exam/-shared/catalog";
+import { browseArchive } from "./routes/exam/-shared/archive";
 
 const common = await loadMessages("en", "common");
 const roadmap = await loadMessages("en", "roadmap");
@@ -34,7 +34,7 @@ test("request instances retain their own language and resource namespaces", () =
 });
 
 test("namespace selection follows case-insensitive routes and trailing slashes", () => {
-  for (const namespace of ["roadmap", "exam", "resources", "alumni"] as const) {
+  for (const namespace of ["roadmap", "exam", "resources", "alumni", "lecturers"] as const) {
     expect(messageNamespace(`/${namespace}`)).toBe(namespace);
     expect(messageNamespace(`/${namespace.toUpperCase()}/`)).toBe(namespace);
   }

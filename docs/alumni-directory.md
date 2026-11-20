@@ -27,8 +27,9 @@ The browser only ever sees `/api/alumni`.
 | `STRAPI_API_TOKEN` | yes | Read-only token for the `Alumni` collection |
 | `STRAPI_ORIGIN` | no | Strapi base URL; defaults to `https://strapi.kagamailkomp.id` |
 
-Local development: copy [`apps/web/.dev.vars.example`](../../apps/web/.dev.vars.example)
-to `apps/web/.dev.vars` and fill in the token. `.dev.vars` is ignored by git.
+Local development: copy [`apps/web/.env.example`](../../apps/web/.env.example)
+to `apps/web/.env` and fill in the token. `.env` is ignored by git.
+Use only `.env`; an existing `.dev.vars` prevents Cloudflare from loading it.
 
 Production: `bunx cf workers secrets update STRAPI_API_TOKEN` from `apps/web`.
 
@@ -120,5 +121,5 @@ bun run dev
 
 Then open `/alumni` and `/alumni/all`, and check both desktop and mobile layouts.
 Automated tests cover the sanitisation, URL normalisation and filtering
-logic in [`directory.test.ts`](../../apps/web/src/features/alumni/directory.test.ts);
+logic in [`directory.test.ts`](../../apps/web/src/routes/alumni/-shared/directory.test.ts);
 UI behaviour is verified manually as the contribution guide requires.

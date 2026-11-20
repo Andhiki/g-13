@@ -5,13 +5,26 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   server: { host: true },
   build: { sourcemap: true },
   environments: { client: { build: { sourcemap: false } } },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+        failOnError: false,
+        filter: ({ path }) =>
+          !path.includes("?") &&
+          !path.startsWith("/dashboard") &&
+          !path.startsWith("/lecturers") &&
+          !path.startsWith("/alumni") &&
+          !path.startsWith("/api"),
+      },
+    }),
     react(),
   ],
 });

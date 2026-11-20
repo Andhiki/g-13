@@ -48,7 +48,8 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
 
 ## Struktur dan kebiasaan kode
 
-- `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: primitif UI.
+- `apps/web/src/routes/`: routing dan implementasi fitur di folder berawalan `-`
+  yang diabaikan generator rute; `apps/web/src/ui/`: primitif UI.
 - `apps/web/src/graph/` dan `apps/web/src/courses/`: perilaku graf dan komponen mata
   kuliah yang dipakai bersama oleh peta kurikulum dan roadmap. Modul bersama tidak
   mengimpor implementasi fitur.

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ResourcesPage } from "../features/resources/ResourcesPage";
+import { ResourcesPage } from "./resources/-components/ResourcesPage";
 
 export const Route = createFileRoute("/resources")({
   head: ({ match }) => ({

@@ -11,6 +11,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useRouterState,
   Link,
 } from "@tanstack/react-router";
 import { useMemo, type ReactNode } from "react";
@@ -26,8 +27,12 @@ import { createI18n, messageNamespace } from "../i18n";
 import { readLanguage } from "../language";
 import { loadMessages } from "@g13/i18n/messages";
 import type { Language } from "@g13/i18n";
+import type { QueryClient } from "@tanstack/react-query";
 
-export const Route = createRootRouteWithContext<{ language?: Language }>()({
+export const Route = createRootRouteWithContext<{
+  language?: Language;
+  queryClient: QueryClient;
+}>()({
   beforeLoad: async ({ context }) => {
     const language = context.language ?? readLanguage();
     return { language, common: await loadMessages(language, "common") };
@@ -129,9 +134,14 @@ function ErrorPage({ reset }: { reset: () => void }) {
 }
 
 function AppLayout() {
+  const dashboard = useRouterState({
+    select: (state) => /^\/dashboard(?:\/|$)/.test(state.location.pathname),
+  });
   return (
-    <div className="min-h-dvh pt-[var(--app-header-height)]">
-      <AppHeader />
+    <div
+      className={dashboard ? "h-dvh overflow-hidden" : "min-h-dvh pt-[var(--app-header-height)]"}
+    >
+      {!dashboard && <AppHeader />}
       <Outlet />
       <Toaster />
     </div>

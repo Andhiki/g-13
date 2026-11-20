@@ -3,7 +3,15 @@ import { createInstance } from "i18next";
 import { courseTitle, i18nOptions, resolveLanguage } from "./index";
 import { loadMessages, type MessageNamespace } from "./messages";
 
-const namespaces: MessageNamespace[] = ["common", "roadmap", "exam", "resources", "alumni"];
+const namespaces: MessageNamespace[] = [
+  "common",
+  "roadmap",
+  "exam",
+  "resources",
+  "alumni",
+  "lecturers",
+  "notifications",
+];
 for (const namespace of namespaces) {
   test(`${namespace} has matching ID/EN keys and interpolation values`, async () => {
     const id = await loadMessages("id", namespace);

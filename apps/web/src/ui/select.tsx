@@ -5,7 +5,7 @@ import { extendTailwindMerge } from "tailwind-merge";
 import { createContext, useContext, type ComponentProps } from "react";
 
 const twMerge = extendTailwindMerge({
-  extend: { classGroups: { "font-size": ["text-paragraph-sm"] } },
+  extend: { classGroups: { "font-size": ["text-paragraph-sm", "text-paragraph-xs"] } },
 });
 
 type SelectVariant = "default" | "compact";

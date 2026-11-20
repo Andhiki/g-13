@@ -1,0 +1,101 @@
+import { useState } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { RiGithubFill } from "@remixicon/react";
+import { canModerate } from "@g13/auth";
+import { AlignButton } from "@/ui/button";
+import { Typography } from "@/ui/typography";
+import { authClient } from "@/routes/-auth/client/auth";
+import type { loadAdminIdentity } from "@/routes/-auth/server/identity";
+
+type Identity = Awaited<ReturnType<typeof loadAdminIdentity>>;
+
+export function LoginPage({ identity }: { identity: Identity }) {
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState(false);
+  const router = useRouter();
+  const approved = canModerate(identity?.role);
+
+  async function signIn() {
+    setPending(true);
+    setError(false);
+    try {
+      const result = await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/dashboard/lecturer-reviews",
+      });
+      if (result.error) {
+        setError(true);
+        setPending(false);
+      }
+    } catch {
+      setError(true);
+      setPending(false);
+    }
+  }
+
+  return (
+    <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
+      <div className="w-full max-w-[380px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-sm">
+        <div className="border-b border-stroke-soft-200 px-6 py-4 text-center">
+          <Typography as="h1" variant="label" className="text-text-strong-950">
+            Sign in to your account
+          </Typography>
+        </div>
+        <div className="space-y-3 p-6">
+          {identity && !approved && (
+            <Typography variant="caption" className="block text-center text-text-sub-600">
+              Your account is awaiting approval.
+            </Typography>
+          )}
+          {approved ? (
+            <AlignButton.Root asChild size="medium" variant="primary" className="w-full">
+              <Link to="/dashboard/lecturer-reviews">Continue to dashboard</Link>
+            </AlignButton.Root>
+          ) : (
+            !identity && (
+              <AlignButton.Root
+                size="medium"
+                variant="neutral"
+                mode="lighter"
+                className="w-full gap-2 text-text-strong-950"
+                disabled={pending}
+                onClick={() => void signIn()}
+              >
+                <RiGithubFill className="size-4.5" />
+                {pending ? "Redirecting…" : "Sign in with GitHub"}
+              </AlignButton.Root>
+            )
+          )}
+          {identity && (
+            <AlignButton.Root
+              size="medium"
+              variant="neutral"
+              mode="stroke"
+              className="w-full"
+              onClick={async () => {
+                const result = await authClient.signOut();
+                if (result.error) {
+                  setError(true);
+                  return;
+                }
+                router.options.context.queryClient.clear();
+                await router.invalidate();
+              }}
+            >
+              Sign out
+            </AlignButton.Root>
+          )}
+          {error && (
+            <Typography
+              role="alert"
+              variant="caption"
+              className="block text-center text-error-base"
+            >
+              Sign-in failed. Please try again.
+            </Typography>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}
