@@ -20,87 +20,82 @@ export function AdminUserList({
 }) {
   return (
     <>
-      <div className="grid grid-cols-[minmax(0,1fr)_120px] gap-4 border-b border-stroke-soft-200 bg-bg-white-0 px-4 py-2 text-label-xs text-text-strong-950 md:sticky md:top-0 md:z-10 md:grid-cols-[minmax(0,1fr)_160px_104px_104px]">
+      <div className="grid grid-cols-[minmax(0,1fr)_120px] gap-4 border-b border-stroke-soft-200 bg-bg-white-0 px-4 py-2 text-label-xs text-text-strong-950 md:sticky md:top-0 md:z-10 md:grid-cols-[minmax(0,1fr)_104px_120px]">
         <span>Account</span>
-        <span className="hidden text-center md:block">Approval</span>
         <span className="hidden text-center md:block">Joined</span>
         <span className="text-right md:text-center">Role</span>
       </div>
-      {users.slice(0, 50).map((user) => (
-        <div
-          key={user.id}
-          data-selected={selectedId === user.id}
-          onClick={() => {
-            if (!window.getSelection()?.toString()) onSelect(user.id);
-          }}
-          className="grid xl:cursor-[var(--interactive-cursor)] grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 md:grid-cols-[minmax(0,1fr)_160px_104px_104px] md:items-center"
-        >
-          <div className="flex min-w-0 items-center gap-2.5">
-            <AlignAvatar.Root size="32" aria-hidden="true" className="text-label-xs">
-              {user.name
-                .split(/\s+/)
-                .slice(0, 2)
-                .map((part) => part[0])
-                .join("")}
-            </AlignAvatar.Root>
-            <div className="min-w-0">
-              <Typography variant="label" className="truncate font-semibold">
-                <AlignButton.Root
-                  variant="neutral"
-                  mode="ghost"
-                  size="xxsmall"
-                  className="hidden h-auto max-w-full truncate rounded-sm p-0 text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
-                  aria-label={`Inspect account ${user.name}`}
-                  aria-pressed={selectedId === user.id}
-                  onClick={() => onSelect(user.id)}
+      {users.slice(0, 50).map((user) => {
+        const approved = canModerate(user.role);
+        return (
+          <div
+            key={user.id}
+            data-selected={selectedId === user.id}
+            onClick={() => {
+              if (!window.getSelection()?.toString()) onSelect(user.id);
+            }}
+            className="grid xl:cursor-[var(--interactive-cursor)] grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 md:grid-cols-[minmax(0,1fr)_104px_120px] md:items-center"
+          >
+            <div className="flex min-w-0 items-center gap-2.5">
+              <AlignAvatar.Root size="32" aria-hidden="true" className="text-label-xs">
+                {user.name
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((part) => part[0])
+                  .join("")}
+              </AlignAvatar.Root>
+              <div className="min-w-0">
+                <Typography variant="label" className="truncate font-semibold">
+                  <AlignButton.Root
+                    variant="neutral"
+                    mode="ghost"
+                    size="xxsmall"
+                    className="hidden h-auto max-w-full truncate rounded-sm p-0 text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+                    aria-label={`Inspect account ${user.name}`}
+                    aria-pressed={selectedId === user.id}
+                    onClick={() => onSelect(user.id)}
+                  >
+                    {user.name}
+                  </AlignButton.Root>
+                  <span className="xl:hidden">{user.name}</span>
+                </Typography>
+                <Typography variant="caption" className="truncate text-text-sub-600">
+                  {user.email}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  className="mt-1 text-text-sub-600 tabular-nums md:hidden"
                 >
-                  {user.name}
-                </AlignButton.Root>
-                <span className="xl:hidden">{user.name}</span>
-              </Typography>
-              <Typography variant="caption" className="truncate text-text-sub-600">
-                {user.email}
-              </Typography>
-              <Typography variant="caption" className="mt-1 text-text-sub-600 md:hidden">
-                {canModerate(user.role) ? "Approved" : "Awaiting approval"} ·{" "}
-                {user.createdAt.toISOString().slice(0, 10)}
-              </Typography>
+                  {user.createdAt.toISOString().slice(0, 10)}
+                </Typography>
+              </div>
+            </div>
+            <Typography
+              variant="caption"
+              className="hidden text-center text-text-strong-950 tabular-nums md:block"
+            >
+              {user.createdAt.toISOString().slice(0, 10)}
+            </Typography>
+            <div className="flex justify-end md:justify-center">
+              <AlignBadge.Root
+                size="medium"
+                variant={approved ? "light" : "warning"}
+                className={`h-6 justify-center gap-1.5 text-label-xs ${approved ? "text-text-strong-950" : ""}`}
+              >
+                <span className="capitalize">{approved ? user.role : "Pending"}</span>
+                {approved && user.id === identityId && (
+                  <>
+                    <span aria-hidden="true" className="text-text-sub-600">
+                      ·
+                    </span>
+                    <span className="text-text-sub-600">You</span>
+                  </>
+                )}
+              </AlignBadge.Root>
             </div>
           </div>
-          <div className="hidden md:flex md:justify-center">
-            <AlignBadge.Root
-              size="medium"
-              variant={canModerate(user.role) ? "light" : "warning"}
-              className="text-label-xs"
-            >
-              {canModerate(user.role) ? "Approved" : "Awaiting approval"}
-            </AlignBadge.Root>
-          </div>
-          <Typography
-            variant="caption"
-            className="hidden text-center text-text-strong-950 tabular-nums md:block"
-          >
-            {user.createdAt.toISOString().slice(0, 10)}
-          </Typography>
-          <div className="flex justify-end md:justify-center">
-            <AlignBadge.Root
-              size="medium"
-              variant="light"
-              className="h-6 justify-center gap-1.5 text-label-xs text-text-strong-950"
-            >
-              <span className="capitalize">{user.role}</span>
-              {user.id === identityId && (
-                <>
-                  <span aria-hidden="true" className="text-text-sub-600">
-                    ·
-                  </span>
-                  <span className="text-text-sub-600">You</span>
-                </>
-              )}
-            </AlignBadge.Root>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }

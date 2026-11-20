@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  RiCheckLine,
-  RiCloseLine,
-  RiShieldUserLine,
-  RiUserForbidLine,
-  RiUserSettingsLine,
-} from "@remixicon/react";
+import { RiCheckLine, RiCloseLine, RiUserForbidLine, RiUserSettingsLine } from "@remixicon/react";
 import { canManageUsers, canModerate, type Role } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
@@ -22,12 +16,12 @@ const roleOptions: Array<{ value: PrivilegedRole; label: string; description: st
   {
     value: "maintainer",
     label: "Maintainer",
-    description: "Inspect, hide, restore, and soft-delete reviews.",
+    description: "Moderate lecturer reviews.",
   },
   {
     value: "admin",
     label: "Admin",
-    description: "Full moderation access, plus approving accounts and assigning roles.",
+    description: "Moderate reviews and manage users.",
   },
 ];
 
@@ -47,8 +41,7 @@ export function UserAccessInspector({
   const previewRole = ownAccount || step === "idle" ? user.role : role;
   const permissions: Array<[string, boolean]> = [
     ["Moderate reviews", canModerate(previewRole)],
-    ["Approve accounts", canManageUsers(previewRole)],
-    ["Assign roles", canManageUsers(previewRole)],
+    ["Manage user access", canManageUsers(previewRole)],
   ];
 
   return (
@@ -57,8 +50,7 @@ export function UserAccessInspector({
       aria-label="Selected account details"
       className="hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0 xl:flex"
     >
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-stroke-soft-200 px-4 text-label-xs">
-        <RiShieldUserLine className="size-3.5 text-text-sub-600" />
+      <div className="flex h-11 shrink-0 items-center border-b border-stroke-soft-200 px-4 text-label-xs">
         Account details
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -90,38 +82,20 @@ export function UserAccessInspector({
             </AlignBadge.Root>
           </div>
           <dl className="space-y-2.5 text-paragraph-xs">
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
+            <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
               <dt className="text-text-sub-600">Joined</dt>
-              <dd>{user.createdAt.toISOString().slice(0, 10)}</dd>
+              <dd className="tabular-nums">{user.createdAt.toISOString().slice(0, 10)}</dd>
             </div>
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
-              <dt className="text-text-sub-600">Current role</dt>
+            <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-2">
+              <dt className="text-text-sub-600">Role</dt>
               <dd className="capitalize">{user.role}</dd>
             </div>
-            <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
-              <dt className="text-text-sub-600">Admin access</dt>
-              <dd>{approved ? "Allowed" : "Not granted"}</dd>
-            </div>
           </dl>
-          {ownAccount && (
-            <section className="border-t border-stroke-soft-200 pt-4">
-              <Typography as="h3" variant="labelSmall">
-                Manage access
-              </Typography>
-              <Typography variant="caption" className="mt-2 text-text-sub-600">
-                Another administrator must manage your role.
-              </Typography>
-            </section>
-          )}
           <section className="border-t border-stroke-soft-200 pt-4">
             <Typography as="h3" variant="labelSmall">
-              {ownAccount
-                ? "Permissions for your role"
-                : step === "choose-role"
-                  ? "Permissions after confirmation"
-                  : "Current permissions"}
+              {step === "choose-role" ? "Permissions after change" : "Permissions"}
             </Typography>
-            <dl className="mt-3 space-y-3 text-paragraph-xs">
+            <dl className="mt-3 space-y-2.5 text-paragraph-xs">
               {permissions.map(([name, allowed]) => (
                 <div key={name} className="flex items-center justify-between gap-2">
                   <dt className="text-text-sub-600">{name}</dt>
@@ -137,6 +111,14 @@ export function UserAccessInspector({
               ))}
             </dl>
           </section>
+          {ownAccount && (
+            <Typography
+              variant="caption"
+              className="border-t border-stroke-soft-200 pt-4 text-text-sub-600"
+            >
+              Another admin must change your role.
+            </Typography>
+          )}
         </div>
       </div>
       {!ownAccount && (
@@ -169,21 +151,16 @@ export function UserAccessInspector({
                 </AlignButton.Root>
               </div>
             ) : (
-              <div className="space-y-2.5">
-                <Typography variant="caption" className="block text-text-sub-600">
-                  Verify this person before granting access.
-                </Typography>
-                <AlignFancyButton.Root
-                  size="small"
-                  className="w-full text-label-xs"
-                  onClick={() => {
-                    setRole("maintainer");
-                    setStep("choose-role");
-                  }}
-                >
-                  Approve account
-                </AlignFancyButton.Root>
-              </div>
+              <AlignFancyButton.Root
+                size="small"
+                className="w-full text-label-xs"
+                onClick={() => {
+                  setRole("maintainer");
+                  setStep("choose-role");
+                }}
+              >
+                Approve account
+              </AlignFancyButton.Root>
             )
           ) : (
             <div className="space-y-3">

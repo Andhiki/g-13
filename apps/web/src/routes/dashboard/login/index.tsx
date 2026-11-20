@@ -23,7 +23,7 @@ export const Route = createFileRoute("/dashboard/login/")({
   ),
   errorComponent: () => (
     <main className="mx-auto max-w-xl px-5 py-12">
-      <Typography role="alert">Authentication is unavailable. Contact an administrator.</Typography>
+      <Typography role="alert">Sign-in is unavailable. Contact an admin.</Typography>
     </main>
   ),
   component: () => <LoginPage identity={Route.useLoaderData().identity} />,

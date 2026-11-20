@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { canManageUsers } from "@g13/auth";
-import { RiChatCheckLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility } from "./-server/handler";
 import { moderationReviewQuery, moderationReviewsQuery } from "./-client/queries";
@@ -184,7 +184,7 @@ function LecturerReviewsPage() {
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
             {reviews.isError ? (
               <Typography role="alert" className="p-4">
-                Unable to load protected data. Refresh or sign in again.
+                Could not load reviews. Refresh or sign in again.
               </Typography>
             ) : reviews.isPending ? (
               <div className="flex h-full min-h-64 items-center justify-center p-6">
@@ -199,22 +199,19 @@ function LecturerReviewsPage() {
                   <span className="text-right">Actions</span>
                 </div>
                 {!visibleRows.length && (
-                  <div className="flex min-h-64 flex-col items-center justify-center gap-2 px-4">
-                    <RiChatCheckLine className="size-7 text-text-sub-600" />
+                  <div className="flex min-h-64 flex-col items-center justify-center gap-1.5 px-4 text-center">
                     <Typography variant="labelSmall">
                       {needle
                         ? "No matching reviews"
                         : status === "all"
-                          ? "No lecturer reviews yet"
+                          ? "No reviews yet"
                           : `No ${status} reviews`}
                     </Typography>
-                    <Typography variant="caption" className="text-text-sub-600">
-                      {needle
-                        ? "Try another lecturer name, course code, or keyword."
-                        : status === "all"
-                          ? "New public reviews will appear here for moderation."
-                          : "Choose another status to inspect other reviews."}
-                    </Typography>
+                    {(needle || status === "all") && (
+                      <Typography variant="caption" className="text-text-sub-600">
+                        {needle ? "Try a different search." : "Submitted reviews appear here."}
+                      </Typography>
+                    )}
                   </div>
                 )}
                 {visibleRows.map((review) => (
@@ -246,16 +243,12 @@ function LecturerReviewsPage() {
         title={`Confirm ${confirmation?.input.action ?? ""}`}
         description={`${confirmation?.label ?? ""}. ${
           confirmation?.input.action === "delete"
-            ? "Soft deletion removes this review from public view and cannot be undone here. It does not erase stored data."
+            ? "Removes this review from public view. You cannot undo this here; the record stays stored."
             : confirmation?.input.action === "hide"
               ? "Remove this review from public listings and scores."
               : "Publish this review again and include it in public scores."
         }`}
-        error={
-          mutation.isError
-            ? "Change failed. Refresh and check your access before trying again."
-            : undefined
-        }
+        error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
         pending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {

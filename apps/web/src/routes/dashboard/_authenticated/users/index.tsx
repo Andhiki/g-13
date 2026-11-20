@@ -131,7 +131,7 @@ function AdminUsersPage() {
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
             {users.isError ? (
               <Typography role="alert" className="p-4">
-                Unable to load protected data. Refresh or sign in again.
+                Could not load accounts. Refresh or sign in again.
               </Typography>
             ) : users.isPending ? (
               <div className="flex h-full min-h-64 items-center justify-center p-6">
@@ -171,13 +171,13 @@ function AdminUsersPage() {
       </div>
       <ConfirmActionModal
         open={confirmation !== null}
-        title="Confirm role assignment"
-        description={`${confirmation?.label ?? ""}. Assign ${confirmation?.input.role ?? ""}. This changes protected access on the next request.`}
-        error={
-          mutation.isError
-            ? "Change failed. Refresh and check your access before trying again."
-            : undefined
+        title={confirmation?.input.role === "user" ? "Revoke access" : "Confirm role change"}
+        description={
+          confirmation?.input.role === "user"
+            ? `Remove moderation access for ${confirmation.label}. Access updates on their next request.`
+            : `Set ${confirmation?.label ?? ""} to ${confirmation?.input.role ?? ""}. Access updates on their next request.`
         }
+        error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
         pending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {

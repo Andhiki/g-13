@@ -52,7 +52,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
       <div className="w-full max-w-[380px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-sm">
         <div className="border-b border-stroke-soft-200 px-6 py-4 text-center">
           <Typography as="h1" variant="label" className="text-text-strong-950">
-            Sign in to your account
+            Sign in
           </Typography>
         </div>
         <div className="space-y-3 p-6">

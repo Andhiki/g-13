@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  RiChatCheckLine,
-  RiDeleteBinLine,
-  RiEyeLine,
-  RiEyeOffLine,
-  RiLockLine,
-} from "@remixicon/react";
+import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { RatingStars } from "@/ui/rating-stars";
 import { Typography } from "@/ui/typography";
@@ -53,8 +47,7 @@ export function ReviewInspector({
       aria-label="Selected review details"
       className="hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0 xl:flex"
     >
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-stroke-soft-200 px-4 text-label-xs">
-        <RiChatCheckLine className="size-3.5 text-text-sub-600" />
+      <div className="flex h-11 shrink-0 items-center border-b border-stroke-soft-200 px-4 text-label-xs">
         Review details
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
