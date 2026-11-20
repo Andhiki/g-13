@@ -74,7 +74,7 @@ export function ReviewList({
                 <Typography as="dt" variant="caption" className="text-text-sub-600">
                   {text(label)}
                 </Typography>
-                <dd className="m-0">
+                <dd className="m-0 flex items-center">
                   <RatingStars value={value} label={`${text(label)}: ${value}/5`} />
                 </dd>
               </div>

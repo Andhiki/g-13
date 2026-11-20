@@ -72,7 +72,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
           variant="neutral"
           mode="ghost"
           size="xsmall"
-          className="relative size-7 shrink-0 px-0"
+          className="relative size-8 shrink-0 px-0 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
           aria-label={text("title")}
           title={text("title")}
         >

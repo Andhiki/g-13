@@ -12,12 +12,13 @@ import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
+import { AdminTableHeader } from "../-components/AdminTable";
 import { AdminPagination } from "../-components/AdminPagination";
 import { ConfirmationChange } from "../-components/ConfirmationChange";
 import { DashboardEmptyState } from "../-components/DashboardEmptyState";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
-import { AdminReviewRow } from "./-components/AdminReviewRow";
+import { AdminReviewRow, reviewTableColumns } from "./-components/AdminReviewRow";
 import { ReviewStatusBadge } from "./-components/ReviewStatusBadge";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
@@ -71,7 +72,7 @@ function LecturerReviewsPage() {
   const needle = query.trim().toLowerCase();
   const visibleRows = needle
     ? pageRows.filter((row) =>
-        `${row.lecturerName} ${row.courseCode} ${row.termLabel} ${row.authorName} ${row.body}`
+        `${row.lecturerName} ${row.courseCode} ${row.courseNameId} ${row.courseNameEn} ${row.termLabel} ${row.authorName} ${row.body}`
           .toLowerCase()
           .includes(needle),
       )
@@ -204,12 +205,14 @@ function LecturerReviewsPage() {
               </div>
             ) : (
               <>
-                <div className="hidden grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] gap-4 border-b border-stroke-soft-200 bg-bg-weak-50/60 px-4 py-2 text-label-xs text-text-sub-600 lg:sticky lg:top-0 lg:z-10 lg:grid">
+                <AdminTableHeader
+                  className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${reviewTableColumns}`}
+                >
                   <span>Lecturer / course</span>
                   <span>Review</span>
                   <span>Rating</span>
                   <span className="text-right">Actions</span>
-                </div>
+                </AdminTableHeader>
                 {!count && (
                   <DashboardEmptyState
                     icon={<RiChatCheckLine />}

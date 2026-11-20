@@ -12,6 +12,8 @@ const moderationReviewColumns = {
   id: reviews.id,
   lecturerName: lecturers.name,
   courseCode: courses.code,
+  courseNameId: courses.nameId,
+  courseNameEn: courses.nameEn,
   authorName: reviews.authorName,
   termLabel: reviews.termLabel,
   body: reviews.body,

@@ -1,9 +1,15 @@
 import { canModerate } from "@g13/auth";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
+import {
+  AdminTableHeader,
+  AdminTableRow,
+} from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import { AccountAvatar } from "./AccountAvatar";
+
+const userTableColumns = "grid-cols-[minmax(0,1fr)_120px] md:grid-cols-[minmax(0,1fr)_104px_120px]";
 
 type Users = Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
 
@@ -20,31 +26,29 @@ export function AdminUserList({
 }) {
   return (
     <>
-      <div className="grid grid-cols-[minmax(0,1fr)_120px] gap-4 border-b border-stroke-soft-200 bg-bg-white-0 px-4 py-2 text-label-xs text-text-strong-950 md:sticky md:top-0 md:z-10 md:grid-cols-[minmax(0,1fr)_104px_120px]">
+      <AdminTableHeader className={`grid md:sticky md:top-0 md:z-10 ${userTableColumns}`}>
         <span>Account</span>
         <span className="hidden text-center md:block">Joined</span>
         <span className="text-right md:text-center">Role</span>
-      </div>
+      </AdminTableHeader>
       {users.slice(0, 50).map((user) => {
         const approved = canModerate(user.role);
         return (
-          <div
+          <AdminTableRow
             key={user.id}
-            data-selected={selectedId === user.id}
-            onClick={() => {
-              if (!window.getSelection()?.toString()) onSelect(user.id);
-            }}
-            className="grid xl:cursor-[var(--interactive-cursor)] grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 md:grid-cols-[minmax(0,1fr)_104px_120px] md:items-center"
+            selected={selectedId === user.id}
+            onSelect={() => onSelect(user.id)}
+            className={`${userTableColumns} items-center`}
           >
             <div className="flex min-w-0 items-center gap-2.5">
               <AccountAvatar name={user.name} image={user.image} />
               <div className="min-w-0">
-                <Typography variant="label" className="truncate font-semibold">
+                <Typography variant="labelSmall" className="truncate font-medium">
                   <AlignButton.Root
                     variant="neutral"
                     mode="ghost"
                     size="xxsmall"
-                    className="hidden h-auto max-w-full truncate rounded-sm p-0 text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+                    className="hidden h-auto max-w-full truncate rounded-sm p-0 text-label-xs text-text-strong-950 hover:bg-transparent hover:underline xl:block"
                     aria-label={`Inspect account ${user.name}`}
                     aria-pressed={selectedId === user.id}
                     onClick={() => onSelect(user.id)}
@@ -87,7 +91,7 @@ export function AdminUserList({
                 )}
               </AlignBadge.Root>
             </div>
-          </div>
+          </AdminTableRow>
         );
       })}
     </>

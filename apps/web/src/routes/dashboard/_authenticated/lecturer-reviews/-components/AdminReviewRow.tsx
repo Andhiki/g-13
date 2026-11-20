@@ -1,12 +1,16 @@
 import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine, RiStarFill } from "@remixicon/react";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
+import { CourseChip } from "@/ui/course-chip";
+import { AdminTableRow } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime, formatRelativeTime } from "../../notifications/-shared/time";
 import type { loadModerationReviews } from "../-server/handler";
 import type { ModerateReviewInput } from "../-shared/moderation";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
+
+export const reviewTableColumns = "lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px]";
 
 type Review = Awaited<ReturnType<typeof loadModerationReviews>>["rows"][number];
 
@@ -29,23 +33,20 @@ export function AdminReviewRow({
   const createdMs = review.createdAt.getTime();
 
   return (
-    // The whole row selects for pointer users; the name button keeps keyboard access.
-    <article
-      data-selected={selected}
-      onClick={() => {
-        if (!window.getSelection()?.toString()) onSelect();
-      }}
-      className="grid gap-3 xl:cursor-[var(--interactive-cursor)] border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px] lg:items-center lg:gap-4 xl:data-[selected=true]:bg-bg-weak-50 xl:data-[selected=true]:hover:bg-bg-weak-50"
+    <AdminTableRow
+      selected={selected}
+      onSelect={onSelect}
+      className={`${reviewTableColumns} lg:items-center`}
     >
       <div className="min-w-0 space-y-1">
         <div className="flex items-center gap-2">
-          <Typography as="h3" variant="label" className="min-w-0 font-medium">
+          <Typography as="h3" variant="labelSmall" className="min-w-0 font-medium">
             <AlignButton.Root
               variant="neutral"
               mode="ghost"
               size="xxsmall"
               onClick={onSelect}
-              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-sm text-text-strong-950 hover:bg-transparent hover:underline xl:block"
+              className="hidden h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs text-text-strong-950 hover:bg-transparent hover:underline xl:block"
               aria-label={`Inspect ${label}`}
               aria-pressed={selected}
             >
@@ -55,8 +56,12 @@ export function AdminReviewRow({
           </Typography>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
+        <CourseChip
+          code={review.courseCode}
+          name={language === "en" ? review.courseNameEn : review.courseNameId}
+        />
         <Typography variant="caption" className="block truncate text-text-sub-600">
-          {review.courseCode} · {review.termLabel}
+          {review.termLabel}
         </Typography>
       </div>
 
@@ -115,6 +120,6 @@ export function AdminReviewRow({
           </AlignBadge.Root>
         )}
       </div>
-    </article>
+    </AdminTableRow>
   );
 }

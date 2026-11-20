@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tansta
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
 import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine, RiStarFill } from "@remixicon/react";
+import { CourseChip } from "@/ui/course-chip";
 import { useLocale } from "@/useLocale";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignEmptyState } from "@/ui/empty-state";
@@ -104,16 +105,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           {data.lecturer.courses.length ? (
             <ul className="mb-0 mt-2 flex flex-wrap gap-1.5 pl-0">
               {data.lecturer.courses.map((course) => (
-                <li
-                  key={course.id}
-                  className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2.5 py-1"
-                >
-                  <Typography as="span" variant="code" className="shrink-0 text-text-sub-600">
-                    {course.code}
-                  </Typography>
-                  <Typography as="span" variant="caption" className="truncate">
-                    {courseDisplayName(course, language)}
-                  </Typography>
+                <li key={course.id} className="min-w-0 max-w-full">
+                  <CourseChip code={course.code} name={courseDisplayName(course, language)} />
                 </li>
               ))}
             </ul>

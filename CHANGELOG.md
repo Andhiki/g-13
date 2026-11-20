@@ -38,6 +38,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menyamakan ukuran kontrol sidebar, meratakan bintang pada ulasan, dan merapikan tabel dashboard dengan label mata kuliah yang konsisten.
+
 - Menyamakan jarak di kedua sisi tautan sidebar dashboard.
 
 - Daftar dan detail akun di dashboard kini menampilkan avatar GitHub jika tersedia.
