@@ -1,13 +1,26 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { loadNotifications } from "../-server/handler";
-import type { NotificationFilter } from "../-shared/schemas";
+import type { NotificationCursor, NotificationFilter } from "../-shared/schemas";
 
 const dashboardStaleTime = 5 * 60 * 1000;
+const firstPage: NotificationCursor | null = null;
 
-export function notificationsQuery(offset = 0, filter: NotificationFilter = "all") {
+export function notificationsQuery(filter: NotificationFilter = "all") {
+  return infiniteQueryOptions({
+    queryKey: ["notifications", "list", filter],
+    queryFn: ({ pageParam }: { pageParam: NotificationCursor | null }) =>
+      loadNotifications({ data: { cursor: pageParam, filter } }),
+    initialPageParam: firstPage,
+    getNextPageParam: (page) => page.nextCursor,
+    staleTime: dashboardStaleTime,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function notificationPopoverQuery() {
   return queryOptions({
-    queryKey: ["notifications", "list", offset, filter],
-    queryFn: () => loadNotifications({ data: { offset, filter } }),
+    queryKey: ["notifications", "popover"],
+    queryFn: () => loadNotifications({ data: { filter: "unread" } }),
     staleTime: dashboardStaleTime,
     refetchOnWindowFocus: false,
   });

@@ -111,6 +111,7 @@ function LecturerReviewsPage() {
         title="Lecturer reviews"
         manager={canManageUsers(identity.role)}
         userName={identity.name}
+        userImage={identity.image}
       />
       <div
         className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"

@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Notifikasi dashboard dapat digulir tanpa tombol halaman, menu akun menampilkan avatar GitHub, dan pilihan peran memakai ikon akses.
+
 - Admin dapat mencabut akses moderasi lewat pilihan peran User. Notifikasi dimuat saat dashboard dibuka dan diperbarui setiap menit selama jendela aktif.
 
 - Sidebar, panel detail, dan pemilih peran dashboard kini membuka dan menutup dengan transisi.

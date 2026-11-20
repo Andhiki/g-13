@@ -18,7 +18,12 @@ export const loadAdminUsers = createServerFn({ method: "GET" })
     if (result.error !== null) rejectUserOperation(result.error);
     return {
       ...result.data,
-      identity: { id: session.user.id, name: session.user.name, role: session.user.role },
+      identity: {
+        id: session.user.id,
+        name: session.user.name,
+        role: session.user.role,
+        image: session.user.image,
+      },
     };
   });
 

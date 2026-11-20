@@ -8,17 +8,19 @@ export function AdminPageHeader({
   title,
   manager,
   userName,
+  userImage,
 }: {
   title: string;
   manager: boolean;
   userName: string;
+  userImage?: string | null;
 }) {
   const { sidebarOpen, setSidebarOpen } = useAdminLayout();
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 px-3">
       <div className="flex min-w-0 items-center gap-2">
-        <MobileModerationMenu manager={manager} userName={userName} />
+        <MobileModerationMenu manager={manager} userName={userName} userImage={userImage} />
         <AlignButton.Root
           size="xsmall"
           variant="neutral"

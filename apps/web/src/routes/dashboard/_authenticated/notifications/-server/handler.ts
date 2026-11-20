@@ -18,12 +18,17 @@ export const loadNotifications = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectNotifications(createDatabase(env.DB), session.user, data.offset, data.filter),
+      inspectNotifications(createDatabase(env.DB), session.user, data.cursor, data.filter),
     );
     if (result.error !== null) rejectNotificationOperation(result.error);
     return {
       ...result.data,
-      identity: { id: session.user.id, name: session.user.name, role: session.user.role },
+      identity: {
+        id: session.user.id,
+        name: session.user.name,
+        role: session.user.role,
+        image: session.user.image,
+      },
     };
   });
 

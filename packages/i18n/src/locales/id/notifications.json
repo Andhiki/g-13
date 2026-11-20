@@ -8,6 +8,7 @@
   "action.markRead": "Tandai dibaca",
   "action.archive": "Arsipkan",
   "action.open": "Buka detail",
+  "action.retry": "Coba muat notifikasi lagi",
   "action.viewAll": "Lihat semua notifikasi",
   "empty.all": "Belum ada notifikasi.",
   "empty.unread": "Semua notifikasi sudah dibaca.",

@@ -5,7 +5,7 @@ import { canManageUsers } from "@g13/auth";
 import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
 import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
-import { notificationsQuery } from "./notifications/-client/queries";
+import { notificationPopoverQuery } from "./notifications/-client/queries";
 import { Typography } from "@/ui/typography";
 
 export const Route = createFileRoute("/dashboard/_authenticated")({
@@ -40,7 +40,7 @@ function AdminLayout() {
     () => false,
   );
   useQuery({
-    ...notificationsQuery(0, "unread"),
+    ...notificationPopoverQuery(),
     enabled: !!identity,
     refetchInterval: focused ? 60_000 : false,
   });
@@ -49,7 +49,11 @@ function AdminLayout() {
       <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
         <div className="flex h-full min-h-0 flex-col md:flex-row">
           {identity && (
-            <ModerationSidebar manager={canManageUsers(identity.role)} userName={identity.name} />
+            <ModerationSidebar
+              manager={canManageUsers(identity.role)}
+              userName={identity.name}
+              userImage={"image" in identity ? identity.image : null}
+            />
           )}
           <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-stroke-soft-200 bg-bg-white-0 md:rounded-xl md:border">
             <Outlet />

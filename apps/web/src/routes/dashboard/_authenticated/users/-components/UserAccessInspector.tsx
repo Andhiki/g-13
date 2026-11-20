@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { RiCheckLine, RiCloseLine, RiUserSettingsLine } from "@remixicon/react";
+import {
+  RiCheckLine,
+  RiCloseLine,
+  RiUserSettingsLine,
+  RiShieldStarLine,
+  RiShieldCheckLine,
+  RiShieldCrossLine,
+  type RemixiconComponentType,
+} from "@remixicon/react";
 import { canManageUsers, canModerate } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
@@ -12,19 +20,27 @@ import type { AssignRoleInput } from "../-shared/schemas";
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
 type AssignableRole = AssignRoleInput["role"];
 
-const roleOptions: Array<{ value: AssignableRole; label: string; description: string }> = [
+const roleOptions: Array<{
+  value: AssignableRole;
+  label: string;
+  description: string;
+  Icon: RemixiconComponentType;
+}> = [
   {
     value: "maintainer",
+    Icon: RiShieldCheckLine,
     label: "Maintainer",
     description: "Moderate lecturer reviews.",
   },
   {
     value: "admin",
+    Icon: RiShieldStarLine,
     label: "Admin",
     description: "Moderate reviews and manage users.",
   },
   {
     value: "user",
+    Icon: RiShieldCrossLine,
     label: "User",
     description: "No moderation access.",
   },
@@ -198,8 +214,12 @@ export function UserAccessInspector({
                             <Typography
                               as="span"
                               variant="labelSmall"
-                              className="text-text-strong-950"
+                              className="flex items-center gap-2 text-text-strong-950"
                             >
+                              <option.Icon
+                                aria-hidden="true"
+                                className="size-4 shrink-0 text-text-sub-600"
+                              />
                               {option.label}
                             </Typography>
                             {selected && <RiCheckLine className="size-3.5 text-primary-base" />}

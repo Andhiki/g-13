@@ -1,4 +1,16 @@
-import { and, desc, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  notInArray,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import {
   notificationEvents,
   notifications,
@@ -6,11 +18,11 @@ import {
 } from "@g13/db/schema/notifications";
 import type { createDatabase } from "@g13/db/client";
 import { hiddenNotificationTypes, type NotificationViewer } from "../-shared/audience";
-import type { NotificationFilter } from "../-shared/schemas";
+import type { NotificationCursor, NotificationFilter } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
 
-export const NOTIFICATIONS_PAGE_SIZE = 50;
+const NOTIFICATIONS_PAGE_SIZE = 50;
 
 export type NotificationItem = {
   id: string;
@@ -62,10 +74,18 @@ function filterCondition(viewer: NotificationViewer, filter: NotificationFilter)
 export async function listUserNotifications(
   db: Database,
   viewer: NotificationViewer,
-  offset = 0,
-  filter: NotificationFilter = "all",
-  limit = NOTIFICATIONS_PAGE_SIZE,
-): Promise<NotificationItem[]> {
+  cursor: NotificationCursor | null,
+  filter: NotificationFilter,
+): Promise<{ rows: NotificationItem[]; nextCursor: NotificationCursor | null }> {
+  const before = cursor
+    ? or(
+        lt(notifications.createdAt, new Date(cursor.createdAt)),
+        and(
+          eq(notifications.createdAt, new Date(cursor.createdAt)),
+          lt(notifications.id, cursor.id),
+        ),
+      )
+    : undefined;
   const rows = await db
     .select({
       id: notifications.id,
@@ -81,18 +101,23 @@ export async function listUserNotifications(
     })
     .from(notifications)
     .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
-    .where(filterCondition(viewer, filter))
+    .where(and(filterCondition(viewer, filter), before))
     .orderBy(desc(notifications.createdAt), desc(notifications.id))
-    .limit(limit + 1)
-    .offset(offset);
+    .limit(NOTIFICATIONS_PAGE_SIZE + 1);
 
-  return rows.map((row) => ({
+  const page = rows.slice(0, NOTIFICATIONS_PAGE_SIZE).map((row) => ({
     ...row,
     payload: row.payload ?? {},
     readAt: row.readAt ? row.readAt.getTime() : null,
     archivedAt: row.archivedAt ? row.archivedAt.getTime() : null,
     createdAt: row.createdAt.getTime(),
   }));
+  const last = page.at(-1);
+  return {
+    rows: page,
+    nextCursor:
+      last && rows.length > page.length ? { createdAt: last.createdAt, id: last.id } : null,
+  };
 }
 
 export async function getNotificationCounts(

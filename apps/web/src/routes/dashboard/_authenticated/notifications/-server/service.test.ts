@@ -108,7 +108,7 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
     expect((await readNotification(db, admin, adminNotifId)).error).toBeNull();
     expect((await inspectNotifications(db, admin)).data?.counts.unread).toBe(0);
     expect((await archiveUserNotification(db, admin, adminNotifId)).error).toBeNull();
-    const archived = await inspectNotifications(db, admin, 0, "archived");
+    const archived = await inspectNotifications(db, admin, null, "archived");
     expect(archived.data?.counts).toEqual({ all: 0, unread: 0, archived: 1 });
     expect(archived.data?.rows.map((row) => row.id)).toEqual([adminNotifId]);
 
@@ -167,3 +167,52 @@ test("prunes notifications and orphaned events older than 90 days", async () => 
     await platform.dispose();
   }
 }, 30_000);
+
+test("continues a notification inbox without gaps when timestamps tie and newer rows arrive", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedFixtures(db);
+    const admin = { id: "admin-1", role: "admin" };
+    const createdAt = new Date("2026-11-19T00:00:00Z");
+    const ids = Array.from({ length: 53 }, (_, index) => `item-${String(index).padStart(2, "0")}`);
+    for (const offset of [0, 10, 20, 30, 40, 50]) {
+      const batch = ids.slice(offset, offset + 10);
+      await db.insert(notificationEvents).values(
+        batch.map((id) => ({
+          id,
+          type: "review.created",
+          resourceType: "lecturer_review",
+          resourceId: id,
+          createdAt,
+        })),
+      );
+      await db
+        .insert(notifications)
+        .values(batch.map((id) => ({ id, eventId: id, recipientId: admin.id, createdAt })));
+    }
+
+    const first = (await inspectNotifications(db, admin)).data;
+    if (!first?.nextCursor) throw new Error("Expected a second page");
+    expect(first.rows.map(({ id }) => id)).toEqual(ids.slice().reverse().slice(0, 50));
+
+    await db.insert(notificationEvents).values({
+      id: "new",
+      type: "review.created",
+      resourceType: "lecturer_review",
+      resourceId: "new",
+      createdAt,
+    });
+    await db.insert(notifications).values({
+      id: "new",
+      eventId: "new",
+      recipientId: admin.id,
+      createdAt: new Date(createdAt.getTime() + 1),
+    });
+    const second = (await inspectNotifications(db, admin, first.nextCursor)).data;
+    expect(second?.rows.map(({ id }) => id)).toEqual(["item-02", "item-01", "item-00"]);
+    expect(second?.nextCursor).toBeNull();
+  } finally {
+    await platform.dispose();
+  }
+});

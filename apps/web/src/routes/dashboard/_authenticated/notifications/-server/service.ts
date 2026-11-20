@@ -1,7 +1,7 @@
 import type { createDatabase } from "@g13/db/client";
 import { NOTIFICATION_ERRORS, type NotificationOperationResult } from "../-shared/errors";
 import type { NotificationViewer } from "../-shared/audience";
-import type { NotificationFilter } from "../-shared/schemas";
+import type { NotificationCursor, NotificationFilter } from "../-shared/schemas";
 import {
   archiveNotification,
   getNotificationCounts,
@@ -18,19 +18,20 @@ type Actor = NotificationViewer;
 export type NotificationListData = {
   rows: NotificationItem[];
   counts: NotificationCounts;
+  nextCursor: NotificationCursor | null;
 };
 
 export async function inspectNotifications(
   db: Database,
   actor: Actor,
-  offset = 0,
+  cursor: NotificationCursor | null = null,
   filter: NotificationFilter = "all",
 ): Promise<NotificationOperationResult<NotificationListData>> {
-  const [rows, counts] = await Promise.all([
-    listUserNotifications(db, actor, offset, filter),
+  const [page, counts] = await Promise.all([
+    listUserNotifications(db, actor, cursor, filter),
     getNotificationCounts(db, actor),
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { ...page, counts }, error: null };
 }
 
 export async function readNotification(

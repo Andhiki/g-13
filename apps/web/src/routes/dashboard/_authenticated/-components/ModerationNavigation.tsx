@@ -50,7 +50,14 @@ const sectionGroups = [
 const navLinkClass =
   "flex w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 outline-none transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 focus-visible:outline-[1.5px] focus-visible:outline-offset-0 focus-visible:outline-stroke-strong-950/35 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950";
 
-function NavigationFooter({ userName, mobile = false }: { userName: string; mobile?: boolean }) {
+type AccountProps = { userName: string; userImage?: string | null };
+
+function NavigationFooter({
+  userName,
+  userImage,
+  mobile = false,
+}: AccountProps & { mobile?: boolean }) {
+  const [failedImage, setFailedImage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -85,10 +92,22 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg px-2 text-label-xs text-text-strong-950"
+              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
               aria-label="Account menu"
             >
-              <RiUser3Line className="size-4 shrink-0 text-text-sub-600" />
+              {userImage && userImage !== failedImage ? (
+                <img
+                  src={userImage}
+                  alt=""
+                  className="size-5 shrink-0 rounded-full object-cover"
+                  onError={() => setFailedImage(userImage)}
+                />
+              ) : (
+                <RiUser3Line
+                  aria-hidden="true"
+                  className="size-5 shrink-0 p-0.5 text-text-sub-600"
+                />
+              )}
               <span className="truncate font-medium">{userName}</span>
             </AlignButton.Root>
           </AlignDropdown.Trigger>
@@ -125,7 +144,11 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
   );
 }
 
-export function ModerationSidebar({ manager, userName }: { manager: boolean; userName: string }) {
+export function ModerationSidebar({
+  manager,
+  userName,
+  userImage,
+}: AccountProps & { manager: boolean }) {
   const { sidebarOpen } = useAdminLayout();
   return (
     <div
@@ -157,7 +180,7 @@ export function ModerationSidebar({ manager, userName }: { manager: boolean; use
             );
           })}
         </nav>
-        <NavigationFooter userName={userName} />
+        <NavigationFooter userName={userName} userImage={userImage} />
       </aside>
     </div>
   );
@@ -166,10 +189,8 @@ export function ModerationSidebar({ manager, userName }: { manager: boolean; use
 export function MobileModerationMenu({
   manager,
   userName,
-}: {
-  manager: boolean;
-  userName: string;
-}) {
+  userImage,
+}: AccountProps & { manager: boolean }) {
   return (
     <AlignDrawer.Root>
       <AlignDrawer.Trigger asChild>
@@ -227,7 +248,7 @@ export function MobileModerationMenu({
               );
             })}
           </nav>
-          <NavigationFooter userName={userName} mobile />
+          <NavigationFooter userName={userName} userImage={userImage} mobile />
         </AlignDrawer.Body>
       </AlignDrawer.Content>
     </AlignDrawer.Root>

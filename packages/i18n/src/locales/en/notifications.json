@@ -8,6 +8,7 @@
   "action.markRead": "Mark as read",
   "action.archive": "Archive",
   "action.open": "Open details",
+  "action.retry": "Retry loading notifications",
   "action.viewAll": "View all notifications",
   "empty.all": "No notifications yet.",
   "empty.unread": "No unread notifications.",
