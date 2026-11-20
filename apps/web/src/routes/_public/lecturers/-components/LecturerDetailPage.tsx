@@ -187,13 +187,13 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                   aria-label={text("Course filter")}
                   className="h-9 min-h-9 max-w-44 flex-1 sm:flex-none"
                 >
-                  <AlignSelect.Value asChild>
-                    <span className="min-w-0 truncate">
+                  <span className="min-w-0 truncate">
+                    <AlignSelect.Value>
                       {selectedCourse
                         ? `${selectedCourse.code} · ${courseDisplayName(selectedCourse, language)}`
                         : text("All courses")}
-                    </span>
-                  </AlignSelect.Value>
+                    </AlignSelect.Value>
+                  </span>
                 </AlignSelect.Trigger>
                 <AlignSelect.Content className="w-[min(20rem,var(--radix-select-content-available-width))] max-w-[calc(100vw-1rem)]">
                   <AlignSelect.Item value="all">{text("All courses")}</AlignSelect.Item>

@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
+import { RiStarFill, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
+import { AlignButton } from "@/ui/button";
+import { CourseChip } from "@/ui/course-chip";
 import { Typography } from "@/ui/typography";
 import type { lecturerDetailQueryOptions } from "../-client/queries";
 import { courseDisplayName } from "../-shared/course-search";
-import { RatingStars } from "./LecturerReviewCard";
 
 type Review = Awaited<
   ReturnType<NonNullable<ReturnType<typeof lecturerDetailQueryOptions>["queryFn"]>>
@@ -37,29 +38,15 @@ export function ReviewList({
         <article
           key={review.id}
           id={`review-${review.id}`}
-          className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 pb-2 sm:p-5 sm:pb-2"
+          className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-4 sm:p-5"
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-            <Typography as="strong" variant="label">
-              {review.authorName.toLowerCase() === "anonymous"
-                ? text("Anonymous")
-                : review.authorName}
-            </Typography>
-            <Typography as="time" variant="caption" className="text-text-sub-600">
-              {review.termLabel}
-            </Typography>
-          </div>
-          <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
-            {courseDisplayName(review, language)} · {review.code}
-          </Typography>
-          <Typography
-            as="p"
-            variant="paragraph"
-            className="mb-0 mt-3 whitespace-pre-wrap break-words leading-relaxed"
-          >
+          <Typography as="p" className="m-0 whitespace-pre-wrap break-words leading-relaxed">
             {review.body}
           </Typography>
-          <dl className="mb-0 mt-3 grid gap-2 sm:flex sm:flex-wrap sm:gap-x-6">
+          <div className="mt-3">
+            <CourseChip code={review.code} name={courseDisplayName(review, language)} />
+          </div>
+          <dl className="mb-0 mt-3 flex flex-wrap gap-x-4 gap-y-2">
             {(
               [
                 ["Clarity", review.clarity],
@@ -67,27 +54,37 @@ export function ReviewList({
                 ["Organization", review.organization],
               ] satisfies [string, number][]
             ).map(([label, value]) => (
-              <div
-                key={label}
-                className="grid min-w-0 grid-cols-[110px_auto] items-center gap-2 sm:flex"
-              >
+              <div key={label} className="flex items-center gap-1.5">
                 <Typography as="dt" variant="caption" className="text-text-sub-600">
                   {text(label)}
                 </Typography>
-                <dd className="m-0 flex items-center">
-                  <RatingStars value={value} label={`${text(label)}: ${value}/5`} />
+                <dd className="m-0 flex items-center gap-0.5 text-label-xs tabular-nums">
+                  {value}
+                  <RiStarFill aria-hidden="true" className="size-3.5 text-primary-base" />
                 </dd>
               </div>
             ))}
           </dl>
-          <ReviewLikeButton
-            reviewId={review.id}
-            count={review.likeCount}
-            liked={likedReviews.includes(review.id)}
-            canLike={canLike}
-            pending={likePending}
-            onLike={onLike}
-          />
+          <footer className="mt-4 flex items-center justify-between gap-3 border-t border-stroke-soft-200 pt-3">
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+              <Typography as="span" variant="labelSmall" className="min-w-0 wrap-anywhere">
+                {review.authorName.toLowerCase() === "anonymous"
+                  ? text("Anonymous")
+                  : review.authorName}
+              </Typography>
+              <Typography as="time" variant="caption" className="text-text-sub-600">
+                {review.termLabel}
+              </Typography>
+            </div>
+            <ReviewLikeButton
+              reviewId={review.id}
+              count={review.likeCount}
+              liked={likedReviews.includes(review.id)}
+              canLike={canLike}
+              pending={likePending}
+              onLike={onLike}
+            />
+          </footer>
         </article>
       ))}
     </div>
@@ -112,18 +109,18 @@ function ReviewLikeButton({
   const { text } = useLocale("lecturers");
   const Icon = liked ? RiThumbUpFill : RiThumbUpLine;
   return (
-    <button
-      type="button"
-      className="mt-1 inline-flex h-9 min-w-9 items-center gap-2 rounded-md px-2 text-label-sm text-text-sub-600 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base disabled:opacity-50"
+    <AlignButton.Root
+      size="xsmall"
+      variant="neutral"
+      mode="stroke"
+      className="min-w-9 shrink-0 gap-1.5 px-2 tabular-nums"
       aria-pressed={liked}
       aria-label={text(liked ? "Unlike review" : "Like review")}
       disabled={!canLike || pending}
       onClick={() => onLike(reviewId, !liked)}
     >
       <Icon className="size-4" aria-hidden="true" />
-      <Typography as="span" variant="label" className="tabular-nums">
-        {count}
-      </Typography>
-    </button>
+      {count}
+    </AlignButton.Root>
   );
 }
