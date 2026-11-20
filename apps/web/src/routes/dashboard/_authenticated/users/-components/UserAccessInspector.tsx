@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { RiCheckLine, RiCloseLine, RiUserSettingsLine } from "@remixicon/react";
 import { canManageUsers, canModerate } from "@g13/auth";
-import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -10,6 +9,7 @@ import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
 
 import { roleOptions, type AssignableRole } from "./role-options";
+import { AccountAvatar } from "./AccountAvatar";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
 export function UserAccessInspector({
@@ -45,13 +45,7 @@ export function UserAccessInspector({
         <div className="space-y-5 p-4">
           <div>
             <div className="mb-3 flex items-center gap-2.5">
-              <AlignAvatar.Root size="32" aria-hidden="true" className="text-label-xs">
-                {user.name
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((part) => part[0])
-                  .join("")}
-              </AlignAvatar.Root>
+              <AccountAvatar name={user.name} image={user.image} />
               <div className="min-w-0">
                 <Typography as="h2" variant="label">
                   {user.name}

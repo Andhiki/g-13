@@ -1,9 +1,9 @@
 import { canModerate } from "@g13/auth";
-import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
+import { AccountAvatar } from "./AccountAvatar";
 
 type Users = Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
 
@@ -37,13 +37,7 @@ export function AdminUserList({
             className="grid xl:cursor-[var(--interactive-cursor)] grid-cols-[minmax(0,1fr)_120px] items-start gap-4 border-b border-stroke-soft-200 px-4 py-3 hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 md:grid-cols-[minmax(0,1fr)_104px_120px] md:items-center"
           >
             <div className="flex min-w-0 items-center gap-2.5">
-              <AlignAvatar.Root size="32" aria-hidden="true" className="text-label-xs">
-                {user.name
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((part) => part[0])
-                  .join("")}
-              </AlignAvatar.Root>
+              <AccountAvatar name={user.name} image={user.image} />
               <div className="min-w-0">
                 <Typography variant="label" className="truncate font-semibold">
                   <AlignButton.Root

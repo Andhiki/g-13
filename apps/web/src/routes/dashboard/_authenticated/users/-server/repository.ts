@@ -11,6 +11,7 @@ export async function listAdminUsers(db: Database, offset: number, status: UserS
       id: authUser.id,
       name: authUser.name,
       email: authUser.email,
+      image: authUser.image,
       role: authUser.role,
       createdAt: authUser.createdAt,
     })

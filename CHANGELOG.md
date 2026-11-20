@@ -36,6 +36,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Daftar dan detail akun di dashboard kini menampilkan avatar GitHub jika tersedia.
+
 - Dialog moderasi tetap menampilkan status muat sampai data dashboard selesai diperbarui.
 
 - Ikon tombol berganti menjadi indikator muat di posisi yang sama, lalu kembali setelah proses selesai.
