@@ -16,6 +16,7 @@ type TurnstileApi = {
   execute: (container: string | HTMLElement) => void;
   reset: (widgetId?: string) => void;
   remove: (widgetId?: string) => void;
+  getResponse: (widgetId?: string) => string | undefined;
 };
 
 declare global {
@@ -71,6 +72,7 @@ export type TurnstileFieldHandle = {
   // Runs the invisible challenge and resolves with a fresh token, or null when
   // the challenge cannot be completed (no site key, error, timeout, or unmount).
   execute: () => Promise<string | null>;
+  reset: () => void;
 };
 
 const CHALLENGE_TIMEOUT_MS = 15_000;
@@ -127,6 +129,11 @@ export const TurnstileField = forwardRef<TurnstileFieldHandle, { siteKey: string
     useImperativeHandle(
       ref,
       () => ({
+        reset: () => {
+          if (widgetIdRef.current && window.turnstile) {
+            window.turnstile.reset(widgetIdRef.current);
+          }
+        },
         execute: () =>
           new Promise<string | null>((resolve) => {
             if (!siteKey || !window.turnstile || !widgetIdRef.current) {
