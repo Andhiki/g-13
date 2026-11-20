@@ -38,6 +38,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Menyamakan jarak di kedua sisi tautan sidebar dashboard.
+
 - Daftar dan detail akun di dashboard kini menampilkan avatar GitHub jika tersedia.
 
 - Dialog moderasi tetap menampilkan status muat sampai data dashboard selesai diperbarui.

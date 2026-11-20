@@ -156,7 +156,7 @@ export function ModerationSidebar({
       data-open={sidebarOpen}
       className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
     >
-      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col px-2 py-2.5">
+      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-2 pr-3.5">
         <nav aria-label="Moderation sections" className="space-y-4">
           {sectionGroups.map((group) => {
             const items = group.items.filter(
