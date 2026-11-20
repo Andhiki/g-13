@@ -25,9 +25,10 @@
     "format:check": "turbo run format:check",
     "check": "turbo run lint format:check typecheck test",
     "test": "turbo run test",
-    "db:migrate": "test -n \"$D1_DATABASE_ID\" || (echo \"D1_DATABASE_ID is required; refusing to run migrations\" && exit 1); cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
+    "db:migrate": "test -n \"$D1_DATABASE_ID\" || { echo \"D1_DATABASE_ID is required; refusing to run migrations\"; exit 1; }; cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
   },
   "devDependencies": {
+    "cf": "^1.0.0-rc.0",
     "turbo": "^2.11.10"
   },
   "packageManager": "bun@1.4.4"
