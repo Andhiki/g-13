@@ -88,6 +88,18 @@ html[data-light-theme="himakom"]:not(.dark) {
   --color-primary-alpha-10: #6246d61a;
 }
 
+html[data-dark-theme="omahti"].dark #moderation-sidebar {
+  background-color: #241f1c;
+}
+
+html[data-dark-theme="omahti"].dark #moderation-sidebar a:hover {
+  background-color: #302723;
+}
+
+html[data-dark-theme="omahti"].dark #moderation-sidebar a[aria-current="page"] {
+  background-color: #342b27;
+}
+
 html[data-dark-theme="himakom"].dark {
   --color-bg-white-0: #191827;
   --color-bg-weak-25: #201e32;

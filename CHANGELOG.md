@@ -30,6 +30,10 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Menyederhanakan teks dan ikon pada tabel dashboard.
 
+- Kondisi kosong dashboard kini menjelaskan sumber data dan langkah selanjutnya, termasuk bahwa ulasan publik langsung terbit setelah dikirim.
+
+- Mengurangi jarak horizontal di sisi tautan navigasi sidebar dashboard dan memberi latar sidebar Omahti gelap rona charcoal hangat.
+
 - Indikator muat dashboard menggunakan warna teks netral.
 
 - Menandai notifikasi sebagai dibaca langsung memperbarui daftar dan indikator belum dibaca sambil menunggu server.

@@ -154,6 +154,13 @@ function AdminUsersPage() {
                   <DashboardEmptyState
                     icon={<RiGroupLine />}
                     title={userStatus === "all" ? "No accounts yet" : `No ${userStatus} accounts`}
+                    description={
+                      userStatus === "all"
+                        ? "Accounts are created on a user's first GitHub sign-in. New accounts appear here until an admin assigns access."
+                        : userStatus === "pending"
+                          ? "New GitHub sign-ins wait here until an admin assigns an access role."
+                          : "Accounts with an assigned dashboard role appear here."
+                    }
                     action={
                       userStatus !== "all" && counts.all > 0 ? (
                         <AlignButton.Root
