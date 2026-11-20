@@ -6,5 +6,4 @@ export const USER_ERRORS = Object.freeze({
 export type UserOperationError = (typeof USER_ERRORS)[keyof typeof USER_ERRORS];
 
 export type UserOperationResult<T> =
-  | { data: T; error: null }
-  | { data: null; error: UserOperationError };
+  { data: T; error: null } | { data: null; error: UserOperationError };

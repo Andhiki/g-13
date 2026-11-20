@@ -6,5 +6,4 @@ export const NOTIFICATION_ERRORS = {
 export type NotificationError = (typeof NOTIFICATION_ERRORS)[keyof typeof NOTIFICATION_ERRORS];
 
 export type NotificationOperationResult<T> =
-  | { data: T; error: null }
-  | { data: null; error: NotificationError };
+  { data: T; error: null } | { data: null; error: NotificationError };

@@ -1,14 +1,7 @@
 import type { Language } from "./index";
 
 export type MessageNamespace =
-  | "common"
-  | "roadmap"
-  | "exam"
-  | "resources"
-  | "alumni"
-  | "lecturers"
-  | "notifications"
-  | "faq";
+  "common" | "roadmap" | "exam" | "resources" | "alumni" | "lecturers" | "notifications" | "faq";
 export type Messages = Record<string, string>;
 
 const loaders = {
