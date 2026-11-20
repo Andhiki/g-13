@@ -312,13 +312,14 @@ export function ReviewSubmissionForm({
             type="submit"
             size="small"
             isLoading={publishMutation.isPending}
+            icon={<RiArrowRightLine className="size-5" />}
+            iconPosition="end"
             disabled={!courses.length}
             className="w-full text-paragraph-sm sm:w-auto"
           >
             <Typography as="span" variant="paragraph">
               {text("Publish review")}
             </Typography>
-            <RiArrowRightLine aria-hidden="true" className="hidden size-5 sm:block" />
           </AlignFancyButton.Root>
         </div>
       </footer>

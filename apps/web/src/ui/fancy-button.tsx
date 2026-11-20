@@ -2,7 +2,7 @@
 import type { ComponentProps } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { createTV, type VariantProps } from "tailwind-variants";
-import { ButtonSpinner } from "./button-spinner";
+import { ButtonContent, type ButtonContentProps } from "./button-spinner";
 
 const tv = createTV({
   twMergeConfig: { extend: { classGroups: { "font-size": ["text-label-sm", "text-label-xs"] } } },
@@ -37,7 +37,8 @@ const fancyButton = tv({
 });
 
 type FancyButtonProps = ComponentProps<"button"> &
-  VariantProps<typeof fancyButton> & { asChild?: boolean; isLoading?: boolean };
+  VariantProps<typeof fancyButton> &
+  ButtonContentProps & { asChild?: boolean; isLoading?: boolean };
 
 function Root({
   asChild = false,
@@ -45,6 +46,8 @@ function Root({
   className,
   type = "button",
   isLoading = false,
+  icon,
+  iconPosition,
   disabled,
   children,
   ...props
@@ -66,8 +69,14 @@ function Root({
       aria-busy={isLoading || undefined}
       {...props}
     >
-      <ButtonSpinner isLoading={isLoading} size={spinnerSize} />
-      {children}
+      <ButtonContent
+        icon={icon}
+        iconPosition={iconPosition}
+        isLoading={isLoading}
+        size={spinnerSize}
+      >
+        {children}
+      </ButtonContent>
     </button>
   );
 }

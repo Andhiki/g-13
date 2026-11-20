@@ -127,10 +127,10 @@ function NotificationRow({
             mode="ghost"
             className="gap-1 text-label-xs"
             isLoading={markingRead}
+            icon={<RiCheckLine className="size-3.5" />}
             disabled={busy}
             onClick={() => onMarkRead(item.id)}
           >
-            <RiCheckLine className="size-3.5" />
             {text("action.markRead")}
           </AlignButton.Root>
         )}
@@ -141,10 +141,10 @@ function NotificationRow({
             mode="ghost"
             className="gap-1 text-label-xs"
             isLoading={archiving}
+            icon={<RiArchiveLine className="size-3.5" />}
             disabled={busy}
             onClick={() => onArchive(item.id)}
           >
-            <RiArchiveLine className="size-3.5" />
             {text("action.archive")}
           </AlignButton.Root>
         )}
@@ -226,10 +226,10 @@ function NotificationsPage() {
           mode="ghost"
           className="gap-1.5 text-label-xs"
           isLoading={readAllMutation.isPending}
+          icon={<RiCheckDoubleLine className="size-3.5" />}
           disabled={busy || counts.unread === 0}
           onClick={() => readAllMutation.mutate()}
         >
-          <RiCheckDoubleLine className="size-3.5" />
           {text("action.markAllRead")}
         </AlignButton.Root>
       </div>

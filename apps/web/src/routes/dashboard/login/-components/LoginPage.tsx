@@ -62,9 +62,9 @@ export function LoginPage({ identity }: { identity: Identity }) {
             mode="lighter"
             className="w-full gap-2 text-text-strong-950"
             isLoading={pending}
+            icon={<RiGithubFill className="size-4.5" />}
             onClick={() => void signIn()}
           >
-            <RiGithubFill className="size-4.5" />
             Sign in with GitHub
           </AlignButton.Root>
           {error && (

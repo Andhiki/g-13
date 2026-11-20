@@ -24,6 +24,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
+- Ikon tombol berganti menjadi indikator muat di posisi yang sama, lalu kembali setelah proses selesai.
+
 - Header dan tata letak dashboard kini mengikuti rute yang sudah siap ditampilkan agar perpindahan halaman lebih mulus.
 
 - Halaman `/dashboard/login` tidak lagi menampilkan pesan galat autentikasi bagi pengunjung yang sudah memiliki sesi; halaman menampilkan tombol lanjut ke dashboard atau keluar.
