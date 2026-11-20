@@ -2,6 +2,7 @@ import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
+import { allocateCatalogId } from "@/routes/dashboard/_authenticated/-server/slug";
 import type {
   CourseLifecycleInput,
   CourseStatus,
@@ -11,29 +12,10 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-function slugifyCourseCode(code: string): string {
-  const slug = code
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return slug || `course-${crypto.randomUUID().slice(0, 8)}`;
-}
-
 async function allocateCourseId(db: Database, code: string): Promise<string> {
-  const base = slugifyCourseCode(code);
-  const existing = await db
-    .select({ id: courses.id })
-    .from(courses)
-    .where(like(courses.id, `${base}%`));
-  const used = new Set(existing.map((row) => row.id));
-  if (!used.has(base)) return base;
-  for (let suffix = 2; suffix < 10_000; suffix++) {
-    const candidate = `${base}-${suffix}`;
-    if (!used.has(candidate)) return candidate;
-  }
-  return `${base}-${crypto.randomUUID().slice(0, 8)}`;
+  return allocateCatalogId(code, "course", (pattern) =>
+    db.select({ id: courses.id }).from(courses).where(like(courses.id, pattern)),
+  );
 }
 
 export async function listAdminCourses(db: Database, offset: number, status: CourseStatus) {

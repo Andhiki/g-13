@@ -1,13 +1,11 @@
-import { useRef, useState } from "react";
-import { AlignButton } from "@/ui/button";
-import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignModal } from "@/ui/modal";
-import { Typography } from "@/ui/typography";
+import { useState } from "react";
+import {
+  AdminForm,
+  AdminFormField,
+  AdminFormModal,
+} from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { courseFieldsSchema, type CourseFieldsInput } from "../-shared/schemas";
 import type { AdminCourse } from "./AdminCourseRow";
-
-const fieldControlClass =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
 
 type FieldErrors = Partial<Record<keyof CourseFieldsInput, string>>;
 
@@ -27,25 +25,16 @@ export function CourseFormModal({
   onSubmit: (values: CourseFieldsInput) => void;
 }) {
   return (
-    <AlignModal.Root
-      open={open}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen && !pending) onClose();
-      }}
-    >
-      <AlignModal.Content className="max-w-[460px] p-0" aria-describedby={undefined}>
-        {open && (
-          <CourseFormBody
-            key={course?.id ?? "new"}
-            course={course}
-            pending={pending}
-            error={error}
-            onClose={onClose}
-            onSubmit={onSubmit}
-          />
-        )}
-      </AlignModal.Content>
-    </AlignModal.Root>
+    <AdminFormModal open={open} pending={pending} onClose={onClose}>
+      <CourseFormBody
+        key={course?.id ?? "new"}
+        course={course}
+        pending={pending}
+        error={error}
+        onClose={onClose}
+        onSubmit={onSubmit}
+      />
+    </AdminFormModal>
   );
 }
 
@@ -62,7 +51,6 @@ function CourseFormBody({
   onClose: () => void;
   onSubmit: (values: CourseFieldsInput) => void;
 }) {
-  const formRef = useRef<HTMLFormElement>(null);
   const [code, setCode] = useState(course?.code ?? "");
   const [nameId, setNameId] = useState(course?.nameId ?? "");
   const [nameEn, setNameEn] = useState(course?.nameEn ?? "");
@@ -73,12 +61,13 @@ function CourseFormBody({
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
 
   return (
-    <form
-      ref={formRef}
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (pending) return;
+    <AdminForm
+      title={editing ? "Edit course" : "Add course"}
+      submitLabel={editing ? "Save changes" : "Add course"}
+      pending={pending}
+      error={error}
+      onClose={onClose}
+      onSubmit={() => {
         const parsed = courseFieldsSchema.safeParse({ code, nameId, nameEn });
         if (!parsed.success) {
           const nextErrors: FieldErrors = {};
@@ -87,145 +76,51 @@ function CourseFormBody({
             if (key && !nextErrors[key]) nextErrors[key] = issue.message;
           }
           setFieldErrors(nextErrors);
-          requestAnimationFrame(() =>
-            formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
-          );
-          return;
+          return false;
         }
         setFieldErrors({});
         onSubmit(parsed.data);
       }}
     >
-      <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
-        <AlignModal.Title asChild>
-          <Typography as="h2" variant="subtitle2" className="text-text-strong-950">
-            {editing ? "Edit course" : "Add course"}
-          </Typography>
-        </AlignModal.Title>
-      </header>
-      <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
-        <div>
-          <Typography
-            as="label"
-            variant="labelSmall"
-            htmlFor="course-code"
-            className="mb-1.5 block text-text-strong-950"
-          >
-            Course code
-          </Typography>
-          <input
-            id="course-code"
-            name="code"
-            type="text"
-            maxLength={40}
-            placeholder="e.g. PACS262301"
-            value={code}
-            aria-invalid={Boolean(fieldErrors.code)}
-            aria-describedby={fieldErrors.code ? "course-code-error" : undefined}
-            className={fieldControlClass}
-            onChange={(event) => {
-              setCode(event.target.value);
-              clearFieldError("code");
-            }}
-          />
-          {fieldErrors.code && (
-            <Typography variant="caption" id="course-code-error" className="mt-1.5 text-error-base">
-              {fieldErrors.code}
-            </Typography>
-          )}
-        </div>
-
-        <div>
-          <Typography
-            as="label"
-            variant="labelSmall"
-            htmlFor="course-name-id"
-            className="mb-1.5 block text-text-strong-950"
-          >
-            Name (Indonesian)
-          </Typography>
-          <input
-            id="course-name-id"
-            name="nameId"
-            type="text"
-            maxLength={200}
-            placeholder="e.g. Basis Data"
-            value={nameId}
-            aria-invalid={Boolean(fieldErrors.nameId)}
-            aria-describedby={fieldErrors.nameId ? "course-name-id-error" : undefined}
-            className={fieldControlClass}
-            onChange={(event) => {
-              setNameId(event.target.value);
-              clearFieldError("nameId");
-            }}
-          />
-          {fieldErrors.nameId && (
-            <Typography
-              variant="caption"
-              id="course-name-id-error"
-              className="mt-1.5 text-error-base"
-            >
-              {fieldErrors.nameId}
-            </Typography>
-          )}
-        </div>
-
-        <div>
-          <Typography
-            as="label"
-            variant="labelSmall"
-            htmlFor="course-name-en"
-            className="mb-1.5 block text-text-strong-950"
-          >
-            Name (English)
-          </Typography>
-          <input
-            id="course-name-en"
-            name="nameEn"
-            type="text"
-            maxLength={200}
-            placeholder="e.g. Database"
-            value={nameEn}
-            aria-invalid={Boolean(fieldErrors.nameEn)}
-            aria-describedby={fieldErrors.nameEn ? "course-name-en-error" : undefined}
-            className={fieldControlClass}
-            onChange={(event) => {
-              setNameEn(event.target.value);
-              clearFieldError("nameEn");
-            }}
-          />
-          {fieldErrors.nameEn && (
-            <Typography
-              variant="caption"
-              id="course-name-en-error"
-              className="mt-1.5 text-error-base"
-            >
-              {fieldErrors.nameEn}
-            </Typography>
-          )}
-        </div>
-
-        {error && (
-          <Typography role="alert" variant="caption" className="text-error-base">
-            {error}
-          </Typography>
-        )}
-      </fieldset>
-      <footer className="flex items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
-        <AlignButton.Root
-          size="xsmall"
-          variant="neutral"
-          mode="stroke"
-          className="px-3"
-          disabled={pending}
-          onClick={onClose}
-        >
-          Cancel
-        </AlignButton.Root>
-        <AlignFancyButton.Root type="submit" size="xsmall" isLoading={pending}>
-          {editing ? "Save changes" : "Add course"}
-        </AlignFancyButton.Root>
-      </footer>
-    </form>
+      <AdminFormField
+        id="course-code"
+        name="code"
+        label="Course code"
+        maxLength={40}
+        placeholder="e.g. PACS262301"
+        value={code}
+        error={fieldErrors.code}
+        onChange={(value) => {
+          setCode(value);
+          clearFieldError("code");
+        }}
+      />
+      <AdminFormField
+        id="course-name-id"
+        name="nameId"
+        label="Name (Indonesian)"
+        maxLength={200}
+        placeholder="e.g. Basis Data"
+        value={nameId}
+        error={fieldErrors.nameId}
+        onChange={(value) => {
+          setNameId(value);
+          clearFieldError("nameId");
+        }}
+      />
+      <AdminFormField
+        id="course-name-en"
+        name="nameEn"
+        label="Name (English)"
+        maxLength={200}
+        placeholder="e.g. Database"
+        value={nameEn}
+        error={fieldErrors.nameEn}
+        onChange={(value) => {
+          setNameEn(value);
+          clearFieldError("nameEn");
+        }}
+      />
+    </AdminForm>
   );
 }

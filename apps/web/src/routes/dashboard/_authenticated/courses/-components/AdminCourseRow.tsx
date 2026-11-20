@@ -1,8 +1,10 @@
-import { RiDeleteBinLine, RiEditLine, RiRestartLine } from "@remixicon/react";
-import { AlignButton } from "@/ui/button";
-import { Typography } from "@/ui/typography";
-import { AdminTableRow } from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import {
+  AdminTableInspectButton,
+  AdminTableRow,
+} from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import { CatalogRowActions } from "@/routes/dashboard/_authenticated/-components/CatalogLifecycleActions";
 import { RecordStatusBadge } from "@/routes/dashboard/_authenticated/-components/RecordStatusBadge";
+import { Typography } from "@/ui/typography";
 import type { loadAdminCourses } from "../-server/handler";
 import type { CourseLifecycleInput } from "../-shared/schemas";
 
@@ -42,19 +44,13 @@ export function AdminCourseRow({
       </div>
 
       <div className="min-w-0">
-        <Typography as="h3" variant="labelSmall" className="min-w-0 font-semibold">
-          <AlignButton.Root
-            variant="neutral"
-            mode="ghost"
-            size="xxsmall"
-            onClick={onSelect}
-            className="block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline"
-            aria-label={`Inspect ${label}`}
-            aria-pressed={selected}
-          >
-            {course.nameId}
-          </AlignButton.Root>
-        </Typography>
+        <AdminTableInspectButton
+          ariaLabel={`Inspect ${label}`}
+          selected={selected}
+          onSelect={onSelect}
+        >
+          {course.nameId}
+        </AdminTableInspectButton>
         <Typography variant="caption" className="mt-0.5 block truncate text-text-sub-600">
           {course.nameEn}
         </Typography>
@@ -65,43 +61,12 @@ export function AdminCourseRow({
         {course.reviewCount}
       </Typography>
 
-      <div className="flex items-center justify-end gap-1">
-        {!deleted ? (
-          <>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="neutral"
-              mode="ghost"
-              className="gap-1 text-label-xs"
-              onClick={() => onEdit(course)}
-            >
-              <RiEditLine className="size-3.5" />
-              Edit
-            </AlignButton.Root>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="error"
-              mode="ghost"
-              className="gap-1 text-label-xs text-error-dark"
-              onClick={() => onLifecycle({ courseId: course.id, action: "delete" }, label)}
-            >
-              <RiDeleteBinLine className="size-3.5" />
-              Delete
-            </AlignButton.Root>
-          </>
-        ) : (
-          <AlignButton.Root
-            size="xxsmall"
-            variant="neutral"
-            mode="ghost"
-            className="gap-1 text-label-xs"
-            onClick={() => onLifecycle({ courseId: course.id, action: "restore" }, label)}
-          >
-            <RiRestartLine className="size-3.5" />
-            Restore
-          </AlignButton.Root>
-        )}
-      </div>
+      <CatalogRowActions
+        deleted={deleted}
+        onEdit={() => onEdit(course)}
+        onDelete={() => onLifecycle({ courseId: course.id, action: "delete" }, label)}
+        onRestore={() => onLifecycle({ courseId: course.id, action: "restore" }, label)}
+      />
     </AdminTableRow>
   );
 }

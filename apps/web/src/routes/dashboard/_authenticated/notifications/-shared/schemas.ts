@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { NotificationPayload } from "@g13/db/schema/notifications";
 
 export const notificationFilterSchema = z.enum(["all", "unread", "archived"]);
 export type NotificationFilter = z.infer<typeof notificationFilterSchema>;
@@ -37,4 +38,26 @@ export function resolveNotificationLink(
     default:
       return null;
   }
+}
+
+export function getNotificationPresentation(item: {
+  type: string;
+  payload: NotificationPayload;
+  resourceType: string;
+  resourceId: string;
+}) {
+  const isKnown =
+    item.type === "review.created" ||
+    item.type === "user.pending_approval" ||
+    item.type === "user.role_updated";
+  return {
+    titleKey: isKnown ? `event.${item.type}.title` : "event.unknown.title",
+    bodyKey: isKnown ? `event.${item.type}.body` : "event.unknown.body",
+    interpolation: {
+      ...item.payload,
+      resourceType: item.resourceType,
+      resourceId: item.resourceId,
+    },
+    linkTarget: resolveNotificationLink(item.resourceType, item.resourceId),
+  };
 }

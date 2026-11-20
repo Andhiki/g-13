@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
-import { RiCloseLine, RiSearchLine, RiUserVoiceLine } from "@remixicon/react";
+import { RiUserVoiceLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
-import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
+import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
 import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
@@ -15,6 +15,7 @@ import { AdminTableHeader } from "../-components/AdminTable";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { ConfirmationChange } from "../-components/ConfirmationChange";
 import { DashboardEmptyState } from "../-components/DashboardEmptyState";
+import { DashboardPending, DashboardRoutePending } from "../-components/DashboardPending";
 import { RecordStatusBadge } from "../-components/RecordStatusBadge";
 import { adminLecturersQuery } from "./-client/queries";
 import {
@@ -46,11 +47,7 @@ export const Route = createFileRoute("/dashboard/_authenticated/lecturers/")({
       throw error;
     }
   },
-  pendingComponent: () => (
-    <div className="flex flex-1 items-center justify-center p-6">
-      <Loading tone="neutral" />
-    </div>
-  ),
+  pendingComponent: DashboardRoutePending,
   component: AdminLecturersPage,
 });
 
@@ -153,62 +150,34 @@ function AdminLecturersPage() {
           </AlignFancyButton.Root>
         }
       />
-      <div
-        className="flex min-h-11 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
-        aria-label="Lecturer status filters"
+      <AdminFilterBar
+        ariaLabel="Lecturer status filters"
+        tabs={lecturerStatusSchema.options.map((value) => ({
+          value,
+          label: value === "active" ? "Active" : "Deleted",
+          count: counts[value],
+        }))}
+        activeTab={status}
+        onTabChange={(value) => {
+          setStatus(value);
+          setOffset(0);
+          setSelectedId(null);
+        }}
       >
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {lecturerStatusSchema.options.map((value) => (
-            <AlignButton.Root
-              key={value}
-              size="xxsmall"
-              variant="neutral"
-              mode={status === value ? "lighter" : "ghost"}
-              className="gap-2 text-label-xs"
-              aria-pressed={status === value}
-              onClick={() => {
-                setStatus(value);
-                setOffset(0);
-                setSelectedId(null);
-              }}
-            >
-              <span>{value === "active" ? "Active" : "Deleted"}</span>
-              <span className="text-text-sub-600 tabular-nums">{counts[value]}</span>
-            </AlignButton.Root>
-          ))}
-        </div>
         <div className="flex w-full items-center gap-2 sm:w-auto">
-          <label className="relative flex flex-1 items-center sm:w-60">
-            <RiSearchLine
-              className="pointer-events-none absolute left-2.5 size-3.5 text-text-sub-600"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Filter lecturer name or slug…"
-              aria-label="Filter lecturers"
-              className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-base sm:h-7 sm:pl-8 sm:pr-7 sm:text-paragraph-xs [&::-webkit-search-cancel-button]:appearance-none text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label="Clear filter"
-                className="absolute right-1.5 inline-flex size-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950"
-              >
-                <RiCloseLine className="size-3.5" />
-              </button>
-            )}
-          </label>
+          <AdminSearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="Filter lecturer name or slug…"
+            ariaLabel="Filter lecturers"
+          />
           <DetailsToggleButton
             available={!!selectedLecturer}
             visible={detailsVisible}
             onToggle={() => setDetailsOpen((open) => !open)}
           />
         </div>
-      </div>
+      </AdminFilterBar>
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
           {!lecturersQuery.isPending && !lecturersQuery.isError && (
@@ -230,9 +199,7 @@ function AdminLecturersPage() {
                 Could not load lecturers. Refresh or sign in again.
               </Typography>
             ) : lecturersQuery.isPending ? (
-              <div className="flex h-full min-h-64 items-center justify-center p-6">
-                <Loading tone="neutral" />
-              </div>
+              <DashboardPending />
             ) : (
               <>
                 <AdminTableHeader

@@ -1,8 +1,10 @@
-import { RiDeleteBinLine, RiEditLine, RiRestartLine } from "@remixicon/react";
-import { AlignButton } from "@/ui/button";
-import { Typography } from "@/ui/typography";
-import { AdminTableRow } from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import {
+  AdminTableInspectButton,
+  AdminTableRow,
+} from "@/routes/dashboard/_authenticated/-components/AdminTable";
+import { CatalogRowActions } from "@/routes/dashboard/_authenticated/-components/CatalogLifecycleActions";
 import { RecordStatusBadge } from "@/routes/dashboard/_authenticated/-components/RecordStatusBadge";
+import { Typography } from "@/ui/typography";
 import type { loadAdminLecturers } from "../-server/handler";
 import type { LecturerLifecycleInput } from "../-shared/schemas";
 
@@ -33,19 +35,13 @@ export function AdminLecturerRow({
     >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <Typography as="h3" variant="labelSmall" className="min-w-0 font-semibold">
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xxsmall"
-              onClick={onSelect}
-              className="block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-transparent hover:underline"
-              aria-label={`Inspect ${lecturer.name}`}
-              aria-pressed={selected}
-            >
-              {lecturer.name}
-            </AlignButton.Root>
-          </Typography>
+          <AdminTableInspectButton
+            ariaLabel={`Inspect ${lecturer.name}`}
+            selected={selected}
+            onSelect={onSelect}
+          >
+            {lecturer.name}
+          </AdminTableInspectButton>
           <div className="lg:hidden">
             <RecordStatusBadge deleted={deleted} />
           </div>
@@ -60,47 +56,12 @@ export function AdminLecturerRow({
         {lecturer.reviewCount}
       </Typography>
 
-      <div className="flex items-center justify-end gap-1">
-        {!deleted ? (
-          <>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="neutral"
-              mode="ghost"
-              className="gap-1 text-label-xs"
-              onClick={() => onEdit(lecturer)}
-            >
-              <RiEditLine className="size-3.5" />
-              Edit
-            </AlignButton.Root>
-            <AlignButton.Root
-              size="xxsmall"
-              variant="error"
-              mode="ghost"
-              className="gap-1 text-label-xs text-error-dark"
-              onClick={() =>
-                onLifecycle({ lecturerId: lecturer.id, action: "delete" }, lecturer.name)
-              }
-            >
-              <RiDeleteBinLine className="size-3.5" />
-              Delete
-            </AlignButton.Root>
-          </>
-        ) : (
-          <AlignButton.Root
-            size="xxsmall"
-            variant="neutral"
-            mode="ghost"
-            className="gap-1 text-label-xs"
-            onClick={() =>
-              onLifecycle({ lecturerId: lecturer.id, action: "restore" }, lecturer.name)
-            }
-          >
-            <RiRestartLine className="size-3.5" />
-            Restore
-          </AlignButton.Root>
-        )}
-      </div>
+      <CatalogRowActions
+        deleted={deleted}
+        onEdit={() => onEdit(lecturer)}
+        onDelete={() => onLifecycle({ lecturerId: lecturer.id, action: "delete" }, lecturer.name)}
+        onRestore={() => onLifecycle({ lecturerId: lecturer.id, action: "restore" }, lecturer.name)}
+      />
     </AdminTableRow>
   );
 }
