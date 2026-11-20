@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
@@ -7,6 +8,8 @@ export function ConfirmActionModal({
   open,
   title,
   description,
+  children,
+  confirmLabel,
   error,
   pending,
   onClose,
@@ -14,7 +17,9 @@ export function ConfirmActionModal({
 }: {
   open: boolean;
   title: string;
-  description: string;
+  description: ReactNode;
+  children?: ReactNode;
+  confirmLabel: string;
   error?: string;
   pending: boolean;
   onClose: () => void;
@@ -38,6 +43,7 @@ export function ConfirmActionModal({
             {description}
           </Typography>
         </AlignModal.Description>
+        {children}
         {error && (
           <Typography role="alert" variant="caption" className="mt-3 text-error-base">
             {error}
@@ -55,7 +61,7 @@ export function ConfirmActionModal({
             Cancel
           </AlignButton.Root>
           <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
-            Confirm
+            {confirmLabel}
           </AlignFancyButton.Root>
         </div>
       </AlignModal.Content>

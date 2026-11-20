@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { canManageUsers } from "@g13/auth";
-import { RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { RiChatCheckLine, RiCloseLine, RiSearchLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility } from "./-server/handler";
 import { moderationReviewQuery, moderationReviewsQuery } from "./-client/queries";
@@ -13,9 +13,12 @@ import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
+import { ConfirmationChange } from "../-components/ConfirmationChange";
+import { DashboardEmptyState } from "../-components/DashboardEmptyState";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminReviewRow } from "./-components/AdminReviewRow";
+import { ReviewStatusBadge } from "./-components/ReviewStatusBadge";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
 const reviewsSearchSchema = z.object({
@@ -58,6 +61,7 @@ function LecturerReviewsPage() {
   const [confirmation, setConfirmation] = useState<{
     input: ModerateReviewInput;
     label: string;
+    status: "published" | "hidden";
   } | null>(null);
   const queryClient = useQueryClient();
   const reviews = useQuery(moderationReviewsQuery(offset, status));
@@ -101,8 +105,13 @@ function LecturerReviewsPage() {
   });
 
   function confirmReview(input: ModerateReviewInput, label: string) {
+    const review =
+      selectedReview?.id === input.reviewId
+        ? selectedReview
+        : pageRows.find(({ id }) => id === input.reviewId);
+    if (!review) return;
     mutation.reset();
-    setConfirmation({ input, label });
+    setConfirmation({ input, label, status: review.status });
   }
 
   return (
@@ -182,7 +191,9 @@ function LecturerReviewsPage() {
               onNext={() => setOffset((current) => current + 50)}
             />
           )}
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
+          <div
+            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+          >
             {reviews.isError ? (
               <Typography role="alert" className="p-4">
                 Could not load reviews. Refresh or sign in again.
@@ -199,21 +210,39 @@ function LecturerReviewsPage() {
                   <span>Rating</span>
                   <span className="text-right">Actions</span>
                 </div>
-                {!visibleRows.length && (
-                  <div className="flex min-h-64 flex-col items-center justify-center gap-1.5 px-4 text-center">
-                    <Typography variant="labelSmall">
-                      {needle
+                {!count && (
+                  <DashboardEmptyState
+                    icon={<RiChatCheckLine />}
+                    title={
+                      needle
                         ? "No matching reviews"
                         : status === "all"
                           ? "No reviews yet"
-                          : `No ${status} reviews`}
-                    </Typography>
-                    {(needle || status === "all") && (
-                      <Typography variant="caption" className="text-text-sub-600">
-                        {needle ? "Try a different search." : "Submitted reviews appear here."}
-                      </Typography>
-                    )}
-                  </div>
+                          : `No ${status} reviews`
+                    }
+                    description={
+                      status === "all" && !needle ? "Submitted reviews appear here." : undefined
+                    }
+                    action={
+                      needle || (status !== "all" && counts.all > 0) ? (
+                        <AlignButton.Root
+                          size="small"
+                          variant="neutral"
+                          mode="stroke"
+                          onClick={() => {
+                            if (needle) setQuery("");
+                            else {
+                              setStatus("all");
+                              setOffset(0);
+                              setSelectedId(null);
+                            }
+                          }}
+                        >
+                          {needle ? "Clear search" : "View all reviews"}
+                        </AlignButton.Root>
+                      ) : undefined
+                    }
+                  />
                 )}
                 {visibleRows.map((review) => (
                   <AdminReviewRow
@@ -248,20 +277,42 @@ function LecturerReviewsPage() {
       <ConfirmActionModal
         open={confirmation !== null}
         title={`Confirm ${confirmation?.input.action ?? ""}`}
-        description={`${confirmation?.label ?? ""}. ${
+        description={
+          <>
+            <strong className="text-text-strong-950">{confirmation?.label}</strong>.{" "}
+            {confirmation?.input.action === "delete"
+              ? "This removes the review from public listings and scores. The record stays stored and cannot be restored here."
+              : confirmation?.input.action === "hide"
+                ? "Remove this review from public listings and scores."
+                : "Publish this review again and include it in public scores."}
+          </>
+        }
+        confirmLabel={
           confirmation?.input.action === "delete"
-            ? "Removes this review from public view. You cannot undo this here; the record stays stored."
+            ? "Delete review"
             : confirmation?.input.action === "hide"
-              ? "Remove this review from public listings and scores."
-              : "Publish this review again and include it in public scores."
-        }`}
+              ? "Hide review"
+              : "Restore review"
+        }
         error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
         pending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) mutation.mutate(confirmation.input);
         }}
-      />
+      >
+        {confirmation && (
+          <ConfirmationChange
+            from={<ReviewStatusBadge status={confirmation.status} deleted={false} />}
+            to={
+              <ReviewStatusBadge
+                status={confirmation.input.action === "restore" ? "published" : "hidden"}
+                deleted={confirmation.input.action === "delete"}
+              />
+            }
+          />
+        )}
+      </ConfirmActionModal>
     </>
   );
 }

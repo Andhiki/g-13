@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  RiCheckLine,
-  RiCloseLine,
-  RiUserSettingsLine,
-  RiShieldStarLine,
-  RiShieldCheckLine,
-  RiShieldCrossLine,
-  type RemixiconComponentType,
-} from "@remixicon/react";
+import { RiCheckLine, RiCloseLine, RiUserSettingsLine } from "@remixicon/react";
 import { canManageUsers, canModerate } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
@@ -17,35 +9,9 @@ import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
 
+import { roleOptions, type AssignableRole } from "./role-options";
+
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
-type AssignableRole = AssignRoleInput["role"];
-
-const roleOptions: Array<{
-  value: AssignableRole;
-  label: string;
-  description: string;
-  Icon: RemixiconComponentType;
-}> = [
-  {
-    value: "maintainer",
-    Icon: RiShieldCheckLine,
-    label: "Maintainer",
-    description: "Moderate lecturer reviews.",
-  },
-  {
-    value: "admin",
-    Icon: RiShieldStarLine,
-    label: "Admin",
-    description: "Moderate reviews and manage users.",
-  },
-  {
-    value: "user",
-    Icon: RiShieldCrossLine,
-    label: "User",
-    description: "No moderation access.",
-  },
-];
-
 export function UserAccessInspector({
   user,
   identityId,

@@ -1,3 +1,4 @@
+import { RiGroupLine } from "@remixicon/react";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -11,8 +12,11 @@ import { Typography } from "@/ui/typography";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
+import { ConfirmationChange } from "../-components/ConfirmationChange";
+import { DashboardEmptyState } from "../-components/DashboardEmptyState";
 import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { AdminUserList } from "./-components/AdminUserList";
+import { roleOptions, type AssignableRole } from "./-components/role-options";
 import { UserAccessInspector } from "./-components/UserAccessInspector";
 
 export const Route = createFileRoute("/dashboard/_authenticated/users/")({
@@ -45,6 +49,7 @@ function AdminUsersPage() {
   const [confirmation, setConfirmation] = useState<{
     input: AssignRoleInput;
     label: string;
+    from: AssignableRole;
   } | null>(null);
   const queryClient = useQueryClient();
   const users = useQuery(adminUsersQuery(offset, userStatus));
@@ -70,8 +75,13 @@ function AdminUsersPage() {
   });
 
   function confirmRole(input: AssignRoleInput, label: string) {
+    if (!selectedUser) return;
     mutation.reset();
-    setConfirmation({ input, label });
+    setConfirmation({
+      input,
+      label,
+      from: canModerate(selectedUser.role) ? selectedUser.role : "user",
+    });
   }
 
   return (
@@ -129,7 +139,9 @@ function AdminUsersPage() {
               onNext={() => setOffset((current) => current + 50)}
             />
           )}
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
+          <div
+            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+          >
             {users.isError ? (
               <Typography role="alert" className="p-4">
                 Could not load accounts. Refresh or sign in again.
@@ -149,13 +161,29 @@ function AdminUsersPage() {
                     setDetailsOpen(true);
                   }}
                 />
-                {!userRows.length && (
-                  <Typography
-                    variant="caption"
-                    className="px-4 py-10 text-center text-text-sub-600"
-                  >
-                    No accounts match this filter.
-                  </Typography>
+                {!count && (
+                  <DashboardEmptyState
+                    icon={<RiGroupLine />}
+                    title={userStatus === "all" ? "No accounts yet" : `No ${userStatus} accounts`}
+                    description={
+                      userStatus === "all" ? "Accounts appear here after users sign in." : undefined
+                    }
+                    action={
+                      userStatus !== "all" && counts.all > 0 ? (
+                        <AlignButton.Root
+                          size="small"
+                          variant="neutral"
+                          mode="stroke"
+                          onClick={() => {
+                            setUserStatus("all");
+                            setOffset(0);
+                          }}
+                        >
+                          View all accounts
+                        </AlignButton.Root>
+                      ) : undefined
+                    }
+                  />
                 )}
               </>
             )}
@@ -180,17 +208,37 @@ function AdminUsersPage() {
         open={confirmation !== null}
         title={confirmation?.input.role === "user" ? "Revoke access" : "Confirm role change"}
         description={
-          confirmation?.input.role === "user"
-            ? `Remove moderation access for ${confirmation.label}. Access updates on their next request.`
-            : `Set ${confirmation?.label ?? ""} to ${confirmation?.input.role ?? ""}. Access updates on their next request.`
+          <>
+            <strong className="text-text-strong-950">{confirmation?.label}</strong>. Access updates
+            on their next request.
+          </>
         }
+        confirmLabel={confirmation?.input.role === "user" ? "Revoke access" : "Save role"}
         error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
         pending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) mutation.mutate(confirmation.input);
         }}
-      />
+      >
+        {confirmation && (
+          <ConfirmationChange
+            from={<RoleLabel role={confirmation.from} />}
+            to={<RoleLabel role={confirmation.input.role} />}
+          />
+        )}
+      </ConfirmActionModal>
     </>
+  );
+}
+
+function RoleLabel({ role }: { role: AssignableRole }) {
+  const option = roleOptions.find(({ value }) => value === role);
+  if (!option) return null;
+  return (
+    <span className="flex items-center gap-1.5 text-label-sm font-semibold">
+      <option.Icon aria-hidden="true" className="size-4 shrink-0" />
+      {option.label}
+    </span>
   );
 }

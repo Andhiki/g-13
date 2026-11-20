@@ -79,7 +79,6 @@ export function AdminReviewRow({
       >
         <RiStarFill className="size-3.5 text-warning-base" aria-hidden="true" />
         <span>{overall.toFixed(1)}</span>
-        <span className="text-text-sub-600">/ 5</span>
       </div>
 
       <div className="flex items-center justify-end gap-1">

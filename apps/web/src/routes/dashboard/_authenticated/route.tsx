@@ -55,7 +55,7 @@ function AdminLayout() {
               userImage={"image" in identity ? identity.image : null}
             />
           )}
-          <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-stroke-soft-200 bg-bg-white-0 md:rounded-xl md:border">
+          <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border">
             <Outlet />
           </section>
         </div>

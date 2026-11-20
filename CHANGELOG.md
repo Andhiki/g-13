@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Dashboard menampilkan kondisi kosong yang seragam dan pratinjau sebelum dan sesudah untuk perubahan peran dan status ulasan.
+
 - Notifikasi dashboard dapat digulir tanpa tombol halaman, menu akun menampilkan avatar GitHub, dan pilihan peran memakai ikon akses.
 
 - Admin dapat mencabut akses moderasi lewat pilihan peran User. Notifikasi dimuat saat dashboard dibuka dan diperbarui setiap menit selama jendela aktif.

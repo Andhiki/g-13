@@ -120,7 +120,7 @@ function NavigationFooter({
             <AlignDropdown.Item asChild className="px-2 py-1.5">
               <Link to="/lecturers">
                 <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
-                Public reviews
+                Public view
               </Link>
             </AlignDropdown.Item>
             <AlignDropdown.Item className="px-2 py-1.5" onSelect={() => setSettingsOpen(true)}>
