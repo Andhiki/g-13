@@ -8,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   type RemixiconComponentType,
+  RiBookOpenLine,
   RiChatCheckLine,
   RiCloseLine,
   RiExternalLinkLine,
@@ -16,6 +17,7 @@ import {
   RiMenuLine,
   RiSettings3Line,
   RiUser3Line,
+  RiUserVoiceLine,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
@@ -43,6 +45,13 @@ const sectionGroups = [
     items: [
       { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
       { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
+    ],
+  },
+  {
+    heading: "Catalog",
+    items: [
+      { to: "/dashboard/courses", label: "Courses", Icon: RiBookOpenLine },
+      { to: "/dashboard/lecturers", label: "Lecturers", Icon: RiUserVoiceLine },
     ],
   },
 ] satisfies ModerationSectionGroup[];

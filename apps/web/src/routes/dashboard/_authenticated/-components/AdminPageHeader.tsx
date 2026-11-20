@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { RiLayoutLeftLine, RiLayoutRightLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
@@ -10,11 +11,13 @@ export function AdminPageHeader({
   manager,
   userName,
   userImage,
+  action,
 }: {
   title: string;
   manager: boolean;
   userName: string;
   userImage?: string | null;
+  action?: ReactNode;
 }) {
   const { sidebarOpen, setSidebarOpen } = useAdminLayout();
 
@@ -39,8 +42,11 @@ export function AdminPageHeader({
           {title}
         </Typography>
       </div>
-      <div className="md:hidden">
-        <NotificationsPopover side="bottom" />
+      <div className="flex shrink-0 items-center gap-2">
+        {action}
+        <div className="md:hidden">
+          <NotificationsPopover side="bottom" />
+        </div>
       </div>
     </header>
   );
