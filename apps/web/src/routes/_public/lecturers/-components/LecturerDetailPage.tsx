@@ -30,6 +30,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const [storageUnavailable, setStorageUnavailable] = useState(false);
   const [reviewOrder, setReviewOrder] = useState<ReviewOrder>("newest");
   const [courseId, setCourseId] = useState<string | null>(null);
+  const selectedCourse = data.lecturer.courses.find(({ id }) => id === courseId);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const likesQuery = useQuery({
     ...lecturerBrowserLikesQueryOptions(browserId ?? ""),
@@ -167,7 +168,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             <Typography as="h2" variant="subtitle2" className="mb-0">
               {text("Reviews")}
             </Typography>
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto">
               <Typography
                 as="label"
                 variant="labelSmall"
@@ -184,15 +185,21 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 <AlignSelect.Trigger
                   id={courseFilterId}
                   aria-label={text("Course filter")}
-                  className="h-9 min-h-9 max-w-44"
+                  className="h-9 min-h-9 max-w-44 flex-1 sm:flex-none"
                 >
-                  <AlignSelect.Value />
+                  <AlignSelect.Value asChild>
+                    <span className="min-w-0 truncate">
+                      {selectedCourse
+                        ? `${selectedCourse.code} · ${courseDisplayName(selectedCourse, language)}`
+                        : text("All courses")}
+                    </span>
+                  </AlignSelect.Value>
                 </AlignSelect.Trigger>
-                <AlignSelect.Content>
+                <AlignSelect.Content className="w-[min(20rem,var(--radix-select-content-available-width))] max-w-[calc(100vw-1rem)]">
                   <AlignSelect.Item value="all">{text("All courses")}</AlignSelect.Item>
                   {data.lecturer.courses.map((course) => (
                     <AlignSelect.Item key={course.id} value={course.id}>
-                      <span className="min-w-0 truncate">
+                      <span className="min-w-0 wrap-anywhere whitespace-normal">
                         {course.code} · {courseDisplayName(course, language)}
                       </span>
                     </AlignSelect.Item>
