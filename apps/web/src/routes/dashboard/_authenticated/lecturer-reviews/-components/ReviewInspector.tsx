@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   RiChatCheckLine,
   RiDeleteBinLine,
@@ -6,7 +7,7 @@ import {
   RiLockLine,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
-import { AlignProgressBar } from "@/ui/progress-bar";
+import { RatingStars } from "@/ui/rating-stars";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime, formatRelativeTime } from "../../notifications/-shared/time";
@@ -24,11 +25,27 @@ export function ReviewInspector({
   onAction: (input: ModerateReviewInput, label: string) => void;
 }) {
   const { language } = useLocale("notifications");
+  const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
   const deleted = review.deletedAt !== null;
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
   const createdMs = review.createdAt.getTime();
+
+  useEffect(() => {
+    const element = bodyRef.current;
+    if (!element || expanded) return;
+    const measure = () => {
+      setCanExpand(element.scrollHeight > element.clientHeight + 1);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [review.body, expanded]);
 
   return (
     <aside
@@ -66,44 +83,67 @@ export function ReviewInspector({
             </div>
           </dl>
           <section className="border-t border-stroke-soft-200 pt-4">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between gap-2">
               <Typography as="h3" variant="labelSmall">
                 Ratings
               </Typography>
-              <Typography variant="labelSmall" className="tabular-nums">
-                {overall.toFixed(1)}
-                <span className="font-normal text-text-sub-600"> / 5 overall</span>
-              </Typography>
+              <div className="flex items-center gap-2">
+                <RatingStars
+                  value={overall}
+                  size="sm"
+                  label={`Overall rating: ${overall.toFixed(1)} of 5`}
+                />
+                <Typography variant="labelSmall" className="tabular-nums">
+                  {overall.toFixed(1)} <span className="text-text-sub-600">/ 5</span>
+                </Typography>
+              </div>
             </div>
-            <dl className="space-y-3">
-              {[
-                ["Clarity", review.clarity],
-                ["Support", review.support],
-                ["Organization", review.organization],
-              ].map(([name, value]) => (
-                <div key={name}>
-                  <div className="mb-1.5 flex justify-between text-paragraph-xs">
-                    <dt className="text-text-sub-600">{name}</dt>
-                    <dd className="tabular-nums">{value}/5</dd>
-                  </div>
-                  <AlignProgressBar.Root
-                    color="orange"
-                    value={Number(value)}
-                    max={5}
-                    aria-label={`${name} rating`}
-                    className="h-1"
-                  />
+            <dl className="space-y-2.5">
+              {(
+                [
+                  ["Clarity", review.clarity],
+                  ["Support", review.support],
+                  ["Organization", review.organization],
+                ] as const
+              ).map(([name, value]) => (
+                <div
+                  key={name}
+                  className="flex items-center justify-between gap-2 text-paragraph-xs"
+                >
+                  <dt className="text-text-sub-600">{name}</dt>
+                  <dd className="flex items-center gap-2 tabular-nums">
+                    <RatingStars value={value} size="xs" label={`${name} rating: ${value} of 5`} />
+                    <span className="w-6 text-right text-text-sub-600">{value}/5</span>
+                  </dd>
                 </div>
               ))}
             </dl>
           </section>
           <section className="border-t border-stroke-soft-200 pt-4">
-            <Typography as="h3" variant="labelSmall">
+            <Typography as="h3" variant="labelSmall" className="text-text-strong-950">
               Experience
             </Typography>
-            <Typography className="mt-2 whitespace-pre-wrap break-words text-[13px] leading-5">
+            <Typography
+              ref={bodyRef}
+              variant="caption"
+              className={`mt-2 whitespace-pre-wrap break-words leading-5 text-text-sub-600 ${
+                expanded ? "" : "line-clamp-3"
+              }`}
+            >
               {review.body}
             </Typography>
+            {(canExpand || expanded) && (
+              <AlignButton.Root
+                size="xxsmall"
+                variant="neutral"
+                mode="ghost"
+                className="-ml-1.5 mt-1.5 h-6 px-1.5 text-label-xs text-text-sub-600"
+                aria-expanded={expanded}
+                onClick={() => setExpanded((current) => !current)}
+              >
+                {expanded ? "Show less" : "Show more"}
+              </AlignButton.Root>
+            )}
           </section>
         </div>
       </div>

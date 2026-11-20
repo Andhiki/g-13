@@ -6,12 +6,12 @@ import { changeUserRole } from "./-server/handler";
 import { adminUsersQuery } from "./-client/queries";
 import { userStatusSchema, type AssignRoleInput, type UserStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
-import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignModal } from "@/ui/modal";
+import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
-import { AdminPageHeader } from "../-components/AdminPageHeader";
+import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
+import { ConfirmActionModal } from "../-components/ConfirmActionModal";
 import { AdminUserList } from "./-components/AdminUserList";
 import { UserAccessInspector } from "./-components/UserAccessInspector";
 
@@ -27,11 +27,17 @@ export const Route = createFileRoute("/dashboard/_authenticated/users/")({
       throw error;
     }
   },
+  pendingComponent: () => (
+    <div className="flex flex-1 items-center justify-center p-6">
+      <Loading />
+    </div>
+  ),
   component: AdminUsersPage,
 });
 
 function AdminUsersPage() {
-  const { identity } = Route.useLoaderData();
+  const initialData = Route.useLoaderData();
+  const { identity } = initialData;
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [userStatus, setUserStatus] = useState<UserStatus>("all");
@@ -42,10 +48,11 @@ function AdminUsersPage() {
   } | null>(null);
   const queryClient = useQueryClient();
   const users = useQuery(adminUsersQuery(offset, userStatus));
+  const counts = users.data?.counts ?? initialData.counts;
   const userRows = users.data?.rows ?? [];
   const visibleRows = userRows.slice(0, 50);
   const count = visibleRows.length;
-  const total = users.data?.counts[userStatus] ?? 0;
+  const total = counts[userStatus];
   const selectedUser =
     visibleRows.find((user) => user.id === selectedUserId) ??
     visibleRows.find((user) => !canModerate(user.role)) ??
@@ -73,50 +80,63 @@ function AdminUsersPage() {
         title="User access"
         manager={canManageUsers(identity.role)}
         userName={identity.name}
-        detailsAvailable={!!selectedUser}
-        detailsVisible={detailsVisible}
-        onToggleDetails={() => setDetailsOpen((open) => !open)}
       />
       <div
-        className="flex min-h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-stroke-soft-200 px-3 py-1.5"
+        className="flex min-h-11 shrink-0 items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-1.5"
         aria-label="Account approval filters"
       >
-        {userStatusSchema.options.map((value) => (
-          <AlignButton.Root
-            key={value}
-            size="xxsmall"
-            variant="neutral"
-            mode={userStatus === value ? "lighter" : "ghost"}
-            className="gap-2 text-label-xs"
-            aria-pressed={userStatus === value}
-            onClick={() => {
-              setUserStatus(value);
-              setOffset(0);
-              setSelectedUserId(null);
-            }}
-          >
-            {value === "all"
-              ? "All accounts"
-              : value === "pending"
-                ? "Pending approval"
-                : "Approved"}
-            <span className="text-text-sub-600 tabular-nums">
-              {users.data?.counts[value] ?? "—"}
-            </span>
-          </AlignButton.Root>
-        ))}
+        <div className="flex items-center gap-1 overflow-x-auto">
+          {userStatusSchema.options.map((value) => (
+            <AlignButton.Root
+              key={value}
+              size="xxsmall"
+              variant="neutral"
+              mode={userStatus === value ? "lighter" : "ghost"}
+              className="gap-2 text-label-xs"
+              aria-pressed={userStatus === value}
+              onClick={() => {
+                setUserStatus(value);
+                setOffset(0);
+                setSelectedUserId(null);
+              }}
+            >
+              {value === "all"
+                ? "All accounts"
+                : value === "pending"
+                  ? "Pending approval"
+                  : "Approved"}
+              <span className="text-text-sub-600 tabular-nums">{counts[value]}</span>
+            </AlignButton.Root>
+          ))}
+        </div>
+        <DetailsToggleButton
+          available={!!selectedUser}
+          visible={detailsVisible}
+          onToggle={() => setDetailsOpen((open) => !open)}
+        />
       </div>
       <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-weak-50">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+          {!users.isPending && !users.isError && (
+            <AdminPagination
+              count={count}
+              offset={offset}
+              total={total}
+              label="accounts"
+              hasNext={userRows.length > 50}
+              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
+              onNext={() => setOffset((current) => current + 50)}
+            />
+          )}
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0">
             {users.isError ? (
               <Typography role="alert" className="p-4">
                 Unable to load protected data. Refresh or sign in again.
               </Typography>
             ) : users.isPending ? (
-              <Typography role="status" className="p-4">
-                Loading…
-              </Typography>
+              <div className="flex h-full min-h-64 items-center justify-center p-6">
+                <Loading />
+              </div>
             ) : (
               <>
                 <AdminUserList
@@ -140,17 +160,6 @@ function AdminUsersPage() {
               </>
             )}
           </div>
-          {!users.isPending && !users.isError && (
-            <AdminPagination
-              count={count}
-              offset={offset}
-              total={total}
-              label="accounts"
-              hasNext={userRows.length > 50}
-              onPrevious={() => setOffset((current) => current - 50)}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
         </div>
         {selectedUser && detailsVisible && (
           <UserAccessInspector
@@ -161,45 +170,21 @@ function AdminUsersPage() {
           />
         )}
       </div>
-      <AlignModal.Root
+      <ConfirmActionModal
         open={confirmation !== null}
-        onOpenChange={(open) => {
-          if (!open && !mutation.isPending) setConfirmation(null);
+        title="Confirm role assignment"
+        description={`${confirmation?.label ?? ""}. Assign ${confirmation?.input.role ?? ""}. This changes protected access on the next request.`}
+        error={
+          mutation.isError
+            ? "Change failed. Refresh and check your access before trying again."
+            : undefined
+        }
+        pending={mutation.isPending}
+        onClose={() => setConfirmation(null)}
+        onConfirm={() => {
+          if (confirmation) mutation.mutate(confirmation.input);
         }}
-      >
-        <AlignModal.Content className="p-5">
-          <AlignModal.Title>Confirm role assignment</AlignModal.Title>
-          <AlignModal.Description className="mt-2 pr-4">
-            {confirmation?.label}. Assign {confirmation?.input.role}. This changes protected access
-            on the next request.
-          </AlignModal.Description>
-          {mutation.isError && (
-            <Typography role="alert" className="mt-3 text-error-base">
-              Change failed. Refresh and check your access before trying again.
-            </Typography>
-          )}
-          <div className="mt-5 flex justify-end gap-2">
-            <AlignButton.Root
-              size="small"
-              variant="neutral"
-              mode="stroke"
-              disabled={mutation.isPending}
-              onClick={() => setConfirmation(null)}
-            >
-              Cancel
-            </AlignButton.Root>
-            <AlignFancyButton.Root
-              className="h-8 text-label-xs"
-              disabled={mutation.isPending}
-              onClick={() => {
-                if (confirmation) mutation.mutate(confirmation.input);
-              }}
-            >
-              {mutation.isPending ? "Saving…" : "Confirm"}
-            </AlignFancyButton.Root>
-          </div>
-        </AlignModal.Content>
-      </AlignModal.Root>
+      />
     </>
   );
 }

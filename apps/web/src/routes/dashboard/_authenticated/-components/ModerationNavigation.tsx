@@ -21,6 +21,7 @@ import { AlignDrawer } from "@/ui/drawer";
 import { AlignDropdown } from "@/ui/dropdown";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
+import { useAdminLayout } from "./AdminLayoutContext";
 import { NotificationsPopover } from "./NotificationsPopover";
 
 type ModerationSection = {
@@ -114,8 +115,13 @@ function NavigationFooter({ userName, mobile = false }: { userName: string; mobi
 }
 
 export function ModerationSidebar({ manager, userName }: { manager: boolean; userName: string }) {
+  const { sidebarOpen } = useAdminLayout();
+  if (!sidebarOpen) return null;
   return (
-    <aside className="hidden w-[220px] shrink-0 flex-col px-2 py-2.5 md:flex">
+    <aside
+      id="moderation-sidebar"
+      className="hidden w-[220px] shrink-0 flex-col px-2 py-2.5 md:flex"
+    >
       <nav aria-label="Moderation sections" className="space-y-4">
         {sectionGroups.map((group) => {
           const items = group.items.filter(

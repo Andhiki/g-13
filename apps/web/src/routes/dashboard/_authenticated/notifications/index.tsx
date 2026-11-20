@@ -9,6 +9,7 @@ import {
   RiExternalLinkLine,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
+import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { AdminPageHeader } from "../-components/AdminPageHeader";
@@ -37,6 +38,11 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
       throw error;
     }
   },
+  pendingComponent: () => (
+    <div className="flex flex-1 items-center justify-center p-6">
+      <Loading />
+    </div>
+  ),
   component: NotificationsPage,
 });
 
@@ -142,7 +148,8 @@ function NotificationRow({
 }
 
 function NotificationsPage() {
-  const { identity } = Route.useLoaderData();
+  const initialData = Route.useLoaderData();
+  const { identity } = initialData;
   const { text } = useLocale("notifications");
   const [offset, setOffset] = useState(0);
   const [filter, setFilter] = useState<NotificationFilter>("all");
@@ -152,7 +159,7 @@ function NotificationsPage() {
   const rows = list.data?.rows ?? [];
   const visibleRows = rows.slice(0, NOTIFICATIONS_PAGE_SIZE);
   const hasNext = rows.length > NOTIFICATIONS_PAGE_SIZE;
-  const counts = list.data?.counts ?? { all: 0, unread: 0, archived: 0 };
+  const counts = list.data?.counts ?? initialData.counts;
   const total = counts[filter];
 
   async function invalidateNotifications() {
@@ -219,15 +226,17 @@ function NotificationsPage() {
           {text("action.markAllRead")}
         </AlignButton.Root>
       </div>
-      <AdminPagination
-        count={visibleRows.length}
-        offset={offset}
-        total={total}
-        label="notifications"
-        hasNext={hasNext}
-        onPrevious={() => setOffset((current) => Math.max(0, current - NOTIFICATIONS_PAGE_SIZE))}
-        onNext={() => setOffset((current) => current + NOTIFICATIONS_PAGE_SIZE)}
-      />
+      {!list.isPending && !list.isError && (
+        <AdminPagination
+          count={visibleRows.length}
+          offset={offset}
+          total={total}
+          label="notifications"
+          hasNext={hasNext}
+          onPrevious={() => setOffset((current) => Math.max(0, current - NOTIFICATIONS_PAGE_SIZE))}
+          onNext={() => setOffset((current) => current + NOTIFICATIONS_PAGE_SIZE)}
+        />
+      )}
       <div className="min-h-0 flex-1 overflow-y-auto">
         {(list.isError || mutationError) && (
           <div className="border-b border-stroke-soft-200 bg-error-lighter px-4 py-2.5">
@@ -236,7 +245,11 @@ function NotificationsPage() {
             </Typography>
           </div>
         )}
-        {visibleRows.length === 0 && !list.isPending ? (
+        {list.isPending ? (
+          <div className="flex h-full min-h-64 items-center justify-center p-6">
+            <Loading />
+          </div>
+        ) : visibleRows.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
             <Typography variant="paragraph" className="text-text-sub-600">
               {text(`empty.${filter}`)}

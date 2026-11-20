@@ -9,6 +9,7 @@ import {
   RiNotification3Line,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
+import { Loading } from "@/ui/loading";
 import { AlignPopover } from "@/ui/popover";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
@@ -116,7 +117,11 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
                 {text("error.load")}
               </Typography>
             </div>
-          ) : items.length === 0 && !listQuery.isPending ? (
+          ) : listQuery.isPending ? (
+            <div className="px-3.5 py-8">
+              <Loading />
+            </div>
+          ) : items.length === 0 ? (
             <div className="px-3.5 py-8 text-center">
               <Typography variant="caption" className="text-text-sub-600">
                 {text("empty.unread")}

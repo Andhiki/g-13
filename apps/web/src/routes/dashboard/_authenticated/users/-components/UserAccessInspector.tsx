@@ -35,7 +35,7 @@ export function UserAccessInspector({
       aria-label="Selected account details"
       className="hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0 xl:flex"
     >
-      <div className="flex h-8 items-center gap-2 border-b border-stroke-soft-200 px-4 text-label-xs">
+      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-stroke-soft-200 px-4 text-label-xs">
         <RiShieldUserLine className="size-3.5 text-text-sub-600" />
         Account details
       </div>

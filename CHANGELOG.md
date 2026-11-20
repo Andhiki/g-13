@@ -18,6 +18,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Halaman publik statis (beranda, arsip ujian, FAQ, resources, roadmap) kini di-prerender saat build; halaman dosen dan dashboard dirender di klien agar hemat CPU.
 - Login produksi kini berfungsi di kedua domain (`csugm.omahti.com` dan `csugm.andhiki.tech`) dengan satu aplikasi OAuth GitHub; sesi tetap terpisah di masing-masing domain.
+- Merapikan antarmuka dashboard moderasi: pengalihan otomatis dari `/dashboard/login` bagi akun terverifikasi, tampilan menunggu persetujuan tanpa tombol keluar, tombol buka/tutup sidebar kiri dan panel detail kanan, paginasi di bagian atas, tampilan rating bintang serta teks pengalaman yang dapat diperluas di panel detail ulasan, kursor baris mengikuti pengaturan kursor, indikator muat Sonic GIF, cache tab filter agar perpindahan tab tidak memuat ulang, serta penyelarasan dialog konfirmasi.
 
 #### Fixed
 

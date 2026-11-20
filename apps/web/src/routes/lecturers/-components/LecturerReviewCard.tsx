@@ -1,10 +1,12 @@
-import { RiStarFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useLocale } from "@/useLocale";
+import { RatingStars } from "@/ui/rating-stars";
 import { Typography } from "@/ui/typography";
 import type { lecturerDirectoryQueryOptions } from "../-client/queries";
 import { courseDisplayName } from "../-shared/course-search";
+
+export { RatingStars };
 
 type Lecturer = Awaited<
   ReturnType<NonNullable<ReturnType<typeof lecturerDirectoryQueryOptions>["queryFn"]>>
@@ -88,25 +90,5 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
         )}
       </div>
     </article>
-  );
-}
-
-export function RatingStars({ value, label }: { value: number | null; label: string }) {
-  return (
-    <span role="img" aria-label={label} className="inline-flex shrink-0 gap-0.5 align-middle">
-      {Array.from({ length: 5 }, (_, index) => (
-        <span key={index} className="relative block size-4" aria-hidden="true">
-          <RiStarFill className="size-full text-text-disabled-300" />
-          <span
-            className="absolute inset-y-0 left-0 overflow-hidden text-primary-base"
-            style={{
-              width: `${Math.max(0, Math.min(1, (value ?? 0) - index)) * 100}%`,
-            }}
-          >
-            <RiStarFill className="size-4 max-w-none" />
-          </span>
-        </span>
-      ))}
-    </span>
   );
 }

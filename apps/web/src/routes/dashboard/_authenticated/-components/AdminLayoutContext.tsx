@@ -8,14 +8,19 @@ import {
 } from "react";
 
 const AdminLayoutContext = createContext<{
+  sidebarOpen: boolean;
+  setSidebarOpen: Dispatch<SetStateAction<boolean>>;
   detailsOpen: boolean;
   setDetailsOpen: Dispatch<SetStateAction<boolean>>;
 } | null>(null);
 
 export function AdminLayoutProvider({ children }: { children: ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(true);
   return (
-    <AdminLayoutContext.Provider value={{ detailsOpen, setDetailsOpen }}>
+    <AdminLayoutContext.Provider
+      value={{ sidebarOpen, setSidebarOpen, detailsOpen, setDetailsOpen }}
+    >
       {children}
     </AdminLayoutContext.Provider>
   );
