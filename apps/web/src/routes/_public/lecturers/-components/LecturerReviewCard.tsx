@@ -17,7 +17,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
   const { text, language } = useLocale("lecturers");
   const [showAllCourses, setShowAllCourses] = useState(false);
   return (
-    <article className="group isolate relative cursor-pointer rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 focus-within:border-stroke-strong-950 sm:p-4">
+    <article className="isolate relative cursor-pointer rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 focus-within:border-stroke-strong-950 sm:p-4">
       <Link
         to="/lecturers/$lecturerId"
         params={{ lecturerId: lecturer.id }}
@@ -31,7 +31,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
               as="h2"
               variant="subtitle2"
               id={`lecturer-card-name-${lecturer.id}`}
-              className="m-0 break-words underline decoration-1 underline-offset-4 group-hover:decoration-2"
+              className="m-0 break-words"
             >
               {lecturer.name}
             </Typography>

@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Menghapus garis bawah pada nama di kartu dosen.
+
 - Dashboard mendukung moderasi dan notifikasi di layar kecil. Tanggal akun memakai bulan dan tahun, daftar dosen memakai dua kolom di layar lebar, dan ulasan ditampilkan lebih ringkas.
 
 - Ukuran teks pada lencana dan label mata kuliah diperkecil agar nama dosen lebih menonjol pada tabel moderasi.
