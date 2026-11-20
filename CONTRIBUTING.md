@@ -16,9 +16,11 @@ skill proyek tersedia di [AGENTS.md](AGENTS.md).
    atau perubahan format yang tidak berkaitan.
 5. Jalankan `bun run check` dan `bun run build`. Jelaskan pemeriksaan yang
    belum dijalankan.
-6. Buka PR ke `main` dengan alasan perubahan, cara verifikasi, dan screenshot
-   bila tampilan berubah. Maintainer meninjau sebelum merge; tidak ada jaminan
-   waktu respons.
+6. Buka PR ke `staging` dengan alasan perubahan, cara verifikasi, dan screenshot
+   bila tampilan berubah. Maintainer meninjau lalu menggabungkannya ke `staging`
+   untuk diuji. Setelah lolos pengujian, maintainer mempromosikan `staging` ke
+   `main` untuk rilis produksi. Tidak ada jaminan waktu respons.
+   Jangan membuka PR fitur langsung ke `main`.
 
 Agent dapat memakai [skill PR body](.agents/skills/pr-body/SKILL.md) yang tersedia
 di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
