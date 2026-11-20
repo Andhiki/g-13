@@ -5,7 +5,7 @@ import { AlignButton } from "@/ui/button";
 export type AdminFilterTab<T extends string> = {
   value: T;
   label: string;
-  count: number;
+  count?: number;
 };
 
 export function AdminFilterBar<T extends string>({
@@ -42,7 +42,9 @@ export function AdminFilterBar<T extends string>({
               onClick={() => onTabChange(tab.value)}
             >
               <span className={tabLabelClassName}>{tab.label}</span>
-              <span className="text-text-sub-600 tabular-nums">{tab.count}</span>
+              {tab.count !== undefined && (
+                <span className="text-text-sub-600 tabular-nums">{tab.count}</span>
+              )}
             </AlignButton.Root>
           );
         })}

@@ -18,6 +18,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 - Tombol akun di sidebar dashboard kini memakai gaya ghost selebar nama depan dengan ikon panah bawah, dan menu akun tampil lebih lebar serta ringkas di atas kiri dengan alamat email di bagian atas.
 
+- Notifikasi tidak lagi menghitung jumlah total untuk setiap filter agar daftar tetap cepat tanpa pemindaian tabel penuh. Tab filter tampil tanpa angka, dan ikon lonceng menampilkan titik (bukan angka) saat ada notifikasi yang belum dibaca.
+
 ### 2026-11-20
 
 #### Added
