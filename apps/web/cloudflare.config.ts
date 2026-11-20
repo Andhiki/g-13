@@ -38,6 +38,15 @@ export default defineConfig(({ mode }) => {
 			cache: {
 				enabled: true,
 			},
+			observability: isStaging
+				? {
+						enabled: true,
+						logs: {
+							enabled: true,
+							invocationLogs: true,
+						},
+					}
+				: undefined,
 			env: {
 				ALUMNI: bindings.worker({
 					worker: workerName,
