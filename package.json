@@ -17,8 +17,6 @@
     "db:generate": "bun run --cwd packages/db db:generate",
     "db:push:local": "cf d1 raw 4961475b-b620-4a57-8e09-520e8c17578b --local --persist-to apps/web/.cloudflare/state --sql=\"$(bun run --cwd packages/db db:export | sed 's/CREATE TABLE /CREATE TABLE IF NOT EXISTS /g; s/CREATE INDEX /CREATE INDEX IF NOT EXISTS /g; s/CREATE UNIQUE INDEX /CREATE UNIQUE INDEX IF NOT EXISTS /g')\"",
     "db:migrate:local": "cf d1 migrations apply 4961475b-b620-4a57-8e09-520e8c17578b --local --dir packages/db/migrations --persist-to apps/web/.cloudflare/state",
-    "db:migrate:remote": "cf d1 migrations apply 4961475b-b620-4a57-8e09-520e8c17578b --dir packages/db/migrations",
-    "db:migrate:staging": "cf d1 migrations apply 5b5d43e1-399d-4844-b782-5ca632690089 --dir packages/db/migrations",
     "db:seed": "cf d1 raw 4961475b-b620-4a57-8e09-520e8c17578b --local --persist-to apps/web/.cloudflare/state --sql=\"$(cat packages/db/seed.sql)\"",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
@@ -26,7 +24,8 @@
     "format": "turbo run format",
     "format:check": "turbo run format:check",
     "check": "turbo run lint format:check typecheck test",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "db:migrate": "test -n \"$D1_DATABASE_ID\" || (echo \"D1_DATABASE_ID is required; refusing to run migrations\" && exit 1); cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
   },
   "devDependencies": {
     "turbo": "^2.11.10"
