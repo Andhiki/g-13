@@ -14,4 +14,6 @@ export const reviewLikeInputSchema = z.object({
 });
 export type ReviewLikeInput = z.output<typeof reviewLikeInputSchema>;
 
-export const publishReviewInputSchema = submissionInputSchema;
+export const publishReviewInputSchema = submissionInputSchema.and(
+  z.object({ turnstileToken: z.string().trim().min(1).max(2048) }),
+);

@@ -43,6 +43,8 @@
   "Check all fields and select a lecturer and course.": "Check all fields and select a lecturer and course.",
   "Reviews are temporarily unavailable. Please try again later.": "Reviews are temporarily unavailable. Please try again later.",
   "Could not confirm publication. Refresh the page before trying again.": "Could not confirm publication. Refresh the page before trying again.",
+  "Complete the security check and try again.": "Complete the security check and try again.",
+  "Security verification failed. Please try again.": "Security verification failed. Please try again.",
   "{{metric}}: {{value}} of 5": "{{metric}}: {{value}} of 5",
   "Not rated": "Not rated",
   "Courses": "Courses",

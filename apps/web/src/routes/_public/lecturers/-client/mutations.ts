@@ -9,7 +9,8 @@ import {
 
 export function publishLecturerReviewMutationOptions(queryClient: QueryClient) {
   return mutationOptions({
-    mutationFn: (input: ReviewSubmissionInput) => publishLecturerReview({ data: input }),
+    mutationFn: (input: ReviewSubmissionInput & { turnstileToken: string }) =>
+      publishLecturerReview({ data: input }),
     onSuccess: async (_result, input) => {
       await Promise.all([
         queryClient.invalidateQueries({

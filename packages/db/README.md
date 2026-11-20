@@ -29,6 +29,11 @@ to the browser. Submissions fail closed without it or a trusted client IP.
 Cloudflare supplies `CF-Connecting-IP`; local development uses loopback. Do not
 serve this handler behind a proxy that allows visitors to forge that header.
 
+Submissions are also gated by Cloudflare Turnstile (invisible widget). Set
+`TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` from the same widget; verification is
+fail-closed, so reviews are rejected when the secret is missing or Siteverify fails.
+See [docs/lecturer-reviews.md](../../docs/lecturer-reviews.md).
+
 The limits are three validated review submissions and 60 like actions per IP per
 UTC clock hour, shared across workers through an atomic D1 upsert. Likes use a
 random identifier stored in the browser; clearing storage allows another like.

@@ -50,6 +50,18 @@ it("requires a server rate-limit secret of at least 32 characters", () => {
     parseSubmissionEnvironment({ REVIEW_RATE_LIMIT_SECRET: "s".repeat(32) })
       .REVIEW_RATE_LIMIT_SECRET,
   ).toHaveLength(32);
+  // Turnstile keys are optional and default to empty strings.
+  expect(parseSubmissionEnvironment({ REVIEW_RATE_LIMIT_SECRET: "s".repeat(32) })).toMatchObject({
+    TURNSTILE_SITE_KEY: "",
+    TURNSTILE_SECRET_KEY: "",
+  });
+  expect(
+    parseSubmissionEnvironment({
+      REVIEW_RATE_LIMIT_SECRET: "s".repeat(32),
+      TURNSTILE_SITE_KEY: "  site-key  ",
+      TURNSTILE_SECRET_KEY: "  secret-key  ",
+    }),
+  ).toMatchObject({ TURNSTILE_SITE_KEY: "site-key", TURNSTILE_SECRET_KEY: "secret-key" });
 });
 
 it("parses the bootstrap admin allowlist", () => {

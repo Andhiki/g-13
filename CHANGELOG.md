@@ -12,6 +12,16 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-21
+
+#### Added
+
+- Menambahkan verifikasi Cloudflare Turnstile (widget tak terlihat) pada formulir ulasan dosen untuk menekan spam; pengiriman ditolak bila verifikasi keamanan gagal.
+
+#### Changed
+
+- Formulir ulasan dosen kini menyertakan token keamanan saat menerbitkan dan menampilkan pesan yang sesuai ketika verifikasi keamanan gagal atau kedaluwarsa.
+
 ### 2026-11-20
 
 #### Added

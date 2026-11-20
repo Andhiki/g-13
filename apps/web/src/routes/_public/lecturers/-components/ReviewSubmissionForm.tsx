@@ -1,6 +1,6 @@
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RiArrowRightLine, RiSpyLine, RiUserLine } from "@remixicon/react";
 import { AlignSelect } from "@/ui/select";
 import * as AlignSwitch from "@/ui/switch";
@@ -11,10 +11,12 @@ import { AlignModal } from "@/ui/modal";
 import { useLocale } from "@/useLocale";
 import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
+import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import type { ReviewSubmissionInput } from "../-shared/submission-schema";
 import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submission-errors";
 import { publishLecturerReviewMutationOptions } from "../-client/mutations";
+import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
 export type ReviewFormData = {
   courses: { id: string; code: string; nameId: string; nameEn: string }[];
@@ -58,6 +60,9 @@ export function ReviewSubmissionForm({
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
   const publishMutation = useMutation(publishLecturerReviewMutationOptions(queryClient));
+  const siteKeyQuery = useQuery(turnstileSiteKeyQueryOptions());
+  const siteKey = siteKeyQuery.data?.siteKey ?? "";
+  const turnstileRef = useRef<TurnstileFieldHandle>(null);
   const form = useRef<HTMLFormElement>(null);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [anonymous, setAnonymous] = useState(true);
@@ -114,18 +119,25 @@ export function ReviewSubmissionForm({
           return;
         }
         try {
-          const result = await publishMutation.mutateAsync(input);
+          const turnstileToken = siteKey ? await turnstileRef.current?.execute() : "";
+          if (!turnstileToken) {
+            setMessage("Complete the security check and try again.");
+            return;
+          }
+          const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
           await onPublished(result.reviewId);
         } catch (error: unknown) {
           const code = error instanceof Error ? error.message : null;
           setMessage(
             code === REVIEW_ERRORS.RATE_LIMIT
               ? "Submission limit reached. Try again next hour."
-              : code === REVIEW_ERRORS.INVALID
-                ? "The lecturer or course may no longer be available. Refresh the page and try again."
-                : code === REVIEW_ERRORS.UNAVAILABLE
-                  ? "Reviews are temporarily unavailable. Please try again later."
-                  : "Could not confirm publication. Refresh the page before trying again.",
+              : code === REVIEW_ERRORS.CAPTCHA
+                ? "Security verification failed. Please try again."
+                : code === REVIEW_ERRORS.INVALID
+                  ? "The lecturer or course may no longer be available. Refresh the page and try again."
+                  : code === REVIEW_ERRORS.UNAVAILABLE
+                    ? "Reviews are temporarily unavailable. Please try again later."
+                    : "Could not confirm publication. Refresh the page before trying again.",
           );
         }
       }}
@@ -289,6 +301,8 @@ export function ReviewSubmissionForm({
           </div>
         </fieldset>
       </div>
+
+      <TurnstileField ref={turnstileRef} siteKey={siteKey} />
 
       <footer className="shrink-0 border-t border-stroke-soft-200 p-4">
         {message && (
