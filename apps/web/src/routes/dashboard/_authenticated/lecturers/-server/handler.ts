@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 import { createDatabase } from "@g13/db/client";
-import { requireAdminSession } from "@/server/auth";
+import { authorize } from "@/server/auth-middleware";
 import { runServerOperation } from "@/server/server-function-error";
 import {
   createLecturerSchema,
@@ -19,9 +18,10 @@ import {
 } from "./service";
 
 export const loadAdminLecturers = createServerFn({ method: "GET" })
+  .middleware([authorize("moderate")])
   .validator(lecturerPageSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       inspectLecturers(createDatabase(env.DB), session.user, data.offset, data.status),
     );
@@ -38,9 +38,10 @@ export const loadAdminLecturers = createServerFn({ method: "GET" })
   });
 
 export const createAdminLecturer = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(createLecturerSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       createLecturer(createDatabase(env.DB), session.user, data),
     );
@@ -49,9 +50,10 @@ export const createAdminLecturer = createServerFn({ method: "POST" })
   });
 
 export const updateAdminLecturer = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(updateLecturerSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       updateLecturer(createDatabase(env.DB), session.user, data),
     );
@@ -60,9 +62,10 @@ export const updateAdminLecturer = createServerFn({ method: "POST" })
   });
 
 export const changeAdminLecturerLifecycle = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(lecturerLifecycleSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       changeLecturerLifecycle(createDatabase(env.DB), session.user, data),
     );

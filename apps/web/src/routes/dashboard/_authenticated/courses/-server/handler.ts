@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 import { createDatabase } from "@g13/db/client";
-import { requireAdminSession } from "@/server/auth";
+import { authorize } from "@/server/auth-middleware";
 import { runServerOperation } from "@/server/server-function-error";
 import {
   courseLifecycleSchema,
@@ -14,9 +13,10 @@ import { rejectCourseAdminOperation } from "./failures";
 import { changeCourseLifecycle, createCourse, inspectCourses, updateCourse } from "./service";
 
 export const loadAdminCourses = createServerFn({ method: "GET" })
+  .middleware([authorize("moderate")])
   .validator(coursePageSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       inspectCourses(createDatabase(env.DB), session.user, data.offset, data.status),
     );
@@ -33,9 +33,10 @@ export const loadAdminCourses = createServerFn({ method: "GET" })
   });
 
 export const createAdminCourse = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(createCourseSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       createCourse(createDatabase(env.DB), session.user, data),
     );
@@ -44,9 +45,10 @@ export const createAdminCourse = createServerFn({ method: "POST" })
   });
 
 export const updateAdminCourse = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(updateCourseSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       updateCourse(createDatabase(env.DB), session.user, data),
     );
@@ -55,9 +57,10 @@ export const updateAdminCourse = createServerFn({ method: "POST" })
   });
 
 export const changeAdminCourseLifecycle = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(courseLifecycleSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       changeCourseLifecycle(createDatabase(env.DB), session.user, data),
     );

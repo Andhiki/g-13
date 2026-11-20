@@ -11,24 +11,19 @@ export const authenticatedMiddleware = createMiddleware({ type: "function" }).se
   },
 );
 
-export const moderateMiddleware = createMiddleware({ type: "function" }).server(
-  async ({ next }) => {
-    const [{ getRequestHeaders }, { requireAdminSession }] = await Promise.all([
-      import("@tanstack/react-start/server"),
-      import("./auth"),
-    ]);
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
-    return next({ context: { session } });
-  },
-);
+type AdminPermission = Parameters<(typeof import("./auth"))["requireAdminSession"]>[1];
 
-export const manageUsersMiddleware = createMiddleware({ type: "function" }).server(
-  async ({ next }) => {
+/**
+ * Gates a server function behind an admin permission. Resolves the session
+ * from the request headers and shares it with the handler as `context.session`.
+ */
+export function authorize(permission: AdminPermission) {
+  return createMiddleware({ type: "function" }).server(async ({ next }) => {
     const [{ getRequestHeaders }, { requireAdminSession }] = await Promise.all([
       import("@tanstack/react-start/server"),
       import("./auth"),
     ]);
-    const session = await requireAdminSession(getRequestHeaders(), "manage-users");
+    const session = await requireAdminSession(getRequestHeaders(), permission);
     return next({ context: { session } });
-  },
-);
+  });
+}
