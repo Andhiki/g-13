@@ -4,7 +4,7 @@
 @import "./fonts/fonts.css";
 
 :root {
-  --app-header-height: calc(64px + env(safe-area-inset-top, 0px));
+  --app-header-height: calc(64px + env(safe-area-inset-top, 0px) + var(--app-banner-height, 0px));
   --interactive-cursor: default;
 }
 

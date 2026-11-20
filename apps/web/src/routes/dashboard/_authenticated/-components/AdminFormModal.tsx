@@ -109,6 +109,7 @@ export function AdminFormField({
   maxLength,
   placeholder,
   error,
+  type = "text",
   onChange,
 }: {
   id: string;
@@ -118,6 +119,7 @@ export function AdminFormField({
   maxLength: number;
   placeholder: string;
   error?: string;
+  type?: "text" | "datetime-local";
   onChange: (value: string) => void;
 }) {
   const errorId = `${id}-error`;
@@ -135,8 +137,8 @@ export function AdminFormField({
       <input
         id={id}
         name={name}
-        type="text"
-        maxLength={maxLength}
+        type={type}
+        maxLength={type === "text" ? maxLength : undefined}
         placeholder={placeholder}
         value={value}
         aria-invalid={Boolean(error)}

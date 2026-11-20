@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-22
+
+#### Added
+
+- Banner pengumuman situs di atas navbar dengan jadwal tayang (tanggal mulai, tanggal kadaluarsa, dan kontrol aktif manual) serta CTA opsional, dikelola dari halaman baru di dashboard.
+
 Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.

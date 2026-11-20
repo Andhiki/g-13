@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiRouteLine } from "@remixicon/react";
 import { AlignModal } from "./modal";
@@ -102,7 +102,7 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
   );
 }
 
-export function AppHeader() {
+export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
   const { resolvedTheme, setTheme } = useTheme();
   useKeyboardShortcuts({ d: () => setTheme(resolvedTheme === "dark" ? "light" : "dark") });
   const [menuOpen, setMenuOpen] = useState(false);
@@ -119,92 +119,95 @@ export function AppHeader() {
 
   return (
     <AlignModal.Root open={menuOpen} onOpenChange={setMenuOpen}>
-      <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--app-header-height)] items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] text-text-strong-950 md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
-        <BrandLogo />
-        <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 md:flex">
-          <AlignLinkButton.Root asChild>
-            <Link
-              to="/exam"
-              activeProps={{
-                className: "decoration-current",
-                "aria-current": "page",
-              }}
+      <div className="fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)] text-text-strong-950">
+        {announcement}
+        <header className="flex h-16 items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
+          <BrandLogo />
+          <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 md:flex">
+            <AlignLinkButton.Root asChild>
+              <Link
+                to="/exam"
+                activeProps={{
+                  className: "decoration-current",
+                  "aria-current": "page",
+                }}
+              >
+                {t("navigation.examArchive")}
+              </Link>
+            </AlignLinkButton.Root>
+            <AlignLinkButton.Root asChild>
+              <Link
+                to="/alumni"
+                activeProps={{
+                  className: "decoration-current",
+                  "aria-current": "page",
+                }}
+              >
+                {t("navigation.alumni")}
+              </Link>
+            </AlignLinkButton.Root>
+            <AlignLinkButton.Root asChild>
+              <Link
+                to="/lecturers"
+                activeProps={{
+                  className: "decoration-current",
+                  "aria-current": "page",
+                }}
+              >
+                {t("navigation.lecturers")}
+              </Link>
+            </AlignLinkButton.Root>
+            <AlignLinkButton.Root asChild>
+              <Link
+                to="/resources"
+                activeProps={{
+                  className: "decoration-current",
+                  "aria-current": "page",
+                }}
+              >
+                {t("navigation.resources")}
+              </Link>
+            </AlignLinkButton.Root>
+            <AlignLinkButton.Root asChild>
+              <Link
+                to="/faq"
+                activeProps={{
+                  className: "decoration-current",
+                  "aria-current": "page",
+                }}
+              >
+                {t("navigation.faq")}
+              </Link>
+            </AlignLinkButton.Root>
+          </nav>
+          <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+            <Settings />
+            <AlignButton.Root
+              asChild
+              variant="neutral-inverse"
+              mode="filled"
+              size="small"
+              className="px-2 md:px-3"
             >
-              {t("navigation.examArchive")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild>
-            <Link
-              to="/alumni"
-              activeProps={{
-                className: "decoration-current",
-                "aria-current": "page",
-              }}
+              <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+                <RiRouteLine aria-hidden="true" className="size-4" />
+                {t("navigation.roadmap")}
+              </Link>
+            </AlignButton.Root>
+          </div>
+          <AlignModal.Trigger asChild>
+            <AlignButton.Root
+              variant="neutral"
+              mode="ghost"
+              className="ml-auto size-11 p-2.5 md:hidden"
+              aria-label={menuOpen ? t("navigation.close") : t("navigation.open")}
+              aria-expanded={menuOpen}
             >
-              {t("navigation.alumni")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild>
-            <Link
-              to="/lecturers"
-              activeProps={{
-                className: "decoration-current",
-                "aria-current": "page",
-              }}
-            >
-              {t("navigation.lecturers")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild>
-            <Link
-              to="/resources"
-              activeProps={{
-                className: "decoration-current",
-                "aria-current": "page",
-              }}
-            >
-              {t("navigation.resources")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild>
-            <Link
-              to="/faq"
-              activeProps={{
-                className: "decoration-current",
-                "aria-current": "page",
-              }}
-            >
-              {t("navigation.faq")}
-            </Link>
-          </AlignLinkButton.Root>
-        </nav>
-        <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
-          <Settings />
-          <AlignButton.Root
-            asChild
-            variant="neutral-inverse"
-            mode="filled"
-            size="small"
-            className="px-2 md:px-3"
-          >
-            <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-              <RiRouteLine aria-hidden="true" className="size-4" />
-              {t("navigation.roadmap")}
-            </Link>
-          </AlignButton.Root>
-        </div>
-        <AlignModal.Trigger asChild>
-          <AlignButton.Root
-            variant="neutral"
-            mode="ghost"
-            className="ml-auto size-11 p-2.5 md:hidden"
-            aria-label={menuOpen ? t("navigation.close") : t("navigation.open")}
-            aria-expanded={menuOpen}
-          >
-            <MenuIcon open={menuOpen} />
-          </AlignButton.Root>
-        </AlignModal.Trigger>
-      </header>
+              <MenuIcon open={menuOpen} />
+            </AlignButton.Root>
+          </AlignModal.Trigger>
+        </header>
+      </div>
       <AlignModal.Content
         showClose={false}
         aria-describedby={undefined}
