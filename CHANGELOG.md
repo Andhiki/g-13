@@ -12,6 +12,12 @@ Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
+### 2026-11-20
+
+#### Fixed
+
+- Halaman `/dashboard/login` tidak lagi menampilkan pesan galat autentikasi bagi pengunjung yang sudah memiliki sesi; halaman menampilkan tombol lanjut ke dashboard atau keluar.
+
 ### 2026-11-19
 
 #### Fixed
