@@ -8,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   type RemixiconComponentType,
+  RiArrowDownSLine,
   RiBookOpenLine,
   RiChatCheckLine,
   RiCloseLine,
@@ -59,10 +60,15 @@ const sectionGroups = [
 const navLinkClass =
   "flex w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 outline-none transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 focus-visible:outline-[1.5px] focus-visible:outline-offset-0 focus-visible:outline-stroke-strong-950/35 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950";
 
-type AccountProps = { userName: string; userImage?: string | null };
+type AccountProps = { userName: string; userEmail?: string | null; userImage?: string | null };
+
+function getFirstName(name: string) {
+  return name.trim().split(/\s+/)[0] || name;
+}
 
 function NavigationFooter({
   userName,
+  userEmail,
   userImage,
   mobile = false,
 }: AccountProps & { mobile?: boolean }) {
@@ -71,6 +77,7 @@ function NavigationFooter({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const firstName = getFirstName(userName);
 
   async function signOut() {
     setSignOutError(false);
@@ -94,14 +101,14 @@ function NavigationFooter({
           Sign-out failed. Try again.
         </Typography>
       )}
-      <div className="flex items-center gap-1 border-t border-stroke-soft-200 pt-2">
+      <div className="flex items-center justify-between gap-1 border-t border-stroke-soft-200 pt-2">
         <AlignDropdown.Root>
           <AlignDropdown.Trigger asChild>
             <AlignButton.Root
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2 text-label-xs text-text-strong-950 hover:border-stroke-strong-950/20 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200"
+              className="h-8 min-w-0 justify-start gap-1.5 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200"
               aria-label="Account menu"
             >
               {userImage && userImage !== failedImage ? (
@@ -117,28 +124,35 @@ function NavigationFooter({
                   className="size-5 shrink-0 p-0.5 text-text-sub-600"
                 />
               )}
-              <span className="truncate font-medium">{userName}</span>
+              <span className="truncate font-medium">{firstName}</span>
+              <RiArrowDownSLine
+                aria-hidden="true"
+                className="size-3.5 shrink-0 text-text-sub-600"
+              />
             </AlignButton.Root>
           </AlignDropdown.Trigger>
           <AlignDropdown.Content
-            side={mobile ? "top" : "right"}
-            align="end"
+            side="top"
+            align="start"
             sideOffset={8}
-            className="w-[180px] rounded-xl p-1.5"
+            className="w-[232px] max-w-[calc(100vw-24px)] gap-0.5 rounded-xl p-1"
           >
-            <AlignDropdown.Item asChild className="px-2 py-1.5">
+            {userEmail && (
+              <div className="truncate px-2 py-1 text-xs text-text-sub-600">{userEmail}</div>
+            )}
+            <AlignDropdown.Item asChild className="px-2 py-1">
               <Link to="/lecturers">
                 <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
                 Public view
               </Link>
             </AlignDropdown.Item>
-            <AlignDropdown.Item className="px-2 py-1.5" onSelect={() => setSettingsOpen(true)}>
+            <AlignDropdown.Item className="px-2 py-1" onSelect={() => setSettingsOpen(true)}>
               <RiSettings3Line className="size-4 shrink-0 text-text-sub-600" />
               Settings
             </AlignDropdown.Item>
-            <AlignDropdown.Separator />
+            <AlignDropdown.Separator className="my-0.5" />
             <AlignDropdown.Item
-              className="px-2 py-1.5 text-error-base data-[highlighted]:bg-error-lighter"
+              className="px-2 py-1 text-error-base data-[highlighted]:bg-error-lighter"
               onSelect={() => void signOut()}
             >
               <RiLogoutBoxLine className="size-4 shrink-0" />
@@ -197,6 +211,7 @@ function ModerationNavSections({
 export function ModerationSidebar({
   manager,
   userName,
+  userEmail,
   userImage,
 }: AccountProps & { manager: boolean }) {
   const { sidebarOpen } = useAdminLayout();
@@ -208,7 +223,7 @@ export function ModerationSidebar({
     >
       <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-1 pr-2.5">
         <ModerationNavSections manager={manager} />
-        <NavigationFooter userName={userName} userImage={userImage} />
+        <NavigationFooter userName={userName} userEmail={userEmail} userImage={userImage} />
       </aside>
     </div>
   );
@@ -217,6 +232,7 @@ export function ModerationSidebar({
 export function MobileModerationMenu({
   manager,
   userName,
+  userEmail,
   userImage,
 }: AccountProps & { manager: boolean }) {
   return (
@@ -252,7 +268,12 @@ export function MobileModerationMenu({
         </AlignDrawer.Header>
         <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
           <ModerationNavSections manager={manager} closeOnNavigate />
-          <NavigationFooter userName={userName} userImage={userImage} mobile />
+          <NavigationFooter
+            userName={userName}
+            userEmail={userEmail}
+            userImage={userImage}
+            mobile
+          />
         </AlignDrawer.Body>
       </AlignDrawer.Content>
     </AlignDrawer.Root>

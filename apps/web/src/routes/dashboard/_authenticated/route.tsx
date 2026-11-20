@@ -52,6 +52,7 @@ function AdminLayout() {
             <ModerationSidebar
               manager={canManageUsers(identity.role)}
               userName={identity.name}
+              userEmail={"email" in identity ? identity.email : null}
               userImage={"image" in identity ? identity.image : null}
             />
           )}

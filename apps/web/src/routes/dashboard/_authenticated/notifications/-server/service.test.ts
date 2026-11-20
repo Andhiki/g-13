@@ -90,10 +90,10 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
 
     const admin = { id: "admin-1", role: "admin" };
     const adminInbox = await inspectNotifications(db, admin);
-    expect(adminInbox.data?.counts).toEqual({ all: 1, unread: 1, archived: 0 });
-    expect((await inspectNotifications(db, { id: "user-1", role: "user" })).data?.counts.all).toBe(
-      0,
-    );
+    expect(adminInbox.data?.rows).toHaveLength(1);
+    expect(
+      (await inspectNotifications(db, { id: "user-1", role: "user" })).data?.rows,
+    ).toHaveLength(0);
 
     // Recipient isolation blocks cross-user mutations.
     const adminNotifId = adminInbox.data!.rows[0]!.id;
@@ -106,10 +106,9 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
 
     // Read, mark-all-read, archive, and filter transitions.
     expect((await readNotification(db, admin, adminNotifId)).error).toBeNull();
-    expect((await inspectNotifications(db, admin)).data?.counts.unread).toBe(0);
+    expect((await inspectNotifications(db, admin, null, "unread")).data?.rows).toHaveLength(0);
     expect((await archiveUserNotification(db, admin, adminNotifId)).error).toBeNull();
     const archived = await inspectNotifications(db, admin, null, "archived");
-    expect(archived.data?.counts).toEqual({ all: 0, unread: 0, archived: 1 });
     expect(archived.data?.rows.map((row) => row.id)).toEqual([adminNotifId]);
 
     // Demoting a maintainer notifies them and hides privileged review notifications.
@@ -117,7 +116,6 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
     const demoted = { id: "maintainer-1", role: "user" };
     const demotedInbox = await inspectNotifications(db, demoted);
     expect(demotedInbox.data?.rows.map((row) => row.type)).toEqual(["user.role_updated"]);
-    expect(demotedInbox.data?.counts).toEqual({ all: 1, unread: 1, archived: 0 });
 
     const reviewNotif = (
       await inspectNotifications(db, { id: "maintainer-1", role: "maintainer" })
@@ -126,10 +124,13 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
       NOTIFICATION_ERRORS.NOT_FOUND,
     );
     await readAllNotifications(db, demoted);
-    expect(
-      (await inspectNotifications(db, { id: "maintainer-1", role: "maintainer" })).data?.counts
-        .unread,
-    ).toBe(1);
+    const stillUnread = await inspectNotifications(
+      db,
+      { id: "maintainer-1", role: "maintainer" },
+      null,
+      "unread",
+    );
+    expect(stillUnread.data?.rows.map((row) => row.id)).toEqual([reviewNotif.id]);
   } finally {
     await platform.dispose();
   }

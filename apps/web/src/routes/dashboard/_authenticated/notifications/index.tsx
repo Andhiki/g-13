@@ -149,18 +149,6 @@ function NotificationsPage() {
   const pendingReadIdSet = usePendingNotificationReadIds();
 
   const visibleRows = list.data?.pages.flatMap((page) => page.rows) ?? [];
-  const counts = list.data?.pages[0]?.counts ?? initialData.counts;
-  const pendingUnreadCount = new Set(
-    visibleRows
-      .filter(
-        (item) => pendingReadIdSet.has(item.id) && item.readAt === null && item.archivedAt === null,
-      )
-      .map((item) => item.id),
-  ).size;
-  const visibleCounts = {
-    ...counts,
-    unread: Math.max(0, counts.unread - pendingUnreadCount),
-  };
   const displayedRows =
     filter === "unread"
       ? visibleRows.filter((item) => !pendingReadIdSet.has(item.id))
@@ -189,6 +177,7 @@ function NotificationsPage() {
         title={text("title")}
         manager={canManageUsers(identity.role)}
         userName={identity.name}
+        userEmail={identity.email}
         userImage={identity.image}
       />
       <AdminFilterBar
@@ -196,7 +185,6 @@ function NotificationsPage() {
         tabs={notificationFilterSchema.options.map((value) => ({
           value,
           label: text(`filter.${value}`),
-          count: visibleCounts[value],
         }))}
         activeTab={filter}
         onTabChange={(value) => {
@@ -211,7 +199,7 @@ function NotificationsPage() {
           className="gap-1.5 text-label-xs"
           isLoading={readAllMutation.isPending}
           icon={<RiCheckDoubleLine className="size-3.5" />}
-          disabled={busy || visibleCounts.unread === 0}
+          disabled={busy}
           onClick={() => readAllMutation.mutate()}
         >
           {text("action.markAllRead")}
@@ -244,7 +232,7 @@ function NotificationsPage() {
             title={text(`empty.${filter}.title`)}
             description={text(`empty.${filter}.contextDescription`)}
             action={
-              filter !== "all" && counts.all > 0 ? (
+              filter !== "all" && initialData.rows.length > 0 ? (
                 <AlignButton.Root
                   size="small"
                   variant="neutral"

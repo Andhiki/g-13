@@ -8,7 +8,6 @@ import {
   lt,
   notInArray,
   or,
-  sql,
   type SQL,
 } from "drizzle-orm";
 import {
@@ -35,12 +34,6 @@ export type NotificationItem = {
   readAt: number | null;
   archivedAt: number | null;
   createdAt: number;
-};
-
-export type NotificationCounts = {
-  all: number;
-  unread: number;
-  archived: number;
 };
 
 function visibleTo(viewer: NotificationViewer): SQL | undefined {
@@ -117,27 +110,6 @@ export async function listUserNotifications(
     rows: page,
     nextCursor:
       last && rows.length > page.length ? { createdAt: last.createdAt, id: last.id } : null,
-  };
-}
-
-export async function getNotificationCounts(
-  db: Database,
-  viewer: NotificationViewer,
-): Promise<NotificationCounts> {
-  const [row] = await db
-    .select({
-      all: sql<number>`coalesce(sum(case when ${notifications.archivedAt} is null then 1 else 0 end), 0)`,
-      unread: sql<number>`coalesce(sum(case when ${notifications.archivedAt} is null and ${notifications.readAt} is null then 1 else 0 end), 0)`,
-      archived: sql<number>`coalesce(sum(case when ${notifications.archivedAt} is not null then 1 else 0 end), 0)`,
-    })
-    .from(notifications)
-    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
-    .where(visibleTo(viewer));
-
-  return {
-    all: Number(row?.all ?? 0),
-    unread: Number(row?.unread ?? 0),
-    archived: Number(row?.archived ?? 0),
   };
 }
 

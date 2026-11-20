@@ -4,11 +4,9 @@ import type { NotificationViewer } from "../-shared/audience";
 import type { NotificationCursor, NotificationFilter } from "../-shared/schemas";
 import {
   archiveNotification,
-  getNotificationCounts,
   listUserNotifications,
   markAllNotificationsRead,
   markNotificationRead,
-  type NotificationCounts,
   type NotificationItem,
 } from "./repository";
 
@@ -17,7 +15,6 @@ type Actor = NotificationViewer;
 
 export type NotificationListData = {
   rows: NotificationItem[];
-  counts: NotificationCounts;
   nextCursor: NotificationCursor | null;
 };
 
@@ -27,11 +24,8 @@ export async function inspectNotifications(
   cursor: NotificationCursor | null = null,
   filter: NotificationFilter = "all",
 ): Promise<NotificationOperationResult<NotificationListData>> {
-  const [page, counts] = await Promise.all([
-    listUserNotifications(db, actor, cursor, filter),
-    getNotificationCounts(db, actor),
-  ]);
-  return { data: { ...page, counts }, error: null };
+  const page = await listUserNotifications(db, actor, cursor, filter);
+  return { data: page, error: null };
 }
 
 export async function readNotification(

@@ -26,12 +26,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
   const listQuery = useQuery({ ...notificationPopoverQuery(), enabled: false });
   const pendingReadIdSet = usePendingNotificationReadIds();
   const serverRows = listQuery.data?.rows ?? [];
-  const pendingUnreadCount = new Set(
-    serverRows
-      .filter((item) => pendingReadIdSet.has(item.id) && item.readAt === null)
-      .map((item) => item.id),
-  ).size;
-  const unreadCount = Math.max(0, (listQuery.data?.counts.unread ?? 0) - pendingUnreadCount);
+  const hasUnread = serverRows.some((item) => !pendingReadIdSet.has(item.id));
   const items = serverRows.filter((item) => !pendingReadIdSet.has(item.id)).slice(0, 8);
 
   const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
@@ -49,10 +44,11 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
           title={text("title")}
         >
           <RiNotification3Line className="size-4 text-text-sub-600" />
-          {unreadCount > 0 && (
-            <span className="absolute right-0.5 top-0.5 flex min-w-3.5 items-center justify-center rounded-full bg-primary-base px-1 text-[10px] leading-[14px] font-medium text-static-white tabular-nums">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
+          {hasUnread && (
+            <span
+              className="absolute top-1 right-1 size-2 rounded-full bg-primary-base"
+              aria-label={text("status.unread")}
+            />
           )}
         </AlignButton.Root>
       </AlignPopover.Trigger>
@@ -68,13 +64,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
             <Typography as="p" variant="label" className="text-text-strong-950">
               {text("title")}
             </Typography>
-            {unreadCount > 0 && (
-              <span className="rounded-full bg-bg-soft-200 px-1.5 py-0.5 text-[11px] leading-none font-medium text-text-sub-600 tabular-nums">
-                {unreadCount}
-              </span>
-            )}
           </div>
-          {unreadCount > 0 && (
+          {hasUnread && (
             <AlignButton.Root
               size="xxsmall"
               variant="neutral"

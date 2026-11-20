@@ -143,6 +143,7 @@ function AdminLecturersPage() {
         title="Lecturers"
         manager={canManageUsers(identity.role)}
         userName={identity.name}
+        userEmail={identity.email}
         userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
