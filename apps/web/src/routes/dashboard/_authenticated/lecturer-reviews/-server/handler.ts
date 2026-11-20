@@ -1,18 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 import { createDatabase } from "@g13/db/client";
 import { runServerOperation } from "@/server/server-function-error";
-import { requireAdminSession } from "@/server/auth";
+import { authorize } from "@/server/auth-middleware";
 import { moderationPageSchema, moderationReviewSchema } from "../-shared/schemas";
 import { moderateReviewSchema } from "../-shared/moderation";
 import { rejectModerationOperation } from "./failures";
 import { inspectReview, inspectReviews, moderateLecturerReview } from "./service";
 
 export const loadModerationReviews = createServerFn({ method: "GET" })
+  .middleware([authorize("moderate")])
   .validator(moderationPageSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       inspectReviews(createDatabase(env.DB), session.user, data.offset, data.status),
     );
@@ -29,9 +29,10 @@ export const loadModerationReviews = createServerFn({ method: "GET" })
   });
 
 export const loadModerationReview = createServerFn({ method: "GET" })
+  .middleware([authorize("moderate")])
   .validator(moderationReviewSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       inspectReview(createDatabase(env.DB), session.user, data.reviewId),
     );
@@ -40,9 +41,10 @@ export const loadModerationReview = createServerFn({ method: "GET" })
   });
 
 export const changeReviewVisibility = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
   .validator(moderateReviewSchema)
-  .handler(async ({ data }) => {
-    const session = await requireAdminSession(getRequestHeaders(), "moderate");
+  .handler(async ({ data, context }) => {
+    const { session } = context;
     const result = await runServerOperation(() =>
       moderateLecturerReview(createDatabase(env.DB), session.user, data),
     );
