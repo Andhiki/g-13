@@ -18,9 +18,9 @@ export function RatingGuidePopover() {
       <AlignPopover.Trigger asChild>
         <AlignButton.Root
           variant="neutral"
-          mode="stroke"
-          size="small"
-          className="w-9 p-0"
+          mode="ghost"
+          size="xsmall"
+          className="size-8 shrink-0 p-0 text-text-sub-600"
           aria-label={text("About ratings and reviews")}
           title={text("About ratings and reviews")}
         >

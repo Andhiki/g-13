@@ -112,6 +112,7 @@
   "Be the first to review!": "Be the first to review!",
   "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.",
   "Optional. Leave blank to publish as Anonymous.": "Optional. Leave blank to publish as Anonymous.",
+  "{{term}} (Current)": "{{term}} (Current)",
   "Select a term": "Select a term",
   "The lecturer or course may no longer be available. Refresh the page and try again.": "The lecturer or course may no longer be available. Refresh the page and try again."
 }

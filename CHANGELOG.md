@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Memperjelas pengurutan dan ringkasan rating ulasan dosen, serta menampilkan semester berjalan di bagian atas pilihan semester.
+
 - Halaman publik statis (beranda, arsip ujian, FAQ, resources, roadmap) kini di-prerender saat build; halaman dosen dan dashboard dirender di klien agar hemat CPU.
 - Login produksi kini berfungsi di kedua domain (`csugm.omahti.com` dan `csugm.andhiki.tech`) dengan satu aplikasi OAuth GitHub; sesi tetap terpisah di masing-masing domain.
 - Merapikan antarmuka dashboard moderasi: pengalihan otomatis dari `/dashboard/login` bagi akun terverifikasi, tampilan menunggu persetujuan tanpa tombol keluar dengan arahan menghubungi maintainer/admin, tombol buka/tutup sidebar kiri dan panel detail kanan, paginasi di bagian atas, tampilan rating bintang serta teks pengalaman yang dapat diperluas di panel detail ulasan, kursor baris mengikuti pengaturan kursor, indikator muat Sonic GIF, cache tab filter agar perpindahan tab tidak memuat ulang, menu Pengaturan di dashboard, manajemen peran dua langkah di panel detail akun, status muat tombol universal (`isLoading`), penyempurnaan cincin fokus tombol/tautan, serta penyelarasan dialog konfirmasi.

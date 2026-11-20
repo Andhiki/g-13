@@ -87,7 +87,7 @@ export function ReviewInspector({
                   label={`Overall rating: ${overall.toFixed(1)} of 5`}
                 />
                 <Typography variant="labelSmall" className="tabular-nums">
-                  {overall.toFixed(1)} <span className="text-text-sub-600">/ 5</span>
+                  {overall.toFixed(1)}
                 </Typography>
               </div>
             </div>
@@ -106,7 +106,7 @@ export function ReviewInspector({
                   <dt className="text-text-sub-600">{name}</dt>
                   <dd className="flex items-center gap-2 tabular-nums">
                     <RatingStars value={value} size="xs" label={`${name} rating: ${value} of 5`} />
-                    <span className="w-6 text-right text-text-sub-600">{value}/5</span>
+                    <span className="w-4 text-right text-text-sub-600">{value}</span>
                   </dd>
                 </div>
               ))}

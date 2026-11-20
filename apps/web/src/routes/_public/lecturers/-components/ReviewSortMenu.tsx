@@ -42,7 +42,7 @@ export function ReviewSortMenu(props: Props) {
         aria-label={text(isLecturer ? "Lecturer order" : "Review order")}
       >
         <RiSortDesc aria-hidden="true" className="hidden size-5 sm:block" />
-        <AlignSelect.Value>{text("Sort")}</AlignSelect.Value>
+        <AlignSelect.Value />
       </AlignSelect.Trigger>
       <AlignSelect.Content align="end">
         {(isLecturer ? lecturerOptions : reviewOptions).map(([value, label]) => (

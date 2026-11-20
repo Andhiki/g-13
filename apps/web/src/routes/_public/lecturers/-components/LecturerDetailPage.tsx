@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
-import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine, RiStarFill } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignEmptyState } from "@/ui/empty-state";
@@ -24,6 +24,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const { text, language } = useLocale("lecturers");
   const queryClient = useQueryClient();
   const courseFilterId = useId();
+  const overall = data.lecturer.overallAverage;
   const [browserId, setBrowserId] = useState<string | null>(null);
   const [storageUnavailable, setStorageUnavailable] = useState(false);
   const [reviewOrder, setReviewOrder] = useState<ReviewOrder>("newest");
@@ -58,18 +59,25 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         <LinkBack />
         <header className="mt-3 sm:mt-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Typography as="h1" variant="subtitle1" className="m-0 min-w-0 flex-1">
-              {data.lecturer.name}
-            </Typography>
-            <RatingStars
-              value={data.lecturer.overallAverage}
-              label={text("Overall rating: {{rating}}", {
-                rating:
-                  data.lecturer.overallAverage === null
-                    ? text("Not rated")
-                    : `${data.lecturer.overallAverage.toFixed(1)}/5`,
-              })}
-            />
+            <div className="flex min-w-0 flex-1 basis-48 items-center gap-2">
+              <Typography as="h1" variant="subtitle1" className="m-0 min-w-0">
+                {data.lecturer.name}
+              </Typography>
+              <RatingGuidePopover />
+            </div>
+            <div className="flex items-center gap-2">
+              <RatingStars
+                value={overall}
+                label={text("Overall rating: {{rating}}", {
+                  rating: overall === null ? text("Not rated") : `${overall.toFixed(1)}/5`,
+                })}
+              />
+              {overall !== null && (
+                <Typography as="span" variant="label" className="tabular-nums" aria-hidden="true">
+                  {overall.toFixed(1)}
+                </Typography>
+              )}
+            </div>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <AlignFancyButton.Root
@@ -81,7 +89,6 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               </Typography>
               <RiArrowRightLine aria-hidden="true" className="size-4" />
             </AlignFancyButton.Root>
-            <RatingGuidePopover />
             <Typography as="span" variant="caption" className="text-text-sub-600">
               {text(data.lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {
                 count: data.lecturer.reviewCount,
@@ -121,27 +128,41 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           <Typography as="h2" variant="subtitle2" className="mb-0">
             {text("Average ratings")}
           </Typography>
-          <dl className="mb-0 mt-2 grid grid-cols-2 gap-x-4 gap-y-2 rounded-10 border border-stroke-soft-200 p-3 sm:gap-3 sm:border-0 sm:p-0">
+          <dl className="mb-0 mt-3 grid max-w-lg gap-x-3 gap-y-2.5 [grid-template-columns:auto_minmax(0,1fr)_auto]">
             {(
               [
-                ["Overall", data.lecturer.overallAverage],
                 ["Clarity", data.lecturer.clarityAverage],
                 ["Support", data.lecturer.supportAverage],
                 ["Organization", data.lecturer.organizationAverage],
               ] satisfies [string, number | null][]
             ).map(([label, value]) => (
-              <div
-                key={label}
-                className="flex min-w-0 flex-col items-start gap-1 sm:grid sm:grid-cols-[140px_auto] sm:items-center sm:gap-3 sm:rounded-10 sm:border sm:border-stroke-soft-200 sm:px-3 sm:py-2.5"
-              >
+              <div key={label} className="col-span-3 grid grid-cols-subgrid items-center">
                 <Typography as="dt" variant="label" className="text-text-sub-600">
                   {text(label)}
                 </Typography>
-                <dd className="m-0 flex min-w-0 items-center gap-2">
-                  <RatingStars
-                    value={value}
-                    label={`${text(label)}: ${value === null ? text("Not rated") : `${value.toFixed(1)}/5`}`}
-                  />
+                <dd className="col-span-2 m-0 grid grid-cols-subgrid items-center">
+                  <div
+                    aria-hidden="true"
+                    className="h-1.5 overflow-hidden rounded-full bg-bg-soft-200"
+                  >
+                    <div
+                      className="h-full rounded-full bg-primary-base"
+                      style={{ width: `${((value ?? 0) / 5) * 100}%` }}
+                    />
+                  </div>
+                  <span className="flex items-center justify-end gap-1 text-label-sm tabular-nums">
+                    {value === null ? (
+                      <>
+                        <span className="sr-only">{text("Not rated")}</span>
+                        <span aria-hidden="true">—</span>
+                      </>
+                    ) : (
+                      <>
+                        {value.toFixed(1)}
+                        <RiStarFill aria-hidden="true" className="size-4 text-primary-base" />
+                      </>
+                    )}
+                  </span>
                 </dd>
               </div>
             ))}
@@ -153,7 +174,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             <Typography as="h2" variant="subtitle2" className="mb-0">
               {text("Reviews")}
             </Typography>
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Typography
                 as="label"
                 variant="labelSmall"

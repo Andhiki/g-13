@@ -221,15 +221,15 @@ export function ReviewSubmissionForm({
               >
                 <AlignSelect.Trigger
                   id="review-term"
-                  className="h-9 min-h-9"
+                  className="h-9 min-h-9 w-full"
                   {...errorProps("termLabel")}
                 >
                   <AlignSelect.Value placeholder={text("Select a term")} />
                 </AlignSelect.Trigger>
-                <AlignSelect.Content>
-                  {terms.map((term) => (
+                <AlignSelect.Content className="w-[var(--radix-select-trigger-width)]">
+                  {terms.map((term, index) => (
                     <AlignSelect.Item key={term} value={term}>
-                      {term}
+                      {index === 0 ? text("{{term}} (Current)", { term }) : term}
                     </AlignSelect.Item>
                   ))}
                 </AlignSelect.Content>

@@ -5,8 +5,8 @@ export function reviewTerms(date: Date): string[] {
   const currentYear = month >= 7 ? year : year - 1;
   const currentSemester = month >= 1 && month < 7 ? 1 : 0;
   const terms: string[] = [];
-  for (let start = 2021; start <= currentYear; start++) {
-    for (let semester = 0; semester <= (start === currentYear ? currentSemester : 1); semester++) {
+  for (let start = currentYear; start >= 2021; start--) {
+    for (let semester = start === currentYear ? currentSemester : 1; semester >= 0; semester--) {
       terms.push(`${start}/${start + 1} ${semester === 0 ? "Ganjil" : "Genap"}`);
     }
   }

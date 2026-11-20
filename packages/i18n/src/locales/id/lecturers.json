@@ -112,6 +112,7 @@
   "Be the first to review!": "Jadilah yang pertama memberi ulasan!",
   "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "Alamat IP digunakan untuk membatasi pengiriman ulasan dan suka. Alamat IP mentah tidak disimpan pada data ulasan atau suka.",
   "Optional. Leave blank to publish as Anonymous.": "Opsional. Kosongkan untuk terbit sebagai Anonim.",
+  "{{term}} (Current)": "{{term}} (Saat ini)",
   "Select a term": "Pilih semester",
   "The lecturer or course may no longer be available. Refresh the page and try again.": "Dosen atau mata kuliah mungkin sudah tidak tersedia. Muat ulang halaman dan coba lagi."
 }

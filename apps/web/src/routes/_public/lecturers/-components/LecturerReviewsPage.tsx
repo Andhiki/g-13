@@ -24,20 +24,20 @@ export function LecturerReviewsPage() {
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12">
       <div className="mx-auto grid max-w-4xl gap-6 sm:gap-8">
         <header>
-          <Typography as="h1" variant="title" className="m-0">
-            {text("Lecturers and reviews")}
-          </Typography>
+          <div className="flex items-center gap-2">
+            <Typography as="h1" variant="title" className="m-0">
+              {text("Lecturers and reviews")}
+            </Typography>
+            <RatingGuidePopover />
+          </div>
           <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
             {text("Browse community experiences with Ilmu Komputer UGM lecturers.")}
           </Typography>
-          <div className="mt-4 flex items-center gap-2">
-            <RatingGuidePopover />
-          </div>
         </header>
         <div className="min-w-0">
           <section aria-label={text("Search and sort")}>
-            <div className="flex items-center gap-2">
-              <label className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex h-9 min-w-32 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
                 <span className="sr-only">{text("Search lecturers or courses")}</span>
                 <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
                 <input
