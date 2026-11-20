@@ -116,18 +116,6 @@ export async function getNotificationCounts(
   };
 }
 
-export async function countUnreadNotifications(
-  db: Database,
-  viewer: NotificationViewer,
-): Promise<number> {
-  const [row] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(notifications)
-    .innerJoin(notificationEvents, eq(notifications.eventId, notificationEvents.id))
-    .where(filterCondition(viewer, "unread"));
-  return Number(row?.count ?? 0);
-}
-
 export async function markNotificationRead(
   db: Database,
   viewer: NotificationViewer,

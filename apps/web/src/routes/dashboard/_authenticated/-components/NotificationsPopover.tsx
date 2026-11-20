@@ -13,7 +13,7 @@ import { AlignPopover } from "@/ui/popover";
 import { SmallLoading } from "@/ui/small-loading";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import { notificationsQuery, unreadNotificationCountQuery } from "../notifications/-client/queries";
+import { notificationsQuery } from "../notifications/-client/queries";
 import {
   archiveNotificationAction,
   markAllNotificationsAsRead,
@@ -27,13 +27,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "top
   const { text, language } = useLocale("notifications");
   const queryClient = useQueryClient();
 
-  const unreadQuery = useQuery(unreadNotificationCountQuery());
-  const listQuery = useQuery({
-    ...notificationsQuery(0, "unread"),
-    enabled: open,
-  });
-
-  const unreadCount = listQuery.data?.counts.unread ?? unreadQuery.data?.unread ?? 0;
+  const listQuery = useQuery({ ...notificationsQuery(0, "unread"), enabled: false });
+  const unreadCount = listQuery.data?.counts.unread ?? 0;
   const items = (listQuery.data?.rows ?? []).slice(0, 8);
 
   async function invalidateNotifications() {

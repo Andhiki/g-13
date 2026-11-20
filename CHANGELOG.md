@@ -16,6 +16,8 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Changed
 
+- Admin dapat mencabut akses moderasi lewat pilihan peran User. Notifikasi dimuat saat dashboard dibuka dan diperbarui setiap menit selama jendela aktif.
+
 - Sidebar, panel detail, dan pemilih peran dashboard kini membuka dan menutup dengan transisi.
 
 - Panel notifikasi menggunakan indikator muat ringkas.

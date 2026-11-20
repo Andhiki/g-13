@@ -4,7 +4,6 @@ import type { NotificationViewer } from "../-shared/audience";
 import type { NotificationFilter } from "../-shared/schemas";
 import {
   archiveNotification,
-  countUnreadNotifications,
   getNotificationCounts,
   listUserNotifications,
   markAllNotificationsRead,
@@ -32,14 +31,6 @@ export async function inspectNotifications(
     getNotificationCounts(db, actor),
   ]);
   return { data: { rows, counts }, error: null };
-}
-
-export async function getUnreadNotificationCount(
-  db: Database,
-  actor: Actor,
-): Promise<NotificationOperationResult<{ unread: number }>> {
-  const unread = await countUnreadNotifications(db, actor);
-  return { data: { unread }, error: null };
 }
 
 export async function readNotification(

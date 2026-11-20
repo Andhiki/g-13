@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { loadNotifications, loadUnreadNotificationCount } from "../-server/handler";
+import { loadNotifications } from "../-server/handler";
 import type { NotificationFilter } from "../-shared/schemas";
 
 const dashboardStaleTime = 5 * 60 * 1000;
@@ -10,13 +10,5 @@ export function notificationsQuery(offset = 0, filter: NotificationFilter = "all
     queryFn: () => loadNotifications({ data: { offset, filter } }),
     staleTime: dashboardStaleTime,
     refetchOnWindowFocus: false,
-  });
-}
-
-export function unreadNotificationCountQuery() {
-  return queryOptions({
-    queryKey: ["notifications", "unread-count"],
-    queryFn: () => loadUnreadNotificationCount(),
-    staleTime: 30_000,
   });
 }

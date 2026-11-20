@@ -7,7 +7,6 @@ import { notificationIdSchema, notificationsPageSchema } from "../-shared/schema
 import { rejectNotificationOperation } from "./failures";
 import {
   archiveUserNotification,
-  getUnreadNotificationCount,
   inspectNotifications,
   readAllNotifications,
   readNotification,
@@ -26,17 +25,6 @@ export const loadNotifications = createServerFn({ method: "GET" })
       ...result.data,
       identity: { id: session.user.id, name: session.user.name, role: session.user.role },
     };
-  });
-
-export const loadUnreadNotificationCount = createServerFn({ method: "GET" })
-  .middleware([authenticatedMiddleware])
-  .handler(async ({ context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      getUnreadNotificationCount(createDatabase(env.DB), session.user),
-    );
-    if (result.error !== null) rejectNotificationOperation(result.error);
-    return result.data;
   });
 
 export const markNotificationAsRead = createServerFn({ method: "POST" })

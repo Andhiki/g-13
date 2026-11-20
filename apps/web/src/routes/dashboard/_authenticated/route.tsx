@@ -1,8 +1,11 @@
+import { useSyncExternalStore } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, isMatch, Outlet, redirect, useMatches } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
 import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
 import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
+import { notificationsQuery } from "./notifications/-client/queries";
 import { Typography } from "@/ui/typography";
 
 export const Route = createFileRoute("/dashboard/_authenticated")({
@@ -19,9 +22,28 @@ export const Route = createFileRoute("/dashboard/_authenticated")({
   component: AdminLayout,
 });
 
+function subscribeToWindowFocus(onChange: () => void) {
+  window.addEventListener("focus", onChange);
+  window.addEventListener("blur", onChange);
+  return () => {
+    window.removeEventListener("focus", onChange);
+    window.removeEventListener("blur", onChange);
+  };
+}
+
 function AdminLayout() {
   const identityMatch = useMatches().find((match) => isMatch(match, "loaderData.identity"));
   const identity = identityMatch?.loaderData?.identity;
+  const focused = useSyncExternalStore(
+    subscribeToWindowFocus,
+    () => document.hasFocus(),
+    () => false,
+  );
+  useQuery({
+    ...notificationsQuery(0, "unread"),
+    enabled: !!identity,
+    refetchInterval: focused ? 60_000 : false,
+  });
   return (
     <AdminLayoutProvider>
       <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">

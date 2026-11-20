@@ -11,7 +11,6 @@ import { createTestPlatformProxy } from "@/test/database";
 import { NOTIFICATION_ERRORS } from "../-shared/errors";
 import {
   archiveUserNotification,
-  getUnreadNotificationCount,
   inspectNotifications,
   readAllNotifications,
   readNotification,
@@ -107,7 +106,7 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
 
     // Read, mark-all-read, archive, and filter transitions.
     expect((await readNotification(db, admin, adminNotifId)).error).toBeNull();
-    expect((await getUnreadNotificationCount(db, admin)).data?.unread).toBe(0);
+    expect((await inspectNotifications(db, admin)).data?.counts.unread).toBe(0);
     expect((await archiveUserNotification(db, admin, adminNotifId)).error).toBeNull();
     const archived = await inspectNotifications(db, admin, 0, "archived");
     expect(archived.data?.counts).toEqual({ all: 0, unread: 0, archived: 1 });

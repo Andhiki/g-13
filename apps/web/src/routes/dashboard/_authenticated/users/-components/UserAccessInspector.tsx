@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { RiCheckLine, RiCloseLine, RiUserForbidLine, RiUserSettingsLine } from "@remixicon/react";
-import { canManageUsers, canModerate, type Role } from "@g13/auth";
+import { RiCheckLine, RiCloseLine, RiUserSettingsLine } from "@remixicon/react";
+import { canManageUsers, canModerate } from "@g13/auth";
 import { AlignAvatar } from "@/ui/avatar";
 import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
@@ -10,9 +10,9 @@ import type { loadAdminUsers } from "../-server/handler";
 import type { AssignRoleInput } from "../-shared/schemas";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
-type PrivilegedRole = Extract<Role, "maintainer" | "admin">;
+type AssignableRole = AssignRoleInput["role"];
 
-const roleOptions: Array<{ value: PrivilegedRole; label: string; description: string }> = [
+const roleOptions: Array<{ value: AssignableRole; label: string; description: string }> = [
   {
     value: "maintainer",
     label: "Maintainer",
@@ -22,6 +22,11 @@ const roleOptions: Array<{ value: PrivilegedRole; label: string; description: st
     value: "admin",
     label: "Admin",
     description: "Moderate reviews and manage users.",
+  },
+  {
+    value: "user",
+    label: "User",
+    description: "No moderation access.",
   },
 ];
 
@@ -36,7 +41,7 @@ export function UserAccessInspector({
 }) {
   const approved = canModerate(user.role);
   const [step, setStep] = useState<"idle" | "choose-role">("idle");
-  const [role, setRole] = useState<PrivilegedRole>(user.role === "admin" ? "admin" : "maintainer");
+  const [role, setRole] = useState<AssignableRole>(user.role === "admin" ? "admin" : "maintainer");
   const choosing = step === "choose-role";
   const ownAccount = user.id === identityId;
   const previewRole = ownAccount || step === "idle" ? user.role : role;
@@ -134,31 +139,19 @@ export function UserAccessInspector({
             <div className="min-h-0 overflow-clip">
               <div className="p-3 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-0 motion-reduce:transition-none">
                 {approved ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    <AlignButton.Root
-                      size="small"
-                      variant="neutral"
-                      mode="stroke"
-                      className="w-full gap-1.5 text-label-xs"
-                      onClick={() => {
-                        setRole(user.role === "admin" ? "admin" : "maintainer");
-                        setStep("choose-role");
-                      }}
-                    >
-                      <RiUserSettingsLine className="size-3.5" />
-                      Change role
-                    </AlignButton.Root>
-                    <AlignButton.Root
-                      size="small"
-                      variant="error"
-                      mode="lighter"
-                      className="w-full gap-1.5 text-label-xs"
-                      onClick={() => onAssign({ userId: user.id, role: "user" }, user.name)}
-                    >
-                      <RiUserForbidLine className="size-3.5" />
-                      Revoke
-                    </AlignButton.Root>
-                  </div>
+                  <AlignButton.Root
+                    size="small"
+                    variant="neutral"
+                    mode="stroke"
+                    className="w-full gap-1.5 text-label-xs"
+                    onClick={() => {
+                      setRole(user.role === "admin" ? "admin" : "maintainer");
+                      setStep("choose-role");
+                    }}
+                  >
+                    <RiUserSettingsLine className="size-3.5" />
+                    Change role
+                  </AlignButton.Root>
                 ) : (
                   <AlignFancyButton.Root
                     size="small"
@@ -184,37 +177,39 @@ export function UserAccessInspector({
                   Choose role
                 </Typography>
                 <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
-                  {roleOptions.map((option) => {
-                    const selected = role === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        onClick={() => setRole(option.value)}
-                        className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
-                          selected
-                            ? "border-primary-base bg-primary-alpha-10"
-                            : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <Typography
-                            as="span"
-                            variant="labelSmall"
-                            className="text-text-strong-950"
-                          >
-                            {option.label}
+                  {roleOptions
+                    .filter((option) => approved || option.value !== "user")
+                    .map((option) => {
+                      const selected = role === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() => setRole(option.value)}
+                          className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
+                            selected
+                              ? "border-primary-base bg-primary-alpha-10"
+                              : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <Typography
+                              as="span"
+                              variant="labelSmall"
+                              className="text-text-strong-950"
+                            >
+                              {option.label}
+                            </Typography>
+                            {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
+                          </div>
+                          <Typography variant="caption" className="mt-0.5 block text-text-sub-600">
+                            {option.description}
                           </Typography>
-                          {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
-                        </div>
-                        <Typography variant="caption" className="mt-0.5 block text-text-sub-600">
-                          {option.description}
-                        </Typography>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <AlignButton.Root
