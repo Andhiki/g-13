@@ -16,7 +16,6 @@ import {
   type CommandProps,
   type CommandShortcutState,
 } from "@ui-sdk/react/command";
-import type { DialogContentProps } from "@radix-ui/react-dialog";
 import type { PartProps } from "@ui-sdk/react/primitive";
 import { twMerge } from "tailwind-merge";
 import { tv, type VariantProps } from "tailwind-variants";
@@ -40,7 +39,7 @@ type DialogProps = CommandProps & {
   children: React.ReactNode;
   className?: string;
   overlayClassName?: string;
-  onCloseAutoFocus?: DialogContentProps["onCloseAutoFocus"];
+  onCloseAutoFocus?: React.ComponentProps<typeof AlignModal.Content>["onCloseAutoFocus"];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
