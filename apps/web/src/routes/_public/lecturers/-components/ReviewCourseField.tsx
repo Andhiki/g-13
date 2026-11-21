@@ -86,7 +86,7 @@ export function ReviewCourseField({
             }
           }}
         >
-          <div className="flex h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16">
+          <div className="flex h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 px-3 transition-colors focus-within:border-stroke-strong-950">
             <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
             <AlignCommandMenu.Input
               asChild
@@ -95,7 +95,7 @@ export function ReviewCourseField({
               aria-expanded={open}
               aria-invalid={Boolean(error)}
               aria-describedby={error ? `${id}-error` : undefined}
-              className="h-full min-w-0 text-base sm:text-paragraph-sm"
+              className="h-full min-w-0 text-base outline-none sm:text-paragraph-sm"
               value={
                 open
                   ? query
