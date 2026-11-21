@@ -3,14 +3,18 @@
   "settings": {
     "shadcn": {
       "componentImports": ["^@/ui(/|$)"],
-      "themeImports": ["^@/ui/"]
+      "themeImports": ["^@/ui/"],
+      "mergeFunctions": ["clsx", "cn", "twMerge"],
+      "variantFunctions": ["tv", "createTV"]
     }
   },
   "overrides": [
     {
       "files": ["apps/web/src/**/*.{ts,tsx}"],
       "rules": {
-        "shadcn/no-raw-colors": "error"
+        "shadcn/no-raw-colors": "error",
+        "shadcn/no-unknown-classes": ["error", { "allow": ["nodrag", "nopan"] }],
+        "shadcn/require-static-classes": "error"
       }
     }
   ]

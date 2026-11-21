@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { RiCloseLine, RiEditLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import {
   AdminTableInspectButton,
@@ -16,20 +17,19 @@ export const announcementTableColumns = "lg:grid-cols-[minmax(0,1fr)_200px_110px
 
 export type AdminAnnouncement = Awaited<ReturnType<typeof loadAdminAnnouncements>>["rows"][number];
 
-const statusBadgeClass: Record<string, string> = {
-  live: "bg-success-lighter text-success-dark",
-  scheduled: "bg-information-lighter text-information-base",
-  expired: "bg-bg-weak-50 text-text-sub-600",
-  disabled: "bg-error-lighter text-error-dark",
-};
-
 function AnnouncementStatusBadge({ announcement }: { announcement: AdminAnnouncement }) {
   const status = resolveAnnouncementStatus(announcement);
   return (
     <AlignBadge.Root
       size="medium"
       variant="light"
-      className={`shrink-0 ${statusBadgeClass[status]}`}
+      className={clsx(
+        "shrink-0",
+        status === "live" && "bg-success-lighter text-success-dark",
+        status === "scheduled" && "bg-information-lighter text-information-base",
+        status === "expired" && "bg-bg-weak-50 text-text-sub-600",
+        status === "disabled" && "bg-error-lighter text-error-dark",
+      )}
     >
       {announcementStatusLabel(status)}
     </AlignBadge.Root>
