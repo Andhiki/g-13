@@ -8,6 +8,8 @@ For curriculum and exam archive work, use the corresponding `gthirteen` skill. B
 
 For browser preview failures caused by missing Linux libraries, see [docs/browser-preview.md](docs/browser-preview.md).
 
+Before using ui-sdk, follow the `ui-sdk` skill in `.agents/skills/ui-sdk/` and read `apps/web/node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `apps/web/node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it.
+
 ## Lessons
 
 - When diagnosing caching, reproduce client navigation and retry requests before treating document cache hits as proof the user flow works.
