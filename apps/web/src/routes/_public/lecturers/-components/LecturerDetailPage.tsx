@@ -264,7 +264,9 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         </section>
       </div>
       <ReviewSubmissionDialog
-        courses={data.courses}
+        initialCourse={
+          courseId ? data.lecturer.courses.find(({ id }) => id === courseId) : undefined
+        }
         lecturerId={data.lecturer.id}
         lecturerName={data.lecturer.name}
         courseId={courseId ?? ""}

@@ -110,6 +110,7 @@ export function AdminFormField({
   placeholder,
   error,
   type = "text",
+  readOnly = false,
   onChange,
 }: {
   id: string;
@@ -120,6 +121,7 @@ export function AdminFormField({
   placeholder: string;
   error?: string;
   type?: "text" | "datetime-local";
+  readOnly?: boolean;
   onChange: (value: string) => void;
 }) {
   const errorId = `${id}-error`;
@@ -141,9 +143,10 @@ export function AdminFormField({
         maxLength={type === "text" ? maxLength : undefined}
         placeholder={placeholder}
         value={value}
+        readOnly={readOnly}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={fieldControlClass}
+        className={readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass}
         onChange={(event) => onChange(event.target.value)}
       />
       {error && (

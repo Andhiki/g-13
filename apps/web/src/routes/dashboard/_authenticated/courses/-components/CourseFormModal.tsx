@@ -89,6 +89,7 @@ function CourseFormBody({
         maxLength={40}
         placeholder="e.g. PACS262301"
         value={code}
+        readOnly={editing}
         error={fieldErrors.code}
         onChange={(value) => {
           setCode(value);

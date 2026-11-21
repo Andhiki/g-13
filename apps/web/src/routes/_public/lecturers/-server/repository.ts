@@ -1,13 +1,55 @@
-import { and, asc, eq, isNull, lt, lte, sql } from "drizzle-orm";
+import { and, asc, eq, gt, isNull, lt, lte, sql, or, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
+import type { CoursePickerCursor, CoursePickerInput } from "../-shared/schemas";
+import type { ReviewCourseOption } from "../-shared/course-search";
 
 type Database = ReturnType<typeof createDatabase>;
 const visibleReview = and(eq(reviews.status, "published"), isNull(reviews.deletedAt));
 const activeCourse = isNull(courses.deletedAt);
 const activeLecturer = isNull(lecturers.deletedAt);
+const COURSE_PICKER_PAGE_SIZE = 20;
+
+// Substring search over code and both names; %, _ and \ are taken literally.
+function courseSearchCondition(query: string): SQL | undefined {
+  if (!query) return undefined;
+  const pattern = `%${query.replaceAll(/[\\%_]/gu, "\\$&")}%`;
+  return or(
+    sql`${courses.code} like ${pattern} escape '\\'`,
+    sql`${courses.nameId} like ${pattern} escape '\\'`,
+    sql`${courses.nameEn} like ${pattern} escape '\\'`,
+  );
+}
+
+export async function getCoursePickerPage(
+  db: Database,
+  input: CoursePickerInput,
+): Promise<{ rows: ReviewCourseOption[]; nextCursor: CoursePickerCursor | null }> {
+  const sortName = input.language === "en" ? courses.nameEn : courses.nameId;
+  const cursor = input.cursor;
+  // Keyset pagination: rows strictly after (name, id) in (sort name, id) ascending order.
+  const afterCursor = cursor
+    ? or(gt(sortName, cursor.name), and(eq(sortName, cursor.name), gt(courses.id, cursor.id)))
+    : undefined;
+  const rows = await db
+    .select({ id: courses.id, code: courses.code, nameId: courses.nameId, nameEn: courses.nameEn })
+    .from(courses)
+    .where(and(activeCourse, afterCursor, courseSearchCondition(input.query)))
+    .orderBy(asc(sortName), asc(courses.id))
+    .limit(COURSE_PICKER_PAGE_SIZE + 1);
+
+  const page = rows.slice(0, COURSE_PICKER_PAGE_SIZE);
+  const last = page.at(-1);
+  return {
+    rows: page,
+    nextCursor:
+      last && rows.length > page.length
+        ? { name: input.language === "en" ? last.nameEn : last.nameId, id: last.id }
+        : null,
+  };
+}
 
 async function getCourseCatalog(db: Database) {
   return db

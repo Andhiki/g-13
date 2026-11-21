@@ -8,7 +8,8 @@ import { REVIEW_ERRORS } from "../-shared/errors";
 import { submissionInputSchema } from "../-shared/submission-schema";
 import { setReviewLike } from "./likes.service";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
-import { getBrowserReviewLikes } from "./repository";
+import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
+import type { CoursePickerCursor } from "../-shared/schemas";
 import { submitReview } from "./submission.service";
 
 const rawInput = {
@@ -164,6 +165,84 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("pages the review course picker by keyset, orders by the active language, and searches code and names", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    const deletedAt = new Date("2026-11-01T00:00:00Z");
+    await db.insert(courses).values([
+      ...Array.from({ length: 21 }, (_, index) => {
+        const n = String(index + 1).padStart(2, "0");
+        return {
+          id: `c${n}`,
+          code: `PAC${n}`,
+          nameId: `Kuliah ${n}`,
+          nameEn: `Course ${String(22 - index - 1).padStart(2, "0")}`,
+        };
+      }),
+      { id: "pacs", code: "PACS262", nameId: "Basis Data", nameEn: "Databases" },
+      { id: "lanjut", code: "PACS270", nameId: "Basis Data Lanjut", nameEn: "Advanced Databases" },
+      { id: "deleted", code: "PACS999", nameId: "Dihapus", nameEn: "Deleted", deletedAt },
+    ]);
+
+    // Sorted by the active language's display name then id; only active courses page through.
+    const inIndonesian = await getCoursePickerPage(db, { cursor: null, query: "", language: "id" });
+    expect(inIndonesian.rows.map((row) => row.id)).toEqual([
+      "pacs",
+      "lanjut",
+      ...Array.from({ length: 18 }, (_, index) => `c${String(index + 1).padStart(2, "0")}`),
+    ]);
+    expect(inIndonesian.nextCursor).toEqual({ name: "Kuliah 18", id: "c18" });
+
+    const walkedIndonesian: string[] = [];
+    let cursor: CoursePickerCursor | null = null;
+    do {
+      const page = await getCoursePickerPage(db, { cursor, query: "", language: "id" });
+      walkedIndonesian.push(...page.rows.map((row) => row.id));
+      cursor = page.nextCursor;
+    } while (cursor);
+    expect(walkedIndonesian).toEqual([
+      "pacs",
+      "lanjut",
+      ...Array.from({ length: 21 }, (_, index) => `c${String(index + 1).padStart(2, "0")}`),
+    ]);
+    expect(walkedIndonesian).toHaveLength(23);
+    expect(new Set(walkedIndonesian).size).toBe(walkedIndonesian.length);
+
+    const walkedEnglish: string[] = [];
+    cursor = null;
+    do {
+      const page = await getCoursePickerPage(db, { cursor, query: "", language: "en" });
+      walkedEnglish.push(...page.rows.map((row) => row.id));
+      cursor = page.nextCursor;
+    } while (cursor);
+    expect(walkedEnglish).toEqual([
+      "lanjut",
+      ...Array.from({ length: 21 }, (_, index) => `c${String(21 - index).padStart(2, "0")}`),
+      "pacs",
+    ]);
+
+    // Search matches code, nameId, and nameEn case-insensitively; LIKE wildcards stay literal.
+    expect(
+      await getCoursePickerPage(db, { cursor: null, query: "pacs262", language: "id" }),
+    ).toEqual({
+      rows: [{ id: "pacs", code: "PACS262", nameId: "Basis Data", nameEn: "Databases" }],
+      nextCursor: null,
+    });
+    expect(
+      (
+        await getCoursePickerPage(db, { cursor: null, query: "BASIS DATA", language: "id" })
+      ).rows.map((row) => row.id),
+    ).toEqual(["pacs", "lanjut"]);
+    expect(await getCoursePickerPage(db, { cursor: null, query: "%", language: "en" })).toEqual({
+      rows: [],
+      nextCursor: null,
+    });
   } finally {
     await platform.dispose();
   }

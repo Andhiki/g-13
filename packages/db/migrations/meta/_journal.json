@@ -15,6 +15,13 @@
       "when": 1795189012996,
       "tag": "0001_third_ultimates",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795245425575,
+      "tag": "0002_brown_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

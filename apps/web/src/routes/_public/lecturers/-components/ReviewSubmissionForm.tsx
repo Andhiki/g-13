@@ -11,6 +11,7 @@ import { AlignModal } from "@/ui/modal";
 import { useLocale } from "@/useLocale";
 import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
+import type { ReviewCourseOption } from "../-shared/course-search";
 import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import type { ReviewSubmissionInput } from "../-shared/submission-schema";
@@ -18,9 +19,6 @@ import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submissio
 import { publishLecturerReviewMutationOptions } from "../-client/mutations";
 import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
-export type ReviewFormData = {
-  courses: { id: string; code: string; nameId: string; nameEn: string }[];
-};
 const row = "grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6";
 const control =
   "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
@@ -43,14 +41,14 @@ const metrics = [
   },
 ] satisfies { name: keyof typeof initialRatings; label: string; hint: string }[];
 export function ReviewSubmissionForm({
-  courses,
+  initialCourse,
   lecturerId,
   lecturerName,
   initialCourseId,
   onClose,
   onPublished,
 }: {
-  courses: ReviewFormData["courses"];
+  initialCourse?: ReviewCourseOption;
   lecturerId: string;
   lecturerName: string;
   initialCourseId: string;
@@ -209,7 +207,7 @@ export function ReviewSubmissionForm({
             </div>
           </div>
           <ReviewCourseField
-            courses={courses}
+            initialCourse={initialCourse}
             value={courseId}
             onChange={(value) => {
               setCourseId(value);
@@ -331,7 +329,7 @@ export function ReviewSubmissionForm({
             isLoading={isSubmitting}
             icon={<RiArrowRightLine className="size-5" />}
             iconPosition="end"
-            disabled={!courses.length || isSubmitting}
+            disabled={isSubmitting}
             className="w-full text-paragraph-sm sm:w-auto"
           >
             <Typography as="span" variant="paragraph">

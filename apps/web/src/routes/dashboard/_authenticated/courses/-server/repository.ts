@@ -1,8 +1,7 @@
-import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
-import { allocateCatalogId } from "@/routes/dashboard/_authenticated/-server/slug";
 import type {
   CourseLifecycleInput,
   CourseStatus,
@@ -11,12 +10,6 @@ import type {
 } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
-
-async function allocateCourseId(db: Database, code: string): Promise<string> {
-  return allocateCatalogId(code, "course", (pattern) =>
-    db.select({ id: courses.id }).from(courses).where(like(courses.id, pattern)),
-  );
-}
 
 export async function listAdminCourses(db: Database, offset: number, status: CourseStatus) {
   return db
@@ -47,12 +40,20 @@ export async function getAdminCourseCounts(db: Database) {
   return counts;
 }
 
+export async function courseCodeExists(db: Database, code: string): Promise<boolean> {
+  const [existing] = await db
+    .select({ id: courses.id })
+    .from(courses)
+    .where(eq(courses.id, code))
+    .limit(1);
+  return existing !== undefined;
+}
+
 export async function createCourseRecord(db: Database, input: CreateCourseInput) {
-  const id = await allocateCourseId(db, input.code);
   const [created] = await db
     .insert(courses)
     .values({
-      id,
+      id: input.code,
       code: input.code,
       nameId: input.nameId,
       nameEn: input.nameEn,
@@ -71,7 +72,6 @@ export async function updateCourseRecord(db: Database, input: UpdateCourseInput)
   const [updated] = await db
     .update(courses)
     .set({
-      code: input.code,
       nameId: input.nameId,
       nameEn: input.nameEn,
     })

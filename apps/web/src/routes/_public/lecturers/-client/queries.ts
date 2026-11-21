@@ -1,13 +1,29 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { notFound } from "@tanstack/react-router";
+import type { Language } from "@g13/i18n";
 import {
   loadBrowserLikes,
+  loadCoursePickerPage,
   loadLecturerDetail,
   loadLecturerDirectory,
   loadTurnstileSiteKey,
 } from "../-server/handler";
+import type { CoursePickerCursor } from "../-shared/schemas";
 
 const publicDataStaleTime = 5 * 60 * 1000;
+const firstPage: CoursePickerCursor | null = null;
+
+export function coursePickerQueryOptions(query: string, language: Language) {
+  return infiniteQueryOptions({
+    queryKey: ["lecturer-reviews", "course-picker", language, query],
+    queryFn: ({ pageParam }: { pageParam: CoursePickerCursor | null }) =>
+      loadCoursePickerPage({ data: { cursor: pageParam, query, language } }),
+    initialPageParam: firstPage,
+    getNextPageParam: (page) => page.nextCursor,
+    staleTime: publicDataStaleTime,
+    refetchOnWindowFocus: false,
+  });
+}
 
 export function turnstileSiteKeyQueryOptions() {
   return queryOptions({
