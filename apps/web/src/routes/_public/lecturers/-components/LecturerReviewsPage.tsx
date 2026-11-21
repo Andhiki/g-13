@@ -30,12 +30,6 @@ export function LecturerReviewsPage() {
             </Typography>
             <RatingGuidePopover />
           </div>
-<<<<<<< HEAD
-=======
-          <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
-            {text("Browse community experiences with Ilmu Komputer UGM lecturers.")}
-          </Typography>
->>>>>>> 9c802dd (refactor(ui): own typography color, weight, and button density in variants)
         </header>
         <div className="min-w-0">
           <section aria-label={text("Search and sort")}>

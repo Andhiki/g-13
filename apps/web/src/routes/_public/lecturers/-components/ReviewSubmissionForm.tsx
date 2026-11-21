@@ -332,7 +332,7 @@ export function ReviewSubmissionForm({
             icon={<RiArrowRightLine className="size-5" />}
             iconPosition="end"
             disabled={isSubmitting}
-            className="w-full text-paragraph-sm sm:w-auto"
+            className="w-full sm:w-auto"
           >
             <Typography as="span" variant="paragraph">
               {text("Publish review")}
