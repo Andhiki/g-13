@@ -54,16 +54,22 @@ export function AdminReviewRow({
           code={review.courseCode}
           name={language === "en" ? review.courseNameEn : review.courseNameId}
         />
-        <Typography variant="caption" className="block truncate text-text-sub-600">
+        <Typography variant="caption" color="muted" className="block truncate">
           {review.termLabel}
         </Typography>
       </div>
 
       <div className="min-w-0">
-        <Typography className="whitespace-pre-wrap break-words text-[13px] leading-5 text-text-strong-950 xl:line-clamp-2">
+        <Typography
+          color="strong"
+          className={
+            // oxlint-disable-next-line shadcn/no-restyle -- moderation row body tuned to 13px alongside its two-line clamp; no label scale matches
+            "whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
+          }
+        >
           {review.body}
         </Typography>
-        <Typography variant="caption" className="mt-1 block text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-1 block">
           {review.authorName}
         </Typography>
       </div>
@@ -82,7 +88,7 @@ export function AdminReviewRow({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             onClick={() =>
               onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
             }
@@ -94,7 +100,7 @@ export function AdminReviewRow({
             size="xxsmall"
             variant="error"
             mode="ghost"
-            className="gap-1 text-label-xs text-error-dark"
+            compact
             onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
           >
             <RiDeleteBinLine className="size-3.5" />

@@ -59,7 +59,8 @@ export function UserAccessInspector({
                       size="small"
                       variant="neutral"
                       mode="stroke"
-                      className="w-full gap-1.5 text-label-xs"
+                      compact
+                      className="w-full"
                       onClick={() => {
                         setRole(user.role === "admin" ? "admin" : "maintainer");
                         setStep("choose-role");
@@ -71,7 +72,8 @@ export function UserAccessInspector({
                   ) : (
                     <AlignFancyButton.Root
                       size="small"
-                      className="w-full text-label-xs"
+                      compact
+                      className="w-full"
                       onClick={() => {
                         setRole("maintainer");
                         setStep("choose-role");
@@ -89,7 +91,7 @@ export function UserAccessInspector({
             >
               <div className="min-h-0 overflow-clip">
                 <div className="space-y-3 p-3 opacity-0 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-100 motion-reduce:transition-none">
-                  <Typography as="h3" variant="labelSmall" className="text-text-strong-950">
+                  <Typography as="h3" variant="labelSmall" color="strong">
                     Choose role
                   </Typography>
                   <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
@@ -111,23 +113,18 @@ export function UserAccessInspector({
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <Typography
-                                as="span"
-                                variant="labelSmall"
-                                className="flex items-center gap-2 text-text-strong-950"
-                              >
+                              <span className="flex items-center gap-2">
                                 <option.Icon
                                   aria-hidden="true"
                                   className="size-4 shrink-0 text-text-sub-600"
                                 />
-                                {option.label}
-                              </Typography>
+                                <Typography as="span" variant="labelSmall" color="strong">
+                                  {option.label}
+                                </Typography>
+                              </span>
                               {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
                             </div>
-                            <Typography
-                              variant="caption"
-                              className="mt-0.5 block text-text-sub-600"
-                            >
+                            <Typography variant="caption" color="muted" className="mt-0.5 block">
                               {option.description}
                             </Typography>
                           </button>
@@ -139,14 +136,16 @@ export function UserAccessInspector({
                       size="small"
                       variant="neutral"
                       mode="stroke"
-                      className="w-full text-label-xs"
+                      compact
+                      className="w-full"
                       onClick={() => setStep("idle")}
                     >
                       Cancel
                     </AlignButton.Root>
                     <AlignFancyButton.Root
                       size="small"
-                      className="w-full text-label-xs"
+                      compact
+                      className="w-full"
                       disabled={approved && role === user.role}
                       onClick={() => onAssign({ userId: user.id, role }, user.name)}
                     >
@@ -167,7 +166,7 @@ export function UserAccessInspector({
             <Typography as="h2" variant="label">
               {user.name}
             </Typography>
-            <Typography variant="caption" className="break-all text-text-sub-600">
+            <Typography variant="caption" color="muted" className="break-all">
               {user.email}
             </Typography>
           </div>
@@ -205,12 +204,11 @@ export function UserAccessInspector({
         </dl>
       </section>
       {ownAccount && (
-        <Typography
-          variant="caption"
-          className="border-t border-stroke-soft-200 pt-4 text-text-sub-600"
-        >
-          Another admin must change your role.
-        </Typography>
+        <section className="border-t border-stroke-soft-200 pt-4">
+          <Typography variant="caption" color="muted">
+            Another admin must change your role.
+          </Typography>
+        </section>
       )}
     </AdminInspectorPanel>
   );

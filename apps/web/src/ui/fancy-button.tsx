@@ -32,7 +32,20 @@ const fancyButton = tv({
       xxsmall:
         "h-7 gap-1.5 rounded-lg px-2.5 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
     },
+    compact: { true: "" },
   },
+  compoundVariants: [
+    {
+      size: "small",
+      compact: true,
+      class: "gap-1.5 text-label-xs",
+    },
+    {
+      size: "medium",
+      compact: true,
+      class: "gap-2 px-3",
+    },
+  ],
   defaultVariants: { size: "medium" },
 });
 
@@ -43,6 +56,7 @@ type FancyButtonProps = ComponentProps<"button"> &
 function Root({
   asChild = false,
   size,
+  compact,
   className,
   type = "button",
   isLoading = false,
@@ -52,7 +66,7 @@ function Root({
   children,
   ...props
 }: FancyButtonProps) {
-  const classes = fancyButton({ size, className });
+  const classes = fancyButton({ size, compact, className });
   if (asChild) {
     return (
       <Slot className={classes} {...props}>

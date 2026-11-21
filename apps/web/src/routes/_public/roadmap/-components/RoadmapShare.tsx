@@ -26,7 +26,7 @@ export function RoadmapShare({ selection }: { selection: string }) {
                 variant="neutral"
                 mode="stroke"
                 onClick={() => void sharePlan()}
-                className="nodrag nopan pointer-events-auto"
+                className="pointer-events-auto"
               >
                 <span className="relative size-5" aria-hidden="true">
                   {[
@@ -71,13 +71,13 @@ export function RoadmapShare({ selection }: { selection: string }) {
       >
         <AlignModal.Content>
           <div className="p-5">
-            <AlignModal.Title asChild>
-              <Typography as="h2" variant="subtitle1" className="pr-8">
+            <AlignModal.Title asChild className="pr-8">
+              <Typography as="h2" variant="subtitle1">
                 {text("Bagikan roadmap")}
               </Typography>
             </AlignModal.Title>
             <AlignModal.Description asChild>
-              <Typography as="p" variant="paragraph" className="mt-2 text-text-sub-600">
+              <Typography as="p" variant="paragraph" color="muted" className="mt-2">
                 {text("Salin tautan ini untuk membuka rencana yang sama.")}
               </Typography>
             </AlignModal.Description>

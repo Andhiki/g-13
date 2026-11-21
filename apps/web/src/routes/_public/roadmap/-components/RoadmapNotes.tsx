@@ -26,7 +26,7 @@ export function RoadmapNotes({
               <AlignButton.Root
                 variant="neutral"
                 mode="stroke"
-                className="size-10 p-0"
+                iconOnly
                 aria-label={text("Catatan roadmap")}
               >
                 <RiInformationLine className="size-5" aria-hidden="true" />
@@ -62,7 +62,7 @@ export function RoadmapNotes({
                 : text("Pemeriksaan rencana")}
             </Typography>
             {target === 7 && plan.conflicts.length > 0 && (
-              <Typography as="p" variant="paragraph" className="text-text-sub-600">
+              <Typography as="p" variant="paragraph" color="muted">
                 {text(
                   "Bandingkan target 8 semester untuk mencari ruang tambahan. Skenario 8 semester juga perlu diperiksa.",
                 )}
@@ -79,7 +79,7 @@ export function RoadmapNotes({
                 ))}
               </ul>
             ) : (
-              <Typography variant="paragraph" className="text-text-sub-600">
+              <Typography variant="paragraph" color="muted">
                 {text(
                   "Tidak ada konflik pada pemeriksaan dasar. Ini belum menjamin kelayakan KRS atau kelulusan.",
                 )}
@@ -90,7 +90,7 @@ export function RoadmapNotes({
             <Typography as="h3" variant="subtitle2" className="m-0">
               {text("Asumsi dan sumber")}
             </Typography>
-            <Typography variant="paragraph" className="text-text-sub-600">
+            <Typography variant="paragraph" color="muted">
               {sourceTitle}
               {text(". Semester panduan bukan jadwal penawaran aktual.")}
             </Typography>

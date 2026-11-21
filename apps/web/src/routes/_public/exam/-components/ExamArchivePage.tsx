@@ -155,10 +155,10 @@ export function ExamArchivePage() {
   return (
     <main className="flex h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950 lg:grid lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)]">
       <header className="shrink-0 px-5 py-10 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-        <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
+        <Typography as="h1" variant="pageTitle" className="m-0">
           {text("Arsip Ujian")}
         </Typography>
-        <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
+        <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-5 max-w-md">
           {text("Provided by")}{" "}
           <a
             href="https://himakom.ugm.ac.id"
@@ -176,33 +176,34 @@ export function ExamArchivePage() {
           <Typography className="mb-2">{text("Tip:")}</Typography>
           <ul className="m-0 list-none space-y-1 p-0">
             <li>
-              <Typography as="span" className="flex items-center gap-1.5">
-                <AlignKbd.Root>/</AlignKbd.Root> — {text("Cari mata kuliah")}
-              </Typography>
+              <span className="flex items-center gap-1.5">
+                <AlignKbd.Root>/</AlignKbd.Root>
+                <Typography as="span"> — {text("Cari mata kuliah")}</Typography>
+              </span>
             </li>
             <li>
-              <Typography as="span" className="flex items-center gap-1.5">
-                <AlignKbd.Root>j</AlignKbd.Root> / <AlignKbd.Root>↓</AlignKbd.Root> —{" "}
-                {text("Ke bawah")}
-              </Typography>
+              <span className="flex items-center gap-1.5">
+                <AlignKbd.Root>j</AlignKbd.Root> / <AlignKbd.Root>↓</AlignKbd.Root>
+                <Typography as="span"> — {text("Ke bawah")}</Typography>
+              </span>
             </li>
             <li>
-              <Typography as="span" className="flex items-center gap-1.5">
-                <AlignKbd.Root>k</AlignKbd.Root> / <AlignKbd.Root>↑</AlignKbd.Root> —{" "}
-                {text("Ke atas")}
-              </Typography>
+              <span className="flex items-center gap-1.5">
+                <AlignKbd.Root>k</AlignKbd.Root> / <AlignKbd.Root>↑</AlignKbd.Root>
+                <Typography as="span"> — {text("Ke atas")}</Typography>
+              </span>
             </li>
             <li>
-              <Typography as="span" className="flex items-center gap-1.5">
-                <AlignKbd.Root>Enter</AlignKbd.Root> / <AlignKbd.Root>→</AlignKbd.Root> —{" "}
-                {text("Buka folder atau berkas")}
-              </Typography>
+              <span className="flex items-center gap-1.5">
+                <AlignKbd.Root>Enter</AlignKbd.Root> / <AlignKbd.Root>→</AlignKbd.Root>
+                <Typography as="span">— {text("Buka folder atau berkas")}</Typography>
+              </span>
             </li>
             <li>
-              <Typography as="span" className="flex items-center gap-1.5">
-                <AlignKbd.Root>-</AlignKbd.Root> / <AlignKbd.Root>←</AlignKbd.Root> —{" "}
-                {text("Naik satu folder")}
-              </Typography>
+              <span className="flex items-center gap-1.5">
+                <AlignKbd.Root>-</AlignKbd.Root> / <AlignKbd.Root>←</AlignKbd.Root>
+                <Typography as="span"> — {text("Naik satu folder")}</Typography>
+              </span>
             </li>
           </ul>
         </div>
@@ -272,7 +273,7 @@ export function ExamArchivePage() {
             className="grid shrink-0 grid-cols-[minmax(0,1fr)_64px_72px] items-center gap-2 border-b border-stroke-soft-200 px-3 py-2 text-text-sub-600 sm:grid-cols-[minmax(0,1fr)_140px_76px_84px] sm:gap-4"
             aria-hidden="true"
           >
-            <Typography as="span" variant="caption" className="flex items-center gap-1">
+            <Typography as="span" variant="caption" className="flex items-center">
               {text("Nama")}
             </Typography>
             <Typography as="span" variant="caption" className="hidden text-center sm:block">
@@ -380,11 +381,7 @@ export function ExamArchivePage() {
                     <Typography as="span" className="min-w-0 break-words">
                       {entry.kind === "folder" ? text(entry.name) : entry.name}
                     </Typography>
-                    <Typography
-                      as="span"
-                      variant="caption"
-                      className="text-text-soft-400 sm:hidden"
-                    >
+                    <Typography as="span" variant="caption" color="soft" className="sm:hidden">
                       {text("Dibuat")} {formatCreatedAt(entry.createdAt, relativeTimeFormatter)}
                     </Typography>
                   </span>
@@ -392,7 +389,8 @@ export function ExamArchivePage() {
                 <Typography
                   as="span"
                   variant="caption"
-                  className="hidden text-center text-text-sub-600 sm:block"
+                  color="muted"
+                  className="hidden text-center sm:block"
                 >
                   {formatCreatedAt(entry.createdAt, relativeTimeFormatter)}
                 </Typography>
@@ -415,11 +413,13 @@ export function ExamArchivePage() {
               </Link>
             ))}
             {folder.entries.length === 0 && (
-              <Typography role="status" className="px-3 py-16 text-center text-text-sub-600">
-                {location.length === 0 && query.trim()
-                  ? text("Tidak ada mata kuliah yang cocok.")
-                  : text("Folder kosong")}
-              </Typography>
+              <div className="px-3 py-16 text-center">
+                <Typography color="muted" role="status">
+                  {location.length === 0 && query.trim()
+                    ? text("Tidak ada mata kuliah yang cocok.")
+                    : text("Folder kosong")}
+                </Typography>
+              </div>
             )}
           </div>
         </div>

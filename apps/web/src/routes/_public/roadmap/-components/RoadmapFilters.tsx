@@ -18,8 +18,9 @@ export function RoadmapFilters({
         <Typography
           as="p"
           variant="labelSmall"
+          color="muted"
           id="roadmap-target-label"
-          className="m-0 text-text-sub-600"
+          className="m-0"
         >
           {text("Target selesai")}
         </Typography>
@@ -35,12 +36,7 @@ export function RoadmapFilters({
       </div>
       {answers.iup === "ya" && ["exchange", "internship"].includes(answers.paparan ?? "") && (
         <div className="flex flex-col gap-[5px]">
-          <Typography
-            as="label"
-            variant="labelSmall"
-            htmlFor="roadmap-exposure"
-            className="text-text-sub-600"
-          >
+          <Typography as="label" variant="labelSmall" color="muted" htmlFor="roadmap-exposure">
             {text("Semester exposure")}
           </Typography>
           <AlignSelect.Root

@@ -247,9 +247,11 @@ function AdminAnnouncementsPage() {
             className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
           >
             {announcementsQuery.isError ? (
-              <Typography role="alert" className="p-4">
-                Could not load announcements. Refresh or sign in again.
-              </Typography>
+              <div className="p-4">
+                <Typography role="alert">
+                  Could not load announcements. Refresh or sign in again.
+                </Typography>
+              </div>
             ) : announcementsQuery.isPending ? (
               <DashboardPending />
             ) : (

@@ -33,23 +33,25 @@ function Icon({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function Title({ className, ...props }: ComponentProps<"h3">) {
+function Title({ className, ...props }: Omit<ComponentProps<"h3">, "color">) {
   return (
     <Typography
       as="h3"
       variant="subtitle2"
-      className={twMerge("m-0 text-text-strong-950", className)}
+      color="strong"
+      className={twMerge("m-0", className)}
       {...props}
     />
   );
 }
 
-function Description({ className, ...props }: ComponentProps<"p">) {
+function Description({ className, ...props }: Omit<ComponentProps<"p">, "color">) {
   return (
     <Typography
       as="p"
       variant="paragraph"
-      className={twMerge("mb-0 mt-2 text-pretty text-text-sub-600", className)}
+      color="muted"
+      className={twMerge("mb-0 mt-2 text-pretty", className)}
       {...props}
     />
   );

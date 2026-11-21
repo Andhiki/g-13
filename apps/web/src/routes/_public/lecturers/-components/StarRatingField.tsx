@@ -39,8 +39,9 @@ export function StarRatingField({
           <Typography
             as="p"
             variant="caption"
+            color="muted"
             id={`${id}-hint`}
-            className="mb-0 mt-1 text-text-sub-600"
+            className="mb-0 mt-1"
           >
             {hint}
           </Typography>
@@ -82,12 +83,7 @@ export function StarRatingField({
                 );
               })}
             </div>
-            <Typography
-              as="span"
-              variant="caption"
-              className="text-text-sub-600"
-              aria-live="polite"
-            >
+            <Typography as="span" variant="caption" color="muted" aria-live="polite">
               {value ? `${value}/5` : text("Not rated")}
             </Typography>
           </div>
@@ -95,8 +91,9 @@ export function StarRatingField({
             <Typography
               as="p"
               variant="caption"
+              color="danger"
               id={`${id}-error`}
-              className="mb-0 mt-1 text-error-base"
+              className="mb-0 mt-1"
             >
               {error}
             </Typography>

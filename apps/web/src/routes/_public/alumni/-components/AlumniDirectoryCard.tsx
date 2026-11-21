@@ -22,7 +22,7 @@ export function AlumniDirectoryCard({ alumnus }: { alumnus: AlumniCard }) {
           {alumnus.name}
         </h3>
         {alumnus.linkedin && (
-          <AlignButton.Root asChild variant="neutral" mode="ghost" className="size-10 shrink-0 p-2">
+          <AlignButton.Root asChild variant="neutral" mode="ghost" iconOnly className="shrink-0">
             <a
               href={alumnus.linkedin}
               target="_blank"

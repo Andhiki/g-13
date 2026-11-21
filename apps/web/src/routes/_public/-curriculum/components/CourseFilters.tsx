@@ -16,7 +16,8 @@ export function CurriculumVersionFilter({
       <Typography
         as="p"
         variant="labelSmall"
-        className="m-0 text-text-sub-600"
+        color="muted"
+        className="m-0"
         id="curriculum-version-label"
       >
         {text("Versi kurikulum")}

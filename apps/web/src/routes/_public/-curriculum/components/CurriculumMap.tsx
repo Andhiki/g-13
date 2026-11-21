@@ -164,23 +164,21 @@ function MapTitle({
           className="absolute -top-[144px] flex flex-col items-start gap-4 max-[650px]:-top-[104px]"
           style={{ left: LANE_X + 12 + origin.x, transform: `translateY(${origin.y}px)` }}
         >
-          <Typography
-            as="h1"
-            variant="graphTitle"
-            className="m-0 whitespace-nowrap text-text-strong-950"
-          >
+          <Typography as="h1" variant="graphTitle" color="strong" className="m-0 whitespace-nowrap">
             {text("Everything CS UGM")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="m-0 max-w-xl text-text-sub-600">
+          <Typography as="p" variant="paragraph" color="muted" className="m-0 max-w-xl">
             {text(
               "Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu Komputer UGM.",
             )}
           </Typography>
-          <AlignFancyButton.Root asChild className="pointer-events-auto nodrag nopan">
-            <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-              {text("Buat roadmap sendiri")}
-            </Link>
-          </AlignFancyButton.Root>
+          <span className="pointer-events-auto nodrag nopan">
+            <AlignFancyButton.Root asChild>
+              <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+                {text("Buat roadmap sendiri")}
+              </Link>
+            </AlignFancyButton.Root>
+          </span>
         </div>
       )}
     </ViewportPortal>

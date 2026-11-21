@@ -69,7 +69,10 @@ export function PaperPreview({
               as="h2"
               tabIndex={-1}
               variant="label"
-              className="min-w-0 flex-1 truncate outline-none"
+              className={
+                // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the modal's toolbar buttons
+                "min-w-0 flex-1 truncate outline-none"
+              }
               title={paper?.name}
             >
               {paper?.name}
@@ -91,7 +94,7 @@ export function PaperPreview({
                   variant: "neutral",
                   mode: "stroke",
                   size: "xsmall",
-                  className: "size-8 p-0",
+                  iconOnly: true,
                 })}
               >
                 <RiDownloadLine className="size-4" aria-hidden="true" />
@@ -103,7 +106,11 @@ export function PaperPreview({
                       variant="neutral"
                       mode="stroke"
                       size="xsmall"
-                      className="size-8 p-0 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+                      iconOnly
+                      className={
+                        // oxlint-disable-next-line shadcn/no-restyle -- copy-link press feedback: a deliberate quick transform scale with its own timing
+                        "transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+                      }
                       aria-label={
                         share?.status === "copied"
                           ? text("Tautan berhasil disalin")
@@ -139,7 +146,7 @@ export function PaperPreview({
                   variant: "neutral",
                   mode: "stroke",
                   size: "xsmall",
-                  className: "size-8 p-0",
+                  iconOnly: true,
                 })}
               >
                 <RiDriveLine className="size-4" aria-hidden="true" />
@@ -149,7 +156,7 @@ export function PaperPreview({
                   variant="neutral"
                   mode="stroke"
                   size="xsmall"
-                  className="size-8 p-0"
+                  iconOnly
                   aria-label={text("Tutup dialog")}
                   title={text("Tutup")}
                 >

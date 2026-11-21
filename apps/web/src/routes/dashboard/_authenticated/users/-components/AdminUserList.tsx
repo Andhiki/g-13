@@ -51,24 +51,22 @@ export function AdminUserList({
                   ariaLabel={`Inspect account ${user.name}`}
                   selected={selectedId === user.id}
                   onSelect={() => onSelect(user.id)}
-                  className="truncate font-medium"
+                  className="truncate"
                 >
                   {user.name}
                 </AdminTableInspectButton>
-                <Typography variant="caption" className="truncate text-text-sub-600">
+                <Typography variant="caption" color="muted" className="truncate">
                   {user.email}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  className="mt-1 text-text-sub-600 tabular-nums md:hidden"
-                >
+                <Typography variant="caption" color="muted" className="mt-1 tabular-nums md:hidden">
                   {formatMonthYear(user.createdAt, language)}
                 </Typography>
               </div>
             </div>
             <Typography
               variant="caption"
-              className="hidden text-center text-text-strong-950 tabular-nums md:block"
+              color="strong"
+              className="hidden text-center tabular-nums md:block"
             >
               {formatMonthYear(user.createdAt, language)}
             </Typography>

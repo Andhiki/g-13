@@ -86,9 +86,11 @@ export function CourseList({
 
   if (!sections.length) {
     return (
-      <Typography as="p" variant="paragraph" className="p-4 text-text-sub-600" role="status">
-        {text("Tidak ada mata kuliah pada filter ini.")}
-      </Typography>
+      <div className="p-4">
+        <Typography as="p" variant="paragraph" color="muted" role="status">
+          {text("Tidak ada mata kuliah pada filter ini.")}
+        </Typography>
+      </div>
     );
   }
 

@@ -89,8 +89,9 @@ export function ReviewSubmissionForm({
       <Typography
         as="p"
         variant="caption"
+        color="danger"
         id={`review-${name}-error`}
-        className="mb-0 mt-1.5 text-error-base"
+        className="mb-0 mt-1.5"
       >
         {text(errors[name])}
       </Typography>
@@ -151,7 +152,11 @@ export function ReviewSubmissionForm({
             as="h2"
             tabIndex={-1}
             variant="subtitle1"
-            className="m-0 font-display text-text-strong-950 outline-none"
+            color="strong"
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the form's fields
+              "m-0 outline-none"
+            }
           >
             {text("Write a review for {{lecturerName}}", { lecturerName })}
           </Typography>
@@ -327,7 +332,7 @@ export function ReviewSubmissionForm({
             icon={<RiArrowRightLine className="size-5" />}
             iconPosition="end"
             disabled={isSubmitting}
-            className="w-full text-paragraph-sm sm:w-auto"
+            className="w-full sm:w-auto"
           >
             <Typography as="span" variant="paragraph">
               {text("Publish review")}

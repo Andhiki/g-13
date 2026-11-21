@@ -37,7 +37,7 @@ export function AnnouncementInspector({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             onClick={() => onEdit(announcement)}
           >
             <RiEditLine className="size-3.5" />
@@ -69,7 +69,7 @@ export function AnnouncementInspector({
               size="xxsmall"
               variant="error"
               mode="ghost"
-              className="gap-1 text-label-xs text-error-dark"
+              compact
               onClick={() =>
                 onLifecycle({ announcementId: announcement.id, action: "delete" }, label)
               }
@@ -87,15 +87,15 @@ export function AnnouncementInspector({
           </Typography>
           <span className="shrink-0 text-text-sub-600">· {announcementStatusLabel(status)}</span>
         </div>
-        <Typography variant="caption" className="mt-1 block break-words text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-1 block break-words">
           {announcement.titleEn}
         </Typography>
       </div>
       <div className="space-y-2">
-        <Typography variant="caption" className="block break-words text-text-sub-600">
+        <Typography variant="caption" color="muted" className="block break-words">
           {announcement.bodyId}
         </Typography>
-        <Typography variant="caption" className="block break-words text-text-sub-600">
+        <Typography variant="caption" color="muted" className="block break-words">
           {announcement.bodyEn}
         </Typography>
       </div>

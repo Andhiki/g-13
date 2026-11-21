@@ -64,8 +64,9 @@ export function LecturerReviewsPage() {
               <Typography
                 as="p"
                 variant="caption"
+                color="muted"
                 role="status"
-                className="mb-0 mt-2 text-text-sub-600"
+                className="mb-0 mt-2"
               >
                 {text("{{count}} lecturers match this search.", { count: visibleLecturers.length })}
               </Typography>
@@ -81,7 +82,7 @@ export function LecturerReviewsPage() {
               ))
             ) : (
               <div className="rounded-10 border border-dashed sm:col-span-2 border-stroke-soft-200 px-6 py-10 text-center">
-                <Typography as="p" variant="paragraph" className="m-0 text-text-sub-600">
+                <Typography as="p" variant="paragraph" color="muted" className="m-0">
                   {text(
                     "No lecturers or reviewed courses match this search. Try another name or clear your search.",
                   )}

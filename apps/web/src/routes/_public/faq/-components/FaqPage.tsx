@@ -244,10 +244,10 @@ export function FaqPage() {
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
         <header className="lg:sticky lg:top-28 lg:self-start">
-          <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
+          <Typography as="h1" variant="pageTitle" className="m-0">
             {text("FAQ")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
+          <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-5 max-w-md">
             {text(
               "Find answers about study requirements, specializations, final projects, and curriculum transitions.",
             )}
@@ -313,7 +313,7 @@ export function FaqPage() {
                   aria-label={text(section.title)}
                   className="border-t border-stroke-soft-200 pt-5"
                 >
-                  <Typography as="h2" variant="subtitle1" className="m-0 text-text-strong-950">
+                  <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
                     {text(section.title)}
                   </Typography>
                   <Accordion.Root
@@ -340,10 +340,10 @@ export function FaqPage() {
             </div>
           ) : (
             <div className="mt-7 rounded-xl border border-dashed border-stroke-soft-200 px-5 py-8 text-center">
-              <Typography as="p" variant="subtitle2" className="m-0 text-text-strong-950">
+              <Typography as="p" variant="subtitle2" color="strong" className="m-0">
                 {text("No matching questions")}
               </Typography>
-              <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
+              <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
                 {text("Try a different word or clear your search.")}
               </Typography>
             </div>

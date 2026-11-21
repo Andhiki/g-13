@@ -104,23 +104,18 @@ function AlumniStoryCard({ story }: { story: AlumniProfile }) {
             />
           </div>
           <div className="min-w-0 space-y-1">
-            <Typography as="h2" variant="subtitle1" className="m-0 text-text-strong-950">
+            <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
               {story.name}
             </Typography>
-            <Typography as="p" variant="label" className="m-0 text-text-sub-600">
+            <Typography as="p" variant="label" color="muted" className="m-0">
               {text(story.currentRole)}
             </Typography>
-            <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
+            <Typography as="p" variant="caption" color="muted" className="m-0">
               {text(story.cohort)}
             </Typography>
           </div>
         </div>
-        <AlignButton.Root
-          asChild
-          variant="neutral"
-          mode="stroke"
-          className="size-10 shrink-0 p-2.5"
-        >
+        <AlignButton.Root asChild variant="neutral" mode="stroke" iconOnly className="shrink-0">
           <a
             href={story.linkedinUrl}
             target="_blank"
@@ -145,11 +140,11 @@ function AlumniStoryCard({ story }: { story: AlumniProfile }) {
               <Typography as="strong" variant="label">
                 {company}
               </Typography>
-              <Typography as="span" variant="paragraph" className="text-text-sub-600">
+              <Typography as="span" variant="paragraph" color="muted">
                 {text(role)}
               </Typography>
             </div>
-            <Typography as="span" variant="caption" className="text-text-sub-600">
+            <Typography as="span" variant="caption" color="muted">
               {text(period)}
             </Typography>
           </li>
@@ -165,10 +160,10 @@ export function AlumniPage() {
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
         <header className="lg:sticky lg:top-28 lg:self-start">
-          <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
+          <Typography as="h1" variant="pageTitle" className="m-0">
             {text("Meet Our Alumni")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
+          <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-5 max-w-md">
             {text(
               "Meet Ilmu Komputer UGM alumni building products, leading teams, and growing careers across technology.",
             )}

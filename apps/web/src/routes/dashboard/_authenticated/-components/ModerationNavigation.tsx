@@ -99,18 +99,19 @@ function NavigationFooter({
   return (
     <div className="mt-auto pt-4">
       {signOutError && (
-        <Typography role="alert" variant="caption" className="mb-1.5 block px-2 text-error-base">
-          Sign-out failed. Try again.
-        </Typography>
+        <div className="mb-1.5 px-2">
+          <Typography role="alert" variant="caption" color="danger">
+            Sign-out failed. Try again.
+          </Typography>
+        </div>
       )}
       <div className="flex items-center justify-between gap-1 border-t border-stroke-soft-200 pt-2">
         <AlignDropdown.Root>
           <AlignDropdown.Trigger asChild>
             <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
+              variant="nav"
               size="xsmall"
-              className="h-8 min-w-0 justify-start gap-1.5 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200"
+              className="min-w-0 justify-start"
               aria-label="Account menu"
             >
               {userImage && userImage !== failedImage ? (
@@ -187,9 +188,11 @@ function ModerationNavSections({
         if (items.length === 0) return null;
         return (
           <div key={group.heading} className="space-y-1">
-            <Typography variant="caption" className="px-2.5 text-text-sub-600">
-              {group.heading}
-            </Typography>
+            <div className="px-2.5">
+              <Typography variant="caption" color="muted">
+                {group.heading}
+              </Typography>
+            </div>
             <div className="space-y-0.5">
               {items.map(({ to, label, Icon }) => {
                 const link = (
@@ -248,7 +251,8 @@ export function MobileModerationMenu({
           variant="neutral"
           mode="ghost"
           size="xsmall"
-          className="w-8 px-0 md:hidden"
+          iconOnly
+          className="md:hidden"
           aria-label="Open navigation"
         >
           <RiMenuLine className="size-5" />
@@ -265,7 +269,8 @@ export function MobileModerationMenu({
               variant="neutral"
               mode="ghost"
               size="xsmall"
-              className="w-8 shrink-0 px-0"
+              iconOnly
+              className="shrink-0"
               aria-label="Close navigation"
             >
               <RiCloseLine className="size-5" />

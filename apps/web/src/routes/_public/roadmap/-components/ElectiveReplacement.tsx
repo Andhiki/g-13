@@ -44,13 +44,13 @@ export function ElectiveReplacement({
       </AlignButton.Root>
       <AlignModal.Content>
         <div className="p-5">
-          <AlignModal.Title asChild>
-            <Typography as="h2" variant="subtitle1" className="pr-8">
+          <AlignModal.Title asChild className="pr-8">
+            <Typography as="h2" variant="subtitle1">
               {text("Ganti mata kuliah pilihan")}
             </Typography>
           </AlignModal.Title>
           <AlignModal.Description asChild>
-            <Typography as="p" variant="paragraph" className="mb-5 mt-2 text-text-sub-600">
+            <Typography as="p" variant="paragraph" color="muted" className="mb-5 mt-2">
               {text("Menggantikan")} {courseName(item.course)}
               {text(". Beban dan prasyarat rencana dihitung ulang.")}
             </Typography>
@@ -78,7 +78,7 @@ export function ElectiveReplacement({
                   .map((requirement) => text(requirement))
                   .join("; ") || text("Tidak dinyatakan dalam tabel.")}
               </Typography>
-              <Typography as="p" variant="caption" className="text-text-sub-600">
+              <Typography as="p" variant="caption" color="muted">
                 {sourceLocation(course, text).join("; ")}
               </Typography>
             </div>

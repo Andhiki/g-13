@@ -36,7 +36,9 @@ export function AdminPageHeader({
           size="xsmall"
           variant="neutral"
           mode="ghost"
-          className="hidden size-7 shrink-0 px-0 aria-expanded:bg-bg-weak-50 md:inline-flex"
+          iconOnly
+          active={sidebarOpen}
+          className="hidden size-7 shrink-0 md:inline-flex"
           aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           aria-expanded={sidebarOpen}
@@ -45,8 +47,8 @@ export function AdminPageHeader({
         >
           <RiLayoutLeftLine className="size-4 text-text-sub-600" />
         </AlignButton.Root>
-        <Typography as="h1" variant="label" className="truncate px-1">
-          {title}
+        <Typography as="h1" variant="label" className="min-w-0">
+          <span className="block truncate px-1">{title}</span>
         </Typography>
       </div>
       <div className="flex shrink-0 items-center gap-2">
@@ -73,7 +75,9 @@ export function DetailsToggleButton({
       size="xsmall"
       variant="neutral"
       mode="ghost"
-      className="hidden size-7 shrink-0 px-0 aria-expanded:bg-bg-weak-50 xl:inline-flex"
+      iconOnly
+      active={visible}
+      className="hidden size-7 shrink-0 xl:inline-flex"
       disabled={!available}
       aria-label={visible ? "Hide details" : "Show details"}
       title={visible ? "Hide details" : "Show details"}

@@ -45,11 +45,12 @@ function RoadmapTitle({ data }: NodeProps<TitleNode>) {
         data-roadmap-title
         as="h1"
         variant="graphTitle"
-        className="m-0 whitespace-nowrap text-text-strong-950"
+        color="strong"
+        className="m-0 whitespace-nowrap"
       >
         {text(data.title)}
       </Typography>
-      <Typography as="p" variant="paragraph" className="mb-0 mt-3 text-text-sub-600">
+      <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-3">
         {data.summary}
       </Typography>
       <div className="nodrag nopan mt-4 flex items-center gap-3">
@@ -121,13 +122,13 @@ function ActivityCard({ data }: NodeProps<ActivityNode>) {
   const { text } = useLocale("roadmap");
   return (
     <div className="w-[246px] rounded-lg border border-primary-base bg-bg-white-0 p-4 text-text-strong-950">
-      <Typography as="p" variant="caption" className="m-0 text-primary-base">
+      <Typography as="p" variant="caption" color="brand" className="m-0">
         {text("Kegiatan")}
       </Typography>
       <Typography as="h3" variant="label" className="mb-1 mt-1">
         {text(data.activity.title)}
       </Typography>
-      <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
+      <Typography as="p" variant="caption" color="muted" className="m-0">
         {text(data.activity.detail)}
       </Typography>
     </div>

@@ -16,7 +16,7 @@ export function ThemeSwitch() {
   return (
     <div className="space-y-5">
       <section aria-labelledby="settings-theme" className="flex items-center justify-between gap-4">
-        <Typography as="h4" id="settings-theme" variant="label" className="text-text-strong-950">
+        <Typography as="h4" id="settings-theme" variant="label" color="strong">
           {t("settings.theme")}
         </Typography>
         <SegmentedControl.Root
@@ -48,12 +48,7 @@ export function ThemeSwitch() {
         </SegmentedControl.Root>
       </section>
       <section aria-labelledby="settings-color-scheme" className="space-y-3">
-        <Typography
-          as="h4"
-          id="settings-color-scheme"
-          variant="label"
-          className="text-text-strong-950"
-        >
+        <Typography as="h4" id="settings-color-scheme" variant="label" color="strong">
           {t("settings.colorScheme")}
         </Typography>
         <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">

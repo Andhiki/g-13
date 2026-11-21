@@ -66,18 +66,16 @@ const Input = React.forwardRef<
 ));
 Input.displayName = "CommandInput";
 
+const listVariants = tv({
+  base: "flex max-h-min min-h-0 flex-1 flex-col [&>[cmdk-list-sizer]]:divide-y [&>[cmdk-list-sizer]]:divide-stroke-soft-200 [&>[cmdk-list-sizer]]:overflow-auto",
+  variants: { elevated: { true: "shadow-regular-md" } },
+});
+
 const List = React.forwardRef<
   React.ComponentRef<typeof Command.List>,
-  React.ComponentPropsWithoutRef<typeof Command.List>
->(({ className, ...props }, ref) => (
-  <Command.List
-    ref={ref}
-    className={twMerge(
-      "flex max-h-min min-h-0 flex-1 flex-col [&>[cmdk-list-sizer]]:divide-y [&>[cmdk-list-sizer]]:divide-stroke-soft-200 [&>[cmdk-list-sizer]]:overflow-auto",
-      className,
-    )}
-    {...props}
-  />
+  React.ComponentPropsWithoutRef<typeof Command.List> & VariantProps<typeof listVariants>
+>(({ elevated, className, ...props }, ref) => (
+  <Command.List ref={ref} className={listVariants({ elevated, className })} {...props} />
 ));
 List.displayName = "CommandList";
 

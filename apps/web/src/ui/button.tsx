@@ -20,6 +20,8 @@ export const buttonVariants = tv({
       neutral: "focus-visible:outline-stroke-strong-950/35",
       "neutral-inverse": "focus-visible:outline-stroke-strong-950/35",
       error: "focus-visible:outline-error-base/50",
+      link: "focus-visible:outline-stroke-strong-950/35",
+      nav: "focus-visible:outline-stroke-strong-950/35",
     },
     mode: {
       filled: "",
@@ -35,8 +37,13 @@ export const buttonVariants = tv({
       xsmall:
         "h-8 gap-2.5 rounded-lg px-2.5 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-1",
       xxsmall:
-        "h-7 gap-2.5 rounded-lg px-2 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
+        "h-7 gap-2.5 rounded-lg px-2 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
     },
+    iconOnly: { true: "" },
+    compact: { true: "" },
+    active: { true: "" },
+    wide: { true: "" },
+    steady: { true: "" },
   },
   compoundVariants: [
     {
@@ -109,7 +116,69 @@ export const buttonVariants = tv({
     {
       variant: "error",
       mode: "ghost",
-      class: "bg-transparent text-error-base ring-transparent hover:bg-red-alpha-10",
+      class: "bg-transparent text-error-dark ring-transparent hover:bg-red-alpha-10",
+    },
+    {
+      variant: "link",
+      class:
+        "bg-transparent p-0 h-auto ring-transparent truncate rounded-sm text-text-strong-950 hover:underline",
+    },
+    {
+      variant: "nav",
+      class:
+        "bg-transparent ring-transparent gap-1.5 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200",
+    },
+    {
+      size: "medium",
+      iconOnly: true,
+      class: "size-10 p-0",
+    },
+    {
+      size: "xsmall",
+      iconOnly: true,
+      class: "size-8 p-0",
+    },
+    {
+      size: "xxsmall",
+      iconOnly: true,
+      class: "size-7 p-0",
+    },
+    {
+      size: "small",
+      compact: true,
+      class: "gap-1.5 text-label-xs",
+    },
+    {
+      size: "xxsmall",
+      compact: true,
+      class: "gap-1",
+    },
+    {
+      size: "medium",
+      compact: true,
+      class: "gap-2",
+    },
+    {
+      size: "xsmall",
+      compact: true,
+      class: "gap-1.5 px-2",
+    },
+    {
+      size: "xsmall",
+      wide: true,
+      class: "px-3",
+    },
+    {
+      variant: "neutral",
+      mode: "ghost",
+      active: true,
+      class: "bg-bg-soft-200 text-text-strong-950",
+    },
+    {
+      variant: "neutral",
+      mode: "ghost",
+      steady: true,
+      class: "disabled:text-text-sub-600",
     },
   ],
   defaultVariants: { variant: "primary", mode: "filled", size: "medium" },
@@ -125,6 +194,11 @@ function Root({
   variant,
   mode,
   size,
+  iconOnly,
+  compact,
+  active,
+  wide,
+  steady,
   type = "button",
   isLoading = false,
   icon,
@@ -133,7 +207,17 @@ function Root({
   children,
   ...props
 }: ButtonProps) {
-  const classes = buttonVariants({ variant, mode, size, className });
+  const classes = buttonVariants({
+    variant,
+    mode,
+    size,
+    iconOnly,
+    compact,
+    active,
+    wide,
+    steady,
+    className,
+  });
   if (asChild)
     return (
       <Slot className={classes} {...props}>

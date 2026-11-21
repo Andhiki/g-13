@@ -36,7 +36,13 @@ export function ReviewList({
     <div className="divide-y divide-stroke-soft-200 border-y border-stroke-soft-200">
       {reviews.map((review) => (
         <article key={review.id} id={`review-${review.id}`} className="min-w-0 py-3 sm:py-4">
-          <Typography as="p" className="m-0 whitespace-pre-wrap break-words leading-relaxed">
+          <Typography
+            as="p"
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- public review body reads best relaxed; the paragraph label scale runs tighter than prose wants
+              "m-0 whitespace-pre-wrap break-words leading-relaxed"
+            }
+          >
             {review.body}
           </Typography>
           <div className="mt-2">
@@ -51,7 +57,7 @@ export function ReviewList({
               ] satisfies [string, number][]
             ).map(([label, value]) => (
               <div key={label} className="flex items-center gap-1.5">
-                <Typography as="dt" variant="caption" className="text-text-sub-600">
+                <Typography as="dt" variant="caption" color="muted">
                   {text(label)}
                 </Typography>
                 <dd className="m-0 flex items-center gap-0.5 text-label-xs tabular-nums">
@@ -68,7 +74,7 @@ export function ReviewList({
                   ? text("Anonymous")
                   : review.authorName}
               </Typography>
-              <Typography as="time" variant="caption" className="text-text-sub-600">
+              <Typography as="time" variant="caption" color="muted">
                 {review.termLabel}
               </Typography>
             </div>
@@ -109,7 +115,11 @@ function ReviewLikeButton({
       size="xsmall"
       variant="neutral"
       mode="stroke"
-      className="min-w-9 shrink-0 gap-1.5 px-2 tabular-nums"
+      compact
+      className={
+        // oxlint-disable-next-line shadcn/no-restyle -- the like count uses tabular numerals so digits do not shift as the count changes
+        "min-w-9 shrink-0 tabular-nums"
+      }
       aria-pressed={liked}
       aria-label={text(liked ? "Unlike review" : "Like review")}
       disabled={!canLike || pending}

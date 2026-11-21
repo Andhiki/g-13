@@ -126,7 +126,8 @@ export function CurriculumPage() {
               <Typography
                 as="h1"
                 variant="title"
-                className="m-0 mb-8 text-text-strong-950 max-[640px]:mb-4"
+                color="strong"
+                className="m-0 mb-8 max-[640px]:mb-4"
               >
                 {text("Mata kuliah")}
               </Typography>

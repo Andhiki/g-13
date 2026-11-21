@@ -42,7 +42,7 @@ export function CourseDetailsPanel({
     <>
       <AlignDrawer.Header className="max-[650px]:touch-none shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
         <div className="min-w-0 flex-1">
-          <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="m-0">
             {course.code || text("Mata kuliah pilihan")}
           </Typography>
           <div className="mt-2 flex items-center gap-3">
@@ -58,7 +58,7 @@ export function CourseDetailsPanel({
               </span>
             )}
             <AlignDrawer.Title asChild>
-              <Typography as="h2" variant="subtitle1" className="m-0 min-w-0 text-text-strong-950">
+              <Typography as="h2" variant="subtitle1" color="strong" className="m-0 min-w-0">
                 {courseName(course)}
               </Typography>
             </AlignDrawer.Title>
@@ -81,7 +81,7 @@ export function CourseDetailsPanel({
         <div className="px-4 pb-4 pt-0 sm:px-5 sm:pb-5">
           <div className="mb-6">
             {credit === null && (
-              <Typography as="p" variant="caption" className="mt-2 text-text-sub-600">
+              <Typography as="p" variant="caption" color="muted" className="mt-2">
                 {text("SKS belum dinyatakan")}
               </Typography>
             )}
@@ -115,7 +115,7 @@ export function CourseDetailsPanel({
           </div>
           {(prereqs.length > 0 || requirements.length > 0) && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
-              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
+              <Typography as="h3" variant="subtitle2" color="strong" className="m-0 py-3">
                 {text("Prasyarat")}
               </Typography>
               {prereqs.length > 0 && (
@@ -144,8 +144,9 @@ export function CourseDetailsPanel({
                 <Typography
                   as="p"
                   variant="paragraph"
+                  color="muted"
                   key={item}
-                  className="mb-0 mt-2 text-text-sub-600"
+                  className="mb-0 mt-2"
                 >
                   {text(item)}
                 </Typography>
@@ -154,7 +155,7 @@ export function CourseDetailsPanel({
           )}
           {next.length > 0 && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
-              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
+              <Typography as="h3" variant="subtitle2" color="strong" className="m-0 py-3">
                 {text("Menjadi prasyarat untuk")}
               </Typography>
               <ul className="-mx-2 divide-y divide-stroke-soft-200">
@@ -195,7 +196,7 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
       {syllabus ? (
         <>
           {versions.length > 1 && (
-            <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
+            <Typography as="p" variant="caption" color="muted" className="mt-3">
               {text("Dokumen kurikulum memuat")} {versions.length}{" "}
               {text("versi silabus untuk kode ini. Keduanya ditampilkan sesuai halaman sumber.")}
             </Typography>
@@ -225,12 +226,12 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
   const topics = syllabusPoints(syllabus.syllabus);
   return (
     <>
-      <Typography as="p" variant="caption" className="mb-4 mt-3 text-text-sub-600">
+      <Typography as="p" variant="caption" color="muted" className="mb-4 mt-3">
         {text("sourceText")}
       </Typography>
       {syllabus.description && (
         <>
-          <Typography as="h3" variant="subtitle2" className="mt-3 text-text-strong-950">
+          <Typography as="h3" variant="subtitle2" color="strong" className="mt-3">
             {text("Tujuan pembelajaran")}
           </Typography>
           <Typography as="p" variant="paragraph" className="mt-2" lang="id">
@@ -255,7 +256,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
       )}
       {syllabus.references.length > 0 && (
         <>
-          <Typography as="h3" variant="subtitle2" className="mt-4 text-text-strong-950">
+          <Typography as="h3" variant="subtitle2" color="strong" className="mt-4">
             {text("Referensi")}
           </Typography>
           <ul className="mt-3 list-disc space-y-1 pl-5">

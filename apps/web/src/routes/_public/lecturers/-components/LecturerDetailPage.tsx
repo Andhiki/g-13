@@ -83,7 +83,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <AlignFancyButton.Root
-              className="h-9 gap-2 px-3"
+              compact
+              className="h-9"
               onClick={() => setReviewDialogOpen(true)}
             >
               <Typography as="span" variant="paragraph">
@@ -91,7 +92,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               </Typography>
               <RiArrowRightLine aria-hidden="true" className="size-4" />
             </AlignFancyButton.Root>
-            <Typography as="span" variant="caption" className="text-text-sub-600">
+            <Typography as="span" variant="caption" color="muted">
               {text(data.lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {
                 count: data.lecturer.reviewCount,
               })}
@@ -112,7 +113,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               ))}
             </ul>
           ) : (
-            <Typography as="p" variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
+            <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
               {text("No reviews yet. Be the first to share your experience.")}
             </Typography>
           )}
@@ -131,7 +132,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               ] satisfies [string, number | null][]
             ).map(([label, value]) => (
               <div key={label} className="col-span-3 grid grid-cols-subgrid items-center">
-                <Typography as="dt" variant="label" className="text-text-sub-600">
+                <Typography as="dt" variant="label" color="muted">
                   {text(label)}
                 </Typography>
                 <dd className="col-span-2 m-0 grid grid-cols-subgrid items-center">
@@ -173,9 +174,9 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 as="label"
                 variant="labelSmall"
                 htmlFor={courseFilterId}
-                className="sr-only sm:not-sr-only sm:shrink-0 sm:text-text-sub-600"
+                className="sr-only sm:not-sr-only sm:shrink-0"
               >
-                {text("Course")}
+                <span className="sm:text-text-sub-600">{text("Course")}</span>
               </Typography>
               <AlignSelect.Root
                 variant="compact"
@@ -210,7 +211,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             </div>
           </div>
           {likeError && (
-            <Typography as="p" variant="paragraph" role="alert" className="mb-3 text-error-base">
+            <Typography as="p" variant="paragraph" color="danger" role="alert" className="mb-3">
               {likeError}
             </Typography>
           )}
@@ -230,7 +231,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 </AlignEmptyState.Description>
                 <AlignEmptyState.Actions>
                   <AlignFancyButton.Root
-                    className="h-9 gap-2 px-3"
+                    compact
+                    className="h-9"
                     onClick={() => setReviewDialogOpen(true)}
                   >
                     <Typography as="span" variant="paragraph">
