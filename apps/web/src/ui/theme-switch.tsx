@@ -1,17 +1,14 @@
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { usePreference } from "@ui-sdk/react/preferences";
 import { RiComputerLine, RiMoonLine, RiSunLine } from "@remixicon/react";
-import { useThemePreference, type ThemeMode } from "./theme-preference";
+import { useThemePreference, themeMode, type ThemeMode } from "./theme-preference";
 import { Typography } from "./typography";
 import { useTranslation } from "react-i18next";
 import * as SegmentedControl from "./segmented-control";
 
 export function ThemeSwitch() {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const mode = usePreference(themeMode);
   const { schemes, setScheme } = useThemePreference();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
   return (
     <div className="space-y-5">
@@ -21,23 +18,22 @@ export function ThemeSwitch() {
         </Typography>
         <SegmentedControl.Root
           className="w-36 shrink-0"
-          value={mounted ? (theme ?? "system") : "system"}
-          onValueChange={(mode) => {
-            if (mode === "system" || mode === "light" || mode === "dark") setTheme(mode);
+          value={mode.value}
+          onValueChange={(next) => {
+            if (next === "system" || next === "light" || next === "dark") themeMode.set(next);
           }}
           aria-labelledby="settings-theme"
         >
           <SegmentedControl.Indicator />
-          {(["system", "light", "dark"] as const).map((mode) => {
+          {(["system", "light", "dark"] as const).map((choice) => {
             const Icon =
-              mode === "system" ? RiComputerLine : mode === "light" ? RiSunLine : RiMoonLine;
+              choice === "system" ? RiComputerLine : choice === "light" ? RiSunLine : RiMoonLine;
             return (
               <SegmentedControl.Item
-                key={mode}
-                value={mode}
-                aria-label={t(`settings.${mode}`)}
-                title={t(`settings.${mode}`)}
-                disabled={!mounted}
+                key={choice}
+                value={choice}
+                aria-label={t(`settings.${choice}`)}
+                title={t(`settings.${choice}`)}
                 className="focus-visible:ring-2 focus-visible:ring-primary-base"
               >
                 <Icon className="size-4" aria-hidden="true" />
@@ -72,11 +68,10 @@ export function ThemeSwitch() {
                         data-mode={mode}
                         aria-label={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
                         title={`${scheme === "omahti" ? "OmahTI" : "HIMAKOM"} · ${t(`settings.${mode}`)}`}
-                        aria-pressed={mounted && selected}
-                        disabled={!mounted}
+                        aria-pressed={selected}
                         onClick={() => setScheme(mode, scheme)}
                       >
-                        {mounted && selected && (
+                        {selected && (
                           <span className="absolute -right-[5px] -bottom-[5px] grid size-7 place-items-center rounded-full border border-stroke-sub-300 bg-bg-white-0 text-text-strong-950">
                             <Icon className="size-4" aria-hidden="true" />
                           </span>

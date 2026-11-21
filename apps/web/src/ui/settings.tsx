@@ -1,6 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { RiSettings3Line } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
+import { usePreference } from "@ui-sdk/react/preferences";
 import { AlignButton } from "./button";
 import { LanguageSwitch } from "./language-switch";
 import { AlignLinkButton } from "./link-button";
@@ -8,6 +9,7 @@ import { AlignModal } from "./modal";
 import { ThemeSwitch } from "./theme-switch";
 import * as Switch from "./switch";
 import { useCursorPreference } from "./cursor-preference";
+import { blurPreference } from "./theme-preference";
 import { Typography } from "./typography";
 
 export function SettingsModal({
@@ -21,20 +23,7 @@ export function SettingsModal({
 }) {
   const { t } = useTranslation();
   const { cursor, setCursor } = useCursorPreference();
-  const [blur, setBlur] = useState(true);
-  useEffect(() => {
-    setBlur(!document.documentElement.hasAttribute("data-no-blur"));
-  }, []);
-
-  function changeBlur(enabled: boolean) {
-    setBlur(enabled);
-    document.documentElement.toggleAttribute("data-no-blur", !enabled);
-    try {
-      localStorage.setItem("g13-blur", enabled ? "on" : "off");
-    } catch {
-      // The preference still applies for this session.
-    }
-  }
+  const { value: blur } = usePreference(blurPreference);
 
   return (
     <AlignModal.Root open={open} onOpenChange={onOpenChange}>
@@ -72,7 +61,11 @@ export function SettingsModal({
               <Typography as="label" htmlFor="backdrop-blur" variant="label">
                 {t("settings.blur")}
               </Typography>
-              <Switch.Root id="backdrop-blur" checked={blur} onCheckedChange={changeBlur} />
+              <Switch.Root
+                id="backdrop-blur"
+                checked={blur === "on"}
+                onCheckedChange={(checked) => blurPreference.set(checked ? "on" : "off")}
+              />
             </div>
           </section>
 
@@ -116,8 +109,6 @@ export function SettingsModal({
 }
 
 export function Settings() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   const { t } = useTranslation();
 
   return (
@@ -128,7 +119,6 @@ export function Settings() {
           mode="stroke"
           className="size-10 p-2.5"
           aria-label={t("settings.title")}
-          disabled={!mounted}
         >
           <RiSettings3Line aria-hidden="true" className="size-5" />
         </AlignButton.Root>
