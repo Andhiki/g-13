@@ -5,8 +5,8 @@ import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Image } from "@unpic/react";
-import { useTheme } from "next-themes";
-import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
+import { themeMode, useThemeMode } from "./theme-preference";
+import { useKeyboardShortcuts } from "./shortcuts";
 import { Settings } from "./settings";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
@@ -103,8 +103,13 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
 }
 
 export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
-  const { resolvedTheme, setTheme } = useTheme();
-  useKeyboardShortcuts({ d: () => setTheme(resolvedTheme === "dark" ? "light" : "dark") });
+  const { resolved } = useThemeMode();
+  useKeyboardShortcuts({
+    d: {
+      run: () => themeMode.set(resolved === "dark" ? "light" : "dark"),
+      description: "Ganti tema",
+    },
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -212,7 +217,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
         showClose={false}
         aria-describedby={undefined}
         overlayClassName="bg-transparent p-0 backdrop-blur-none md:hidden"
-        className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto overscroll-contain rounded-none pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-text-strong-950 shadow-none data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-2 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100 motion-reduce:animate-none"
+        className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto overscroll-contain rounded-none pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-text-strong-950 shadow-none group-data-starting-style/modal:-translate-y-2 group-data-starting-style/modal:opacity-0 group-data-ending-style/modal:-translate-y-2 group-data-ending-style/modal:opacity-0 transition-[opacity,translate] duration-150 motion-reduce:transition-none"
       >
         <AlignModal.Title className="sr-only">{t("navigation.label")}</AlignModal.Title>
         <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4 pt-[env(safe-area-inset-top)]">

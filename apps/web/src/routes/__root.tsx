@@ -1,12 +1,10 @@
 import { StatusPage } from "./-StatusPage";
 import { Toaster } from "../ui/toast";
-import { CursorProvider } from "../ui/cursor-preference";
 import { PublicFrame } from "./_public/-PublicFrame";
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { useMemo, type ReactNode } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
-import { ThemeProvider } from "next-themes";
-import { ThemePreferenceProvider, themePreferenceScript } from "../ui/theme-preference";
+import { AppPreferences, darkModeScript } from "../ui/theme-preference";
 import { I18nextProvider } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
 import interFont from "../fonts/inter-subset.woff2?url";
@@ -122,7 +120,7 @@ function RootDocument({ children }: { children: ReactNode }) {
             data-cf-beacon='{"token": "38f322cab5754b91a26627775d91250a"}'
           />
         )}
-        <script dangerouslySetInnerHTML={{ __html: themePreferenceScript }} />
+        <script dangerouslySetInnerHTML={{ __html: darkModeScript }} />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -132,18 +130,14 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <I18nextProvider i18n={i18n}>
-          <ThemeProvider attribute="class" defaultTheme="system" storageKey="curriculum-theme">
-            <ThemePreferenceProvider>
-              <CursorProvider>
-                <LazyMotion features={domAnimation}>
-                  <div id="root" className="m-0 h-full w-full min-w-80">
-                    {children}
-                    <Toaster />
-                  </div>
-                </LazyMotion>
-              </CursorProvider>
-            </ThemePreferenceProvider>
-          </ThemeProvider>
+          <AppPreferences>
+            <LazyMotion features={domAnimation}>
+              <div id="root" className="m-0 h-full w-full min-w-80">
+                {children}
+                <Toaster />
+              </div>
+            </LazyMotion>
+          </AppPreferences>
         </I18nextProvider>
         <Scripts />
       </body>

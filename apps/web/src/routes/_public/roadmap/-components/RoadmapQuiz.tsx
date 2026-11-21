@@ -2,7 +2,7 @@ import { useLocale } from "@/useLocale";
 import { RiArrowLeftLine, RiCornerDownLeftLine } from "@remixicon/react";
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef } from "react";
-import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "@/ui/shortcuts";
 import { m, useReducedMotion } from "motion/react";
 import { AlignKbd } from "@/ui/kbd";
 import { AlignButton } from "@/ui/button";

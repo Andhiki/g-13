@@ -1,6 +1,6 @@
 import { PaperPreview } from "./PaperPreview";
 import { useLocale } from "@/useLocale";
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   RiFilePdf2Line,
@@ -12,6 +12,7 @@ import {
 import { AlignBreadcrumb } from "@/ui/breadcrumb";
 import { AlignBadge } from "@/ui/badge";
 import { AlignKbd } from "@/ui/kbd";
+import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { Typography } from "@/ui/typography";
 import { browseArchive, prepareCourseSearch, resolveArchive } from "../-shared/archive";
 import { folderSearch } from "../-shared/search";
@@ -62,60 +63,64 @@ export function ExamArchivePage() {
   const focusNextFolder = useRef(false);
   const previousLocation = useRef(location);
   const locationKey = JSON.stringify(location);
-  useEffect(() => {
-    let lastGAt: number | null = null;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.defaultPrevented ||
-        !["ArrowDown", "ArrowUp", "j", "k", "/", "g", "G"].includes(event.key) ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        (event.shiftKey && event.key !== "G") ||
-        paper ||
-        !(event.target instanceof HTMLElement) ||
-        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']")
-      ) {
-        lastGAt = null;
-        return;
-      }
-      if (event.key === "g") {
-        event.preventDefault();
-        if (event.repeat) return;
-        if (lastGAt !== null && event.timeStamp - lastGAt < 1000) {
-          lastGAt = null;
-          list.current?.querySelector<HTMLAnchorElement>("a")?.focus();
-        } else lastGAt = event.timeStamp;
-        return;
-      }
-      lastGAt = null;
-      if (event.key === "G") {
-        event.preventDefault();
-        Array.from(list.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])
-          .at(-1)
-          ?.focus();
-        return;
-      }
-      if (event.key === "/") {
-        if (!window.matchMedia("(min-width: 640px)").matches) return;
-        event.preventDefault();
-        if (searchInput.current) searchInput.current.focus();
-        else {
-          focusSearch.current = true;
-          void navigate({ search: folderSearch([]), resetScroll: false });
-        }
-        return;
-      }
-      if (list.current?.contains(event.target)) return;
-      const first = list.current?.querySelector<HTMLAnchorElement>("a");
-      if (first) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [paper, navigate, locationKey]);
+  const lastGAt = useRef<number | null>(null);
+  const goFirstLink = (event: KeyboardEvent) => {
+    lastGAt.current = null;
+    if (event.target instanceof Node && list.current?.contains(event.target)) return;
+    list.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+  };
+  const goListTop = () => {
+    if (lastGAt.current !== null && performance.now() - lastGAt.current < 1000) {
+      lastGAt.current = null;
+      list.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    } else {
+      lastGAt.current = performance.now();
+    }
+  };
+  const goListEnd = () => {
+    lastGAt.current = null;
+    Array.from(list.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])
+      .at(-1)
+      ?.focus();
+  };
+  const focusCourseSearch = () => {
+    lastGAt.current = null;
+    if (searchInput.current) searchInput.current.focus();
+    else {
+      focusSearch.current = true;
+      void navigate({ search: folderSearch([]), resetScroll: false });
+    }
+  };
+  // The registry replaces the old window listener: the preview modal pauses
+  // page shortcuts while it is open, and ordinary typing stays typing. The
+  // list's own keydown handler keeps moving inside the list and wins by
+  // preventing the event before the registry sees it.
+  useKeyboardShortcuts({
+    j: { run: goFirstLink, description: "Ke bawah" },
+    k: { run: goFirstLink, description: "Ke atas" },
+    arrowdown: { run: goFirstLink, description: "Ke bawah" },
+    arrowup: { run: goFirstLink, description: "Ke atas" },
+    g: goListTop,
+    "shift+g": goListEnd,
+    "/": {
+      run: focusCourseSearch,
+      description: "Cari mata kuliah",
+      when: () => window.matchMedia("(min-width: 640px)").matches,
+    },
+    "shift+/": {
+      run: focusCourseSearch,
+      when: () => window.matchMedia("(min-width: 640px)").matches,
+    },
+  });
+  const searchHint = useShortcutHint("/");
+  const jHint = useShortcutHint("j");
+  const downHint = useShortcutHint("arrowdown");
+  const kHint = useShortcutHint("k");
+  const upHint = useShortcutHint("arrowup");
+  const enterHint = useShortcutHint("enter");
+  const rightHint = useShortcutHint("arrowright");
+  const minusHint = useShortcutHint("-");
+  const leftHint = useShortcutHint("arrowleft");
   useLayoutEffect(() => {
     const previous = previousLocation.current;
     previousLocation.current = location;
@@ -177,31 +182,35 @@ export function ExamArchivePage() {
           <ul className="m-0 list-none space-y-1 p-0">
             <li>
               <span className="flex items-center gap-1.5">
-                <AlignKbd.Root>/</AlignKbd.Root>
+                <AlignKbd.Root>{searchHint.text}</AlignKbd.Root>
                 <Typography as="span"> — {text("Cari mata kuliah")}</Typography>
               </span>
             </li>
             <li>
               <span className="flex items-center gap-1.5">
-                <AlignKbd.Root>j</AlignKbd.Root> / <AlignKbd.Root>↓</AlignKbd.Root>
+                <AlignKbd.Root>{jHint.text}</AlignKbd.Root> /{" "}
+                <AlignKbd.Root>{downHint.text}</AlignKbd.Root>
                 <Typography as="span"> — {text("Ke bawah")}</Typography>
               </span>
             </li>
             <li>
               <span className="flex items-center gap-1.5">
-                <AlignKbd.Root>k</AlignKbd.Root> / <AlignKbd.Root>↑</AlignKbd.Root>
+                <AlignKbd.Root>{kHint.text}</AlignKbd.Root> /{" "}
+                <AlignKbd.Root>{upHint.text}</AlignKbd.Root>
                 <Typography as="span"> — {text("Ke atas")}</Typography>
               </span>
             </li>
             <li>
               <span className="flex items-center gap-1.5">
-                <AlignKbd.Root>Enter</AlignKbd.Root> / <AlignKbd.Root>→</AlignKbd.Root>
+                <AlignKbd.Root>{enterHint.text}</AlignKbd.Root> /{" "}
+                <AlignKbd.Root>{rightHint.text}</AlignKbd.Root>
                 <Typography as="span">— {text("Buka folder atau berkas")}</Typography>
               </span>
             </li>
             <li>
               <span className="flex items-center gap-1.5">
-                <AlignKbd.Root>-</AlignKbd.Root> / <AlignKbd.Root>←</AlignKbd.Root>
+                <AlignKbd.Root>{minusHint.text}</AlignKbd.Root> /{" "}
+                <AlignKbd.Root>{leftHint.text}</AlignKbd.Root>
                 <Typography as="span"> — {text("Naik satu folder")}</Typography>
               </span>
             </li>
@@ -265,7 +274,7 @@ export function ExamArchivePage() {
                     }
                   }}
                 />
-                <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
+                <AlignKbd.Root aria-hidden="true">{searchHint.text}</AlignKbd.Root>
               </label>
             )}
           </div>

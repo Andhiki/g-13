@@ -7,7 +7,7 @@ import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
 import { AlignKbd } from "@/ui/kbd";
-import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { Typography } from "@/ui/typography";
 import { AlumniDirectoryCard } from "./AlumniDirectoryCard";
 import { filterAlumni, type AlumniDirectoryData } from "../-shared/directory";
@@ -29,7 +29,10 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
   const searchSectionRef = useRef<HTMLElement>(null);
   const [isSticky, setIsSticky] = useState(false);
   const reducedMotion = useReducedMotion();
-  useKeyboardShortcuts({ "/": () => searchRef.current?.focus() });
+  useKeyboardShortcuts({
+    "/": { run: () => searchRef.current?.focus(), description: "Cari alumni" },
+  });
+  const searchHint = useShortcutHint("/");
 
   useEffect(() => {
     const update = () => {
@@ -174,7 +177,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
                 aria-hidden="true"
                 className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
               >
-                /
+                {searchHint.text}
               </AlignKbd.Root>
             </m.div>
           </section>

@@ -1,7 +1,14 @@
-import { Typography } from "@/ui/typography";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/react/combobox";
 import { useEffect, useId, useRef, useState } from "react";
 import { RiCheckLine, RiSearchLine } from "@remixicon/react";
-import { AlignCommandMenu } from "@/ui/command-menu";
+import { Typography } from "@/ui/typography";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocale } from "@/useLocale";
 import { courseDisplayName, type ReviewCourseOption } from "../-shared/course-search";
@@ -25,6 +32,7 @@ export function ReviewCourseField({
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [field, setField] = useState<HTMLDivElement | null>(null);
   const [picked, setPicked] = useState<ReviewCourseOption | null>(initialCourse ?? null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const picker = useInfiniteQuery(coursePickerQueryOptions(debouncedQuery, language));
@@ -39,7 +47,7 @@ export function ReviewCourseField({
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || !picker.hasNextPage) return;
+    if (!sentinel || !open || !picker.hasNextPage) return;
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting) && !picker.isFetchingNextPage) {
         void picker.fetchNextPage();
@@ -47,113 +55,109 @@ export function ReviewCourseField({
     });
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [picker.data, picker.hasNextPage, picker.isFetchingNextPage, picker.fetchNextPage]);
+  }, [open, picker.data, picker.hasNextPage, picker.isFetchingNextPage, picker.fetchNextPage]);
 
-  const closeMenu = () => {
-    setOpen(false);
-    setQuery("");
-    setDebouncedQuery("");
-  };
   return (
-    <div
-      className="grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6"
-      onBlurCapture={(event) => {
-        if (
-          !event.currentTarget.contains(
-            event.relatedTarget instanceof Node ? event.relatedTarget : null,
-          )
-        ) {
-          closeMenu();
-        }
-      }}
-    >
+    <div className="grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6">
       <div>
         <Typography as="label" variant="label" htmlFor={id}>
           {text("Course")}
         </Typography>
       </div>
       <div className="relative min-w-0">
-        <AlignCommandMenu.Root
-          shouldFilter={false}
-          label={text("Course")}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.stopPropagation();
-              event.preventDefault();
-              closeMenu();
-            } else if (!open && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        <Combobox
+          value={selected ?? null}
+          itemToValue={(course) => course.id}
+          itemToLabel={(course) => courseDisplayName(course, language)}
+          onValueChange={(next) => {
+            onChange(next ? next.id : "");
+            if (next) setPicked(next);
+          }}
+          query={
+            open
+              ? query
+              : selected
+                ? `${selected.code} · ${courseDisplayName(selected, language)}`
+                : ""
+          }
+          onQueryChange={(next, details) => {
+            if (details.reason === "input-change") {
+              setQuery(next);
+              onChange("");
               setOpen(true);
             }
           }}
+          open={open}
+          onOpenChange={(nextOpen) => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+              setQuery("");
+              setDebouncedQuery("");
+            }
+          }}
+          filter={false}
+          autoHighlight
+          loop={false}
         >
-          <div className="flex h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 px-3 transition-colors focus-within:border-stroke-strong-950">
+          <div
+            ref={setField}
+            className="flex h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 px-3 transition-colors focus-within:border-stroke-strong-950"
+          >
             <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
-            <AlignCommandMenu.Input
-              asChild
+            <ComboboxInput
               id={id}
               aria-label={text("Course")}
-              aria-expanded={open}
-              aria-invalid={Boolean(error)}
+              aria-invalid={error ? true : undefined}
               aria-describedby={error ? `${id}-error` : undefined}
-              className="h-full min-w-0 text-base outline-none sm:text-paragraph-sm"
-              value={
-                open
-                  ? query
-                  : selected
-                    ? `${selected.code} · ${courseDisplayName(selected, language)}`
-                    : ""
-              }
+              className="h-full w-full min-w-0 bg-transparent text-base text-text-strong-950 outline-none transition duration-200 ease-out placeholder:text-text-soft-400 sm:text-paragraph-sm"
               placeholder={text("Course code or name")}
               onFocus={() => setOpen(true)}
-              onClick={() => setOpen(true)}
-              onValueChange={(next) => {
-                setQuery(next);
-                onChange("");
-                setOpen(true);
-              }}
-            >
-              <input id={id} aria-expanded={open} />
-            </AlignCommandMenu.Input>
+            />
           </div>
-          {open && (
-            <AlignCommandMenu.List
-              elevated
-              className="absolute inset-x-0 top-10 z-20 max-h-64 overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-1"
-              aria-label={text("Courses")}
-            >
+          <ComboboxContent
+            anchor={field}
+            side="bottom"
+            align="start"
+            sideOffset={4}
+            className="max-h-64 w-[var(--anchor-width)] overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-regular-md"
+          >
+            {!rows.length && !picker.isPending && (
+              <ComboboxEmpty className="p-3 text-paragraph-sm text-text-sub-600">
+                {text("No courses match this search.")}
+              </ComboboxEmpty>
+            )}
+            <ComboboxList aria-label={text("Courses")}>
               {rows.map((course) => (
-                <AlignCommandMenu.Item
+                <ComboboxItem
                   key={course.id}
-                  value={course.id}
-                  className="min-h-9 rounded-md px-2 py-1.5 text-paragraph-sm"
-                  onSelect={() => {
-                    onChange(course.id);
-                    setPicked(course);
-                    closeMenu();
-                  }}
+                  value={course}
+                  label={courseDisplayName(course, language)}
+                  className="flex min-h-9 cursor-[var(--interactive-cursor)] items-center gap-3 rounded-md bg-bg-white-0 px-2 py-1.5 text-paragraph-sm text-text-strong-950 transition duration-200 ease-out data-highlighted:bg-bg-weak-50"
                 >
-                  <span className="min-w-0 flex-1">
-                    <Typography as="span" variant="paragraph" className="block">
-                      {courseDisplayName(course, language)}
-                    </Typography>
-                    <Typography as="span" variant="code" color="muted">
-                      {course.code}
-                    </Typography>
-                  </span>
-                  {value === course.id && (
-                    <RiCheckLine aria-hidden="true" className="size-4 shrink-0 text-primary-base" />
+                  {(state) => (
+                    <>
+                      <span className="min-w-0 flex-1">
+                        <Typography as="span" variant="paragraph" className="block">
+                          {courseDisplayName(course, language)}
+                        </Typography>
+                        <Typography as="span" variant="code" color="muted">
+                          {course.code}
+                        </Typography>
+                      </span>
+                      {state.selected && (
+                        <RiCheckLine
+                          aria-hidden="true"
+                          className="size-4 shrink-0 text-primary-base"
+                        />
+                      )}
+                    </>
                   )}
-                </AlignCommandMenu.Item>
+                </ComboboxItem>
               ))}
-              {!rows.length && !picker.isPending && (
-                <AlignCommandMenu.Empty className="p-3 text-paragraph-sm text-text-sub-600">
-                  {text("No courses match this search.")}
-                </AlignCommandMenu.Empty>
-              )}
-              {picker.hasNextPage && <div ref={sentinelRef} aria-hidden="true" />}
-            </AlignCommandMenu.List>
-          )}
-        </AlignCommandMenu.Root>
+            </ComboboxList>
+            {picker.hasNextPage && <div ref={sentinelRef} aria-hidden="true" />}
+          </ComboboxContent>
+        </Combobox>
         {error && (
           <Typography
             as="p"

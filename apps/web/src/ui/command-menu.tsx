@@ -1,17 +1,47 @@
 // Adapted from AlignUI CommandMenu v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import * as React from "react";
-import { Command } from "cmdk";
-import type { DialogContentProps, DialogProps } from "@radix-ui/react-dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+  type CommandInputState,
+  type CommandItemProps,
+  type CommandItemState,
+  type CommandListState,
+  type CommandProps,
+  type CommandShortcutState,
+} from "@ui-sdk/react/command";
+import type { PartProps } from "@ui-sdk/react/primitive";
 import { twMerge } from "tailwind-merge";
 import { tv, type VariantProps } from "tailwind-variants";
 import { AlignModal } from "./modal";
 
-type DialogComponentProps = DialogProps & {
+// The wrappers merge static classes, so callers pass class strings, not render functions.
+type ClassProps<State> = Omit<PartProps<"div", State>, "className" | "children"> & {
+  children?: React.ReactNode;
+  className?: string;
+};
+type InputProps = Omit<PartProps<"input", CommandInputState>, "className"> & {
+  className?: string;
+};
+type ItemProps = Omit<
+  ClassProps<CommandItemState>,
+  "value" | "defaultValue" | "onChange" | "onSelect"
+> &
+  CommandItemProps;
+
+type DialogProps = CommandProps & {
   children: React.ReactNode;
   className?: string;
   overlayClassName?: string;
-  onCloseAutoFocus?: DialogContentProps["onCloseAutoFocus"];
-  shouldFilter?: boolean;
+  onCloseAutoFocus?: React.ComponentProps<typeof AlignModal.Content>["onCloseAutoFocus"];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 function Dialog({
@@ -19,11 +49,12 @@ function Dialog({
   className,
   overlayClassName,
   onCloseAutoFocus,
-  shouldFilter = true,
+  open,
+  onOpenChange,
   ...props
-}: DialogComponentProps) {
+}: DialogProps) {
   return (
-    <AlignModal.Root {...props}>
+    <AlignModal.Root open={open} onOpenChange={onOpenChange}>
       <AlignModal.Content
         overlayClassName={twMerge("justify-start pt-20", overlayClassName)}
         showClose={false}
@@ -34,12 +65,11 @@ function Dialog({
         )}
       >
         <Command
-          shouldFilter={shouldFilter}
           className={twMerge(
-            "divide-y divide-stroke-soft-200",
-            "grid min-h-0 auto-cols-auto grid-flow-row max-[650px]:flex-1 max-[650px]:grid-rows-[auto_minmax(0,1fr)_auto]",
-            "[&>[cmdk-label]+*]:!border-t-0",
+            "grid min-h-0 auto-cols-auto grid-flow-row divide-y divide-stroke-soft-200",
+            "max-[650px]:flex-1 max-[650px]:grid-rows-[auto_minmax(0,1fr)_auto]",
           )}
+          {...props}
         >
           {children}
         </Command>
@@ -51,58 +81,43 @@ function Dialog({
 const DialogTitle = AlignModal.Title;
 const DialogDescription = AlignModal.Description;
 
-const Input = React.forwardRef<
-  React.ComponentRef<typeof Command.Input>,
-  React.ComponentPropsWithoutRef<typeof Command.Input>
->(({ className, ...props }, ref) => (
-  <Command.Input
-    ref={ref}
-    className={twMerge(
-      "w-full bg-transparent text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out placeholder:[transition:inherit] placeholder:text-text-soft-400 focus:outline-none",
-      className,
-    )}
-    {...props}
-  />
-));
-Input.displayName = "CommandInput";
+function Input({ className, ...props }: InputProps) {
+  return (
+    <CommandInput
+      className={twMerge(
+        "w-full bg-transparent text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out placeholder:[transition:inherit] placeholder:text-text-soft-400 focus:outline-none",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 
 const listVariants = tv({
-  base: "flex max-h-min min-h-0 flex-1 flex-col [&>[cmdk-list-sizer]]:divide-y [&>[cmdk-list-sizer]]:divide-stroke-soft-200 [&>[cmdk-list-sizer]]:overflow-auto",
+  base: "flex min-h-0 flex-1 flex-col divide-y divide-stroke-soft-200 overflow-auto",
   variants: { elevated: { true: "shadow-regular-md" } },
 });
 
-const List = React.forwardRef<
-  React.ComponentRef<typeof Command.List>,
-  React.ComponentPropsWithoutRef<typeof Command.List> & VariantProps<typeof listVariants>
->(({ elevated, className, ...props }, ref) => (
-  <Command.List ref={ref} className={listVariants({ elevated, className })} {...props} />
-));
-List.displayName = "CommandList";
+function List({
+  className,
+  elevated,
+  ...props
+}: ClassProps<CommandListState> & VariantProps<typeof listVariants>) {
+  return <CommandList className={listVariants({ elevated, className })} {...props} />;
+}
 
-const Group = React.forwardRef<
-  React.ComponentRef<typeof Command.Group>,
-  React.ComponentPropsWithoutRef<typeof Command.Group>
->(({ className, ...props }, ref) => (
-  <Command.Group
-    ref={ref}
-    className={twMerge(
-      "relative px-2 py-3",
-      "[&>[cmdk-group-heading]]:text-label-xs [&>[cmdk-group-heading]]:text-text-sub-600",
-      "[&>[cmdk-group-heading]]:mb-2 [&>[cmdk-group-heading]]:px-3 [&>[cmdk-group-heading]]:pt-1",
-      className,
-    )}
-    {...props}
-  />
-));
-Group.displayName = "CommandGroup";
+function Group({ className, ...props }: ClassProps<Record<string, never>>) {
+  return <CommandGroup className={twMerge("relative px-2 py-3", className)} {...props} />;
+}
 
-const Empty = Command.Empty;
+const Empty = CommandEmpty;
+const Separator = CommandSeparator;
 
 const itemVariants = tv({
   base: [
     "flex items-center gap-3 rounded-10 bg-bg-white-0",
     "cursor-[var(--interactive-cursor)] text-paragraph-sm text-text-strong-950",
-    "transition duration-200 ease-out data-[selected=true]:bg-bg-weak-50",
+    "transition duration-200 ease-out data-highlighted:bg-bg-weak-50",
   ],
   variants: {
     size: { small: "px-3 py-2.5", medium: "px-3 py-3" },
@@ -110,15 +125,18 @@ const itemVariants = tv({
   defaultVariants: { size: "small" },
 });
 
-type ItemProps = VariantProps<typeof itemVariants> &
-  React.ComponentPropsWithoutRef<typeof Command.Item>;
+function Item({ className, size, ...props }: ItemProps & VariantProps<typeof itemVariants>) {
+  return <CommandItem className={itemVariants({ size, className })} {...props} />;
+}
 
-const Item = React.forwardRef<React.ComponentRef<typeof Command.Item>, ItemProps>(
-  ({ className, size, ...props }, ref) => (
-    <Command.Item ref={ref} className={itemVariants({ size, className })} {...props} />
-  ),
-);
-Item.displayName = "CommandItem";
+function Shortcut({ className, ...props }: ClassProps<CommandShortcutState>) {
+  return (
+    <CommandShortcut
+      className={twMerge("ms-auto text-label-xs text-text-sub-600", className)}
+      {...props}
+    />
+  );
+}
 
 export const AlignCommandMenu = {
   Root: Command,
@@ -130,4 +148,6 @@ export const AlignCommandMenu = {
   Group,
   Empty,
   Item,
+  Separator,
+  Shortcut,
 };

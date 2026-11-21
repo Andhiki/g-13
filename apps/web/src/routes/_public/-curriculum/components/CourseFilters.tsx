@@ -22,14 +22,19 @@ export function CurriculumVersionFilter({
       >
         {text("Versi kurikulum")}
       </Typography>
-      <SegmentedControl.Root value={curriculum} onValueChange={onChange}>
-        <SegmentedControl.List aria-labelledby="curriculum-version-label">
-          {listCurricula().map((item) => (
-            <SegmentedControl.Trigger key={item.id} value={item.id}>
-              {item.id === "2021" ? text("2021 (rev. 2023)") : item.id}
-            </SegmentedControl.Trigger>
-          ))}
-        </SegmentedControl.List>
+      <SegmentedControl.Root
+        value={curriculum}
+        onValueChange={(value) => {
+          if (value !== null) onChange(value);
+        }}
+        aria-labelledby="curriculum-version-label"
+      >
+        <SegmentedControl.Indicator />
+        {listCurricula().map((item) => (
+          <SegmentedControl.Item key={item.id} value={item.id}>
+            {item.id === "2021" ? text("2021 (rev. 2023)") : item.id}
+          </SegmentedControl.Item>
+        ))}
       </SegmentedControl.Root>
     </div>
   );

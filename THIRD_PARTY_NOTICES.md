@@ -14,6 +14,7 @@ Daftar ini mencatat sumber yang diketahui; ini bukan bukti izin redistribusi.
 | Ikon perusahaan | Sumber, lisensi, dan perubahan setiap aset dicatat di [company-logos/README.md](apps/web/public/company-logos/README.md). Merek tetap milik pemilik masing-masing; lisensi aset tidak memberikan hak merek. |
 | GIF Sonic | `apps/web/public/theme/sonic-dancing.gif`; [asal aset](apps/web/public/theme/README.md). Sumber Tenor dan referensi portfolio-magic tidak membuktikan lisensi terbuka. Konfirmasi izin atau ganti dengan aset orisinal/berlisensi jelas sebelum mempromosikan paket aset sebagai bebas digunakan ulang. |
 | Dependensi dan font | Lisensi masing-masing paket tetap berlaku; periksa notice di paket yang didistribusikan. `bun.lock` mengunci versi dependensi. |
+| Skill agent ui-sdk | `.agents/skills/ui-sdk/` disalin dari [vercel-labs/ui](https://github.com/vercel-labs/ui) pada commit `855bc7fd`, tercatat di `skills-lock.json`. Paket `@ui-sdk/core` dan `@ui-sdk/react` berlisensi Apache-2.0. |
 | Font Geist | [Geist oleh Vercel](https://github.com/vercel/geist-font), didistribusikan melalui `@fontsource-variable/geist` dengan lisensi SIL Open Font License 1.1. Web menggunakan subset bernama internal G13GeistSubset; lisensi disalin ke `apps/web/src/fonts/geist-LICENSE.txt`. Font trailer tidak diubah; lisensinya di `apps/trailer/public/geist-OFL.txt`. |
 
 Kontributor harus menyertakan URL asal, pemilik, lisensi, serta modifikasi untuk

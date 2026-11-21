@@ -197,7 +197,6 @@ export function CurriculumMap({
   selectedId,
   nodes,
   edges,
-  lastSemester,
 }: {
   stage: RefObject<HTMLDivElement | null>;
   active: boolean;
@@ -210,7 +209,6 @@ export function CurriculumMap({
   selectedId: string | null;
   nodes: MapNode[];
   edges: Edge[];
-  lastSemester: number;
 }) {
   const { text } = useLocale();
   const title = useRef<HTMLDivElement>(null);
@@ -261,18 +259,7 @@ export function CurriculumMap({
           resetVersion={resetVersion}
           selectedId={selectedId}
         />
-        <ZoomControls
-          active={active}
-          shortcuts={[
-            { key: "f", description: "Buka/tutup pilihan kurikulum" },
-            { key: "v", description: "Ganti tampilan" },
-            { key: "/", description: "Cari mata kuliah" },
-            { key: "d", description: "Ganti tema" },
-          ]}
-          onReset={onReset}
-          selected={selectedId !== null}
-          lastSemester={lastSemester}
-        />
+        <ZoomControls active={active} onReset={onReset} selected={selectedId !== null} />
         <SemesterViewport
           enabled={active && selectedId === null}
           nodes={nodes}

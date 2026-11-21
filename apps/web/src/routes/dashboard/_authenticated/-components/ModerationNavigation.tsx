@@ -245,7 +245,7 @@ export function MobileModerationMenu({
   userImage,
 }: AccountProps & { manager: boolean }) {
   return (
-    <AlignDrawer.Root>
+    <AlignDrawer.Root side="left">
       <AlignDrawer.Trigger asChild>
         <AlignButton.Root
           variant="neutral"
@@ -258,7 +258,7 @@ export function MobileModerationMenu({
           <RiMenuLine className="size-5" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <AlignDrawer.Content side="left" className="max-w-[220px]">
+      <AlignDrawer.Content className="max-w-[220px]">
         <AlignDrawer.Title className="sr-only">Moderation navigation</AlignDrawer.Title>
         <AlignDrawer.Description className="sr-only">
           Choose a moderation section or return to public reviews.

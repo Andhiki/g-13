@@ -27,11 +27,11 @@ export function RoadmapFilters({
         <SegmentedControl.Root
           value={String(answers.lulus)}
           onValueChange={(value) => update({ ...answers, lulus: value === "7" ? 7 : 8 })}
+          aria-labelledby="roadmap-target-label"
         >
-          <SegmentedControl.List aria-labelledby="roadmap-target-label">
-            <SegmentedControl.Trigger value="7">{text("7 semester")}</SegmentedControl.Trigger>
-            <SegmentedControl.Trigger value="8">{text("8 semester")}</SegmentedControl.Trigger>
-          </SegmentedControl.List>
+          <SegmentedControl.Indicator />
+          <SegmentedControl.Item value="7">{text("7 semester")}</SegmentedControl.Item>
+          <SegmentedControl.Item value="8">{text("8 semester")}</SegmentedControl.Item>
         </SegmentedControl.Root>
       </div>
       {answers.iup === "ya" && ["exchange", "internship"].includes(answers.paparan ?? "") && (
