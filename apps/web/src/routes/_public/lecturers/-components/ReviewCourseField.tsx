@@ -117,7 +117,8 @@ export function ReviewCourseField({
           </div>
           {open && (
             <AlignCommandMenu.List
-              className="absolute inset-x-0 top-10 z-20 max-h-64 overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-regular-md"
+              elevated
+              className="absolute inset-x-0 top-10 z-20 max-h-64 overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-1"
               aria-label={text("Courses")}
             >
               {rows.map((course) => (
@@ -132,10 +133,10 @@ export function ReviewCourseField({
                   }}
                 >
                   <span className="min-w-0 flex-1">
-                    <Typography as="span" variant="paragraph" className="block text-paragraph-sm">
+                    <Typography as="span" variant="paragraph" className="block">
                       {courseDisplayName(course, language)}
                     </Typography>
-                    <Typography as="span" variant="code" className="text-text-sub-600">
+                    <Typography as="span" variant="code" color="muted">
                       {course.code}
                     </Typography>
                   </span>
@@ -157,8 +158,9 @@ export function ReviewCourseField({
           <Typography
             as="p"
             variant="caption"
+            color="danger"
             id={`${id}-error`}
-            className="mb-0 mt-1.5 text-error-base"
+            className="mb-0 mt-1.5"
           >
             {error}
           </Typography>

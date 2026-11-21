@@ -39,7 +39,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
           variant="neutral"
           mode="ghost"
           size="xsmall"
-          className="relative size-8 shrink-0 px-0 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
+          iconOnly
+          className="relative shrink-0 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
           aria-label={text("title")}
           title={text("title")}
         >
@@ -61,7 +62,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
       >
         <div className="flex items-center justify-between gap-2 border-b border-stroke-soft-200 px-3.5 py-2.5">
           <div className="flex items-center gap-2">
-            <Typography as="p" variant="label" className="text-text-strong-950">
+            <Typography as="p" variant="label" color="strong">
               {text("title")}
             </Typography>
           </div>
@@ -70,7 +71,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
               size="xxsmall"
               variant="neutral"
               mode="ghost"
-              className="size-7 px-0"
+              iconOnly
               aria-label={text("action.markAllRead")}
               title={text("action.markAllRead")}
               disabled={busy}
@@ -83,7 +84,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
 
         {readMutationError && (
           <div className="border-b border-stroke-soft-200 bg-error-lighter px-3.5 py-2">
-            <Typography role="alert" variant="caption" className="text-error-base">
+            <Typography role="alert" variant="caption" color="danger">
               {text("error.update")}
             </Typography>
           </div>
@@ -92,7 +93,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
         <div className="max-h-[340px] overflow-y-auto">
           {listQuery.isError ? (
             <div className="px-3.5 py-6 text-center">
-              <Typography role="alert" variant="caption" className="text-error-base">
+              <Typography role="alert" variant="caption" color="danger">
                 {text("error.load")}
               </Typography>
             </div>
@@ -102,7 +103,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
             </div>
           ) : items.length === 0 ? (
             <div className="px-3.5 py-8 text-center">
-              <Typography variant="caption" className="text-text-sub-600">
+              <Typography variant="caption" color="muted">
                 {text("empty.unread")}
               </Typography>
             </div>
@@ -123,22 +124,19 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
                           className="inline-block size-1.5 shrink-0 rounded-full bg-primary-base"
                           aria-label={text("status.unread")}
                         />
-                        <Typography
-                          as="p"
-                          variant="labelSmall"
-                          className="truncate text-text-strong-950"
-                        >
+                        <Typography as="p" variant="labelSmall" color="strong" className="truncate">
                           {text(titleKey, interpolation)}
                         </Typography>
                         <Typography
                           variant="caption"
-                          className="shrink-0 text-text-sub-600"
+                          color="muted"
+                          className="shrink-0"
                           title={formatAbsoluteTime(item.createdAt, language)}
                         >
                           · {formatRelativeTime(item.createdAt, language)}
                         </Typography>
                       </div>
-                      <Typography variant="caption" className="block text-text-sub-600">
+                      <Typography variant="caption" color="muted" className="block">
                         {text(bodyKey, interpolation)}
                       </Typography>
                     </div>
@@ -149,7 +147,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
                           size="xxsmall"
                           variant="neutral"
                           mode="ghost"
-                          className="size-7 px-0"
+                          iconOnly
                           aria-label={text("action.open")}
                           title={text("action.open")}
                           onClick={() => setOpen(false)}
@@ -163,7 +161,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
                         size="xxsmall"
                         variant="neutral"
                         mode="ghost"
-                        className="size-7 px-0"
+                        iconOnly
                         aria-label={text("action.markRead")}
                         title={text("action.markRead")}
                         disabled={busy}
@@ -175,7 +173,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
                         size="xxsmall"
                         variant="neutral"
                         mode="ghost"
-                        className="size-7 px-0"
+                        iconOnly
                         aria-label={text("action.archive")}
                         title={text("action.archive")}
                         disabled={busy}
@@ -197,7 +195,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="w-full justify-center text-label-xs"
+            className="w-full justify-center"
             onClick={() => setOpen(false)}
           >
             <Link to="/dashboard/notifications">{text("action.viewAll")}</Link>

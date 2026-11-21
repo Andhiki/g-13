@@ -61,12 +61,12 @@ function MapControlDrawer({
         <div className="flex items-start gap-3 p-5">
           <div className="min-w-0 flex-1">
             <AlignDrawer.Title asChild>
-              <Typography as="h2" variant="label" className="text-text-strong-950">
+              <Typography as="h2" variant="label" color="strong">
                 {text(copy.title)}
               </Typography>
             </AlignDrawer.Title>
             <AlignDrawer.Description asChild>
-              <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
+              <Typography as="p" variant="caption" color="muted" className="mt-1">
                 {text(copy.description)}
               </Typography>
             </AlignDrawer.Description>

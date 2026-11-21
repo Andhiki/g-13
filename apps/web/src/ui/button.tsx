@@ -35,8 +35,10 @@ export const buttonVariants = tv({
       xsmall:
         "h-8 gap-2.5 rounded-lg px-2.5 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-1",
       xxsmall:
-        "h-7 gap-2.5 rounded-lg px-2 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
+        "h-7 gap-2.5 rounded-lg px-2 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
     },
+    iconOnly: { true: "" },
+    compact: { true: "" },
   },
   compoundVariants: [
     {
@@ -109,7 +111,32 @@ export const buttonVariants = tv({
     {
       variant: "error",
       mode: "ghost",
-      class: "bg-transparent text-error-base ring-transparent hover:bg-red-alpha-10",
+      class: "bg-transparent text-error-dark ring-transparent hover:bg-red-alpha-10",
+    },
+    {
+      size: "medium",
+      iconOnly: true,
+      class: "size-10 p-0",
+    },
+    {
+      size: "xsmall",
+      iconOnly: true,
+      class: "size-8 p-0",
+    },
+    {
+      size: "xxsmall",
+      iconOnly: true,
+      class: "size-7 p-0",
+    },
+    {
+      size: "small",
+      compact: true,
+      class: "gap-1.5 text-label-xs",
+    },
+    {
+      size: "xxsmall",
+      compact: true,
+      class: "gap-1",
     },
   ],
   defaultVariants: { variant: "primary", mode: "filled", size: "medium" },
@@ -125,6 +152,8 @@ function Root({
   variant,
   mode,
   size,
+  iconOnly,
+  compact,
   type = "button",
   isLoading = false,
   icon,
@@ -133,7 +162,7 @@ function Root({
   children,
   ...props
 }: ButtonProps) {
-  const classes = buttonVariants({ variant, mode, size, className });
+  const classes = buttonVariants({ variant, mode, size, iconOnly, compact, className });
   if (asChild)
     return (
       <Slot className={classes} {...props}>

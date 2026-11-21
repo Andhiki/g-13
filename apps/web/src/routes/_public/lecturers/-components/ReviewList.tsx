@@ -51,7 +51,7 @@ export function ReviewList({
               ] satisfies [string, number][]
             ).map(([label, value]) => (
               <div key={label} className="flex items-center gap-1.5">
-                <Typography as="dt" variant="caption" className="text-text-sub-600">
+                <Typography as="dt" variant="caption" color="muted">
                   {text(label)}
                 </Typography>
                 <dd className="m-0 flex items-center gap-0.5 text-label-xs tabular-nums">
@@ -68,7 +68,7 @@ export function ReviewList({
                   ? text("Anonymous")
                   : review.authorName}
               </Typography>
-              <Typography as="time" variant="caption" className="text-text-sub-600">
+              <Typography as="time" variant="caption" color="muted">
                 {review.termLabel}
               </Typography>
             </div>

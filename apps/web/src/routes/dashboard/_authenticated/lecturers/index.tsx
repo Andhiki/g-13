@@ -196,9 +196,11 @@ function AdminLecturersPage() {
             className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
           >
             {lecturersQuery.isError ? (
-              <Typography role="alert" className="p-4">
-                Could not load lecturers. Refresh or sign in again.
-              </Typography>
+              <div className="p-4">
+                <Typography role="alert">
+                  Could not load lecturers. Refresh or sign in again.
+                </Typography>
+              </div>
             ) : lecturersQuery.isPending ? (
               <DashboardPending />
             ) : (

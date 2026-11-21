@@ -57,7 +57,8 @@ export function ReviewInspector({
               size="small"
               variant="neutral"
               mode="stroke"
-              className="w-full gap-1.5 text-label-xs"
+              compact
+              className="w-full"
               onClick={() =>
                 onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
               }
@@ -69,7 +70,8 @@ export function ReviewInspector({
               size="small"
               variant="error"
               mode="lighter"
-              className="w-full gap-1.5 text-label-xs"
+              compact
+              className="w-full"
               onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
             >
               <RiDeleteBinLine className="size-3.5" />
@@ -77,13 +79,12 @@ export function ReviewInspector({
             </AlignButton.Root>
           </div>
         ) : (
-          <Typography
-            variant="caption"
-            className="flex items-center justify-center gap-1.5 py-1 text-text-sub-600"
-          >
+          <div className="flex items-center justify-center gap-1.5 py-1">
             <RiLockLine className="size-3.5" />
-            Read only
-          </Typography>
+            <Typography variant="caption" color="muted">
+              Read only
+            </Typography>
+          </div>
         )
       }
     >
@@ -94,7 +95,7 @@ export function ReviewInspector({
           </Typography>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
-        <Typography variant="caption" className="mt-1 block text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-1 block">
           {review.courseCode} · {review.termLabel}
         </Typography>
       </div>
@@ -141,13 +142,14 @@ export function ReviewInspector({
         </dl>
       </section>
       <section className="border-t border-stroke-soft-200 pt-4">
-        <Typography as="h3" variant="labelSmall" className="text-text-strong-950">
+        <Typography as="h3" variant="labelSmall" color="strong">
           Experience
         </Typography>
         <Typography
           ref={bodyRef}
           variant="caption"
-          className={`mt-2 whitespace-pre-wrap break-words leading-5 text-text-sub-600 ${
+          color="muted"
+          className={`mt-2 whitespace-pre-wrap break-words leading-5 ${
             expanded ? "" : "line-clamp-3"
           }`}
         >
@@ -158,7 +160,7 @@ export function ReviewInspector({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="-ml-1.5 mt-1.5 h-6 px-1.5 text-label-xs text-text-sub-600"
+            className="-ml-1.5 mt-1.5 h-6 px-1.5"
             aria-expanded={expanded}
             onClick={() => setExpanded((current) => !current)}
           >

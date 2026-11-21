@@ -18,10 +18,10 @@ export function LoginPage({ identity }: { identity: Identity }) {
     return (
       <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
         <div className="max-w-sm space-y-1.5 text-center">
-          <Typography variant="paragraph" className="text-text-strong-950">
+          <Typography variant="paragraph" color="strong">
             Your account is awaiting approval.
           </Typography>
-          <Typography variant="caption" className="text-text-sub-600">
+          <Typography variant="caption" color="muted">
             Contact maintainers or admin to help get your account approved.
           </Typography>
         </div>
@@ -51,7 +51,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
     <main className="flex min-h-dvh w-full items-center justify-center bg-bg-white-0 px-4 py-12">
       <div className="w-full max-w-[380px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-sm">
         <div className="border-b border-stroke-soft-200 px-6 py-4 text-center">
-          <Typography as="h1" variant="label" className="text-text-strong-950">
+          <Typography as="h1" variant="label" color="strong">
             Sign in
           </Typography>
         </div>
@@ -68,11 +68,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
             Sign in with GitHub
           </AlignButton.Root>
           {error && (
-            <Typography
-              role="alert"
-              variant="caption"
-              className="block text-center text-error-base"
-            >
+            <Typography role="alert" variant="caption" color="danger" className="block text-center">
               Sign-in failed. Please try again.
             </Typography>
           )}

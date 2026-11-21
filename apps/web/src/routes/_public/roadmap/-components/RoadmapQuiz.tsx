@@ -76,8 +76,9 @@ export function RoadmapQuiz({
           <Typography
             as="p"
             variant="paragraph"
+            color="muted"
             id="quiz-description"
-            className="mb-8 mt-3 max-w-[650px] text-text-sub-600"
+            className="mb-8 mt-3 max-w-[650px]"
           >
             {text(question.description)}
           </Typography>

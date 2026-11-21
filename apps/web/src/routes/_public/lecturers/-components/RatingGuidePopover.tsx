@@ -20,7 +20,8 @@ export function RatingGuidePopover() {
           variant="neutral"
           mode="ghost"
           size="xsmall"
-          className="size-8 shrink-0 p-0 text-text-sub-600"
+          iconOnly
+          className="shrink-0"
           aria-label={text("About ratings and reviews")}
           title={text("About ratings and reviews")}
         >
@@ -48,13 +49,13 @@ export function RatingGuidePopover() {
                 <Typography as="dt" variant="label">
                   {text(label)}
                 </Typography>
-                <Typography as="dd" variant="caption" className="m-0 mt-0.5 text-text-sub-600">
+                <Typography as="dd" variant="caption" color="muted" className="m-0 mt-0.5">
                   {text(description)}
                 </Typography>
               </div>
             ))}
           </dl>
-          <Typography as="p" variant="caption" className="mb-0 mt-3 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-3">
             {text(
               "Overall ratings give equal weight to these three aspects. Scores range from 1 to 5.",
             )}
@@ -67,20 +68,20 @@ export function RatingGuidePopover() {
           <Typography as="h2" variant="label" id="review-policy-title" className="m-0">
             {text("Unverified reviews")}
           </Typography>
-          <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1.5">
             {text(
               "Reviews are shared by the community and do not prove course attendance. This is a community-run project, not an official university service.",
             )}
           </Typography>
-          <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1.5">
             {text("Ratings summarize experiences and are not a definitive ranking.")}
           </Typography>
-          <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1.5">
             {text(
               "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.",
             )}
           </Typography>
-          <Typography as="p" variant="caption" className="mb-0 mt-1.5 text-text-sub-600">
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1.5">
             {text(
               "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.",
             )}

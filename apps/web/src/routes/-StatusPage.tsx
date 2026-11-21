@@ -15,7 +15,9 @@ export function StatusPage({ kind, reset }: { kind: "notFound" | "error"; reset?
         <Typography as="h1" variant="title">
           {t(`${kind}.title`)}
         </Typography>
-        <Typography className="mt-3 text-text-sub-600">{t(`${kind}.description`)}</Typography>
+        <Typography color="muted" className="mt-3">
+          {t(`${kind}.description`)}
+        </Typography>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {kind === "error" && (
             <AlignButton.Root onClick={reset}>

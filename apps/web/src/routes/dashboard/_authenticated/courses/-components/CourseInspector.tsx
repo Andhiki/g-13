@@ -45,7 +45,7 @@ export function CourseInspector({
           </Typography>
           <RecordStatusBadge deleted={deleted} />
         </div>
-        <Typography variant="caption" className="mt-1 block break-words text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-1 block break-words">
           {course.nameEn}
         </Typography>
       </div>

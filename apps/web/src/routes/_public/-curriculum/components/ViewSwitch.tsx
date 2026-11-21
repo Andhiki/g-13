@@ -22,7 +22,7 @@ export function ViewSwitch({
             variant="neutral"
             mode="stroke"
             size="medium"
-            className="size-10 p-0"
+            iconOnly
             aria-pressed={view === "list"}
             aria-keyshortcuts="V"
             aria-label={text(label)}

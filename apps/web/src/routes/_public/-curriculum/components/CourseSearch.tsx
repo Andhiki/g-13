@@ -106,7 +106,8 @@ export function CourseSearch({
                         <Typography
                           as="span"
                           variant="labelSmall"
-                          className="whitespace-nowrap text-text-sub-600"
+                          color="muted"
+                          className="whitespace-nowrap"
                         >
                           {course.code}
                         </Typography>
@@ -114,7 +115,8 @@ export function CourseSearch({
                       <Typography
                         as="small"
                         variant="labelSmall"
-                        className="col-start-1 text-text-sub-600"
+                        color="muted"
+                        className="col-start-1"
                       >
                         {semesterLabel(course, text)}
                       </Typography>
@@ -134,18 +136,24 @@ export function CourseSearch({
           )}
         </AlignCommandMenu.List>
         <div className="hidden flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-text-sub-600 min-[650px]:flex">
-          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1.5">
             <AlignKbd.Root aria-label={text("Panah bawah")}>↓</AlignKbd.Root>
-            {text("Turun")}
-          </Typography>
-          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
+            <Typography as="span" variant="caption">
+              {text("Turun")}
+            </Typography>
+          </span>
+          <span className="flex items-center gap-1.5">
             <AlignKbd.Root aria-label={text("Panah atas")}>↑</AlignKbd.Root>
-            {text("Naik")}
-          </Typography>
-          <Typography as="span" variant="caption" className="flex items-center gap-1.5">
+            <Typography as="span" variant="caption">
+              {text("Naik")}
+            </Typography>
+          </span>
+          <span className="flex items-center gap-1.5">
             <AlignKbd.Root>Enter</AlignKbd.Root>
-            {text("Buka mata kuliah")}
-          </Typography>
+            <Typography as="span" variant="caption">
+              {text("Buka mata kuliah")}
+            </Typography>
+          </span>
         </div>
       </AlignCommandMenu.Dialog>
     </div>

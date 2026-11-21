@@ -33,19 +33,19 @@ export function ConfirmActionModal({
       }}
     >
       <AlignModal.Content className="p-5">
-        <AlignModal.Title asChild>
-          <Typography as="h2" variant="subtitle2" className="pr-8 text-text-strong-950">
+        <AlignModal.Title asChild className="pr-8">
+          <Typography as="h2" variant="subtitle2" color="strong">
             {title}
           </Typography>
         </AlignModal.Title>
-        <AlignModal.Description asChild>
-          <Typography variant="paragraph" className="mt-2 pr-4 text-text-sub-600">
+        <AlignModal.Description asChild className="mt-2 pr-4">
+          <Typography variant="paragraph" color="muted">
             {description}
           </Typography>
         </AlignModal.Description>
         {children}
         {error && (
-          <Typography role="alert" variant="caption" className="mt-3 text-error-base">
+          <Typography role="alert" variant="caption" color="danger" className="mt-3">
             {error}
           </Typography>
         )}

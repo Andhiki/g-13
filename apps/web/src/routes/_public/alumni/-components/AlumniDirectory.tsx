@@ -225,7 +225,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
                 <Typography variant="label" className="m-0">
                   {text("Tidak ada alumni yang cocok.")}
                 </Typography>
-                <Typography variant="paragraph" className="mb-0 mt-2 text-text-sub-600">
+                <Typography variant="paragraph" color="muted" className="mb-0 mt-2">
                   {text("Coba kata kunci lain atau pilih semua angkatan.")}
                 </Typography>
               </div>

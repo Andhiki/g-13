@@ -91,7 +91,7 @@ export function PaperPreview({
                   variant: "neutral",
                   mode: "stroke",
                   size: "xsmall",
-                  className: "size-8 p-0",
+                  iconOnly: true,
                 })}
               >
                 <RiDownloadLine className="size-4" aria-hidden="true" />
@@ -103,7 +103,8 @@ export function PaperPreview({
                       variant="neutral"
                       mode="stroke"
                       size="xsmall"
-                      className="size-8 p-0 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+                      iconOnly
+                      className="transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
                       aria-label={
                         share?.status === "copied"
                           ? text("Tautan berhasil disalin")
@@ -139,7 +140,7 @@ export function PaperPreview({
                   variant: "neutral",
                   mode: "stroke",
                   size: "xsmall",
-                  className: "size-8 p-0",
+                  iconOnly: true,
                 })}
               >
                 <RiDriveLine className="size-4" aria-hidden="true" />
@@ -149,7 +150,7 @@ export function PaperPreview({
                   variant="neutral"
                   mode="stroke"
                   size="xsmall"
-                  className="size-8 p-0"
+                  iconOnly
                   aria-label={text("Tutup dialog")}
                   title={text("Tutup")}
                 >

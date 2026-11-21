@@ -69,7 +69,7 @@ export function AdminForm({
     >
       <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
         <AlignModal.Title asChild>
-          <Typography as="h2" variant="subtitle2" className="text-text-strong-950">
+          <Typography as="h2" variant="subtitle2" color="strong">
             {title}
           </Typography>
         </AlignModal.Title>
@@ -77,7 +77,7 @@ export function AdminForm({
       <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
         {children}
         {error && (
-          <Typography role="alert" variant="caption" className="text-error-base">
+          <Typography role="alert" variant="caption" color="danger">
             {error}
           </Typography>
         )}
@@ -131,8 +131,9 @@ export function AdminFormField({
       <Typography
         as="label"
         variant="labelSmall"
+        color="strong"
         htmlFor={id}
-        className="mb-1.5 block text-text-strong-950"
+        className="mb-1.5 block"
       >
         {label}
       </Typography>
@@ -150,7 +151,7 @@ export function AdminFormField({
         onChange={(event) => onChange(event.target.value)}
       />
       {error && (
-        <Typography variant="caption" id={errorId} className="mt-1.5 text-error-base">
+        <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
           {error}
         </Typography>
       )}

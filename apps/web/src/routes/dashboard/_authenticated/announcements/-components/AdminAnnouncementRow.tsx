@@ -66,16 +66,16 @@ export function AdminAnnouncementRow({
         >
           {announcement.titleId}
         </AdminTableInspectButton>
-        <Typography variant="caption" className="mt-0.5 block truncate text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
           {announcement.titleEn} · {announcement.slug}
         </Typography>
       </div>
 
       <div className="min-w-0">
-        <Typography variant="caption" className="block text-text-strong-950">
+        <Typography variant="caption" color="strong" className="block">
           {formatAbsoluteTime(announcement.startsAt.getTime(), language)}
         </Typography>
-        <Typography variant="caption" className="mt-0.5 block text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-0.5 block">
           {announcement.endsAt === null
             ? "No expiry"
             : `→ ${formatAbsoluteTime(announcement.endsAt.getTime(), language)}`}
@@ -91,7 +91,7 @@ export function AdminAnnouncementRow({
           size="xxsmall"
           variant="neutral"
           mode="ghost"
-          className="gap-1 text-label-xs"
+          compact
           onClick={() => onEdit(announcement)}
         >
           <RiEditLine className="size-3.5" />
@@ -102,7 +102,7 @@ export function AdminAnnouncementRow({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             onClick={() =>
               onLifecycle({ announcementId: announcement.id, action: "disable" }, label)
             }
@@ -115,7 +115,7 @@ export function AdminAnnouncementRow({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             onClick={() =>
               onLifecycle({ announcementId: announcement.id, action: "enable" }, label)
             }
@@ -128,7 +128,7 @@ export function AdminAnnouncementRow({
           size="xxsmall"
           variant="error"
           mode="ghost"
-          className="gap-1 text-label-xs text-error-dark"
+          compact
           onClick={() => onLifecycle({ announcementId: announcement.id, action: "delete" }, label)}
         >
           <RiCloseLine className="size-3.5" />

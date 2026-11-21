@@ -46,7 +46,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
             })}
           />
         </div>
-        <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
+        <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
           {lecturer.reviewCount === 0
             ? text("No reviews yet")
             : text(lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {

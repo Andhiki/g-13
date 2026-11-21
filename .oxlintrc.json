@@ -1,20 +1,109 @@
 {
-  "jsPlugins": ["@shadcn/lint"],
+  "jsPlugins": [
+    "@shadcn/lint"
+  ],
   "settings": {
     "shadcn": {
-      "componentImports": ["^@/ui(/|$)"],
-      "themeImports": ["^@/ui/"],
-      "mergeFunctions": ["clsx", "cn", "twMerge"],
-      "variantFunctions": ["tv", "createTV"]
+      "componentImports": [
+        "^@/ui(/|$)"
+      ],
+      "themeImports": [
+        "^@/ui/"
+      ],
+      "mergeFunctions": [
+        "clsx",
+        "cn",
+        "twMerge"
+      ],
+      "variantFunctions": [
+        "tv",
+        "createTV"
+      ]
     }
   },
   "overrides": [
     {
-      "files": ["apps/web/src/**/*.{ts,tsx}"],
+      "files": [
+        "apps/web/src/**/*.{ts,tsx}"
+      ],
       "rules": {
         "shadcn/no-raw-colors": "error",
-        "shadcn/no-unknown-classes": ["error", { "allow": ["nodrag", "nopan"] }],
-        "shadcn/require-static-classes": "error"
+        "shadcn/no-unknown-classes": [
+          "error",
+          {
+            "allow": [
+              "nodrag",
+              "nopan"
+            ]
+          }
+        ],
+        "shadcn/require-static-classes": "error",
+        "shadcn/no-restyle": [
+          "error",
+          {
+            "allow": [
+              "layout",
+              "spacing",
+              "typography",
+              "color",
+              "shape",
+              "motion",
+              "appearance"
+            ],
+            "contracts": [
+              {
+                "pattern": "^Typography$",
+                "allow": [
+                  "layout",
+                  "truncate",
+                  "tabular-nums",
+                  "break-words",
+                  "line-clamp"
+                ]
+              },
+              {
+                "pattern": "^(AlignButtonRoot|AlignFancyButtonRoot)$",
+                "allow": [
+                  "layout"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/web/src/ui/**"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/web/src/routes/_public/-announcements/banner.tsx",
+        "apps/web/src/routes/_public/-curriculum/components/CourseTable.tsx",
+        "apps/web/src/routes/_public/exam/-components/PaperPreview.tsx",
+        "apps/web/src/routes/_public/lecturers/-components/LecturerDetailPage.tsx",
+        "apps/web/src/routes/_public/lecturers/-components/ReviewList.tsx",
+        "apps/web/src/routes/_public/lecturers/-components/ReviewSubmissionForm.tsx",
+        "apps/web/src/routes/_public/roadmap/-components/RoadmapQuiz.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/AdminFilterBar.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/AdminFormModal.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/AdminPageHeader.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/AdminPagination.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/AdminTable.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/ConfirmActionModal.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/ModerationNavigation.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/-components/NotificationsPopover.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/lecturer-reviews/-components/AdminReviewRow.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/lecturer-reviews/-components/ReviewInspector.tsx",
+        "apps/web/src/routes/dashboard/_authenticated/notifications/index.tsx",
+        "apps/web/src/routes/dashboard/login/-components/LoginPage.tsx"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off"
       }
     }
   ]

@@ -35,7 +35,7 @@ export function AdminCourseRow({
       className={`${courseTableColumns} lg:items-center`}
     >
       <div className="flex min-w-0 items-center gap-2">
-        <Typography variant="code" className="truncate font-medium text-text-strong-950">
+        <Typography variant="code" color="strong" weight="medium" className="truncate">
           {course.code}
         </Typography>
         <div className="lg:hidden">
@@ -51,12 +51,12 @@ export function AdminCourseRow({
         >
           {course.nameId}
         </AdminTableInspectButton>
-        <Typography variant="caption" className="mt-0.5 block truncate text-text-sub-600">
+        <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
           {course.nameEn}
         </Typography>
       </div>
 
-      <Typography variant="caption" className="text-text-sub-600 tabular-nums lg:text-right">
+      <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
         <span className="lg:hidden">Reviews: </span>
         {course.reviewCount}
       </Typography>

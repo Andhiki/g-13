@@ -17,35 +17,17 @@ export function CatalogRowActions({
     <div className="flex items-center justify-end gap-1">
       {!deleted ? (
         <>
-          <AlignButton.Root
-            size="xxsmall"
-            variant="neutral"
-            mode="ghost"
-            className="gap-1 text-label-xs"
-            onClick={onEdit}
-          >
+          <AlignButton.Root size="xxsmall" variant="neutral" mode="ghost" compact onClick={onEdit}>
             <RiEditLine className="size-3.5" />
             Edit
           </AlignButton.Root>
-          <AlignButton.Root
-            size="xxsmall"
-            variant="error"
-            mode="ghost"
-            className="gap-1 text-label-xs text-error-dark"
-            onClick={onDelete}
-          >
+          <AlignButton.Root size="xxsmall" variant="error" mode="ghost" compact onClick={onDelete}>
             <RiDeleteBinLine className="size-3.5" />
             Delete
           </AlignButton.Root>
         </>
       ) : (
-        <AlignButton.Root
-          size="xxsmall"
-          variant="neutral"
-          mode="ghost"
-          className="gap-1 text-label-xs"
-          onClick={onRestore}
-        >
+        <AlignButton.Root size="xxsmall" variant="neutral" mode="ghost" compact onClick={onRestore}>
           <RiRestartLine className="size-3.5" />
           Restore
         </AlignButton.Root>
@@ -74,7 +56,8 @@ export function CatalogInspectorActions({
           size="small"
           variant="neutral"
           mode="stroke"
-          className="w-full gap-1.5 text-label-xs"
+          compact
+          className="w-full"
           onClick={onEdit}
         >
           <RiEditLine className="size-3.5" />
@@ -84,7 +67,8 @@ export function CatalogInspectorActions({
           size="small"
           variant="error"
           mode="lighter"
-          className="w-full gap-1.5 text-label-xs"
+          compact
+          className="w-full"
           onClick={onDelete}
         >
           <RiDeleteBinLine className="size-3.5" />
@@ -95,11 +79,7 @@ export function CatalogInspectorActions({
   }
 
   return (
-    <AlignFancyButton.Root
-      size="small"
-      className="w-full gap-1.5 text-label-xs"
-      onClick={onRestore}
-    >
+    <AlignFancyButton.Root size="small" compact className="w-full" onClick={onRestore}>
       <RiRestartLine className="size-3.5" />
       {restoreLabel}
     </AlignFancyButton.Root>

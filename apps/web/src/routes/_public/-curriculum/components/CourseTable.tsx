@@ -27,10 +27,10 @@ export function CourseTable({
       aria-labelledby={headingId}
     >
       <div className="mb-3 flex items-baseline justify-between gap-4">
-        <Typography as="h2" variant="subtitle2" id={headingId} className="m-0 text-text-strong-950">
+        <Typography as="h2" variant="subtitle2" color="strong" id={headingId} className="m-0">
           {text(section.title)}
         </Typography>
-        <Typography as="span" variant="caption" className="text-text-sub-600">
+        <Typography as="span" variant="caption" color="muted">
           {text("courseCount", { count: section.courses.length })}
         </Typography>
       </div>
@@ -100,7 +100,7 @@ export function CourseTable({
                     {course.code && (
                       <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
                     )}
-                    <Typography as="span" variant="caption" className="text-text-sub-600">
+                    <Typography as="span" variant="caption" color="muted">
                       {course.code || "—"}
                     </Typography>
                   </div>
@@ -115,7 +115,7 @@ export function CourseTable({
                     aria-pressed={selectedId === course.id}
                     onClick={() => select(course.id)}
                   >
-                    <Typography as="span" variant="label" className="text-text-strong-950">
+                    <Typography as="span" variant="label" color="strong">
                       {courseName(course)}
                     </Typography>
                   </AlignButton.Root>
@@ -123,7 +123,7 @@ export function CourseTable({
                     {course.code && (
                       <div className="inline-flex items-center gap-1">
                         <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
-                        <Typography as="span" variant="code" className="text-text-sub-600">
+                        <Typography as="span" variant="code" color="muted">
                           {course.code}
                         </Typography>
                       </div>
@@ -134,37 +134,29 @@ export function CourseTable({
                       </AlignBadge.Root>
                     ))}
                     {groups && (
-                      <Typography as="span" variant="caption" className="text-text-sub-600">
+                      <Typography as="span" variant="caption" color="muted">
                         {groups}
                       </Typography>
                     )}
                   </div>
                   {showSemesters && (
-                    <Typography
-                      as="span"
-                      variant="caption"
-                      className="mb-1 block text-text-sub-600"
-                    >
+                    <Typography as="span" variant="caption" color="muted" className="mb-1 block">
                       {semesterLabel(course, text)}
                     </Typography>
                   )}
                 </AlignTable.Cell>
                 <AlignTable.Cell className="h-10 max-[640px]:hidden">
-                  <Typography as="span" variant="caption" className="block text-text-sub-600">
+                  <Typography as="span" variant="caption" color="muted" className="block">
                     {categories}
                   </Typography>
                   {groups && (
-                    <Typography as="span" variant="caption" className="block text-text-sub-600">
+                    <Typography as="span" variant="caption" color="muted" className="block">
                       {groups}
                     </Typography>
                   )}
                 </AlignTable.Cell>
                 <AlignTable.Cell className="h-10 whitespace-nowrap text-right max-[640px]:align-top max-[640px]:pt-3">
-                  <Typography
-                    as="span"
-                    variant="paragraph"
-                    className="text-text-sub-600 tabular-nums"
-                  >
+                  <Typography as="span" variant="paragraph" color="muted" className="tabular-nums">
                     {credits || "—"}
                     <span className="min-[640px]:hidden"> {text("SKS")}</span>
                   </Typography>

@@ -46,12 +46,12 @@ export function AdminLecturerRow({
             <RecordStatusBadge deleted={deleted} />
           </div>
         </div>
-        <Typography variant="code" className="mt-0.5 block truncate text-text-sub-600">
+        <Typography variant="code" color="muted" className="mt-0.5 block truncate">
           {lecturer.id}
         </Typography>
       </div>
 
-      <Typography variant="caption" className="text-text-sub-600 tabular-nums lg:text-right">
+      <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
         <span className="lg:hidden">Reviews: </span>
         {lecturer.reviewCount}
       </Typography>

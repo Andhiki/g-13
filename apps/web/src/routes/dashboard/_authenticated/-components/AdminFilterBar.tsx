@@ -37,7 +37,7 @@ export function AdminFilterBar<T extends string>({
               size="xxsmall"
               variant="neutral"
               mode={active ? "lighter" : "ghost"}
-              className="gap-2 text-label-xs"
+              className="gap-2"
               aria-pressed={active}
               onClick={() => onTabChange(tab.value)}
             >

@@ -46,13 +46,13 @@ export function ZoomControls({
             <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
               <div className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
                 <dt>
-                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                  <Typography as="span" variant="caption" color="muted">
                     {text("Ke semester")}
                   </Typography>
                 </dt>
                 <dd className="m-0 flex items-center justify-end gap-1">
                   <AlignKbd.Root>1</AlignKbd.Root>
-                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                  <Typography as="span" variant="caption" color="muted">
                     -
                   </Typography>
                   <AlignKbd.Root>{lastSemester}</AlignKbd.Root>
@@ -61,7 +61,7 @@ export function ZoomControls({
               {shortcuts.map(({ key, description }) => (
                 <div key={key} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
                   <dt>
-                    <Typography as="span" variant="caption" className="text-text-sub-600">
+                    <Typography as="span" variant="caption" color="muted">
                       {text(description)}
                     </Typography>
                   </dt>
@@ -120,7 +120,8 @@ function ZoomButtons({ onReset }: { onReset: () => void }) {
       <Typography
         as="span"
         variant="label"
-        className="min-w-10 text-center tabular-nums text-text-sub-600"
+        color="muted"
+        className="min-w-10 text-center tabular-nums"
         aria-label={text("Zoom {{v0}}%", { v0: percent })}
       >
         {percent}%

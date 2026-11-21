@@ -112,7 +112,8 @@ export function AnnouncementBanner() {
                 variant="neutral"
                 mode="ghost"
                 size="xsmall"
-                className="size-7 shrink-0 p-0 text-static-white hover:bg-static-white/10"
+                iconOnly
+                className="size-7 shrink-0 text-static-white hover:bg-static-white/10"
                 aria-label={text("Tutup pengumuman")}
                 onClick={() => dismiss(row.slug)}
               >

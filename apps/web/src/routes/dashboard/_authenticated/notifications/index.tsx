@@ -76,30 +76,24 @@ function NotificationRow({
               aria-label={text("status.unread")}
             />
           )}
-          <Typography as="p" variant="label" className="text-text-strong-950">
+          <Typography as="p" variant="label" color="strong">
             {text(titleKey, interpolation)}
           </Typography>
           <Typography
             variant="caption"
-            className="text-text-sub-600"
+            color="muted"
             title={formatAbsoluteTime(item.createdAt, language)}
           >
             · {formatRelativeTime(item.createdAt, language)}
           </Typography>
         </div>
-        <Typography variant="paragraph" className="text-paragraph-sm text-text-sub-600">
+        <Typography variant="paragraph" color="muted">
           {text(bodyKey, interpolation)}
         </Typography>
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-1.5">
         {linkTarget && (
-          <AlignButton.Root
-            asChild
-            size="xxsmall"
-            variant="neutral"
-            mode="stroke"
-            className="gap-1 text-label-xs"
-          >
+          <AlignButton.Root asChild size="xxsmall" variant="neutral" mode="stroke" compact>
             <Link to={linkTarget.to} search={linkTarget.search}>
               <RiExternalLinkLine className="size-3.5" />
               {text("action.open")}
@@ -111,7 +105,7 @@ function NotificationRow({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             icon={<RiCheckLine className="size-3.5" />}
             disabled={busy}
             onClick={() => onMarkRead(item.id)}
@@ -124,7 +118,7 @@ function NotificationRow({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="gap-1 text-label-xs"
+            compact
             isLoading={archiving}
             icon={<RiArchiveLine className="size-3.5" />}
             disabled={busy}
@@ -196,7 +190,7 @@ function NotificationsPage() {
           size="xxsmall"
           variant="neutral"
           mode="ghost"
-          className="gap-1.5 text-label-xs"
+          className="gap-1.5"
           isLoading={readAllMutation.isPending}
           icon={<RiCheckDoubleLine className="size-3.5" />}
           disabled={busy}
@@ -211,7 +205,7 @@ function NotificationsPage() {
       >
         {((list.isError && !isFetchNextPageError) || mutationError) && (
           <div className="border-b border-stroke-soft-200 bg-error-lighter px-4 py-2.5">
-            <Typography role="alert" variant="caption" className="text-error-base">
+            <Typography role="alert" variant="caption" color="danger">
               {list.isError && !isFetchNextPageError ? text("error.load") : text("error.update")}
             </Typography>
           </div>

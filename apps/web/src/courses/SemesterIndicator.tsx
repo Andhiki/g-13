@@ -5,7 +5,7 @@ export function SemesterIndicator({ label }: { label: string }) {
   const match = /^Semester ([1-8])$/.exec(label);
   if (!match)
     return (
-      <Typography variant="label" className="m-0 mt-2 text-text-strong-950">
+      <Typography variant="label" color="strong" className="m-0 mt-2">
         {text(label)}
       </Typography>
     );
