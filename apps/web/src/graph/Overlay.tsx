@@ -1,11 +1,11 @@
 import { useLocale } from "../useLocale";
 import { Typography } from "../ui/typography";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiStackLine } from "@remixicon/react";
 import { AlignButton } from "../ui/button";
 import { AlignDrawer } from "../ui/drawer";
-import { useKeyboardShortcuts } from "../ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "../ui/shortcuts";
 
 const compactQuery = "(width < 1100px)";
 
@@ -123,20 +123,21 @@ export function MapControlPanel({
   const { text, language } = useLocale();
   const toggle = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (!open) return;
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape" || event.defaultPrevented) return;
-      if (event.target instanceof Element && event.target.closest('[role="listbox"]')) return;
-      event.preventDefault();
-      event.stopPropagation();
-      onOpenChange(false);
-      toggle.current?.focus();
-    }
-    window.addEventListener("keydown", closeOnEscape, true);
-    return () => window.removeEventListener("keydown", closeOnEscape, true);
-  }, [open, onOpenChange]);
+  // Escape closes the panel while it is open, including from inside its fields;
+  // selects in the panel take Escape first, and modals pause page shortcuts.
+  useKeyboardShortcuts(
+    open
+      ? {
+          escape: {
+            run: () => {
+              onOpenChange(false);
+              toggle.current?.focus();
+            },
+            allowInInput: true,
+          },
+        }
+      : {},
+  );
 
   return (
     <section
@@ -236,6 +237,7 @@ export function Overlay({
   controlsLabel,
   home,
   panelCopy = defaultPanelCopy,
+  shortcutDescription,
 }: {
   navigation: ReactNode;
   search: ReactNode;
@@ -245,9 +247,12 @@ export function Overlay({
   controlsLabel: string;
   home?: ReactNode;
   panelCopy?: PanelCopy;
+  shortcutDescription?: string;
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
-  useKeyboardShortcuts({ f: () => setPanelOpen((open) => !open) });
+  useKeyboardShortcuts({
+    f: { run: () => setPanelOpen((open) => !open), description: shortcutDescription },
+  });
 
   const compact = useSyncExternalStore(
     subscribeToCompactControls,

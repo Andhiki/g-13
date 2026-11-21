@@ -309,11 +309,6 @@ export function RoadmapGraph({
             <ZoomControls
               className="right-12!"
               selected={selectedId !== null}
-              lastSemester={semesters.length}
-              shortcuts={[
-                { key: "f", description: "Buka/tutup filter" },
-                { key: "d", description: "Ganti tema" },
-              ]}
               onReset={() => {
                 onReset();
                 setResetVersion((version) => version + 1);

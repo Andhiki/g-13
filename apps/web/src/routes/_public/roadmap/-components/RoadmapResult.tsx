@@ -13,7 +13,7 @@ import { buttonVariants } from "@/ui/button";
 import { CourseDetails } from "@/courses/CourseDetails";
 import { getRoadmap } from "../-shared/roadmap-cache";
 import { RoadmapGraph } from "./RoadmapGraph";
-import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "@/ui/shortcuts";
 import { ElectiveReplacement } from "./ElectiveReplacement";
 import type { PlanningInput } from "../-shared/planning-input";
 import type { RoadmapSearch } from "../-shared/search";
@@ -58,7 +58,7 @@ export function RoadmapResult({
     Object.fromEntries(
       Array.from({ length: Math.min(lastSemester, 8) }, (_, index) => [
         String(index + 1),
-        () => navigateToSemester(index + 1),
+        { run: () => navigateToSemester(index + 1), description: "Ke semester {{v0}}" },
       ]),
     ),
   );
@@ -112,6 +112,7 @@ export function RoadmapResult({
       </main>
       <Overlay
         controlsLabel={text("Filter roadmap")}
+        shortcutDescription="Buka/tutup filter"
         panelCopy={{
           title: text("Filter roadmap"),
           openLabel: text("Buka filter roadmap"),

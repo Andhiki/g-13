@@ -5,8 +5,8 @@ import { AlignModal } from "./modal";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Image } from "@unpic/react";
-import { useTheme } from "next-themes";
-import { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
+import { themeMode, useThemeMode } from "./theme-preference";
+import { useKeyboardShortcuts } from "./shortcuts";
 import { Settings } from "./settings";
 import { AlignButton } from "./button";
 import { AlignLinkButton } from "./link-button";
@@ -103,8 +103,13 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
 }
 
 export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
-  const { resolvedTheme, setTheme } = useTheme();
-  useKeyboardShortcuts({ d: () => setTheme(resolvedTheme === "dark" ? "light" : "dark") });
+  const { resolved } = useThemeMode();
+  useKeyboardShortcuts({
+    d: {
+      run: () => themeMode.set(resolved === "dark" ? "light" : "dark"),
+      description: "Ganti tema",
+    },
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useTranslation();
 

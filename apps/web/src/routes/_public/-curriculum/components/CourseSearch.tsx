@@ -2,7 +2,7 @@ import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import { useMemo, useRef, useState } from "react";
 import { RiSearchLine } from "@remixicon/react";
-import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { AlignButton } from "@/ui/button";
 import { AlignCommandMenu } from "@/ui/command-menu";
 import { AlignKbd } from "@/ui/kbd";
@@ -24,7 +24,10 @@ export function CourseSearch({
     setOpen(nextOpen);
     if (!nextOpen) setQuery("");
   };
-  useKeyboardShortcuts(open ? {} : { "/": () => setOpen(true) });
+  useKeyboardShortcuts({
+    "/": { run: () => setOpen(true), description: "Cari mata kuliah" },
+  });
+  const searchHint = useShortcutHint("/");
   const results = useMemo(
     () => (query.trim() ? data.all.filter((course) => matches(course, query)).slice(0, 8) : []),
     [data, query],
@@ -39,13 +42,13 @@ export function CourseSearch({
         size="medium"
         aria-label={text("Cari mata kuliah")}
         aria-haspopup="dialog"
-        aria-keyshortcuts="/"
+        aria-keyshortcuts={searchHint.ariaKeyshortcuts}
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
         <span className="min-w-0 flex-1 truncate text-left">{text("Cari mata kuliah")}</span>
         <RiSearchLine className="size-5 shrink-0 min-[650px]:hidden" aria-hidden="true" />
-        <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
+        <AlignKbd.Root aria-hidden="true">{searchHint.text}</AlignKbd.Root>
       </AlignButton.Root>
       <AlignCommandMenu.Dialog
         open={open}

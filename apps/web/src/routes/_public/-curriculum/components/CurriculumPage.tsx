@@ -11,7 +11,7 @@ import { SemesterFilter } from "@/graph/SemesterFilter";
 import { ViewSwitch } from "./ViewSwitch";
 import { Overlay } from "@/graph/Overlay";
 import { useCurriculumExplorer } from "../client/useCurriculumExplorer";
-import { useKeyboardShortcuts } from "@/ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "@/ui/shortcuts";
 
 export function CurriculumPage() {
   const { text } = useLocale();
@@ -32,15 +32,18 @@ export function CurriculumPage() {
     setSemesterNavigation({ semester });
   };
   useKeyboardShortcuts({
-    "1": () => navigateToSemester(1),
-    "2": () => navigateToSemester(2),
-    "3": () => navigateToSemester(3),
-    "4": () => navigateToSemester(4),
-    "5": () => navigateToSemester(5),
-    "6": () => navigateToSemester(6),
-    "7": () => navigateToSemester(7),
-    "8": () => navigateToSemester(8),
-    v: () => explorer.setView((current) => (current === "map" ? "list" : "map")),
+    "1": { run: () => navigateToSemester(1), description: "Ke semester {{v0}}" },
+    "2": { run: () => navigateToSemester(2), description: "Ke semester {{v0}}" },
+    "3": { run: () => navigateToSemester(3), description: "Ke semester {{v0}}" },
+    "4": { run: () => navigateToSemester(4), description: "Ke semester {{v0}}" },
+    "5": { run: () => navigateToSemester(5), description: "Ke semester {{v0}}" },
+    "6": { run: () => navigateToSemester(6), description: "Ke semester {{v0}}" },
+    "7": { run: () => navigateToSemester(7), description: "Ke semester {{v0}}" },
+    "8": { run: () => navigateToSemester(8), description: "Ke semester {{v0}}" },
+    v: {
+      run: () => explorer.setView((current) => (current === "map" ? "list" : "map")),
+      description: "Ganti tampilan",
+    },
   });
 
   return (
@@ -53,6 +56,7 @@ export function CurriculumPage() {
     >
       <Overlay
         controlsLabel={text("Kurikulum")}
+        shortcutDescription="Buka/tutup pilihan kurikulum"
         navigation={
           <SemesterFilter
             visible={view === "map" && selected ? [] : visibleSemesters}
@@ -115,7 +119,6 @@ export function CurriculumPage() {
             selectedId={selected?.id ?? null}
             nodes={map.nodes}
             edges={map.edges}
-            lastSemester={map.lastSemester}
           />
         </div>
         {view === "list" && (

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { RiSearchLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import * as Accordion from "@/ui/accordion";
 import { AlignKbd } from "@/ui/kbd";
+import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { AlignLinkButton } from "@/ui/link-button";
 import { Typography } from "@/ui/typography";
 
@@ -198,27 +199,15 @@ export function FaqPage() {
   const searchInput = useRef<HTMLInputElement>(null);
   const locale = language === "id" ? "id-ID" : "en";
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.defaultPrevented ||
-        event.key !== "/" ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey ||
-        !(event.target instanceof HTMLElement) ||
-        event.target.closest("input, textarea, select, [contenteditable], [role='dialog']") ||
-        !window.matchMedia("(min-width: 640px)").matches
-      ) {
-        return;
-      }
-      event.preventDefault();
-      searchInput.current?.focus();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  // On mobile the search field is always on screen, so the shortcut only applies on desktop.
+  useKeyboardShortcuts({
+    "/": {
+      run: () => searchInput.current?.focus(),
+      description: "Search questions and answers",
+      when: () => window.matchMedia("(min-width: 640px)").matches,
+    },
+  });
+  const searchHint = useShortcutHint("/");
   const localizedQuestions = questions.map((item) => ({
     ...item,
     question: text(item.question),
@@ -272,7 +261,7 @@ export function FaqPage() {
                 }
               }}
             />
-            <AlignKbd.Root aria-hidden="true">/</AlignKbd.Root>
+            <AlignKbd.Root aria-hidden="true">{searchHint.text}</AlignKbd.Root>
           </label>
 
           <div className="mt-6">
