@@ -44,9 +44,10 @@ function focusTargetAfterCallback(
   };
 }
 
-// Content needs the side to pick its sheet classes at merge time; a data-* variant cannot, because
-// it would outrank a caller's own height class. Root shares it downward.
-const SideContext = React.createContext<DrawerSide>("left");
+const DrawerContext = React.createContext<{
+  side: DrawerSide;
+  modal: boolean | "trap-focus";
+}>({ side: "left", modal: true });
 
 type RootProps = Omit<
   DrawerProps,
@@ -62,6 +63,7 @@ type RootProps = Omit<
 function Root({
   children,
   side = "left",
+  modal = true,
   onOpenChange,
   snapPoints,
   defaultSnapPoint,
@@ -72,12 +74,13 @@ function Root({
     <UixDrawer
       {...props}
       side={side}
+      modal={modal}
       snapPoints={snapPoints}
       defaultSnapPoint={defaultSnapPoint}
       onSnapPointChange={onSnapPointChange ? (point) => onSnapPointChange(point) : undefined}
       onOpenChange={(open) => onOpenChange?.(open)}
     >
-      <SideContext.Provider value={side}>{children}</SideContext.Provider>
+      <DrawerContext.Provider value={{ side, modal }}>{children}</DrawerContext.Provider>
     </UixDrawer>
   );
 }
@@ -123,10 +126,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
   { className, style, onOpenAutoFocus, children, ...props },
   forwardedRef,
 ) {
-  const side = React.useContext(SideContext);
+  const { side, modal } = React.useContext(DrawerContext);
   return (
     <>
-      <DrawerBackdrop className="fixed inset-0 bg-overlay backdrop-blur-[10px]" />
+      {modal === true && (
+        <DrawerBackdrop className="fixed inset-0 bg-overlay backdrop-blur-[10px]" />
+      )}
       <DrawerContent
         {...props}
         ref={forwardedRef}
@@ -137,13 +142,16 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
         }
         style={style}
         className={twMerge(
-          "relative flex w-full max-w-[400px] flex-col overflow-y-auto overscroll-contain border-r border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] focus:outline-none",
-          side === "bottom" &&
-            "h-auto max-h-[85dvh] max-w-none rounded-t-10 border-t border-r-0 pt-0",
+          "relative flex w-full max-w-[400px] flex-col border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] focus:outline-none after:pointer-events-none after:absolute after:bg-inherit after:content-[''] data-[side=left]:border-r data-[side=left]:after:inset-y-0 data-[side=left]:after:right-full data-[side=left]:after:w-24 data-[side=right]:border-l data-[side=right]:after:inset-y-0 data-[side=right]:after:left-full data-[side=right]:after:w-24 data-[side=bottom]:border-t data-[side=bottom]:after:-inset-x-px data-[side=bottom]:after:top-full data-[side=bottom]:after:h-24 data-[side=top]:border-b data-[side=top]:after:-inset-x-px data-[side=top]:after:bottom-full data-[side=top]:after:h-24",
+          (side === "bottom" || side === "top") && "h-auto max-h-[85dvh] max-w-none",
+          side === "bottom" && "rounded-t-10 pt-0",
+          side === "top" && "rounded-b-10 pb-0",
           className,
         )}
       >
-        {children}
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
+          {children}
+        </div>
       </DrawerContent>
     </>
   );
@@ -157,15 +165,27 @@ type HandleProps = Omit<PartProps<"button", DrawerHandleState>, "className" | "c
 
 function Handle({ className, children, ...props }: HandleProps) {
   return (
-    <div className={twMerge("flex shrink-0 justify-center", className)}>
+    <div className={twMerge("flex shrink-0 justify-center py-1.5", className)}>
       <DrawerHandle
         {...props}
-        className="flex h-5 w-24 items-center justify-center rounded-lg outline-none select-none focus-visible:[&>span]:bg-primary-base"
+        className="relative flex h-6 w-24 cursor-grab items-center justify-center rounded-lg outline-none select-none active:cursor-grabbing before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-[''] focus-visible:[&>span]:bg-primary-base"
       >
         <span className="h-1 w-10 rounded-full bg-stroke-soft-200" aria-hidden="true">
           {children}
         </span>
       </DrawerHandle>
+    </div>
+  );
+}
+
+function Grip({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+  return (
+    <div
+      aria-hidden="true"
+      className={twMerge("flex shrink-0 justify-center pt-2.5 pb-1", className)}
+      {...props}
+    >
+      <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
     </div>
   );
 }
@@ -245,7 +265,12 @@ function Header({ className, ...props }: React.ComponentPropsWithoutRef<"div">) 
 }
 
 function Body({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  return <div className={twMerge("flex-1 overscroll-contain", className)} {...props} />;
+  return (
+    <div
+      className={twMerge("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
+      {...props}
+    />
+  );
 }
 
 export const AlignDrawer = {
@@ -258,6 +283,7 @@ export const AlignDrawer = {
   Description,
   Body,
   Handle,
+  Grip,
 };
 
 export type { SnapPoint };

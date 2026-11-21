@@ -1,5 +1,7 @@
 import { useSyncExternalStore, type ReactNode } from "react";
-import { AlignModal } from "@/ui/modal";
+import { RiCloseLine } from "@remixicon/react";
+import { CompactButton } from "@/ui/compact-button";
+import { AlignDrawer } from "@/ui/drawer";
 
 export const desktopInspectorQuery = "(min-width: 80rem)";
 
@@ -30,16 +32,29 @@ export function AdminInspector({
 
   if (!desktop) {
     return (
-      <AlignModal.Root open={mobileOpen && !!children} onOpenChange={onMobileOpenChange}>
-        <AlignModal.Content
-          overlayClassName="items-stretch justify-end p-0"
-          className="h-[min(85dvh,40rem)] max-w-none overflow-hidden rounded-b-none pb-[env(safe-area-inset-bottom)] [&>aside]:w-full [&>aside]:border-0"
+      <AlignDrawer.Root
+        open={mobileOpen && !!children}
+        onOpenChange={onMobileOpenChange}
+        side="bottom"
+      >
+        <AlignDrawer.Content
           aria-describedby={undefined}
+          className="h-[min(85dvh,40rem)] [&>div>aside]:min-h-0 [&>div>aside]:w-full [&>div>aside]:flex-1 [&>div>aside]:border-0"
         >
-          <AlignModal.Title className="sr-only">{title}</AlignModal.Title>
+          <AlignDrawer.Grip />
+          <AlignDrawer.Title className="sr-only">{title}</AlignDrawer.Title>
+          <AlignDrawer.Close asChild>
+            <CompactButton
+              data-drawer-no-drag=""
+              className="absolute top-3 right-3 z-10"
+              aria-label="Close inspector"
+            >
+              <RiCloseLine aria-hidden="true" />
+            </CompactButton>
+          </AlignDrawer.Close>
           {children}
-        </AlignModal.Content>
-      </AlignModal.Root>
+        </AlignDrawer.Content>
+      </AlignDrawer.Root>
     );
   }
 

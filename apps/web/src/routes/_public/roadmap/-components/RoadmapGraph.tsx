@@ -5,14 +5,22 @@ import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type RefObject,
   type ReactNode,
 } from "react";
-import { Background, BackgroundVariant, useReactFlow, type NodeProps } from "@xyflow/react";
+import {
+  Background,
+  BackgroundVariant,
+  useOnViewportChange,
+  useReactFlow,
+  type NodeProps,
+} from "@xyflow/react";
 import { ZoomControls } from "@/graph/ZoomControls";
 import { MotionGraph } from "@/graph/MotionGraph";
 import { GraphFocus } from "@/graph/GraphFocus";
@@ -264,7 +272,11 @@ export function RoadmapGraph({
             nodeTypes={nodeTypes}
             edgeTypes={routedEdgeTypes}
             onPaneClick={close}
-            onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
+            onNodeMouseEnter={(_, node) => {
+              if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+                setHoveredId(node.type === "course" ? node.id : null);
+              }
+            }}
             onNodeMouseLeave={() => setHoveredId(null)}
             onFocusCapture={(event) =>
               setHoveredId(
@@ -273,20 +285,6 @@ export function RoadmapGraph({
             }
             onBlurCapture={() => setHoveredId(null)}
             defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
-            onMoveEnd={() => {
-              const bounds = stage.current!.getBoundingClientRect();
-              onVisibleSemesters(
-                semesters.filter((term) => {
-                  const lane = stage.current!.querySelector(`[data-id="semester-${term}"]`);
-                  if (!lane) return false;
-                  const box = lane.getBoundingClientRect();
-                  return (
-                    Math.min(bounds.right, box.right) - Math.max(bounds.left, box.left) >=
-                    box.width / 2
-                  );
-                }),
-              );
-            }}
             minZoom={0.05}
             maxZoom={1.35}
             nodesDraggable={false}
@@ -305,6 +303,12 @@ export function RoadmapGraph({
               stage={stage}
               selectedId={selectedId}
               navigation={navigation}
+            />
+            <RoadmapSemesterViewport
+              stage={stage}
+              semesters={semesters}
+              enabled={selectedId === null}
+              onVisibleSemesters={onVisibleSemesters}
             />
             <ZoomControls
               className="right-12!"
@@ -325,4 +329,44 @@ export function RoadmapGraph({
       </RoadmapTitleContext.Provider>
     </section>
   );
+}
+
+function RoadmapSemesterViewport({
+  stage,
+  semesters,
+  enabled,
+  onVisibleSemesters,
+}: {
+  stage: RefObject<HTMLElement | null>;
+  semesters: number[];
+  enabled: boolean;
+  onVisibleSemesters: (semesters: number[]) => void;
+}) {
+  const lastVisible = useRef<string | null>(null);
+  const update = useCallback(() => {
+    const root = stage.current;
+    if (!root) return;
+    const bounds = root.getBoundingClientRect();
+    const next = semesters.filter((term) => {
+      const lane = root.querySelector(`[data-id="semester-${term}"]`);
+      if (!lane) return false;
+      const box = lane.getBoundingClientRect();
+      return Math.min(bounds.right, box.right) - Math.max(bounds.left, box.left) >= box.width / 2;
+    });
+    const key = next.join(",");
+    if (lastVisible.current !== key) {
+      lastVisible.current = key;
+      onVisibleSemesters(next);
+    }
+  }, [onVisibleSemesters, semesters, stage]);
+
+  useOnViewportChange({ onChange: enabled ? update : undefined });
+
+  useEffect(() => {
+    if (!enabled) return;
+    lastVisible.current = null;
+    update();
+  }, [enabled, update]);
+
+  return null;
 }

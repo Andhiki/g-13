@@ -106,13 +106,16 @@ export function CourseDetails({
               "--course-details-width": `${courseLayout.detailsWidth}px`,
             } as CSSProperties
           }
-          className="min-[650px]:mt-[var(--app-header-height)] min-[650px]:max-w-[var(--course-details-width)] overflow-hidden pt-0 max-[650px]:h-[75dvh]"
+          className="min-[650px]:mt-[var(--app-header-height)] min-[650px]:max-w-[var(--course-details-width)] pt-0 max-[650px]:h-[75dvh]"
         >
           <AlignDrawer.Handle
             aria-label={text("Tinggi detail mata kuliah")}
             className="min-[650px]:hidden"
           />
-          <div className="absolute right-4 top-4 z-10 flex items-center gap-2 sm:right-5 sm:top-5">
+          <div
+            data-drawer-no-drag=""
+            className="absolute right-4 top-4 z-10 flex items-center gap-3 sm:right-5 sm:top-5"
+          >
             <CopyCourseButton
               key={content.course.id}
               value={content.course.id}

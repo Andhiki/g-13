@@ -1,7 +1,7 @@
 // Adapted from AlignUI Toast and Alert. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ReactElement } from "react";
 import { RiCheckboxCircleFill } from "@remixicon/react";
-import { toast as sonnerToast, Toaster, type ToasterProps } from "sonner";
+import { toast as sonnerToast, Toaster as SonnerToaster, type ToasterProps } from "sonner";
 
 const defaultOptions: ToasterProps = {
   className: "group/toast",
@@ -23,6 +23,14 @@ function SuccessToast({ message }: { message: string }) {
       </div>
     </div>
   );
+}
+
+function Toaster({
+  position = "bottom-center",
+  swipeDirections = ["bottom"],
+  ...props
+}: ToasterProps) {
+  return <SonnerToaster position={position} swipeDirections={swipeDirections} {...props} />;
 }
 
 export { toast, Toaster, SuccessToast };

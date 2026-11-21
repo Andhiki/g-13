@@ -203,6 +203,7 @@ function AdminUsersPage() {
       </div>
       <ConfirmActionModal
         open={confirmation !== null}
+        destructive={confirmation?.input.role === "user"}
         title={confirmation?.input.role === "user" ? "Revoke access" : "Confirm role change"}
         description={
           <>

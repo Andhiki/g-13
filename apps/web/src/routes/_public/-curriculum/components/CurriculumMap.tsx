@@ -228,7 +228,11 @@ export function CurriculumMap({
         className="absolute! inset-0 z-0 bg-transparent!"
         proOptions={{ hideAttribution: true }}
         onPaneClick={close}
-        onNodeMouseEnter={(_, node) => setHoveredId(node.type === "course" ? node.id : null)}
+        onNodeMouseEnter={(_, node) => {
+          if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            setHoveredId(node.type === "course" ? node.id : null);
+          }
+        }}
         onNodeMouseLeave={() => setHoveredId(null)}
         onFocusCapture={(event) =>
           setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)

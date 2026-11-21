@@ -54,13 +54,13 @@ function Dialog({
   ...props
 }: DialogProps) {
   return (
-    <AlignModal.Root open={open} onOpenChange={onOpenChange}>
+    <AlignModal.Root open={open} onOpenChange={onOpenChange} presentation="dialog">
       <AlignModal.Content
-        overlayClassName={twMerge("justify-start pt-20", overlayClassName)}
+        overlayClassName={overlayClassName}
         showClose={false}
         onCloseAutoFocus={onCloseAutoFocus}
         className={twMerge(
-          "flex max-h-full max-w-[720px] flex-col overflow-hidden rounded-2xl",
+          "mt-20 mb-auto flex max-h-[calc(100dvh-6rem)] max-w-[720px] flex-col overflow-hidden rounded-2xl",
           className,
         )}
       >

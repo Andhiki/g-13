@@ -20,6 +20,18 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-21
 
+#### Fixed
+
+- Panel detail mata kuliah di desktop kini tidak lagi menampilkan latar belakang buram di atas header dan graf mata kuliah.
+
+#### Changed
+
+- Navigasi alfabet pada direktori alumni dipindahkan ke sisi kiri layar agar tidak berbenturan dengan bilah gulir, dengan pelacakan gestur 1:1 dan efek pegas di ujung daftar.
+
+- Dukungan gestur dan area sentuh: rating bintang ulasan dosen kini dapat digeser secara horizontal, banner pengumuman dapat digeser ke atas untuk ditutup, notifikasi di perangkat sentuh dapat digeser ke kiri untuk diarsipkan, menu seluler serta modal responsif kini tampil sebagai panel geser (drawer/sheet), aksi hapus/cabut akses memerlukan tekan-tahan konfirmasi, dan area ketuk tombol serta kontrol antarmuka ditingkatkan untuk kenyamanan perangkat sentuh.
+
+- Filter semester pada roadmap kini diperbarui secara kontinu saat peta digeser tanpa pantulan berlebih, dan akordeon kini menggunakan transisi CSS yang mulus saat dibuka atau ditutup ulang.
+
 #### Added
 
 - Menambahkan verifikasi Cloudflare Turnstile (widget tak terlihat) pada formulir ulasan dosen untuk menekan spam; pengiriman ditolak bila verifikasi keamanan gagal.

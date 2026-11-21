@@ -31,13 +31,13 @@ export const buttonVariants = tv({
     },
     size: {
       medium:
-        "h-10 gap-3 rounded-10 px-3.5 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2",
+        "h-10 gap-3 rounded-10 px-3.5 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
       small:
-        "h-9 gap-3 rounded-lg px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-1",
+        "h-9 gap-3 rounded-lg px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-1 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
       xsmall:
-        "h-8 gap-2.5 rounded-lg px-2.5 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-1",
+        "h-8 gap-2.5 rounded-lg px-2.5 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-1 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
       xxsmall:
-        "h-7 gap-2.5 rounded-lg px-2 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
+        "h-7 gap-2.5 rounded-lg px-2 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
     },
     iconOnly: { true: "" },
     compact: { true: "" },
@@ -121,7 +121,7 @@ export const buttonVariants = tv({
     {
       variant: "link",
       class:
-        "bg-transparent p-0 h-auto ring-transparent truncate rounded-sm text-text-strong-950 hover:underline",
+        "bg-transparent p-0 h-auto ring-transparent truncate rounded-sm text-text-strong-950 hover:underline pointer-coarse:before:hidden",
     },
     {
       variant: "nav",

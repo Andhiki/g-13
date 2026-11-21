@@ -339,6 +339,7 @@ function AdminAnnouncementsPage() {
       />
       <ConfirmActionModal
         open={confirmation !== null}
+        destructive={confirmation?.input.action === "delete"}
         title={confirmCopy?.title ?? ""}
         description={
           <>
