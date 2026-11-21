@@ -1,0 +1,17 @@
+{
+  "jsPlugins": ["@shadcn/lint"],
+  "settings": {
+    "shadcn": {
+      "componentImports": ["^@/ui(/|$)"],
+      "themeImports": ["^@/ui/"]
+    }
+  },
+  "overrides": [
+    {
+      "files": ["apps/web/src/**/*.{ts,tsx}"],
+      "rules": {
+        "shadcn/no-raw-colors": "error"
+      }
+    }
+  ]
+}
