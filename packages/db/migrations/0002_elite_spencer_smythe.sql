@@ -19,57 +19,34 @@ CREATE TABLE `announcements` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `announcements_slug_unique` ON `announcements` (`slug`);--> statement-breakpoint
--- Seed the course catalog from packages/curriculum (2021 + 2026 editions, 192 unique codes).
+-- Seed the course catalog from packages/curriculum (2021 + 2026 editions).
+-- 146 canonical courses: one row per course, so a course taught in both editions is stored
+-- once under its newest code and 46 superseded codes are merged below. Names are compared
+-- case- and punctuation-insensitively with roman numerals folded to digits, so "Kalkulus I" and
+-- "Kalkulus 1" count as the same course.
 -- Excluded on purpose: elective placeholders without a code, "Aktivitas di luar program studi"
--- entries, and MBKM-style activities (internship, assistantship, independent/community projects,
--- research, entrepreneurship, soft skills) plus thesis/proposal and work-practice courses.
--- Re-running is safe: existing rows for a code keep their names unless the catalog changed.
+-- entries, MBKM-style activities (internship, assistantship, independent/community projects,
+-- research, entrepreneurship, soft skills), and thesis/proposal/work-practice courses.
 INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`) VALUES
 	('MFF-1011', 'MFF-1011', 'Fisika Dasar 1', 'Basic Physics 1'),
 	('MII21-1001', 'MII21-1001', 'Aljabar Linier Fundamental', 'Elementary Linear Algebra'),
-	('MII21-1002', 'MII21-1002', 'Logika Informatika', 'Logic for Computer Science'),
 	('MII21-1004', 'MII21-1004', 'Bahasa Inggris', 'English'),
 	('MII21-1005', 'MII21-1005', 'Integral dan Persamaan Diferensial', 'Integral and Differential Equations'),
-	('MII21-1006', 'MII21-1006', 'Matematika Diskrit', 'Discrete Mathematics'),
 	('MII21-1007', 'MII21-1007', 'Pengantar Statistika', 'Introduction to Statistics'),
-	('MII21-1201', 'MII21-1201', 'Pemrograman', 'Programming'),
-	('MII21-1202', 'MII21-1202', 'Praktikum Pemrograman', 'Lab work in Programming'),
-	('MII21-1203', 'MII21-1203', 'Algoritma dan Struktur Data', 'Algorithms and Data Structures'),
-	('MII21-1204', 'MII21-1204', 'Praktikum Algoritma dan Struktur Data', 'Lab work in Algorithms and Data Structures'),
-	('MII21-1601', 'MII21-1601', 'Organisasi dan Arsitektur Komputer', 'Organization and Computer Architecture'),
-	('MII21-1602', 'MII21-1602', 'Sistem Digital', 'Digital Systems'),
 	('MII21-2001', 'MII21-2001', 'Probabilitas dan Proses Stokastika', 'Probability and Stochastic Processes'),
 	('MII21-2003', 'MII21-2003', 'Pengembangan Startup Digital', 'Startup Digital Development'),
 	('MII21-2010', 'MII21-2010', 'Penulisan Akademik dan Etika', 'Academic Writing & Ecthics'),
 	('MII21-2201', 'MII21-2201', 'Analisis Algoritma dan Kompleksitas', 'Analysis of Algorithm and Complexity'),
 	('MII21-2202', 'MII21-2202', 'Bahasa dan Otomata', 'Languages dan Automata'),
-	('MII21-2203', 'MII21-2203', 'Metode Numerik', 'Numerical Methods'),
-	('MII21-2204', 'MII21-2204', 'Pengolahan Citra Digital', 'Digital Image Processing'),
-	('MII21-2205', 'MII21-2205', 'Grafika Komputer', 'Computer Graphics'),
 	('MII21-2206', 'MII21-2206', 'Penglihatan Komputer dan Analisis Citra', 'Computer Vision and Image Analysis'),
-	('MII21-2209', 'MII21-2209', 'Kriptografi dan Keamanan Informasi', 'Cryptography and Network Security'),
-	('MII21-2401', 'MII21-2401', 'Kecerdasan Artifisial', 'Artificial Intelligence'),
-	('MII21-2402', 'MII21-2402', 'Pembelajaran Mesin', 'Machine Learning'),
-	('MII21-2404', 'MII21-2404', 'Logika Fuzzy', 'Fuzzy Logic'),
-	('MII21-2405', 'MII21-2405', 'Pengenalan Pola', 'Pattern Recognition'),
 	('MII21-2410', 'MII21-2410', 'Tren Penelitian Sistem Cerdas', 'Research Trends on Artificial Intelligence'),
-	('MII21-2501', 'MII21-2501', 'Basis Data', 'Database'),
-	('MII21-2502', 'MII21-2502', 'Praktikum Basis Data', 'Database Lab work'),
-	('MII21-2503', 'MII21-2503', 'Metode Rekayasa Perangkat Lunak', 'Software Engineering Methods'),
 	('MII21-2504', 'MII21-2504', 'Workshop Implementasi Rancangan Perangkat Lunak', 'Workshop on Implementing Software Design'),
 	('MII21-2505', 'MII21-2505', 'Pengembangan UI/UX & Front-end', 'Frontend and UI/UX development'),
-	('MII21-2506', 'MII21-2506', 'Pengembangan Perangkat Lunak Scalable', 'Scalable Software Development'),
-	('MII21-2601', 'MII21-2601', 'Jaringan Komputer', 'Computer Network'),
-	('MII21-2602', 'MII21-2602', 'Sistem Operasi', 'Operating Systems'),
 	('MII21-2603', 'MII21-2603', 'Praktikum Sistem Komputer dan Jaringan', 'Computer System and Network Lab work'),
 	('MII21-2605', 'MII21-2605', 'Perkembangan Terbaru Penelitian Sistem Komputer dan Jaringan', 'Computer Systems and Network Research Trends'),
 	('MII21-2606', 'MII21-2606', 'Internet of Things dan Aplikasinya', 'Internet of Things and Applications'),
 	('MII21-2607', 'MII21-2607', 'Arsitektur dan Teknologi Data Besar', 'Big Data Architecture and Infrastructure'),
-	('MII21-2608', 'MII21-2608', 'Kapita Selekta Sistem Komputer dan Jaringan', 'Special Topic on Computer and Network Systems'),
-	('MII21-2609', 'MII21-2609', 'Pengembangan Pusat Komputasi Data', 'Development of Computing Data Centre'),
-	('MII21-2610', 'MII21-2610', 'Komputasi Awan', 'Cloud Computing'),
 	('MII21-2611', 'MII21-2611', 'Telekomunikasi Generasi Lanjut', 'Next Generation Networks'),
-	('MII21-3002', 'MII21-3002', 'Metodologi Penelitian Ilmu Komputer', 'Research Method of Computer Science'),
 	('MII21-3017', 'MII21-3017', 'Industri Kreatif dan Game Digital', 'Creative Industry and Digital Game'),
 	('MII21-30450', 'MII21-30450', 'Poster Ilmiah Bidang Ilmu Komputer', 'Scholarly Poster in Computer Science'),
 	('MII21-30451', 'MII21-30451', 'Publikasi Akademik Bidang Ilmu Komputer', 'Academic Publication in Computer Science'),
@@ -77,21 +54,10 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`) VALUES
 	('MII21-3090', 'MII21-3090', 'Tantangan dan Pengalaman Informatika', 'Informatics Challenge and Experiences'),
 	('MII21-3091', 'MII21-3091', 'Kompetisi Inovasi Digital Mahasiswa', 'Student Digital Innovation Competition'),
 	('MII21-3092', 'MII21-3092', 'Pengembangan Kinerja Talenta Digital Kreatif Internasional', 'Performance Development of International Digital Creative Talent'),
-	('MII21-3201', 'MII21-3201', 'Metode Optimasi', 'Optimization Methods'),
-	('MII21-3202', 'MII21-3202', 'Sains Manajemen', 'Management Science'),
 	('MII21-3203', 'MII21-3203', 'Simulasi Sains', 'Science Simulation'),
 	('MII21-3204', 'MII21-3204', 'Tren Penelitian Algoritma dan Komputasi', 'Research Trends in Algorithm and Computation'),
-	('MII21-3205', 'MII21-3205', 'Kapita Selekta Algoritma dan Komputasi', 'Special Topic on Algorithm and Computation'),
-	('MII21-3206', 'MII21-3206', 'Algoritma Terdistribusi dan Pemrograman Paralel', 'Distributed Algorithm and Parallel Programming'),
 	('MII21-3207', 'MII21-3207', 'Verifikasi Formal', 'Formal Verification'),
 	('MII21-3208', 'MII21-3208', 'Computational Thinking', 'Computational Thinking'),
-	('MII21-3401', 'MII21-3401', 'Pembelajaran Mesin Mendalam', 'Deep Learning'),
-	('MII21-3402', 'MII21-3402', 'Algoritma Genetika', 'Genetic Algorithm'),
-	('MII21-3403', 'MII21-3403', 'Bioinformatika', 'Bioinformatics'),
-	('MII21-3404', 'MII21-3404', 'Pemrosesan Bahasa Alami', 'Natural Language Processing'),
-	('MII21-3405', 'MII21-3405', 'Sistem Pakar', 'Expert Systems'),
-	('MII21-3406', 'MII21-3406', 'Sistem Pendukung Keputusan', 'Decision Support Systems'),
-	('MII21-3407', 'MII21-3407', 'Kapita Selekta Sistem Cerdas', 'Special Topic on Intelligent Systems'),
 	('MII21-3501', 'MII21-3501', 'Proyek Rekayasa Perangkat Lunak', 'Software Engineering Project'),
 	('MII21-3502', 'MII21-3502', 'Web Semantik', 'Semantic Web'),
 	('MII21-3503', 'MII21-3503', 'Temu Kembali Informasi', 'Information Retrieval System'),
@@ -104,8 +70,6 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`) VALUES
 	('MII21-3510', 'MII21-3510', 'Tren Penelitian Rekayasa Perangkat Lunak dan Data', 'Research Trends in Software and Data Engineering'),
 	('MII21-3511', 'MII21-3511', 'Pemodelan Jaringan Komunitas Digital', 'Digital Society Network Modelling'),
 	('MII21-3512', 'MII21-3512', 'Pengembangan Aplikasi Mobile', 'Mobile Application Development'),
-	('MII21-3601', 'MII21-3601', 'Arsitektur dan Infrastruktur Berkinerja Tinggi', 'High Performance Architecture and Infrastructure'),
-	('MII21-3602', 'MII21-3602', 'Keamanan Sistem dan Siber', 'Cyber System Security'),
 	('MII21-3603', 'MII21-3603', 'Lingkungan Cerdas dan Intelijen', 'Smart and Intelligent Environment'),
 	('MII21-3608', 'MII21-3608', 'Pengantar Blockchain', 'Pengantar Blockchain'),
 	('MII21-38..', 'MII21-38..', 'Sertifikasi untuk Pemula/Asisten ***', 'Sertification for Assosiate ***'),
@@ -115,7 +79,6 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`) VALUES
 	('MII21-4033', 'MII21-4033', 'Hard skill: Pengelolaan Anggaran Organisasi', 'Budgeting Training'),
 	('MII21-4034', 'MII21-4034', 'Hard skill: Manajemen Risiko', 'Risk Management Training'),
 	('MKK-1101', 'MKK-1101', 'Kimia Dasar 1', 'Basic Chemistry 1'),
-	('MMM-1101', 'MMM-1101', 'Kalkulus 1', 'Calculus 1'),
 	('PACS262101', 'PACS262101', 'Aljabar Vektor dan Matriks', 'Vector and Matrix Algebra'),
 	('PACS262102', 'PACS262102', 'Logika Informatika', 'Logic for Computer Science'),
 	('PACS262103', 'PACS262103', 'Matematika Diskrit', 'Discrete Mathematics'),
@@ -210,13 +173,7 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`) VALUES
 	('UNKU260013', 'UNKU260013', 'Keterampilan Masa Depan Berkelanjutan', 'Sustainable Future Skills'),
 	('UNKU260014', 'UNKU260014', 'KKN-PPM**', 'Community Service Program'),
 	('UNKU260015', 'UNKU260015', 'Komunikasi Masyarakat**', 'Community Communication'),
-	('UNKU260016', 'UNKU260016', 'Penerapan Manajemen Pengetahuan**', 'Implementation of Knowledge Management'),
-	('UNU22-2001', 'UNU22-2001', 'KKN PPM', 'Community Service Development'),
-	('UNU22-2002', 'UNU22-2002', 'Komunikasi Masyarakat', 'Public Communication'),
-	('UNU22-2004', 'UNU22-2004', 'Penerapan Manajemen Pengetahuan', 'Applied of Knowledge Management'),
-	('UNU22-2011', 'UNU22-2011', 'Pancasila', 'Pancasila'),
-	('UNU22-2012', 'UNU22-2012', 'Kewarganegaraan', 'Citizenship'),
-	('UNU22-2013', 'UNU22-2013', 'Bahasa Indonesia', 'Indonesian Language')
+	('UNKU260016', 'UNKU260016', 'Penerapan Manajemen Pengetahuan**', 'Implementation of Knowledge Management')
 ON CONFLICT(`id`) DO UPDATE SET
 	`code` = excluded.`code`,
 	`name_id` = excluded.`name_id`,
@@ -230,12 +187,103 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`, `deleted_at`)
 	WHERE `code` <> '' AND `id` <> `code`
 	ON CONFLICT(`id`) DO NOTHING;
 --> statement-breakpoint
-UPDATE `reviews`
-	SET `course_id` = (SELECT c.`code` FROM `courses` c WHERE c.`id` = `reviews`.`course_id`)
-	WHERE EXISTS (
-		SELECT 1 FROM `courses` c
-		WHERE c.`id` = `reviews`.`course_id` AND c.`code` <> '' AND c.`id` <> c.`code`
-	);
+-- A course taught in both editions under different codes keeps one identity: move its reviews to
+-- the newest code before the superseded row is removed.
+UPDATE `reviews` SET `course_id` = 'PACS262102' WHERE `course_id` = 'MII21-1002';
+UPDATE `reviews` SET `course_id` = 'PACS262103' WHERE `course_id` = 'MII21-1006';
+UPDATE `reviews` SET `course_id` = 'PAKF262105' WHERE `course_id` = 'MII21-1201';
+UPDATE `reviews` SET `course_id` = 'PAKF262106' WHERE `course_id` = 'MII21-1202';
+UPDATE `reviews` SET `course_id` = 'PACS262201' WHERE `course_id` = 'MII21-1203';
+UPDATE `reviews` SET `course_id` = 'PACS262205' WHERE `course_id` = 'MII21-1204';
+UPDATE `reviews` SET `course_id` = 'PACS262204' WHERE `course_id` = 'MII21-1601';
+UPDATE `reviews` SET `course_id` = 'PACS262207' WHERE `course_id` = 'MII21-1602';
+UPDATE `reviews` SET `course_id` = 'PACS262309' WHERE `course_id` = 'MII21-2203';
+UPDATE `reviews` SET `course_id` = 'PACS262310' WHERE `course_id` = 'MII21-2204';
+UPDATE `reviews` SET `course_id` = 'PACS262303' WHERE `course_id` = 'MII21-2205';
+UPDATE `reviews` SET `course_id` = 'PACS262308' WHERE `course_id` = 'MII21-2209';
+UPDATE `reviews` SET `course_id` = 'PACS262304' WHERE `course_id` = 'MII21-2401';
+UPDATE `reviews` SET `course_id` = 'PACS262413' WHERE `course_id` = 'MII21-2402';
+UPDATE `reviews` SET `course_id` = 'PACS262408' WHERE `course_id` = 'MII21-2404';
+UPDATE `reviews` SET `course_id` = 'PACS262523' WHERE `course_id` = 'MII21-2405';
+UPDATE `reviews` SET `course_id` = 'PACS262301' WHERE `course_id` = 'MII21-2501';
+UPDATE `reviews` SET `course_id` = 'PACS262312' WHERE `course_id` = 'MII21-2502';
+UPDATE `reviews` SET `course_id` = 'PACS262411' WHERE `course_id` = 'MII21-2503';
+UPDATE `reviews` SET `course_id` = 'PACS262521' WHERE `course_id` = 'MII21-2506';
+UPDATE `reviews` SET `course_id` = 'PACS262202' WHERE `course_id` = 'MII21-2601';
+UPDATE `reviews` SET `course_id` = 'PACS262313' WHERE `course_id` = 'MII21-2602';
+UPDATE `reviews` SET `course_id` = 'PACS262509' WHERE `course_id` = 'MII21-2608';
+UPDATE `reviews` SET `course_id` = 'PACS262522' WHERE `course_id` = 'MII21-2609';
+UPDATE `reviews` SET `course_id` = 'PACS262407' WHERE `course_id` = 'MII21-2610';
+UPDATE `reviews` SET `course_id` = 'PACS262412' WHERE `course_id` = 'MII21-3002';
+UPDATE `reviews` SET `course_id` = 'PACS262410' WHERE `course_id` = 'MII21-3201';
+UPDATE `reviews` SET `course_id` = 'PACS262528' WHERE `course_id` = 'MII21-3202';
+UPDATE `reviews` SET `course_id` = 'PACS262507' WHERE `course_id` = 'MII21-3205';
+UPDATE `reviews` SET `course_id` = 'PACS262401' WHERE `course_id` = 'MII21-3206';
+UPDATE `reviews` SET `course_id` = 'PACS262516' WHERE `course_id` = 'MII21-3401';
+UPDATE `reviews` SET `course_id` = 'PACS262501' WHERE `course_id` = 'MII21-3402';
+UPDATE `reviews` SET `course_id` = 'PACS262503' WHERE `course_id` = 'MII21-3403';
+UPDATE `reviews` SET `course_id` = 'PACS262518' WHERE `course_id` = 'MII21-3404';
+UPDATE `reviews` SET `course_id` = 'PACS262420' WHERE `course_id` = 'MII21-3405';
+UPDATE `reviews` SET `course_id` = 'PACS262421' WHERE `course_id` = 'MII21-3406';
+UPDATE `reviews` SET `course_id` = 'PACS262604' WHERE `course_id` = 'MII21-3407';
+UPDATE `reviews` SET `course_id` = 'PACS262502' WHERE `course_id` = 'MII21-3601';
+UPDATE `reviews` SET `course_id` = 'PACS262406' WHERE `course_id` = 'MII21-3602';
+UPDATE `reviews` SET `course_id` = 'PAKF262103' WHERE `course_id` = 'MMM-1101';
+UPDATE `reviews` SET `course_id` = 'UNKU260014' WHERE `course_id` = 'UNU22-2001';
+UPDATE `reviews` SET `course_id` = 'UNKU260015' WHERE `course_id` = 'UNU22-2002';
+UPDATE `reviews` SET `course_id` = 'UNKU260016' WHERE `course_id` = 'UNU22-2004';
+UPDATE `reviews` SET `course_id` = 'UNKU260008' WHERE `course_id` = 'UNU22-2011';
+UPDATE `reviews` SET `course_id` = 'UNKU260009' WHERE `course_id` = 'UNU22-2012';
+UPDATE `reviews` SET `course_id` = 'UNKU260010' WHERE `course_id` = 'UNU22-2013';
+--> statement-breakpoint
+DELETE FROM `courses` WHERE `id` IN (
+	'MII21-1002',
+	'MII21-1006',
+	'MII21-1201',
+	'MII21-1202',
+	'MII21-1203',
+	'MII21-1204',
+	'MII21-1601',
+	'MII21-1602',
+	'MII21-2203',
+	'MII21-2204',
+	'MII21-2205',
+	'MII21-2209',
+	'MII21-2401',
+	'MII21-2402',
+	'MII21-2404',
+	'MII21-2405',
+	'MII21-2501',
+	'MII21-2502',
+	'MII21-2503',
+	'MII21-2506',
+	'MII21-2601',
+	'MII21-2602',
+	'MII21-2608',
+	'MII21-2609',
+	'MII21-2610',
+	'MII21-3002',
+	'MII21-3201',
+	'MII21-3202',
+	'MII21-3205',
+	'MII21-3206',
+	'MII21-3401',
+	'MII21-3402',
+	'MII21-3403',
+	'MII21-3404',
+	'MII21-3405',
+	'MII21-3406',
+	'MII21-3407',
+	'MII21-3601',
+	'MII21-3602',
+	'MMM-1101',
+	'UNU22-2001',
+	'UNU22-2002',
+	'UNU22-2004',
+	'UNU22-2011',
+	'UNU22-2012',
+	'UNU22-2013'
+);
 --> statement-breakpoint
 DELETE FROM `courses`
 	WHERE `id` <> `code` AND `code` <> ''
