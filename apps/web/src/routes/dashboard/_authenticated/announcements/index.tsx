@@ -31,13 +31,7 @@ import {
   type AnnouncementLifecycleInput,
   type AnnouncementStatus,
 } from "./-shared/schemas";
-
-const statusLabels: Record<AnnouncementStatus, string> = {
-  live: "Live",
-  scheduled: "Scheduled",
-  expired: "Expired",
-  disabled: "Disabled",
-};
+import { announcementStatusLabel } from "./-shared/status";
 
 const emptyStateCopy: Record<AnnouncementStatus, { title: string; description: string }> = {
   live: {
@@ -212,7 +206,7 @@ function AdminAnnouncementsPage() {
         ariaLabel="Announcement status filters"
         tabs={announcementStatusSchema.options.map((value) => ({
           value,
-          label: statusLabels[value],
+          label: announcementStatusLabel(value),
           count: counts[value],
         }))}
         activeTab={status}

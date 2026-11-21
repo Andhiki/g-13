@@ -6,7 +6,7 @@ export type AnnouncementStatusFields = {
   endsAt: Date | null;
 };
 
-/** Derives the schedule state shown in admin filters, rows, and the public banner check. */
+/** Derives the schedule state shown in admin filters, rows, and the inspector. */
 export function resolveAnnouncementStatus(
   row: AnnouncementStatusFields,
   now = Date.now(),

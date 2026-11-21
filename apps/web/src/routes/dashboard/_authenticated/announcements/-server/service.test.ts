@@ -3,6 +3,7 @@ import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { getActiveAnnouncements } from "@/routes/_public/-announcements/service";
 import { createTestPlatformProxy } from "@/test/database";
+import { announcementFieldsShape } from "../-shared/schemas";
 import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementAdminResult } from "../-shared/errors";
 import {
   changeAnnouncementLifecycle,
@@ -122,6 +123,34 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
       }),
     ).toEqual({ data: { announcementId: created.id, action: "enable" }, error: null });
     expect((await getActiveAnnouncements(db, now)).length).toBe(1);
+
+    // The CTA is optional: an empty link is stored as null and the banner renders without one.
+    const withoutCta = resultData(
+      await createAnnouncement(
+        db,
+        admin,
+        createBulletin({
+          slug: "no-cta",
+          ctaHref: "",
+          ctaLabelId: "",
+          ctaLabelEn: "",
+          startsAt: now - day,
+          endsAt: now + day,
+        }),
+      ),
+    );
+    const rowsWithNoCta = await getActiveAnnouncements(db, now);
+    expect(rowsWithNoCta.find((row) => row.id === withoutCta.id)?.ctaHref).toBeNull();
+
+    // Empty CTA link is a valid form value, so the optional field is actually optional.
+    expect(announcementFieldsShape.safeParse(createBulletin({ ctaHref: "" })).success).toBe(true);
+    expect(
+      announcementFieldsShape.safeParse(createBulletin({ ctaHref: "not-a-link" })).success,
+    ).toBe(false);
+    await changeAnnouncementLifecycle(db, admin, {
+      announcementId: withoutCta.id,
+      action: "delete",
+    });
 
     // Mutating a nonexistent announcement is unavailable, not forbidden.
     expect(

@@ -12,5 +12,3 @@ export const adminAnnouncementsQuery = (offset = 0, status: AnnouncementStatus =
     refetchOnWindowFocus: false,
     retry: false,
   });
-
-export const adminAnnouncementsQueryKey = ["admin", "announcements"] as const;

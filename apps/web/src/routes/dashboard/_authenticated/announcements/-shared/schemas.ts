@@ -45,7 +45,10 @@ export const announcementFieldsShape = z.object({
     .string()
     .trim()
     .max(500, "The CTA link must be 500 characters or fewer.")
-    .refine(isValidAnnouncementHref, "Enter a full https:// address or a path starting with /."),
+    .refine(
+      (value) => value === "" || isValidAnnouncementHref(value),
+      "Enter a full https:// address or a path starting with /.",
+    ),
   ctaLabelId: optionalLocalizedText(60),
   ctaLabelEn: optionalLocalizedText(60),
   startsAt: z.number().int().positive("Pick a start date."),
