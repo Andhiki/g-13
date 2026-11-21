@@ -1,8 +1,7 @@
 import { Typography } from "@/ui/typography";
-// AlignUI Rating appearance with native radio inputs for selection and keyboard support.
-// See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import { useId, useState } from "react";
 import { RiStarFill, RiStarLine } from "@remixicon/react";
+import { Rating, RatingItem } from "@ui-sdk/react/rating";
+import { useId } from "react";
 import { useLocale } from "@/useLocale";
 
 export function StarRatingField({
@@ -22,13 +21,9 @@ export function StarRatingField({
 }) {
   const { text } = useLocale("lecturers");
   const id = useId();
-  const [preview, setPreview] = useState(0);
+  const describedBy = `${id}-hint${error ? ` ${id}-error` : ""}`;
   return (
-    <fieldset
-      aria-describedby={`${id}-hint${error ? ` ${id}-error` : ""}`}
-      aria-labelledby={`${id}-label`}
-      className="min-w-0"
-    >
+    <fieldset aria-describedby={describedBy} aria-labelledby={`${id}-label`} className="min-w-0">
       <div className="grid gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6">
         <div>
           <div id={`${id}-label`}>
@@ -48,41 +43,35 @@ export function StarRatingField({
         </div>
         <div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <div className="flex" onPointerLeave={() => setPreview(0)}>
-              {[1, 2, 3, 4, 5].map((score) => {
-                const Star = score <= (preview || value) ? RiStarFill : RiStarLine;
-                return (
-                  <label
-                    key={score}
-                    className="relative flex size-9 cursor-pointer items-center justify-center rounded-10 has-checked:bg-primary-alpha-10 hover:bg-bg-weak-50"
-                    onPointerEnter={(event) => {
-                      if (event.pointerType === "mouse") setPreview(score);
-                    }}
-                  >
-                    <input
-                      className="peer sr-only"
-                      type="radio"
-                      name={name}
-                      value={score}
-                      checked={value === score}
-                      required
-                      aria-label={text("{{metric}}: {{value}} of 5", {
-                        metric: label,
-                        value: score,
-                      })}
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? `${id}-error` : `${id}-hint`}
-                      onChange={() => onChange(score)}
-                    />
-                    <span className="absolute inset-0 rounded-10 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-base" />
-                    <Star
+            <Rating
+              aria-describedby={describedBy}
+              aria-invalid={Boolean(error)}
+              aria-labelledby={`${id}-label`}
+              className="flex"
+              getValueLabel={(score) =>
+                text("{{metric}}: {{value}} of 5", { metric: label, value: score })
+              }
+              name={name}
+              required
+              value={value > 0 ? value : null}
+              onValueChange={(next) => onChange(next ?? 0)}
+            >
+              <RatingItem className="flex size-9 items-center justify-center rounded-10 data-checked:bg-primary-alpha-10 hover:bg-bg-weak-50 [&_[role=radio]:focus-visible]:outline-2 [&_[role=radio]:focus-visible]:outline-offset-2 [&_[role=radio]:focus-visible]:outline-primary-base">
+                {({ fill }) =>
+                  fill > 0 ? (
+                    <RiStarFill
                       aria-hidden="true"
-                      className={`pointer-events-none size-5 ${score <= (preview || value) ? "text-primary-base" : "text-text-sub-600"}`}
+                      className="pointer-events-none size-5 text-primary-base"
                     />
-                  </label>
-                );
-              })}
-            </div>
+                  ) : (
+                    <RiStarLine
+                      aria-hidden="true"
+                      className="pointer-events-none size-5 text-text-sub-600"
+                    />
+                  )
+                }
+              </RatingItem>
+            </Rating>
             <Typography as="span" variant="caption" color="muted" aria-live="polite">
               {value ? `${value}/5` : text("Not rated")}
             </Typography>
