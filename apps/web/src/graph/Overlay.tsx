@@ -42,7 +42,7 @@ function MapControlDrawer({
   const { text, language } = useLocale();
   const Icon = copy.icon;
   return (
-    <AlignDrawer.Root open={open} onOpenChange={onOpenChange}>
+    <AlignDrawer.Root open={open} onOpenChange={onOpenChange} side="bottom">
       <AlignDrawer.Trigger asChild>
         <AlignButton.Root
           variant="neutral"
@@ -57,7 +57,7 @@ function MapControlDrawer({
           <Icon className="size-5" aria-hidden="true" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <AlignDrawer.Content side="bottom">
+      <AlignDrawer.Content>
         <div className="flex items-start gap-3 p-5">
           <div className="min-w-0 flex-1">
             <AlignDrawer.Title asChild>
