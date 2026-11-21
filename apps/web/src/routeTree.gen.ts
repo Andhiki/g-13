@@ -26,6 +26,7 @@ import { Route as PublicLecturersLecturerIdRouteImport } from './routes/_public/
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardAuthenticatedIndexRouteImport } from './routes/dashboard/_authenticated/index'
 import { Route as DashboardLoginIndexRouteImport } from './routes/dashboard/login/index'
+import { Route as DashboardAuthenticatedAnnouncementsIndexRouteImport } from './routes/dashboard/_authenticated/announcements/index'
 import { Route as DashboardAuthenticatedCoursesIndexRouteImport } from './routes/dashboard/_authenticated/courses/index'
 import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from './routes/dashboard/_authenticated/lecturer-reviews/index'
 import { Route as DashboardAuthenticatedLecturersIndexRouteImport } from './routes/dashboard/_authenticated/lecturers/index'
@@ -118,6 +119,12 @@ const DashboardLoginIndexRoute = DashboardLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardAuthenticatedAnnouncementsIndexRoute =
+  DashboardAuthenticatedAnnouncementsIndexRouteImport.update({
+    id: '/announcements/',
+    path: '/announcements/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
 const DashboardAuthenticatedCoursesIndexRoute =
   DashboardAuthenticatedCoursesIndexRouteImport.update({
     id: '/courses/',
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/lecturers/': typeof PublicLecturersIndexRoute
   '/dashboard/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/announcements/': typeof DashboardAuthenticatedAnnouncementsIndexRoute
   '/dashboard/courses/': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
@@ -185,6 +193,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/lecturers': typeof PublicLecturersIndexRoute
   '/dashboard/login': typeof DashboardLoginIndexRoute
+  '/dashboard/announcements': typeof DashboardAuthenticatedAnnouncementsIndexRoute
   '/dashboard/courses': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/lecturer-reviews': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/lecturers': typeof DashboardAuthenticatedLecturersIndexRoute
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_public/lecturers/': typeof PublicLecturersIndexRoute
   '/dashboard/_authenticated/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
+  '/dashboard/_authenticated/announcements/': typeof DashboardAuthenticatedAnnouncementsIndexRoute
   '/dashboard/_authenticated/courses/': typeof DashboardAuthenticatedCoursesIndexRoute
   '/dashboard/_authenticated/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/_authenticated/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/lecturers/'
     | '/dashboard/'
     | '/dashboard/login/'
+    | '/dashboard/announcements/'
     | '/dashboard/courses/'
     | '/dashboard/lecturer-reviews/'
     | '/dashboard/lecturers/'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/lecturers'
     | '/dashboard/login'
+    | '/dashboard/announcements'
     | '/dashboard/courses'
     | '/dashboard/lecturer-reviews'
     | '/dashboard/lecturers'
@@ -278,6 +290,7 @@ export interface FileRouteTypes {
     | '/_public/lecturers/'
     | '/dashboard/_authenticated/'
     | '/dashboard/login/'
+    | '/dashboard/_authenticated/announcements/'
     | '/dashboard/_authenticated/courses/'
     | '/dashboard/_authenticated/lecturer-reviews/'
     | '/dashboard/_authenticated/lecturers/'
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLoginIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/_authenticated/announcements/': {
+      id: '/dashboard/_authenticated/announcements/'
+      path: '/announcements'
+      fullPath: '/dashboard/announcements/'
+      preLoaderRoute: typeof DashboardAuthenticatedAnnouncementsIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
     '/dashboard/_authenticated/courses/': {
       id: '/dashboard/_authenticated/courses/'
       path: '/courses'
@@ -493,6 +513,7 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 
 interface DashboardAuthenticatedRouteRouteChildren {
   DashboardAuthenticatedIndexRoute: typeof DashboardAuthenticatedIndexRoute
+  DashboardAuthenticatedAnnouncementsIndexRoute: typeof DashboardAuthenticatedAnnouncementsIndexRoute
   DashboardAuthenticatedCoursesIndexRoute: typeof DashboardAuthenticatedCoursesIndexRoute
   DashboardAuthenticatedLecturerReviewsIndexRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   DashboardAuthenticatedLecturersIndexRoute: typeof DashboardAuthenticatedLecturersIndexRoute
@@ -503,6 +524,8 @@ interface DashboardAuthenticatedRouteRouteChildren {
 const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRouteChildren =
   {
     DashboardAuthenticatedIndexRoute: DashboardAuthenticatedIndexRoute,
+    DashboardAuthenticatedAnnouncementsIndexRoute:
+      DashboardAuthenticatedAnnouncementsIndexRoute,
     DashboardAuthenticatedCoursesIndexRoute:
       DashboardAuthenticatedCoursesIndexRoute,
     DashboardAuthenticatedLecturerReviewsIndexRoute:

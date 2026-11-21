@@ -28,6 +28,7 @@
     "db:migrate": "test -n \"$D1_DATABASE_ID\" || { echo \"D1_DATABASE_ID is required; refusing to run migrations\"; exit 1; }; cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
   },
   "devDependencies": {
+    "@shadcn/lint": "^0.2.5",
     "cf": "^1.0.0-rc.0",
     "turbo": "^2.11.10"
   },

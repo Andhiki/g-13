@@ -8,6 +8,10 @@
       "types": "./dist/client.d.mts",
       "import": "./dist/client.mjs"
     },
+    "./schema/announcements": {
+      "types": "./dist/schema/announcements.d.mts",
+      "import": "./dist/schema/announcements.mjs"
+    },
     "./schema/auth": {
       "types": "./dist/schema/auth.d.mts",
       "import": "./dist/schema/auth.mjs"

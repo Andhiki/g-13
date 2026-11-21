@@ -27,7 +27,7 @@ export function SemesterIndicator({ label }: { label: string }) {
                   <Typography
                     as="span"
                     variant="labelSmall"
-                    className={`absolute -top-10 whitespace-nowrap rounded-4 bg-bg-strong-950 px-2 py-1 text-text-white-0 ${index === 0 ? "left-0" : index === 7 ? "right-0" : "left-1/2 -translate-x-1/2"}`}
+                    className={`absolute -top-10 whitespace-nowrap rounded-sm bg-bg-strong-950 px-2 py-1 text-text-white-0 ${index === 0 ? "left-0" : index === 7 ? "right-0" : "left-1/2 -translate-x-1/2"}`}
                   >
                     {text("Semester")} {semester}
                   </Typography>

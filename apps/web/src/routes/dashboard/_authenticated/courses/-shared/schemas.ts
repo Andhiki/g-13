@@ -31,7 +31,7 @@ export type CourseFieldsInput = z.infer<typeof courseFieldsSchema>;
 export const createCourseSchema = courseFieldsSchema;
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 
-export const updateCourseSchema = courseFieldsSchema.extend({
+export const updateCourseSchema = courseFieldsSchema.omit({ code: true }).extend({
   courseId: z.string().trim().min(1).max(100),
 });
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;

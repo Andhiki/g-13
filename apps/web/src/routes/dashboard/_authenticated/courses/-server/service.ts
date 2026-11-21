@@ -8,6 +8,7 @@ import type {
   UpdateCourseInput,
 } from "../-shared/schemas";
 import {
+  courseCodeExists,
   createCourseRecord,
   getAdminCourseCounts,
   listAdminCourses,
@@ -42,6 +43,9 @@ export async function createCourse(
   input: CreateCourseInput,
 ): Promise<CourseAdminResult<{ id: string }>> {
   if (!canModerate(actor.role)) return { data: null, error: COURSE_ADMIN_ERRORS.FORBIDDEN };
+  if (await courseCodeExists(db, input.code)) {
+    return { data: null, error: COURSE_ADMIN_ERRORS.COURSE_CODE_TAKEN };
+  }
   const created = await createCourseRecord(db, input);
   return { data: { id: created.id }, error: null };
 }

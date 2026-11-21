@@ -1,6 +1,5 @@
 {
   "Lecturers and reviews": "Dosen dan ulasan",
-  "Browse community experiences with Ilmu Komputer UGM lecturers.": "Jelajahi pengalaman komunitas bersama dosen Ilmu Komputer UGM.",
   "Search lecturers": "Cari dosen",
   "Search a lecturer by name": "Cari dosen berdasarkan nama",
   "Search courses": "Cari mata kuliah",
@@ -68,7 +67,6 @@
   "What helped you learn? What could be improved?": "Apa yang membantu kamu belajar? Apa yang bisa diperbaiki?",
   "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.": "Nama tampilanmu bersifat publik. Anonim menyembunyikannya, tetapi pengelola infrastruktur mungkin tetap dapat mengidentifikasimu.",
   "Display name": "Nama tampilan",
-  "1–80 characters. Avoid personal information.": "1–80 karakter. Hindari informasi pribadi.",
   "The lecturer or course may no longer be available. Choose them again and retry.": "Dosen atau mata kuliah mungkin sudah tidak tersedia. Pilih kembali dan coba lagi.",
   "Your review is published. Refresh the page to see it.": "Ulasanmu telah terbit. Muat ulang halaman untuk melihatnya.",
   "Lecturer order": "Urutan dosen",
@@ -111,7 +109,6 @@
   "Average ratings": "Rata-rata penilaian",
   "Reviews": "Ulasan",
   "No reviews yet. Be the first to share your experience.": "Belum ada ulasan. Jadilah orang pertama yang berbagi pengalaman.",
-  "Be the first to review!": "Jadilah yang pertama memberi ulasan!",
   "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "Alamat IP digunakan untuk membatasi pengiriman ulasan dan suka. Alamat IP mentah tidak disimpan pada data ulasan atau suka.",
   "Optional. Leave blank to publish as Anonymous.": "Opsional. Kosongkan untuk terbit sebagai Anonim.",
   "{{term}} (Current)": "{{term}} (Saat ini)",

@@ -20,7 +20,7 @@ const Root = React.forwardRef<
       className={clsx(
         "h-4 w-7 rounded-full bg-bg-soft-200 p-0.5 outline-none transition duration-200 ease-out",
         !disabled &&
-          "group-hover/switch:bg-bg-sub-300 group-focus-visible/switch:bg-bg-sub-300 group-active/switch:bg-bg-soft-200 group-data-[state=checked]/switch:bg-primary-base group-hover:data-[state=checked]/switch:bg-primary-darker group-active:data-[state=checked]/switch:bg-primary-base",
+          "group-hover/switch:bg-bg-sub-300 group-focus-visible/switch:bg-bg-sub-300 group-active/switch:bg-bg-soft-200 group-data-[state=checked]/switch:bg-primary-base group-data-[state=checked]/switch:group-hover/switch:bg-primary-darker group-data-[state=checked]/switch:group-active/switch:bg-primary-base",
         disabled && "bg-bg-white-0 p-[3px] ring-1 ring-inset ring-stroke-soft-200",
       )}
     >

@@ -3,6 +3,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: {
     client: "src/client.ts",
+    "schema/announcements": "src/schema/announcements.ts",
     "schema/auth": "src/schema/auth.ts",
     "schema/courses": "src/schema/courses.ts",
     "schema/lecturers": "src/schema/lecturers.ts",

@@ -1,6 +1,5 @@
 {
   "Lecturers and reviews": "Lecturers and reviews",
-  "Browse community experiences with Ilmu Komputer UGM lecturers.": "Browse community experiences with Ilmu Komputer UGM lecturers.",
   "Search lecturers": "Search lecturers",
   "Search a lecturer by name": "Search a lecturer by name",
   "Search courses": "Search courses",
@@ -68,7 +67,6 @@
   "What helped you learn? What could be improved?": "What helped you learn? What could be improved?",
   "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.": "Your display name is public. Anonymous hides it, but infrastructure operators may still identify you.",
   "Display name": "Display name",
-  "1–80 characters. Avoid personal information.": "1–80 characters. Avoid personal information.",
   "The lecturer or course may no longer be available. Choose them again and retry.": "The lecturer or course may no longer be available. Choose them again and retry.",
   "Your review is published. Refresh the page to see it.": "Your review is published. Refresh the page to see it.",
   "Lecturer order": "Lecturer order",
@@ -111,7 +109,6 @@
   "Average ratings": "Average ratings",
   "Reviews": "Reviews",
   "No reviews yet. Be the first to share your experience.": "No reviews yet. Be the first to share your experience.",
-  "Be the first to review!": "Be the first to review!",
   "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.": "IP addresses are used to limit review submissions and likes. Raw IP addresses are not stored in review or like records.",
   "Optional. Leave blank to publish as Anonymous.": "Optional. Leave blank to publish as Anonymous.",
   "{{term}} (Current)": "{{term}} (Current)",

@@ -5,6 +5,19 @@ const browserIdSchema = z
   .string()
   .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
+const coursePickerCursorSchema = z.object({
+  name: z.string().min(1).max(200),
+  id: z.string().min(1).max(128),
+});
+export type CoursePickerCursor = z.infer<typeof coursePickerCursorSchema>;
+
+export const coursePickerInputSchema = z.object({
+  cursor: coursePickerCursorSchema.nullable().default(null),
+  query: z.string().trim().max(120).default(""),
+  language: z.enum(["id", "en"]),
+});
+export type CoursePickerInput = z.infer<typeof coursePickerInputSchema>;
+
 export const lecturerDetailInputSchema = z.object({ lecturerId: z.string().min(1) });
 export const browserLikesInputSchema = z.object({ browserId: browserIdSchema });
 export const reviewLikeInputSchema = z.object({

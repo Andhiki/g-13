@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { clsx } from "clsx";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 
@@ -49,7 +50,6 @@ export function AdminTableInspectButton({
   selected,
   onSelect,
   className = "min-w-0 font-semibold",
-  buttonClassName = "font-semibold",
   children,
 }: {
   as?: "h3" | "p";
@@ -57,7 +57,6 @@ export function AdminTableInspectButton({
   selected: boolean;
   onSelect: () => void;
   className?: string;
-  buttonClassName?: string;
   children: ReactNode;
 }) {
   return (
@@ -67,7 +66,9 @@ export function AdminTableInspectButton({
         mode="ghost"
         size="xxsmall"
         onClick={onSelect}
-        className={`block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs text-text-strong-950 hover:bg-transparent hover:underline${buttonClassName ? ` ${buttonClassName}` : ""}`}
+        className={clsx(
+          "block h-auto max-w-full truncate rounded-sm p-0 text-left text-label-xs text-text-strong-950 hover:bg-transparent hover:underline",
+        )}
         aria-label={ariaLabel}
         aria-pressed={selected}
       >

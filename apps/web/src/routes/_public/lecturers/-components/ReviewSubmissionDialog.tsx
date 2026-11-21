@@ -1,15 +1,17 @@
 import { AlignModal } from "@/ui/modal";
-import { ReviewSubmissionForm, type ReviewFormData } from "./ReviewSubmissionForm";
+import type { ReviewCourseOption } from "../-shared/course-search";
+import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
 
 export function ReviewSubmissionDialog({
-  courses,
+  initialCourse,
   lecturerId,
   lecturerName,
   courseId,
   open,
   onClose,
   onPublished,
-}: ReviewFormData & {
+}: {
+  initialCourse?: ReviewCourseOption;
   lecturerId: string;
   lecturerName: string;
   courseId: string;
@@ -35,7 +37,7 @@ export function ReviewSubmissionDialog({
       >
         {open && (
           <ReviewSubmissionForm
-            courses={courses}
+            initialCourse={initialCourse}
             lecturerId={lecturerId}
             lecturerName={lecturerName}
             initialCourseId={courseId}

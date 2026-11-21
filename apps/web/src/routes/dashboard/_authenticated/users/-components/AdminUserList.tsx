@@ -52,7 +52,6 @@ export function AdminUserList({
                   selected={selectedId === user.id}
                   onSelect={() => onSelect(user.id)}
                   className="truncate font-medium"
-                  buttonClassName=""
                 >
                   {user.name}
                 </AdminTableInspectButton>

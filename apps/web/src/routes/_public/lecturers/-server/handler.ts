@@ -7,12 +7,13 @@ import { reviewClientIp } from "@/server/request-identity";
 import { runServerOperation } from "@/server/server-function-error";
 import {
   browserLikesInputSchema,
+  coursePickerInputSchema,
   lecturerDetailInputSchema,
   publishReviewInputSchema,
   reviewLikeInputSchema,
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
-import { getBrowserReviewLikes } from "./repository";
+import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
 import { rejectReviewLikeOperation, rejectSubmissionOperation } from "./failures";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
@@ -27,6 +28,12 @@ export const loadLecturerDetail = createServerFn({ method: "GET" })
   .validator(lecturerDetailInputSchema)
   .handler(async ({ data }) =>
     runServerOperation(() => getLecturerDetail(createDatabase(env.DB), data.lecturerId)),
+  );
+
+export const loadCoursePickerPage = createServerFn({ method: "GET" })
+  .validator(coursePickerInputSchema)
+  .handler(async ({ data }) =>
+    runServerOperation(() => getCoursePickerPage(createDatabase(env.DB), data)),
   );
 
 export const loadTurnstileSiteKey = createServerFn({ method: "GET" }).handler(async () =>

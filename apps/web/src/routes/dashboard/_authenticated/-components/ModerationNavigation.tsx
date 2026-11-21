@@ -14,6 +14,7 @@ import {
   RiCloseLine,
   RiExternalLinkLine,
   RiGroupLine,
+  RiMegaphoneLine,
   RiLogoutBoxLine,
   RiMenuLine,
   RiSettings3Line,
@@ -46,6 +47,7 @@ const sectionGroups = [
     items: [
       { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
       { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
+      { to: "/dashboard/announcements", label: "Announcements", Icon: RiMegaphoneLine },
     ],
   },
   {
@@ -177,7 +179,11 @@ function ModerationNavSections({
   return (
     <nav aria-label="Moderation sections" className="space-y-4">
       {sectionGroups.map((group) => {
-        const items = group.items.filter((section) => manager || section.to !== "/dashboard/users");
+        const items = group.items.filter(
+          (section) =>
+            manager ||
+            (section.to !== "/dashboard/users" && section.to !== "/dashboard/announcements"),
+        );
         if (items.length === 0) return null;
         return (
           <div key={group.heading} className="space-y-1">

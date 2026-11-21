@@ -64,6 +64,10 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
   pemeriksaan teks, posisi piksel, ukuran, tata letak, atau animasi.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run format` dan
   `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
+- Aturan design system untuk `apps/web` didefinisikan di `.oxlintrc.json` lewat
+  plugin `@shadcn/lint`. Tambahkan aturan baru di berkas itu, bukan sebagai
+  argumen CLI tiap paket, lalu pastikan `bun run lint` tetap lolos. Berkas yang
+  sama juga dibaca `bun lint` setelah linter bawaan Bun tersedia di rilis stabil.
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru
   untuk sesuatu yang sudah tersedia di proyek.
 
