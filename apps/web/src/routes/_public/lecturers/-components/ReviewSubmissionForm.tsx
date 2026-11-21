@@ -165,9 +165,6 @@ export function ReviewSubmissionForm({
               <Typography as="label" variant="label" htmlFor="review-author">
                 {text("Display name")}
               </Typography>
-              <Typography as="p" variant="caption" className="mb-0 mt-1 text-text-sub-600">
-                {text("1–80 characters. Avoid personal information.")}
-              </Typography>
               <label
                 htmlFor="review-anonymous"
                 className="mt-2 flex min-h-9 cursor-pointer items-center gap-3 text-paragraph-sm sm:mt-1"
@@ -183,7 +180,7 @@ export function ReviewSubmissionForm({
                 {text("Publish as Anonymous")}
               </label>
             </div>
-            <div className="sm:pt-11">
+            <div className="sm:pt-9">
               <div
                 className={`flex min-h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:outline-2 focus-within:outline-primary-base ${anonymous ? "cursor-not-allowed opacity-50" : ""}`}
               >
