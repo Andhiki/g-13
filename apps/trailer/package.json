@@ -5,9 +5,9 @@
   "description": "Trailer g-13",
   "license": "MIT",
   "scripts": {
-    "studio": "remotionb studio",
-    "build": "remotionb bundle --out-dir=dist",
-    "render": "remotionb render G13Trailer out/trailer.mp4",
+    "studio": "bun --preserve-symlinks ./node_modules/.bin/remotionb studio",
+    "build": "bun --preserve-symlinks ./node_modules/.bin/remotionb bundle --out-dir=dist",
+    "render": "bun --preserve-symlinks ./node_modules/.bin/remotionb render G13Trailer out/trailer.mp4",
     "typecheck": "bun check --no-script",
     "lint": "oxlint --deny-warnings src remotion.config.ts",
     "format": "bun fmt src remotion.config.ts package.json tsconfig.json",
