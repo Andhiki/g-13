@@ -45,9 +45,6 @@ export function ResourcesPage() {
           <Typography as="h1" variant="title" className="m-0 text-title-h3 sm:text-title-h2">
             {text("Looking for a place to start?")}
           </Typography>
-          <Typography as="p" variant="paragraph" className="mb-0 mt-5 max-w-md text-text-sub-600">
-            {text("Pick a resource that fits what you need and explore it at your own pace.")}
-          </Typography>
         </header>
         <section
           aria-label={text("Helpful resources")}
