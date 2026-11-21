@@ -56,7 +56,9 @@ export function CourseSearch({
           event.preventDefault();
           triggerRef.current?.focus();
         }}
-        shouldFilter={false}
+        filter={false}
+        query={query}
+        onQueryChange={setQuery}
       >
         <AlignCommandMenu.DialogTitle className="sr-only">
           {text("Cari mata kuliah")}
@@ -70,8 +72,6 @@ export function CourseSearch({
               autoFocus
               aria-label={text("Cari mata kuliah")}
               placeholder={text("Nama, kode, prasyarat…")}
-              value={query}
-              onValueChange={setQuery}
             />
           </div>
           <div className="shrink-0 min-[650px]:hidden">
@@ -87,52 +87,49 @@ export function CourseSearch({
           </div>
         </div>
         <AlignCommandMenu.List className="max-[650px]:max-h-none">
-          {query.trim() ? (
-            results.length ? (
-              <AlignCommandMenu.Group>
-                {results.map((course) => (
-                  <AlignCommandMenu.Item
-                    key={course.id}
-                    value={course.id}
-                    onSelect={() => {
-                      setQuery("");
-                      setOpen(false);
-                      onSelect(course);
-                    }}
-                  >
-                    <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-0.5">
-                      <span>{courseName(course)}</span>
-                      {course.code && (
-                        <Typography
-                          as="span"
-                          variant="labelSmall"
-                          color="muted"
-                          className="whitespace-nowrap"
-                        >
-                          {course.code}
-                        </Typography>
-                      )}
+          {results.length ? (
+            <AlignCommandMenu.Group>
+              {results.map((course) => (
+                <AlignCommandMenu.Item
+                  key={course.id}
+                  value={course.id}
+                  onSelect={() => {
+                    changeOpen(false);
+                    onSelect(course);
+                  }}
+                >
+                  <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-0.5">
+                    <span>{courseName(course)}</span>
+                    {course.code && (
                       <Typography
-                        as="small"
+                        as="span"
                         variant="labelSmall"
                         color="muted"
-                        className="col-start-1"
+                        className="whitespace-nowrap"
                       >
-                        {semesterLabel(course, text)}
+                        {course.code}
                       </Typography>
-                    </span>
-                  </AlignCommandMenu.Item>
-                ))}
-              </AlignCommandMenu.Group>
-            ) : (
-              <AlignCommandMenu.Empty className="px-5 py-4 text-text-sub-600" role="status">
-                <Typography>{text("Tidak ada mata kuliah yang cocok.")}</Typography>
-              </AlignCommandMenu.Empty>
-            )
+                    )}
+                    <Typography
+                      as="small"
+                      variant="labelSmall"
+                      color="muted"
+                      className="col-start-1"
+                    >
+                      {semesterLabel(course, text)}
+                    </Typography>
+                  </span>
+                </AlignCommandMenu.Item>
+              ))}
+            </AlignCommandMenu.Group>
           ) : (
-            <AlignCommandMenu.Empty className="px-5 py-4 text-text-sub-600">
-              <Typography>{text("Ketik nama, kode, atau prasyarat untuk mencari.")}</Typography>
-            </AlignCommandMenu.Empty>
+            <div className="px-5 py-4 text-text-sub-600" role={query.trim() ? "status" : undefined}>
+              <Typography>
+                {query.trim()
+                  ? text("Tidak ada mata kuliah yang cocok.")
+                  : text("Ketik nama, kode, atau prasyarat untuk mencari.")}
+              </Typography>
+            </div>
           )}
         </AlignCommandMenu.List>
         <div className="hidden flex-wrap items-center gap-x-4 gap-y-2 bg-bg-weak-50 px-5 py-3 text-text-sub-600 min-[650px]:flex">
