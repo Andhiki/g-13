@@ -302,6 +302,7 @@ function AdminCoursesPage() {
       />
       <ConfirmActionModal
         open={confirmation !== null}
+        destructive={confirmation?.input.action === "delete"}
         title={confirmation?.input.action === "delete" ? "Confirm delete" : "Confirm restore"}
         description={
           <>

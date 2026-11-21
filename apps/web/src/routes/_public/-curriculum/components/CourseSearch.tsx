@@ -53,8 +53,7 @@ export function CourseSearch({
       <AlignCommandMenu.Dialog
         open={open}
         onOpenChange={changeOpen}
-        overlayClassName="max-[650px]:p-0"
-        className="max-[650px]:h-dvh max-[650px]:max-w-none max-[650px]:rounded-none"
+        className="max-[650px]:my-0 max-[650px]:h-dvh max-[650px]:max-h-none max-[650px]:w-full max-[650px]:max-w-none max-[650px]:rounded-none"
         onCloseAutoFocus={(event) => {
           event.preventDefault();
           triggerRef.current?.focus();

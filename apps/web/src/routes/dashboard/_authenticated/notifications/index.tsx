@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
 import {
@@ -43,6 +44,14 @@ export const Route = createFileRoute("/dashboard/_authenticated/notifications/")
   component: NotificationsPage,
 });
 
+const coarsePointerQuery = "(pointer: coarse)";
+
+function subscribeCoarsePointer(onChange: () => void) {
+  const query = window.matchMedia(coarsePointerQuery);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
 function NotificationRow({
   item,
   busy,
@@ -61,73 +70,111 @@ function NotificationRow({
   const { text, language } = useLocale("notifications");
   const { titleKey, bodyKey, interpolation, linkTarget } = getNotificationPresentation(item);
   const unread = !optimisticallyRead && item.readAt === null && item.archivedAt === null;
+  const reducedMotion = useReducedMotion();
+  const coarsePointer = useSyncExternalStore(
+    subscribeCoarsePointer,
+    () => window.matchMedia(coarsePointerQuery).matches,
+    () => false,
+  );
+  const canSwipe = item.archivedAt === null && !busy && !reducedMotion && coarsePointer;
+  const swipeX = useMotionValue(0);
+  const revealOpacity = useTransform(swipeX, [-96, -24, 0], [1, 0.65, 0]);
+
+  useEffect(() => {
+    if (!archiving) {
+      animate(swipeX, 0, { type: "spring", stiffness: 500, damping: 35 });
+    }
+  }, [archiving, swipeX]);
 
   return (
-    <li
-      className={`flex items-start justify-between gap-3 border-b border-stroke-soft-200 px-4 py-3 ${
-        unread ? "bg-bg-weak-50/70" : "bg-bg-white-0"
-      }`}
-    >
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <div className="flex flex-wrap items-center gap-1.5">
-          {unread && (
-            <span
-              className="inline-block size-2 shrink-0 rounded-full bg-primary-base"
-              aria-label={text("status.unread")}
-            />
-          )}
-          <Typography as="p" variant="label" color="strong">
-            {text(titleKey, interpolation)}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="muted"
-            title={formatAbsoluteTime(item.createdAt, language)}
-          >
-            · {formatRelativeTime(item.createdAt, language)}
+    <li className="relative overflow-hidden border-b border-stroke-soft-200">
+      {item.archivedAt === null && (
+        <m.div
+          aria-hidden="true"
+          style={{ opacity: revealOpacity }}
+          className="pointer-events-none absolute inset-y-0 right-0 flex items-center gap-1.5 bg-bg-strong-950 px-4 text-label-xs text-text-white-0"
+        >
+          <RiArchiveLine className="size-4" />
+          {text("action.archive")}
+        </m.div>
+      )}
+      <m.div
+        style={canSwipe ? { x: swipeX } : undefined}
+        drag={canSwipe ? "x" : false}
+        dragDirectionLock
+        dragConstraints={{ left: -120, right: 0 }}
+        dragElastic={{ left: 0.2, right: 0.05 }}
+        dragSnapToOrigin
+        onDragEnd={(_, info) => {
+          if (!busy && (info.offset.x <= -72 || info.velocity.x <= -450)) {
+            onArchive(item.id);
+          }
+        }}
+        className={`relative z-10 flex touch-pan-y items-start justify-between gap-3 px-4 py-3 ${
+          unread ? "bg-bg-weak-50/70" : "bg-bg-white-0"
+        }`}
+      >
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {unread && (
+              <span
+                className="inline-block size-2 shrink-0 rounded-full bg-primary-base"
+                aria-label={text("status.unread")}
+              />
+            )}
+            <Typography as="p" variant="label" color="strong">
+              {text(titleKey, interpolation)}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="muted"
+              title={formatAbsoluteTime(item.createdAt, language)}
+            >
+              · {formatRelativeTime(item.createdAt, language)}
+            </Typography>
+          </div>
+          <Typography variant="paragraph" color="muted">
+            {text(bodyKey, interpolation)}
           </Typography>
         </div>
-        <Typography variant="paragraph" color="muted">
-          {text(bodyKey, interpolation)}
-        </Typography>
-      </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-1.5">
-        {linkTarget && (
-          <AlignButton.Root asChild size="xxsmall" variant="neutral" mode="stroke" compact>
-            <Link to={linkTarget.to} search={linkTarget.search}>
-              <RiExternalLinkLine className="size-3.5" />
-              {text("action.open")}
-            </Link>
-          </AlignButton.Root>
-        )}
-        {unread && (
-          <AlignButton.Root
-            size="xxsmall"
-            variant="neutral"
-            mode="ghost"
-            compact
-            icon={<RiCheckLine className="size-3.5" />}
-            disabled={busy}
-            onClick={() => onMarkRead(item.id)}
-          >
-            {text("action.markRead")}
-          </AlignButton.Root>
-        )}
-        {item.archivedAt === null && (
-          <AlignButton.Root
-            size="xxsmall"
-            variant="neutral"
-            mode="ghost"
-            compact
-            isLoading={archiving}
-            icon={<RiArchiveLine className="size-3.5" />}
-            disabled={busy}
-            onClick={() => onArchive(item.id)}
-          >
-            {text("action.archive")}
-          </AlignButton.Root>
-        )}
-      </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+          {linkTarget && (
+            <AlignButton.Root asChild size="xxsmall" variant="neutral" mode="stroke" compact>
+              <Link to={linkTarget.to} search={linkTarget.search}>
+                <RiExternalLinkLine className="size-3.5" />
+                {text("action.open")}
+              </Link>
+            </AlignButton.Root>
+          )}
+          {unread && (
+            <AlignButton.Root
+              size="xxsmall"
+              variant="neutral"
+              mode="ghost"
+              compact
+              icon={<RiCheckLine className="size-3.5" />}
+              disabled={busy}
+              onClick={() => onMarkRead(item.id)}
+            >
+              {text("action.markRead")}
+            </AlignButton.Root>
+          )}
+          {item.archivedAt === null && (
+            <AlignButton.Root
+              size="xxsmall"
+              variant="neutral"
+              mode="ghost"
+              compact
+              isLoading={archiving}
+              icon={<RiArchiveLine className="size-3.5" />}
+              disabled={busy}
+              onClick={() => onArchive(item.id)}
+            >
+              {text("action.archive")}
+            </AlignButton.Root>
+          )}
+        </div>
+      </m.div>
     </li>
   );
 }

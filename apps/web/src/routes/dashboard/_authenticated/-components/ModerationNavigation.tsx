@@ -196,7 +196,11 @@ function ModerationNavSections({
             <div className="space-y-0.5">
               {items.map(({ to, label, Icon }) => {
                 const link = (
-                  <Link key={to} to={to} className={`${navLinkClass} h-8`}>
+                  <Link
+                    key={to}
+                    to={to}
+                    className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}
+                  >
                     <Icon className="size-4 shrink-0" />
                     <span className="truncate">{label}</span>
                   </Link>

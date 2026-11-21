@@ -1,8 +1,104 @@
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
 import { Typography } from "@/ui/typography";
+
+const HOLD_DURATION_MS = 850;
+const CANCEL_DURATION_MS = 150;
+
+function HoldConfirmButton({
+  confirmLabel,
+  open,
+  pending,
+  onConfirm,
+}: {
+  confirmLabel: string;
+  open: boolean;
+  pending: boolean;
+  onConfirm: () => void;
+}) {
+  const [holding, setHolding] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const cancelHold = useCallback(() => {
+    clearTimer();
+    setHolding(false);
+  }, [clearTimer]);
+
+  const startHold = useCallback(() => {
+    if (pending || !open) return;
+    clearTimer();
+    setHolding(true);
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      setHolding(false);
+      onConfirm();
+    }, HOLD_DURATION_MS);
+  }, [clearTimer, onConfirm, open, pending]);
+
+  useEffect(() => {
+    if (!open || pending) cancelHold();
+  }, [cancelHold, open, pending]);
+
+  useEffect(() => () => clearTimer(), [clearTimer]);
+
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      aria-busy={pending || undefined}
+      aria-label={`Hold to ${confirmLabel}`}
+      onPointerDown={(event) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        startHold();
+      }}
+      onPointerUp={cancelHold}
+      onPointerCancel={cancelHold}
+      onLostPointerCapture={cancelHold}
+      onKeyDown={(event) => {
+        if (event.repeat) return;
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          startHold();
+        }
+      }}
+      onKeyUp={(event) => {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          cancelHold();
+        }
+      }}
+      onBlur={cancelHold}
+      className="relative inline-flex h-8 shrink-0 touch-none select-none items-center justify-center rounded-lg bg-error-base px-3 text-label-sm text-static-white outline-none transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error-base disabled:pointer-events-none disabled:opacity-60 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
+    >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
+      >
+        <span
+          style={{
+            transform: holding ? "scaleX(1)" : "scaleX(0)",
+            transformOrigin: "left center",
+            transitionProperty: "transform",
+            transitionTimingFunction: holding ? "linear" : "cubic-bezier(0.22, 1, 0.36, 1)",
+            transitionDuration: holding ? `${HOLD_DURATION_MS}ms` : `${CANCEL_DURATION_MS}ms`,
+          }}
+          className="block size-full bg-static-white/25"
+        />
+      </span>
+      <span className="relative z-10">{confirmLabel}</span>
+    </button>
+  );
+}
 
 export function ConfirmActionModal({
   open,
@@ -10,6 +106,7 @@ export function ConfirmActionModal({
   description,
   children,
   confirmLabel,
+  destructive = false,
   error,
   pending,
   onClose,
@@ -20,6 +117,7 @@ export function ConfirmActionModal({
   description: ReactNode;
   children?: ReactNode;
   confirmLabel: string;
+  destructive?: boolean;
   error?: string;
   pending: boolean;
   onClose: () => void;
@@ -60,9 +158,18 @@ export function ConfirmActionModal({
           >
             Cancel
           </AlignButton.Root>
-          <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
-            {confirmLabel}
-          </AlignFancyButton.Root>
+          {destructive ? (
+            <HoldConfirmButton
+              confirmLabel={confirmLabel}
+              open={open}
+              pending={pending}
+              onConfirm={onConfirm}
+            />
+          ) : (
+            <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
+              {confirmLabel}
+            </AlignFancyButton.Root>
+          )}
         </div>
       </AlignModal.Content>
     </AlignModal.Root>

@@ -261,6 +261,7 @@ function LecturerReviewsPage() {
       </div>
       <ConfirmActionModal
         open={confirmation !== null}
+        destructive={confirmation?.input.action === "delete"}
         title={`Confirm ${confirmation?.input.action ?? ""}`}
         description={
           <>

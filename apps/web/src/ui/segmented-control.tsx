@@ -72,7 +72,7 @@ function Item({ className, ...props }: ItemProps) {
     <SegmentedControlItemPrimitive
       className={cn(
         // base; z-10 lifts the label above the indicator
-        "relative z-10 flex h-7 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-label-sm text-text-soft-400 outline-none",
+        "relative z-10 flex h-7 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-label-sm text-text-soft-400 outline-none pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
         "transition duration-200 ease-out",
         // focus
         "focus:outline-none",

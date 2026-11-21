@@ -58,7 +58,8 @@ function MapControlDrawer({
         </AlignButton.Root>
       </AlignDrawer.Trigger>
       <AlignDrawer.Content>
-        <div className="flex items-start gap-3 p-5">
+        <AlignDrawer.Grip />
+        <div className="flex items-start gap-3 px-5 pt-2 pb-4">
           <div className="min-w-0 flex-1">
             <AlignDrawer.Title asChild>
               <Typography as="h2" variant="label" color="strong">
@@ -73,6 +74,7 @@ function MapControlDrawer({
           </div>
           <AlignDrawer.Close asChild>
             <AlignButton.Root
+              data-drawer-no-drag=""
               variant="neutral"
               mode="ghost"
               size="medium"

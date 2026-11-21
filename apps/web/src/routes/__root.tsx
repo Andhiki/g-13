@@ -3,7 +3,7 @@ import { Toaster } from "../ui/toast";
 import { PublicFrame } from "./_public/-PublicFrame";
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { useMemo, type ReactNode } from "react";
-import { LazyMotion, domAnimation } from "motion/react";
+import { LazyMotion, domMax } from "motion/react";
 import { AppPreferences, darkModeScript } from "../ui/theme-preference";
 import { I18nextProvider } from "react-i18next";
 import flowStyles from "@xyflow/react/dist/style.css?url";
@@ -131,7 +131,7 @@ function RootDocument({ children }: { children: ReactNode }) {
       <body className="m-0 h-full w-full min-w-80 bg-bg-white-0">
         <I18nextProvider i18n={i18n}>
           <AppPreferences>
-            <LazyMotion features={domAnimation}>
+            <LazyMotion features={domMax}>
               <div id="root" className="m-0 h-full w-full min-w-80">
                 {children}
                 <Toaster />

@@ -1,8 +1,18 @@
-import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { RiArrowLeftLine, RiSearchLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import * as Tabs from "@radix-ui/react-tabs";
-import { m, useReducedMotion } from "motion/react";
+import { animate, m, useMotionValue, useReducedMotion } from "motion/react";
 import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { Loading } from "@/ui/loading";
@@ -65,70 +75,14 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
   );
 
   const listRef = useRef<HTMLUListElement>(null);
-  const [current, setCurrent] = useState("");
-  const [hovered, setHovered] = useState("");
-  const navRef = useRef<HTMLElement>(null);
-  const [expanded, setExpanded] = useState(false);
-  const draggingRef = useRef(false);
-  const lastDragLetterRef = useRef("");
-  // Browsers synthesise compat mouse pointer events right after a touch lift;
-  // ignore them so the rail does not spring back open after a scrub.
-  const lastTouchRef = useRef(0);
-  const recentTouch = () => Date.now() - lastTouchRef.current < 700;
   const letters = useMemo(
     () => [...new Set(filtered.map((item) => letterOf(item.name)))],
     [filtered],
   );
-  useEffect(() => {
-    const update = () => {
-      const cards = listRef.current?.querySelectorAll<HTMLElement>("[data-letter]");
-      if (!cards?.length) return;
-      let letter = cards[0]?.dataset.letter ?? "";
-      for (const card of cards) {
-        if (card.getBoundingClientRect().top > window.innerHeight / 3) break;
-        letter = card.dataset.letter ?? letter;
-      }
-      setCurrent(letter);
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, [filtered]);
-  const activeIndex = letters.indexOf(hovered || current);
-  const jump = (letter: string) => {
-    const target = [
-      ...(listRef.current?.querySelectorAll<HTMLElement>("[data-letter]") ?? []),
-    ].find((card) => card.dataset.letter === letter);
-    target?.scrollIntoView({ block: "start", behavior: "auto" });
-    setCurrent(letter);
-  };
-  // Maps a thumb position to the letter whose button covers it, clamping
-  // overshoot above/below the rail so fast drags never lose the pointer.
-  const letterFromY = (clientY: number): string | null => {
-    const buttons = navRef.current?.querySelectorAll<HTMLButtonElement>("[data-letter]");
-    const count = buttons?.length ?? 0;
-    if (!count || !buttons) return null;
-    const first = buttons[0].getBoundingClientRect();
-    const last = buttons[count - 1].getBoundingClientRect();
-    const step = (last.bottom - first.top) / count;
-    const index = Math.min(count - 1, Math.max(0, Math.floor((clientY - first.top) / step)));
-    return buttons[index]?.dataset.letter ?? null;
-  };
-  const dragTo = (clientY: number) => {
-    const letter = letterFromY(clientY);
-    if (!letter || letter === lastDragLetterRef.current) return;
-    lastDragLetterRef.current = letter;
-    setHovered(letter);
-    jump(letter);
-  };
-  const endDrag = (collapse: boolean) => {
-    draggingRef.current = false;
-    lastDragLetterRef.current = "";
-    if (collapse) {
-      setHovered("");
-      setExpanded(false);
-    }
-  };
+  const letterLabel = useCallback(
+    (letter: string) => text("Ke huruf {{v0}}", { v0: letter }),
+    [text],
+  );
 
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 lg:px-12">
@@ -254,21 +208,204 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
         </Tabs.Root>
       </div>
       {letters.length > 1 && (
+        <AlphabetScrubber
+          letters={letters}
+          listRef={listRef}
+          label={text("Navigasi alfabet")}
+          letterLabel={letterLabel}
+        />
+      )}
+    </main>
+  );
+}
+
+const AlphabetScrubber = memo(function AlphabetScrubber({
+  letters,
+  listRef,
+  label,
+  letterLabel,
+}: {
+  letters: string[];
+  listRef: RefObject<HTMLUListElement | null>;
+  label: string;
+  letterLabel: (letter: string) => string;
+}) {
+  const reducedMotion = useReducedMotion();
+  const navRef = useRef<HTMLElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const tickRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const offsetsRef = useRef<number[]>([]);
+  const targetMapRef = useRef<Map<string, HTMLElement>>(new Map());
+  const orderedCardsRef = useRef<{ letter: string; el: HTMLElement }[]>([]);
+  const railRectRef = useRef<{ top: number; bottom: number; step: number } | null>(null);
+  const draggingRef = useRef(false);
+  const lastDragIndexRef = useRef(-1);
+  const scrollIndexRef = useRef(0);
+  const hoverIndexRef = useRef(-1);
+  // Browsers synthesise compat mouse pointer events right after a touch lift;
+  // ignore them so the rail does not spring back open after a scrub.
+  const lastTouchRef = useRef(0);
+  const [expanded, setExpanded] = useState(false);
+  const rubberY = useMotionValue(0);
+
+  const recentTouch = () => Date.now() - lastTouchRef.current < 700;
+
+  const setTickTransition = (enabled: boolean) => {
+    for (let i = 0; i < tickRefs.current.length; i++) {
+      const tick = tickRefs.current[i];
+      if (tick) tick.style.transitionDuration = enabled && !reducedMotion ? "150ms" : "0ms";
+    }
+  };
+
+  const paintActive = useCallback(
+    (index: number, showPill: boolean) => {
+      for (let i = 0; i < letters.length; i++) {
+        const tick = tickRefs.current[i];
+        if (!tick) continue;
+        const dist = index >= 0 ? Math.abs(i - index) : 99;
+        const scale = dist === 0 ? 1 : dist === 1 ? 0.833 : dist === 2 ? 0.667 : 0.5;
+        const opacity = dist === 0 ? "1" : dist === 1 ? "0.7" : dist === 2 ? "0.5" : "0.4";
+        tick.style.transform = `scaleX(${scale})`;
+        tick.style.opacity = opacity;
+      }
+      const pill = pillRef.current;
+      if (!pill) return;
+      if (showPill && index >= 0 && letters[index]) {
+        const offsetTop = offsetsRef.current[index] ?? 0;
+        pill.textContent = letters[index];
+        pill.style.opacity = "1";
+        pill.style.transform = `translate3d(0, calc(${offsetTop}px - 50%), 0)`;
+      } else {
+        pill.style.opacity = "0";
+      }
+    },
+    [letters],
+  );
+
+  const cacheTargetsAndOffsets = useCallback(() => {
+    const cards = listRef.current?.querySelectorAll<HTMLElement>("[data-letter]");
+    const map = new Map<string, HTMLElement>();
+    const ordered: { letter: string; el: HTMLElement }[] = [];
+    if (cards) {
+      for (const card of cards) {
+        const letter = card.dataset.letter ?? "";
+        ordered.push({ letter, el: card });
+        if (letter && !map.has(letter)) map.set(letter, card);
+      }
+    }
+    targetMapRef.current = map;
+    orderedCardsRef.current = ordered;
+    offsetsRef.current = letters.map((_, i) => {
+      const btn = buttonRefs.current[i];
+      return btn ? btn.offsetTop + btn.offsetHeight / 2 : 0;
+    });
+  }, [letters, listRef]);
+
+  useEffect(() => {
+    cacheTargetsAndOffsets();
+    const updateFromScroll = () => {
+      const cards = orderedCardsRef.current;
+      if (!cards.length) return;
+      let letter = cards[0].letter;
+      for (const card of cards) {
+        if (card.el.getBoundingClientRect().top > window.innerHeight / 3) break;
+        letter = card.letter;
+      }
+      const nextIdx = letters.indexOf(letter);
+      if (nextIdx >= 0) {
+        scrollIndexRef.current = nextIdx;
+        if (!draggingRef.current && hoverIndexRef.current < 0) {
+          paintActive(nextIdx, false);
+        }
+      }
+    };
+    updateFromScroll();
+    window.addEventListener("scroll", updateFromScroll, { passive: true });
+    return () => window.removeEventListener("scroll", updateFromScroll);
+  }, [cacheTargetsAndOffsets, letters, paintActive]);
+
+  const jumpIndex = (index: number) => {
+    const letter = letters[index];
+    if (!letter) return;
+    targetMapRef.current.get(letter)?.scrollIntoView({ block: "start", behavior: "auto" });
+    scrollIndexRef.current = index;
+  };
+
+  const dragTo = (clientY: number) => {
+    const rect = railRectRef.current;
+    const count = letters.length;
+    if (!rect || !count) return;
+    if (clientY < rect.top) {
+      const overshoot = rect.top - clientY;
+      rubberY.set(reducedMotion ? 0 : -((overshoot * 24) / (overshoot + 48)));
+    } else if (clientY > rect.bottom) {
+      const overshoot = clientY - rect.bottom;
+      rubberY.set(reducedMotion ? 0 : (overshoot * 24) / (overshoot + 48));
+    } else {
+      rubberY.set(0);
+    }
+    const index = Math.min(count - 1, Math.max(0, Math.floor((clientY - rect.top) / rect.step)));
+    if (index === lastDragIndexRef.current) return;
+    lastDragIndexRef.current = index;
+    paintActive(index, true);
+    jumpIndex(index);
+  };
+
+  const finishDrag = (collapse: boolean) => {
+    draggingRef.current = false;
+    lastDragIndexRef.current = -1;
+    railRectRef.current = null;
+    setTickTransition(true);
+    if (reducedMotion) {
+      rubberY.set(0);
+    } else {
+      animate(rubberY, 0, { type: "spring", stiffness: 500, damping: 32 });
+    }
+    if (collapse) {
+      hoverIndexRef.current = -1;
+      setExpanded(false);
+      paintActive(scrollIndexRef.current, false);
+    } else {
+      const activeIdx = hoverIndexRef.current >= 0 ? hoverIndexRef.current : scrollIndexRef.current;
+      paintActive(activeIdx, hoverIndexRef.current >= 0);
+    }
+  };
+
+  return (
+    <div className="fixed left-0 top-1/2 z-20 -translate-y-1/2">
+      <m.div style={reducedMotion ? undefined : { y: rubberY }}>
         <nav
           ref={navRef}
-          aria-label={text("Navigasi alfabet")}
-          className={`fixed right-0 top-1/2 z-20 flex -translate-y-1/2 touch-none flex-col items-end py-2 transition-transform duration-200 ${
-            expanded ? "translate-x-0" : "translate-x-7"
+          aria-label={label}
+          className={`relative flex touch-none flex-col items-start py-2 transition-transform duration-200 before:absolute before:-inset-y-2 before:left-0 before:w-12 before:content-[''] ${
+            expanded ? "translate-x-0" : "-translate-x-1"
           }`}
           onPointerEnter={(event) => {
             if (event.pointerType === "mouse" && !recentTouch()) setExpanded(true);
           }}
           onPointerLeave={() => {
-            if (!draggingRef.current) endDrag(true);
+            if (!draggingRef.current) {
+              hoverIndexRef.current = -1;
+              setExpanded(false);
+              paintActive(scrollIndexRef.current, false);
+            }
           }}
           onPointerDown={(event) => {
+            if (event.pointerType === "mouse" && event.button !== 0) return;
+            const count = letters.length;
+            const first = buttonRefs.current[0]?.getBoundingClientRect();
+            const last = buttonRefs.current[count - 1]?.getBoundingClientRect();
+            if (!first || !last) return;
+            cacheTargetsAndOffsets();
+            railRectRef.current = {
+              top: first.top,
+              bottom: last.bottom,
+              step: (last.bottom - first.top) / count,
+            };
             draggingRef.current = true;
-            lastDragLetterRef.current = "";
+            lastDragIndexRef.current = -1;
+            setTickTransition(false);
             setExpanded(true);
             navRef.current?.setPointerCapture(event.pointerId);
             dragTo(event.clientY);
@@ -277,54 +414,66 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
             if (draggingRef.current) dragTo(event.clientY);
           }}
           onPointerUp={(event) => {
+            if (!draggingRef.current) return;
             if (event.pointerType !== "mouse") lastTouchRef.current = Date.now();
-            endDrag(event.pointerType !== "mouse");
+            const shouldCollapse =
+              event.pointerType !== "mouse" || !navRef.current?.matches(":hover");
+            finishDrag(shouldCollapse);
           }}
-          onPointerCancel={() => endDrag(true)}
+          onPointerCancel={() => {
+            if (draggingRef.current) finishDrag(true);
+          }}
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) {
-              setHovered("");
+              hoverIndexRef.current = -1;
               setExpanded(false);
+              paintActive(scrollIndexRef.current, false);
             }
           }}
         >
+          <span
+            ref={pillRef}
+            aria-hidden="true"
+            style={{ opacity: 0 }}
+            className="pointer-events-none absolute left-12 top-0 rounded-md bg-bg-strong-950 px-2 py-1 text-label-sm text-text-white-0 transition-opacity duration-100"
+          />
           {letters.map((letter, index) => (
             <button
               key={letter}
+              ref={(el) => {
+                buttonRefs.current[index] = el;
+              }}
               type="button"
               data-letter={letter}
-              aria-label={text("Ke huruf {{v0}}", { v0: letter })}
+              aria-label={letterLabel(letter)}
               onPointerEnter={(event) => {
-                if (event.pointerType !== "mouse" || !recentTouch()) setHovered(letter);
+                if (event.pointerType === "mouse" && !recentTouch() && !draggingRef.current) {
+                  hoverIndexRef.current = index;
+                  paintActive(index, true);
+                }
               }}
               onFocus={() => {
                 setExpanded(true);
-                setHovered(letter);
+                hoverIndexRef.current = index;
+                paintActive(index, true);
               }}
-              onBlur={() => setHovered("")}
-              onClick={() => jump(letter)}
-              className="group relative flex h-3 w-9 items-center justify-end pr-1 focus-visible:outline-2 focus-visible:outline-primary-base"
+              onBlur={() => {
+                hoverIndexRef.current = -1;
+                paintActive(scrollIndexRef.current, false);
+              }}
+              onClick={() => jumpIndex(index)}
+              className="group relative flex h-3 w-11 items-center justify-start pl-1 focus-visible:outline-2 focus-visible:outline-primary-base"
             >
-              {(hovered === letter || (!hovered && current === letter)) && (
-                <span className="absolute right-9 rounded-md bg-bg-strong-950 px-2 py-1 text-label-sm text-text-white-0">
-                  {letter}
-                </span>
-              )}
               <span
-                className={`h-0.5 rounded-full bg-text-sub-600 transition-all ${
-                  activeIndex >= 0 && index === activeIndex
-                    ? "w-6 opacity-100"
-                    : activeIndex >= 0 && Math.abs(index - activeIndex) === 1
-                      ? "w-5 opacity-70"
-                      : activeIndex >= 0 && Math.abs(index - activeIndex) === 2
-                        ? "w-4 opacity-50"
-                        : "w-3 opacity-40"
-                }`}
+                ref={(el) => {
+                  tickRefs.current[index] = el;
+                }}
+                className="h-0.5 w-6 origin-left rounded-full bg-text-sub-600 transition-[transform,opacity] duration-150"
               />
             </button>
           ))}
         </nav>
-      )}
-    </main>
+      </m.div>
+    </div>
   );
-}
+});

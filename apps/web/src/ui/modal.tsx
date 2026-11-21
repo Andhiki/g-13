@@ -7,6 +7,7 @@ import { RiCloseLine } from "@remixicon/react";
 import * as React from "react";
 import {
   Dialog,
+  DialogBackdrop,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -160,6 +161,10 @@ function focusTargetAfterCallback(
   };
 }
 
+function Root({ presentation = "auto", ...props }: React.ComponentProps<typeof Dialog>) {
+  return <Dialog presentation={presentation} {...props} />;
+}
+
 const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
   (
     {
@@ -175,50 +180,70 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
   ) => {
     const { text } = useLocale("common");
     return (
-      <DialogContent
-        {...props}
-        initialFocus={
-          onOpenAutoFocus ? focusTargetAfterCallback(onOpenAutoFocus, "open-auto-focus") : undefined
-        }
-        finalFocus={
-          onCloseAutoFocus
-            ? focusTargetAfterCallback(onCloseAutoFocus, "close-auto-focus")
-            : undefined
-        }
-        className={twMerge(
-          "fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto overscroll-contain bg-overlay pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-[10px] pointer-events-none focus:outline-none transition-[opacity] duration-150 ease-[ease] data-starting-style:opacity-0 data-ending-style:opacity-0 group/modal",
-          overlayClassName,
-        )}
-      >
-        <div
-          ref={ref}
+      <>
+        <DialogBackdrop
           className={twMerge(
-            "pointer-events-auto relative max-h-full w-full max-w-[400px] overflow-y-auto rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] group-data-starting-style/modal:opacity-0 group-data-starting-style/modal:scale-95 group-data-ending-style/modal:opacity-0 group-data-ending-style/modal:scale-95",
+            "fixed inset-0 z-50 bg-overlay backdrop-blur-[10px] transition-opacity duration-150 ease-[ease] data-starting-style:opacity-0 data-ending-style:opacity-0",
+            overlayClassName,
+          )}
+        />
+        <DialogContent
+          ref={ref}
+          {...props}
+          initialFocus={
+            onOpenAutoFocus
+              ? focusTargetAfterCallback(onOpenAutoFocus, "open-auto-focus")
+              : undefined
+          }
+          finalFocus={
+            onCloseAutoFocus
+              ? focusTargetAfterCallback(onCloseAutoFocus, "close-auto-focus")
+              : undefined
+          }
+          className={twMerge(
+            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
+            "data-[presentation=sheet]:relative data-[presentation=sheet]:inset-auto data-[presentation=sheet]:my-0 data-[presentation=sheet]:h-auto data-[presentation=sheet]:max-h-[85dvh] data-[presentation=sheet]:w-full data-[presentation=sheet]:max-w-none data-[presentation=sheet]:rounded-b-none data-[presentation=sheet]:transition-none data-[presentation=sheet]:data-starting-style:scale-100 data-[presentation=sheet]:data-starting-style:opacity-100 data-[presentation=sheet]:data-ending-style:scale-100 data-[presentation=sheet]:data-ending-style:opacity-100 data-[presentation=sheet]:after:pointer-events-none data-[presentation=sheet]:after:absolute data-[presentation=sheet]:after:inset-x-0 data-[presentation=sheet]:after:top-full data-[presentation=sheet]:after:h-24 data-[presentation=sheet]:after:bg-inherit data-[presentation=sheet]:after:content-['']",
             className,
+            "data-[presentation=sheet]:overflow-visible",
           )}
         >
-          {children}
-          {showClose && (
-            <DialogClose
-              render={
-                <CompactButton
-                  className="absolute top-4 right-4"
-                  aria-label={text("Tutup dialog")}
-                />
-              }
-            >
-              <RiCloseLine aria-hidden="true" />
-            </DialogClose>
+          {(state) => (
+            <>
+              {state.presentation === "sheet" && (
+                <div aria-hidden="true" className="flex shrink-0 justify-center pt-2.5 pb-1">
+                  <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
+                </div>
+              )}
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
+                {children}
+              </div>
+              {state.presentation === "sheet" && (
+                <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
+              )}
+              {showClose && (
+                <DialogClose
+                  data-drawer-no-drag=""
+                  render={
+                    <CompactButton
+                      className="absolute top-4 right-4 z-10"
+                      aria-label={text("Tutup dialog")}
+                    />
+                  }
+                >
+                  <RiCloseLine aria-hidden="true" />
+                </DialogClose>
+              )}
+            </>
           )}
-        </div>
-      </DialogContent>
+        </DialogContent>
+      </>
     );
   },
 );
 Content.displayName = "ModalContent";
 
 export const AlignModal = {
-  Root: Dialog,
+  Root,
   Trigger,
   Close,
   Title,

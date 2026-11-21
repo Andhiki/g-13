@@ -41,6 +41,7 @@ export function PaperPreview({
   }
   return (
     <AlignModal.Root
+      presentation="dialog"
       open={paper !== null}
       onOpenChange={(open) => {
         if (!open) onClose();

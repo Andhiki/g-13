@@ -5,6 +5,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 const compactButton = tv({
   base: [
     "relative flex shrink-0 items-center justify-center rounded-md outline-none",
+    "pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
     "transition duration-200 ease-out",
     "disabled:pointer-events-none disabled:border-transparent disabled:bg-transparent disabled:text-text-disabled-300 disabled:shadow-none",
     "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-regular-xs",

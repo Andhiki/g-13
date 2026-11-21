@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiRouteLine } from "@remixicon/react";
-import { AlignModal } from "./modal";
+import { AlignDrawer } from "./drawer";
 import { Link } from "@tanstack/react-router";
 import { defaultCurriculumId } from "@g13/curriculum";
 import { Image } from "@unpic/react";
@@ -123,7 +123,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
   }, []);
 
   return (
-    <AlignModal.Root open={menuOpen} onOpenChange={setMenuOpen}>
+    <AlignDrawer.Root open={menuOpen} onOpenChange={setMenuOpen} side="right">
       <div className="fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)] text-text-strong-950">
         {announcement}
         <header className="flex h-16 items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
@@ -200,7 +200,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
               </Link>
             </AlignButton.Root>
           </div>
-          <AlignModal.Trigger asChild>
+          <AlignDrawer.Trigger asChild>
             <AlignButton.Root
               variant="neutral"
               mode="ghost"
@@ -210,20 +210,19 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
             >
               <MenuIcon open={menuOpen} />
             </AlignButton.Root>
-          </AlignModal.Trigger>
+          </AlignDrawer.Trigger>
         </header>
       </div>
-      <AlignModal.Content
-        showClose={false}
+      <AlignDrawer.Content
         aria-describedby={undefined}
-        overlayClassName="bg-transparent p-0 backdrop-blur-none md:hidden"
-        className="fixed inset-0 flex h-dvh max-w-none flex-col overflow-y-auto overscroll-contain rounded-none pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-text-strong-950 shadow-none group-data-starting-style/modal:-translate-y-2 group-data-starting-style/modal:opacity-0 group-data-ending-style/modal:-translate-y-2 group-data-ending-style/modal:opacity-0 transition-[opacity,translate] duration-150 motion-reduce:transition-none"
+        className="w-[min(85vw,340px)] max-w-none pt-0 text-text-strong-950 md:hidden"
       >
-        <AlignModal.Title className="sr-only">{t("navigation.label")}</AlignModal.Title>
+        <AlignDrawer.Title className="sr-only">{t("navigation.label")}</AlignDrawer.Title>
         <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4 pt-[env(safe-area-inset-top)]">
           <BrandLogo onClick={() => setMenuOpen(false)} />
-          <AlignModal.Close asChild>
+          <AlignDrawer.Close asChild>
             <AlignButton.Root
+              data-drawer-no-drag=""
               variant="neutral"
               mode="ghost"
               className="size-11 p-2.5"
@@ -231,7 +230,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
             >
               <MenuIcon open={menuOpen} />
             </AlignButton.Root>
-          </AlignModal.Close>
+          </AlignDrawer.Close>
         </div>
         <nav
           aria-label={t("navigation.mobileLabel")}
@@ -306,7 +305,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
         <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
           <Settings />
         </div>
-      </AlignModal.Content>
-    </AlignModal.Root>
+      </AlignDrawer.Content>
+    </AlignDrawer.Root>
   );
 }

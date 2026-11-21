@@ -1,3 +1,5 @@
+@layer ui-sdk;
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./alignui.css";
@@ -45,8 +47,13 @@ html {
 
 :is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]):not(
     :disabled
-  ):not([aria-disabled="true"]):not([data-disabled]):active {
+  ):not([aria-disabled="true"]):not([data-disabled]):not([data-slot="drawer-handle"]):active {
   opacity: 0.7;
+}
+
+/* Cancel backdrop transition when Dialog presents as a sheet so swipe opacity tracks 1:1. */
+[data-slot="dialog-backdrop"]:has(+ [data-slot="dialog-viewport"]) {
+  transition: none;
 }
 
 @media (any-pointer: coarse) {
@@ -92,8 +99,10 @@ html[data-dark-theme="omahti"].dark #moderation-sidebar {
   background-color: #241f1c;
 }
 
-html[data-dark-theme="omahti"].dark #moderation-sidebar a:hover {
-  background-color: #302723;
+@media (hover: hover) and (pointer: fine) {
+  html[data-dark-theme="omahti"].dark #moderation-sidebar a:hover {
+    background-color: #302723;
+  }
 }
 
 html[data-dark-theme="omahti"].dark #moderation-sidebar a[aria-current="page"] {
