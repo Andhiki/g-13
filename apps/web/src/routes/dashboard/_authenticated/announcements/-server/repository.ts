@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, isNotNull, isNull, lte, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, ne, sql, type SQL } from "drizzle-orm";
 import { announcements } from "@g13/db/schema/announcements";
 import type { createDatabase } from "@g13/db/client";
 import type {
@@ -9,24 +9,18 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-function statusCondition(status: AnnouncementStatus, now: Date) {
+/** Single definition of each schedule state, shared by the list filter and the counts aggregate. */
+function statusCondition(status: AnnouncementStatus, now: Date): SQL {
+  const at = now.getTime();
   switch (status) {
     case "live":
-      return and(
-        eq(announcements.enabled, true),
-        lte(announcements.startsAt, now),
-        or(isNull(announcements.endsAt), gt(announcements.endsAt, now)),
-      );
+      return sql`${announcements.enabled} = true and ${announcements.startsAt} <= ${at} and (${announcements.endsAt} is null or ${announcements.endsAt} > ${at})`;
     case "scheduled":
-      return and(eq(announcements.enabled, true), gt(announcements.startsAt, now));
+      return sql`${announcements.enabled} = true and ${announcements.startsAt} > ${at}`;
     case "expired":
-      return and(
-        eq(announcements.enabled, true),
-        isNotNull(announcements.endsAt),
-        lte(announcements.endsAt, now),
-      );
+      return sql`${announcements.enabled} = true and ${announcements.endsAt} is not null and ${announcements.endsAt} <= ${at}`;
     case "disabled":
-      return eq(announcements.enabled, false);
+      return sql`${announcements.enabled} = false`;
   }
 }
 
@@ -46,12 +40,14 @@ export async function listAdminAnnouncements(
 }
 
 export async function getAnnouncementCounts(db: Database, now: Date) {
+  const count = (status: AnnouncementStatus) =>
+    sql<number>`coalesce(sum(case when ${statusCondition(status, now)} then 1 else 0 end), 0)`;
   const [counts] = await db
     .select({
-      live: sql<number>`coalesce(sum(case when ${announcements.enabled} = true and ${announcements.startsAt} <= ${now.getTime()} and (${announcements.endsAt} is null or ${announcements.endsAt} > ${now.getTime()}) then 1 else 0 end), 0)`,
-      scheduled: sql<number>`coalesce(sum(case when ${announcements.enabled} = true and ${announcements.startsAt} > ${now.getTime()} then 1 else 0 end), 0)`,
-      expired: sql<number>`coalesce(sum(case when ${announcements.enabled} = true and ${announcements.endsAt} is not null and ${announcements.endsAt} <= ${now.getTime()} then 1 else 0 end), 0)`,
-      disabled: sql<number>`coalesce(sum(case when ${announcements.enabled} = false then 1 else 0 end), 0)`,
+      live: count("live"),
+      scheduled: count("scheduled"),
+      expired: count("expired"),
+      disabled: count("disabled"),
     })
     .from(announcements);
   return counts;

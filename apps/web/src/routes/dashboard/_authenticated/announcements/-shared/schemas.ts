@@ -30,6 +30,14 @@ export function isValidAnnouncementHref(value: string): boolean {
   }
 }
 
+/** An announcement may run forever, but it may not expire before it starts. */
+export function hasValidScheduleWindow(input: {
+  startsAt: number;
+  endsAt: number | null;
+}): boolean {
+  return input.endsAt === null || input.endsAt > input.startsAt;
+}
+
 export const announcementFieldsShape = z.object({
   slug: z
     .string()
@@ -58,13 +66,10 @@ export const announcementFieldsShape = z.object({
 export type AnnouncementFieldsInput = z.infer<typeof announcementFieldsShape>;
 
 /** Window rule kept out of the shape: TanStack Start validators cannot consume refined objects. */
-export const announcementFieldsSchema = announcementFieldsShape.refine(
-  (data) => data.endsAt === null || data.endsAt > data.startsAt,
-  {
-    message: "The expiry date must be after the start date.",
-    path: ["endsAt"],
-  },
-);
+export const announcementFieldsSchema = announcementFieldsShape.refine(hasValidScheduleWindow, {
+  message: "The expiry date must be after the start date.",
+  path: ["endsAt"],
+});
 
 export const createAnnouncementSchema = announcementFieldsShape;
 export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;

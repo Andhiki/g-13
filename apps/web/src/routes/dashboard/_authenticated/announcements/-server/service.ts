@@ -7,6 +7,7 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from "../-shared/schemas";
+import { hasValidScheduleWindow } from "../-shared/schemas";
 import {
   createAnnouncementRecord,
   deleteAnnouncement,
@@ -19,10 +20,6 @@ import {
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
-
-function withinWindow(input: { startsAt: number; endsAt: number | null }): boolean {
-  return input.endsAt === null || input.endsAt > input.startsAt;
-}
 
 export type AnnouncementListData = {
   rows: Awaited<ReturnType<typeof listAdminAnnouncements>>;
@@ -63,7 +60,7 @@ export async function createAnnouncement(
 ): Promise<AnnouncementAdminResult<{ id: string }>> {
   if (!canManageUsers(actor.role))
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
-  if (!withinWindow(input)) {
+  if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
   const slug = await resolveUniqueSlug(db, input.slug, input.titleId);
@@ -79,7 +76,7 @@ export async function updateAnnouncement(
 ): Promise<AnnouncementAdminResult<{ announcementId: string }>> {
   if (!canManageUsers(actor.role))
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
-  if (!withinWindow(input)) {
+  if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
   const slug = await resolveUniqueSlug(db, input.slug, input.titleId, input.announcementId);

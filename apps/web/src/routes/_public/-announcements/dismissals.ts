@@ -1,5 +1,5 @@
 export const DISMISSED_ANNOUNCEMENTS_KEY = "g13-dismissed-announcements";
-export const DISMISSAL_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
+export const DISMISSAL_RETENTION_MS = 5 * 60 * 1000;
 
 export type DismissedAnnouncements = Record<string, number>;
 
