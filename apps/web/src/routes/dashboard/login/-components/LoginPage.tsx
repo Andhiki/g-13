@@ -60,7 +60,11 @@ export function LoginPage({ identity }: { identity: Identity }) {
             size="medium"
             variant="neutral"
             mode="lighter"
-            className="w-full gap-2 text-text-strong-950"
+            compact
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- OAuth sign-in keeps strong ink on the lighter surface; no existing lighter compound sets text color
+              "w-full text-text-strong-950"
+            }
             isLoading={pending}
             icon={<RiGithubFill className="size-4.5" />}
             onClick={() => void signIn()}

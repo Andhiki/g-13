@@ -113,7 +113,10 @@ export function AnnouncementBanner() {
                 mode="ghost"
                 size="xsmall"
                 iconOnly
-                className="size-7 shrink-0 text-static-white hover:bg-static-white/10"
+                className={
+                  // oxlint-disable-next-line shadcn/no-restyle -- banner close button sits on the announcement's colored surface: static-white icon with a translucent white hover
+                  "size-7 shrink-0 text-static-white hover:bg-static-white/10"
+                }
                 aria-label={text("Tutup pengumuman")}
                 onClick={() => dismiss(row.slug)}
               >

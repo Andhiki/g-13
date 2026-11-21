@@ -153,7 +153,10 @@ export function ReviewSubmissionForm({
             tabIndex={-1}
             variant="subtitle1"
             color="strong"
-            className="m-0 outline-none"
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the form's fields
+              "m-0 outline-none"
+            }
           >
             {text("Write a review for {{lecturerName}}", { lecturerName })}
           </Typography>

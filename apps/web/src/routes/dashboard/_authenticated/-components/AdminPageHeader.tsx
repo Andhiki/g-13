@@ -37,7 +37,8 @@ export function AdminPageHeader({
           variant="neutral"
           mode="ghost"
           iconOnly
-          className="hidden size-7 shrink-0 aria-expanded:bg-bg-weak-50 md:inline-flex"
+          active={sidebarOpen}
+          className="hidden size-7 shrink-0 md:inline-flex"
           aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           aria-expanded={sidebarOpen}
@@ -75,7 +76,8 @@ export function DetailsToggleButton({
       variant="neutral"
       mode="ghost"
       iconOnly
-      className="hidden size-7 shrink-0 aria-expanded:bg-bg-weak-50 xl:inline-flex"
+      active={visible}
+      className="hidden size-7 shrink-0 xl:inline-flex"
       disabled={!available}
       aria-label={visible ? "Hide details" : "Show details"}
       title={visible ? "Hide details" : "Show details"}

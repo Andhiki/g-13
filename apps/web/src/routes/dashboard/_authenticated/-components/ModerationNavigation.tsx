@@ -109,10 +109,9 @@ function NavigationFooter({
         <AlignDropdown.Root>
           <AlignDropdown.Trigger asChild>
             <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
+              variant="nav"
               size="xsmall"
-              className="min-w-0 justify-start gap-1.5 px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200"
+              className="min-w-0 justify-start"
               aria-label="Account menu"
             >
               {userImage && userImage !== failedImage ? (

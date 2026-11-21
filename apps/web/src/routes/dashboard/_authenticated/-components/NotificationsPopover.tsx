@@ -40,7 +40,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
           mode="ghost"
           size="xsmall"
           iconOnly
-          className="relative shrink-0 hover:bg-bg-soft-200 data-[state=open]:bg-bg-soft-200"
+          active={open}
+          className="relative shrink-0"
           aria-label={text("title")}
           title={text("title")}
         >

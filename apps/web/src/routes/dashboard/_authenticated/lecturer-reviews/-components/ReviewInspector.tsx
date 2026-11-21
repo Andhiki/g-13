@@ -149,9 +149,10 @@ export function ReviewInspector({
           ref={bodyRef}
           variant="caption"
           color="muted"
-          className={`mt-2 whitespace-pre-wrap break-words leading-5 ${
-            expanded ? "" : "line-clamp-3"
-          }`}
+          className={
+            // oxlint-disable-next-line shadcn/no-restyle -- inspector review body runs tighter than caption's default leading for the clamp layout
+            `mt-2 whitespace-pre-wrap break-words leading-5 ${expanded ? "" : "line-clamp-3"}`
+          }
         >
           {review.body}
         </Typography>
@@ -160,7 +161,10 @@ export function ReviewInspector({
             size="xxsmall"
             variant="neutral"
             mode="ghost"
-            className="-ml-1.5 mt-1.5 h-6 px-1.5"
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- inline show-more/less toggle: h-6 px-1.5 keeps it a text-height continuation of the clamped body
+              "-ml-1.5 mt-1.5 h-6 px-1.5"
+            }
             aria-expanded={expanded}
             onClick={() => setExpanded((current) => !current)}
           >

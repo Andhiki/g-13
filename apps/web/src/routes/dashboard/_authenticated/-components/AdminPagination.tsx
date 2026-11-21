@@ -28,7 +28,7 @@ export function AdminPagination({
           size="xxsmall"
           variant="neutral"
           mode="ghost"
-          className="disabled:text-text-sub-600"
+          steady
           disabled={!offset}
           onClick={onPrevious}
         >
@@ -38,7 +38,7 @@ export function AdminPagination({
           size="xxsmall"
           variant="neutral"
           mode="ghost"
-          className="disabled:text-text-sub-600"
+          steady
           disabled={!hasNext}
           onClick={onNext}
         >

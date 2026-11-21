@@ -69,7 +69,10 @@ export function RoadmapQuiz({
             id="quiz-title"
             ref={heading}
             tabIndex={-1}
-            className="m-0 max-w-[680px] outline-none"
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the quiz choice and footer buttons
+              "m-0 max-w-[680px] outline-none"
+            }
           >
             {text(question.title)}
           </Typography>
@@ -112,14 +115,19 @@ export function RoadmapQuiz({
                 variant={selected === choice.value ? "primary" : "neutral"}
                 mode={selected === choice.value ? "lighter" : "stroke"}
                 aria-pressed={selected === choice.value}
-                className="min-h-24 h-auto w-full whitespace-normal px-10 py-8 text-label-lg sm:min-h-32 sm:px-12"
+                className={
+                  // oxlint-disable-next-line shadcn/no-restyle -- quiz choice card: bare p-0 button — the card's padding and text sizing live on the inner wrapper so the ring traces the card box
+                  "min-h-24 h-auto w-full whitespace-normal p-0 sm:min-h-32"
+                }
                 aria-keyshortcuts={String(choiceIndex + 1)}
                 onClick={() => choose(choice.value)}
               >
                 <AlignKbd.Root aria-hidden="true" className="absolute left-3 top-3">
                   {choiceIndex + 1}
                 </AlignKbd.Root>
-                <span>{text(choice.label)}</span>
+                <span className="px-10 py-8 text-text-strong-950 text-label-sm sm:px-12">
+                  {text(choice.label)}
+                </span>
               </AlignButton.Root>
             </m.div>
           ))}

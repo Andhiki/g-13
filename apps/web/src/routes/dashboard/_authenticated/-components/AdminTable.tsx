@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { clsx } from "clsx";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 
@@ -62,13 +61,10 @@ export function AdminTableInspectButton({
   return (
     <Typography as={as} variant="labelSmall" className={className}>
       <AlignButton.Root
-        variant="neutral"
-        mode="ghost"
+        variant="link"
         size="xxsmall"
         onClick={onSelect}
-        className={clsx(
-          "block h-auto max-w-full truncate rounded-sm p-0 text-left text-text-strong-950 hover:bg-transparent hover:underline",
-        )}
+        className="block max-w-full text-left"
         aria-label={ariaLabel}
         aria-pressed={selected}
       >

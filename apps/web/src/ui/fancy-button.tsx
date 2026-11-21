@@ -40,6 +40,11 @@ const fancyButton = tv({
       compact: true,
       class: "gap-1.5 text-label-xs",
     },
+    {
+      size: "medium",
+      compact: true,
+      class: "gap-2 px-3",
+    },
   ],
   defaultVariants: { size: "medium" },
 });

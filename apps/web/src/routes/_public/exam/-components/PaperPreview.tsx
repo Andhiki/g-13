@@ -69,7 +69,10 @@ export function PaperPreview({
               as="h2"
               tabIndex={-1}
               variant="label"
-              className="min-w-0 flex-1 truncate outline-none"
+              className={
+                // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the modal's toolbar buttons
+                "min-w-0 flex-1 truncate outline-none"
+              }
               title={paper?.name}
             >
               {paper?.name}
@@ -104,7 +107,10 @@ export function PaperPreview({
                       mode="stroke"
                       size="xsmall"
                       iconOnly
-                      className="transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+                      className={
+                        // oxlint-disable-next-line shadcn/no-restyle -- copy-link press feedback: a deliberate quick transform scale with its own timing
+                        "transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+                      }
                       aria-label={
                         share?.status === "copied"
                           ? text("Tautan berhasil disalin")

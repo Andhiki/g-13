@@ -107,10 +107,9 @@ export function CourseTable({
                 </AlignTable.Cell>
                 <AlignTable.Cell className="h-10">
                   <AlignButton.Root
-                    variant="neutral"
-                    mode="ghost"
+                    variant="link"
                     size="small"
-                    className="h-auto min-h-9 w-full justify-start whitespace-normal px-0 py-1 text-left"
+                    className="min-h-9 w-full justify-start whitespace-normal text-left"
                     aria-label={text("Buka detail {{v0}}", { v0: courseName(course) })}
                     aria-pressed={selectedId === course.id}
                     onClick={() => select(course.id)}

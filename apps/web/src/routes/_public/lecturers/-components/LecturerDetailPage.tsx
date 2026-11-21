@@ -83,7 +83,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <AlignFancyButton.Root
-              className="h-9 gap-2 px-3"
+              compact
+              className="h-9"
               onClick={() => setReviewDialogOpen(true)}
             >
               <Typography as="span" variant="paragraph">
@@ -230,7 +231,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
                 </AlignEmptyState.Description>
                 <AlignEmptyState.Actions>
                   <AlignFancyButton.Root
-                    className="h-9 gap-2 px-3"
+                    compact
+                    className="h-9"
                     onClick={() => setReviewDialogOpen(true)}
                   >
                     <Typography as="span" variant="paragraph">

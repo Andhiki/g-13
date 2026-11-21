@@ -62,7 +62,10 @@ export function AdminReviewRow({
       <div className="min-w-0">
         <Typography
           color="strong"
-          className="whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
+          className={
+            // oxlint-disable-next-line shadcn/no-restyle -- moderation row body tuned to 13px alongside its two-line clamp; no label scale matches
+            "whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
+          }
         >
           {review.body}
         </Typography>

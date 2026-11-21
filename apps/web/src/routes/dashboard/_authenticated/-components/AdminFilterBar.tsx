@@ -37,13 +37,12 @@ export function AdminFilterBar<T extends string>({
               size="xxsmall"
               variant="neutral"
               mode={active ? "lighter" : "ghost"}
-              className="gap-2"
               aria-pressed={active}
               onClick={() => onTabChange(tab.value)}
             >
               <span className={tabLabelClassName}>{tab.label}</span>
               {tab.count !== undefined && (
-                <span className="text-text-sub-600 tabular-nums">{tab.count}</span>
+                <span className="ms-2 text-text-sub-600 tabular-nums">{tab.count}</span>
               )}
             </AlignButton.Root>
           );

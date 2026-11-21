@@ -190,7 +190,10 @@ function NotificationsPage() {
           size="xxsmall"
           variant="neutral"
           mode="ghost"
-          className="gap-1.5"
+          className={
+            // oxlint-disable-next-line shadcn/no-restyle -- icon-label action sits between xxsmall compact (gap-1) and the default (gap-2.5); no compound covers this rhythm
+            "gap-1.5"
+          }
           isLoading={readAllMutation.isPending}
           icon={<RiCheckDoubleLine className="size-3.5" />}
           disabled={busy}

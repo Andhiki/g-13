@@ -54,7 +54,7 @@ export function ConfirmActionModal({
             size="xsmall"
             variant="neutral"
             mode="stroke"
-            className="px-3"
+            wide
             disabled={pending}
             onClick={onClose}
           >
