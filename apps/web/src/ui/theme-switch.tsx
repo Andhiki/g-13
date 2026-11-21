@@ -21,30 +21,29 @@ export function ThemeSwitch() {
         </Typography>
         <SegmentedControl.Root
           className="w-36 shrink-0"
-          activationMode="manual"
           value={mounted ? (theme ?? "system") : "system"}
           onValueChange={(mode) => {
             if (mode === "system" || mode === "light" || mode === "dark") setTheme(mode);
           }}
+          aria-labelledby="settings-theme"
         >
-          <SegmentedControl.List aria-labelledby="settings-theme">
-            {(["system", "light", "dark"] as const).map((mode) => {
-              const Icon =
-                mode === "system" ? RiComputerLine : mode === "light" ? RiSunLine : RiMoonLine;
-              return (
-                <SegmentedControl.Trigger
-                  key={mode}
-                  value={mode}
-                  aria-label={t(`settings.${mode}`)}
-                  title={t(`settings.${mode}`)}
-                  disabled={!mounted}
-                  className="focus-visible:ring-2 focus-visible:ring-primary-base"
-                >
-                  <Icon className="size-4" aria-hidden="true" />
-                </SegmentedControl.Trigger>
-              );
-            })}
-          </SegmentedControl.List>
+          <SegmentedControl.Indicator />
+          {(["system", "light", "dark"] as const).map((mode) => {
+            const Icon =
+              mode === "system" ? RiComputerLine : mode === "light" ? RiSunLine : RiMoonLine;
+            return (
+              <SegmentedControl.Item
+                key={mode}
+                value={mode}
+                aria-label={t(`settings.${mode}`)}
+                title={t(`settings.${mode}`)}
+                disabled={!mounted}
+                className="focus-visible:ring-2 focus-visible:ring-primary-base"
+              >
+                <Icon className="size-4" aria-hidden="true" />
+              </SegmentedControl.Item>
+            );
+          })}
         </SegmentedControl.Root>
       </section>
       <section aria-labelledby="settings-color-scheme" className="space-y-3">
