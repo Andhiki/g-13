@@ -11,6 +11,26 @@ import { Typography } from "../ui/typography";
 
 type ListedShortcut = ReturnType<typeof shortcuts.list>[number] & { description: string };
 
+function ShortcutList({ items }: { items: ListedShortcut[] }) {
+  const { text } = useLocale();
+  return (
+    <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
+      {items.map((item) => (
+        <div key={item.keys} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
+          <dt>
+            <Typography as="span" variant="caption" color="muted">
+              {text(item.description, { v0: item.keys })}
+            </Typography>
+          </dt>
+          <dd className="m-0 justify-self-end">
+            <AlignKbd.Root>{item.hint}</AlignKbd.Root>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export function ZoomControls({
   active = true,
   onReset,
@@ -23,7 +43,6 @@ export function ZoomControls({
   selected: boolean;
   /** Still accepted (and ignored) while CurriculumMap and RoadmapGraph stop passing them. */
 }) {
-  const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   // Snapshot before opening: the panel is a popup, and a help screen must list the page's
   // shortcuts even though the registry pauses them behind the panel it is rendered in.
@@ -57,23 +76,7 @@ export function ZoomControls({
             open={shortcutsOpen}
             onOpenChange={changeOpen}
           >
-            <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
-              {listed.map((item) => (
-                <div
-                  key={item.keys}
-                  className="col-span-2 grid grid-cols-subgrid items-center gap-x-3"
-                >
-                  <dt>
-                    <Typography as="span" variant="caption" color="muted">
-                      {text(item.description, { v0: item.keys })}
-                    </Typography>
-                  </dt>
-                  <dd className="m-0 justify-self-end">
-                    <AlignKbd.Root>{item.hint}</AlignKbd.Root>
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <ShortcutList items={listed} />
           </MapControlPanel>
         </div>
         {active && !selected && <ZoomButtons onReset={onReset} />}

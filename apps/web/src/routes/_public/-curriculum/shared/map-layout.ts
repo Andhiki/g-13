@@ -11,6 +11,33 @@ const ROW_STEP = 120;
 const COURSE_X_OFFSET = 12;
 const COURSE_Y_START = 156;
 
+function swapCloserPairs(
+  courses: Course[],
+  rows: Map<string, number>,
+  distance: (id: string, row: number) => number,
+) {
+  let improved = false;
+  for (let a = 0; a < courses.length; a++) {
+    for (let b = a + 1; b < courses.length; b++) {
+      const first = courses[a],
+        second = courses[b];
+      if (first.id.startsWith("2021-slot-") !== second.id.startsWith("2021-slot-")) continue;
+      if (
+        distance(first.id, b) + distance(second.id, a) >=
+        distance(first.id, a) + distance(second.id, b)
+      ) {
+        continue;
+      }
+      courses[a] = second;
+      courses[b] = first;
+      rows.set(first.id, b);
+      rows.set(second.id, a);
+      improved = true;
+    }
+  }
+  return improved;
+}
+
 function shortenConnections(semesters: Map<number, Course[]>, relations: Relation[]) {
   const rows = new Map<string, number>();
   for (const courses of semesters.values())
@@ -38,23 +65,7 @@ function shortenConnections(semesters: Map<number, Course[]>, relations: Relatio
   while (improved) {
     improved = false;
     for (const courses of semesters.values()) {
-      for (let a = 0; a < courses.length; a++) {
-        for (let b = a + 1; b < courses.length; b++) {
-          const first = courses[a],
-            second = courses[b];
-          if (first.id.startsWith("2021-slot-") !== second.id.startsWith("2021-slot-")) continue;
-          if (
-            distance(first.id, b) + distance(second.id, a) >=
-            distance(first.id, a) + distance(second.id, b)
-          )
-            continue;
-          courses[a] = second;
-          courses[b] = first;
-          rows.set(first.id, b);
-          rows.set(second.id, a);
-          improved = true;
-        }
-      }
+      if (swapCloserPairs(courses, rows, distance)) improved = true;
     }
   }
 }

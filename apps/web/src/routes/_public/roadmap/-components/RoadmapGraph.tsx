@@ -149,6 +149,125 @@ const nodeTypes = {
   title: RoadmapTitle,
 };
 
+function computeFocusLayout(graphNodes: RoadmapNode[], selectedId: string | null) {
+  const selectedCourse = graphNodes.find(
+    (node) => node.id === selectedId && node.type === "course",
+  );
+  const focusIds = new Set<string>();
+  const focusPositions = new Map<string, { x: number; y: number }>();
+  if (!selectedCourse || selectedCourse.type !== "course") return { focusIds, focusPositions };
+  focusIds.add(selectedCourse.id);
+  focusPositions.set(selectedCourse.id, selectedCourse.position);
+  for (const [side, ids] of [
+    ["source", selectedCourse.data.incoming],
+    ["target", selectedCourse.data.outgoing],
+  ] as const) {
+    const neighbors = ids
+      .map((id) => graphNodes.find((node) => node.id === id))
+      .filter((node): node is RoadmapNode => node?.type === "course")
+      .sort((a, b) => a.position.y - b.position.y);
+    neighbors.forEach((neighbor, index) => {
+      focusIds.add(neighbor.id);
+      focusPositions.set(neighbor.id, {
+        x: selectedCourse.position.x + (side === "source" ? -LANE_STEP : LANE_STEP),
+        y: selectedCourse.position.y + (index - (neighbors.length - 1) / 2) * 120,
+      });
+    });
+  }
+  return { focusIds, focusPositions };
+}
+
+function RoadmapFlowCanvas({
+  plan,
+  target,
+  resetVersion,
+  selectedId,
+  navigation,
+  nodes,
+  edges,
+  semesters,
+  heading,
+  stage,
+  close,
+  onReset,
+  onVisibleSemesters,
+  setHoveredId,
+}: {
+  plan: Roadmap;
+  target: number;
+  resetVersion: number;
+  selectedId: string | null;
+  navigation: { semester: number } | null;
+  nodes: RoadmapNode[];
+  edges: ReturnType<typeof mapConnections>;
+  semesters: number[];
+  heading: RefObject<HTMLHeadingElement | null>;
+  stage: RefObject<HTMLElement | null>;
+  close: () => void;
+  onReset: () => void;
+  onVisibleSemesters: (semesters: number[]) => void;
+  setHoveredId: (id: string | null) => void;
+}) {
+  const { text } = useLocale("roadmap");
+  return (
+    <MotionGraph<RoadmapNode>
+      selectedId={selectedId}
+      resetKey={`roadmap:${resetVersion}`}
+      navigation={navigation}
+      className="absolute! inset-0"
+      key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      edgeTypes={routedEdgeTypes}
+      onPaneClick={close}
+      onNodeMouseEnter={(_, node) => {
+        if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+          setHoveredId(node.type === "course" ? node.id : null);
+        }
+      }}
+      onNodeMouseLeave={() => setHoveredId(null)}
+      onFocusCapture={(event) =>
+        setHoveredId(event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null)
+      }
+      onBlurCapture={() => setHoveredId(null)}
+      defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
+      minZoom={0.05}
+      maxZoom={1.35}
+      nodesDraggable={false}
+      nodesConnectable={false}
+      elementsSelectable={false}
+      zoomOnDoubleClick={false}
+      panOnScroll
+      zoomOnScroll={false}
+      fitView={false}
+      proOptions={{ hideAttribution: true }}
+      aria-label={text("Roadmap mata kuliah per semester")}
+    >
+      <RoadmapFocus
+        resetVersion={resetVersion}
+        heading={heading}
+        stage={stage}
+        selectedId={selectedId}
+        navigation={navigation}
+      />
+      <RoadmapSemesterViewport
+        stage={stage}
+        semesters={semesters}
+        enabled={selectedId === null}
+        onVisibleSemesters={onVisibleSemesters}
+      />
+      <ZoomControls className="right-12!" selected={selectedId !== null} onReset={onReset} />
+      <Background
+        variant={BackgroundVariant.Dots}
+        color="var(--color-stroke-sub-300)"
+        gap={24}
+        size={1}
+      />
+    </MotionGraph>
+  );
+}
+
 export function RoadmapGraph({
   plan,
   restart,
@@ -184,33 +303,10 @@ export function RoadmapGraph({
     [plan, target, summary, text, language],
   );
   const { semesters } = graph;
-  const { focusIds, focusPositions } = useMemo(() => {
-    const selectedCourse = graph.nodes.find(
-      (node) => node.id === selectedId && node.type === "course",
-    );
-    const focusIds = new Set<string>();
-    const focusPositions = new Map<string, { x: number; y: number }>();
-    if (!selectedCourse || selectedCourse.type !== "course") return { focusIds, focusPositions };
-    focusIds.add(selectedCourse.id);
-    focusPositions.set(selectedCourse.id, selectedCourse.position);
-    for (const [side, ids] of [
-      ["source", selectedCourse.data.incoming],
-      ["target", selectedCourse.data.outgoing],
-    ] as const) {
-      const neighbors = ids
-        .map((id) => graph.nodes.find((node) => node.id === id))
-        .filter((node): node is (typeof graph.nodes)[number] => node?.type === "course")
-        .sort((a, b) => a.position.y - b.position.y);
-      neighbors.forEach((neighbor, index) => {
-        focusIds.add(neighbor.id);
-        focusPositions.set(neighbor.id, {
-          x: selectedCourse.position.x + (side === "source" ? -LANE_STEP : LANE_STEP),
-          y: selectedCourse.position.y + (index - (neighbors.length - 1) / 2) * 120,
-        });
-      });
-    }
-    return { focusIds, focusPositions };
-  }, [graph, selectedId]);
+  const { focusIds, focusPositions } = useMemo(
+    () => computeFocusLayout(graph.nodes, selectedId),
+    [graph, selectedId],
+  );
   const nodes = useMemo(
     () =>
       graph.nodes.map((node): RoadmapNode => {
@@ -261,70 +357,25 @@ export function RoadmapGraph({
     >
       <RoadmapTitleContext.Provider value={{ heading, restart, shareLink }}>
         <EdgeRouting>
-          <MotionGraph<RoadmapNode>
+          <RoadmapFlowCanvas
+            plan={plan}
+            target={target}
+            resetVersion={resetVersion}
             selectedId={selectedId}
-            resetKey={`roadmap:${resetVersion}`}
             navigation={navigation}
-            className="absolute! inset-0"
-            key={`${target}:${plan.activities.map((a) => a.semester).join()}`}
             nodes={nodes}
             edges={revealedEdges}
-            nodeTypes={nodeTypes}
-            edgeTypes={routedEdgeTypes}
-            onPaneClick={close}
-            onNodeMouseEnter={(_, node) => {
-              if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-                setHoveredId(node.type === "course" ? node.id : null);
-              }
+            semesters={semesters}
+            heading={heading}
+            stage={stage}
+            close={close}
+            onReset={() => {
+              onReset();
+              setResetVersion((version) => version + 1);
             }}
-            onNodeMouseLeave={() => setHoveredId(null)}
-            onFocusCapture={(event) =>
-              setHoveredId(
-                event.target.closest<HTMLElement>("[data-course]")?.dataset.course ?? null,
-              )
-            }
-            onBlurCapture={() => setHoveredId(null)}
-            defaultViewport={{ x: 10, y: 0, zoom: 0.68 }}
-            minZoom={0.05}
-            maxZoom={1.35}
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={false}
-            zoomOnDoubleClick={false}
-            panOnScroll
-            zoomOnScroll={false}
-            fitView={false}
-            proOptions={{ hideAttribution: true }}
-            aria-label={text("Roadmap mata kuliah per semester")}
-          >
-            <RoadmapFocus
-              resetVersion={resetVersion}
-              heading={heading}
-              stage={stage}
-              selectedId={selectedId}
-              navigation={navigation}
-            />
-            <RoadmapSemesterViewport
-              stage={stage}
-              semesters={semesters}
-              enabled={selectedId === null}
-              onVisibleSemesters={onVisibleSemesters}
-            />
-            <ZoomControls
-              className="right-12!"
-              selected={selectedId !== null}
-              onReset={() => {
-                onReset();
-                setResetVersion((version) => version + 1);
-              }}
-            />
-            <Background
-              variant={BackgroundVariant.Dots}
-              color="var(--color-stroke-sub-300)"
-              gap={24}
-              size={1}
-            />
-          </MotionGraph>
+            onVisibleSemesters={onVisibleSemesters}
+            setHoveredId={setHoveredId}
+          />
         </EdgeRouting>
       </RoadmapTitleContext.Provider>
     </section>

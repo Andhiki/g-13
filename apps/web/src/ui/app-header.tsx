@@ -102,6 +102,111 @@ function BrandLogo({ onClick }: { onClick?: () => void }) {
   );
 }
 
+const DESKTOP_NAV_ITEMS = [
+  { to: "/exam", labelKey: "navigation.examArchive" },
+  { to: "/alumni", labelKey: "navigation.alumni" },
+  { to: "/lecturers", labelKey: "navigation.lecturers" },
+  { to: "/resources", labelKey: "navigation.resources" },
+  { to: "/faq", labelKey: "navigation.faq" },
+] as const;
+
+const MOBILE_NAV_ITEMS = [
+  { to: "/", labelKey: "navigation.curriculum", search: { kurikulum: defaultCurriculumId } },
+  { to: "/exam", labelKey: "navigation.examArchive" },
+  { to: "/alumni", labelKey: "navigation.alumni" },
+  { to: "/lecturers", labelKey: "navigation.lecturers" },
+  { to: "/resources", labelKey: "navigation.resources" },
+  { to: "/roadmap", labelKey: "navigation.roadmap", search: { lulus: 8, semesterPaparan: 6 } },
+  { to: "/faq", labelKey: "navigation.faq" },
+] as const;
+
+const ACTIVE_NAV_PROPS = {
+  className: "decoration-current",
+  "aria-current": "page" as const,
+};
+
+function DesktopNav() {
+  const { t } = useTranslation();
+  return (
+    <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 md:flex">
+      {DESKTOP_NAV_ITEMS.map((item) => (
+        <AlignLinkButton.Root key={item.to} asChild>
+          <Link to={item.to} activeProps={ACTIVE_NAV_PROPS}>
+            {t(item.labelKey)}
+          </Link>
+        </AlignLinkButton.Root>
+      ))}
+    </nav>
+  );
+}
+
+function DesktopActions() {
+  const { t } = useTranslation();
+  return (
+    <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+      <Settings />
+      <AlignButton.Root
+        asChild
+        variant="neutral-inverse"
+        mode="filled"
+        size="small"
+        className="px-2 md:px-3"
+      >
+        <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
+          <RiRouteLine aria-hidden="true" className="size-4" />
+          {t("navigation.roadmap")}
+        </Link>
+      </AlignButton.Root>
+    </div>
+  );
+}
+
+function MobileNavDrawer({ menuOpen, onClose }: { menuOpen: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <AlignDrawer.Content
+      aria-describedby={undefined}
+      className="w-[min(85vw,340px)] max-w-none pt-0 text-text-strong-950 md:hidden"
+    >
+      <AlignDrawer.Title className="sr-only">{t("navigation.label")}</AlignDrawer.Title>
+      <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4 pt-[env(safe-area-inset-top)]">
+        <BrandLogo onClick={onClose} />
+        <AlignDrawer.Close asChild>
+          <AlignButton.Root
+            data-drawer-no-drag=""
+            variant="neutral"
+            mode="ghost"
+            className="size-11 p-2.5"
+            aria-label={t("navigation.close")}
+          >
+            <MenuIcon open={menuOpen} />
+          </AlignButton.Root>
+        </AlignDrawer.Close>
+      </div>
+      <nav
+        aria-label={t("navigation.mobileLabel")}
+        className="flex flex-col divide-y divide-stroke-soft-200 px-6"
+      >
+        {MOBILE_NAV_ITEMS.map((item) => (
+          <AlignLinkButton.Root key={item.to} asChild className="h-14 justify-start text-lg">
+            <Link
+              to={item.to}
+              search={"search" in item ? item.search : undefined}
+              onClick={onClose}
+              activeProps={ACTIVE_NAV_PROPS}
+            >
+              {t(item.labelKey)}
+            </Link>
+          </AlignLinkButton.Root>
+        ))}
+      </nav>
+      <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
+        <Settings />
+      </div>
+    </AlignDrawer.Content>
+  );
+}
+
 export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
   const { resolved } = useThemeMode();
   useKeyboardShortcuts({
@@ -128,78 +233,8 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
         {announcement}
         <header className="flex h-16 items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
           <BrandLogo />
-          <nav aria-label={t("navigation.label")} className="hidden items-center gap-5 md:flex">
-            <AlignLinkButton.Root asChild>
-              <Link
-                to="/exam"
-                activeProps={{
-                  className: "decoration-current",
-                  "aria-current": "page",
-                }}
-              >
-                {t("navigation.examArchive")}
-              </Link>
-            </AlignLinkButton.Root>
-            <AlignLinkButton.Root asChild>
-              <Link
-                to="/alumni"
-                activeProps={{
-                  className: "decoration-current",
-                  "aria-current": "page",
-                }}
-              >
-                {t("navigation.alumni")}
-              </Link>
-            </AlignLinkButton.Root>
-            <AlignLinkButton.Root asChild>
-              <Link
-                to="/lecturers"
-                activeProps={{
-                  className: "decoration-current",
-                  "aria-current": "page",
-                }}
-              >
-                {t("navigation.lecturers")}
-              </Link>
-            </AlignLinkButton.Root>
-            <AlignLinkButton.Root asChild>
-              <Link
-                to="/resources"
-                activeProps={{
-                  className: "decoration-current",
-                  "aria-current": "page",
-                }}
-              >
-                {t("navigation.resources")}
-              </Link>
-            </AlignLinkButton.Root>
-            <AlignLinkButton.Root asChild>
-              <Link
-                to="/faq"
-                activeProps={{
-                  className: "decoration-current",
-                  "aria-current": "page",
-                }}
-              >
-                {t("navigation.faq")}
-              </Link>
-            </AlignLinkButton.Root>
-          </nav>
-          <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
-            <Settings />
-            <AlignButton.Root
-              asChild
-              variant="neutral-inverse"
-              mode="filled"
-              size="small"
-              className="px-2 md:px-3"
-            >
-              <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>
-                <RiRouteLine aria-hidden="true" className="size-4" />
-                {t("navigation.roadmap")}
-              </Link>
-            </AlignButton.Root>
-          </div>
+          <DesktopNav />
+          <DesktopActions />
           <AlignDrawer.Trigger asChild>
             <AlignButton.Root
               variant="neutral"
@@ -213,99 +248,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
           </AlignDrawer.Trigger>
         </header>
       </div>
-      <AlignDrawer.Content
-        aria-describedby={undefined}
-        className="w-[min(85vw,340px)] max-w-none pt-0 text-text-strong-950 md:hidden"
-      >
-        <AlignDrawer.Title className="sr-only">{t("navigation.label")}</AlignDrawer.Title>
-        <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between border-b border-stroke-soft-200 px-4 pt-[env(safe-area-inset-top)]">
-          <BrandLogo onClick={() => setMenuOpen(false)} />
-          <AlignDrawer.Close asChild>
-            <AlignButton.Root
-              data-drawer-no-drag=""
-              variant="neutral"
-              mode="ghost"
-              className="size-11 p-2.5"
-              aria-label={t("navigation.close")}
-            >
-              <MenuIcon open={menuOpen} />
-            </AlignButton.Root>
-          </AlignDrawer.Close>
-        </div>
-        <nav
-          aria-label={t("navigation.mobileLabel")}
-          className="flex flex-col divide-y divide-stroke-soft-200 px-6"
-        >
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/"
-              search={{ kurikulum: defaultCurriculumId }}
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.curriculum")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/exam"
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.examArchive")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/alumni"
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.alumni")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/lecturers"
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.lecturers")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/resources"
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.resources")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/roadmap"
-              search={{ lulus: 8, semesterPaparan: 6 }}
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.roadmap")}
-            </Link>
-          </AlignLinkButton.Root>
-          <AlignLinkButton.Root asChild className="h-14 justify-start text-lg">
-            <Link
-              to="/faq"
-              onClick={() => setMenuOpen(false)}
-              activeProps={{ "aria-current": "page", className: "decoration-current" }}
-            >
-              {t("navigation.faq")}
-            </Link>
-          </AlignLinkButton.Root>
-        </nav>
-        <div className="mx-6 mt-auto flex justify-end gap-2 border-t border-stroke-soft-200 py-5">
-          <Settings />
-        </div>
-      </AlignDrawer.Content>
+      <MobileNavDrawer menuOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </AlignDrawer.Root>
   );
 }

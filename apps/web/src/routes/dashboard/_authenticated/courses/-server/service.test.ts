@@ -91,10 +91,8 @@ it("enforces RBAC, CRUD, soft delete, restore, and public visibility for courses
     expect(
       await changeCourseLifecycle(db, maintainer, { courseId: first.id, action: "restore" }),
     ).toEqual({ data: { courseId: first.id, action: "restore" }, error: null });
-    expect((await getLecturerDirectory(db)).courses.map((row) => row.id).sort()).toEqual([
-      first.id,
-      second.id,
-    ]);
+    const publicDirectory = await getLecturerDirectory(db);
+    expect(publicDirectory.courses.map((row) => row.id).sort()).toEqual([first.id, second.id]);
     expect(
       await changeCourseLifecycle(db, maintainer, { courseId: first.id, action: "restore" }),
     ).toEqual({ data: null, error: COURSE_ADMIN_ERRORS.COURSE_ACTION_UNAVAILABLE });

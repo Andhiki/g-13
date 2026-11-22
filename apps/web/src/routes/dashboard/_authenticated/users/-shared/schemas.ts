@@ -7,8 +7,11 @@ export const userPageSchema = z.object({
 });
 export type UserStatus = z.infer<typeof userStatusSchema>;
 
+const nonEmpty = z.string().trim().min(1);
+const requiredId = () => nonEmpty.max(100);
+
 export const assignRoleSchema = z.object({
-  userId: z.string().trim().min(1).max(100),
+  userId: requiredId(),
   role: z.enum(["user", "maintainer", "admin"]),
 });
 

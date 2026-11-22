@@ -68,6 +68,95 @@ function getFirstName(name: string) {
   return name.trim().split(/\s+/)[0] || name;
 }
 
+function AccountAvatarIcon({
+  userImage,
+  failedImage,
+  onImageError,
+}: {
+  userImage?: string | null;
+  failedImage: string | null;
+  onImageError: () => void;
+}) {
+  if (userImage && userImage !== failedImage) {
+    return (
+      <img
+        src={userImage}
+        alt=""
+        className="size-5 shrink-0 rounded-full object-cover"
+        onError={onImageError}
+      />
+    );
+  }
+  return <RiUser3Line aria-hidden="true" className="size-5 shrink-0 p-0.5 text-text-sub-600" />;
+}
+
+function AccountMenuDropdown({
+  firstName,
+  userEmail,
+  userImage,
+  failedImage,
+  onImageError,
+  onOpenSettings,
+  onSignOut,
+}: {
+  firstName: string;
+  userEmail?: string | null;
+  userImage?: string | null;
+  failedImage: string | null;
+  onImageError: () => void;
+  onOpenSettings: () => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <AlignDropdown.Root>
+      <AlignDropdown.Trigger asChild>
+        <AlignButton.Root
+          variant="nav"
+          size="xsmall"
+          className="min-w-0 justify-start"
+          aria-label="Account menu"
+        >
+          <AccountAvatarIcon
+            userImage={userImage}
+            failedImage={failedImage}
+            onImageError={onImageError}
+          />
+          <span className="truncate font-medium">{firstName}</span>
+          <RiArrowDownSLine aria-hidden="true" className="size-3.5 shrink-0 text-text-sub-600" />
+        </AlignButton.Root>
+      </AlignDropdown.Trigger>
+      <AlignDropdown.Content
+        side="top"
+        align="start"
+        sideOffset={8}
+        className="w-[232px] max-w-[calc(100vw-24px)] gap-0.5 rounded-xl p-1"
+      >
+        {userEmail && (
+          <div className="truncate px-2 py-1 text-xs text-text-sub-600">{userEmail}</div>
+        )}
+        <AlignDropdown.Item asChild className="px-2 py-1">
+          <Link to="/lecturers">
+            <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
+            Public view
+          </Link>
+        </AlignDropdown.Item>
+        <AlignDropdown.Item className="px-2 py-1" onSelect={onOpenSettings}>
+          <RiSettings3Line className="size-4 shrink-0 text-text-sub-600" />
+          Settings
+        </AlignDropdown.Item>
+        <AlignDropdown.Separator className="my-0.5" />
+        <AlignDropdown.Item
+          className="px-2 py-1 text-error-base data-[highlighted]:bg-error-lighter"
+          onSelect={onSignOut}
+        >
+          <RiLogoutBoxLine className="size-4 shrink-0" />
+          Sign out
+        </AlignDropdown.Item>
+      </AlignDropdown.Content>
+    </AlignDropdown.Root>
+  );
+}
+
 function NavigationFooter({
   userName,
   userEmail,
@@ -106,68 +195,38 @@ function NavigationFooter({
         </div>
       )}
       <div className="flex items-center justify-between gap-1 border-t border-stroke-soft-200 pt-2">
-        <AlignDropdown.Root>
-          <AlignDropdown.Trigger asChild>
-            <AlignButton.Root
-              variant="nav"
-              size="xsmall"
-              className="min-w-0 justify-start"
-              aria-label="Account menu"
-            >
-              {userImage && userImage !== failedImage ? (
-                <img
-                  src={userImage}
-                  alt=""
-                  className="size-5 shrink-0 rounded-full object-cover"
-                  onError={() => setFailedImage(userImage)}
-                />
-              ) : (
-                <RiUser3Line
-                  aria-hidden="true"
-                  className="size-5 shrink-0 p-0.5 text-text-sub-600"
-                />
-              )}
-              <span className="truncate font-medium">{firstName}</span>
-              <RiArrowDownSLine
-                aria-hidden="true"
-                className="size-3.5 shrink-0 text-text-sub-600"
-              />
-            </AlignButton.Root>
-          </AlignDropdown.Trigger>
-          <AlignDropdown.Content
-            side="top"
-            align="start"
-            sideOffset={8}
-            className="w-[232px] max-w-[calc(100vw-24px)] gap-0.5 rounded-xl p-1"
-          >
-            {userEmail && (
-              <div className="truncate px-2 py-1 text-xs text-text-sub-600">{userEmail}</div>
-            )}
-            <AlignDropdown.Item asChild className="px-2 py-1">
-              <Link to="/lecturers">
-                <RiExternalLinkLine className="size-4 shrink-0 text-text-sub-600" />
-                Public view
-              </Link>
-            </AlignDropdown.Item>
-            <AlignDropdown.Item className="px-2 py-1" onSelect={() => setSettingsOpen(true)}>
-              <RiSettings3Line className="size-4 shrink-0 text-text-sub-600" />
-              Settings
-            </AlignDropdown.Item>
-            <AlignDropdown.Separator className="my-0.5" />
-            <AlignDropdown.Item
-              className="px-2 py-1 text-error-base data-[highlighted]:bg-error-lighter"
-              onSelect={() => void signOut()}
-            >
-              <RiLogoutBoxLine className="size-4 shrink-0" />
-              Sign out
-            </AlignDropdown.Item>
-          </AlignDropdown.Content>
-        </AlignDropdown.Root>
+        <AccountMenuDropdown
+          firstName={firstName}
+          userEmail={userEmail}
+          userImage={userImage}
+          failedImage={failedImage}
+          onImageError={() => userImage && setFailedImage(userImage)}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onSignOut={() => void signOut()}
+        />
         <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
         {!mobile && <NotificationsPopover />}
       </div>
     </div>
   );
+}
+
+function ModerationNavItem({
+  section,
+  closeOnNavigate,
+}: {
+  section: ModerationSection;
+  closeOnNavigate: boolean;
+}) {
+  const { to, label, Icon } = section;
+  const link = (
+    <Link to={to} className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}>
+      <Icon className="size-4 shrink-0" />
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+  if (!closeOnNavigate) return link;
+  return <AlignDrawer.Close asChild>{link}</AlignDrawer.Close>;
 }
 
 function ModerationNavSections({
@@ -194,25 +253,13 @@ function ModerationNavSections({
               </Typography>
             </div>
             <div className="space-y-0.5">
-              {items.map(({ to, label, Icon }) => {
-                const link = (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}
-                  >
-                    <Icon className="size-4 shrink-0" />
-                    <span className="truncate">{label}</span>
-                  </Link>
-                );
-                return closeOnNavigate ? (
-                  <AlignDrawer.Close asChild key={to}>
-                    {link}
-                  </AlignDrawer.Close>
-                ) : (
-                  link
-                );
-              })}
+              {items.map((section) => (
+                <ModerationNavItem
+                  key={section.to}
+                  section={section}
+                  closeOnNavigate={closeOnNavigate}
+                />
+              ))}
             </div>
           </div>
         );
@@ -242,6 +289,40 @@ export function ModerationSidebar({
   );
 }
 
+function MobileDrawerContent({
+  manager,
+  userName,
+  userEmail,
+  userImage,
+}: AccountProps & { manager: boolean }) {
+  return (
+    <AlignDrawer.Content className="max-w-[220px]">
+      <AlignDrawer.Title className="sr-only">Moderation navigation</AlignDrawer.Title>
+      <AlignDrawer.Description className="sr-only">
+        Choose a moderation section or return to public reviews.
+      </AlignDrawer.Description>
+      <AlignDrawer.Header className="justify-end px-2 py-1.5">
+        <AlignDrawer.Close asChild>
+          <AlignButton.Root
+            variant="neutral"
+            mode="ghost"
+            size="xsmall"
+            iconOnly
+            className="shrink-0"
+            aria-label="Close navigation"
+          >
+            <RiCloseLine className="size-5" />
+          </AlignButton.Root>
+        </AlignDrawer.Close>
+      </AlignDrawer.Header>
+      <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
+        <ModerationNavSections manager={manager} closeOnNavigate />
+        <NavigationFooter userName={userName} userEmail={userEmail} userImage={userImage} mobile />
+      </AlignDrawer.Body>
+    </AlignDrawer.Content>
+  );
+}
+
 export function MobileModerationMenu({
   manager,
   userName,
@@ -262,35 +343,12 @@ export function MobileModerationMenu({
           <RiMenuLine className="size-5" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <AlignDrawer.Content className="max-w-[220px]">
-        <AlignDrawer.Title className="sr-only">Moderation navigation</AlignDrawer.Title>
-        <AlignDrawer.Description className="sr-only">
-          Choose a moderation section or return to public reviews.
-        </AlignDrawer.Description>
-        <AlignDrawer.Header className="justify-end px-2 py-1.5">
-          <AlignDrawer.Close asChild>
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="xsmall"
-              iconOnly
-              className="shrink-0"
-              aria-label="Close navigation"
-            >
-              <RiCloseLine className="size-5" />
-            </AlignButton.Root>
-          </AlignDrawer.Close>
-        </AlignDrawer.Header>
-        <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
-          <ModerationNavSections manager={manager} closeOnNavigate />
-          <NavigationFooter
-            userName={userName}
-            userEmail={userEmail}
-            userImage={userImage}
-            mobile
-          />
-        </AlignDrawer.Body>
-      </AlignDrawer.Content>
+      <MobileDrawerContent
+        manager={manager}
+        userName={userName}
+        userEmail={userEmail}
+        userImage={userImage}
+      />
     </AlignDrawer.Root>
   );
 }

@@ -51,6 +51,270 @@ export const Route = createFileRoute("/dashboard/_authenticated/lecturers/")({
   component: AdminLecturersPage,
 });
 
+function lecturerEmptyAction({
+  needle,
+  status,
+  activeCount,
+  onClearSearch,
+  onViewActive,
+  onCreate,
+}: {
+  needle: string;
+  status: LecturerStatus;
+  activeCount: number;
+  onClearSearch: () => void;
+  onViewActive: () => void;
+  onCreate: () => void;
+}) {
+  if (needle) {
+    return (
+      <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onClearSearch}>
+        Clear search
+      </AlignButton.Root>
+    );
+  }
+  if (status === "deleted" && activeCount > 0) {
+    return (
+      <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onViewActive}>
+        View active lecturers
+      </AlignButton.Root>
+    );
+  }
+  if (status === "active") {
+    return (
+      <AlignFancyButton.Root size="small" onClick={onCreate}>
+        Add lecturer
+      </AlignFancyButton.Root>
+    );
+  }
+  return undefined;
+}
+
+function LecturersListBody({
+  queryState,
+  visibleRows,
+  needle,
+  status,
+  activeCount,
+  selectedId,
+  onClearSearch,
+  onViewActive,
+  onCreate,
+  onSelect,
+  onEdit,
+  onLifecycle,
+}: {
+  queryState: { isError: boolean; isPending: boolean };
+  visibleRows: AdminLecturer[];
+  needle: string;
+  status: LecturerStatus;
+  activeCount: number;
+  selectedId?: string;
+  onClearSearch: () => void;
+  onViewActive: () => void;
+  onCreate: () => void;
+  onSelect: (id: string) => void;
+  onEdit: (lecturer: AdminLecturer) => void;
+  onLifecycle: (input: LecturerLifecycleInput, label: string) => void;
+}) {
+  if (queryState.isError) {
+    return (
+      <div className="p-4">
+        <Typography role="alert">Could not load lecturers. Refresh or sign in again.</Typography>
+      </div>
+    );
+  }
+  if (queryState.isPending) return <DashboardPending />;
+  const emptyTitle = needle
+    ? "No matching lecturers"
+    : status === "active"
+      ? "No lecturers yet"
+      : "No deleted lecturers";
+  const emptyDescription = needle
+    ? "Try another search term or clear the search to see catalogue lecturers."
+    : status === "active"
+      ? "Lecturers in the catalogue can be selected on public review pages. Add a lecturer if someone is missing."
+      : "Deleted lecturers are kept here so they can be restored without removing their review history.";
+
+  return (
+    <>
+      <AdminTableHeader
+        className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${lecturerTableColumns}`}
+      >
+        <span>Lecturer</span>
+        <span className="text-right">Reviews</span>
+        <span className="text-right">Actions</span>
+      </AdminTableHeader>
+      {visibleRows.length === 0 && (
+        <DashboardEmptyState
+          icon={<RiUserVoiceLine />}
+          title={emptyTitle}
+          description={emptyDescription}
+          action={lecturerEmptyAction({
+            needle,
+            status,
+            activeCount,
+            onClearSearch,
+            onViewActive,
+            onCreate,
+          })}
+        />
+      )}
+      {visibleRows.map((lecturer) => (
+        <AdminLecturerRow
+          key={lecturer.id}
+          lecturer={lecturer}
+          selected={selectedId === lecturer.id}
+          onSelect={() => onSelect(lecturer.id)}
+          onEdit={onEdit}
+          onLifecycle={onLifecycle}
+        />
+      ))}
+    </>
+  );
+}
+
+function LecturerLifecycleModal({
+  confirmation,
+  isError,
+  isPending,
+  onClose,
+  onConfirm,
+}: {
+  confirmation: { input: LecturerLifecycleInput; label: string } | null;
+  isError: boolean;
+  isPending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const deleting = confirmation?.input.action === "delete";
+  const summary = deleting
+    ? "This hides the lecturer from public listings and new review submissions. Existing reviews stay preserved and you can restore them anytime."
+    : "This restores the lecturer to the public directory and makes them available for new review submissions again.";
+
+  return (
+    <ConfirmActionModal
+      open={confirmation !== null}
+      destructive={deleting}
+      title={deleting ? "Confirm delete" : "Confirm restore"}
+      description={
+        <>
+          <strong className="text-text-strong-950">{confirmation?.label}</strong>. {summary}
+        </>
+      }
+      confirmLabel={deleting ? "Delete lecturer" : "Restore lecturer"}
+      error={isError ? "Update failed. Refresh and try again." : undefined}
+      pending={isPending}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      {confirmation && (
+        <ConfirmationChange
+          from={<RecordStatusBadge deleted={confirmation.input.action === "restore"} />}
+          to={<RecordStatusBadge deleted={deleting} />}
+        />
+      )}
+    </ConfirmActionModal>
+  );
+}
+
+function LecturersContent({
+  queryState,
+  visibleRows,
+  count,
+  offset,
+  total,
+  hasNext,
+  needle,
+  status,
+  activeCount,
+  selectedLecturer,
+  detailsVisible,
+  mobileDetailsOpen,
+  onMobileDetailsOpenChange,
+  onPreviousPage,
+  onNextPage,
+  onClearSearch,
+  onViewActive,
+  onCreate,
+  onSelect,
+  onEdit,
+  onLifecycle,
+}: {
+  queryState: { isError: boolean; isPending: boolean };
+  visibleRows: AdminLecturer[];
+  count: number;
+  offset: number;
+  total: number;
+  hasNext: boolean;
+  needle: string;
+  status: LecturerStatus;
+  activeCount: number;
+  selectedLecturer: AdminLecturer | undefined;
+  detailsVisible: boolean;
+  mobileDetailsOpen: boolean;
+  onMobileDetailsOpenChange: (open: boolean) => void;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
+  onClearSearch: () => void;
+  onViewActive: () => void;
+  onCreate: () => void;
+  onSelect: (id: string) => void;
+  onEdit: (lecturer: AdminLecturer) => void;
+  onLifecycle: (input: LecturerLifecycleInput, label: string) => void;
+}) {
+  return (
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+        {!queryState.isPending && !queryState.isError && (
+          <AdminPagination
+            count={count}
+            offset={needle ? 0 : offset}
+            total={total}
+            label="lecturers"
+            hasNext={hasNext}
+            onPrevious={onPreviousPage}
+            onNext={onNextPage}
+          />
+        )}
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+        >
+          <LecturersListBody
+            queryState={queryState}
+            visibleRows={visibleRows}
+            needle={needle}
+            status={status}
+            activeCount={activeCount}
+            selectedId={selectedLecturer?.id}
+            onClearSearch={onClearSearch}
+            onViewActive={onViewActive}
+            onCreate={onCreate}
+            onSelect={onSelect}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        </div>
+      </div>
+      <AdminInspector
+        title="Lecturer details"
+        desktopOpen={detailsVisible}
+        mobileOpen={mobileDetailsOpen}
+        onMobileOpenChange={onMobileDetailsOpenChange}
+      >
+        {selectedLecturer && !queryState.isPending && !queryState.isError && (
+          <LecturerInspector
+            key={selectedLecturer.id}
+            lecturer={selectedLecturer}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        )}
+      </AdminInspector>
+    </div>
+  );
+}
+
 function AdminLecturersPage() {
   const initialData = Route.useLoaderData();
   const { identity } = initialData;
@@ -137,6 +401,22 @@ function AdminLecturersPage() {
     setConfirmation({ input, label });
   }
 
+  const searchAndDetails = (
+    <div className="flex w-full items-center gap-2 sm:w-auto">
+      <AdminSearchInput
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter lecturer name or slug…"
+        ariaLabel="Filter lecturers"
+      />
+      <DetailsToggleButton
+        available={!!selectedLecturer}
+        visible={detailsVisible}
+        onToggle={() => setDetailsOpen((open) => !open)}
+      />
+    </div>
+  );
+
   return (
     <>
       <AdminPageHeader
@@ -165,135 +445,39 @@ function AdminLecturersPage() {
           setSelectedId(null);
         }}
       >
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <AdminSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Filter lecturer name or slug…"
-            ariaLabel="Filter lecturers"
-          />
-          <DetailsToggleButton
-            available={!!selectedLecturer}
-            visible={detailsVisible}
-            onToggle={() => setDetailsOpen((open) => !open)}
-          />
-        </div>
+        {searchAndDetails}
       </AdminFilterBar>
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-          {!lecturersQuery.isPending && !lecturersQuery.isError && (
-            <AdminPagination
-              count={count}
-              offset={needle ? 0 : offset}
-              total={total}
-              label="lecturers"
-              hasNext={!needle && lecturerRows.length > 50}
-              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
-          <div
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-          >
-            {lecturersQuery.isError ? (
-              <div className="p-4">
-                <Typography role="alert">
-                  Could not load lecturers. Refresh or sign in again.
-                </Typography>
-              </div>
-            ) : lecturersQuery.isPending ? (
-              <DashboardPending />
-            ) : (
-              <>
-                <AdminTableHeader
-                  className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${lecturerTableColumns}`}
-                >
-                  <span>Lecturer</span>
-                  <span className="text-right">Reviews</span>
-                  <span className="text-right">Actions</span>
-                </AdminTableHeader>
-                {!count && (
-                  <DashboardEmptyState
-                    icon={<RiUserVoiceLine />}
-                    title={
-                      needle
-                        ? "No matching lecturers"
-                        : status === "active"
-                          ? "No lecturers yet"
-                          : "No deleted lecturers"
-                    }
-                    description={
-                      needle
-                        ? "Try another search term or clear the search to see catalogue lecturers."
-                        : status === "active"
-                          ? "Lecturers in the catalogue can be selected on public review pages. Add a lecturer if someone is missing."
-                          : "Deleted lecturers are kept here so they can be restored without removing their review history."
-                    }
-                    action={
-                      needle ? (
-                        <AlignButton.Root
-                          size="small"
-                          variant="neutral"
-                          mode="stroke"
-                          onClick={() => setQuery("")}
-                        >
-                          Clear search
-                        </AlignButton.Root>
-                      ) : status === "deleted" && counts.active > 0 ? (
-                        <AlignButton.Root
-                          size="small"
-                          variant="neutral"
-                          mode="stroke"
-                          onClick={() => {
-                            setStatus("active");
-                            setOffset(0);
-                            setSelectedId(null);
-                          }}
-                        >
-                          View active lecturers
-                        </AlignButton.Root>
-                      ) : status === "active" ? (
-                        <AlignFancyButton.Root size="small" onClick={openCreateModal}>
-                          Add lecturer
-                        </AlignFancyButton.Root>
-                      ) : undefined
-                    }
-                  />
-                )}
-                {visibleRows.map((lecturer) => (
-                  <AdminLecturerRow
-                    key={lecturer.id}
-                    lecturer={lecturer}
-                    selected={selectedLecturer?.id === lecturer.id}
-                    onSelect={() => {
-                      setSelectedId(lecturer.id);
-                      setDetailsOpen(true);
-                      setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
-                    }}
-                    onEdit={openEditModal}
-                    onLifecycle={confirmLifecycle}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-        <AdminInspector
-          title="Lecturer details"
-          desktopOpen={detailsVisible}
-          mobileOpen={mobileDetailsOpen}
-          onMobileOpenChange={setMobileDetailsOpen}
-        >
-          {selectedLecturer && !lecturersQuery.isPending && !lecturersQuery.isError && (
-            <LecturerInspector
-              key={selectedLecturer.id}
-              lecturer={selectedLecturer}
-              onEdit={openEditModal}
-              onLifecycle={confirmLifecycle}
-            />
-          )}
-        </AdminInspector>
-      </div>
+      <LecturersContent
+        queryState={lecturersQuery}
+        visibleRows={visibleRows}
+        count={count}
+        offset={offset}
+        total={total}
+        hasNext={!needle && lecturerRows.length > 50}
+        needle={needle}
+        status={status}
+        activeCount={counts.active}
+        selectedLecturer={selectedLecturer}
+        detailsVisible={detailsVisible}
+        mobileDetailsOpen={mobileDetailsOpen}
+        onMobileDetailsOpenChange={setMobileDetailsOpen}
+        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
+        onNextPage={() => setOffset((current) => current + 50)}
+        onClearSearch={() => setQuery("")}
+        onViewActive={() => {
+          setStatus("active");
+          setOffset(0);
+          setSelectedId(null);
+        }}
+        onCreate={openCreateModal}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setDetailsOpen(true);
+          setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
+        }}
+        onEdit={openEditModal}
+        onLifecycle={confirmLifecycle}
+      />
       <LecturerFormModal
         open={formModal.open}
         lecturer={formModal.lecturer}
@@ -302,35 +486,15 @@ function AdminLecturersPage() {
         onClose={() => setFormModal({ open: false, lecturer: null })}
         onSubmit={(values) => saveMutation.mutate({ lecturerId: formModal.lecturer?.id, values })}
       />
-      <ConfirmActionModal
-        open={confirmation !== null}
-        destructive={confirmation?.input.action === "delete"}
-        title={confirmation?.input.action === "delete" ? "Confirm delete" : "Confirm restore"}
-        description={
-          <>
-            <strong className="text-text-strong-950">{confirmation?.label}</strong>.{" "}
-            {confirmation?.input.action === "delete"
-              ? "This hides the lecturer from public listings and new review submissions. Existing reviews stay preserved and you can restore them anytime."
-              : "This restores the lecturer to the public directory and makes them available for new review submissions again."}
-          </>
-        }
-        confirmLabel={
-          confirmation?.input.action === "delete" ? "Delete lecturer" : "Restore lecturer"
-        }
-        error={lifecycleMutation.isError ? "Update failed. Refresh and try again." : undefined}
-        pending={lifecycleMutation.isPending}
+      <LecturerLifecycleModal
+        confirmation={confirmation}
+        isError={lifecycleMutation.isError}
+        isPending={lifecycleMutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) lifecycleMutation.mutate(confirmation.input);
         }}
-      >
-        {confirmation && (
-          <ConfirmationChange
-            from={<RecordStatusBadge deleted={confirmation.input.action === "restore"} />}
-            to={<RecordStatusBadge deleted={confirmation.input.action === "delete"} />}
-          />
-        )}
-      </ConfirmActionModal>
+      />
     </>
   );
 }

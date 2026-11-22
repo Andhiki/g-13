@@ -21,6 +21,17 @@
       ]
     }
   },
+  "rules": {
+    "no-dupe-else-if": "error",
+    "max-nested-callbacks": "error",
+    "max-depth": "error",
+    "max-lines-per-function": [
+      "error",
+      {
+        "max": 200
+      }
+    ]
+  },
   "overrides": [
     {
       "files": [

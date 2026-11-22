@@ -1,13 +1,18 @@
 import { z } from "zod";
 
+const trimmed = z.string().trim();
+const requiredTrimmed = (max: number) => trimmed.min(1).max(max);
+const integerRating = z.number().int();
+const ratingScore = () => integerRating.min(1).max(5);
+
 const submissionFieldsSchema = z.object({
-  lecturerId: z.string().trim().min(1).max(100),
-  courseId: z.string().trim().min(1).max(100),
-  termLabel: z.string().trim().min(1).max(60),
-  clarity: z.number().int().min(1).max(5),
-  support: z.number().int().min(1).max(5),
-  organization: z.number().int().min(1).max(5),
-  body: z.string().trim().min(1).max(1000),
+  lecturerId: requiredTrimmed(100),
+  courseId: requiredTrimmed(100),
+  termLabel: requiredTrimmed(60),
+  clarity: ratingScore(),
+  support: ratingScore(),
+  organization: ratingScore(),
+  body: requiredTrimmed(1000),
 });
 
 export const submissionFieldSchema = submissionFieldsSchema
@@ -19,7 +24,7 @@ export const submissionInputSchema = z
     submissionFieldsSchema.extend({ anonymous: z.literal(true) }),
     submissionFieldsSchema.extend({
       anonymous: z.literal(false),
-      authorName: z.string().trim().min(1).max(80),
+      authorName: requiredTrimmed(80),
     }),
   ])
   .transform((value) => ({

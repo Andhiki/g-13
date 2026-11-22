@@ -41,11 +41,14 @@ function defaultTrustedOrigins(baseURL: AuthBaseURL) {
     : baseURL.allowedHosts.map(originForHost);
 }
 
+function isHttpsUrl(url: string) {
+  return new URL(url).protocol === "https:";
+}
+
 function defaultSecureCookies(baseURL: AuthBaseURL) {
-  if (typeof baseURL === "string") return new URL(baseURL).protocol === "https:";
-  if (baseURL.protocol === "http") return false;
-  if (baseURL.protocol === "https") return true;
-  return baseURL.fallback ? new URL(baseURL.fallback).protocol === "https:" : true;
+  if (typeof baseURL === "string") return isHttpsUrl(baseURL);
+  if (baseURL.protocol && baseURL.protocol !== "auto") return baseURL.protocol === "https";
+  return baseURL.fallback ? isHttpsUrl(baseURL.fallback) : true;
 }
 
 export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthConfiguration) {

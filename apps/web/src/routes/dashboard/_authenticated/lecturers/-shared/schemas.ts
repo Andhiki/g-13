@@ -21,13 +21,16 @@ export type LecturerFieldsInput = z.infer<typeof lecturerFieldsSchema>;
 export const createLecturerSchema = lecturerFieldsSchema;
 export type CreateLecturerInput = z.infer<typeof createLecturerSchema>;
 
+const nonEmpty = z.string().trim().min(1);
+const requiredId = () => nonEmpty.max(100);
+
 export const updateLecturerSchema = lecturerFieldsSchema.extend({
-  lecturerId: z.string().trim().min(1).max(100),
+  lecturerId: requiredId(),
 });
 export type UpdateLecturerInput = z.infer<typeof updateLecturerSchema>;
 
 export const lecturerLifecycleSchema = z.object({
-  lecturerId: z.string().trim().min(1).max(100),
+  lecturerId: requiredId(),
   action: z.enum(["delete", "restore"]),
 });
 export type LecturerLifecycleInput = z.infer<typeof lecturerLifecycleSchema>;

@@ -10,6 +10,10 @@ export const announcementPageSchema = z.object({
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+const nonEmpty = z.string().trim().min(1);
+const requiredId = () => nonEmpty.max(100);
+const positiveInt = () => z.number().int().positive();
+
 const localizedText = (label: string, max: number) =>
   z
     .string()
@@ -60,7 +64,7 @@ export const announcementFieldsShape = z.object({
   ctaLabelId: optionalLocalizedText(60),
   ctaLabelEn: optionalLocalizedText(60),
   startsAt: z.number().int().positive("Pick a start date."),
-  endsAt: z.number().int().positive().nullable(),
+  endsAt: positiveInt().nullable(),
   enabled: z.boolean(),
 });
 export type AnnouncementFieldsInput = z.infer<typeof announcementFieldsShape>;
@@ -75,7 +79,7 @@ export const createAnnouncementSchema = announcementFieldsShape;
 export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
 
 export const updateAnnouncementSchema = announcementFieldsShape.safeExtend({
-  announcementId: z.string().trim().min(1).max(100),
+  announcementId: requiredId(),
   slug: z
     .string()
     .trim()
@@ -87,7 +91,7 @@ export const updateAnnouncementSchema = announcementFieldsShape.safeExtend({
 export type UpdateAnnouncementInput = z.infer<typeof updateAnnouncementSchema>;
 
 export const announcementLifecycleSchema = z.object({
-  announcementId: z.string().trim().min(1).max(100),
+  announcementId: requiredId(),
   action: z.enum(["enable", "disable", "delete"]),
 });
 export type AnnouncementLifecycleInput = z.infer<typeof announcementLifecycleSchema>;

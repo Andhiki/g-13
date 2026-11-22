@@ -88,45 +88,52 @@ const alumniProfiles: AlumniProfile[] = [
   },
 ];
 
+function AlumniStoryHeader({ story }: { story: AlumniProfile }) {
+  const { text } = useLocale("alumni");
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="size-20 shrink-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 sm:size-24">
+          <img
+            src={story.photo}
+            alt={story.name}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover"
+          />
+        </div>
+        <div className="min-w-0 space-y-1">
+          <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
+            {story.name}
+          </Typography>
+          <Typography as="p" variant="label" color="muted" className="m-0">
+            {text(story.currentRole)}
+          </Typography>
+          <Typography as="p" variant="caption" color="muted" className="m-0">
+            {text(story.cohort)}
+          </Typography>
+        </div>
+      </div>
+      <AlignButton.Root asChild variant="neutral" mode="stroke" iconOnly className="shrink-0">
+        <a
+          href={story.linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={text("View {{v0}} on LinkedIn (opens in a new tab)", { v0: story.name })}
+          title="LinkedIn"
+        >
+          <RiLinkedinBoxFill aria-hidden="true" className="size-5" />
+        </a>
+      </AlignButton.Root>
+    </div>
+  );
+}
+
 function AlumniStoryCard({ story }: { story: AlumniProfile }) {
   const { text } = useLocale("alumni");
   return (
     <article className="rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="size-20 shrink-0 overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-weak-50 sm:size-24">
-            <img
-              src={story.photo}
-              alt={story.name}
-              loading="lazy"
-              decoding="async"
-              className="size-full object-cover"
-            />
-          </div>
-          <div className="min-w-0 space-y-1">
-            <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
-              {story.name}
-            </Typography>
-            <Typography as="p" variant="label" color="muted" className="m-0">
-              {text(story.currentRole)}
-            </Typography>
-            <Typography as="p" variant="caption" color="muted" className="m-0">
-              {text(story.cohort)}
-            </Typography>
-          </div>
-        </div>
-        <AlignButton.Root asChild variant="neutral" mode="stroke" iconOnly className="shrink-0">
-          <a
-            href={story.linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={text("View {{v0}} on LinkedIn (opens in a new tab)", { v0: story.name })}
-            title="LinkedIn"
-          >
-            <RiLinkedinBoxFill aria-hidden="true" className="size-5" />
-          </a>
-        </AlignButton.Root>
-      </div>
+      <AlumniStoryHeader story={story} />
       <Typography as="p" variant="paragraph" className="mb-0 mt-5">
         {text(story.achievement)}
       </Typography>
