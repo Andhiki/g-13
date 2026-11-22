@@ -28,6 +28,154 @@ const tabClassName =
   "relative shrink-0 whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-label-sm text-text-sub-600 transition-colors hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-base data-[state=active]:border-primary-base data-[state=active]:text-text-strong-950";
 const letterOf = (name: string) => name[0]?.toLocaleUpperCase("id") ?? "#";
 
+const TICK_SCALES = [1, 0.833, 0.667] as const;
+const TICK_OPACITIES = ["1", "0.7", "0.5"] as const;
+
+function AlumniSearchBar({
+  searchId,
+  searchRef,
+  searchSectionRef,
+  query,
+  isSticky,
+  hintText,
+  reducedMotion,
+  onQueryChange,
+}: {
+  searchId: string;
+  searchRef: RefObject<HTMLInputElement | null>;
+  searchSectionRef: RefObject<HTMLElement | null>;
+  query: string;
+  isSticky: boolean;
+  hintText: string;
+  reducedMotion: boolean | null;
+  onQueryChange: (value: string) => void;
+}) {
+  const { text } = useLocale("alumni");
+  return (
+    <section
+      ref={searchSectionRef}
+      aria-label={text("Filter alumni")}
+      className="sticky top-[var(--app-header-height)] z-30 mt-3 py-3"
+    >
+      <m.div
+        className="relative mx-auto"
+        initial={false}
+        animate={{ width: isSticky ? "90%" : "100%" }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.12, ease: "easeOut" }}
+      >
+        <label htmlFor={searchId} className="sr-only">
+          {text("Cari alumni")}
+        </label>
+        <RiSearchLine
+          aria-hidden="true"
+          className="pointer-events-none absolute left-4 top-1/2 z-10 size-5 -translate-y-1/2 text-primary-base"
+        />
+        <input
+          id={searchId}
+          ref={searchRef}
+          type="search"
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={text("Cari nama, instansi, atau posisi")}
+          className="h-12 w-full rounded-full bg-bg-weak-50/60 backdrop-blur-xl pl-12 pr-4 min-[651px]:pr-12 text-paragraph-sm text-text-strong-950 ring-1 ring-inset ring-stroke-soft-200 outline-none transition-colors duration-120 placeholder:text-text-sub-600 focus:bg-bg-weak-50/75 focus:ring-primary-base"
+        />
+        <AlignKbd.Root
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
+        >
+          {hintText}
+        </AlignKbd.Root>
+      </m.div>
+    </section>
+  );
+}
+
+function AlumniResultsContent({
+  batch,
+  status,
+  filtered,
+  listRef,
+  onReload,
+}: {
+  batch: string;
+  status: "loading" | "unavailable" | "ready";
+  filtered: ReturnType<typeof filterAlumni>;
+  listRef: RefObject<HTMLUListElement | null>;
+  onReload: () => void;
+}) {
+  const { text } = useLocale("alumni");
+  return (
+    <Tabs.Content value={batch}>
+      <p aria-live="polite" className="mt-6 text-paragraph-sm text-text-sub-600">
+        {status === "ready" && text("Menampilkan {{v0}} alumni", { v0: String(filtered.length) })}
+      </p>
+      {status === "loading" && (
+        <div className="mt-6 flex min-h-64">
+          <Loading />
+        </div>
+      )}
+      {status === "unavailable" && (
+        <div
+          role="alert"
+          className="mt-6 flex flex-col items-start gap-3 rounded-10 bg-bg-weak-50 p-6"
+        >
+          <Typography variant="label" className="m-0">
+            {text("Daftar alumni gagal dimuat.")}
+          </Typography>
+          <AlignButton.Root size="small" onClick={onReload}>
+            {text("Coba lagi")}
+          </AlignButton.Root>
+        </div>
+      )}
+      {status === "ready" && filtered.length === 0 && (
+        <div className="mt-6 rounded-10 border border-stroke-soft-200 p-10 text-center">
+          <Typography variant="label" className="m-0">
+            {text("Tidak ada alumni yang cocok.")}
+          </Typography>
+          <Typography variant="paragraph" color="muted" className="mb-0 mt-2">
+            {text("Coba kata kunci lain atau pilih semua angkatan.")}
+          </Typography>
+        </div>
+      )}
+      {filtered.length > 0 && (
+        <ul
+          ref={listRef}
+          className="mt-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {filtered.map((alumnus) => (
+            <li
+              key={alumnus.id}
+              data-letter={letterOf(alumnus.name)}
+              className="min-w-0 scroll-mt-36"
+            >
+              <AlumniDirectoryCard alumnus={alumnus} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </Tabs.Content>
+  );
+}
+
+function AlumniBatchTabs({ batches }: { batches: number[] }) {
+  const { text } = useLocale("alumni");
+  return (
+    <Tabs.List
+      aria-label={text("Angkatan")}
+      className="mt-5 flex w-full overflow-x-auto border-b border-stroke-soft-200 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <Tabs.Trigger value={allBatches} className={tabClassName}>
+        {text("Semua angkatan")}
+      </Tabs.Trigger>
+      {batches.map((year) => (
+        <Tabs.Trigger key={year} value={String(year)} className={tabClassName}>
+          {text("Angkatan {{v0}}", { v0: String(year) })}
+        </Tabs.Trigger>
+      ))}
+    </Tabs.List>
+  );
+}
+
 export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryData | null }) {
   const { text } = useLocale("alumni");
   const directory = useAlumniDirectory(initialData);
@@ -100,111 +248,24 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
 
         <Tabs.Root value={batch} onValueChange={setBatch}>
           <div ref={stickyMarkerRef} aria-hidden="true" className="relative top-3" />
-          <section
-            ref={searchSectionRef}
-            aria-label={text("Filter alumni")}
-            className="sticky top-[var(--app-header-height)] z-30 mt-3 py-3"
-          >
-            <m.div
-              className="relative mx-auto"
-              initial={false}
-              animate={{ width: isSticky ? "90%" : "100%" }}
-              transition={reducedMotion ? { duration: 0 } : { duration: 0.12, ease: "easeOut" }}
-            >
-              <label htmlFor={searchId} className="sr-only">
-                {text("Cari alumni")}
-              </label>
-              <RiSearchLine
-                aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 z-10 size-5 -translate-y-1/2 text-primary-base"
-              />
-              <input
-                id={searchId}
-                ref={searchRef}
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={text("Cari nama, instansi, atau posisi")}
-                className="h-12 w-full rounded-full bg-bg-weak-50/60 backdrop-blur-xl pl-12 pr-4 min-[651px]:pr-12 text-paragraph-sm text-text-strong-950 ring-1 ring-inset ring-stroke-soft-200 outline-none transition-colors duration-120 placeholder:text-text-sub-600 focus:bg-bg-weak-50/75 focus:ring-primary-base"
-              />
-              <AlignKbd.Root
-                aria-hidden="true"
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
-              >
-                {searchHint.text}
-              </AlignKbd.Root>
-            </m.div>
-          </section>
-          {directory.status === "ready" && (
-            <Tabs.List
-              aria-label={text("Angkatan")}
-              className="mt-5 flex w-full overflow-x-auto border-b border-stroke-soft-200 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              <Tabs.Trigger value={allBatches} className={tabClassName}>
-                {text("Semua angkatan")}
-              </Tabs.Trigger>
-              {batches.map((year) => (
-                <Tabs.Trigger key={year} value={String(year)} className={tabClassName}>
-                  {text("Angkatan {{v0}}", { v0: String(year) })}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
-          )}
-
-          <Tabs.Content value={batch}>
-            <p aria-live="polite" className="mt-6 text-paragraph-sm text-text-sub-600">
-              {directory.status === "ready" &&
-                text("Menampilkan {{v0}} alumni", { v0: String(filtered.length) })}
-            </p>
-
-            {directory.status === "loading" && (
-              <div className="mt-6 flex min-h-64">
-                <Loading />
-              </div>
-            )}
-
-            {directory.status === "unavailable" && (
-              <div
-                role="alert"
-                className="mt-6 flex flex-col items-start gap-3 rounded-10 bg-bg-weak-50 p-6"
-              >
-                <Typography variant="label" className="m-0">
-                  {text("Daftar alumni gagal dimuat.")}
-                </Typography>
-                <AlignButton.Root size="small" onClick={directory.reload}>
-                  {text("Coba lagi")}
-                </AlignButton.Root>
-              </div>
-            )}
-
-            {directory.status === "ready" && filtered.length === 0 && (
-              <div className="mt-6 rounded-10 border border-stroke-soft-200 p-10 text-center">
-                <Typography variant="label" className="m-0">
-                  {text("Tidak ada alumni yang cocok.")}
-                </Typography>
-                <Typography variant="paragraph" color="muted" className="mb-0 mt-2">
-                  {text("Coba kata kunci lain atau pilih semua angkatan.")}
-                </Typography>
-              </div>
-            )}
-
-            {filtered.length > 0 && (
-              <ul
-                ref={listRef}
-                className="mt-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3"
-              >
-                {filtered.map((alumnus) => (
-                  <li
-                    key={alumnus.id}
-                    data-letter={letterOf(alumnus.name)}
-                    className="min-w-0 scroll-mt-36"
-                  >
-                    <AlumniDirectoryCard alumnus={alumnus} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Tabs.Content>
+          <AlumniSearchBar
+            searchId={searchId}
+            searchRef={searchRef}
+            searchSectionRef={searchSectionRef}
+            query={query}
+            isSticky={isSticky}
+            hintText={searchHint.text}
+            reducedMotion={reducedMotion}
+            onQueryChange={setQuery}
+          />
+          {directory.status === "ready" && <AlumniBatchTabs batches={batches} />}
+          <AlumniResultsContent
+            batch={batch}
+            status={directory.status}
+            filtered={filtered}
+            listRef={listRef}
+            onReload={directory.reload}
+          />
         </Tabs.Root>
       </div>
       {letters.length > 1 && (
@@ -219,18 +280,37 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
   );
 }
 
-const AlphabetScrubber = memo(function AlphabetScrubber({
+function collectAlphabetTargets(
+  listEl: HTMLUListElement | null,
+  letters: string[],
+  buttons: (HTMLButtonElement | null)[],
+) {
+  const cards = listEl?.querySelectorAll<HTMLElement>("[data-letter]");
+  const targetMap = new Map<string, HTMLElement>();
+  const ordered: { letter: string; el: HTMLElement }[] = [];
+  if (cards) {
+    for (const card of cards) {
+      const letter = card.dataset.letter ?? "";
+      ordered.push({ letter, el: card });
+      if (letter && !targetMap.has(letter)) targetMap.set(letter, card);
+    }
+  }
+  const offsets = letters.map((_, i) => {
+    const btn = buttons[i];
+    return btn ? btn.offsetTop + btn.offsetHeight / 2 : 0;
+  });
+  return { targetMap, ordered, offsets };
+}
+
+function useAlphabetScrubber({
   letters,
   listRef,
-  label,
-  letterLabel,
+  reducedMotion,
 }: {
   letters: string[];
   listRef: RefObject<HTMLUListElement | null>;
-  label: string;
-  letterLabel: (letter: string) => string;
+  reducedMotion: boolean | null;
 }) {
-  const reducedMotion = useReducedMotion();
   const navRef = useRef<HTMLElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -252,8 +332,7 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
   const recentTouch = () => Date.now() - lastTouchRef.current < 700;
 
   const setTickTransition = (enabled: boolean) => {
-    for (let i = 0; i < tickRefs.current.length; i++) {
-      const tick = tickRefs.current[i];
+    for (const tick of tickRefs.current) {
       if (tick) tick.style.transitionDuration = enabled && !reducedMotion ? "150ms" : "0ms";
     }
   };
@@ -264,10 +343,8 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
         const tick = tickRefs.current[i];
         if (!tick) continue;
         const dist = index >= 0 ? Math.abs(i - index) : 99;
-        const scale = dist === 0 ? 1 : dist === 1 ? 0.833 : dist === 2 ? 0.667 : 0.5;
-        const opacity = dist === 0 ? "1" : dist === 1 ? "0.7" : dist === 2 ? "0.5" : "0.4";
-        tick.style.transform = `scaleX(${scale})`;
-        tick.style.opacity = opacity;
+        tick.style.transform = `scaleX(${TICK_SCALES[dist] ?? 0.5})`;
+        tick.style.opacity = TICK_OPACITIES[dist] ?? "0.4";
       }
       const pill = pillRef.current;
       if (!pill) return;
@@ -284,22 +361,10 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
   );
 
   const cacheTargetsAndOffsets = useCallback(() => {
-    const cards = listRef.current?.querySelectorAll<HTMLElement>("[data-letter]");
-    const map = new Map<string, HTMLElement>();
-    const ordered: { letter: string; el: HTMLElement }[] = [];
-    if (cards) {
-      for (const card of cards) {
-        const letter = card.dataset.letter ?? "";
-        ordered.push({ letter, el: card });
-        if (letter && !map.has(letter)) map.set(letter, card);
-      }
-    }
-    targetMapRef.current = map;
-    orderedCardsRef.current = ordered;
-    offsetsRef.current = letters.map((_, i) => {
-      const btn = buttonRefs.current[i];
-      return btn ? btn.offsetTop + btn.offsetHeight / 2 : 0;
-    });
+    const cached = collectAlphabetTargets(listRef.current, letters, buttonRefs.current);
+    targetMapRef.current = cached.targetMap;
+    orderedCardsRef.current = cached.ordered;
+    offsetsRef.current = cached.offsets;
   }, [letters, listRef]);
 
   useEffect(() => {
@@ -313,12 +378,9 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
         letter = card.letter;
       }
       const nextIdx = letters.indexOf(letter);
-      if (nextIdx >= 0) {
-        scrollIndexRef.current = nextIdx;
-        if (!draggingRef.current && hoverIndexRef.current < 0) {
-          paintActive(nextIdx, false);
-        }
-      }
+      if (nextIdx < 0) return;
+      scrollIndexRef.current = nextIdx;
+      if (!draggingRef.current && hoverIndexRef.current < 0) paintActive(nextIdx, false);
     };
     updateFromScroll();
     window.addEventListener("scroll", updateFromScroll, { passive: true });
@@ -357,11 +419,8 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
     lastDragIndexRef.current = -1;
     railRectRef.current = null;
     setTickTransition(true);
-    if (reducedMotion) {
-      rubberY.set(0);
-    } else {
-      animate(rubberY, 0, { type: "spring", stiffness: 500, damping: 32 });
-    }
+    if (reducedMotion) rubberY.set(0);
+    else animate(rubberY, 0, { type: "spring", stiffness: 500, damping: 32 });
     if (collapse) {
       hoverIndexRef.current = -1;
       setExpanded(false);
@@ -372,105 +431,165 @@ const AlphabetScrubber = memo(function AlphabetScrubber({
     }
   };
 
+  const startDrag = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    const count = letters.length;
+    const first = buttonRefs.current[0]?.getBoundingClientRect();
+    const last = buttonRefs.current[count - 1]?.getBoundingClientRect();
+    if (!first || !last) return;
+    cacheTargetsAndOffsets();
+    railRectRef.current = {
+      top: first.top,
+      bottom: last.bottom,
+      step: (last.bottom - first.top) / count,
+    };
+    draggingRef.current = true;
+    lastDragIndexRef.current = -1;
+    setTickTransition(false);
+    setExpanded(true);
+    navRef.current?.setPointerCapture(event.pointerId);
+    dragTo(event.clientY);
+  };
+
+  const navHandlers = {
+    onPointerEnter: (event: React.PointerEvent<HTMLElement>) => {
+      if (event.pointerType === "mouse" && !recentTouch()) setExpanded(true);
+    },
+    onPointerLeave: () => {
+      if (draggingRef.current) return;
+      hoverIndexRef.current = -1;
+      setExpanded(false);
+      paintActive(scrollIndexRef.current, false);
+    },
+    onPointerDown: startDrag,
+    onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
+      if (draggingRef.current) dragTo(event.clientY);
+    },
+    onPointerUp: (event: React.PointerEvent<HTMLElement>) => {
+      if (!draggingRef.current) return;
+      if (event.pointerType !== "mouse") lastTouchRef.current = Date.now();
+      const shouldCollapse = event.pointerType !== "mouse" || !navRef.current?.matches(":hover");
+      finishDrag(shouldCollapse);
+    },
+    onPointerCancel: () => {
+      if (draggingRef.current) finishDrag(true);
+    },
+    onBlur: (event: React.FocusEvent<HTMLElement>) => {
+      if (event.currentTarget.contains(event.relatedTarget)) return;
+      hoverIndexRef.current = -1;
+      setExpanded(false);
+      paintActive(scrollIndexRef.current, false);
+    },
+  };
+
+  return {
+    navRef,
+    pillRef,
+    buttonRefs,
+    tickRefs,
+    expanded,
+    rubberY,
+    navHandlers,
+    recentTouch,
+    draggingRef,
+    hoverIndexRef,
+    scrollIndexRef,
+    setExpanded,
+    paintActive,
+    jumpIndex,
+  };
+}
+
+function AlphabetTickButton({
+  letter,
+  index,
+  scrubber,
+  letterLabel,
+}: {
+  letter: string;
+  index: number;
+  scrubber: ReturnType<typeof useAlphabetScrubber>;
+  letterLabel: (letter: string) => string;
+}) {
+  return (
+    <button
+      ref={(el) => {
+        scrubber.buttonRefs.current[index] = el;
+      }}
+      type="button"
+      data-letter={letter}
+      aria-label={letterLabel(letter)}
+      onPointerEnter={(event) => {
+        if (
+          event.pointerType === "mouse" &&
+          !scrubber.recentTouch() &&
+          !scrubber.draggingRef.current
+        ) {
+          scrubber.hoverIndexRef.current = index;
+          scrubber.paintActive(index, true);
+        }
+      }}
+      onFocus={() => {
+        scrubber.setExpanded(true);
+        scrubber.hoverIndexRef.current = index;
+        scrubber.paintActive(index, true);
+      }}
+      onBlur={() => {
+        scrubber.hoverIndexRef.current = -1;
+        scrubber.paintActive(scrubber.scrollIndexRef.current, false);
+      }}
+      onClick={() => scrubber.jumpIndex(index)}
+      className="group relative flex h-3 w-11 items-center justify-start pl-1 focus-visible:outline-2 focus-visible:outline-primary-base"
+    >
+      <span
+        ref={(el) => {
+          scrubber.tickRefs.current[index] = el;
+        }}
+        className="h-0.5 w-6 origin-left rounded-full bg-text-sub-600 transition-[transform,opacity] duration-150"
+      />
+    </button>
+  );
+}
+
+const AlphabetScrubber = memo(function AlphabetScrubber({
+  letters,
+  listRef,
+  label,
+  letterLabel,
+}: {
+  letters: string[];
+  listRef: RefObject<HTMLUListElement | null>;
+  label: string;
+  letterLabel: (letter: string) => string;
+}) {
+  const reducedMotion = useReducedMotion();
+  const scrubber = useAlphabetScrubber({ letters, listRef, reducedMotion });
+
   return (
     <div className="fixed left-0 top-1/2 z-20 -translate-y-1/2">
-      <m.div style={reducedMotion ? undefined : { y: rubberY }}>
+      <m.div style={reducedMotion ? undefined : { y: scrubber.rubberY }}>
         <nav
-          ref={navRef}
+          ref={scrubber.navRef}
           aria-label={label}
           className={`relative flex touch-none flex-col items-start py-2 transition-transform duration-200 before:absolute before:-inset-y-2 before:left-0 before:w-12 before:content-[''] ${
-            expanded ? "translate-x-0" : "-translate-x-1"
+            scrubber.expanded ? "translate-x-0" : "-translate-x-1"
           }`}
-          onPointerEnter={(event) => {
-            if (event.pointerType === "mouse" && !recentTouch()) setExpanded(true);
-          }}
-          onPointerLeave={() => {
-            if (!draggingRef.current) {
-              hoverIndexRef.current = -1;
-              setExpanded(false);
-              paintActive(scrollIndexRef.current, false);
-            }
-          }}
-          onPointerDown={(event) => {
-            if (event.pointerType === "mouse" && event.button !== 0) return;
-            const count = letters.length;
-            const first = buttonRefs.current[0]?.getBoundingClientRect();
-            const last = buttonRefs.current[count - 1]?.getBoundingClientRect();
-            if (!first || !last) return;
-            cacheTargetsAndOffsets();
-            railRectRef.current = {
-              top: first.top,
-              bottom: last.bottom,
-              step: (last.bottom - first.top) / count,
-            };
-            draggingRef.current = true;
-            lastDragIndexRef.current = -1;
-            setTickTransition(false);
-            setExpanded(true);
-            navRef.current?.setPointerCapture(event.pointerId);
-            dragTo(event.clientY);
-          }}
-          onPointerMove={(event) => {
-            if (draggingRef.current) dragTo(event.clientY);
-          }}
-          onPointerUp={(event) => {
-            if (!draggingRef.current) return;
-            if (event.pointerType !== "mouse") lastTouchRef.current = Date.now();
-            const shouldCollapse =
-              event.pointerType !== "mouse" || !navRef.current?.matches(":hover");
-            finishDrag(shouldCollapse);
-          }}
-          onPointerCancel={() => {
-            if (draggingRef.current) finishDrag(true);
-          }}
-          onBlur={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-              hoverIndexRef.current = -1;
-              setExpanded(false);
-              paintActive(scrollIndexRef.current, false);
-            }
-          }}
+          {...scrubber.navHandlers}
         >
           <span
-            ref={pillRef}
+            ref={scrubber.pillRef}
             aria-hidden="true"
             style={{ opacity: 0 }}
             className="pointer-events-none absolute left-12 top-0 rounded-md bg-bg-strong-950 px-2 py-1 text-label-sm text-text-white-0 transition-opacity duration-100"
           />
           {letters.map((letter, index) => (
-            <button
+            <AlphabetTickButton
               key={letter}
-              ref={(el) => {
-                buttonRefs.current[index] = el;
-              }}
-              type="button"
-              data-letter={letter}
-              aria-label={letterLabel(letter)}
-              onPointerEnter={(event) => {
-                if (event.pointerType === "mouse" && !recentTouch() && !draggingRef.current) {
-                  hoverIndexRef.current = index;
-                  paintActive(index, true);
-                }
-              }}
-              onFocus={() => {
-                setExpanded(true);
-                hoverIndexRef.current = index;
-                paintActive(index, true);
-              }}
-              onBlur={() => {
-                hoverIndexRef.current = -1;
-                paintActive(scrollIndexRef.current, false);
-              }}
-              onClick={() => jumpIndex(index)}
-              className="group relative flex h-3 w-11 items-center justify-start pl-1 focus-visible:outline-2 focus-visible:outline-primary-base"
-            >
-              <span
-                ref={(el) => {
-                  tickRefs.current[index] = el;
-                }}
-                className="h-0.5 w-6 origin-left rounded-full bg-text-sub-600 transition-[transform,opacity] duration-150"
-              />
-            </button>
+              letter={letter}
+              index={index}
+              scrubber={scrubber}
+              letterLabel={letterLabel}
+            />
           ))}
         </nav>
       </m.div>

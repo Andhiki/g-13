@@ -17,6 +17,137 @@ import { paperLinks } from "../-shared/archive";
 import type { ExamPaper, ArchiveLocation } from "../-shared/contracts";
 import type { RefObject } from "react";
 
+function PaperShareButton({ copied, onShare }: { copied: boolean; onShare: () => void }) {
+  const { text } = useLocale("exam");
+  return (
+    <AlignTooltip.Provider>
+      <AlignTooltip.Root>
+        <AlignTooltip.Trigger asChild>
+          <AlignButton.Root
+            variant="neutral"
+            mode="stroke"
+            size="xsmall"
+            iconOnly
+            className={
+              // oxlint-disable-next-line shadcn/no-restyle -- copy-link press feedback: a deliberate quick transform scale with its own timing
+              "transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
+            }
+            aria-label={copied ? text("Tautan berhasil disalin") : text("Salin tautan")}
+            onClick={onShare}
+          >
+            {copied ? (
+              <RiCheckLine
+                key="copied"
+                className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
+                aria-hidden="true"
+              />
+            ) : (
+              <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
+            )}
+          </AlignButton.Root>
+        </AlignTooltip.Trigger>
+        <AlignTooltip.Content size="xsmall" side="bottom">
+          {copied ? text("Tautan disalin") : text("Salin tautan")}
+        </AlignTooltip.Content>
+      </AlignTooltip.Root>
+    </AlignTooltip.Provider>
+  );
+}
+
+function PaperPreviewActions({
+  links,
+  copied,
+  onShare,
+}: {
+  links: ReturnType<typeof paperLinks>;
+  copied: boolean;
+  onShare: () => void;
+}) {
+  const { text } = useLocale("exam");
+  const iconButton = buttonVariants({
+    variant: "neutral",
+    mode: "stroke",
+    size: "xsmall",
+    iconOnly: true,
+  });
+  return (
+    <div className="flex shrink-0 items-center gap-1" role="group" aria-label={text("Aksi berkas")}>
+      <a
+        href={links.download}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={text("Unduh")}
+        title={text("Unduh")}
+        className={iconButton}
+      >
+        <RiDownloadLine className="size-4" aria-hidden="true" />
+      </a>
+      <PaperShareButton copied={copied} onShare={onShare} />
+      <a
+        href={links.drive}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={text("Buka di Drive")}
+        title={text("Buka di Drive")}
+        className={iconButton}
+      >
+        <RiDriveLine className="size-4" aria-hidden="true" />
+      </a>
+      <AlignModal.Close asChild>
+        <AlignButton.Root
+          variant="neutral"
+          mode="stroke"
+          size="xsmall"
+          iconOnly
+          aria-label={text("Tutup dialog")}
+          title={text("Tutup")}
+        >
+          <RiCloseLine className="size-4" aria-hidden="true" />
+        </AlignButton.Root>
+      </AlignModal.Close>
+    </div>
+  );
+}
+
+function PaperPreviewHeader({
+  paperName,
+  modalTitle,
+  links,
+  copied,
+  onShare,
+}: {
+  paperName?: string;
+  modalTitle: RefObject<HTMLHeadingElement | null>;
+  links: ReturnType<typeof paperLinks> | null;
+  copied: boolean;
+  onShare: () => void;
+}) {
+  const { text } = useLocale("exam");
+  return (
+    <div className="flex min-w-0 items-center justify-between gap-4 p-4">
+      <AlignModal.Title asChild>
+        <Typography
+          ref={modalTitle}
+          as="h2"
+          tabIndex={-1}
+          variant="label"
+          className={
+            // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the modal's toolbar buttons
+            "min-w-0 flex-1 truncate outline-none"
+          }
+          title={paperName}
+        >
+          {paperName}
+        </Typography>
+      </AlignModal.Title>
+      {links && <PaperPreviewActions links={links} copied={copied} onShare={onShare} />}
+      <span className="sr-only" role="status" aria-live="polite">
+        {copied ? text("Tautan berhasil disalin") : ""}
+      </span>
+    </div>
+  );
+}
+
 export function PaperPreview({
   paper,
   location,
@@ -63,113 +194,15 @@ export function PaperPreview({
           else list.current?.focus();
         }}
       >
-        <div className="flex min-w-0 items-center justify-between gap-4 p-4">
-          <AlignModal.Title asChild>
-            <Typography
-              ref={modalTitle}
-              as="h2"
-              tabIndex={-1}
-              variant="label"
-              className={
-                // oxlint-disable-next-line shadcn/no-restyle -- programmatic focus target; keyboard focus is shown by the modal's toolbar buttons
-                "min-w-0 flex-1 truncate outline-none"
-              }
-              title={paper?.name}
-            >
-              {paper?.name}
-            </Typography>
-          </AlignModal.Title>
-          {links && (
-            <div
-              className="flex shrink-0 items-center gap-1"
-              role="group"
-              aria-label={text("Aksi berkas")}
-            >
-              <a
-                href={links.download}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={text("Unduh")}
-                title={text("Unduh")}
-                className={buttonVariants({
-                  variant: "neutral",
-                  mode: "stroke",
-                  size: "xsmall",
-                  iconOnly: true,
-                })}
-              >
-                <RiDownloadLine className="size-4" aria-hidden="true" />
-              </a>
-              <AlignTooltip.Provider>
-                <AlignTooltip.Root>
-                  <AlignTooltip.Trigger asChild>
-                    <AlignButton.Root
-                      variant="neutral"
-                      mode="stroke"
-                      size="xsmall"
-                      iconOnly
-                      className={
-                        // oxlint-disable-next-line shadcn/no-restyle -- copy-link press feedback: a deliberate quick transform scale with its own timing
-                        "transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.98]"
-                      }
-                      aria-label={
-                        share?.status === "copied"
-                          ? text("Tautan berhasil disalin")
-                          : text("Salin tautan")
-                      }
-                      onClick={() => {
-                        void sharePaper();
-                      }}
-                    >
-                      {share?.status === "copied" ? (
-                        <RiCheckLine
-                          key="copied"
-                          className="size-4 animate-in fade-in-0 zoom-in-75 text-success-base duration-200"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <RiFileCopyLine key="copy" className="size-4" aria-hidden="true" />
-                      )}
-                    </AlignButton.Root>
-                  </AlignTooltip.Trigger>
-                  <AlignTooltip.Content size="xsmall" side="bottom">
-                    {share?.status === "copied" ? text("Tautan disalin") : text("Salin tautan")}
-                  </AlignTooltip.Content>
-                </AlignTooltip.Root>
-              </AlignTooltip.Provider>
-              <a
-                href={links.drive}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={text("Buka di Drive")}
-                title={text("Buka di Drive")}
-                className={buttonVariants({
-                  variant: "neutral",
-                  mode: "stroke",
-                  size: "xsmall",
-                  iconOnly: true,
-                })}
-              >
-                <RiDriveLine className="size-4" aria-hidden="true" />
-              </a>
-              <AlignModal.Close asChild>
-                <AlignButton.Root
-                  variant="neutral"
-                  mode="stroke"
-                  size="xsmall"
-                  iconOnly
-                  aria-label={text("Tutup dialog")}
-                  title={text("Tutup")}
-                >
-                  <RiCloseLine className="size-4" aria-hidden="true" />
-                </AlignButton.Root>
-              </AlignModal.Close>
-            </div>
-          )}
-          <span className="sr-only" role="status" aria-live="polite">
-            {share?.status === "copied" ? text("Tautan berhasil disalin") : ""}
-          </span>
-        </div>
+        <PaperPreviewHeader
+          paperName={paper?.name}
+          modalTitle={modalTitle}
+          links={links}
+          copied={share?.status === "copied"}
+          onShare={() => {
+            void sharePaper();
+          }}
+        />
         {share?.status === "manual" && (
           <div className="border-y border-stroke-soft-200 px-4 py-2">
             <Typography variant="caption" role="status">

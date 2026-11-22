@@ -70,6 +70,235 @@ export const Route = createFileRoute("/dashboard/_authenticated/announcements/")
   component: AdminAnnouncementsPage,
 });
 
+const CONFIRM_COPY: Record<
+  AnnouncementLifecycleInput["action"],
+  { title: string; description: string; confirmLabel: string }
+> = {
+  delete: {
+    title: "Confirm delete",
+    description: "This permanently removes the announcement from the site and the admin list.",
+    confirmLabel: "Delete announcement",
+  },
+  disable: {
+    title: "Confirm disable",
+    description:
+      "This hides the announcement from the site while keeping its content and schedule, so you can re-enable it later.",
+    confirmLabel: "Disable announcement",
+  },
+  enable: {
+    title: "Confirm enable",
+    description:
+      "This makes the announcement eligible to appear above the navbar within its schedule.",
+    confirmLabel: "Enable announcement",
+  },
+};
+
+function AnnouncementsListBody({
+  queryState,
+  visibleRows,
+  needle,
+  status,
+  selectedId,
+  onClearSearch,
+  onOpenCreate,
+  onSelect,
+  onEdit,
+  onLifecycle,
+}: {
+  queryState: { isError: boolean; isPending: boolean };
+  visibleRows: AdminAnnouncement[];
+  needle: string;
+  status: AnnouncementStatus;
+  selectedId?: string;
+  onClearSearch: () => void;
+  onOpenCreate: () => void;
+  onSelect: (id: string) => void;
+  onEdit: (announcement: AdminAnnouncement) => void;
+  onLifecycle: (input: AnnouncementLifecycleInput, label: string) => void;
+}) {
+  if (queryState.isError) {
+    return (
+      <div className="p-4">
+        <Typography role="alert">
+          Could not load announcements. Refresh or sign in again.
+        </Typography>
+      </div>
+    );
+  }
+  if (queryState.isPending) return <DashboardPending />;
+  const emptyAction = needle ? (
+    <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onClearSearch}>
+      Clear search
+    </AlignButton.Root>
+  ) : status === "live" ? (
+    <AlignFancyButton.Root size="small" onClick={onOpenCreate}>
+      Add announcement
+    </AlignFancyButton.Root>
+  ) : undefined;
+
+  return (
+    <>
+      <AdminTableHeader
+        className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${announcementTableColumns}`}
+      >
+        <span>Announcement</span>
+        <span>Schedule</span>
+        <span>Status</span>
+        <span className="text-right">Actions</span>
+      </AdminTableHeader>
+      {visibleRows.length === 0 && (
+        <DashboardEmptyState
+          icon={<RiMegaphoneLine />}
+          title={needle ? "No matching announcements" : emptyStateCopy[status].title}
+          description={
+            needle
+              ? "Try another search term or clear the search to see announcements."
+              : emptyStateCopy[status].description
+          }
+          action={emptyAction}
+        />
+      )}
+      {visibleRows.map((announcement) => (
+        <AdminAnnouncementRow
+          key={announcement.id}
+          announcement={announcement}
+          selected={selectedId === announcement.id}
+          onSelect={() => onSelect(announcement.id)}
+          onEdit={onEdit}
+          onLifecycle={onLifecycle}
+        />
+      ))}
+    </>
+  );
+}
+
+function AnnouncementsContent({
+  queryState,
+  visibleRows,
+  count,
+  offset,
+  total,
+  hasNext,
+  needle,
+  status,
+  selectedAnnouncement,
+  detailsVisible,
+  mobileDetailsOpen,
+  onMobileDetailsOpenChange,
+  onPreviousPage,
+  onNextPage,
+  onClearSearch,
+  onOpenCreate,
+  onSelect,
+  onEdit,
+  onLifecycle,
+}: {
+  queryState: { isError: boolean; isPending: boolean };
+  visibleRows: AdminAnnouncement[];
+  count: number;
+  offset: number;
+  total: number;
+  hasNext: boolean;
+  needle: string;
+  status: AnnouncementStatus;
+  selectedAnnouncement: AdminAnnouncement | undefined;
+  detailsVisible: boolean;
+  mobileDetailsOpen: boolean;
+  onMobileDetailsOpenChange: (open: boolean) => void;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
+  onClearSearch: () => void;
+  onOpenCreate: () => void;
+  onSelect: (id: string) => void;
+  onEdit: (announcement: AdminAnnouncement) => void;
+  onLifecycle: (input: AnnouncementLifecycleInput, label: string) => void;
+}) {
+  return (
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+        {!queryState.isPending && !queryState.isError && (
+          <AdminPagination
+            count={count}
+            offset={needle ? 0 : offset}
+            total={total}
+            label="announcements"
+            hasNext={hasNext}
+            onPrevious={onPreviousPage}
+            onNext={onNextPage}
+          />
+        )}
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+        >
+          <AnnouncementsListBody
+            queryState={queryState}
+            visibleRows={visibleRows}
+            needle={needle}
+            status={status}
+            selectedId={selectedAnnouncement?.id}
+            onClearSearch={onClearSearch}
+            onOpenCreate={onOpenCreate}
+            onSelect={onSelect}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        </div>
+      </div>
+      <AdminInspector
+        title="Announcement details"
+        desktopOpen={detailsVisible}
+        mobileOpen={mobileDetailsOpen}
+        onMobileOpenChange={onMobileDetailsOpenChange}
+      >
+        {selectedAnnouncement && !queryState.isPending && !queryState.isError && (
+          <AnnouncementInspector
+            key={selectedAnnouncement.id}
+            announcement={selectedAnnouncement}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        )}
+      </AdminInspector>
+    </div>
+  );
+}
+
+function AnnouncementLifecycleModal({
+  confirmation,
+  isError,
+  isPending,
+  onClose,
+  onConfirm,
+}: {
+  confirmation: { input: AnnouncementLifecycleInput; label: string } | null;
+  isError: boolean;
+  isPending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const confirmCopy = confirmation ? CONFIRM_COPY[confirmation.input.action] : null;
+  const description = (
+    <span>
+      <strong className="text-text-strong-950">{confirmation?.label}</strong>.{" "}
+      {confirmCopy?.description}
+    </span>
+  );
+
+  return (
+    <ConfirmActionModal
+      open={confirmation !== null}
+      destructive={confirmation?.input.action === "delete"}
+      title={confirmCopy?.title ?? ""}
+      description={description}
+      confirmLabel={confirmCopy?.confirmLabel ?? ""}
+      error={isError ? "Update failed. Refresh and try again." : undefined}
+      pending={isPending}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    />
+  );
+}
+
 function AdminAnnouncementsPage() {
   const initialData = Route.useLoaderData();
   const { identity } = initialData;
@@ -165,28 +394,21 @@ function AdminAnnouncementsPage() {
     setConfirmation({ input, label });
   }
 
-  const confirmCopy = confirmation
-    ? confirmation.input.action === "delete"
-      ? {
-          title: "Confirm delete",
-          description:
-            "This permanently removes the announcement from the site and the admin list.",
-          confirmLabel: "Delete announcement",
-        }
-      : confirmation.input.action === "disable"
-        ? {
-            title: "Confirm disable",
-            description:
-              "This hides the announcement from the site while keeping its content and schedule, so you can re-enable it later.",
-            confirmLabel: "Disable announcement",
-          }
-        : {
-            title: "Confirm enable",
-            description:
-              "This makes the announcement eligible to appear above the navbar within its schedule.",
-            confirmLabel: "Enable announcement",
-          }
-    : null;
+  const searchAndDetails = (
+    <div className="flex w-full items-center gap-2 sm:w-auto">
+      <AdminSearchInput
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter slug or title…"
+        ariaLabel="Filter announcements"
+      />
+      <DetailsToggleButton
+        available={!!selectedAnnouncement}
+        visible={detailsVisible}
+        onToggle={() => setDetailsOpen((open) => !open)}
+      />
+    </div>
+  );
 
   return (
     <>
@@ -216,115 +438,33 @@ function AdminAnnouncementsPage() {
           setSelectedId(null);
         }}
       >
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <AdminSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Filter slug or title…"
-            ariaLabel="Filter announcements"
-          />
-          <DetailsToggleButton
-            available={!!selectedAnnouncement}
-            visible={detailsVisible}
-            onToggle={() => setDetailsOpen((open) => !open)}
-          />
-        </div>
+        {searchAndDetails}
       </AdminFilterBar>
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-          {!announcementsQuery.isPending && !announcementsQuery.isError && (
-            <AdminPagination
-              count={count}
-              offset={needle ? 0 : offset}
-              total={total}
-              label="announcements"
-              hasNext={!needle && announcementRows.length > 50}
-              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
-          <div
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-          >
-            {announcementsQuery.isError ? (
-              <div className="p-4">
-                <Typography role="alert">
-                  Could not load announcements. Refresh or sign in again.
-                </Typography>
-              </div>
-            ) : announcementsQuery.isPending ? (
-              <DashboardPending />
-            ) : (
-              <>
-                <AdminTableHeader
-                  className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${announcementTableColumns}`}
-                >
-                  <span>Announcement</span>
-                  <span>Schedule</span>
-                  <span>Status</span>
-                  <span className="text-right">Actions</span>
-                </AdminTableHeader>
-                {!count && (
-                  <DashboardEmptyState
-                    icon={<RiMegaphoneLine />}
-                    title={needle ? "No matching announcements" : emptyStateCopy[status].title}
-                    description={
-                      needle
-                        ? "Try another search term or clear the search to see announcements."
-                        : emptyStateCopy[status].description
-                    }
-                    action={
-                      needle ? (
-                        <AlignButton.Root
-                          size="small"
-                          variant="neutral"
-                          mode="stroke"
-                          onClick={() => setQuery("")}
-                        >
-                          Clear search
-                        </AlignButton.Root>
-                      ) : status === "live" ? (
-                        <AlignFancyButton.Root size="small" onClick={openCreateModal}>
-                          Add announcement
-                        </AlignFancyButton.Root>
-                      ) : undefined
-                    }
-                  />
-                )}
-                {visibleRows.map((announcement) => (
-                  <AdminAnnouncementRow
-                    key={announcement.id}
-                    announcement={announcement}
-                    selected={selectedAnnouncement?.id === announcement.id}
-                    onSelect={() => {
-                      setSelectedId(announcement.id);
-                      setDetailsOpen(true);
-                      setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
-                    }}
-                    onEdit={openEditModal}
-                    onLifecycle={confirmLifecycle}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-        <AdminInspector
-          title="Announcement details"
-          desktopOpen={detailsVisible}
-          mobileOpen={mobileDetailsOpen}
-          onMobileOpenChange={setMobileDetailsOpen}
-        >
-          {selectedAnnouncement && !announcementsQuery.isPending && !announcementsQuery.isError && (
-            <AnnouncementInspector
-              key={selectedAnnouncement.id}
-              announcement={selectedAnnouncement}
-              onEdit={openEditModal}
-              onLifecycle={confirmLifecycle}
-            />
-          )}
-        </AdminInspector>
-      </div>
+      <AnnouncementsContent
+        queryState={announcementsQuery}
+        visibleRows={visibleRows}
+        count={count}
+        offset={offset}
+        total={total}
+        hasNext={!needle && announcementRows.length > 50}
+        needle={needle}
+        status={status}
+        selectedAnnouncement={selectedAnnouncement}
+        detailsVisible={detailsVisible}
+        mobileDetailsOpen={mobileDetailsOpen}
+        onMobileDetailsOpenChange={setMobileDetailsOpen}
+        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
+        onNextPage={() => setOffset((current) => current + 50)}
+        onClearSearch={() => setQuery("")}
+        onOpenCreate={openCreateModal}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setDetailsOpen(true);
+          setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
+        }}
+        onEdit={openEditModal}
+        onLifecycle={confirmLifecycle}
+      />
       <AnnouncementFormModal
         open={formModal.open}
         announcement={formModal.announcement}
@@ -337,19 +477,10 @@ function AdminAnnouncementsPage() {
           saveMutation.mutate({ announcementId: formModal.announcement?.id, values })
         }
       />
-      <ConfirmActionModal
-        open={confirmation !== null}
-        destructive={confirmation?.input.action === "delete"}
-        title={confirmCopy?.title ?? ""}
-        description={
-          <>
-            <strong className="text-text-strong-950">{confirmation?.label}</strong>.{" "}
-            {confirmCopy?.description}
-          </>
-        }
-        confirmLabel={confirmCopy?.confirmLabel ?? ""}
-        error={lifecycleMutation.isError ? "Update failed. Refresh and try again." : undefined}
-        pending={lifecycleMutation.isPending}
+      <AnnouncementLifecycleModal
+        confirmation={confirmation}
+        isError={lifecycleMutation.isError}
+        isPending={lifecycleMutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) lifecycleMutation.mutate(confirmation.input);

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { canManageUsers } from "@g13/auth";
 import { RiChatCheckLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
-import { changeReviewVisibility } from "./-server/handler";
+import { changeReviewVisibility, type loadModerationReviews } from "./-server/handler";
 import { moderationReviewQuery, moderationReviewsQuery } from "./-client/queries";
 import { reviewStatusSchema, type ReviewStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
@@ -43,6 +43,251 @@ export const Route = createFileRoute("/dashboard/_authenticated/lecturer-reviews
   component: LecturerReviewsPage,
 });
 
+type ModerationReview = Awaited<ReturnType<typeof loadModerationReviews>>["rows"][number];
+type ReviewConfirmation = {
+  input: ModerateReviewInput;
+  label: string;
+  status: "published" | "hidden";
+};
+
+function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
+  if (needle) return "No matching reviews";
+  if (status === "all") return "No reviews yet";
+  return `No ${status} reviews`;
+}
+
+function reviewEmptyDescription(needle: string, status: ReviewStatus): string {
+  if (needle) return "Try another search term or clear the search to see submitted reviews.";
+  if (status === "all") {
+    return "Reviews submitted from public lecturer pages appear here immediately; they are not held for admin approval.";
+  }
+  if (status === "published") {
+    return "New public submissions are published immediately and will appear here once visitors post them.";
+  }
+  return `Reviews appear here after an admin moves them to ${status}.`;
+}
+
+function ReviewsListBody({
+  reviewsState,
+  visibleRows,
+  needle,
+  status,
+  allCount,
+  selectedReviewId,
+  onClearSearch,
+  onViewAll,
+  onSelectReview,
+  onAction,
+}: {
+  reviewsState: { isError: boolean; isPending: boolean };
+  visibleRows: ModerationReview[];
+  needle: string;
+  status: ReviewStatus;
+  allCount: number;
+  selectedReviewId?: string;
+  onClearSearch: () => void;
+  onViewAll: () => void;
+  onSelectReview: (id: string) => void;
+  onAction: (input: ModerateReviewInput, label: string) => void;
+}) {
+  if (reviewsState.isError) {
+    return (
+      <div className="p-4">
+        <Typography role="alert">Could not load reviews. Refresh or sign in again.</Typography>
+      </div>
+    );
+  }
+  if (reviewsState.isPending) return <DashboardPending />;
+  const showReset = Boolean(needle) || (status !== "all" && allCount > 0);
+  return (
+    <>
+      <AdminTableHeader
+        className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${reviewTableColumns}`}
+      >
+        <span>Lecturer / course</span>
+        <span>Review</span>
+        <span>Rating</span>
+        <span className="text-right">Actions</span>
+      </AdminTableHeader>
+      {visibleRows.length === 0 && (
+        <DashboardEmptyState
+          icon={<RiChatCheckLine />}
+          title={reviewEmptyTitle(needle, status)}
+          description={reviewEmptyDescription(needle, status)}
+          action={
+            showReset ? (
+              <AlignButton.Root
+                size="small"
+                variant="neutral"
+                mode="stroke"
+                onClick={needle ? onClearSearch : onViewAll}
+              >
+                {needle ? "Clear search" : "View all reviews"}
+              </AlignButton.Root>
+            ) : undefined
+          }
+        />
+      )}
+      {visibleRows.map((review) => (
+        <AdminReviewRow
+          key={review.id}
+          review={review}
+          selected={selectedReviewId === review.id}
+          onSelect={() => onSelectReview(review.id)}
+          onAction={onAction}
+        />
+      ))}
+    </>
+  );
+}
+
+const REVIEW_ACTION_LABELS: Record<ModerateReviewInput["action"], string> = {
+  delete: "Delete review",
+  hide: "Hide review",
+  restore: "Restore review",
+};
+
+const REVIEW_ACTION_SUMMARIES: Record<ModerateReviewInput["action"], string> = {
+  delete:
+    "This removes the review from public listings and scores. The record stays stored and cannot be restored here.",
+  hide: "Remove this review from public listings and scores.",
+  restore: "Publish this review again and include it in public scores.",
+};
+
+function ReviewConfirmModal({
+  confirmation,
+  isError,
+  isPending,
+  onClose,
+  onConfirm,
+}: {
+  confirmation: ReviewConfirmation | null;
+  isError: boolean;
+  isPending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const action = confirmation?.input.action ?? "restore";
+  const actionSummary = REVIEW_ACTION_SUMMARIES[action];
+  const confirmLabel = REVIEW_ACTION_LABELS[action];
+
+  return (
+    <ConfirmActionModal
+      open={confirmation !== null}
+      destructive={action === "delete"}
+      title={`Confirm ${confirmation?.input.action ?? ""}`}
+      description={
+        <span>
+          <strong className="text-text-strong-950">{confirmation?.label}</strong>. {actionSummary}
+        </span>
+      }
+      confirmLabel={confirmLabel}
+      error={isError ? "Update failed. Refresh and try again." : undefined}
+      pending={isPending}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      {confirmation && (
+        <ConfirmationChange
+          from={<ReviewStatusBadge status={confirmation.status} deleted={false} />}
+          to={
+            <ReviewStatusBadge
+              status={confirmation.input.action === "restore" ? "published" : "hidden"}
+              deleted={confirmation.input.action === "delete"}
+            />
+          }
+        />
+      )}
+    </ConfirmActionModal>
+  );
+}
+
+function ReviewsContent({
+  reviewsState,
+  visibleRows,
+  count,
+  offset,
+  total,
+  hasNext,
+  needle,
+  status,
+  allCount,
+  selectedReview,
+  detailsVisible,
+  mobileDetailsOpen,
+  onMobileDetailsOpenChange,
+  onPreviousPage,
+  onNextPage,
+  onClearSearch,
+  onViewAll,
+  onSelectReview,
+  onAction,
+}: {
+  reviewsState: { isError: boolean; isPending: boolean };
+  visibleRows: ModerationReview[];
+  count: number;
+  offset: number;
+  total: number;
+  hasNext: boolean;
+  needle: string;
+  status: ReviewStatus;
+  allCount: number;
+  selectedReview: ModerationReview | undefined;
+  detailsVisible: boolean;
+  mobileDetailsOpen: boolean;
+  onMobileDetailsOpenChange: (open: boolean) => void;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
+  onClearSearch: () => void;
+  onViewAll: () => void;
+  onSelectReview: (id: string) => void;
+  onAction: (input: ModerateReviewInput, label: string) => void;
+}) {
+  return (
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+        {!reviewsState.isPending && !reviewsState.isError && (
+          <AdminPagination
+            count={count}
+            offset={needle ? 0 : offset}
+            total={total}
+            label="reviews"
+            hasNext={hasNext}
+            onPrevious={onPreviousPage}
+            onNext={onNextPage}
+          />
+        )}
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+        >
+          <ReviewsListBody
+            reviewsState={reviewsState}
+            visibleRows={visibleRows}
+            needle={needle}
+            status={status}
+            allCount={allCount}
+            selectedReviewId={selectedReview?.id}
+            onClearSearch={onClearSearch}
+            onViewAll={onViewAll}
+            onSelectReview={onSelectReview}
+            onAction={onAction}
+          />
+        </div>
+      </div>
+      <AdminInspector
+        title="Review details"
+        desktopOpen={detailsVisible}
+        mobileOpen={mobileDetailsOpen}
+        onMobileOpenChange={onMobileDetailsOpenChange}
+      >
+        {selectedReview && !reviewsState.isPending && !reviewsState.isError && (
+          <ReviewInspector key={selectedReview.id} review={selectedReview} onAction={onAction} />
+        )}
+      </AdminInspector>
+    </div>
+  );
+}
+
 function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
   const { identity } = initialData;
@@ -59,11 +304,7 @@ function LecturerReviewsPage() {
     setMobileDetailsOpen(!!linkedReviewId);
     setSelectedId(linkedReviewId ?? null);
   }
-  const [confirmation, setConfirmation] = useState<{
-    input: ModerateReviewInput;
-    label: string;
-    status: "published" | "hidden";
-  } | null>(null);
+  const [confirmation, setConfirmation] = useState<ReviewConfirmation | null>(null);
   const queryClient = useQueryClient();
   const reviews = useQuery(moderationReviewsQuery(offset, status));
   const counts = reviews.data?.counts ?? initialData.counts;
@@ -115,6 +356,22 @@ function LecturerReviewsPage() {
     setConfirmation({ input, label, status: review.status });
   }
 
+  const searchAndDetails = (
+    <div className="flex w-full items-center gap-2 sm:w-auto">
+      <AdminSearchInput
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter lecturer, course, text…"
+        ariaLabel="Filter reviews"
+      />
+      <DetailsToggleButton
+        available={!!selectedReview}
+        visible={detailsVisible}
+        onToggle={() => setDetailsOpen((open) => !open)}
+      />
+    </div>
+  );
+
   return (
     <>
       <AdminPageHeader
@@ -139,166 +396,46 @@ function LecturerReviewsPage() {
           setSelectedId(null);
         }}
       >
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <AdminSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Filter lecturer, course, text…"
-            ariaLabel="Filter reviews"
-          />
-          <DetailsToggleButton
-            available={!!selectedReview}
-            visible={detailsVisible}
-            onToggle={() => setDetailsOpen((open) => !open)}
-          />
-        </div>
+        {searchAndDetails}
       </AdminFilterBar>
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-          {!reviews.isPending && !reviews.isError && (
-            <AdminPagination
-              count={count}
-              offset={needle ? 0 : offset}
-              total={total}
-              label="reviews"
-              hasNext={!needle && reviewRows.length > 50}
-              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
-          <div
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-          >
-            {reviews.isError ? (
-              <div className="p-4">
-                <Typography role="alert">
-                  Could not load reviews. Refresh or sign in again.
-                </Typography>
-              </div>
-            ) : reviews.isPending ? (
-              <DashboardPending />
-            ) : (
-              <>
-                <AdminTableHeader
-                  className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${reviewTableColumns}`}
-                >
-                  <span>Lecturer / course</span>
-                  <span>Review</span>
-                  <span>Rating</span>
-                  <span className="text-right">Actions</span>
-                </AdminTableHeader>
-                {!count && (
-                  <DashboardEmptyState
-                    icon={<RiChatCheckLine />}
-                    title={
-                      needle
-                        ? "No matching reviews"
-                        : status === "all"
-                          ? "No reviews yet"
-                          : `No ${status} reviews`
-                    }
-                    description={
-                      needle
-                        ? "Try another search term or clear the search to see submitted reviews."
-                        : status === "all"
-                          ? "Reviews submitted from public lecturer pages appear here immediately; they are not held for admin approval."
-                          : status === "published"
-                            ? "New public submissions are published immediately and will appear here once visitors post them."
-                            : `Reviews appear here after an admin moves them to ${status}.`
-                    }
-                    action={
-                      needle || (status !== "all" && counts.all > 0) ? (
-                        <AlignButton.Root
-                          size="small"
-                          variant="neutral"
-                          mode="stroke"
-                          onClick={() => {
-                            if (needle) setQuery("");
-                            else {
-                              setStatus("all");
-                              setOffset(0);
-                              setSelectedId(null);
-                            }
-                          }}
-                        >
-                          {needle ? "Clear search" : "View all reviews"}
-                        </AlignButton.Root>
-                      ) : undefined
-                    }
-                  />
-                )}
-                {visibleRows.map((review) => (
-                  <AdminReviewRow
-                    key={review.id}
-                    review={review}
-                    selected={selectedReview?.id === review.id}
-                    onSelect={() => {
-                      setSelectedId(review.id);
-                      setDetailsOpen(true);
-                      setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
-                    }}
-                    onAction={confirmReview}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-        <AdminInspector
-          title="Review details"
-          desktopOpen={detailsVisible}
-          mobileOpen={mobileDetailsOpen}
-          onMobileOpenChange={setMobileDetailsOpen}
-        >
-          {selectedReview && !reviews.isPending && !reviews.isError && (
-            <ReviewInspector
-              key={selectedReview.id}
-              review={selectedReview}
-              onAction={confirmReview}
-            />
-          )}
-        </AdminInspector>
-      </div>
-      <ConfirmActionModal
-        open={confirmation !== null}
-        destructive={confirmation?.input.action === "delete"}
-        title={`Confirm ${confirmation?.input.action ?? ""}`}
-        description={
-          <>
-            <strong className="text-text-strong-950">{confirmation?.label}</strong>.{" "}
-            {confirmation?.input.action === "delete"
-              ? "This removes the review from public listings and scores. The record stays stored and cannot be restored here."
-              : confirmation?.input.action === "hide"
-                ? "Remove this review from public listings and scores."
-                : "Publish this review again and include it in public scores."}
-          </>
-        }
-        confirmLabel={
-          confirmation?.input.action === "delete"
-            ? "Delete review"
-            : confirmation?.input.action === "hide"
-              ? "Hide review"
-              : "Restore review"
-        }
-        error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
-        pending={mutation.isPending}
+      <ReviewsContent
+        reviewsState={reviews}
+        visibleRows={visibleRows}
+        count={count}
+        offset={offset}
+        total={total}
+        hasNext={!needle && reviewRows.length > 50}
+        needle={needle}
+        status={status}
+        allCount={counts.all}
+        selectedReview={selectedReview}
+        detailsVisible={detailsVisible}
+        mobileDetailsOpen={mobileDetailsOpen}
+        onMobileDetailsOpenChange={setMobileDetailsOpen}
+        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
+        onNextPage={() => setOffset((current) => current + 50)}
+        onClearSearch={() => setQuery("")}
+        onViewAll={() => {
+          setStatus("all");
+          setOffset(0);
+          setSelectedId(null);
+        }}
+        onSelectReview={(id) => {
+          setSelectedId(id);
+          setDetailsOpen(true);
+          setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
+        }}
+        onAction={confirmReview}
+      />
+      <ReviewConfirmModal
+        confirmation={confirmation}
+        isError={mutation.isError}
+        isPending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) mutation.mutate(confirmation.input);
         }}
-      >
-        {confirmation && (
-          <ConfirmationChange
-            from={<ReviewStatusBadge status={confirmation.status} deleted={false} />}
-            to={
-              <ReviewStatusBadge
-                status={confirmation.input.action === "restore" ? "published" : "hidden"}
-                deleted={confirmation.input.action === "delete"}
-              />
-            }
-          />
-        )}
-      </ConfirmActionModal>
+      />
     </>
   );
 }

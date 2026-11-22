@@ -1,7 +1,10 @@
 import { z } from "zod";
 
+const nonEmpty = z.string().trim().min(1);
+const requiredId = () => nonEmpty.max(100);
+
 export const moderateReviewSchema = z.object({
-  reviewId: z.string().trim().min(1).max(100),
+  reviewId: requiredId(),
   action: z.enum(["hide", "restore", "delete"]),
 });
 

@@ -7,6 +7,105 @@ import { AlignModal } from "@/ui/modal";
 import { formatConflict } from "../-shared/conflict-format";
 import type { Roadmap } from "../-shared/planner";
 
+function RoadmapNotesTrigger({ conflictCount }: { conflictCount: number }) {
+  const { text } = useLocale("roadmap");
+  return (
+    <AlignTooltip.Provider>
+      <AlignTooltip.Root>
+        <AlignTooltip.Trigger asChild>
+          <AlignModal.Trigger asChild>
+            <AlignButton.Root
+              variant="neutral"
+              mode="stroke"
+              iconOnly
+              aria-label={text("Catatan roadmap")}
+            >
+              <RiInformationLine className="size-5" aria-hidden="true" />
+            </AlignButton.Root>
+          </AlignModal.Trigger>
+        </AlignTooltip.Trigger>
+        <AlignTooltip.Content size="xsmall" side="left">
+          {text("Catatan roadmap")}
+          {conflictCount ? text(" · {{v0}} hal perlu diperiksa", { v0: conflictCount }) : ""}
+        </AlignTooltip.Content>
+      </AlignTooltip.Root>
+    </AlignTooltip.Provider>
+  );
+}
+
+function RoadmapConflictsSection({
+  conflicts,
+  target,
+}: {
+  conflicts: Roadmap["conflicts"];
+  target: number;
+}) {
+  const { text, courseName } = useLocale("roadmap");
+  return (
+    <section className="space-y-2">
+      <Typography as="h3" variant="subtitle2" className="m-0">
+        {conflicts.length
+          ? text("{{v0}} hal perlu diperiksa", { v0: conflicts.length })
+          : text("Pemeriksaan rencana")}
+      </Typography>
+      {target === 7 && conflicts.length > 0 && (
+        <Typography as="p" variant="paragraph" color="muted">
+          {text(
+            "Bandingkan target 8 semester untuk mencari ruang tambahan. Skenario 8 semester juga perlu diperiksa.",
+          )}
+        </Typography>
+      )}
+      {conflicts.length ? (
+        <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
+          {conflicts.map((note) => (
+            <li key={JSON.stringify(note)}>
+              <Typography as="span" variant="paragraph">
+                {formatConflict(note, { text, courseName })}
+              </Typography>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <Typography variant="paragraph" color="muted">
+          {text(
+            "Tidak ada konflik pada pemeriksaan dasar. Ini belum menjamin kelayakan KRS atau kelulusan.",
+          )}
+        </Typography>
+      )}
+    </section>
+  );
+}
+
+function RoadmapAssumptionsSection({
+  sourceTitle,
+  notes,
+}: {
+  sourceTitle: string;
+  notes: Roadmap["notes"];
+}) {
+  const { text } = useLocale("roadmap");
+  return (
+    <section className="space-y-2">
+      <Typography as="h3" variant="subtitle2" className="m-0">
+        {text("Asumsi dan sumber")}
+      </Typography>
+      <Typography variant="paragraph" color="muted">
+        {sourceTitle}
+        {text(". Semester panduan bukan jadwal penawaran aktual.")}
+      </Typography>
+      <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
+        {notes.map((note) => (
+          <li key={JSON.stringify(note)}>
+            <Typography as="span" variant="paragraph">
+              {text(note)}
+            </Typography>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function RoadmapNotes({
   plan,
   target,
@@ -16,31 +115,10 @@ export function RoadmapNotes({
   target: number;
   sourceTitle: string;
 }) {
-  const { text, courseName } = useLocale("roadmap");
+  const { text } = useLocale("roadmap");
   return (
     <AlignModal.Root>
-      <AlignTooltip.Provider>
-        <AlignTooltip.Root>
-          <AlignTooltip.Trigger asChild>
-            <AlignModal.Trigger asChild>
-              <AlignButton.Root
-                variant="neutral"
-                mode="stroke"
-                iconOnly
-                aria-label={text("Catatan roadmap")}
-              >
-                <RiInformationLine className="size-5" aria-hidden="true" />
-              </AlignButton.Root>
-            </AlignModal.Trigger>
-          </AlignTooltip.Trigger>
-          <AlignTooltip.Content size="xsmall" side="left">
-            {text("Catatan roadmap")}
-            {plan.conflicts.length
-              ? text(" · {{v0}} hal perlu diperiksa", { v0: plan.conflicts.length })
-              : ""}
-          </AlignTooltip.Content>
-        </AlignTooltip.Root>
-      </AlignTooltip.Provider>
+      <RoadmapNotesTrigger conflictCount={plan.conflicts.length} />
       <AlignModal.Content className="max-w-[560px] max-h-[85dvh] overflow-y-auto">
         <div className="p-5 pr-12">
           <AlignModal.Title asChild>
@@ -55,55 +133,8 @@ export function RoadmapNotes({
           </Typography>
         </AlignModal.Description>
         <div className="space-y-6 overflow-y-auto p-5 pt-0">
-          <section className="space-y-2">
-            <Typography as="h3" variant="subtitle2" className="m-0">
-              {plan.conflicts.length
-                ? text("{{v0}} hal perlu diperiksa", { v0: plan.conflicts.length })
-                : text("Pemeriksaan rencana")}
-            </Typography>
-            {target === 7 && plan.conflicts.length > 0 && (
-              <Typography as="p" variant="paragraph" color="muted">
-                {text(
-                  "Bandingkan target 8 semester untuk mencari ruang tambahan. Skenario 8 semester juga perlu diperiksa.",
-                )}
-              </Typography>
-            )}
-            {plan.conflicts.length ? (
-              <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
-                {plan.conflicts.map((note) => (
-                  <li key={JSON.stringify(note)}>
-                    <Typography as="span" variant="paragraph">
-                      {formatConflict(note, { text, courseName })}
-                    </Typography>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <Typography variant="paragraph" color="muted">
-                {text(
-                  "Tidak ada konflik pada pemeriksaan dasar. Ini belum menjamin kelayakan KRS atau kelulusan.",
-                )}
-              </Typography>
-            )}
-          </section>
-          <section className="space-y-2">
-            <Typography as="h3" variant="subtitle2" className="m-0">
-              {text("Asumsi dan sumber")}
-            </Typography>
-            <Typography variant="paragraph" color="muted">
-              {sourceTitle}
-              {text(". Semester panduan bukan jadwal penawaran aktual.")}
-            </Typography>
-            <ul className="list-disc space-y-2 pl-4 text-text-sub-600">
-              {plan.notes.map((note) => (
-                <li key={JSON.stringify(note)}>
-                  <Typography as="span" variant="paragraph">
-                    {text(note)}
-                  </Typography>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <RoadmapConflictsSection conflicts={plan.conflicts} target={target} />
+          <RoadmapAssumptionsSection sourceTitle={sourceTitle} notes={plan.notes} />
         </div>
       </AlignModal.Content>
     </AlignModal.Root>

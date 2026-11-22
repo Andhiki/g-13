@@ -10,6 +10,20 @@ const RoadmapResult = lazy(() =>
   import("./RoadmapResult").then((module) => ({ default: module.RoadmapResult })),
 );
 
+function readStoredRoadmap(): RoadmapSearch | null {
+  let stored: unknown;
+  try {
+    stored = JSON.parse(localStorage.getItem("cs-courses:roadmap") ?? "null");
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    localStorage.removeItem("cs-courses:roadmap");
+    return null;
+  }
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return null;
+  const saved = validateRoadmapSearch(Object.fromEntries(Object.entries(stored)));
+  return saved.kurikulum ? saved : null;
+}
+
 export function RoadmapPage() {
   const answers = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -18,21 +32,10 @@ export function RoadmapPage() {
     try {
       if (!restored.current) {
         restored.current = true;
-        if (!answers.kurikulum) {
-          let stored: unknown;
-          try {
-            stored = JSON.parse(localStorage.getItem("cs-courses:roadmap") ?? "null");
-          } catch (error) {
-            if (!(error instanceof SyntaxError)) throw error;
-            localStorage.removeItem("cs-courses:roadmap");
-          }
-          if (stored && typeof stored === "object" && !Array.isArray(stored)) {
-            const saved = validateRoadmapSearch(Object.fromEntries(Object.entries(stored)));
-            if (saved.kurikulum) {
-              void navigate({ search: saved, replace: true });
-              return;
-            }
-          }
+        const saved = !answers.kurikulum ? readStoredRoadmap() : null;
+        if (saved) {
+          void navigate({ search: saved, replace: true });
+          return;
         }
       }
       if (answers.kurikulum) localStorage.setItem("cs-courses:roadmap", JSON.stringify(answers));

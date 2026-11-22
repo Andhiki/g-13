@@ -13,10 +13,193 @@ import { Overlay } from "@/graph/Overlay";
 import { useCurriculumExplorer } from "../client/useCurriculumExplorer";
 import { useKeyboardShortcuts } from "@/ui/shortcuts";
 
-export function CurriculumPage() {
+function CourseListView({
+  courses,
+  selectedId,
+  semesterNavigation,
+  onVisibleSemesters,
+  onSelectCourse,
+}: {
+  courses: ReturnType<typeof useCurriculumExplorer>["data"]["all"];
+  selectedId: string | null;
+  semesterNavigation: { semester: number } | null;
+  onVisibleSemesters: (next: number[]) => void;
+  onSelectCourse: (id: string) => void;
+}) {
   const { text } = useLocale();
+  return (
+    <section
+      className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 max-[640px]:pt-28 ${selectedId ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
+    >
+      <div className="mx-auto max-w-3xl">
+        <Typography as="h1" variant="title" color="strong" className="m-0 mb-8 max-[640px]:mb-4">
+          {text("Mata kuliah")}
+        </Typography>
+        <CourseList
+          navigation={semesterNavigation}
+          onVisibleSemesters={onVisibleSemesters}
+          courses={courses}
+          selectedId={selectedId}
+          select={onSelectCourse}
+        />
+      </div>
+    </section>
+  );
+}
+
+function CurriculumOverlayBar({
+  explorer,
+  visibleSemesters,
+  navigateToSemester,
+  onVersionReset,
+}: {
+  explorer: ReturnType<typeof useCurriculumExplorer>;
+  visibleSemesters: number[];
+  navigateToSemester: (semester: number) => void;
+  onVersionReset: () => void;
+}) {
+  const { text } = useLocale();
+  const { curriculum, data, selected, view, map } = explorer;
+  return (
+    <Overlay
+      controlsLabel={text("Kurikulum")}
+      shortcutDescription="Buka/tutup pilihan kurikulum"
+      navigation={
+        <SemesterFilter
+          visible={view === "map" && selected ? [] : visibleSemesters}
+          onNavigate={navigateToSemester}
+          lastSemester={map.lastSemester}
+        />
+      }
+      searchLeading={<ViewSwitch view={view} onViewChange={explorer.setView} />}
+      search={
+        <CourseSearch
+          key={curriculum}
+          data={data}
+          onSelect={(course) => explorer.selectCourse(course.id)}
+        />
+      }
+    >
+      <CurriculumVersionFilter
+        curriculum={curriculum}
+        onChange={(value) => {
+          onVersionReset();
+          explorer.changeVersion(value);
+        }}
+      />
+    </Overlay>
+  );
+}
+
+function CurriculumStage({
+  stage,
+  explorer,
+  resetVersion,
+  semesterNavigation,
+  onReset,
+  onVisibleSemesters,
+}: {
+  stage: React.RefObject<HTMLDivElement | null>;
+  explorer: ReturnType<typeof useCurriculumExplorer>;
+  resetVersion: number;
+  semesterNavigation: { semester: number } | null;
+  onReset: () => void;
+  onVisibleSemesters: (next: number[]) => void;
+}) {
+  const { curriculum, selected, view, map } = explorer;
+  return (
+    <div
+      ref={stage}
+      data-map-stage
+      aria-hidden={view !== "map"}
+      inert={view !== "map"}
+      className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
+      style={{ opacity: view === "map" ? 1 : 0 }}
+    >
+      <CurriculumMap
+        stage={stage}
+        active={view === "map"}
+        navigation={semesterNavigation}
+        resetVersion={resetVersion}
+        onReset={onReset}
+        onVisibleSemesters={onVisibleSemesters}
+        close={explorer.closeDetails}
+        curriculum={curriculum}
+        selectedId={selected?.id ?? null}
+        nodes={map.nodes}
+        edges={map.edges}
+      />
+    </div>
+  );
+}
+
+function CurriculumMain({
+  stage,
+  explorer,
+  detailsHeight,
+  resetVersion,
+  semesterNavigation,
+  onReset,
+  onVisibleSemesters,
+  onDetailsHeightChange,
+}: {
+  stage: React.RefObject<HTMLDivElement | null>;
+  explorer: ReturnType<typeof useCurriculumExplorer>;
+  detailsHeight: number;
+  resetVersion: number;
+  semesterNavigation: { semester: number } | null;
+  onReset: () => void;
+  onVisibleSemesters: (next: number[]) => void;
+  onDetailsHeightChange: (height: number) => void;
+}) {
+  const { data, relations, selected, view } = explorer;
+  return (
+    <main
+      style={
+        {
+          "--course-sheet-height": `${detailsHeight}dvh`,
+          "--course-details-width": `${courseLayout.detailsWidth}px`,
+        } as CSSProperties
+      }
+      className={
+        view === "map"
+          ? "fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden bg-bg-weak-25 text-text-strong-950"
+          : "min-h-[calc(100dvh-var(--app-header-height))] text-text-strong-950"
+      }
+    >
+      <CurriculumStage
+        stage={stage}
+        explorer={explorer}
+        resetVersion={resetVersion}
+        semesterNavigation={semesterNavigation}
+        onReset={onReset}
+        onVisibleSemesters={onVisibleSemesters}
+      />
+      {view === "list" && (
+        <CourseListView
+          courses={data.all}
+          selectedId={selected?.id ?? null}
+          semesterNavigation={semesterNavigation}
+          onVisibleSemesters={onVisibleSemesters}
+          onSelectCourse={explorer.selectCourse}
+        />
+      )}
+      <CourseDetails
+        onHeightChange={onDetailsHeightChange}
+        modal={false}
+        course={selected}
+        data={data}
+        relations={relations}
+        select={explorer.selectCourse}
+        close={explorer.closeDetails}
+      />
+    </main>
+  );
+}
+
+export function CurriculumPage() {
   const explorer = useCurriculumExplorer();
-  const { curriculum, data, relations, selected, view, map } = explorer;
+  const { view, map } = explorer;
 
   const [resetVersion, setResetVersion] = useState(0);
   const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
@@ -54,106 +237,26 @@ export function CurriculumPage() {
           : "min-h-[calc(100dvh-var(--app-header-height))] w-full bg-bg-white-0"
       }
     >
-      <Overlay
-        controlsLabel={text("Kurikulum")}
-        shortcutDescription="Buka/tutup pilihan kurikulum"
-        navigation={
-          <SemesterFilter
-            visible={view === "map" && selected ? [] : visibleSemesters}
-            onNavigate={navigateToSemester}
-            lastSemester={map.lastSemester}
-          />
-        }
-        searchLeading={<ViewSwitch view={view} onViewChange={explorer.setView} />}
-        search={
-          <CourseSearch
-            key={curriculum}
-            data={data}
-            onSelect={(course) => explorer.selectCourse(course.id)}
-          />
-        }
-      >
-        <CurriculumVersionFilter
-          curriculum={curriculum}
-          onChange={(value) => {
-            setSemesterNavigation(null);
-            explorer.changeVersion(value);
-          }}
-        />
-      </Overlay>
-
-      <main
-        style={
-          {
-            "--course-sheet-height": `${detailsHeight}dvh`,
-            "--course-details-width": `${courseLayout.detailsWidth}px`,
-          } as CSSProperties
-        }
-        className={
-          view === "map"
-            ? "fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden bg-bg-weak-25 text-text-strong-950"
-            : "min-h-[calc(100dvh-var(--app-header-height))] text-text-strong-950"
-        }
-      >
-        <div
-          ref={stage}
-          data-map-stage
-          aria-hidden={view !== "map"}
-          inert={view !== "map"}
-          className="fixed inset-x-0 bottom-0 top-[var(--app-header-height)] overflow-hidden"
-          style={{ opacity: view === "map" ? 1 : 0 }}
-        >
-          <CurriculumMap
-            stage={stage}
-            active={view === "map"}
-            navigation={semesterNavigation}
-            resetVersion={resetVersion}
-            onReset={() => {
-              setSemesterNavigation(null);
-              explorer.closeDetails();
-              setResetVersion((version) => version + 1);
-            }}
-            onVisibleSemesters={reportSemesters}
-            close={explorer.closeDetails}
-            curriculum={curriculum}
-            selectedId={selected?.id ?? null}
-            nodes={map.nodes}
-            edges={map.edges}
-          />
-        </div>
-        {view === "list" && (
-          <section
-            className={`bg-bg-white-0 px-4 pb-[76px] pt-32 text-text-strong-950 transition-[padding] duration-200 ease-out motion-reduce:transition-none max-[1100px]:pt-36 max-[640px]:pt-28 ${selected ? "min-[650px]:pl-[calc(var(--course-details-width)+16px)] max-[650px]:pb-[calc(var(--course-sheet-height)+76px)]" : ""}`}
-          >
-            <div className="mx-auto max-w-3xl">
-              <Typography
-                as="h1"
-                variant="title"
-                color="strong"
-                className="m-0 mb-8 max-[640px]:mb-4"
-              >
-                {text("Mata kuliah")}
-              </Typography>
-              <CourseList
-                navigation={semesterNavigation}
-                onVisibleSemesters={reportSemesters}
-                courses={data.all}
-                selectedId={selected?.id ?? null}
-                select={explorer.selectCourse}
-              />
-            </div>
-          </section>
-        )}
-        <CourseDetails
-          onHeightChange={setDetailsHeight}
-          modal={false}
-          course={selected}
-          data={data}
-          relations={relations}
-          select={explorer.selectCourse}
-          close={explorer.closeDetails}
-        />
-      </main>
+      <CurriculumOverlayBar
+        explorer={explorer}
+        visibleSemesters={visibleSemesters}
+        navigateToSemester={navigateToSemester}
+        onVersionReset={() => setSemesterNavigation(null)}
+      />
+      <CurriculumMain
+        stage={stage}
+        explorer={explorer}
+        detailsHeight={detailsHeight}
+        resetVersion={resetVersion}
+        semesterNavigation={semesterNavigation}
+        onReset={() => {
+          setSemesterNavigation(null);
+          explorer.closeDetails();
+          setResetVersion((version) => version + 1);
+        }}
+        onVisibleSemesters={reportSemesters}
+        onDetailsHeightChange={setDetailsHeight}
+      />
     </div>
   );
 }

@@ -192,6 +192,141 @@ const questions: { section: SectionId; question: string; answer: string }[] = [
   },
 ];
 
+function FaqSectionGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: { question: string; answer: string }[];
+}) {
+  const { text } = useLocale("faq");
+  return (
+    <section aria-label={text(title)} className="border-t border-stroke-soft-200 pt-5">
+      <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
+        {text(title)}
+      </Typography>
+      <Accordion.Root type="single" collapsible className="mt-2 divide-y divide-stroke-soft-200">
+        {items.map((item) => (
+          <Accordion.Item key={item.question} value={item.question}>
+            <Accordion.Header>
+              <Accordion.Trigger>
+                {item.question}
+                <Accordion.Arrow aria-hidden="true" className="shrink-0" />
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content className="max-w-3xl pb-4 leading-relaxed">
+              {item.answer}
+            </Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion.Root>
+    </section>
+  );
+}
+
+function FaqFilterBar({
+  matchingGroups,
+  selectedSection,
+  searchResultCount,
+  onSelectSection,
+}: {
+  matchingGroups: { id: SectionId; title: string; items: { question: string; answer: string }[] }[];
+  selectedSection: SectionId | "all";
+  searchResultCount: number;
+  onSelectSection: (section: SectionId | "all") => void;
+}) {
+  const { text } = useLocale("faq");
+  return (
+    <div className="mt-6">
+      <div role="group" aria-label={text("FAQ topic filters")} className="flex flex-wrap gap-2">
+        <AlignLinkButton.Root
+          type="button"
+          variant={selectedSection === "all" ? "primary" : "gray"}
+          underline={selectedSection === "all"}
+          aria-pressed={selectedSection === "all"}
+          onClick={() => onSelectSection("all")}
+        >
+          {text("All topics")} ({searchResultCount})
+        </AlignLinkButton.Root>
+        {matchingGroups.map((section) => (
+          <AlignLinkButton.Root
+            key={section.id}
+            type="button"
+            variant={selectedSection === section.id ? "primary" : "gray"}
+            underline={selectedSection === section.id}
+            aria-pressed={selectedSection === section.id}
+            onClick={() => onSelectSection(section.id)}
+          >
+            {text(section.title)} ({section.items.length})
+          </AlignLinkButton.Root>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FaqResults({
+  groups,
+}: {
+  groups: { id: SectionId; title: string; items: { question: string; answer: string }[] }[];
+}) {
+  const { text } = useLocale("faq");
+  if (!groups.length) {
+    return (
+      <div className="mt-7 rounded-xl border border-dashed border-stroke-soft-200 px-5 py-8 text-center">
+        <Typography as="p" variant="subtitle2" color="strong" className="m-0">
+          {text("No matching questions")}
+        </Typography>
+        <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
+          {text("Try a different word or clear your search.")}
+        </Typography>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-7 space-y-9">
+      {groups.map((section) => (
+        <FaqSectionGroup key={section.id} title={section.title} items={section.items} />
+      ))}
+    </div>
+  );
+}
+
+function FaqSearchInput({
+  searchInput,
+  query,
+  hintText,
+  onQueryChange,
+}: {
+  searchInput: React.RefObject<HTMLInputElement | null>;
+  query: string;
+  hintText: string;
+  onQueryChange: (value: string) => void;
+}) {
+  const { text } = useLocale("faq");
+  return (
+    <label className="flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600">
+      <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
+      <input
+        ref={searchInput}
+        type="search"
+        className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+        aria-label={text("Search questions and answers")}
+        placeholder={text("Search questions and answers")}
+        value={query}
+        onChange={(event) => onQueryChange(event.currentTarget.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.currentTarget.blur();
+          }
+        }}
+      />
+      <AlignKbd.Root aria-hidden="true">{hintText}</AlignKbd.Root>
+    </label>
+  );
+}
+
 export function FaqPage() {
   const { text, language } = useLocale("faq");
   const [query, setQuery] = useState("");
@@ -244,99 +379,19 @@ export function FaqPage() {
         </header>
 
         <section aria-label={text("FAQ")} className="grid content-start">
-          <label className="flex h-9 w-full items-center gap-2 rounded-lg border border-stroke-soft-200 px-3 text-text-sub-600">
-            <RiSearchLine className="size-4 shrink-0" aria-hidden="true" />
-            <input
-              ref={searchInput}
-              type="search"
-              className="w-full min-w-0 bg-transparent text-paragraph-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-              aria-label={text("Search questions and answers")}
-              placeholder={text("Search questions and answers")}
-              value={query}
-              onChange={(event) => setQuery(event.currentTarget.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Escape") {
-                  event.preventDefault();
-                  event.currentTarget.blur();
-                }
-              }}
-            />
-            <AlignKbd.Root aria-hidden="true">{searchHint.text}</AlignKbd.Root>
-          </label>
-
-          <div className="mt-6">
-            <div
-              role="group"
-              aria-label={text("FAQ topic filters")}
-              className="flex flex-wrap gap-2"
-            >
-              <AlignLinkButton.Root
-                type="button"
-                variant={selectedSection === "all" ? "primary" : "gray"}
-                underline={selectedSection === "all"}
-                aria-pressed={selectedSection === "all"}
-                onClick={() => setSelectedSection("all")}
-              >
-                {text("All topics")} ({searchResultCount})
-              </AlignLinkButton.Root>
-              {matchingGroups.map((section) => (
-                <AlignLinkButton.Root
-                  key={section.id}
-                  type="button"
-                  variant={selectedSection === section.id ? "primary" : "gray"}
-                  underline={selectedSection === section.id}
-                  aria-pressed={selectedSection === section.id}
-                  onClick={() => setSelectedSection(section.id)}
-                >
-                  {text(section.title)} ({section.items.length})
-                </AlignLinkButton.Root>
-              ))}
-            </div>
-          </div>
-
-          {groups.length ? (
-            <div className="mt-7 space-y-9">
-              {groups.map((section) => (
-                <section
-                  key={section.id}
-                  aria-label={text(section.title)}
-                  className="border-t border-stroke-soft-200 pt-5"
-                >
-                  <Typography as="h2" variant="subtitle1" color="strong" className="m-0">
-                    {text(section.title)}
-                  </Typography>
-                  <Accordion.Root
-                    type="single"
-                    collapsible
-                    className="mt-2 divide-y divide-stroke-soft-200"
-                  >
-                    {section.items.map((item) => (
-                      <Accordion.Item key={item.question} value={item.question}>
-                        <Accordion.Header>
-                          <Accordion.Trigger>
-                            {item.question}
-                            <Accordion.Arrow aria-hidden="true" className="shrink-0" />
-                          </Accordion.Trigger>
-                        </Accordion.Header>
-                        <Accordion.Content className="max-w-3xl pb-4 leading-relaxed">
-                          {item.answer}
-                        </Accordion.Content>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion.Root>
-                </section>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-7 rounded-xl border border-dashed border-stroke-soft-200 px-5 py-8 text-center">
-              <Typography as="p" variant="subtitle2" color="strong" className="m-0">
-                {text("No matching questions")}
-              </Typography>
-              <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
-                {text("Try a different word or clear your search.")}
-              </Typography>
-            </div>
-          )}
+          <FaqSearchInput
+            searchInput={searchInput}
+            query={query}
+            hintText={searchHint.text}
+            onQueryChange={setQuery}
+          />
+          <FaqFilterBar
+            matchingGroups={matchingGroups}
+            selectedSection={selectedSection}
+            searchResultCount={searchResultCount}
+            onSelectSection={setSelectedSection}
+          />
+          <FaqResults groups={groups} />
         </section>
       </div>
     </main>

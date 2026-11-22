@@ -20,7 +20,9 @@ describe("semester table grouping", () => {
       const sections = groupCoursesForList(curriculum.all);
       const groupedIds = sections.flatMap((section) => section.courses.map((item) => item.id));
 
-      expect([...groupedIds].sort()).toEqual([...originalIds].sort());
+      const sortedGrouped = [...groupedIds].sort();
+      const sortedOriginal = [...originalIds].sort();
+      expect(sortedGrouped).toEqual(sortedOriginal);
       expect(new Set(groupedIds).size).toBe(curriculum.all.length);
       expect(curriculum.all.map((item) => item.id)).toEqual(originalIds);
     });
@@ -46,7 +48,8 @@ describe("semester table grouping", () => {
     ]);
     expect(sections[0].courses).toEqual([required]);
     expect(sections[2].courses).toEqual([elective]);
-    expect(sections[2].courses[0].placements).toHaveLength(2);
+    const [firstElective] = sections[2].courses;
+    expect(firstElective.placements).toHaveLength(2);
   });
 
   test("retains required courses with no semester and omits empty sections", () => {

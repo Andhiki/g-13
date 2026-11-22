@@ -50,6 +50,20 @@ function HoldConfirmButton({
 
   useEffect(() => () => clearTimer(), [clearTimer]);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.repeat) return;
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      startHold();
+    }
+  };
+  const handleKeyUp = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      cancelHold();
+    }
+  };
+
   return (
     <button
       type="button"
@@ -64,19 +78,8 @@ function HoldConfirmButton({
       onPointerUp={cancelHold}
       onPointerCancel={cancelHold}
       onLostPointerCapture={cancelHold}
-      onKeyDown={(event) => {
-        if (event.repeat) return;
-        if (event.key === " " || event.key === "Enter") {
-          event.preventDefault();
-          startHold();
-        }
-      }}
-      onKeyUp={(event) => {
-        if (event.key === " " || event.key === "Enter") {
-          event.preventDefault();
-          cancelHold();
-        }
-      }}
+      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
       onBlur={cancelHold}
       className="relative inline-flex h-8 shrink-0 touch-none select-none items-center justify-center rounded-lg bg-error-base px-3 text-label-sm text-static-white outline-none transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error-base disabled:pointer-events-none disabled:opacity-60 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
     >
@@ -97,6 +100,49 @@ function HoldConfirmButton({
       </span>
       <span className="relative z-10">{confirmLabel}</span>
     </button>
+  );
+}
+
+function ConfirmActionFooter({
+  destructive,
+  confirmLabel,
+  open,
+  pending,
+  onClose,
+  onConfirm,
+}: {
+  destructive: boolean;
+  confirmLabel: string;
+  open: boolean;
+  pending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="mt-5 flex items-center justify-end gap-2">
+      <AlignButton.Root
+        size="xsmall"
+        variant="neutral"
+        mode="stroke"
+        wide
+        disabled={pending}
+        onClick={onClose}
+      >
+        Cancel
+      </AlignButton.Root>
+      {destructive ? (
+        <HoldConfirmButton
+          confirmLabel={confirmLabel}
+          open={open}
+          pending={pending}
+          onConfirm={onConfirm}
+        />
+      ) : (
+        <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
+          {confirmLabel}
+        </AlignFancyButton.Root>
+      )}
+    </div>
   );
 }
 
@@ -147,30 +193,14 @@ export function ConfirmActionModal({
             {error}
           </Typography>
         )}
-        <div className="mt-5 flex items-center justify-end gap-2">
-          <AlignButton.Root
-            size="xsmall"
-            variant="neutral"
-            mode="stroke"
-            wide
-            disabled={pending}
-            onClick={onClose}
-          >
-            Cancel
-          </AlignButton.Root>
-          {destructive ? (
-            <HoldConfirmButton
-              confirmLabel={confirmLabel}
-              open={open}
-              pending={pending}
-              onConfirm={onConfirm}
-            />
-          ) : (
-            <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
-              {confirmLabel}
-            </AlignFancyButton.Root>
-          )}
-        </div>
+        <ConfirmActionFooter
+          destructive={destructive}
+          confirmLabel={confirmLabel}
+          open={open}
+          pending={pending}
+          onClose={onClose}
+          onConfirm={onConfirm}
+        />
       </AlignModal.Content>
     </AlignModal.Root>
   );

@@ -4,8 +4,13 @@ import type { NotificationPayload } from "@g13/db/schema/notifications";
 export const notificationFilterSchema = z.enum(["all", "unread", "archived"]);
 export type NotificationFilter = z.infer<typeof notificationFilterSchema>;
 
+const integerNumber = z.number().int();
+const createdAtTimestamp = () => integerNumber.min(0).max(8_640_000_000_000_000);
+const nonEmpty = z.string().trim().min(1);
+const requiredNotificationId = () => nonEmpty.max(128);
+
 const notificationCursorSchema = z.object({
-  createdAt: z.number().int().min(0).max(8_640_000_000_000_000),
+  createdAt: createdAtTimestamp(),
   id: z.string().min(1).max(128),
 });
 export type NotificationCursor = z.infer<typeof notificationCursorSchema>;
@@ -17,7 +22,7 @@ export const notificationsPageSchema = z.object({
 export type NotificationsPageInput = z.infer<typeof notificationsPageSchema>;
 
 export const notificationIdSchema = z.object({
-  notificationId: z.string().trim().min(1).max(128),
+  notificationId: requiredNotificationId(),
 });
 export type NotificationIdInput = z.infer<typeof notificationIdSchema>;
 

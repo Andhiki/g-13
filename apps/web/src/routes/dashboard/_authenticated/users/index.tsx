@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { canManageUsers, canModerate } from "@g13/auth";
-import { changeUserRole } from "./-server/handler";
+import { changeUserRole, type loadAdminUsers } from "./-server/handler";
 import { adminUsersQuery } from "./-client/queries";
 import { userStatusSchema, type AssignRoleInput, type UserStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
@@ -36,6 +36,192 @@ export const Route = createFileRoute("/dashboard/_authenticated/users/")({
   pendingComponent: DashboardRoutePending,
   component: AdminUsersPage,
 });
+
+const USER_EMPTY_DESCRIPTIONS: Record<UserStatus, string> = {
+  all: "Accounts are created on a user's first GitHub sign-in. New accounts appear here until an admin assigns access.",
+  pending: "New GitHub sign-ins wait here until an admin assigns an access role.",
+  approved: "Accounts with an assigned dashboard role appear here.",
+};
+
+function UsersTableBody({
+  users,
+  visibleRows,
+  userStatus,
+  allCount,
+  identityId,
+  selectedUserId,
+  onSelectUser,
+  onShowAll,
+}: {
+  users: { isError: boolean; isPending: boolean };
+  visibleRows: Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
+  userStatus: UserStatus;
+  allCount: number;
+  identityId: string;
+  selectedUserId?: string;
+  onSelectUser: (id: string) => void;
+  onShowAll: () => void;
+}) {
+  if (users.isError) {
+    return (
+      <div className="p-4">
+        <Typography role="alert">Could not load accounts. Refresh or sign in again.</Typography>
+      </div>
+    );
+  }
+  if (users.isPending) return <DashboardPending />;
+  return (
+    <>
+      <AdminUserList
+        users={visibleRows}
+        identityId={identityId}
+        selectedId={selectedUserId}
+        onSelect={onSelectUser}
+      />
+      {visibleRows.length === 0 && (
+        <DashboardEmptyState
+          icon={<RiGroupLine />}
+          title={userStatus === "all" ? "No accounts yet" : `No ${userStatus} accounts`}
+          description={USER_EMPTY_DESCRIPTIONS[userStatus]}
+          action={
+            userStatus !== "all" && allCount > 0 ? (
+              <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onShowAll}>
+                View all accounts
+              </AlignButton.Root>
+            ) : undefined
+          }
+        />
+      )}
+    </>
+  );
+}
+
+function UsersContent({
+  users,
+  visibleRows,
+  count,
+  offset,
+  total,
+  hasNext,
+  userStatus,
+  allCount,
+  identityId,
+  selectedUser,
+  detailsVisible,
+  mobileDetailsOpen,
+  onMobileDetailsOpenChange,
+  onPreviousPage,
+  onNextPage,
+  onSelectUser,
+  onShowAll,
+  onAssignRole,
+}: {
+  users: { isError: boolean; isPending: boolean };
+  visibleRows: Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
+  count: number;
+  offset: number;
+  total: number;
+  hasNext: boolean;
+  userStatus: UserStatus;
+  allCount: number;
+  identityId: string;
+  selectedUser: Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number] | undefined;
+  detailsVisible: boolean;
+  mobileDetailsOpen: boolean;
+  onMobileDetailsOpenChange: (open: boolean) => void;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
+  onSelectUser: (id: string) => void;
+  onShowAll: () => void;
+  onAssignRole: (input: AssignRoleInput, label: string) => void;
+}) {
+  return (
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
+        {!users.isPending && !users.isError && (
+          <AdminPagination
+            count={count}
+            offset={offset}
+            total={total}
+            label="accounts"
+            hasNext={hasNext}
+            onPrevious={onPreviousPage}
+            onNext={onNextPage}
+          />
+        )}
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+        >
+          <UsersTableBody
+            users={users}
+            visibleRows={visibleRows}
+            userStatus={userStatus}
+            allCount={allCount}
+            identityId={identityId}
+            selectedUserId={selectedUser?.id}
+            onSelectUser={onSelectUser}
+            onShowAll={onShowAll}
+          />
+        </div>
+      </div>
+      <AdminInspector
+        title="Account details"
+        desktopOpen={detailsVisible}
+        mobileOpen={mobileDetailsOpen}
+        onMobileOpenChange={onMobileDetailsOpenChange}
+      >
+        {selectedUser && !users.isPending && !users.isError && (
+          <UserAccessInspector
+            key={selectedUser.id}
+            user={selectedUser}
+            identityId={identityId}
+            onAssign={onAssignRole}
+          />
+        )}
+      </AdminInspector>
+    </div>
+  );
+}
+
+function UsersConfirmationModal({
+  confirmation,
+  isError,
+  isPending,
+  onClose,
+  onConfirm,
+}: {
+  confirmation: { input: AssignRoleInput; label: string; from: AssignableRole } | null;
+  isError: boolean;
+  isPending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <ConfirmActionModal
+      open={confirmation !== null}
+      destructive={confirmation?.input.role === "user"}
+      title={confirmation?.input.role === "user" ? "Revoke access" : "Confirm role change"}
+      description={
+        <>
+          <strong className="text-text-strong-950">{confirmation?.label}</strong>. Access updates on
+          their next request.
+        </>
+      }
+      confirmLabel={confirmation?.input.role === "user" ? "Revoke access" : "Save role"}
+      error={isError ? "Update failed. Refresh and try again." : undefined}
+      pending={isPending}
+      onClose={onClose}
+      onConfirm={onConfirm}
+    >
+      {confirmation && (
+        <ConfirmationChange
+          from={<RoleLabel role={confirmation.from} />}
+          to={<RoleLabel role={confirmation.input.role} />}
+        />
+      )}
+    </ConfirmActionModal>
+  );
+}
 
 function AdminUsersPage() {
   const initialData = Route.useLoaderData();
@@ -117,115 +303,42 @@ function AdminUsersPage() {
           onToggle={() => setDetailsOpen((open) => !open)}
         />
       </AdminFilterBar>
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-          {!users.isPending && !users.isError && (
-            <AdminPagination
-              count={count}
-              offset={offset}
-              total={total}
-              label="accounts"
-              hasNext={userRows.length > 50}
-              onPrevious={() => setOffset((current) => Math.max(0, current - 50))}
-              onNext={() => setOffset((current) => current + 50)}
-            />
-          )}
-          <div
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-          >
-            {users.isError ? (
-              <div className="p-4">
-                <Typography role="alert">
-                  Could not load accounts. Refresh or sign in again.
-                </Typography>
-              </div>
-            ) : users.isPending ? (
-              <DashboardPending />
-            ) : (
-              <>
-                <AdminUserList
-                  users={visibleRows}
-                  identityId={identity.id}
-                  selectedId={selectedUser?.id}
-                  onSelect={(id) => {
-                    setSelectedUserId(id);
-                    setDetailsOpen(true);
-                    setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
-                  }}
-                />
-                {!count && (
-                  <DashboardEmptyState
-                    icon={<RiGroupLine />}
-                    title={userStatus === "all" ? "No accounts yet" : `No ${userStatus} accounts`}
-                    description={
-                      userStatus === "all"
-                        ? "Accounts are created on a user's first GitHub sign-in. New accounts appear here until an admin assigns access."
-                        : userStatus === "pending"
-                          ? "New GitHub sign-ins wait here until an admin assigns an access role."
-                          : "Accounts with an assigned dashboard role appear here."
-                    }
-                    action={
-                      userStatus !== "all" && counts.all > 0 ? (
-                        <AlignButton.Root
-                          size="small"
-                          variant="neutral"
-                          mode="stroke"
-                          onClick={() => {
-                            setUserStatus("all");
-                            setOffset(0);
-                          }}
-                        >
-                          View all accounts
-                        </AlignButton.Root>
-                      ) : undefined
-                    }
-                  />
-                )}
-              </>
-            )}
-          </div>
-        </div>
-        <AdminInspector
-          title="Account details"
-          desktopOpen={detailsVisible}
-          mobileOpen={mobileDetailsOpen}
-          onMobileOpenChange={setMobileDetailsOpen}
-        >
-          {selectedUser && !users.isPending && !users.isError && (
-            <UserAccessInspector
-              key={selectedUser.id}
-              user={selectedUser}
-              identityId={identity.id}
-              onAssign={confirmRole}
-            />
-          )}
-        </AdminInspector>
-      </div>
-      <ConfirmActionModal
-        open={confirmation !== null}
-        destructive={confirmation?.input.role === "user"}
-        title={confirmation?.input.role === "user" ? "Revoke access" : "Confirm role change"}
-        description={
-          <>
-            <strong className="text-text-strong-950">{confirmation?.label}</strong>. Access updates
-            on their next request.
-          </>
-        }
-        confirmLabel={confirmation?.input.role === "user" ? "Revoke access" : "Save role"}
-        error={mutation.isError ? "Update failed. Refresh and try again." : undefined}
-        pending={mutation.isPending}
+      <UsersContent
+        users={users}
+        visibleRows={visibleRows}
+        count={count}
+        offset={offset}
+        total={total}
+        hasNext={userRows.length > 50}
+        userStatus={userStatus}
+        allCount={counts.all}
+        identityId={identity.id}
+        selectedUser={selectedUser}
+        detailsVisible={detailsVisible}
+        mobileDetailsOpen={mobileDetailsOpen}
+        onMobileDetailsOpenChange={setMobileDetailsOpen}
+        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
+        onNextPage={() => setOffset((current) => current + 50)}
+        onSelectUser={(id) => {
+          setSelectedUserId(id);
+          setDetailsOpen(true);
+          setMobileDetailsOpen(!window.matchMedia(desktopInspectorQuery).matches);
+        }}
+        onShowAll={() => {
+          setUserStatus("all");
+          setOffset(0);
+        }}
+        onAssignRole={confirmRole}
+      />
+      <UsersConfirmationModal
+        confirmation={confirmation}
+        isError={mutation.isError}
+        isPending={mutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {
           if (confirmation) mutation.mutate(confirmation.input);
         }}
-      >
-        {confirmation && (
-          <ConfirmationChange
-            from={<RoleLabel role={confirmation.from} />}
-            to={<RoleLabel role={confirmation.input.role} />}
-          />
-        )}
-      </ConfirmActionModal>
+      />
     </>
   );
 }

@@ -8,6 +8,154 @@ import { AlignTable } from "@/ui/table";
 import { courseLabels, semesterLabel } from "@/courses/course-utils";
 import type { CourseSection } from "../shared/list-groups";
 
+function describeCourseRow(
+  course: CourseSection["courses"][number],
+  sectionKind: CourseSection["kind"],
+  text: ReturnType<typeof useLocale>["text"],
+) {
+  const categoryLabels = courseLabels(course).map((label) => text(label));
+  const semesterLabels = new Set(course.placements.map((placement) => placement.semesterLabel));
+  const showSemesters =
+    sectionKind === "electives" ||
+    semesterLabels.size > 1 ||
+    course.placements.some(
+      (placement) =>
+        placement.semesterLabel && placement.semesterLabel !== String(placement.semester),
+    );
+  const groupNames = new Set(
+    course.placements
+      .filter((placement) => placement.groupKind === "interest" || placement.groupKind === "other")
+      .map((placement) => placement.group)
+      .filter(Boolean),
+  );
+  const creditValues = new Set(
+    course.placements
+      .map((placement) => placement.credits)
+      .filter((value): value is number => value !== null),
+  );
+  return {
+    categoryLabels,
+    categories: categoryLabels.join(" · "),
+    showSemesters,
+    groups: [...groupNames].map((group) => text(group)).join(" · "),
+    credits: [...creditValues].sort((left, right) => left - right).join(" / "),
+  };
+}
+
+function CourseCodeCell({ code }: { code: string }) {
+  const { text } = useLocale();
+  return (
+    <AlignTable.Cell className="h-10 max-[640px]:hidden">
+      <div className="flex items-center gap-1 whitespace-nowrap">
+        {code && <CopyCourseButton value={code} label={text("kode mata kuliah")} />}
+        <Typography as="span" variant="caption" color="muted">
+          {code || "—"}
+        </Typography>
+      </div>
+    </AlignTable.Cell>
+  );
+}
+
+function CourseMobileMeta({
+  code,
+  categoryLabels,
+  groups,
+}: {
+  code: string;
+  categoryLabels: string[];
+  groups: string;
+}) {
+  const { text } = useLocale();
+  return (
+    <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 min-[640px]:hidden">
+      {code && (
+        <div className="inline-flex items-center gap-1">
+          <CopyCourseButton value={code} label={text("kode mata kuliah")} />
+          <Typography as="span" variant="code" color="muted">
+            {code}
+          </Typography>
+        </div>
+      )}
+      {categoryLabels.map((label) => (
+        <AlignBadge.Root key={label} variant="light" size="medium">
+          {label}
+        </AlignBadge.Root>
+      ))}
+      {groups && (
+        <Typography as="span" variant="caption" color="muted">
+          {groups}
+        </Typography>
+      )}
+    </div>
+  );
+}
+
+function CourseTableRow({
+  course,
+  sectionKind,
+  selected,
+  onSelect,
+}: {
+  course: CourseSection["courses"][number];
+  sectionKind: CourseSection["kind"];
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const { text, courseName } = useLocale();
+  const { categoryLabels, categories, showSemesters, groups, credits } = describeCourseRow(
+    course,
+    sectionKind,
+    text,
+  );
+  return (
+    <AlignTable.Row
+      className="cursor-[var(--interactive-cursor)] max-[640px]:border-b max-[640px]:border-stroke-soft-200"
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest("button")) return;
+        onSelect();
+      }}
+    >
+      <CourseCodeCell code={course.code} />
+      <AlignTable.Cell className="h-10">
+        <AlignButton.Root
+          variant="link"
+          size="small"
+          className="min-h-9 w-full justify-start whitespace-normal text-left"
+          aria-label={text("Buka detail {{v0}}", { v0: courseName(course) })}
+          aria-pressed={selected}
+          onClick={onSelect}
+        >
+          <Typography as="span" variant="label" color="strong">
+            {courseName(course)}
+          </Typography>
+        </AlignButton.Root>
+        <CourseMobileMeta code={course.code} categoryLabels={categoryLabels} groups={groups} />
+        {showSemesters && (
+          <Typography as="span" variant="caption" color="muted" className="mb-1 block">
+            {semesterLabel(course, text)}
+          </Typography>
+        )}
+      </AlignTable.Cell>
+      <AlignTable.Cell className="h-10 max-[640px]:hidden">
+        <Typography as="span" variant="caption" color="muted" className="block">
+          {categories}
+        </Typography>
+        {groups && (
+          <Typography as="span" variant="caption" color="muted" className="block">
+            {groups}
+          </Typography>
+        )}
+      </AlignTable.Cell>
+      <AlignTable.Cell className="h-10 whitespace-nowrap text-right max-[640px]:align-top max-[640px]:pt-3">
+        <Typography as="span" variant="paragraph" color="muted" className="tabular-nums">
+          {credits || "—"}
+          <span className="min-[640px]:hidden"> {text("SKS")}</span>
+        </Typography>
+      </AlignTable.Cell>
+    </AlignTable.Row>
+  );
+}
+
 export function CourseTable({
   section,
   selectedId,
@@ -17,7 +165,7 @@ export function CourseTable({
   selectedId: string | null;
   select: (id: string) => void;
 }) {
-  const { text, courseName } = useLocale();
+  const { text } = useLocale();
   const headingId = useId();
 
   return (
@@ -50,119 +198,15 @@ export function CourseTable({
           </AlignTable.Row>
         </AlignTable.Header>
         <AlignTable.Body>
-          {section.courses.map((course) => {
-            const categoryLabels = courseLabels(course).map((label) => text(label));
-            const categories = categoryLabels.join(" · ");
-            const semesterLabels = new Set(
-              course.placements.map((placement) => placement.semesterLabel),
-            );
-            const showSemesters =
-              section.kind === "electives" ||
-              semesterLabels.size > 1 ||
-              course.placements.some(
-                (placement) =>
-                  placement.semesterLabel && placement.semesterLabel !== String(placement.semester),
-              );
-            const groups = [
-              ...new Set(
-                course.placements
-                  .filter(
-                    (placement) =>
-                      placement.groupKind === "interest" || placement.groupKind === "other",
-                  )
-                  .map((placement) => placement.group)
-                  .filter(Boolean),
-              ),
-            ]
-              .map((group) => text(group))
-              .join(" · ");
-            const credits = [
-              ...new Set(
-                course.placements
-                  .map((placement) => placement.credits)
-                  .filter((value): value is number => value !== null),
-              ),
-            ]
-              .sort((left, right) => left - right)
-              .join(" / ");
-
-            return (
-              <AlignTable.Row
-                key={course.id}
-                className="cursor-[var(--interactive-cursor)] max-[640px]:border-b max-[640px]:border-stroke-soft-200"
-                onClick={(event) => {
-                  if ((event.target as HTMLElement).closest("button")) return;
-                  select(course.id);
-                }}
-              >
-                <AlignTable.Cell className="h-10 max-[640px]:hidden">
-                  <div className="flex items-center gap-1 whitespace-nowrap">
-                    {course.code && (
-                      <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
-                    )}
-                    <Typography as="span" variant="caption" color="muted">
-                      {course.code || "—"}
-                    </Typography>
-                  </div>
-                </AlignTable.Cell>
-                <AlignTable.Cell className="h-10">
-                  <AlignButton.Root
-                    variant="link"
-                    size="small"
-                    className="min-h-9 w-full justify-start whitespace-normal text-left"
-                    aria-label={text("Buka detail {{v0}}", { v0: courseName(course) })}
-                    aria-pressed={selectedId === course.id}
-                    onClick={() => select(course.id)}
-                  >
-                    <Typography as="span" variant="label" color="strong">
-                      {courseName(course)}
-                    </Typography>
-                  </AlignButton.Root>
-                  <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 min-[640px]:hidden">
-                    {course.code && (
-                      <div className="inline-flex items-center gap-1">
-                        <CopyCourseButton value={course.code} label={text("kode mata kuliah")} />
-                        <Typography as="span" variant="code" color="muted">
-                          {course.code}
-                        </Typography>
-                      </div>
-                    )}
-                    {categoryLabels.map((label) => (
-                      <AlignBadge.Root key={label} variant="light" size="medium">
-                        {label}
-                      </AlignBadge.Root>
-                    ))}
-                    {groups && (
-                      <Typography as="span" variant="caption" color="muted">
-                        {groups}
-                      </Typography>
-                    )}
-                  </div>
-                  {showSemesters && (
-                    <Typography as="span" variant="caption" color="muted" className="mb-1 block">
-                      {semesterLabel(course, text)}
-                    </Typography>
-                  )}
-                </AlignTable.Cell>
-                <AlignTable.Cell className="h-10 max-[640px]:hidden">
-                  <Typography as="span" variant="caption" color="muted" className="block">
-                    {categories}
-                  </Typography>
-                  {groups && (
-                    <Typography as="span" variant="caption" color="muted" className="block">
-                      {groups}
-                    </Typography>
-                  )}
-                </AlignTable.Cell>
-                <AlignTable.Cell className="h-10 whitespace-nowrap text-right max-[640px]:align-top max-[640px]:pt-3">
-                  <Typography as="span" variant="paragraph" color="muted" className="tabular-nums">
-                    {credits || "—"}
-                    <span className="min-[640px]:hidden"> {text("SKS")}</span>
-                  </Typography>
-                </AlignTable.Cell>
-              </AlignTable.Row>
-            );
-          })}
+          {section.courses.map((course) => (
+            <CourseTableRow
+              key={course.id}
+              course={course}
+              sectionKind={section.kind}
+              selected={selectedId === course.id}
+              onSelect={() => select(course.id)}
+            />
+          ))}
         </AlignTable.Body>
       </AlignTable.Root>
     </section>

@@ -19,6 +19,180 @@ import { AccountAvatar } from "./AccountAvatar";
 
 type User = Awaited<ReturnType<typeof loadAdminUsers>>["rows"][number];
 
+function RoleOptionButton({
+  option,
+  selected,
+  onSelect,
+}: {
+  option: (typeof roleOptions)[number];
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
+        selected
+          ? "border-primary-base bg-primary-alpha-10"
+          : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2">
+          <option.Icon aria-hidden="true" className="size-4 shrink-0 text-text-sub-600" />
+          <Typography as="span" variant="labelSmall" color="strong">
+            {option.label}
+          </Typography>
+        </span>
+        {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
+      </div>
+      <Typography variant="caption" color="muted" className="mt-0.5 block">
+        {option.description}
+      </Typography>
+    </button>
+  );
+}
+
+function RoleChooserPanel({
+  options,
+  role,
+  approved,
+  currentRole,
+  onSelectRole,
+  onCancel,
+  onSave,
+}: {
+  options: typeof roleOptions;
+  role: AssignableRole;
+  approved: boolean;
+  currentRole: User["role"];
+  onSelectRole: (role: AssignableRole) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <div className="space-y-3 p-3 opacity-0 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-100 motion-reduce:transition-none">
+      <Typography as="h3" variant="labelSmall" color="strong">
+        Choose role
+      </Typography>
+      <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
+        {options.map((option) => (
+          <RoleOptionButton
+            key={option.value}
+            option={option}
+            selected={role === option.value}
+            onSelect={() => onSelectRole(option.value)}
+          />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <AlignButton.Root
+          size="small"
+          variant="neutral"
+          mode="stroke"
+          compact
+          className="w-full"
+          onClick={onCancel}
+        >
+          Cancel
+        </AlignButton.Root>
+        <AlignFancyButton.Root
+          size="small"
+          compact
+          className="w-full"
+          disabled={approved && role === currentRole}
+          onClick={onSave}
+        >
+          {approved ? "Save role" : "Approve"}
+        </AlignFancyButton.Root>
+      </div>
+    </div>
+  );
+}
+
+function RolePanelCollapse({
+  inert,
+  gridClassName,
+  children,
+}: {
+  inert: boolean;
+  gridClassName: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div inert={inert} className={gridClassName}>
+      <div className="min-h-0 overflow-clip">{children}</div>
+    </div>
+  );
+}
+
+function RoleAssignmentFooter({
+  user,
+  approved,
+  choosing,
+  role,
+  onStartChoose,
+  onSelectRole,
+  onCancel,
+  onSave,
+}: {
+  user: User;
+  approved: boolean;
+  choosing: boolean;
+  role: AssignableRole;
+  onStartChoose: () => void;
+  onSelectRole: (role: AssignableRole) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const options = roleOptions.filter((option) => approved || option.value !== "user");
+  return (
+    <div data-choosing={choosing} className="group/role">
+      <RolePanelCollapse
+        inert={choosing}
+        gridClassName="grid grid-rows-[1fr] transition-[grid-template-rows] duration-200 ease-out group-data-[choosing=true]/role:grid-rows-[0fr] motion-reduce:transition-none"
+      >
+        <div className="p-3 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-0 motion-reduce:transition-none">
+          {approved ? (
+            <AlignButton.Root
+              size="small"
+              variant="neutral"
+              mode="stroke"
+              compact
+              className="w-full"
+              onClick={onStartChoose}
+            >
+              <RiUserSettingsLine className="size-3.5" />
+              Change role
+            </AlignButton.Root>
+          ) : (
+            <AlignFancyButton.Root size="small" compact className="w-full" onClick={onStartChoose}>
+              Approve account
+            </AlignFancyButton.Root>
+          )}
+        </div>
+      </RolePanelCollapse>
+      <RolePanelCollapse
+        inert={!choosing}
+        gridClassName="grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out group-data-[choosing=true]/role:grid-rows-[1fr] motion-reduce:transition-none"
+      >
+        <RoleChooserPanel
+          options={options}
+          role={role}
+          approved={approved}
+          currentRole={user.role}
+          onSelectRole={onSelectRole}
+          onCancel={onCancel}
+          onSave={onSave}
+        />
+      </RolePanelCollapse>
+    </div>
+  );
+}
+
 export function UserAccessInspector({
   user,
   identityId,
@@ -47,115 +221,19 @@ export function UserAccessInspector({
       footerClassName=""
       footer={
         !ownAccount && (
-          <div data-choosing={choosing} className="group/role">
-            <div
-              inert={choosing}
-              className="grid grid-rows-[1fr] transition-[grid-template-rows] duration-200 ease-out group-data-[choosing=true]/role:grid-rows-[0fr] motion-reduce:transition-none"
-            >
-              <div className="min-h-0 overflow-clip">
-                <div className="p-3 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-0 motion-reduce:transition-none">
-                  {approved ? (
-                    <AlignButton.Root
-                      size="small"
-                      variant="neutral"
-                      mode="stroke"
-                      compact
-                      className="w-full"
-                      onClick={() => {
-                        setRole(user.role === "admin" ? "admin" : "maintainer");
-                        setStep("choose-role");
-                      }}
-                    >
-                      <RiUserSettingsLine className="size-3.5" />
-                      Change role
-                    </AlignButton.Root>
-                  ) : (
-                    <AlignFancyButton.Root
-                      size="small"
-                      compact
-                      className="w-full"
-                      onClick={() => {
-                        setRole("maintainer");
-                        setStep("choose-role");
-                      }}
-                    >
-                      Approve account
-                    </AlignFancyButton.Root>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div
-              inert={!choosing}
-              className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out group-data-[choosing=true]/role:grid-rows-[1fr] motion-reduce:transition-none"
-            >
-              <div className="min-h-0 overflow-clip">
-                <div className="space-y-3 p-3 opacity-0 transition-opacity duration-150 group-data-[choosing=true]/role:opacity-100 motion-reduce:transition-none">
-                  <Typography as="h3" variant="labelSmall" color="strong">
-                    Choose role
-                  </Typography>
-                  <div role="radiogroup" aria-label="Choose role" className="space-y-1.5">
-                    {roleOptions
-                      .filter((option) => approved || option.value !== "user")
-                      .map((option) => {
-                        const selected = role === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            role="radio"
-                            aria-checked={selected}
-                            onClick={() => setRole(option.value)}
-                            className={`w-full rounded-lg border p-2.5 text-left outline-none transition-colors focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 ${
-                              selected
-                                ? "border-primary-base bg-primary-alpha-10"
-                                : "border-stroke-soft-200 bg-bg-white-0 hover:bg-bg-weak-50"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="flex items-center gap-2">
-                                <option.Icon
-                                  aria-hidden="true"
-                                  className="size-4 shrink-0 text-text-sub-600"
-                                />
-                                <Typography as="span" variant="labelSmall" color="strong">
-                                  {option.label}
-                                </Typography>
-                              </span>
-                              {selected && <RiCheckLine className="size-3.5 text-primary-base" />}
-                            </div>
-                            <Typography variant="caption" color="muted" className="mt-0.5 block">
-                              {option.description}
-                            </Typography>
-                          </button>
-                        );
-                      })}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <AlignButton.Root
-                      size="small"
-                      variant="neutral"
-                      mode="stroke"
-                      compact
-                      className="w-full"
-                      onClick={() => setStep("idle")}
-                    >
-                      Cancel
-                    </AlignButton.Root>
-                    <AlignFancyButton.Root
-                      size="small"
-                      compact
-                      className="w-full"
-                      disabled={approved && role === user.role}
-                      onClick={() => onAssign({ userId: user.id, role }, user.name)}
-                    >
-                      {approved ? "Save role" : "Approve"}
-                    </AlignFancyButton.Root>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <RoleAssignmentFooter
+            user={user}
+            approved={approved}
+            choosing={choosing}
+            role={role}
+            onStartChoose={() => {
+              setRole(approved && user.role === "admin" ? "admin" : "maintainer");
+              setStep("choose-role");
+            }}
+            onSelectRole={setRole}
+            onCancel={() => setStep("idle")}
+            onSave={() => onAssign({ userId: user.id, role }, user.name)}
+          />
         )
       }
     >

@@ -31,13 +31,16 @@ export type CourseFieldsInput = z.infer<typeof courseFieldsSchema>;
 export const createCourseSchema = courseFieldsSchema;
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 
+const nonEmpty = z.string().trim().min(1);
+const requiredId = () => nonEmpty.max(100);
+
 export const updateCourseSchema = courseFieldsSchema.omit({ code: true }).extend({
-  courseId: z.string().trim().min(1).max(100),
+  courseId: requiredId(),
 });
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 
 export const courseLifecycleSchema = z.object({
-  courseId: z.string().trim().min(1).max(100),
+  courseId: requiredId(),
   action: z.enum(["delete", "restore"]),
 });
 export type CourseLifecycleInput = z.infer<typeof courseLifecycleSchema>;

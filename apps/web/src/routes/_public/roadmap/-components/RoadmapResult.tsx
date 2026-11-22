@@ -12,6 +12,7 @@ import { RoadmapNotes } from "./RoadmapNotes";
 import { buttonVariants } from "@/ui/button";
 import { CourseDetails } from "@/courses/CourseDetails";
 import { getRoadmap } from "../-shared/roadmap-cache";
+import type { Roadmap } from "../-shared/planner";
 import { RoadmapGraph } from "./RoadmapGraph";
 import { useKeyboardShortcuts } from "@/ui/shortcuts";
 import { ElectiveReplacement } from "./ElectiveReplacement";
@@ -23,7 +24,97 @@ const kinds = {
   interest: "Wajib minat",
   elective: "Rekomendasi pilihan",
   internship: "Magang pilihan",
-};
+} as const;
+
+function PlannedCourseFooter({
+  selected,
+  plan,
+  answers,
+  onReplace,
+}: {
+  selected: Roadmap["courses"][number];
+  plan: Roadmap;
+  answers: RoadmapSearch;
+  onReplace: (originalId: string, id: string) => void;
+}) {
+  const { text } = useLocale("roadmap");
+  return (
+    <div className="space-y-3">
+      <Typography as="p" variant="paragraph" className="m-0">
+        {text(kinds[selected.kind])} {text("· Rencana semester")} {selected.semester}
+      </Typography>
+      {selected.kind === "elective" && (
+        <ElectiveReplacement
+          key={selected.course.id}
+          item={selected}
+          plan={plan}
+          answers={answers}
+          replace={onReplace}
+        />
+      )}
+    </div>
+  );
+}
+
+function RoadmapOverlay({
+  kurikulum,
+  plan,
+  answers,
+  visibleSemesters,
+  lastSemester,
+  sourceTitle,
+  onNavigate,
+  update,
+}: {
+  kurikulum: PlanningInput["kurikulum"];
+  plan: Roadmap;
+  answers: RoadmapSearch;
+  visibleSemesters: number[];
+  lastSemester: number;
+  sourceTitle: string;
+  onNavigate: (semester: number) => void;
+  update: (next: RoadmapSearch) => void;
+}) {
+  const { text } = useLocale("roadmap");
+  return (
+    <Overlay
+      controlsLabel={text("Filter roadmap")}
+      shortcutDescription="Buka/tutup filter"
+      panelCopy={{
+        title: text("Filter roadmap"),
+        openLabel: text("Buka filter roadmap"),
+        icon: RiFilter3Line,
+        description: text("Bandingkan target selesai dan waktu kegiatan."),
+      }}
+      home={
+        <Link
+          to="/"
+          search={{ kurikulum }}
+          className={buttonVariants({
+            variant: "neutral",
+            mode: "stroke",
+            className: "pointer-events-auto",
+          })}
+        >
+          <RiArrowLeftLine className="size-5" aria-hidden="true" />
+          {text("Kembali")}
+        </Link>
+      }
+      navigation={
+        <SemesterFilter
+          visible={visibleSemesters}
+          onNavigate={onNavigate}
+          lastSemester={lastSemester}
+        />
+      }
+      search={null}
+      viewControl={<RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={sourceTitle} />}
+    >
+      <RoadmapFilters answers={answers} update={update} />
+    </Overlay>
+  );
+}
+
 export function RoadmapResult({
   answers,
   input,
@@ -110,43 +201,16 @@ export function RoadmapResult({
           onVisibleSemesters={reportSemesters}
         />
       </main>
-      <Overlay
-        controlsLabel={text("Filter roadmap")}
-        shortcutDescription="Buka/tutup filter"
-        panelCopy={{
-          title: text("Filter roadmap"),
-          openLabel: text("Buka filter roadmap"),
-          icon: RiFilter3Line,
-          description: text("Bandingkan target selesai dan waktu kegiatan."),
-        }}
-        home={
-          <Link
-            to="/"
-            search={{ kurikulum: input.kurikulum }}
-            className={buttonVariants({
-              variant: "neutral",
-              mode: "stroke",
-              className: "pointer-events-auto",
-            })}
-          >
-            <RiArrowLeftLine className="size-5" aria-hidden="true" />
-            {text("Kembali")}
-          </Link>
-        }
-        navigation={
-          <SemesterFilter
-            visible={visibleSemesters}
-            onNavigate={navigateToSemester}
-            lastSemester={lastSemester}
-          />
-        }
-        search={null}
-        viewControl={
-          <RoadmapNotes plan={plan} target={answers.lulus} sourceTitle={data.sourceTitle} />
-        }
-      >
-        <RoadmapFilters answers={answers} update={update} />
-      </Overlay>
+      <RoadmapOverlay
+        kurikulum={input.kurikulum}
+        plan={plan}
+        answers={answers}
+        visibleSemesters={visibleSemesters}
+        lastSemester={lastSemester}
+        sourceTitle={data.sourceTitle}
+        onNavigate={navigateToSemester}
+        update={update}
+      />
       <CourseDetails
         modal={false}
         course={selected?.course ?? data.all.find((course) => course.id === selectedId) ?? null}
@@ -156,23 +220,15 @@ export function RoadmapResult({
         close={() => setSelectedId(null)}
         footer={
           selected && (
-            <div className="space-y-3">
-              <Typography as="p" variant="paragraph" className="m-0">
-                {text(kinds[selected.kind])} {text("· Rencana semester")} {selected.semester}
-              </Typography>
-              {selected.kind === "elective" && (
-                <ElectiveReplacement
-                  key={selected.course.id}
-                  item={selected}
-                  plan={plan}
-                  answers={answers}
-                  replace={(originalId, id) => {
-                    update({ ...answers, ganti: { ...answers.ganti, [originalId]: id } });
-                    setSelectedId(id);
-                  }}
-                />
-              )}
-            </div>
+            <PlannedCourseFooter
+              selected={selected}
+              plan={plan}
+              answers={answers}
+              onReplace={(originalId, id) => {
+                update({ ...answers, ganti: { ...answers.ganti, [originalId]: id } });
+                setSelectedId(id);
+              }}
+            />
           )
         }
       />

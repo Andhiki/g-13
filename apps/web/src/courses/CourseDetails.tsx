@@ -42,6 +42,77 @@ function subscribeToPhone(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
+function CourseDrawerToolbar({
+  courseId,
+  closeButton,
+}: {
+  courseId: string;
+  closeButton: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const { text } = useLocale();
+  return (
+    <div
+      data-drawer-no-drag=""
+      className="absolute right-4 top-4 z-10 flex items-center gap-3 sm:right-5 sm:top-5"
+    >
+      <CopyCourseButton key={courseId} value={courseId} label={text("ID mata kuliah")} />
+      <AlignDrawer.Close asChild>
+        <CompactButton ref={closeButton} aria-label={text("Tutup detail mata kuliah")}>
+          <RiCloseLine className="size-5" aria-hidden="true" />
+        </CompactButton>
+      </AlignDrawer.Close>
+    </div>
+  );
+}
+
+function CourseDrawerContent({
+  content,
+  closeButton,
+  select,
+  footer,
+}: {
+  content: { course: Course; data: Curriculum; relations: Relation[] };
+  closeButton: React.RefObject<HTMLButtonElement | null>;
+  select: (id: string) => void;
+  footer?: ReactNode;
+}) {
+  const { text, courseName } = useLocale();
+  return (
+    <AlignDrawer.Content
+      aria-describedby={undefined}
+      aria-label={text("Detail {{v0}}", { v0: courseName(content.course) })}
+      onOpenAutoFocus={(event) => {
+        event.preventDefault();
+        closeButton.current?.focus();
+      }}
+      style={
+        {
+          "--course-details-width": `${courseLayout.detailsWidth}px`,
+        } as CSSProperties
+      }
+      className="min-[650px]:mt-[var(--app-header-height)] min-[650px]:max-w-[var(--course-details-width)] pt-0 max-[650px]:h-[75dvh]"
+    >
+      <AlignDrawer.Handle
+        aria-label={text("Tinggi detail mata kuliah")}
+        className="min-[650px]:hidden"
+      />
+      <CourseDrawerToolbar courseId={content.course.id} closeButton={closeButton} />
+      <DeferredContent
+        fallback={
+          <>
+            <AlignDrawer.Title className="sr-only">
+              {text("Memuat detail mata kuliah…")}
+            </AlignDrawer.Title>
+            <Loading />
+          </>
+        }
+      >
+        <CourseDetailsPanel {...content} select={select} footer={footer} />
+      </DeferredContent>
+    </AlignDrawer.Content>
+  );
+}
+
 export function CourseDetails({
   course,
   data,
@@ -52,7 +123,7 @@ export function CourseDetails({
   footer,
   onHeightChange,
 }: CourseDetailsProps) {
-  const { text, courseName } = useLocale();
+  const { text } = useLocale();
   const closeButton = useRef<HTMLButtonElement>(null);
   const phone = useSyncExternalStore(
     subscribeToPhone,
@@ -94,52 +165,12 @@ export function CourseDetails({
       }
     >
       {content && (
-        <AlignDrawer.Content
-          aria-describedby={undefined}
-          aria-label={text("Detail {{v0}}", { v0: courseName(content.course) })}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            closeButton.current?.focus();
-          }}
-          style={
-            {
-              "--course-details-width": `${courseLayout.detailsWidth}px`,
-            } as CSSProperties
-          }
-          className="min-[650px]:mt-[var(--app-header-height)] min-[650px]:max-w-[var(--course-details-width)] pt-0 max-[650px]:h-[75dvh]"
-        >
-          <AlignDrawer.Handle
-            aria-label={text("Tinggi detail mata kuliah")}
-            className="min-[650px]:hidden"
-          />
-          <div
-            data-drawer-no-drag=""
-            className="absolute right-4 top-4 z-10 flex items-center gap-3 sm:right-5 sm:top-5"
-          >
-            <CopyCourseButton
-              key={content.course.id}
-              value={content.course.id}
-              label={text("ID mata kuliah")}
-            />
-            <AlignDrawer.Close asChild>
-              <CompactButton ref={closeButton} aria-label={text("Tutup detail mata kuliah")}>
-                <RiCloseLine className="size-5" aria-hidden="true" />
-              </CompactButton>
-            </AlignDrawer.Close>
-          </div>
-          <DeferredContent
-            fallback={
-              <>
-                <AlignDrawer.Title className="sr-only">
-                  {text("Memuat detail mata kuliah…")}
-                </AlignDrawer.Title>
-                <Loading />
-              </>
-            }
-          >
-            <CourseDetailsPanel {...content} select={select} footer={footer} />
-          </DeferredContent>
-        </AlignDrawer.Content>
+        <CourseDrawerContent
+          content={content}
+          closeButton={closeButton}
+          select={select}
+          footer={footer}
+        />
       )}
     </AlignDrawer.Root>
   );

@@ -160,9 +160,8 @@ test("prunes notifications and orphaned events older than 90 days", async () => 
     });
 
     await pruneOldNotifications(db, { olderThanDays: 90, now });
-    expect((await db.select().from(notificationEvents)).map((row) => row.resourceId)).toEqual([
-      "recent-review",
-    ]);
+    const remainingEvents = await db.select().from(notificationEvents);
+    expect(remainingEvents.map((row) => row.resourceId)).toEqual(["recent-review"]);
     expect(await db.select().from(notifications)).toHaveLength(1);
   } finally {
     await platform.dispose();
@@ -195,7 +194,8 @@ test("continues a notification inbox without gaps when timestamps tie and newer 
 
     const first = (await inspectNotifications(db, admin)).data;
     if (!first?.nextCursor) throw new Error("Expected a second page");
-    expect(first.rows.map(({ id }) => id)).toEqual(ids.slice().reverse().slice(0, 50));
+    const expectedFirstPage = [...ids].reverse().slice(0, 50);
+    expect(first.rows.map(({ id }) => id)).toEqual(expectedFirstPage);
 
     await db.insert(notificationEvents).values({
       id: "new",

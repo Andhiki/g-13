@@ -52,6 +52,102 @@ function subscribeCoarsePointer(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
+function NotificationRowActions({
+  itemId,
+  archived,
+  unread,
+  linkTarget,
+  busy,
+  archiving,
+  onMarkRead,
+  onArchive,
+}: {
+  itemId: string;
+  archived: boolean;
+  unread: boolean;
+  linkTarget: ReturnType<typeof getNotificationPresentation>["linkTarget"];
+  busy: boolean;
+  archiving: boolean;
+  onMarkRead: (id: string) => void;
+  onArchive: (id: string) => void;
+}) {
+  const { text } = useLocale("notifications");
+  return (
+    <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+      {linkTarget && (
+        <AlignButton.Root asChild size="xxsmall" variant="neutral" mode="stroke" compact>
+          <Link to={linkTarget.to} search={linkTarget.search}>
+            <RiExternalLinkLine className="size-3.5" />
+            {text("action.open")}
+          </Link>
+        </AlignButton.Root>
+      )}
+      {unread && (
+        <AlignButton.Root
+          size="xxsmall"
+          variant="neutral"
+          mode="ghost"
+          compact
+          icon={<RiCheckLine className="size-3.5" />}
+          disabled={busy}
+          onClick={() => onMarkRead(itemId)}
+        >
+          {text("action.markRead")}
+        </AlignButton.Root>
+      )}
+      {!archived && (
+        <AlignButton.Root
+          size="xxsmall"
+          variant="neutral"
+          mode="ghost"
+          compact
+          isLoading={archiving}
+          icon={<RiArchiveLine className="size-3.5" />}
+          disabled={busy}
+          onClick={() => onArchive(itemId)}
+        >
+          {text("action.archive")}
+        </AlignButton.Root>
+      )}
+    </div>
+  );
+}
+
+function NotificationRowContent({
+  unread,
+  title,
+  body,
+  createdAt,
+}: {
+  unread: boolean;
+  title: string;
+  body: string;
+  createdAt: number;
+}) {
+  const { text, language } = useLocale("notifications");
+  return (
+    <div className="min-w-0 flex-1 space-y-0.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        {unread && (
+          <span
+            className="inline-block size-2 shrink-0 rounded-full bg-primary-base"
+            aria-label={text("status.unread")}
+          />
+        )}
+        <Typography as="p" variant="label" color="strong">
+          {title}
+        </Typography>
+        <Typography variant="caption" color="muted" title={formatAbsoluteTime(createdAt, language)}>
+          · {formatRelativeTime(createdAt, language)}
+        </Typography>
+      </div>
+      <Typography variant="paragraph" color="muted">
+        {body}
+      </Typography>
+    </div>
+  );
+}
+
 function NotificationRow({
   item,
   busy,
@@ -67,7 +163,7 @@ function NotificationRow({
   onMarkRead: (id: string) => void;
   onArchive: (id: string) => void;
 }) {
-  const { text, language } = useLocale("notifications");
+  const { text } = useLocale("notifications");
   const { titleKey, bodyKey, interpolation, linkTarget } = getNotificationPresentation(item);
   const unread = !optimisticallyRead && item.readAt === null && item.archivedAt === null;
   const reducedMotion = useReducedMotion();
@@ -114,68 +210,117 @@ function NotificationRow({
           unread ? "bg-bg-weak-50/70" : "bg-bg-white-0"
         }`}
       >
-        <div className="min-w-0 flex-1 space-y-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {unread && (
-              <span
-                className="inline-block size-2 shrink-0 rounded-full bg-primary-base"
-                aria-label={text("status.unread")}
-              />
-            )}
-            <Typography as="p" variant="label" color="strong">
-              {text(titleKey, interpolation)}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="muted"
-              title={formatAbsoluteTime(item.createdAt, language)}
-            >
-              · {formatRelativeTime(item.createdAt, language)}
-            </Typography>
-          </div>
-          <Typography variant="paragraph" color="muted">
-            {text(bodyKey, interpolation)}
-          </Typography>
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
-          {linkTarget && (
-            <AlignButton.Root asChild size="xxsmall" variant="neutral" mode="stroke" compact>
-              <Link to={linkTarget.to} search={linkTarget.search}>
-                <RiExternalLinkLine className="size-3.5" />
-                {text("action.open")}
-              </Link>
-            </AlignButton.Root>
-          )}
-          {unread && (
-            <AlignButton.Root
-              size="xxsmall"
-              variant="neutral"
-              mode="ghost"
-              compact
-              icon={<RiCheckLine className="size-3.5" />}
-              disabled={busy}
-              onClick={() => onMarkRead(item.id)}
-            >
-              {text("action.markRead")}
-            </AlignButton.Root>
-          )}
-          {item.archivedAt === null && (
-            <AlignButton.Root
-              size="xxsmall"
-              variant="neutral"
-              mode="ghost"
-              compact
-              isLoading={archiving}
-              icon={<RiArchiveLine className="size-3.5" />}
-              disabled={busy}
-              onClick={() => onArchive(item.id)}
-            >
-              {text("action.archive")}
-            </AlignButton.Root>
-          )}
-        </div>
+        <NotificationRowContent
+          unread={unread}
+          title={text(titleKey, interpolation)}
+          body={text(bodyKey, interpolation)}
+          createdAt={item.createdAt}
+        />
+        <NotificationRowActions
+          itemId={item.id}
+          archived={item.archivedAt !== null}
+          unread={unread}
+          linkTarget={linkTarget}
+          busy={busy}
+          archiving={archiving}
+          onMarkRead={onMarkRead}
+          onArchive={onArchive}
+        />
       </m.div>
     </li>
+  );
+}
+
+const EMPTY_NOTIFICATION_ICONS = {
+  archived: <RiArchiveLine className="size-5" />,
+  unread: <RiCheckDoubleLine className="size-5" />,
+  all: <RiNotification3Line className="size-5" />,
+} as const;
+
+function NotificationsFeed({
+  isPending,
+  isFetchingNextPage,
+  isFetchNextPageError,
+  hasNextPage,
+  hasInitialRows,
+  filter,
+  displayedRows,
+  pendingReadIdSet,
+  busy,
+  archivingId,
+  nextPageRef,
+  onViewAll,
+  onMarkRead,
+  onArchive,
+  onRetryNextPage,
+}: {
+  isPending: boolean;
+  isFetchingNextPage: boolean;
+  isFetchNextPageError: boolean;
+  hasNextPage: boolean;
+  hasInitialRows: boolean;
+  filter: NotificationFilter;
+  displayedRows: NotificationItem[];
+  pendingReadIdSet: Set<string>;
+  busy: boolean;
+  archivingId?: string;
+  nextPageRef: React.RefObject<HTMLDivElement | null>;
+  onViewAll: () => void;
+  onMarkRead: (id: string) => void;
+  onArchive: (id: string) => void;
+  onRetryNextPage: () => void;
+}) {
+  const { text } = useLocale("notifications");
+  if (isPending) return <DashboardPending />;
+  if (displayedRows.length === 0) {
+    return (
+      <DashboardEmptyState
+        icon={EMPTY_NOTIFICATION_ICONS[filter]}
+        title={text(`empty.${filter}.title`)}
+        description={text(`empty.${filter}.contextDescription`)}
+        action={
+          filter !== "all" && hasInitialRows ? (
+            <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onViewAll}>
+              {text("action.viewAll")}
+            </AlignButton.Root>
+          ) : undefined
+        }
+      />
+    );
+  }
+
+  return (
+    <>
+      <ul>
+        {displayedRows.map((item) => (
+          <NotificationRow
+            key={item.id}
+            item={item}
+            busy={busy}
+            optimisticallyRead={pendingReadIdSet.has(item.id)}
+            archiving={archivingId === item.id}
+            onMarkRead={onMarkRead}
+            onArchive={onArchive}
+          />
+        ))}
+      </ul>
+      {hasNextPage && (
+        <div ref={nextPageRef} className="flex justify-center px-4 py-4">
+          {isFetchingNextPage ? (
+            <SmallLoading label={text("status.loading")} />
+          ) : isFetchNextPageError ? (
+            <AlignButton.Root
+              variant="neutral"
+              mode="stroke"
+              size="small"
+              onClick={onRetryNextPage}
+            >
+              {text("action.retry")}
+            </AlignButton.Root>
+          ) : null}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -211,6 +356,12 @@ function NotificationsPage() {
 
   const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
   const mutationError = readMutation.isError || readAllMutation.isError || archiveMutation.isError;
+  const errorMessage =
+    list.isError && !isFetchNextPageError ? text("error.load") : text("error.update");
+  const handleViewAll = () => {
+    setFilter("all");
+    scrollArea.current?.scrollTo({ top: 0 });
+  };
 
   return (
     <>
@@ -253,72 +404,27 @@ function NotificationsPage() {
         {((list.isError && !isFetchNextPageError) || mutationError) && (
           <div className="border-b border-stroke-soft-200 bg-error-lighter px-4 py-2.5">
             <Typography role="alert" variant="caption" color="danger">
-              {list.isError && !isFetchNextPageError ? text("error.load") : text("error.update")}
+              {errorMessage}
             </Typography>
           </div>
         )}
-        {list.isPending ? (
-          <DashboardPending />
-        ) : displayedRows.length === 0 ? (
-          <DashboardEmptyState
-            icon={
-              filter === "archived" ? (
-                <RiArchiveLine className="size-5" />
-              ) : filter === "unread" ? (
-                <RiCheckDoubleLine className="size-5" />
-              ) : (
-                <RiNotification3Line className="size-5" />
-              )
-            }
-            title={text(`empty.${filter}.title`)}
-            description={text(`empty.${filter}.contextDescription`)}
-            action={
-              filter !== "all" && initialData.rows.length > 0 ? (
-                <AlignButton.Root
-                  size="small"
-                  variant="neutral"
-                  mode="stroke"
-                  onClick={() => {
-                    setFilter("all");
-                    scrollArea.current?.scrollTo({ top: 0 });
-                  }}
-                >
-                  {text("action.viewAll")}
-                </AlignButton.Root>
-              ) : undefined
-            }
-          />
-        ) : (
-          <ul>
-            {displayedRows.map((item) => (
-              <NotificationRow
-                key={item.id}
-                item={item}
-                busy={busy}
-                optimisticallyRead={pendingReadIdSet.has(item.id)}
-                archiving={archiveMutation.isPending && archiveMutation.variables === item.id}
-                onMarkRead={(id) => readMutation.mutate(id)}
-                onArchive={(id) => archiveMutation.mutate(id)}
-              />
-            ))}
-          </ul>
-        )}
-        {hasNextPage && (
-          <div ref={nextPage} className="flex justify-center px-4 py-4">
-            {list.isFetchingNextPage ? (
-              <SmallLoading label={text("status.loading")} />
-            ) : isFetchNextPageError ? (
-              <AlignButton.Root
-                variant="neutral"
-                mode="stroke"
-                size="small"
-                onClick={() => void fetchNextPage({ cancelRefetch: false })}
-              >
-                {text("action.retry")}
-              </AlignButton.Root>
-            ) : null}
-          </div>
-        )}
+        <NotificationsFeed
+          isPending={list.isPending}
+          isFetchingNextPage={list.isFetchingNextPage}
+          isFetchNextPageError={isFetchNextPageError}
+          hasNextPage={Boolean(hasNextPage)}
+          hasInitialRows={initialData.rows.length > 0}
+          filter={filter}
+          displayedRows={displayedRows}
+          pendingReadIdSet={pendingReadIdSet}
+          busy={busy}
+          archivingId={archiveMutation.isPending ? archiveMutation.variables : undefined}
+          nextPageRef={nextPage}
+          onViewAll={handleViewAll}
+          onMarkRead={(id) => readMutation.mutate(id)}
+          onArchive={(id) => archiveMutation.mutate(id)}
+          onRetryNextPage={() => void fetchNextPage({ cancelRefetch: false })}
+        />
       </div>
     </>
   );
