@@ -44,7 +44,7 @@ export const Route = createRootRouteWithContext<{
           "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       },
       { name: "theme-color", content: "#ffffff" },
-      ...(import.meta.env.MODE === "staging"
+      ...(import.meta.env.MODE === "staging" || import.meta.env.MODE === "staging-e2e"
         ? [{ name: "robots", content: "noindex, nofollow" }]
         : []),
       {
