@@ -77,7 +77,7 @@ function CourseMobileMeta({
         </div>
       )}
       {categoryLabels.map((label) => (
-        <AlignBadge.Root key={label} variant="light" size="medium">
+        <AlignBadge.Root key={label} variant="light" size="medium" shape="tag">
           {label}
         </AlignBadge.Root>
       ))}

@@ -54,7 +54,7 @@ function CoursePanelHeader({
         </div>
         <div className="mt-3 flex flex-wrap gap-2" aria-label={text("Kategori mata kuliah")}>
           {labels.map((label) => (
-            <AlignBadge.Root variant="light" size="medium" key={label}>
+            <AlignBadge.Root variant="light" size="medium" shape="tag" key={label}>
               {text(label)}
             </AlignBadge.Root>
           ))}
