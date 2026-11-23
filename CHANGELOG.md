@@ -16,6 +16,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
+- Pilihan semester pada formulir ulasan dosen kini menampilkan daftar pilihan dan tidak lagi menutup formulir saat diklik.
 - Toast kini memakai Inter Variable, typeface yang sama dengan teks lain di aplikasi, alih-alih font bawaan Sonner.
 - Badge kategori mata kuliah kini memakai bentuk tag dengan sudut membulat dan padding lebih lega, sehingga label panjang tetap rapi saat membungkus ke dua baris.
 
