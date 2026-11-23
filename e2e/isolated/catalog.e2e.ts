@@ -1,4 +1,5 @@
 import { expect } from "e2e";
+import { randomUUID } from "node:crypto";
 import { fixture } from "../database.ts";
 import { test } from "../isolated-test.ts";
 import { profile } from "./review-form.ts";
@@ -30,8 +31,8 @@ for (const catalog of [
     await expect(screen.getByRole("heading", { name: catalog.heading })).toBeVisible();
     const filter = screen.getByPlaceholder(catalog.filter);
     const title = `Add ${catalog.kind}`;
-    const name = "E2E Disposable Record";
-    const revised = "E2E Disposable Record Revised";
+    const name = `E2E Disposable Record ${randomUUID().slice(0, 8)}`;
+    const revised = `${name} Revised`;
     await filter.fill("nonexistent record");
     await expect(screen.getByText(`No matching ${catalog.path}`)).toBeVisible();
     await filter.clear();
@@ -41,7 +42,7 @@ for (const catalog of [
     await submit.click();
     await expect(form.getByLabel(catalog.label)).toHaveAttribute("aria-invalid", "true");
     if (catalog.kind === "course") {
-      await form.getByLabel("Course code").fill("E2ETEST101");
+      await form.getByLabel("Course code").fill(`E2ETEST${randomUUID().slice(0, 8)}`);
       await form.getByLabel("Name (English)").fill(name);
     }
     await form.getByLabel(catalog.label).fill(name);

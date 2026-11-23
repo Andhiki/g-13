@@ -25,6 +25,7 @@ test("Maintainer can cancel, hide, and restore a review and its public rating", 
   await expect(confirmHide).toBeHidden();
   await expect(hide).toBeVisible();
   await hide.press("Enter");
+  await expect(confirmHide).toBeVisible();
   await confirmHide.getByRole("button", { name: "Hide review" }).click();
   await expect(
     screen

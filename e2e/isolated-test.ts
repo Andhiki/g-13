@@ -8,8 +8,11 @@ export const test = base.extend<{
   // Reset per test attempt, not once per test: a retry must not see the
   // previous attempt's writes.
   reset: [
-    async ({}, use) => {
+    async ({ browser }, use) => {
       await resetFixtures();
+      // The fixture writes directly to D1, so clear any query cache left by
+      // the prior scenario before this attempt starts.
+      await browser.reload();
       await use();
     },
     { auto: true },

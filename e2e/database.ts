@@ -41,8 +41,9 @@ async function cloudflareRequest<T>(path: string, body?: unknown) {
   const data = (await response.json()) as CloudflareResult<T>;
   if (!response.ok || !data.success) {
     const detail =
-      data.errors?.map(({ code, message }) => (message ? `${code}: ${message}` : code)).join(", ") ??
-      "none";
+      data.errors
+        ?.map(({ code, message }) => (message ? `${code}: ${message}` : code))
+        .join(", ") ?? "none";
     throw new Error(`Cloudflare request failed (HTTP ${response.status}, ${detail})`);
   }
   return data.result as T;
@@ -191,7 +192,8 @@ export async function exhaustReviewLimit(action: "submission" | "like") {
   const window = Math.floor(Date.now() / 3_600_000);
   await cloudflare("/query", {
     batch: [window, window + 1].map((hour) => ({
-      sql: 'INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)',
+      sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)
+            ON CONFLICT("key") DO UPDATE SET "count" = excluded."count", "expires_at" = excluded."expires_at"`,
       params: [
         createHmac("sha256", secret).update(`${action}:${hour}:192.0.2.60`).digest("hex"),
         action === "submission" ? 3 : 60,

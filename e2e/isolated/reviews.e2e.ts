@@ -1,4 +1,5 @@
 ﻿import { expect } from "e2e";
+import { randomUUID } from "node:crypto";
 import { fillReview, profile } from "./review-form.ts";
 import { exhaustReviewLimit, fixture } from "../database.ts";
 import { test } from "../isolated-test.ts";
@@ -56,7 +57,7 @@ for (const author of [undefined, "E2E Reviewer"]) {
     browser,
     screen,
   }) => {
-    const body = "This e2e review explains a helpful set of practical examples.";
+    const body = `This e2e review explains helpful examples ${randomUUID()}.`;
     await (await fillReview({ app, browser, screen }, body, { author })).click();
     const review = screen.getByRole("article").filter({ hasText: body });
     await expect(review).toBeVisible();
@@ -86,7 +87,7 @@ for (const failure of [
 ]) {
   test(`Review submission recovery: ${failure.name}`, async ({ app, browser, screen }) => {
     if (failure.name === "submission limit reached") await exhaustReviewLimit("submission");
-    const body = "This disposable review should never appear on the profile.";
+    const body = `This disposable review should never appear ${randomUUID()}.`;
     await (await fillReview({ app, browser, screen }, body, failure)).click();
     await expect(screen.getByRole("dialog").getByText(failure.text)).toBeVisible();
     await expect(screen.getByRole("article").filter({ hasText: body })).toBeHidden();
