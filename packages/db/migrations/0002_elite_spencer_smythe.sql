@@ -187,6 +187,12 @@ INSERT INTO `courses` (`id`, `code`, `name_id`, `name_en`, `deleted_at`)
 	WHERE `code` <> '' AND `id` <> `code`
 	ON CONFLICT(`id`) DO NOTHING;
 --> statement-breakpoint
+-- Move reviews off the generated rows and onto the canonical row keyed by the same code. This has
+-- to happen before the generated rows are removed, or the review foreign key blocks the delete.
+UPDATE `reviews`
+	SET `course_id` = (SELECT c.`code` FROM `courses` c WHERE c.`id` = `reviews`.`course_id`)
+	WHERE `course_id` IN (SELECT `id` FROM `courses` WHERE `id` <> `code` AND `code` <> '');
+--> statement-breakpoint
 -- A course taught in both editions under different codes keeps one identity: move its reviews to
 -- the newest code before the superseded row is removed.
 UPDATE `reviews` SET `course_id` = 'PACS262102' WHERE `course_id` = 'MII21-1002';
