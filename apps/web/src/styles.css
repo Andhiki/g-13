@@ -30,6 +30,11 @@
   }
 }
 
+/* Sonner injects its own system font stack on the toaster; keep toasts on the app font. */
+:root [data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;

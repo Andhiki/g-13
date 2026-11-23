@@ -14,6 +14,10 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Katalog mata kuliah pada formulir ulasan kini memakai 146 mata kuliah dari edisi 2021 dan 2026; mata kuliah yang sama di kedua edisi digabung ke satu identitas dan ulasan yang sudah ada tetap terhubung.
 
+#### Fixed
+
+- Toast kini memakai Inter Variable, typeface yang sama dengan teks lain di aplikasi, alih-alih font bawaan Sonner.
+
 ### 2026-11-22
 
 #### Added
