@@ -1,4 +1,9 @@
 import { bindings, defineConfig } from "cf/config";
+import {
+	isolatedOrigin,
+	isolatedResourceName,
+	localE2eDatabaseId,
+} from "../../e2e/targets.ts";
 
 /**
  * Secret-like files were detected but not read or migrated: .dev.vars.example. Only `secrets.required` entries are migrated.
@@ -18,8 +23,13 @@ const D1 = {
 
 export default defineConfig(({ mode }) => {
 	const isStaging = mode === "staging";
-	const workerName = isStaging ? "g-13-staging" : "g-13";
-	const database = isStaging ? D1.staging : D1.production;
+	const isE2E = mode === "local-e2e";
+	const workerName = isE2E ? isolatedResourceName : isStaging ? "g-13-staging" : "g-13";
+	const database = isE2E
+		? { name: isolatedResourceName, id: localE2eDatabaseId }
+		: isStaging
+			? D1.staging
+			: D1.production;
 
 	return {
 		worker: {
@@ -29,14 +39,16 @@ export default defineConfig(({ mode }) => {
 				"nodejs_compat",
 			],
 			entrypoint: "./src/worker.ts",
-			triggers: [
-				{
-					type: "scheduled",
-					schedule: "0 3 * * *",
-				},
-			],
+			triggers: isE2E
+				? []
+				: [
+						{
+							type: "scheduled",
+							schedule: "0 3 * * *",
+						},
+					],
 			cache: {
-				enabled: true,
+				enabled: !isE2E,
 			},
 			observability: isStaging
 				? {
@@ -55,20 +67,35 @@ export default defineConfig(({ mode }) => {
 					name: database.name,
 					id: database.id,
 				}),
-				BETTER_AUTH_SECRET: bindings.secret(),
-				BETTER_AUTH_URL: bindings.secret(),
-				ADMIN_EMAILS: bindings.secret(),
+				E2E_FIXTURE_TOKEN: isE2E
+					? bindings.text(requiredE2eSecret("E2E_FIXTURE_TOKEN"))
+					: undefined,
+				BETTER_AUTH_SECRET: isE2E
+					? bindings.text(requiredE2eSecret("E2E_AUTH_SECRET"))
+					: bindings.secret(),
+				BETTER_AUTH_URL: isE2E ? bindings.text(isolatedOrigin) : bindings.secret(),
+				ADMIN_EMAILS: isE2E ? bindings.text("") : bindings.secret(),
 				BETTER_AUTH_ALLOWED_HOSTS: bindings.text(
-					isStaging
-						? "g-13-staging.andhikiandre.workers.dev"
-						: "csugm.omahti.com,csugm.andhiki.tech",
+					isE2E
+						? new URL(isolatedOrigin).hostname
+						: isStaging
+							? "g-13-staging.andhikiandre.workers.dev"
+							: "csugm.omahti.com,csugm.andhiki.tech",
 				),
-				GITHUB_CLIENT_ID: bindings.secret(),
-				GITHUB_CLIENT_SECRET: bindings.secret(),
-				REVIEW_RATE_LIMIT_SECRET: bindings.secret(),
-				TURNSTILE_SITE_KEY: bindings.secret(),
-				TURNSTILE_SECRET_KEY: bindings.secret(),
+				GITHUB_CLIENT_ID: isE2E ? bindings.text("isolated-e2e-client") : bindings.secret(),
+				GITHUB_CLIENT_SECRET: isE2E ? bindings.text("isolated-e2e-secret") : bindings.secret(),
+				REVIEW_RATE_LIMIT_SECRET: isE2E
+					? bindings.text(requiredE2eSecret("E2E_REVIEW_RATE_LIMIT_SECRET"))
+					: bindings.secret(),
+				TURNSTILE_SITE_KEY: isE2E ? bindings.text("isolated-e2e-site") : bindings.secret(),
+				TURNSTILE_SECRET_KEY: isE2E ? bindings.text("isolated-e2e-verifier") : bindings.secret(),
 			},
 		},
 	};
 });
+
+function requiredE2eSecret(name: string) {
+	const value = process.env[name];
+	if (!value) throw new Error(`${name} is required for local E2E mode`);
+	return value;
+}

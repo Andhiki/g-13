@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { setResponseStatus } from "@tanstack/react-start/server";
+import { getRequest, setResponseStatus } from "@tanstack/react-start/server";
 import { AlumniDirectory } from "./alumni/-components/AlumniDirectory";
 import type { AlumniDirectoryData } from "./alumni/-shared/directory";
 import { Loading } from "@/ui/loading";
@@ -8,6 +8,12 @@ import { Loading } from "@/ui/loading";
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { env } = await import("cloudflare:workers");
   try {
+    if (
+      import.meta.env.MODE === "local-e2e" &&
+      getRequest().headers.get("x-e2e-alumni-failure") === "1"
+    ) {
+      throw new Error("Simulated directory outage");
+    }
     // Service-binding fetches share Workers Cache with browser requests to this endpoint.
     const response = await env.ALUMNI.fetch("https://alumni.internal/api/alumni");
     if (!response.ok) throw new Error("Directory unavailable");

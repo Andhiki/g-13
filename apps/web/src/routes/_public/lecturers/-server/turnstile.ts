@@ -27,6 +27,9 @@ export async function verifyTurnstileToken({
   const trimmedSecret = secret.trim();
   const trimmedToken = token.trim();
   if (!trimmedSecret || !trimmedToken) return false;
+  if (import.meta.env.MODE === "local-e2e") {
+    return trimmedSecret === "isolated-e2e-verifier" && trimmedToken === "e2e-verified";
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
