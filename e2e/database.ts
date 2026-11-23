@@ -1,10 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { spawnSync } from "node:child_process";
-import { rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { isolatedOrigin, localE2eDatabaseId } from "./targets.ts";
+import { isolatedOrigin } from "./targets.ts";
 
 export const fixture = {
   lecturerId: "e2e-lecturer",
@@ -24,35 +19,18 @@ function required(name: string) {
   return value;
 }
 
-function localD1(body: unknown) {
-  const statePath = required("E2E_D1_LOCAL_PATH");
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-  const requestPath = join(tmpdir(), `g13-e2e-query-${randomBytes(12).toString("hex")}.json`);
-  writeFileSync(requestPath, JSON.stringify(body));
-  try {
-    const result = spawnSync(
-      process.execPath,
-      [
-        join(root, "apps/web/node_modules/cf/bin/cf"),
-        "--mode",
-        "local-e2e",
-        "d1",
-        "raw",
-        localE2eDatabaseId,
-        "--local",
-        "--persist-to",
-        statePath,
-        "--body",
-        `@${requestPath}`,
-      ],
-      { cwd: join(root, "apps/web"), encoding: "utf8", maxBuffer: 2 * 1024 * 1024 },
-    );
-    if (result.error) throw result.error;
-    if (result.status !== 0) {
-      throw new Error(`Local D1 query failed: ${result.stderr.trim() || result.stdout.trim()}`);
-    }
-  } finally {
-    rmSync(requestPath, { force: true });
+async function localD1(body: unknown) {
+  const response = await fetch(`${isolatedOrigin}/__e2e/database`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${required("E2E_FIXTURE_TOKEN")}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) {
+    throw new Error(`Local D1 query failed (HTTP ${response.status}): ${await response.text()}`);
   }
 }
 
@@ -74,7 +52,7 @@ const cleanup = [
 
 export async function resetFixtures() {
   const rows = cleanup.map((sql) => ({ sql }));
-  localD1({
+  await localD1({
     batch: [
       ...rows,
       {
@@ -134,7 +112,7 @@ export async function seedSession(role: Role, expired = false) {
   const secret = required("E2E_AUTH_SECRET");
   if (secret.length < 32) throw new Error("E2E_AUTH_SECRET must have at least 32 characters");
   const token = randomBytes(32).toString("hex");
-  localD1({
+  await localD1({
     sql: `INSERT INTO auth_session (id, token, user_id, expires_at, created_at, updated_at)
           VALUES (?, ?, ?, ?, unixepoch() * 1000, unixepoch() * 1000)`,
     params: [token, token, `e2e-${role}`, Date.now() + (expired ? -3_600_000 : 3_600_000)],
@@ -154,7 +132,7 @@ export async function seedSession(role: Role, expired = false) {
 export async function exhaustReviewLimit(action: "submission" | "like") {
   const secret = required("E2E_REVIEW_RATE_LIMIT_SECRET");
   const window = Math.floor(Date.now() / 3_600_000);
-  localD1({
+  await localD1({
     batch: [window, window + 1].map((hour) => ({
       sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)
             ON CONFLICT("key") DO UPDATE SET "count" = excluded."count", "expires_at" = excluded."expires_at"`,

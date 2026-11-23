@@ -4,6 +4,7 @@ import { fillReview, profile } from "./review-form.ts";
 import { exhaustReviewLimit, fixture } from "../database.ts";
 import { test } from "../isolated-test.ts";
 import { notFound } from "../routes.ts";
+import { isolatedOrigin } from "../targets.ts";
 
 const profileCount = (count: number) => new RegExp(`\\b${count} (ulasan|reviews?)\\b`, "i");
 
@@ -48,7 +49,7 @@ test("Empty and unknown lecturer profiles show their distinct recovery screens",
   await app.open("/lecturers/e2e-does-not-exist");
   await expect(screen.getByRole("heading", { name: notFound })).toBeVisible();
   await screen.getByRole("link", { name: /^(kembali|back)$/i }).click();
-  await expect(browser).toHaveURL(/workers\.dev\/(?:\?|$)/);
+  await expect.poll(async () => new URL(await browser.url()).origin).toBe(isolatedOrigin);
 });
 
 for (const author of [undefined, "E2E Reviewer"]) {

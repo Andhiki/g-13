@@ -55,7 +55,19 @@ function runMigration(statePath: string, env: NodeJS.ProcessEnv) {
     { cwd: appDirectory, env, encoding: "utf8", stdio: "inherit" },
   );
   if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`Local D1 migrations failed with exit code ${result.status}`);
+  if (result.status !== 0)
+    throw new Error(`Local D1 migrations failed with exit code ${result.status}`);
+}
+
+function buildLocalWorker(env: NodeJS.ProcessEnv) {
+  const result = spawnSync(process.execPath, [viteCli, "build", "--mode", "local-e2e"], {
+    cwd: appDirectory,
+    env,
+    stdio: "inherit",
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0)
+    throw new Error(`Local Worker build failed with exit code ${result.status}`);
 }
 
 function runProcess(command: string, args: string[], options: Parameters<typeof spawn>[2]) {
@@ -73,17 +85,57 @@ function runProcess(command: string, args: string[], options: Parameters<typeof 
   });
 }
 
+async function stopWorker(child: ChildProcess) {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  const waitForClose = (timeoutMs: number) =>
+    new Promise<boolean>((resolveClose) => {
+      if (child.exitCode !== null || child.signalCode !== null) {
+        resolveClose(true);
+        return;
+      }
+      const timeout = setTimeout(() => {
+        child.off("close", onClose);
+        resolveClose(false);
+      }, timeoutMs);
+      const onClose = () => {
+        clearTimeout(timeout);
+        resolveClose(true);
+      };
+      child.once("close", onClose);
+    });
+
+  child.kill(process.platform === "win32" ? "SIGINT" : "SIGTERM");
+  if (await waitForClose(5_000)) return;
+
+  if (process.platform === "win32" && child.pid !== undefined) {
+    const result = spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], {
+      stdio: "ignore",
+    });
+    if (result.error) throw result.error;
+    await waitForClose(5_000);
+  }
+}
+
+function removeTemporaryDirectory(path: string) {
+  try {
+    rmSync(path, { recursive: true, force: true, maxRetries: 10, retryDelay: 500 });
+  } catch (error) {
+    if (process.platform !== "win32") throw error;
+    console.warn(`Could not remove temporary E2E state at ${path}:`, error);
+  }
+}
+
 async function waitForWorker(child: ChildProcess, origin: string) {
   for (let attempt = 0; attempt < 120; attempt++) {
     if (child.exitCode !== null || child.signalCode !== null) {
       throw new Error("The local Worker stopped before it became ready");
     }
     try {
-      const response = await fetch(origin, {
+      const response = await fetch(`${origin}/api/alumni`, {
         cache: "no-store",
         signal: AbortSignal.timeout(2_000),
       });
-      if (response.headers.get("X-E2E-Revision") === "local") {
+      if (response.ok) {
         console.log(`Local Worker is ready at ${origin}`);
         return;
       }
@@ -109,6 +161,7 @@ async function main() {
       E2E_MODE: "isolated",
       E2E_BASE_URL: origin,
       E2E_D1_LOCAL_PATH: statePath,
+      E2E_FIXTURE_TOKEN: randomBytes(32).toString("hex"),
       E2E_AUTH_SECRET: randomBytes(32).toString("hex"),
       E2E_REVIEW_RATE_LIMIT_SECRET: randomBytes(32).toString("hex"),
       E2E_TELEMETRY_DISABLED: "1",
@@ -118,11 +171,15 @@ async function main() {
     console.log("Applying migrations to a temporary local D1 database");
     runMigration(statePath, env);
 
-    console.log("Starting the local Cloudflare Worker");
+    console.log("Building the local Worker for browser tests");
+    buildLocalWorker(env);
+
+    console.log("Starting the local Cloudflare Worker preview");
     worker = spawn(
       process.execPath,
       [
         viteCli,
+        "preview",
         "--mode",
         "local-e2e",
         "--host",
@@ -138,24 +195,17 @@ async function main() {
     worker.once("error", (error) => console.error("Local Worker process failed:", error));
     await waitForWorker(worker, origin);
 
-    return await runProcess(process.execPath, [e2eCli, "run"], {
+    return await runProcess(process.execPath, [e2eCli, "run", ...process.argv.slice(2)], {
       cwd: root,
       env,
       stdio: "inherit",
     });
   } finally {
     if (worker && worker.exitCode === null && worker.signalCode === null) {
-      worker.kill("SIGTERM");
-      await new Promise<void>((resolveClose) => {
-        const timeout = setTimeout(resolveClose, 5_000);
-        worker!.once("close", () => {
-          clearTimeout(timeout);
-          resolveClose();
-        });
-      });
+      await stopWorker(worker);
     }
     activeChildren.delete(worker!);
-    rmSync(temporaryDirectory, { recursive: true, force: true });
+    removeTemporaryDirectory(temporaryDirectory);
   }
 }
 

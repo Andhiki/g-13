@@ -54,7 +54,10 @@ for (const catalog of [
     await expect(
       screen.getByText(`${catalog.kind} details`, { exact: false }).first(),
     ).toBeVisible();
-    const edit = screen.getByRole("button", { name: "Edit", exact: true }).first();
+    const inspectorLabel =
+      catalog.kind === "course" ? "Selected course details" : "Selected lecturer details";
+    const inspector = screen.getByRole("complementary", { name: inspectorLabel });
+    const edit = inspector.getByRole("button", { name: "Edit", exact: true });
     await edit.click();
     const editForm = screen.getByRole("dialog", { name: `Edit ${catalog.kind}` });
     await editForm.getByLabel(catalog.label).fill("Canceled edit");
@@ -71,7 +74,7 @@ for (const catalog of [
     await filter.fill(revised);
     await expect(screen.getByText(revised, { exact: true }).first()).toBeVisible();
 
-    const remove = screen.getByRole("button", { name: "Delete", exact: true }).first();
+    const remove = inspector.getByRole("button", { name: "Delete", exact: true });
     const confirmDelete = screen.getByRole("dialog", { name: "Confirm delete" });
     await remove.click();
     await confirmDelete.getByRole("button", { name: "Cancel" }).click();
@@ -88,11 +91,11 @@ for (const catalog of [
     await screen.getByRole("button", { name: /^deleted\b/i }).click();
     await expect(screen.getByText(revised, { exact: true }).first()).toBeVisible();
     await screen.getByRole("button", { name: "Restore", exact: true }).first().click();
-    await screen
-      .getByRole("dialog", { name: "Confirm restore" })
-      .getByRole("button", { name: `Restore ${catalog.kind}` })
-      .click();
-    await screen.getByRole("button", { name: /^active\b/i }).click();
+    const confirmRestore = screen.getByRole("dialog", { name: "Confirm restore" });
+    await confirmRestore.getByRole("button", { name: `Restore ${catalog.kind}` }).click();
+    await expect(confirmRestore).toBeHidden();
+    // The restore dialog's exit overlay can eat the first pointer click.
+    await screen.getByRole("button", { name: /^active\b/i }).press("Enter");
     await expect(screen.getByText(revised, { exact: true }).first()).toBeVisible();
   });
 }

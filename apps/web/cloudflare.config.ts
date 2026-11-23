@@ -67,6 +67,9 @@ export default defineConfig(({ mode }) => {
 					name: database.name,
 					id: database.id,
 				}),
+				E2E_FIXTURE_TOKEN: isE2E
+					? bindings.text(requiredE2eSecret("E2E_FIXTURE_TOKEN"))
+					: undefined,
 				BETTER_AUTH_SECRET: isE2E
 					? bindings.text(requiredE2eSecret("E2E_AUTH_SECRET"))
 					: bindings.secret(),
