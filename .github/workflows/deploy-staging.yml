@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
-          node-version: "24"
+          node-version: "26"
       - name: Build packages and web app
         run: bun run build:packages && bun run --cwd apps/web build:staging
       - name: Apply D1 migrations

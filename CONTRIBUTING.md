@@ -11,8 +11,9 @@ skill proyek tersedia di [AGENTS.md](AGENTS.md).
    GitHub Issues terlebih dahulu. Koreksi kecil boleh langsung melalui PR.
 2. Fork repo, clone fork, dan buat branch dari `main` terbaru.
 3. Jalankan `bun install --frozen-lockfile`, `bun run build:packages`, lalu `bun run dev`.
-   Gunakan versi Bun di `package.json`. Node.js 22.18+ hanya diperlukan untuk
-   build trailer dan CLI Cloudflare.
+   Gunakan versi Bun dan Node.js di `package.json` (`packageManager` dan
+   `engines`): Bun 1.4.4 dan Node.js 26.13+. Node.js hanya diperlukan untuk build
+   trailer, CLI Cloudflare, dan runner E2E lokal.
 4. Buat perubahan dengan scope jelas; jangan sertakan hasil tes, kredensial,
    atau perubahan format yang tidak berkaitan.
 5. Jalankan `bun run check` dan `bun run build`. Jelaskan pemeriksaan yang
@@ -29,9 +30,9 @@ di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
 ## Regresi browser di staging
 
 Suite browser memakai [e2e](https://e2e.com/docs) dengan Chromium pada viewport
-1440 × 900. Jalankan dengan Bun sesuai versi di `package.json`. Perintah E2E
-memakai CLI Cloudflare yang masih membutuhkan Node.js 22.23 atau lebih baru pada
-jalur 22, atau Node.js 24.22 atau lebih baru.
+1440 × 900. Jalankan dengan Bun sesuai versi di `package.json` dan Node.js 26.13
+atau lebih baru, karena runner E2E dijalankan dengan `node` dan memanggil CLI
+Cloudflare.
 
 ```sh
 bun install --frozen-lockfile
