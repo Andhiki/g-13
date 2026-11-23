@@ -13,6 +13,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 #### Changed
 
 - Katalog mata kuliah pada formulir ulasan kini memakai 146 mata kuliah dari edisi 2021 dan 2026; mata kuliah yang sama di kedua edisi digabung ke satu identitas dan ulasan yang sudah ada tetap terhubung.
+- Ulasan dosen dengan salah satu rating 2 atau lebih rendah kini masuk antrean Pending dan tidak tampil di halaman publik sampai disetujui admin. Ulasan dengan semua rating 3 ke atas tetap terbit langsung. Halaman moderasi mendapat tab Pending dengan tombol setujui dan sembunyikan.
 
 #### Fixed
 

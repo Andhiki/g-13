@@ -374,9 +374,17 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         courseId={courseId ?? ""}
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
-        onPublished={async () => {
+        onSubmitted={async (status) => {
           setReviewDialogOpen(false);
-          toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
+          toast.custom(() => (
+            <SuccessToast
+              message={
+                status === "pending"
+                  ? text("Your review is awaiting moderation.")
+                  : text("Your review is published.")
+              }
+            />
+          ));
         }}
       />
     </main>

@@ -54,6 +54,7 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
     });
     expect(resultData(await inspectReviews(db, maintainer)).counts).toEqual({
       all: 1,
+      pending: 0,
       published: 1,
       hidden: 0,
       deleted: 0,
@@ -71,6 +72,7 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
     });
     expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
       all: 1,
+      pending: 0,
       published: 0,
       hidden: 1,
       deleted: 0,
@@ -98,6 +100,7 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
     expect((await getLecturerDetail(db, "lecturer"))?.reviews).toEqual([]);
     expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
       all: 1,
+      pending: 0,
       published: 0,
       hidden: 0,
       deleted: 1,
@@ -111,6 +114,87 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
     expect(
       await moderateLecturerReview(db, admin, { reviewId: "missing-review", action: "hide" }),
     ).toEqual({ data: null, error: MODERATION_ERRORS.REVIEW_ACTION_UNAVAILABLE });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("holds pending reviews out of public reads until an admin approves or hides them", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "lecturer", name: "Lecturer" });
+    await db.insert(courses).values({ id: "course", code: "CS", nameId: "Data", nameEn: "Data" });
+    await db.insert(reviews).values([
+      {
+        id: "to-approve",
+        lecturerId: "lecturer",
+        courseId: "course",
+        termLabel: "2026",
+        authorName: "Student",
+        clarity: 2,
+        support: 4,
+        organization: 5,
+        body: "Needs a closer look",
+        status: "pending",
+      },
+      {
+        id: "to-hide",
+        lecturerId: "lecturer",
+        courseId: "course",
+        termLabel: "2026",
+        authorName: "Student",
+        clarity: 1,
+        support: 1,
+        organization: 1,
+        body: "Abusive",
+        status: "pending",
+      },
+    ]);
+    const admin = { id: "admin", role: "admin" };
+
+    expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
+      all: 2,
+      pending: 2,
+      published: 0,
+      hidden: 0,
+      deleted: 0,
+    });
+    expect(
+      resultData(await inspectReviews(db, admin, 0, "pending"))
+        .rows.map(({ id }) => id)
+        .sort(),
+    ).toEqual(["to-approve", "to-hide"]);
+    expect((await getLecturerDetail(db, "lecturer"))?.reviews).toEqual([]);
+    expect((await getLecturerDirectory(db)).lecturers[0]).toMatchObject({
+      reviewCount: 0,
+      overallAverage: null,
+      courses: [],
+    });
+
+    expect(
+      await moderateLecturerReview(db, admin, { reviewId: "to-approve", action: "approve" }),
+    ).toEqual({ data: { reviewId: "to-approve", action: "approve" }, error: null });
+    expect((await getLecturerDetail(db, "lecturer"))?.lecturer).toMatchObject({ reviewCount: 1 });
+    expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
+      all: 2,
+      pending: 1,
+      published: 1,
+      hidden: 0,
+      deleted: 0,
+    });
+
+    expect(
+      await moderateLecturerReview(db, admin, { reviewId: "to-hide", action: "hide" }),
+    ).toEqual({ data: { reviewId: "to-hide", action: "hide" }, error: null });
+    expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
+      all: 2,
+      pending: 0,
+      published: 1,
+      hidden: 1,
+      deleted: 0,
+    });
+    expect((await getLecturerDetail(db, "lecturer"))?.lecturer).toMatchObject({ reviewCount: 1 });
   } finally {
     await platform.dispose();
   }
