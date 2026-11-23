@@ -77,7 +77,8 @@ for (const catalog of [
     await confirmDelete.getByRole("button", { name: "Cancel" }).click();
     await expect(confirmDelete).toBeHidden();
     await expect(remove).toBeVisible();
-    await remove.click();
+    // The exit overlay still eats pointer clicks; reopen by keyboard.
+    await remove.press("Enter");
     await confirmDelete
       .getByRole("button", { name: `Hold to Delete ${catalog.kind}` })
       .longPress({ duration: 1_000 });

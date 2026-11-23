@@ -44,6 +44,12 @@ test("Maintainer can cancel, hide, and restore a review and its public rating", 
     .getByRole("dialog", { name: /^confirm restore$/i })
     .getByRole("button", { name: "Restore review" })
     .click();
+  await expect(
+    screen
+      .getByRole("article")
+      .filter({ hasText: fixture.review })
+      .getByText("Published", { exact: true }),
+  ).toBeVisible();
   await app.open(profile);
   await expect(screen.getByText(fixture.review)).toBeVisible();
   await expect(screen.getByText(/\b2 (ulasan|reviews)\b/i).first()).toBeVisible();
