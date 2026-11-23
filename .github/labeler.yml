@@ -1,40 +1,40 @@
-web:
+"scope:web":
   - changed-files:
       - any-glob-to-any-file: apps/web/**
 
-trailer:
+"scope:trailer":
   - changed-files:
       - any-glob-to-any-file: apps/trailer/**
 
-curriculum:
+"scope:curriculum":
   - changed-files:
       - any-glob-to-any-file: packages/curriculum/**
 
-db:
+"scope:db":
   - changed-files:
       - any-glob-to-any-file: packages/db/**
 
-auth:
+"scope:auth":
   - changed-files:
       - any-glob-to-any-file: packages/auth/**
 
-env:
+"scope:env":
   - changed-files:
       - any-glob-to-any-file: packages/env/**
 
-i18n:
+"scope:i18n":
   - changed-files:
       - any-glob-to-any-file: packages/i18n/**
 
-documentation:
+"scope:documentation":
   - changed-files:
       - any-glob-to-any-file: ["**/*.md", "**/*.{md,mdx,markdown}"]
 
-dependencies:
+"scope:dependencies":
   - changed-files:
       - any-glob-to-any-file: ["**/package.json", "bun.lock"]
 
-github_actions:
+"scope:github-actions":
   - changed-files:
       - any-glob-to-any-file: .github/**
 
