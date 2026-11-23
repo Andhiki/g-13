@@ -22,6 +22,7 @@ test("Maintainer can cancel, hide, and restore a review and its public rating", 
   await hide.click();
   const confirmHide = screen.getByRole("dialog", { name: /^confirm hide$/i });
   await confirmHide.getByRole("button", { name: "Cancel" }).click();
+  await expect(confirmHide).toBeHidden();
   await expect(hide).toBeVisible();
   await hide.click();
   await confirmHide.getByRole("button", { name: "Hide review" }).click();
@@ -59,8 +60,8 @@ test("Deleting a disposable review removes it and its reaction control from the 
   await screen.getByRole("button", { name: "Delete", exact: true }).first().click();
   await screen
     .getByRole("dialog", { name: /^confirm delete$/i })
-    .getByRole("button", { name: "Delete review" })
-    .click();
+    .getByRole("button", { name: "Hold to Delete review" })
+    .longPress({ duration: 1_000 });
   await expect(
     screen
       .getByRole("article")
@@ -75,12 +76,12 @@ test("Deleting a disposable review removes it and its reaction control from the 
   );
 });
 
-test("A maintainer opens the announcements page on the current staging revision", async ({
+test("An admin opens the announcements page on the current staging revision", async ({
   app,
   screen,
   signIn,
 }) => {
-  await signIn("maintainer");
+  await signIn("admin");
   await app.open("/dashboard/announcements");
   await expect(screen.getByRole("heading", { name: "Announcements" })).toBeVisible();
   await expect(screen.getByRole("button", { name: "Add announcement" }).first()).toBeVisible();

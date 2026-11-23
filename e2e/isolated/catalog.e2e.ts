@@ -59,6 +59,7 @@ for (const catalog of [
     await editForm.getByLabel(catalog.label).fill("Canceled edit");
     await editForm.getByRole("button", { name: "Cancel" }).click();
     await expect(screen.getByText("Canceled edit")).toBeHidden();
+    await expect(editForm).toBeHidden();
     await edit.click();
     await editForm.getByLabel(catalog.label).fill(revised);
     if (catalog.kind === "course") await editForm.getByLabel("Name (English)").fill(revised);
@@ -72,9 +73,12 @@ for (const catalog of [
     const confirmDelete = screen.getByRole("dialog", { name: "Confirm delete" });
     await remove.click();
     await confirmDelete.getByRole("button", { name: "Cancel" }).click();
+    await expect(confirmDelete).toBeHidden();
     await expect(remove).toBeVisible();
     await remove.click();
-    await confirmDelete.getByRole("button", { name: `Delete ${catalog.kind}` }).click();
+    await confirmDelete
+      .getByRole("button", { name: `Hold to Delete ${catalog.kind}` })
+      .longPress({ duration: 1_000 });
     await expect(
       screen.getByRole("button", { name: /inspect.*e2e disposable record/i }),
     ).toBeHidden();
@@ -101,8 +105,8 @@ test("A deleted course is unavailable for new reviews and its published reviews 
   await screen.getByRole("button", { name: "Delete", exact: true }).first().click();
   await screen
     .getByRole("dialog", { name: "Confirm delete" })
-    .getByRole("button", { name: "Delete course" })
-    .click();
+    .getByRole("button", { name: "Hold to Delete course" })
+    .longPress({ duration: 1_000 });
   await expect(screen.getByText("No matching courses")).toBeVisible();
   await app.open(profile);
   await expect(screen.getByText(fixture.review)).toBeVisible();
@@ -129,8 +133,8 @@ test("A deleted lecturer is removed from public search and the profile review en
   await screen.getByRole("button", { name: "Delete", exact: true }).first().click();
   await screen
     .getByRole("dialog", { name: "Confirm delete" })
-    .getByRole("button", { name: "Delete lecturer" })
-    .click();
+    .getByRole("button", { name: "Hold to Delete lecturer" })
+    .longPress({ duration: 1_000 });
   await expect(screen.getByText("No matching lecturers")).toBeVisible();
   await app.open("/lecturers");
   await screen

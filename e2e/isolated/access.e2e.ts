@@ -108,7 +108,7 @@ test("Admin grants and revokes access and can cancel a role change", async ({
   await roles.getByRole("radio", { name: /maintainer/i }).click();
   await screen.getByRole("button", { name: "Approve", exact: true }).click();
   await confirmation.getByRole("button", { name: /^(confirm|approve|save role)$/i }).click();
-  await expect(account.getByText("Maintainer", { exact: true })).toBeVisible();
+  await expect(account.getByText("maintainer", { exact: true })).toBeVisible();
   await signIn("user");
   await app.open("/dashboard");
   await expect(browser).toHaveURL(queueURL);

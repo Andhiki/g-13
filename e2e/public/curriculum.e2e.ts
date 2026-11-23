@@ -58,7 +58,7 @@ test("An unknown course deep link leaves the explorer usable", async ({ app, bro
   await screen.getByRole("option", { name: /PACS262201/i }).click();
   await expect(screen.getByRole("heading", { name: courseTitle })).toBeVisible();
   await screen.getByRole("button", { name: /pilih kurikulum|choose curriculum/i }).click();
-  await screen.getByRole("button", { name: /^2021/ }).click();
+  await screen.getByRole("radio", { name: /^2021/ }).click();
   await expect(browser).toHaveURL(/kurikulum=%222021%22/);
   await expect(screen.getByRole("button", { name: closeDetails })).toBeHidden();
 });
