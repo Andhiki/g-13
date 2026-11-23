@@ -28,11 +28,9 @@ for (const { edition, code } of [
     await expect(title).toBeVisible();
     await expect(screen.getByText(/^(prasyarat|prerequisites)$/i).first()).toBeVisible();
     await expect(
-      screen
-          .getByRole("dialog", { name: courseTitle })
-        .getByRole("button", {
-          name: /^(buka detail pemrograman|open details? (?:for )?programming)$/i,
-        }),
+      screen.getByRole("dialog", { name: courseTitle }).getByRole("button", {
+        name: /^(buka detail pemrograman|open details? (?:for )?programming)$/i,
+      }),
     ).toBeVisible();
     const link = await browser.url();
     expect(new URL(link).searchParams.get("mk")).toContain(code);
