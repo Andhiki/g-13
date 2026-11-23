@@ -13,8 +13,9 @@ the roadmap does not replace department rules.
 ## Run the project on your computer
 
 You’ll need [Git](https://git-scm.com/downloads),
-[Bun 1.4.3](https://bun.sh/docs/installation), and Node.js 22.12 or newer. Some
-of the tools used to run and build the website need Node.js.
+[Bun 1.4.4](https://bun.sh/docs/installation), and Node.js 22.18 or newer. Bun
+runs the website, the shared packages, and the tests. The Remotion trailer build
+and the Cloudflare CLI still run on Node.js.
 
 1. Download the project and enter its folder:
 

@@ -8,19 +8,19 @@ Run every command from the repository root.
 Install Node.js 20.19 or later in the 20.x line, 22.13 or later in the 22.x
 line, or 24 or later. Get it from the [official Node.js download page](https://nodejs.org/en/download/).
 
-Install Bun 1.4.3, the version pinned by this repository. Use the command for
+Install Bun 1.4.4, the version pinned by this repository. Use the command for
 your terminal. These commands come from Bun's [installation guide](https://bun.sh/docs/installation).
 
 macOS or Linux:
 
 ```sh
-curl -fsSL https://bun.com/install | bash -s "bun-v1.4.3"
+curl -fsSL https://bun.com/install | bash -s "bun-v1.4.4"
 ```
 
 Windows PowerShell:
 
 ```powershell
-iex "& {$(irm https://bun.com/install.ps1)} -Version 1.4.3"
+iex "& {$(irm https://bun.com/install.ps1)} -Version 1.4.4"
 ```
 
 Check that both tools are available:
@@ -30,7 +30,7 @@ node --version
 bun --version
 ```
 
-`bun --version` should print `1.4.3`.
+`bun --version` should print `1.4.4`.
 
 ## Install the project
 
