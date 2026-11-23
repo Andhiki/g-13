@@ -9,7 +9,7 @@ const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { env } = await import("cloudflare:workers");
   try {
     if (
-      import.meta.env.MODE === "staging-e2e" &&
+      import.meta.env.MODE === "local-e2e" &&
       getRequest().headers.get("x-e2e-alumni-failure") === "1"
     ) {
       throw new Error("Simulated directory outage");

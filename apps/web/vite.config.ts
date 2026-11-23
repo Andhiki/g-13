@@ -10,7 +10,12 @@ export default defineConfig({
   build: { sourcemap: true },
   environments: { client: { build: { sourcemap: false } } },
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    cloudflare({
+      viteEnvironment: { name: "ssr" },
+      persistState: process.env.E2E_D1_LOCAL_PATH
+        ? { path: process.env.E2E_D1_LOCAL_PATH }
+        : undefined,
+    }),
     tailwindcss(),
     tanstackStart({
       prerender: {

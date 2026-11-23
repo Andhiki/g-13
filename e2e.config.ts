@@ -10,7 +10,7 @@ export default {
     : ["e2e/isolated/**/*.e2e.ts", "e2e/public/**/*.e2e.ts"],
   targets: [
     {
-      name: smoke ? "shared-staging" : "isolated-staging",
+      name: smoke ? "shared-staging" : "local-sqlite",
       engine: web({ browser: "chromium", viewport: { width: 1440, height: 900 }, locale: "id-ID" }),
       app: { url: smoke ? sharedOrigin : isolatedOrigin },
     },

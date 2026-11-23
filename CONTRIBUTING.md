@@ -29,7 +29,7 @@ di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
 
 Suite browser memakai [e2e](https://e2e.com/docs) dengan Chromium pada viewport
 1440 × 900. Jalankan dengan Bun sesuai versi di `package.json` dan Node.js
-22.22.3 atau lebih baru pada jalur 22, atau Node.js 24.8 atau lebih baru.
+22.23 atau lebih baru pada jalur 22, atau Node.js 24.22 atau lebih baru.
 
 ```sh
 bun install --frozen-lockfile
@@ -44,36 +44,19 @@ branch default, smoke juga bisa dijalankan dari tab Actions melalui **Staging
 browser tests**. Laporan, JUnit, dan trace kegagalan tersedia di `.e2e/` dan
 sebagai artefak Actions.
 
-`bun run test:e2e` menjalankan skenario fungsional pada Worker
-`g-13-staging-e2e.andhikiandre.workers.dev`. Siapkan Worker dan D1 terpisah yang
-keduanya bernama `g-13-staging-e2e`. Job ini berjalan untuk PR dari repo yang sama
-ke `staging`, satu per satu, setelah migrasi D1 dan revisi Worker siap. PR dari
-fork tetap menjalankan pemeriksaan Bun yang biasa. Langkah browser memakai
-locator dan assertion deterministik sehingga tidak memerlukan akun atau kunci AI.
+`bun run test:e2e` menjalankan skenario fungsional pada Worker lokal dengan D1
+SQLite sementara. Perintah ini menerapkan migrasi ke direktori temporer, memulai
+Worker lokal, menjalankan browser Chromium, lalu menghentikan Worker dan menghapus
+database tersebut. Sesi, data ulasan, dan batas rate limit dibuat langsung pada
+D1 lokal. Tidak diperlukan akun Cloudflare, token, deployment Worker, atau
+database D1 jangka panjang.
 
-Workflow **Staging browser tests** memakai ulang akun staging dan secret
-repositori `CLOUDFLARE_API_TOKEN`. Job membuat database D1 khusus
-`g-13-staging-e2e` jika belum ada, menjalankan migrasi, lalu mendeploy Worker
-dengan nama yang sama. Token Cloudflare perlu izin Workers Scripts: Edit dan
-D1: Edit. Jangan memakai ID D1 staging atau produksi untuk database pengujian.
-Environment Actions **staging-e2e** hanya memerlukan secret `E2E_AUTH_SECRET`
-dan `E2E_REVIEW_RATE_LIMIT_SECRET` (masing-masing minimal 32 karakter). Nilai
-pertama dipakai sebagai `BETTER_AUTH_SECRET` Worker pengujian; keduanya dipakai
-untuk membuat sesi dan menguji batas pengiriman ulasan. `BETTER_AUTH_URL` diisi
-`https://g-13-staging-e2e.andhikiandre.workers.dev` dan `ADMIN_EMAILS` kosong
-secara otomatis. Mode staging pengujian menyediakan fixture Strapi dan Turnstile,
-serta konfigurasi GitHub dummy untuk memeriksa URL otorisasi. Sesi pengguna,
-maintainer, dan admin dibuat sementara dari fixture D1.
-
-Untuk menjalankan suite fungsional dari terminal, tunggu sampai deployment
-pengujian tersedia dan job lain selesai. Isi variabel yang sama seperti CI,
-dengan `CLOUDFLARE_ACCOUNT_ID` dan `CLOUDFLARE_API_TOKEN` sebagai nama variabel
-terminal untuk Cloudflare, lalu jalankan `bun run test:e2e`. Setelah selesai,
-jalankan `node e2e/deployment.ts clean` untuk membersihkan fixture. Suite ini
-mereset tabel dinamis pada D1 pengujian setiap skenario yang menggunakan fixture,
-sambil mempertahankan katalog referensi dari migrasi. Gunakan database itu
-khusus untuk pengujian browser. Pemeriksaan data dan logika aplikasi tetap
-dijalankan dengan `bun run check`.
+Workflow **Staging browser tests** menjalankan suite fungsional tersebut untuk
+setiap PR ke `staging`, termasuk PR dari fork, setelah membangun paket workspace
+dan memasang Chromium. Workflow manual tetap menjalankan smoke test read-only
+terhadap staging bersama. Mode `local-e2e` menggunakan fixture alumni, Turnstile,
+dan kredensial GitHub dummy agar skenario tidak menghubungi layanan eksternal.
+Pemeriksaan data dan logika aplikasi tetap dijalankan dengan `bun run check`.
 
 ## Changelog
 

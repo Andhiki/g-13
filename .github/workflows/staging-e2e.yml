@@ -10,18 +10,9 @@ permissions:
 
 jobs:
   isolated:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    environment: staging-e2e
-    concurrency:
-      group: staging-e2e-worker-and-database
-      cancel-in-progress: false
-    env:
-      # Reuse the staging Cloudflare account and repository token.
-      CLOUDFLARE_ACCOUNT_ID: 0f1162f3c5692f21189157353ef26e56
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      VITE_E2E_REVISION: ${{ github.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -31,38 +22,16 @@ jobs:
           node-version: "24"
       - name: Install Chromium
         run: node node_modules/@e2e-dev/web/dist/bin.js install chromium --with-deps
-      - name: Prepare the isolated D1 database
-        run: node e2e/deployment.ts prepare-database
-      - name: Verify the isolated D1 database and apply migrations
-        run: |
-          node e2e/deployment.ts verify-database
-          D1_DATABASE_ID="$E2E_D1_DATABASE_ID" bun run db:migrate
-      - name: Build the isolated Worker
-        run: |
-          bun run build:packages
-          bun run --cwd apps/web build --mode staging-e2e
-      - name: Deploy the isolated Worker and wait for its revision
-        run: |
-          node e2e/deployment.ts write-secrets
-          bunx --cwd apps/web cf deploy --prebuilt --mode staging-e2e --secrets-file "$RUNNER_TEMP/e2e-secrets.json"
-          node e2e/deployment.ts wait
-        env:
-          E2E_AUTH_SECRET: ${{ secrets.E2E_AUTH_SECRET }}
-          E2E_REVIEW_RATE_LIMIT_SECRET: ${{ secrets.E2E_REVIEW_RATE_LIMIT_SECRET }}
+      - name: Build workspace packages
+        run: bun run build:packages
       - name: Run functional browser scenarios
         id: functional
         run: bun run test:e2e
-        env:
-          E2E_AUTH_SECRET: ${{ secrets.E2E_AUTH_SECRET }}
-          E2E_REVIEW_RATE_LIMIT_SECRET: ${{ secrets.E2E_REVIEW_RATE_LIMIT_SECRET }}
-      - name: Remove browser test fixtures
-        if: always() && steps.functional.outcome != 'skipped' && steps.functional.outcome != ''
-        run: node e2e/deployment.ts clean
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: isolated-staging-e2e
+          name: local-sqlite-e2e
           path: .e2e/
           include-hidden-files: true
           if-no-files-found: ignore

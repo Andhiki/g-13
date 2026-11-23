@@ -1,6 +1,10 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { appendFileSync } from "node:fs";
-import { isolatedDatabaseId, isolatedOrigin, isolatedResourceName } from "./targets.ts";
+import { spawnSync } from "node:child_process";
+import { rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isolatedOrigin, localE2eDatabaseId } from "./targets.ts";
 
 export const fixture = {
   lecturerId: "e2e-lecturer",
@@ -16,72 +20,39 @@ export type Role = "user" | "maintainer" | "admin";
 
 function required(name: string) {
   const value = process.env[name];
-  if (!value) throw new Error(`Missing ${name} for isolated staging`);
+  if (!value) throw new Error(`Missing ${name} for local E2E`);
   return value;
 }
 
-type CloudflareResult<T> = {
-  success: boolean;
-  result?: T;
-  errors?: { code: number; message?: string }[];
-};
-
-async function cloudflareRequest<T>(path: string, body?: unknown) {
-  const account = required("CLOUDFLARE_ACCOUNT_ID");
-  if (!/^[a-f0-9]{32}$/i.test(account)) throw new Error("Invalid Cloudflare account ID");
-  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`, {
-    method: body ? "POST" : "GET",
-    headers: {
-      authorization: `Bearer ${required("CLOUDFLARE_API_TOKEN")}`,
-      "content-type": "application/json",
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(15_000),
-  });
-  const data = (await response.json()) as CloudflareResult<T>;
-  if (!response.ok || !data.success) {
-    const detail =
-      data.errors
-        ?.map(({ code, message }) => (message ? `${code}: ${message}` : code))
-        .join(", ") ?? "none";
-    throw new Error(`Cloudflare request failed (HTTP ${response.status}, ${detail})`);
-  }
-  return data.result as T;
-}
-
-type Database = { uuid: string; name: string };
-
-export async function ensureDatabase() {
-  const databases = await cloudflareRequest<Database[]>(
-    `/d1/database?name=${encodeURIComponent(isolatedResourceName)}`,
-  );
-  const database =
-    databases.find(({ name }) => name === isolatedResourceName) ??
-    (await cloudflareRequest<Database>("/d1/database", { name: isolatedResourceName }));
-  if (database.name !== isolatedResourceName || !database.uuid) {
-    throw new Error(`Refusing D1 access: expected database ${isolatedResourceName}`);
-  }
-  process.env.E2E_D1_DATABASE_ID = database.uuid;
-  const envFile = process.env.GITHUB_ENV;
-  if (envFile) appendFileSync(envFile, `E2E_D1_DATABASE_ID=${database.uuid}\n`);
-  console.log(`Isolated staging database ${database.name} is ready`);
-}
-
-async function cloudflare(path: string, body?: unknown) {
-  const result = await cloudflareRequest<{ name?: string } | { success: boolean }[]>(
-    `/d1/database/${isolatedDatabaseId()}${path}`,
-    body,
-  );
-  if (Array.isArray(result) && result.some((query) => !query.success)) {
-    throw new Error("Isolated D1 query failed");
-  }
-  return result;
-}
-
-export async function verifyDatabase() {
-  const metadata = await cloudflare("");
-  if (!metadata || Array.isArray(metadata) || metadata.name !== isolatedResourceName) {
-    throw new Error(`Refusing D1 access: expected database ${isolatedResourceName}`);
+function localD1(body: unknown) {
+  const statePath = required("E2E_D1_LOCAL_PATH");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+  const requestPath = join(tmpdir(), `g13-e2e-query-${randomBytes(12).toString("hex")}.json`);
+  writeFileSync(requestPath, JSON.stringify(body));
+  try {
+    const result = spawnSync(
+      process.execPath,
+      [
+        join(root, "apps/web/node_modules/cf/bin/cf"),
+        "--mode",
+        "local-e2e",
+        "d1",
+        "raw",
+        localE2eDatabaseId,
+        "--local",
+        "--persist-to",
+        statePath,
+        "--body",
+        `@${requestPath}`,
+      ],
+      { cwd: join(root, "apps/web"), encoding: "utf8", maxBuffer: 2 * 1024 * 1024 },
+    );
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(`Local D1 query failed: ${result.stderr.trim() || result.stdout.trim()}`);
+    }
+  } finally {
+    rmSync(requestPath, { force: true });
   }
 }
 
@@ -101,11 +72,9 @@ const cleanup = [
   "DELETE FROM courses WHERE id LIKE 'e2e-%' OR code LIKE 'E2ETEST%'",
 ];
 
-export async function resetFixtures({ seed = true }: { seed?: boolean } = {}) {
-  await verifyDatabase();
+export async function resetFixtures() {
   const rows = cleanup.map((sql) => ({ sql }));
-  if (!seed) return cloudflare("/query", { batch: rows });
-  await cloudflare("/query", {
+  localD1({
     batch: [
       ...rows,
       {
@@ -165,7 +134,7 @@ export async function seedSession(role: Role, expired = false) {
   const secret = required("E2E_AUTH_SECRET");
   if (secret.length < 32) throw new Error("E2E_AUTH_SECRET must have at least 32 characters");
   const token = randomBytes(32).toString("hex");
-  await cloudflare("/query", {
+  localD1({
     sql: `INSERT INTO auth_session (id, token, user_id, expires_at, created_at, updated_at)
           VALUES (?, ?, ?, ?, unixepoch() * 1000, unixepoch() * 1000)`,
     params: [token, token, `e2e-${role}`, Date.now() + (expired ? -3_600_000 : 3_600_000)],
@@ -175,22 +144,17 @@ export async function seedSession(role: Role, expired = false) {
   const attributes = {
     value,
     url: isolatedOrigin,
-    secure: true,
+    secure: new URL(isolatedOrigin).protocol === "https:",
     httpOnly: true,
     sameSite: "Lax" as const,
   };
-  // Better Auth drops the secure prefix unless NODE_ENV is "production" inside the
-  // Worker, so seed both names and let the deployed Worker read the one it uses.
-  return [
-    { name: "__Secure-better-auth.session_token", ...attributes },
-    { name: "better-auth.session_token", ...attributes },
-  ];
+  return [{ name: "better-auth.session_token", ...attributes }];
 }
 
 export async function exhaustReviewLimit(action: "submission" | "like") {
   const secret = required("E2E_REVIEW_RATE_LIMIT_SECRET");
   const window = Math.floor(Date.now() / 3_600_000);
-  await cloudflare("/query", {
+  localD1({
     batch: [window, window + 1].map((hour) => ({
       sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)
             ON CONFLICT("key") DO UPDATE SET "count" = excluded."count", "expires_at" = excluded."expires_at"`,

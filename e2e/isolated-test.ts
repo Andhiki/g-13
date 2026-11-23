@@ -10,9 +10,9 @@ export const test = base.extend<{
   reset: [
     async ({ browser }, use) => {
       await resetFixtures();
-      // The fixture writes directly to D1. A retry can reuse the previous
-      // attempt's page, so reload it to drop any cached rows; the first
-      // attempt has no page yet.
+      // The fixture writes directly to the local D1 database. A retry can reuse
+      // the previous attempt's page, so reload it to drop any cached rows; the
+      // first attempt has no page yet.
       if (browser.tabs().length > 0) await browser.reload();
       await use();
     },

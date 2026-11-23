@@ -27,7 +27,7 @@ export async function verifyTurnstileToken({
   const trimmedSecret = secret.trim();
   const trimmedToken = token.trim();
   if (!trimmedSecret || !trimmedToken) return false;
-  if (import.meta.env.MODE === "staging-e2e") {
+  if (import.meta.env.MODE === "local-e2e") {
     return trimmedSecret === "isolated-e2e-verifier" && trimmedToken === "e2e-verified";
   }
 
