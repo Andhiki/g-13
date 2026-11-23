@@ -104,9 +104,8 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru
   untuk sesuatu yang sudah tersedia di proyek.
 
-GitHub Issues adalah pintu masuk kontributor publik. Tiket Markdown `.scratch/`
-tetap dipakai untuk rencana implementasi lokal sesuai
-[panduan agent](docs/issue-tracker.md); kontributor tidak wajib membuatnya.
+GitHub Issues adalah pintu masuk kontributor publik sekaligus satu-satunya pelacak
+isu proyek, sesuai [panduan agent](docs/issue-tracker.md).
 
 ## Hak cipta dan keamanan
 
