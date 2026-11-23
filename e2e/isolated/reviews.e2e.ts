@@ -123,7 +123,10 @@ test("Like, reload, and unlike a published review", async ({ app, browser, scree
   await expect(screen.getByText("Hidden fixture review")).toBeHidden();
   await expect(review.getByRole("button", { name: like })).toHaveText("0");
   await review.getByRole("button", { name: like }).click();
-  await expect(review.getByRole("button", { name: unlike })).toHaveText("1");
+  const unlikeButton = review.getByRole("button", { name: unlike });
+  await expect(unlikeButton).toHaveText("1");
+  // Wait for the write to settle; reloading during the optimistic update loses it.
+  await expect(unlikeButton).toBeEnabled();
   await browser.reload();
   await expect(review.getByRole("button", { name: unlike })).toHaveText("1");
   await review.getByRole("button", { name: unlike }).click();

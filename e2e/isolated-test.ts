@@ -7,7 +7,7 @@ export const test = base.extend<{
   signIn: async ({ browser }, use) => {
     await use(async (role, { expired = false } = {}) => {
       await browser.clearCookies();
-      await browser.setCookies([await seedSession(role, expired)]);
+      await browser.setCookies(await seedSession(role, expired));
     });
   },
 });

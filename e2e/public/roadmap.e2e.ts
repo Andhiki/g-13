@@ -100,7 +100,7 @@ test("A supported elective replacement survives sharing and a reload", async ({
   await dialog.getByRole("combobox").press("ArrowDown");
   await screen
     .getByRole("option", { name: /algoritma untuk trading|algorithms for trading/i })
-    .click();
+    .press("Enter");
   await dialog.getByRole("button", { name: /gunakan mata kuliah ini|use this course/i }).click();
   await expect(dialog).toBeHidden();
   await screen

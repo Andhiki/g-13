@@ -23,7 +23,7 @@ function required(name: string) {
 type CloudflareResult<T> = {
   success: boolean;
   result?: T;
-  errors?: { code: number }[];
+  errors?: { code: number; message?: string }[];
 };
 
 async function cloudflareRequest<T>(path: string, body?: unknown) {
@@ -40,9 +40,10 @@ async function cloudflareRequest<T>(path: string, body?: unknown) {
   });
   const data = (await response.json()) as CloudflareResult<T>;
   if (!response.ok || !data.success) {
-    throw new Error(
-      `Cloudflare request failed (HTTP ${response.status}, codes ${data.errors?.map(({ code }) => code).join(", ") ?? "none"})`,
-    );
+    const detail =
+      data.errors?.map(({ code, message }) => (message ? `${code}: ${message}` : code)).join(", ") ??
+      "none";
+    throw new Error(`Cloudflare request failed (HTTP ${response.status}, ${detail})`);
   }
   return data.result as T;
 }
@@ -166,17 +167,23 @@ export async function seedSession(role: Role, expired = false) {
   await cloudflare("/query", {
     sql: `INSERT INTO auth_session (id, token, user_id, expires_at, created_at, updated_at)
           VALUES (?, ?, ?, ?, unixepoch() * 1000, unixepoch() * 1000)`,
-    params: [token, token, `e2e-${role}`, String(Date.now() + (expired ? -3_600_000 : 3_600_000))],
+    params: [token, token, `e2e-${role}`, Date.now() + (expired ? -3_600_000 : 3_600_000)],
   });
   const signature = createHmac("sha256", secret).update(token).digest("base64");
-  return {
-    name: "__Secure-better-auth.session_token",
-    value: encodeURIComponent(`${token}.${signature}`),
+  const value = encodeURIComponent(`${token}.${signature}`);
+  const attributes = {
+    value,
     url: isolatedOrigin,
     secure: true,
     httpOnly: true,
     sameSite: "Lax" as const,
   };
+  // Better Auth drops the secure prefix unless NODE_ENV is "production" inside the
+  // Worker, so seed both names and let the deployed Worker read the one it uses.
+  return [
+    { name: "__Secure-better-auth.session_token", ...attributes },
+    { name: "better-auth.session_token", ...attributes },
+  ];
 }
 
 export async function exhaustReviewLimit(action: "submission" | "like") {
@@ -184,11 +191,11 @@ export async function exhaustReviewLimit(action: "submission" | "like") {
   const window = Math.floor(Date.now() / 3_600_000);
   await cloudflare("/query", {
     batch: [window, window + 1].map((hour) => ({
-      sql: "INSERT INTO review_submission_limits (key, count, expires_at) VALUES (?, ?, ?)",
+      sql: 'INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)',
       params: [
         createHmac("sha256", secret).update(`${action}:${hour}:192.0.2.60`).digest("hex"),
-        action === "submission" ? "3" : "60",
-        String((hour + 1) * 3_600_000),
+        action === "submission" ? 3 : 60,
+        (hour + 1) * 3_600_000,
       ],
     })),
   });

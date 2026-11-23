@@ -71,7 +71,7 @@ test("A new review notification opens the matching moderation inspector", async 
   await (
     await fillReview({ app, browser, screen }, body, { author: "Notification Fixture" })
   ).click();
-  await expect(screen.getByText(body)).toBeVisible();
+  await expect(screen.getByRole("article").filter({ hasText: body })).toBeVisible();
   await signIn("maintainer");
   await app.open(path);
   const item = screen.getByRole("listitem").filter({ hasText: "Notification Fixture" });

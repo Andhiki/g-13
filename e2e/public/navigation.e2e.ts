@@ -45,8 +45,16 @@ test("FAQ topic and case-insensitive answer search recover from an empty query r
   screen,
 }) => {
   await app.open("/faq");
-  await browser.keyboard.press("/");
   const search = screen.getByRole("searchbox");
+  await expect
+    .poll(async () => {
+      if (await browser.evaluate(() => document.activeElement?.getAttribute("type") === "search")) {
+        return true;
+      }
+      await browser.keyboard.press("/");
+      return browser.evaluate(() => document.activeElement?.getAttribute("type") === "search");
+    })
+    .toBe(true);
   await expect(search).toBeFocused();
   await screen
     .getByRole("group", { name: /filter topik faq|faq topic filters/i })

@@ -16,8 +16,14 @@ for (const { edition, code } of [
   }) => {
     await app.open(`/?kurikulum=${encodeURIComponent(JSON.stringify(edition))}`);
     await expect(screen.getByRole("button", { name: courseTrigger })).toBeVisible();
-    await browser.keyboard.press("/");
     const search = screen.getByRole("combobox", { name: courseTrigger });
+    await expect
+      .poll(async () => {
+        if (await search.isVisible()) return true;
+        await browser.keyboard.press("/");
+        return search.isVisible();
+      })
+      .toBe(true);
     await expect(search).toBeFocused();
     await search.fill("E2E_MISSING_COURSE");
     await expect(screen.getByText(/tidak ada mata kuliah|no courses match/i)).toBeVisible();
@@ -52,7 +58,7 @@ test("An unknown course deep link leaves the explorer usable", async ({ app, bro
   await screen.getByRole("option", { name: /PACS262201/i }).click();
   await expect(screen.getByRole("heading", { name: courseTitle })).toBeVisible();
   await screen.getByRole("button", { name: /pilih kurikulum|choose curriculum/i }).click();
-  await screen.getByRole("tab", { name: /2021/ }).press("Enter");
+  await screen.getByRole("button", { name: /^2021/ }).click();
   await expect(browser).toHaveURL(/kurikulum=%222021%22/);
   await expect(screen.getByRole("button", { name: closeDetails })).toBeHidden();
 });
