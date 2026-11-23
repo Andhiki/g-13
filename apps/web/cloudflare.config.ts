@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => {
 				}),
 				BETTER_AUTH_SECRET: bindings.secret(),
 				BETTER_AUTH_URL: bindings.secret(),
-				ADMIN_EMAILS: bindings.secret(),
+				ADMIN_EMAILS: isE2E ? bindings.text("") : bindings.secret(),
 				BETTER_AUTH_ALLOWED_HOSTS: bindings.text(
 					isE2E
 						? isolatedHost

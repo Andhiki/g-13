@@ -51,17 +51,19 @@ ke `staging`, satu per satu, setelah migrasi D1 dan revisi Worker siap. PR dari
 fork tetap menjalankan pemeriksaan Bun yang biasa. Langkah browser memakai
 locator dan assertion deterministik sehingga tidak memerlukan akun atau kunci AI.
 
-Konfigurasi environment Actions **staging-e2e** memerlukan variabel
-`E2E_CLOUDFLARE_ACCOUNT_ID` dan `E2E_D1_DATABASE_ID`, serta secret
-`E2E_CLOUDFLARE_API_TOKEN`, `E2E_AUTH_SECRET`, dan
-`E2E_REVIEW_RATE_LIMIT_SECRET`. Gunakan akun atau token Cloudflare yang dibatasi
-untuk deployment dan D1 pengujian. Pada Worker pengujian, atur
-`BETTER_AUTH_URL=https://g-13-staging-e2e.andhikiandre.workers.dev` dan secret
-`BETTER_AUTH_SECRET` serta `REVIEW_RATE_LIMIT_SECRET` dengan nilai yang sama
-dengan secret Actions terkait. Biarkan `ADMIN_EMAILS` kosong. Mode staging
-pengujian menyediakan fixture Strapi dan Turnstile, serta konfigurasi GitHub
-dummy untuk memeriksa URL otorisasi. Sesi pengguna, maintainer, dan admin dibuat
-sementara dari fixture D1.
+Workflow **Staging browser tests** memakai ulang akun staging dan secret
+repositori `CLOUDFLARE_API_TOKEN`. Job membuat database D1 khusus
+`g-13-staging-e2e` jika belum ada, menjalankan migrasi, lalu mendeploy Worker
+dengan nama yang sama. Token Cloudflare perlu izin Workers Scripts: Edit dan
+D1: Edit. Jangan memakai ID D1 staging atau produksi untuk database pengujian.
+Environment Actions **staging-e2e** hanya memerlukan secret `E2E_AUTH_SECRET`
+dan `E2E_REVIEW_RATE_LIMIT_SECRET` (masing-masing minimal 32 karakter). Nilai
+pertama dipakai sebagai `BETTER_AUTH_SECRET` Worker pengujian; keduanya dipakai
+untuk membuat sesi dan menguji batas pengiriman ulasan. `BETTER_AUTH_URL` diisi
+`https://g-13-staging-e2e.andhikiandre.workers.dev` dan `ADMIN_EMAILS` kosong
+secara otomatis. Mode staging pengujian menyediakan fixture Strapi dan Turnstile,
+serta konfigurasi GitHub dummy untuk memeriksa URL otorisasi. Sesi pengguna,
+maintainer, dan admin dibuat sementara dari fixture D1.
 
 Untuk menjalankan suite fungsional dari terminal, tunggu sampai deployment
 pengujian tersedia dan job lain selesai. Isi variabel yang sama seperti CI,

@@ -1,4 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
+import { appendFileSync } from "node:fs";
 import { isolatedDatabaseId, isolatedOrigin, isolatedResourceName } from "./targets.ts";
 
 export const fixture = {
@@ -19,36 +20,60 @@ function required(name: string) {
   return value;
 }
 
-async function cloudflare(path: string, body?: unknown) {
+type CloudflareResult<T> = {
+  success: boolean;
+  result?: T;
+  errors?: { code: number }[];
+};
+
+async function cloudflareRequest<T>(path: string, body?: unknown) {
   const account = required("CLOUDFLARE_ACCOUNT_ID");
   if (!/^[a-f0-9]{32}$/i.test(account)) throw new Error("Invalid Cloudflare account ID");
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${isolatedDatabaseId()}${path}`,
-    {
-      method: body ? "POST" : "GET",
-      headers: {
-        authorization: `Bearer ${required("CLOUDFLARE_API_TOKEN")}`,
-        "content-type": "application/json",
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(15_000),
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`, {
+    method: body ? "POST" : "GET",
+    headers: {
+      authorization: `Bearer ${required("CLOUDFLARE_API_TOKEN")}`,
+      "content-type": "application/json",
     },
-  );
-  const data = (await response.json()) as {
-    success: boolean;
-    result?: { name?: string } | { success: boolean }[];
-    errors?: { code: number }[];
-  };
-  if (
-    !response.ok ||
-    !data.success ||
-    (Array.isArray(data.result) && data.result.some((query) => !query.success))
-  ) {
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(15_000),
+  });
+  const data = (await response.json()) as CloudflareResult<T>;
+  if (!response.ok || !data.success) {
     throw new Error(
-      `Isolated D1 request failed (HTTP ${response.status}, codes ${data.errors?.map(({ code }) => code).join(", ") ?? "none"})`,
+      `Cloudflare request failed (HTTP ${response.status}, codes ${data.errors?.map(({ code }) => code).join(", ") ?? "none"})`,
     );
   }
-  return data.result;
+  return data.result as T;
+}
+
+type Database = { uuid: string; name: string };
+
+export async function ensureDatabase() {
+  const databases = await cloudflareRequest<Database[]>(
+    `/d1/database?name=${encodeURIComponent(isolatedResourceName)}`,
+  );
+  const database =
+    databases.find(({ name }) => name === isolatedResourceName) ??
+    (await cloudflareRequest<Database>("/d1/database", { name: isolatedResourceName }));
+  if (database.name !== isolatedResourceName || !database.uuid) {
+    throw new Error(`Refusing D1 access: expected database ${isolatedResourceName}`);
+  }
+  process.env.E2E_D1_DATABASE_ID = database.uuid;
+  const envFile = process.env.GITHUB_ENV;
+  if (envFile) appendFileSync(envFile, `E2E_D1_DATABASE_ID=${database.uuid}\n`);
+  console.log(`Isolated staging database ${database.name} is ready`);
+}
+
+async function cloudflare(path: string, body?: unknown) {
+  const result = await cloudflareRequest<{ name?: string } | { success: boolean }[]>(
+    `/d1/database/${isolatedDatabaseId()}${path}`,
+    body,
+  );
+  if (Array.isArray(result) && result.some((query) => !query.success)) {
+    throw new Error("Isolated D1 query failed");
+  }
+  return result;
 }
 
 export async function verifyDatabase() {
