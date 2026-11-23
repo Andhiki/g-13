@@ -5,8 +5,8 @@ Run every command from the repository root.
 
 ## Install Node.js and Bun
 
-Install Node.js 20.19 or later in the 20.x line, 22.13 or later in the 22.x
-line, or 24 or later. Get it from the [official Node.js download page](https://nodejs.org/en/download/).
+Install Node.js 26.13 or later, the version pinned by this repository's
+`engines` field. Get it from the [official Node.js download page](https://nodejs.org/en/download/).
 
 Install Bun 1.4.4, the version pinned by this repository. Use the command for
 your terminal. These commands come from Bun's [installation guide](https://bun.sh/docs/installation).

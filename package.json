@@ -7,6 +7,9 @@
     "packages/*"
   ],
   "type": "module",
+  "engines": {
+    "node": ">=26.13.0"
+  },
   "scripts": {
     "dev": "turbo run dev --filter='./apps/*'",
     "build:packages": "turbo run build --filter='./packages/*'",
