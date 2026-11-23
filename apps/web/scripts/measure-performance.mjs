@@ -6,7 +6,7 @@ if (
   ports.some((port) => !Number.isInteger(port) || port < 1 || port > 65535)
 ) {
   throw new Error(
-    "Usage: node apps/web/scripts/measure-performance.mjs <baseline-port> <optimized-port>",
+    "Usage: bun apps/web/scripts/measure-performance.mjs <baseline-port> <optimized-port>",
   );
 }
 const taskDurationMs = (metrics) =>

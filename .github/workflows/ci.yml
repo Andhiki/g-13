@@ -61,5 +61,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        with:
+          node-version: "24"
       - name: Build
         run: bun run build
