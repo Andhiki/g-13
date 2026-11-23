@@ -138,6 +138,8 @@ test("A rate-limited like rolls back the count and pressed state", async ({ app,
   await app.open(profile);
   const review = screen.getByRole("article").filter({ hasText: fixture.review });
   await review.getByRole("button", { name: like }).click();
-  await expect(screen.getByText(/could not update like|gagal.*suka/i)).toBeVisible();
+  await expect(
+    screen.getByText(/could not update like|gagal.*suka|tidak dapat memperbarui suka/i),
+  ).toBeVisible();
   await expect(review.getByRole("button", { name: like })).toHaveText("0");
 });

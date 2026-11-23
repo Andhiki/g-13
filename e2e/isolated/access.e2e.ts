@@ -120,7 +120,9 @@ test("Admin grants and revokes access and can cancel a role change", async ({
   await roles.getByRole("radio", { name: /^(user|regular user|no access)/i }).click();
   await screen.getByRole("button", { name: "Save role" }).click();
   confirmation = screen.getByRole("dialog", { name: "Revoke access" });
-  await confirmation.getByRole("button", { name: /^(confirm|revoke access|revoke)$/i }).click();
+  await confirmation
+    .getByRole("button", { name: /^hold to revoke access$/i })
+    .longPress({ duration: 1_000 });
   await expect(account.getByText("Pending", { exact: true })).toBeVisible();
   await screen.getByRole("button", { name: /inspect account fixture admin/i }).click();
   await expect(screen.getByRole("button", { name: "Change role" })).toBeHidden();

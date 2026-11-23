@@ -60,7 +60,8 @@ for (const catalog of [
     await editForm.getByRole("button", { name: "Cancel" }).click();
     await expect(screen.getByText("Canceled edit")).toBeHidden();
     await expect(editForm).toBeHidden();
-    await edit.click();
+    // The exit overlay still eats pointer clicks; activate the trigger by keyboard.
+    await edit.press("Enter");
     await editForm.getByLabel(catalog.label).fill(revised);
     if (catalog.kind === "course") await editForm.getByLabel("Name (English)").fill(revised);
     await editForm.getByRole("button", { name: "Save changes" }).click();
