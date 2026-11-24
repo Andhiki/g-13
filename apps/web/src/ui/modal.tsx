@@ -181,7 +181,7 @@ function ModalBody({ open, children }: { open: boolean; children: React.ReactNod
     <ModalOpenContext.Provider value={open}>
       <div
         inert={!open}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"
       >
         {open ? children : lastOpenChildren}
       </div>
@@ -225,7 +225,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
               : undefined
           }
           className={twMerge(
-            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
+            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col overflow-hidden rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
             "data-[presentation=sheet]:relative data-[presentation=sheet]:inset-auto data-[presentation=sheet]:my-0 data-[presentation=sheet]:h-auto data-[presentation=sheet]:max-h-[85dvh] data-[presentation=sheet]:w-full data-[presentation=sheet]:max-w-none data-[presentation=sheet]:rounded-b-none data-[presentation=sheet]:transition-none data-[presentation=sheet]:data-starting-style:scale-100 data-[presentation=sheet]:data-starting-style:opacity-100 data-[presentation=sheet]:data-ending-style:scale-100 data-[presentation=sheet]:data-ending-style:opacity-100 data-[presentation=sheet]:after:pointer-events-none data-[presentation=sheet]:after:absolute data-[presentation=sheet]:after:inset-x-0 data-[presentation=sheet]:after:top-full data-[presentation=sheet]:after:h-24 data-[presentation=sheet]:after:bg-inherit data-[presentation=sheet]:after:content-['']",
             className,
             "data-[presentation=sheet]:overflow-visible",

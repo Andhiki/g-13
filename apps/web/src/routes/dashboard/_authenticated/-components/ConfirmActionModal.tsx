@@ -168,30 +168,32 @@ export function ConfirmActionModal({
         if (!nextOpen && !pending) onClose();
       }}
     >
-      <AlignModal.Content className="p-5">
-        <AlignModal.Title asChild className="pr-8">
-          <Typography as="h2" variant="subtitle2" color="strong">
-            {title}
-          </Typography>
-        </AlignModal.Title>
-        <AlignModal.Description asChild className="mt-2 pr-4">
-          <Typography variant="paragraph" color="muted">
-            {description}
-          </Typography>
-        </AlignModal.Description>
-        {children}
-        {error && (
-          <Typography role="alert" variant="caption" color="danger" className="mt-3">
-            {error}
-          </Typography>
-        )}
-        <ConfirmActionFooter
-          destructive={destructive}
-          confirmLabel={confirmLabel}
-          pending={pending}
-          onClose={onClose}
-          onConfirm={onConfirm}
-        />
+      <AlignModal.Content>
+        <div className="p-5">
+          <AlignModal.Title asChild className="pr-8">
+            <Typography as="h2" variant="subtitle2" color="strong">
+              {title}
+            </Typography>
+          </AlignModal.Title>
+          <AlignModal.Description asChild className="mt-2 pr-4">
+            <Typography variant="paragraph" color="muted">
+              {description}
+            </Typography>
+          </AlignModal.Description>
+          {children}
+          {error && (
+            <Typography role="alert" variant="caption" color="danger" className="mt-3">
+              {error}
+            </Typography>
+          )}
+          <ConfirmActionFooter
+            destructive={destructive}
+            confirmLabel={confirmLabel}
+            pending={pending}
+            onClose={onClose}
+            onConfirm={onConfirm}
+          />
+        </div>
       </AlignModal.Content>
     </AlignModal.Root>
   );
