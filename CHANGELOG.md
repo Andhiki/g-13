@@ -18,6 +18,10 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
 
+#### Fixed
+
+- Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.
+
 ### 2026-11-23
 
 #### Changed
