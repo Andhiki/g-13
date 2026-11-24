@@ -24,7 +24,8 @@
   "rules": {
     "no-dupe-else-if": "error",
     "max-nested-callbacks": "error",
-    "max-depth": "error",
+    "max-depth": ["error", { "max": 4 }],
+    "max-lines": ["error", { "max": 500 }],
     "max-lines-per-function": [
       "error",
       {
@@ -33,6 +34,15 @@
     ]
   },
   "overrides": [
+    {
+      "files": [
+        "apps/web/src/routeTree.gen.ts",
+        "apps/web/src/routes/_public/exam/-shared/catalog.ts"
+      ],
+      "rules": {
+        "max-lines": "off"
+      }
+    },
     {
       "files": [
         "apps/web/src/**/*.{ts,tsx}"
