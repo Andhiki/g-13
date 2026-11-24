@@ -9,7 +9,7 @@ import { AnnouncementBannerRow, resolveAnnouncementCopy } from "@/ui/announcemen
 import { useAnnouncementClock } from "@/ui/announcement-countdown";
 import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-value";
 import { Typography } from "@/ui/typography";
-import { useLocale } from "@/useLocale";
+import { useTranslation } from "react-i18next";
 import type { AnnouncementStatus } from "../-shared/schemas";
 import { resolveAnnouncementStatus } from "../-shared/status";
 
@@ -51,15 +51,18 @@ export function AnnouncementPreview({
   countdownAt: DateTimeParts;
   enabled: boolean;
 }) {
-  const { text, language } = useLocale();
-  const [previewLanguage, setPreviewLanguage] = useState<Language>(language);
+  const { i18n } = useTranslation("common");
+  const [previewLanguage, setPreviewLanguage] = useState<Language>(
+    i18n.resolvedLanguage === "en" ? "en" : "id",
+  );
+  const previewText = i18n.getFixedT(previewLanguage, "common");
   const headingId = useId();
 
   const now = Date.now();
   const startsAtMs = dateTimePartsToTimestamp(startsAt);
   const endsAtMs = dateTimePartsToTimestamp(endsAt);
   const countdownAtMs = dateTimePartsToTimestamp(countdownAt);
-  const countdownNow = useAnnouncementClock([countdownAtMs]);
+  const countdownNow = useAnnouncementClock(countdownAtMs);
   const status = resolveAnnouncementStatus(
     {
       enabled,
@@ -144,7 +147,7 @@ export function AnnouncementPreview({
           interactiveCta={false}
           countdownAt={countdownAtMs}
           countdownNow={countdownNow}
-          countdownText={text}
+          countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
           onDismiss={() => {}}
         />
       </div>
