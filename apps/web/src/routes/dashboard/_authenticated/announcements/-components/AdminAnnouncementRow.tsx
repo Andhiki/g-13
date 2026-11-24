@@ -67,7 +67,7 @@ export function AdminAnnouncementRow({
           {announcement.titleId}
         </AdminTableInspectButton>
         <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
-          {announcement.titleEn} · {announcement.slug}
+          {announcement.titleEn}
         </Typography>
       </div>
 
@@ -80,6 +80,11 @@ export function AdminAnnouncementRow({
             ? "No expiry"
             : `→ ${formatAbsoluteTime(announcement.endsAt.getTime(), language)}`}
         </Typography>
+        {announcement.countdownAt !== null && (
+          <Typography variant="caption" color="muted" className="mt-0.5 block">
+            Countdown · {formatAbsoluteTime(announcement.countdownAt.getTime(), language)}
+          </Typography>
+        )}
       </div>
 
       <div>

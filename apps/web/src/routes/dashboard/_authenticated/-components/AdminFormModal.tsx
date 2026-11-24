@@ -37,6 +37,7 @@ export function AdminForm({
   submitLabel,
   pending,
   error,
+  beforeFields,
   onClose,
   onSubmit,
   children,
@@ -45,6 +46,7 @@ export function AdminForm({
   submitLabel: string;
   pending: boolean;
   error?: string;
+  beforeFields?: ReactNode;
   onClose: () => void;
   onSubmit: () => boolean | void;
   children: ReactNode;
@@ -72,6 +74,7 @@ export function AdminForm({
           </Typography>
         </AlignModal.Title>
       </header>
+      {beforeFields}
       <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
         {children}
         {error && (

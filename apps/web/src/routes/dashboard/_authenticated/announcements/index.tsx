@@ -326,7 +326,7 @@ function AdminAnnouncementsPage() {
   const needle = query.trim().toLowerCase();
   const visibleRows = needle
     ? pageRows.filter((row) =>
-        `${row.slug} ${row.titleId} ${row.titleEn}`.toLowerCase().includes(needle),
+        `${row.id} ${row.titleId} ${row.titleEn}`.toLowerCase().includes(needle),
       )
     : pageRows;
   const count = visibleRows.length;
@@ -397,7 +397,7 @@ function AdminAnnouncementsPage() {
       <AdminSearchInput
         value={query}
         onChange={setQuery}
-        placeholder="Filter slug or title…"
+        placeholder="Filter announcement or title…"
         ariaLabel="Filter announcements"
       />
       <DetailsToggleButton
