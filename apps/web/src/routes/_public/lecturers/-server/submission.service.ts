@@ -36,25 +36,27 @@ export async function submitReview(
     authorName,
     status,
   });
-  try {
-    await dispatchNotification(db, {
-      type: "review.created",
-      resourceType: "lecturer_review",
-      resourceId: reviewId,
-      payload: {
-        lecturerId: review.lecturerId,
-        lecturerName: references.lecturerName,
-        courseCode: references.courseCode,
-        termLabel: review.termLabel,
-        authorName,
-        anonymous,
-      },
-      dedupeKey: `review.created:${reviewId}`,
-      recipients: { roles: ["admin", "maintainer"] },
-      now: context.now,
-    });
-  } catch {
-    // Notification delivery is non-blocking for review submission.
+  if (status === "pending") {
+    try {
+      await dispatchNotification(db, {
+        type: "review.created",
+        resourceType: "lecturer_review",
+        resourceId: reviewId,
+        payload: {
+          lecturerId: review.lecturerId,
+          lecturerName: references.lecturerName,
+          courseCode: references.courseCode,
+          termLabel: review.termLabel,
+          authorName,
+          anonymous,
+        },
+        dedupeKey: `review.created:${reviewId}`,
+        recipients: { roles: ["admin", "maintainer"] },
+        now: context.now,
+      });
+    } catch {
+      // Notification delivery is non-blocking for review submission.
+    }
   }
   return { data: { reviewId, status }, error: null };
 }

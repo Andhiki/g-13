@@ -24,6 +24,8 @@ submitReview → D1
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them
 from the dashboard. Reviews with every rating at 3 or higher publish immediately.
+Only pending submissions notify admins and maintainers; immediate publications
+do not.
 
 The Turnstile widget is **invisible** (`execution: "execute"`, `appearance: "interaction-only"`).
 Nothing is shown for ordinary visitors; the challenge runs only when the form is

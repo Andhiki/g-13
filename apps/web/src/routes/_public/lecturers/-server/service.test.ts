@@ -1,8 +1,10 @@
 import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
+import { authUser } from "@g13/db/schema/auth";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { lecturers } from "@g13/db/schema/lecturers";
+import { notificationEvents } from "@g13/db/schema/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { submissionInputSchema } from "../-shared/submission-schema";
@@ -38,6 +40,14 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
       { id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" },
       { id: "deleted-course", code: "CS102", nameId: "Dihapus", nameEn: "Deleted", deletedAt },
     ]);
+    await db.insert(authUser).values({
+      id: "admin",
+      name: "Admin",
+      email: "admin@example.com",
+      role: "admin",
+      createdAt: deletedAt,
+      updatedAt: deletedAt,
+    });
 
     const input = submissionInputSchema.parse(rawInput);
     const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
@@ -69,6 +79,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         context,
       ),
     ).toMatchObject({ data: { reviewId: expect.any(String), status: "published" }, error: null });
+    expect(await db.select().from(notificationEvents)).toEqual([]);
 
     // Any rating of 2 or lower waits for moderation and never reaches public reads.
     const pendingInput = submissionInputSchema.parse({
@@ -92,6 +103,9 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     expect(
       (await getLecturerDetail(db, "p"))?.reviews.some((row) => row.body === "Pending feedback"),
     ).toBe(false);
+    expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
+      pendingReviewId,
+    ]);
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,
     // while existing published reviews for soft-deleted courses remain visible on active lecturers.
