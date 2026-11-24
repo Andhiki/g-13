@@ -19,7 +19,7 @@ export const reviews = sqliteTable(
     support: integer("support").notNull(),
     organization: integer("organization").notNull(),
     body: text("body").notNull(),
-    status: text("status", { enum: ["pending", "published", "hidden"] })
+    status: text("status", { enum: ["published", "hidden"] })
       .notNull()
       .default("published"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -34,7 +34,7 @@ export const reviews = sqliteTable(
       "reviews_ratings_range",
       sql`${table.clarity} between 1 and 5 and ${table.support} between 1 and 5 and ${table.organization} between 1 and 5`,
     ),
-    check("reviews_status_valid", sql`${table.status} in ('pending', 'published', 'hidden')`),
+    check("reviews_status_valid", sql`${table.status} in ('published', 'hidden')`),
   ],
 );
 

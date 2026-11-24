@@ -16,7 +16,7 @@ export async function submitReview(
     secret: string;
     now?: number;
   },
-): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
+): Promise<ReviewOperationResult<{ reviewId: string }>> {
   const ip = context.ip;
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   const references = await getReviewReferences(db, review);
@@ -26,37 +26,31 @@ export async function submitReview(
   const { anonymous, ...values } = review;
   const reviewId = crypto.randomUUID();
   const authorName = anonymous ? "Anonymous" : review.authorName;
-  const status =
-    review.clarity <= 2 || review.support <= 2 || review.organization <= 2
-      ? "pending"
-      : "published";
   await createReview(db, {
     ...values,
     id: reviewId,
     authorName,
-    status,
+    status: "published",
   });
-  if (status === "pending") {
-    try {
-      await dispatchNotification(db, {
-        type: "review.created",
-        resourceType: "lecturer_review",
-        resourceId: reviewId,
-        payload: {
-          lecturerId: review.lecturerId,
-          lecturerName: references.lecturerName,
-          courseCode: references.courseCode,
-          termLabel: review.termLabel,
-          authorName,
-          anonymous,
-        },
-        dedupeKey: `review.created:${reviewId}`,
-        recipients: { roles: ["admin", "maintainer"] },
-        now: context.now,
-      });
-    } catch {
-      // Notification delivery is non-blocking for review submission.
-    }
+  try {
+    await dispatchNotification(db, {
+      type: "review.created",
+      resourceType: "lecturer_review",
+      resourceId: reviewId,
+      payload: {
+        lecturerId: review.lecturerId,
+        lecturerName: references.lecturerName,
+        courseCode: references.courseCode,
+        termLabel: review.termLabel,
+        authorName,
+        anonymous,
+      },
+      dedupeKey: `review.created:${reviewId}`,
+      recipients: { roles: ["admin", "maintainer"] },
+      now: context.now,
+    });
+  } catch {
+    // Notification delivery is non-blocking for review submission.
   }
-  return { data: { reviewId, status }, error: null };
+  return { data: { reviewId }, error: null };
 }

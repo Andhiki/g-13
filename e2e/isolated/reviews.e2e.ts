@@ -102,7 +102,7 @@ test("Required review fields show validation and receive focus", async ({ app, s
     .first()
     .click();
   const dialog = screen.getByRole("dialog");
-  await dialog.getByRole("button", { name: /kirim ulasan|submit review/i }).click();
+  await dialog.getByRole("button", { name: /terbitkan ulasan|publish review/i }).click();
   await expect(dialog.getByRole("combobox", { name: /^(mata kuliah|course)$/i })).toBeFocused();
   await expect(
     dialog.getByRole("combobox", { name: /^(semester|periode|term)$/i }),

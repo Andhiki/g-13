@@ -47,7 +47,7 @@ type ModerationReview = Awaited<ReturnType<typeof loadModerationReviews>>["rows"
 type ReviewConfirmation = {
   input: ModerateReviewInput;
   label: string;
-  status: "pending" | "published" | "hidden";
+  status: "published" | "hidden";
 };
 
 function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
@@ -59,13 +59,10 @@ function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
 function reviewEmptyDescription(needle: string, status: ReviewStatus): string {
   if (needle) return "Try another search term or clear the search to see submitted reviews.";
   if (status === "all") {
-    return "Reviews with any rating of 2 or lower wait in Pending; all others publish immediately.";
-  }
-  if (status === "pending") {
-    return "Reviews with a rating of 2 or lower wait here until an admin approves or hides them.";
+    return "Reviews submitted from public lecturer pages appear here immediately; they are not held for admin approval.";
   }
   if (status === "published") {
-    return "Reviews with every rating at 3 or higher publish immediately and appear here.";
+    return "New public submissions are published immediately and will appear here once visitors post them.";
   }
   return `Reviews appear here after an admin moves them to ${status}.`;
 }
@@ -145,14 +142,12 @@ function ReviewsListBody({
 }
 
 const REVIEW_ACTION_LABELS: Record<ModerateReviewInput["action"], string> = {
-  approve: "Approve review",
   delete: "Delete review",
   hide: "Hide review",
   restore: "Restore review",
 };
 
 const REVIEW_ACTION_SUMMARIES: Record<ModerateReviewInput["action"], string> = {
-  approve: "Publish this review and include it in public scores.",
   delete:
     "This removes the review from public listings and scores. The record stays stored and cannot be restored here.",
   hide: "Remove this review from public listings and scores.",
@@ -197,11 +192,7 @@ function ReviewConfirmModal({
           from={<ReviewStatusBadge status={confirmation.status} deleted={false} />}
           to={
             <ReviewStatusBadge
-              status={
-                confirmation.input.action === "hide" || confirmation.input.action === "delete"
-                  ? "hidden"
-                  : "published"
-              }
+              status={confirmation.input.action === "restore" ? "published" : "hidden"}
               deleted={confirmation.input.action === "delete"}
             />
           }

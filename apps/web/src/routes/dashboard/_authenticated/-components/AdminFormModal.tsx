@@ -5,7 +5,7 @@ import { AlignModal } from "@/ui/modal";
 import { Typography } from "@/ui/typography";
 
 const fieldControlClass =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:pointer-fine:min-h-8 sm:pointer-fine:text-paragraph-xs";
+  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
 
 export function AdminFormModal({
   open,

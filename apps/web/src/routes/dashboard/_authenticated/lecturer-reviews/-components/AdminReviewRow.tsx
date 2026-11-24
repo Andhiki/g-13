@@ -1,10 +1,4 @@
-import {
-  RiCheckLine,
-  RiDeleteBinLine,
-  RiEyeLine,
-  RiEyeOffLine,
-  RiStarFill,
-} from "@remixicon/react";
+import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiStarFill } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import {
@@ -34,7 +28,6 @@ export function AdminReviewRow({
 }) {
   const { language } = useLocale("notifications");
   const deleted = review.deletedAt !== null;
-  const pending = review.status === "pending";
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
@@ -91,59 +84,28 @@ export function AdminReviewRow({
 
       {!deleted && (
         <div className="flex items-center justify-end gap-1">
-          {pending ? (
-            <>
-              <AlignButton.Root
-                size="xxsmall"
-                variant="primary"
-                mode="ghost"
-                compact
-                onClick={() => onAction({ reviewId: review.id, action: "approve" }, label)}
-              >
-                <RiCheckLine className="size-3.5" />
-                Approve
-              </AlignButton.Root>
-              <AlignButton.Root
-                size="xxsmall"
-                variant="neutral"
-                mode="ghost"
-                compact
-                onClick={() => onAction({ reviewId: review.id, action: "hide" }, label)}
-              >
-                <RiEyeOffLine className="size-3.5" />
-                Hide
-              </AlignButton.Root>
-            </>
-          ) : (
-            <>
-              <AlignButton.Root
-                size="xxsmall"
-                variant="neutral"
-                mode="ghost"
-                compact
-                onClick={() =>
-                  onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
-                }
-              >
-                {hidden ? (
-                  <RiEyeLine className="size-3.5" />
-                ) : (
-                  <RiEyeOffLine className="size-3.5" />
-                )}
-                {hidden ? "Restore" : "Hide"}
-              </AlignButton.Root>
-              <AlignButton.Root
-                size="xxsmall"
-                variant="error"
-                mode="ghost"
-                compact
-                onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
-              >
-                <RiDeleteBinLine className="size-3.5" />
-                Delete
-              </AlignButton.Root>
-            </>
-          )}
+          <AlignButton.Root
+            size="xxsmall"
+            variant="neutral"
+            mode="ghost"
+            compact
+            onClick={() =>
+              onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
+            }
+          >
+            {hidden ? <RiEyeLine className="size-3.5" /> : <RiEyeOffLine className="size-3.5" />}
+            {hidden ? "Restore" : "Hide"}
+          </AlignButton.Root>
+          <AlignButton.Root
+            size="xxsmall"
+            variant="error"
+            mode="ghost"
+            compact
+            onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
+          >
+            <RiDeleteBinLine className="size-3.5" />
+            Delete
+          </AlignButton.Root>
         </div>
       )}
     </AdminTableRow>
