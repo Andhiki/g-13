@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Fixed
+
+- Ukuran teks isian dashboard dan formulir ulasan dosen kini seragam, termasuk pada laptop dengan layar sentuh.
+
 ## 0.1.0 - 2026-11-24
 
 ### 2026-11-24
