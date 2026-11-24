@@ -8,6 +8,8 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+## 0.1.0 - 2026-11-24
+
 ### 2026-11-24
 
 #### Added
@@ -40,10 +42,6 @@ Riwayat sebelum changelog ini dibuat tersedia di
 #### Added
 
 - Banner pengumuman situs di atas navbar dengan jadwal tayang (tanggal mulai, tanggal kadaluarsa, dan kontrol aktif manual) serta CTA opsional, dikelola dari halaman baru di dashboard.
-
-Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
-[GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
-Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-21
 
@@ -838,3 +836,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   agar isi daftar tetap dapat dijangkau.
 - Tombol `Escape` menutup filter desktop dan mengembalikan fokus ke tombol
   pembukanya tanpa mengganggu penutupan pilihan filter yang sedang terbuka.
+
+Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
+[GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
+Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
