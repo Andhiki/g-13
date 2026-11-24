@@ -246,7 +246,7 @@ function CitationSection({ thesis }: { thesis: ThesisDetail }) {
       <Typography as="h2" variant="subtitle2" id="thesis-citation" className="m-0">
         {text("Citation")}
       </Typography>
-      <Typography as="p" variant="paragraph" className="mb-0 mt-3 break-words">
+      <Typography as="p" variant="paragraph" className="mb-0 mt-3 wrap-anywhere">
         {citation}
       </Typography>
     </section>

@@ -35,7 +35,12 @@ export function ThesisSubmissionCta() {
             {text("Open the submission form")}
           </a>
         </AlignFancyButton.Root>
-        <AlignLinkButton.Root asChild variant="gray" size="small">
+        <AlignLinkButton.Root
+          asChild
+          variant="gray"
+          size="small"
+          className="h-auto whitespace-normal text-start"
+        >
           <a href={maintainerProfileUrl} target="_blank" rel="noopener noreferrer">
             {text("No GitHub or need private contact? Contact the maintainer.")}
           </a>

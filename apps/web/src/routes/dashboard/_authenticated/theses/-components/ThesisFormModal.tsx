@@ -241,24 +241,13 @@ function FieldMultiSelect({
   const errorId = "thesis-fields-error";
   return (
     <div>
-      <Typography
-        as="label"
-        variant="labelSmall"
-        color="strong"
-        htmlFor="thesis-fields"
-        className="mb-1.5 block"
-      >
-        Sub-labs
-      </Typography>
-      <Typography as="p" variant="caption" color="muted" className="mb-1.5">
-        Select one or more sub-labs. Use Ctrl/Cmd or Shift to select multiple.
-      </Typography>
       <select
         id="thesis-fields"
         name="fieldIds"
         multiple
         size={10}
         value={selected}
+        aria-labelledby="thesis-fields-heading"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
         className={`${fieldControlClass} min-h-44 py-1`}
@@ -299,11 +288,11 @@ function FieldsSection({
   return (
     <section className="space-y-3">
       <div>
-        <Typography as="h3" variant="label" className="m-0">
+        <Typography as="h3" id="thesis-fields-heading" variant="label" className="m-0">
           Sub-labs
         </Typography>
         <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
-          Optional. Choose the lab sub-fields that describe the thesis.
+          Optional. Choose one or more lab sub-fields. Use Ctrl/Cmd or Shift to select multiple.
         </Typography>
       </div>
       <FieldMultiSelect fields={fields} selected={selected} error={error} onChange={onChange} />
