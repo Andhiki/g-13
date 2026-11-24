@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { m, useReducedMotion, type Variants } from "motion/react";
 
 export type AnnouncementCountdownUnit = "day" | "hour" | "minute" | "second";
 export type AnnouncementCountdownPart = { unit: AnnouncementCountdownUnit; value: number };
@@ -82,6 +83,14 @@ export function useAnnouncementClock(latestTarget: number | null): number | null
   return now;
 }
 
+const countdownVariants = {
+  counting: { scale: 1 },
+  reached: {
+    scale: [1, 1.06, 1],
+    transition: { duration: 0.26, ease: "easeOut" },
+  },
+} satisfies Variants;
+
 export function AnnouncementCountdown({
   countdownAt,
   now,
@@ -91,10 +100,20 @@ export function AnnouncementCountdown({
   now: number | null;
   text: (key: string) => string;
 }) {
+  const reducedMotion = useReducedMotion();
   if (now === null) return null;
   const reading = resolveAnnouncementCountdown(countdownAt, now);
   if (reading.state === "happening-now") {
-    return <span>{text("Happening now")}</span>;
+    return (
+      <m.span
+        className="ml-2 inline-block origin-left whitespace-nowrap font-semibold"
+        initial={false}
+        animate={reducedMotion ? "counting" : "reached"}
+        variants={countdownVariants}
+      >
+        {text("Happening now")}
+      </m.span>
+    );
   }
 
   const prefix = text("Starts in");
@@ -105,7 +124,12 @@ export function AnnouncementCountdown({
   const compactParts = reading.parts.map(({ unit, value }) => `${value}${text(shortUnit(unit))}`);
 
   return (
-    <span className="ml-2 inline-flex items-baseline gap-1.5 whitespace-nowrap">
+    <m.span
+      className="ml-2 inline-flex origin-left items-baseline gap-1.5 whitespace-nowrap"
+      initial={false}
+      animate="counting"
+      variants={countdownVariants}
+    >
       <span aria-hidden="true" className="text-static-white/75">
         {prefix}
       </span>
@@ -113,7 +137,7 @@ export function AnnouncementCountdown({
         {compactParts.join(" ")}
       </span>
       <span className="sr-only">{summary}</span>
-    </span>
+    </m.span>
   );
 }
 
