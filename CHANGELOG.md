@@ -18,6 +18,10 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
 
+#### Fixed
+
+- Kolom isian pada formulir dashboard kini mengikuti skala teks dan tinggi kontrol lain di panel, sehingga label, isian, dan tombol tidak lagi tampak tidak seimbang.
+
 ### 2026-11-23
 
 #### Changed
