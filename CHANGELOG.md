@@ -14,6 +14,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Isi dan tombol dialog tetap tampil utuh selama animasi penutupan.
 - Ukuran teks isian dashboard dan formulir ulasan dosen kini seragam, termasuk pada laptop dengan layar sentuh.
+- Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.
 
 ## 0.1.0 - 2026-11-24
 
@@ -29,6 +30,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
+- Banner pengumuman mengembang dengan halus saat pertama kali dimuat tanpa cache.
 - Kolom isian pada formulir dashboard kini mengikuti skala teks dan tinggi kontrol lain di panel, sehingga label, isian, dan tombol tidak lagi tampak tidak seimbang.
 
 ### 2026-11-23
