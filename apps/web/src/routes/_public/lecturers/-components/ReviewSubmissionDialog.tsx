@@ -9,7 +9,7 @@ export function ReviewSubmissionDialog({
   courseId,
   open,
   onClose,
-  onPublished,
+  onSubmitted,
 }: {
   initialCourse?: ReviewCourseOption;
   lecturerId: string;
@@ -17,7 +17,7 @@ export function ReviewSubmissionDialog({
   courseId: string;
   open: boolean;
   onClose: () => void;
-  onPublished: (reviewId: string) => Promise<void>;
+  onSubmitted: (status: "pending" | "published") => Promise<void>;
 }) {
   return (
     <AlignModal.Root
@@ -37,7 +37,7 @@ export function ReviewSubmissionDialog({
             lecturerName={lecturerName}
             initialCourseId={courseId}
             onClose={onClose}
-            onPublished={onPublished}
+            onSubmitted={onSubmitted}
           />
         )}
       </AlignModal.Content>

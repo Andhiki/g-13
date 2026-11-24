@@ -20,6 +20,10 @@
       "types": "./dist/schema/courses.d.mts",
       "import": "./dist/schema/courses.mjs"
     },
+    "./schema/learning-resources": {
+      "types": "./dist/schema/learning-resources.d.mts",
+      "import": "./dist/schema/learning-resources.mjs"
+    },
     "./schema/lecturers": {
       "types": "./dist/schema/lecturers.d.mts",
       "import": "./dist/schema/lecturers.mjs"

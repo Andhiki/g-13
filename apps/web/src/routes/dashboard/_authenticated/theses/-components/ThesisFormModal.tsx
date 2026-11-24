@@ -10,7 +10,6 @@ import {
   SelectList,
 } from "@ui-sdk/react/select";
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch";
-import { Textarea } from "@ui-sdk/react/textarea";
 import {
   ThesisSelectContent,
   ThesisSelectItem,
@@ -47,8 +46,6 @@ type FieldErrors = Record<string, string | undefined>;
 
 const fieldControlClass =
   "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
-
-const textAreaClass = `${fieldControlClass} min-h-28 resize-y`;
 
 const typeOptions = thesisTypeSchema.options.map((value) => ({
   value,
@@ -87,60 +84,6 @@ const contactChannelOptions = [
     label: value === "email" ? "Email" : "URL",
   })),
 ];
-
-function TextAreaField({
-  id,
-  name,
-  label,
-  value,
-  placeholder,
-  maxLength,
-  rows = 5,
-  error,
-  onChange,
-}: {
-  id: string;
-  name: string;
-  label: string;
-  value: string;
-  placeholder?: string;
-  maxLength: number;
-  rows?: number;
-  error?: string;
-  onChange: (value: string) => void;
-}) {
-  const errorId = `${id}-error`;
-  return (
-    <div>
-      <Typography
-        as="label"
-        variant="labelSmall"
-        color="strong"
-        htmlFor={id}
-        className="mb-1.5 block"
-      >
-        {label}
-      </Typography>
-      <Textarea
-        id={id}
-        name={name}
-        rows={rows}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        value={value}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-        className={textAreaClass}
-        onValueChange={onChange}
-      />
-      {error && (
-        <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
-          {error}
-        </Typography>
-      )}
-    </div>
-  );
-}
 
 function SelectField({
   id,
@@ -630,7 +573,9 @@ function AbstractSection({
       <Typography as="h3" variant="label" className="m-0">
         Abstract and keywords
       </Typography>
-      <TextAreaField
+      <AdminFormField
+        multiline
+        rows={5}
         id="thesis-abstract"
         name="abstract"
         label="Abstract (Indonesian)"
@@ -640,7 +585,9 @@ function AbstractSection({
         error={errors.abstract}
         onChange={(value) => onChange("abstract", value)}
       />
-      <TextAreaField
+      <AdminFormField
+        multiline
+        rows={5}
         id="thesis-abstract-en"
         name="abstractEn"
         label="Abstract (English, optional)"

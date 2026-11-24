@@ -16,16 +16,19 @@ Riwayat sebelum changelog ini dibuat tersedia di
 - Dashboard skripsi untuk menambah, mengubah, menerbitkan, menyembunyikan, menghapus, dan memulihkan data skripsi, termasuk dosen pembimbing, kata kunci, dan sumber izin penulis.
 - Formulir pengajuan skripsi lewat GitHub Issue dan CTA di `/theses`, dengan catatan privasi dan alur peninjauan maintainer sebelum data diterbitkan.
 - Sub-lab skripsi multi-select dari daftar Simaster, dengan tabel `thesis_fields` dan relasi many-to-many; formulir pengajuan dan dashboard kini memakai pilihan sub-lab, bukan teks bebas.
+- Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutan yang bisa digeser langsung, semuanya tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
 
 #### Changed
 
 - Pemilih sub-lab di dashboard skripsi kini bisa dicari dan mendukung pilihan jamak tanpa tombol pengubah.
+- Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
 
 ### 2026-11-23
 
 #### Changed
 
 - Katalog mata kuliah pada formulir ulasan kini memakai 146 mata kuliah dari edisi 2021 dan 2026; mata kuliah yang sama di kedua edisi digabung ke satu identitas dan ulasan yang sudah ada tetap terhubung.
+- Ulasan dosen dengan salah satu rating 2 atau lebih rendah kini masuk antrean Pending dan tidak tampil di halaman publik sampai disetujui admin. Ulasan dengan semua rating 3 ke atas tetap terbit langsung. Halaman moderasi mendapat tab Pending dengan tombol setujui dan sembunyikan.
 
 #### Fixed
 

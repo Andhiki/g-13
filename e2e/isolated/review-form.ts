@@ -53,5 +53,5 @@ export async function fillReview(
     await dialog.getByLabel(/nama tampilan|display name/i).fill(options.author);
   }
   await expect.poll(() => browser.evaluate(() => "turnstile" in window)).toBe(true);
-  return dialog.getByRole("button", { name: /terbitkan ulasan|publish review/i });
+  return dialog.getByRole("button", { name: /kirim ulasan|submit review/i });
 }

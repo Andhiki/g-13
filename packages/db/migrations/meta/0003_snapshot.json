@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "afb2c810-a3ba-4b4e-b2c3-bec10e07562b",
+  "id": "672f8473-0829-478c-886c-82639ae2c868",
   "prevId": "7e72986c-a664-4a1a-8167-101cc436ed44",
   "tables": {
     "announcements": {
@@ -587,6 +587,103 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "learning_resources": {
+      "name": "learning_resources",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title_id": {
+          "name": "title_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title_en": {
+          "name": "title_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description_id": {
+          "name": "description_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description_en": {
+          "name": "description_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "learning_resources_visible_idx": {
+          "name": "learning_resources_visible_idx",
+          "columns": [
+            "deleted_at",
+            "sort_order"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "learning_resources_url_scheme": {
+          "name": "learning_resources_url_scheme",
+          "value": "\"learning_resources\".\"url\" like 'https://%'"
+        }
+      }
+    },
     "review_likes": {
       "name": "review_likes",
       "columns": {
@@ -1056,389 +1153,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
-    },
-    "theses": {
-      "name": "theses",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "abstract": {
-          "name": "abstract",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "abstract_en": {
-          "name": "abstract_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "author_name": {
-          "name": "author_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "author_batch": {
-          "name": "author_batch",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "year": {
-          "name": "year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'skripsi'"
-        },
-        "field": {
-          "name": "field",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "language": {
-          "name": "language",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'id'"
-        },
-        "repository_url": {
-          "name": "repository_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "contact_channel": {
-          "name": "contact_channel",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "contact_value": {
-          "name": "contact_value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "abstract_public": {
-          "name": "abstract_public",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "contact_public": {
-          "name": "contact_public",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "consent_at": {
-          "name": "consent_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "consent_source": {
-          "name": "consent_source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'draft'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch() * 1000)"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch() * 1000)"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "theses_status_deleted_year_idx": {
-          "name": "theses_status_deleted_year_idx",
-          "columns": [
-            "status",
-            "deleted_at",
-            "year"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {
-        "theses_title_not_empty": {
-          "name": "theses_title_not_empty",
-          "value": "length(trim(\"theses\".\"title\")) > 0"
-        },
-        "theses_author_name_not_empty": {
-          "name": "theses_author_name_not_empty",
-          "value": "length(trim(\"theses\".\"author_name\")) > 0"
-        },
-        "theses_year_range": {
-          "name": "theses_year_range",
-          "value": "\"theses\".\"year\" between 1945 and 2100"
-        },
-        "theses_author_batch_range": {
-          "name": "theses_author_batch_range",
-          "value": "\"theses\".\"author_batch\" is null or \"theses\".\"author_batch\" between 1945 and 2100"
-        },
-        "theses_type_valid": {
-          "name": "theses_type_valid",
-          "value": "\"theses\".\"type\" in ('skripsi', 'product-innovation', 'collaborative-project', 'industry-project', 'scientific-publication')"
-        },
-        "theses_language_valid": {
-          "name": "theses_language_valid",
-          "value": "\"theses\".\"language\" in ('id', 'en')"
-        },
-        "theses_status_valid": {
-          "name": "theses_status_valid",
-          "value": "\"theses\".\"status\" in ('draft', 'published', 'hidden')"
-        },
-        "theses_contact_channel_valid": {
-          "name": "theses_contact_channel_valid",
-          "value": "\"theses\".\"contact_channel\" is null or \"theses\".\"contact_channel\" in ('email', 'url')"
-        },
-        "theses_abstract_public_content": {
-          "name": "theses_abstract_public_content",
-          "value": "\"theses\".\"abstract_public\" = 0 or (\"theses\".\"abstract\" is not null and length(trim(\"theses\".\"abstract\")) > 0)"
-        },
-        "theses_contact_public_content": {
-          "name": "theses_contact_public_content",
-          "value": "\"theses\".\"contact_public\" = 0 or (\"theses\".\"contact_channel\" is not null and \"theses\".\"contact_value\" is not null and length(trim(\"theses\".\"contact_value\")) > 0)"
-        },
-        "theses_consent_required": {
-          "name": "theses_consent_required",
-          "value": "(\"theses\".\"abstract_public\" = 0 and \"theses\".\"contact_public\" = 0) or \"theses\".\"consent_at\" is not null"
-        },
-        "theses_published_consent": {
-          "name": "theses_published_consent",
-          "value": "\"theses\".\"status\" != 'published' or (\"theses\".\"consent_at\" is not null and \"theses\".\"consent_source\" is not null)"
-        }
-      }
-    },
-    "thesis_keywords": {
-      "name": "thesis_keywords",
-      "columns": {
-        "thesis_id": {
-          "name": "thesis_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "keyword": {
-          "name": "keyword",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "thesis_keywords_keyword_idx": {
-          "name": "thesis_keywords_keyword_idx",
-          "columns": [
-            "keyword"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "thesis_keywords_thesis_id_theses_id_fk": {
-          "name": "thesis_keywords_thesis_id_theses_id_fk",
-          "tableFrom": "thesis_keywords",
-          "tableTo": "theses",
-          "columnsFrom": [
-            "thesis_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "thesis_keywords_thesis_id_keyword_pk": {
-          "columns": [
-            "thesis_id",
-            "keyword"
-          ],
-          "name": "thesis_keywords_thesis_id_keyword_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {
-        "thesis_keywords_not_empty": {
-          "name": "thesis_keywords_not_empty",
-          "value": "length(trim(\"thesis_keywords\".\"keyword\")) > 0"
-        }
-      }
-    },
-    "thesis_supervisors": {
-      "name": "thesis_supervisors",
-      "columns": {
-        "thesis_id": {
-          "name": "thesis_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "lecturer_id": {
-          "name": "lecturer_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "thesis_supervisors_lecturer_idx": {
-          "name": "thesis_supervisors_lecturer_idx",
-          "columns": [
-            "lecturer_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "thesis_supervisors_thesis_id_theses_id_fk": {
-          "name": "thesis_supervisors_thesis_id_theses_id_fk",
-          "tableFrom": "thesis_supervisors",
-          "tableTo": "theses",
-          "columnsFrom": [
-            "thesis_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "thesis_supervisors_lecturer_id_lecturers_id_fk": {
-          "name": "thesis_supervisors_lecturer_id_lecturers_id_fk",
-          "tableFrom": "thesis_supervisors",
-          "tableTo": "lecturers",
-          "columnsFrom": [
-            "lecturer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "thesis_supervisors_thesis_id_position_pk": {
-          "columns": [
-            "thesis_id",
-            "position"
-          ],
-          "name": "thesis_supervisors_thesis_id_position_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {
-        "thesis_supervisors_position_valid": {
-          "name": "thesis_supervisors_position_valid",
-          "value": "\"thesis_supervisors\".\"position\" >= 0"
-        },
-        "thesis_supervisors_name_not_empty": {
-          "name": "thesis_supervisors_name_not_empty",
-          "value": "length(trim(\"thesis_supervisors\".\"name\")) > 0"
-        },
-        "thesis_supervisors_role_valid": {
-          "name": "thesis_supervisors_role_valid",
-          "value": "\"thesis_supervisors\".\"role\" is null or \"thesis_supervisors\".\"role\" in ('main', 'co')"
-        }
-      }
     }
   },
   "views": {},
