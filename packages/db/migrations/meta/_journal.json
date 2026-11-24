@@ -36,20 +36,6 @@
       "when": 1795504045374,
       "tag": "0004_talented_kate_bishop",
       "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1795504045375,
-      "tag": "0005_next_praxagora",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1795504045376,
-      "tag": "0006_chubby_killraven",
-      "breakpoints": true
     }
   ]
 }
