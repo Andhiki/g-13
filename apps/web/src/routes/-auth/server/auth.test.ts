@@ -5,6 +5,7 @@ import { authRateLimits, authSession, authUser } from "@g13/db/schema/auth";
 import { createDatabase } from "@g13/db/client";
 import { eq } from "drizzle-orm";
 import { createTestPlatformProxy } from "@/test/database";
+import { prepareAuthRequest } from "@/server/auth-request";
 
 it("creates only unprivileged GitHub accounts and rejects forged OAuth state", async () => {
   const platform = await createTestPlatformProxy();
@@ -212,6 +213,150 @@ it("derives the OAuth callback from the request host for each allowed domain", a
       );
     }
   } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("signs in on the forwarded host when a trusted proxy forwards the browser host", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    const auth = createAuth(db, {
+      secret: crypto.randomUUID(),
+      baseURL: {
+        allowedHosts: ["csugm.omahti.com", "csugm.andhiki.tech"],
+        fallback: "https://csugm.omahti.com",
+      },
+      secureCookies: true,
+      githubClientId: "integration-test-only",
+      githubClientSecret: "integration-test-only",
+    });
+    const response = await auth.handler(
+      new Request("https://csugm.andhiki.tech/api/auth/sign-in/social", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: "https://csugm.omahti.com",
+          "cf-connecting-ip": "192.0.2.11",
+          "x-forwarded-host": "csugm.omahti.com",
+          "x-forwarded-proto": "https",
+        },
+        body: JSON.stringify({ provider: "github", callbackURL: "/dashboard" }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const { url } = z.object({ url: z.string() }).parse(await response.json());
+    expect(new URL(url).searchParams.get("redirect_uri")).toBe(
+      "https://csugm.omahti.com/api/auth/callback/github",
+    );
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("completes sign-in on the browser host when a proxy only forwards Origin and cookies", async () => {
+  const platform = await createTestPlatformProxy();
+  const realFetch = globalThis.fetch;
+  const tokenRequests: URLSearchParams[] = [];
+  const fetchFixture = Object.assign(
+    async (...[input, init]: Parameters<typeof fetch>) => {
+      const url = input instanceof Request ? input.url : String(input);
+      if (url === "https://github.com/login/oauth/access_token") {
+        if (init?.body instanceof URLSearchParams) tokenRequests.push(init.body);
+        else if (typeof init?.body === "string") tokenRequests.push(new URLSearchParams(init.body));
+        else if (input instanceof Request) {
+          tokenRequests.push(new URLSearchParams(await input.clone().text()));
+        }
+        return Response.json({
+          access_token: "proxy-fixture",
+          token_type: "bearer",
+          scope: "read:user,user:email",
+        });
+      }
+      if (url === "https://api.github.com/user") {
+        return Response.json({
+          id: 77001,
+          login: "proxy-user",
+          name: "Proxy User",
+          email: "proxy@example.test",
+          avatar_url: null,
+        });
+      }
+      if (url === "https://api.github.com/user/emails") {
+        return Response.json([{ email: "proxy@example.test", primary: true, verified: true }]);
+      }
+      return realFetch(input, init);
+    },
+    { preconnect: realFetch.preconnect },
+  );
+  const mockFetch = spyOn(globalThis, "fetch").mockImplementation(fetchFixture);
+  try {
+    const allowedHosts = ["csugm.omahti.com", "csugm.andhiki.tech"];
+    const db = createDatabase(platform.env.DB);
+    const auth = createAuth(db, {
+      secret: crypto.randomUUID(),
+      baseURL: {
+        allowedHosts,
+        fallback: "https://csugm.omahti.com",
+      },
+      secureCookies: true,
+      githubClientId: "integration-test-only",
+      githubClientSecret: "integration-test-only",
+    });
+
+    const signInRequest = prepareAuthRequest(
+      new Request("https://csugm.andhiki.tech/api/auth/sign-in/social", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: "https://csugm.omahti.com",
+          "cf-connecting-ip": "192.0.2.12",
+        },
+        body: JSON.stringify({ provider: "github", callbackURL: "/dashboard" }),
+      }),
+      allowedHosts,
+    );
+    expect(signInRequest.request.headers.get("x-forwarded-host")).toBe("csugm.omahti.com");
+
+    const signIn = await auth.handler(signInRequest.request);
+    expect(signIn.status).toBe(200);
+    const { url } = z.object({ url: z.string() }).parse(await signIn.json());
+    expect(new URL(url).searchParams.get("redirect_uri")).toBe(
+      "https://csugm.omahti.com/api/auth/callback/github",
+    );
+    const state = new URL(url).searchParams.get("state");
+    const cookies = signIn.headers
+      .getSetCookie()
+      .map((cookie) => cookie.split(";")[0])
+      .join("; ");
+
+    const callbackRequest = prepareAuthRequest(
+      new Request(
+        `https://csugm.andhiki.tech/api/auth/callback/github?code=fixture&state=${encodeURIComponent(state ?? "")}`,
+        {
+          headers: {
+            cookie: `${cookies}; g13-auth-origin=https%3A%2F%2Fcsugm.omahti.com`,
+            "cf-connecting-ip": "192.0.2.12",
+          },
+        },
+      ),
+      allowedHosts,
+    );
+    expect(callbackRequest.origin).toBe("https://csugm.omahti.com");
+
+    const callback = await auth.handler(callbackRequest.request);
+    expect(callback.status).toBe(302);
+    expect(callback.headers.get("location")).toBe("/dashboard");
+    expect(tokenRequests.at(-1)?.get("redirect_uri")).toBe(
+      "https://csugm.omahti.com/api/auth/callback/github",
+    );
+    expect(
+      callback.headers
+        .getSetCookie()
+        .some((cookie) => cookie.startsWith("better-auth.session_token=")),
+    ).toBe(true);
+  } finally {
+    mockFetch.mockRestore();
     await platform.dispose();
   }
 }, 30_000);
