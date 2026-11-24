@@ -52,6 +52,9 @@ for (const role of ["maintainer", "admin"] as const) {
     await expect(navigation.getByRole("link", { name: "User access" })).toBeVisible({
       visible: role === "admin",
     });
+    await expect(navigation.getByRole("link", { name: "Announcements" })).toBeVisible({
+      visible: role === "admin",
+    });
   });
 }
 

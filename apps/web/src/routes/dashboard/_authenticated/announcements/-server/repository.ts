@@ -1,4 +1,4 @@
-import { and, desc, eq, ne, sql, type SQL } from "drizzle-orm";
+import { desc, eq, sql, type SQL } from "drizzle-orm";
 import { announcements } from "@g13/db/schema/announcements";
 import type { createDatabase } from "@g13/db/client";
 import type {
@@ -53,19 +53,6 @@ export async function getAnnouncementCounts(db: Database, now: Date) {
   return counts;
 }
 
-export async function isSlugTaken(db: Database, slug: string, excludeId?: string) {
-  const [existing] = await db
-    .select({ id: announcements.id })
-    .from(announcements)
-    .where(
-      excludeId === undefined
-        ? eq(announcements.slug, slug)
-        : and(eq(announcements.slug, slug), ne(announcements.id, excludeId)),
-    )
-    .limit(1);
-  return existing !== undefined;
-}
-
 export async function createAnnouncementRecord(
   db: Database,
   input: CreateAnnouncementInput,
@@ -75,7 +62,6 @@ export async function createAnnouncementRecord(
     .insert(announcements)
     .values({
       id: crypto.randomUUID(),
-      slug: input.slug,
       titleId: input.titleId,
       titleEn: input.titleEn,
       bodyId: input.bodyId,
@@ -85,6 +71,7 @@ export async function createAnnouncementRecord(
       ctaLabelEn: input.ctaLabelEn === "" ? null : input.ctaLabelEn,
       startsAt: new Date(input.startsAt),
       endsAt: input.endsAt === null ? null : new Date(input.endsAt),
+      countdownAt: input.countdownAt === null ? null : new Date(input.countdownAt),
       enabled: input.enabled,
       createdById,
     })
@@ -99,7 +86,6 @@ export async function updateAnnouncementRecord(
   const [updated] = await db
     .update(announcements)
     .set({
-      slug: input.slug,
       titleId: input.titleId,
       titleEn: input.titleEn,
       bodyId: input.bodyId,
@@ -109,6 +95,7 @@ export async function updateAnnouncementRecord(
       ctaLabelEn: input.ctaLabelEn === "" ? null : input.ctaLabelEn,
       startsAt: new Date(input.startsAt),
       endsAt: input.endsAt === null ? null : new Date(input.endsAt),
+      countdownAt: input.countdownAt === null ? null : new Date(input.countdownAt),
       enabled: input.enabled,
       updatedAt: new Date(),
     })

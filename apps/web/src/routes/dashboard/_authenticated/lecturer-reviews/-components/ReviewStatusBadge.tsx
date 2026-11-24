@@ -4,16 +4,30 @@ export function ReviewStatusBadge({
   status,
   deleted,
 }: {
-  status: "published" | "hidden";
+  status: "pending" | "published" | "hidden";
   deleted: boolean;
 }) {
   return (
     <AlignBadge.Root
       size="medium"
-      variant={status === "hidden" && !deleted ? "warning" : "light"}
-      className={`shrink-0 ${deleted ? "bg-error-lighter text-error-dark" : status === "hidden" ? "" : "bg-success-lighter text-success-dark"}`}
+      variant={
+        deleted
+          ? "light"
+          : status === "pending"
+            ? "information"
+            : status === "hidden"
+              ? "warning"
+              : "light"
+      }
+      className={`shrink-0 ${deleted ? "bg-error-lighter text-error-dark" : status === "published" ? "bg-success-lighter text-success-dark" : ""}`}
     >
-      {deleted ? "Deleted" : status === "hidden" ? "Hidden" : "Published"}
+      {deleted
+        ? "Deleted"
+        : status === "pending"
+          ? "Pending"
+          : status === "hidden"
+            ? "Hidden"
+            : "Published"}
     </AlignBadge.Root>
   );
 }

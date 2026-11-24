@@ -160,7 +160,7 @@ function CourseComboboxControl({
           aria-label={text("Course")}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className="h-full w-full min-w-0 bg-transparent text-base text-text-strong-950 outline-none transition duration-200 ease-out placeholder:text-text-soft-400 sm:text-paragraph-sm"
+          className="h-full w-full min-w-0 bg-transparent text-form-control text-text-strong-950 outline-none transition duration-200 ease-out placeholder:text-text-soft-400"
           placeholder={text("Course code or name")}
           onFocus={() => setOpen(true)}
         />

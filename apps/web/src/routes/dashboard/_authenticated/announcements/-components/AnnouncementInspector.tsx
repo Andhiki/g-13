@@ -88,12 +88,12 @@ function AnnouncementInspectorMeta({
   const expiresLabel = announcement.endsAt
     ? formatRelativeTime(announcement.endsAt.getTime(), language)
     : "Never";
+  const countdownTitle = announcement.countdownAt
+    ? formatAbsoluteTime(announcement.countdownAt.getTime(), language)
+    : undefined;
 
   return (
     <AdminInspectorMeta>
-      <AdminInspectorMetaRow label="Slug" valueClassName="break-all font-mono">
-        {announcement.slug}
-      </AdminInspectorMetaRow>
       <AdminInspectorMetaRow label="ID" valueClassName="break-all font-mono text-text-sub-600">
         {announcement.id}
       </AdminInspectorMetaRow>
@@ -109,6 +109,11 @@ function AnnouncementInspectorMeta({
       </AdminInspectorMetaRow>
       <AdminInspectorMetaRow label="Expires" valueClassName="tabular-nums" title={expiresTitle}>
         {expiresLabel}
+      </AdminInspectorMetaRow>
+      <AdminInspectorMetaRow label="Countdown" valueClassName="tabular-nums" title={countdownTitle}>
+        {announcement.countdownAt
+          ? formatRelativeTime(announcement.countdownAt.getTime(), language)
+          : "None"}
       </AdminInspectorMetaRow>
       <AdminInspectorMetaRow label="CTA" valueClassName="break-all">
         {announcement.ctaHref ?? "—"}

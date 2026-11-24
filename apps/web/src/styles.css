@@ -61,11 +61,20 @@ html {
   transition: none;
 }
 
-@media (any-pointer: coarse) {
+@utility text-form-control {
+  @apply text-paragraph-sm;
+
+  @media (pointer: coarse) {
+    font-size: max(16px, 1rem);
+    line-height: 1.5;
+  }
+}
+
+@media (pointer: coarse) {
   input,
   textarea,
   select {
-    font-size: max(16px, 1em);
+    font-size: max(16px, 1rem);
   }
 }
 

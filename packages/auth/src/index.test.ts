@@ -1,5 +1,25 @@
 import { expect, it } from "bun:test";
-import { canManageUsers, canModerate, isAllowlistedAdmin } from "./index";
+import { canManageUsers, canModerate, hasPermission, isAllowlistedAdmin, isRole } from "./index";
+
+it("recognizes valid roles with isRole", () => {
+  expect(isRole("admin")).toBe(true);
+  expect(isRole("maintainer")).toBe(true);
+  expect(isRole("user")).toBe(true);
+  for (const value of [undefined, null, "", "moderator", "ADMIN", 123]) {
+    expect(isRole(value)).toBe(false);
+  }
+});
+
+it("checks role permissions via hasPermission", () => {
+  expect(hasPermission("admin", "moderate")).toBe(true);
+  expect(hasPermission("admin", "manage-users")).toBe(true);
+  expect(hasPermission("maintainer", "moderate")).toBe(true);
+  expect(hasPermission("maintainer", "manage-users")).toBe(false);
+  expect(hasPermission("user", "moderate")).toBe(false);
+  expect(hasPermission("user", "manage-users")).toBe(false);
+  expect(hasPermission(null, "moderate")).toBe(false);
+  expect(hasPermission(undefined, "manage-users")).toBe(false);
+});
 
 it("allows only explicit privileged roles to moderate", () => {
   expect(canModerate("admin")).toBe(true);

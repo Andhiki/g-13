@@ -17,15 +17,15 @@ export function parseDismissedAnnouncements(
     const parsed: unknown = JSON.parse(raw);
     if (!isDismissalRecord(parsed)) return {};
     const dismissals: DismissedAnnouncements = {};
-    for (const [slug, dismissedAt] of Object.entries(parsed)) {
+    for (const [announcementId, dismissedAt] of Object.entries(parsed)) {
       if (
-        slug.length === 0 ||
+        announcementId.length === 0 ||
         typeof dismissedAt !== "number" ||
         !Number.isFinite(dismissedAt) ||
         now - dismissedAt >= DISMISSAL_RETENTION_MS
       )
         continue;
-      dismissals[slug] = dismissedAt;
+      dismissals[announcementId] = dismissedAt;
     }
     return dismissals;
   } catch {
@@ -35,15 +35,15 @@ export function parseDismissedAnnouncements(
 
 export function dismissAnnouncement(
   dismissals: DismissedAnnouncements,
-  slug: string,
+  announcementId: string,
   now = Date.now(),
 ): DismissedAnnouncements {
-  return { ...dismissals, [slug]: now };
+  return { ...dismissals, [announcementId]: now };
 }
 
-export function filterAnnouncementsNotDismissed<T extends { slug: string }>(
+export function filterAnnouncementsNotDismissed<T extends { id: string }>(
   rows: readonly T[],
   dismissals: DismissedAnnouncements,
 ): T[] {
-  return rows.filter((row) => !(row.slug in dismissals));
+  return rows.filter((row) => !(row.id in dismissals));
 }

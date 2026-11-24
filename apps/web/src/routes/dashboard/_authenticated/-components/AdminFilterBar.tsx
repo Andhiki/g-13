@@ -1,3 +1,4 @@
+import { FormInput } from "@/ui/form-control";
 import type { ReactNode } from "react";
 import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
@@ -70,13 +71,14 @@ export function AdminSearchInput({
         className="pointer-events-none absolute left-2.5 size-3.5 text-text-sub-600"
         aria-hidden="true"
       />
-      <input
+      <FormInput
+        variant="bare"
         type="search"
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={onChange}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:pointer-fine:h-7 sm:pointer-fine:pl-8 sm:pointer-fine:pr-7 sm:pointer-fine:text-paragraph-xs [&::-webkit-search-cancel-button]:appearance-none"
+        className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:pointer-fine:h-7 sm:pointer-fine:pl-8 sm:pointer-fine:pr-7 [&::-webkit-search-cancel-button]:appearance-none"
       />
       {value && (
         <button

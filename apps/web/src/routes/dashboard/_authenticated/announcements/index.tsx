@@ -2,7 +2,6 @@ import { RiMegaphoneLine } from "@remixicon/react";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
@@ -301,7 +300,6 @@ function AnnouncementLifecycleModal({
 
 function AdminAnnouncementsPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<AnnouncementStatus>("live");
@@ -328,7 +326,7 @@ function AdminAnnouncementsPage() {
   const needle = query.trim().toLowerCase();
   const visibleRows = needle
     ? pageRows.filter((row) =>
-        `${row.slug} ${row.titleId} ${row.titleEn}`.toLowerCase().includes(needle),
+        `${row.id} ${row.titleId} ${row.titleEn}`.toLowerCase().includes(needle),
       )
     : pageRows;
   const count = visibleRows.length;
@@ -399,7 +397,7 @@ function AdminAnnouncementsPage() {
       <AdminSearchInput
         value={query}
         onChange={setQuery}
-        placeholder="Filter slug or title…"
+        placeholder="Filter announcement or title…"
         ariaLabel="Filter announcements"
       />
       <DetailsToggleButton
@@ -414,10 +412,6 @@ function AdminAnnouncementsPage() {
     <>
       <AdminPageHeader
         title="Announcements"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
             Add announcement

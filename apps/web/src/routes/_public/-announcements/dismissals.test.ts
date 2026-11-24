@@ -21,16 +21,15 @@ test("parses valid dismissal records and prunes expired entries", () => {
   ).toEqual({ fresh: now - 1000 });
 });
 
-test("dismissing adds the slug with the current time", () => {
-  const dismissed = dismissAnnouncement({ other: now - 100 }, "midterm-schedule", now);
-  expect(dismissed).toEqual({ other: now - 100, "midterm-schedule": now });
+test("dismissing adds the announcement ID with the current time", () => {
+  const dismissed = dismissAnnouncement({ other: now - 100 }, "announcement-1", now);
+  expect(dismissed).toEqual({ other: now - 100, "announcement-1": now });
 });
 
-test("filters rows by their dismissed slugs", () => {
-  const rows = [
-    { slug: "a", id: "1" },
-    { slug: "b", id: "2" },
-  ];
-  expect(filterAnnouncementsNotDismissed(rows, { a: now })).toEqual([{ slug: "b", id: "2" }]);
+test("filters rows by their dismissed IDs", () => {
+  const rows = [{ id: "announcement-1" }, { id: "announcement-2" }];
+  expect(filterAnnouncementsNotDismissed(rows, { "announcement-1": now })).toEqual([
+    { id: "announcement-2" },
+  ]);
   expect(filterAnnouncementsNotDismissed(rows, {})).toEqual(rows);
 });

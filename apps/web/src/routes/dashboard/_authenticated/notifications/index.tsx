@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
 import {
   RiArchiveLine,
   RiCheckDoubleLine,
@@ -326,7 +325,6 @@ function NotificationsFeed({
 
 function NotificationsPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { text } = useLocale("notifications");
   const scrollArea = useRef<HTMLDivElement>(null);
   const nextPage = useRef<HTMLDivElement>(null);
@@ -365,13 +363,7 @@ function NotificationsPage() {
 
   return (
     <>
-      <AdminPageHeader
-        title={text("title")}
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
-      />
+      <AdminPageHeader title={text("title")} />
       <AdminFilterBar
         ariaLabel="Notification filters"
         tabs={notificationFilterSchema.options.map((value) => ({

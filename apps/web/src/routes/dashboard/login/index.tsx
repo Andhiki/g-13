@@ -4,16 +4,21 @@ import { Loading } from "@/ui/loading";
 import { Typography } from "@/ui/typography";
 import { loadAdminIdentity } from "@/routes/-auth/server/identity";
 import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
+import { clearDashboardIdentity } from "../_authenticated/-client/identity";
 import { LoginPage } from "./-components/LoginPage";
 
 export const Route = createFileRoute("/dashboard/login/")({
   head: () => ({
     meta: [{ title: "Sign in" }, { name: "robots", content: "noindex, nofollow" }],
   }),
-  loader: async () => {
-    if (hasDashboardSessionCookie() === false) return { identity: null };
+  loader: async ({ context }) => {
+    if (hasDashboardSessionCookie() === false) {
+      clearDashboardIdentity(context.queryClient);
+      return { identity: null };
+    }
     const identity = await loadAdminIdentity();
     if (canModerate(identity?.role)) throw redirect({ to: "/dashboard/lecturer-reviews" });
+    clearDashboardIdentity(context.queryClient);
     return { identity };
   },
   pendingComponent: () => (

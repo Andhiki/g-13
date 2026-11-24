@@ -2,10 +2,8 @@ import { useRef, type ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
+import { FormInput, FormTextarea } from "@/ui/form-control";
 import { Typography } from "@/ui/typography";
-
-const fieldControlClass =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
 
 export function AdminFormModal({
   open,
@@ -39,6 +37,7 @@ export function AdminForm({
   submitLabel,
   pending,
   error,
+  beforeFields,
   onClose,
   onSubmit,
   children,
@@ -47,6 +46,7 @@ export function AdminForm({
   submitLabel: string;
   pending: boolean;
   error?: string;
+  beforeFields?: ReactNode;
   onClose: () => void;
   onSubmit: () => boolean | void;
   children: ReactNode;
@@ -74,6 +74,7 @@ export function AdminForm({
           </Typography>
         </AlignModal.Title>
       </header>
+      {beforeFields}
       <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
         {children}
         {error && (
@@ -135,7 +136,6 @@ export function AdminFormField({
   onBlur?: () => void;
 }) {
   const errorId = `${id}-error`;
-  const controlClassName = readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass;
   const controlProps = {
     id,
     name,
@@ -144,8 +144,7 @@ export function AdminFormField({
     readOnly,
     "aria-invalid": Boolean(error),
     "aria-describedby": error ? errorId : undefined,
-    className: controlClassName,
-    onChange: (event: { target: { value: string } }) => onChange(event.target.value),
+    onValueChange: onChange,
     onBlur,
   };
 
@@ -161,15 +160,16 @@ export function AdminFormField({
         {label}
       </Typography>
       {multiline ? (
-        <textarea
+        <FormTextarea
           {...controlProps}
           rows={rows}
           maxLength={maxLength}
-          className={`${controlClassName} resize-y`}
+          className="sm:pointer-fine:min-h-8 read-only:text-text-sub-600"
         />
       ) : (
-        <input
+        <FormInput
           {...controlProps}
+          className="sm:pointer-fine:min-h-8 read-only:text-text-sub-600"
           type={type}
           inputMode={inputMode}
           autoComplete={autoComplete}

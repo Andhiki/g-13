@@ -61,7 +61,7 @@ test("A failed notification update leaves it actionable, then mark all as read s
   await expect(screen.getByText(emptyUnread).first()).toBeVisible();
 });
 
-test("A new review notification opens the matching moderation inspector", async ({
+test("A pending review notification opens the matching moderation inspector", async ({
   app,
   browser,
   screen,
@@ -69,9 +69,12 @@ test("A new review notification opens the matching moderation inspector", async 
 }) => {
   const body = "This review should send a unique notification to each moderator.";
   await (
-    await fillReview({ app, browser, screen }, body, { author: "Notification Fixture" })
+    await fillReview({ app, browser, screen }, body, {
+      author: "Notification Fixture",
+      pending: true,
+    })
   ).click();
-  await expect(screen.getByRole("article").filter({ hasText: body })).toBeVisible();
+  await expect(screen.getByText(/menunggu moderasi|awaiting moderation/i)).toBeVisible();
   await signIn("maintainer");
   await app.open(path);
   const item = screen.getByRole("listitem").filter({ hasText: "Notification Fixture" });
@@ -81,4 +84,17 @@ test("A new review notification opens the matching moderation inspector", async 
   await expect(screen.getByText("Review details", { exact: true }).first()).toBeVisible();
   await expect(screen.getByText(body).last()).toBeVisible();
   await expect(screen.getByText(fixture.lecturer, { exact: true }).first()).toBeVisible();
+});
+
+test("A published review does not notify moderators", async ({ app, browser, screen, signIn }) => {
+  const body = "This review publishes immediately and should not notify moderators.";
+  await (
+    await fillReview({ app, browser, screen }, body, { author: "Published Fixture" })
+  ).click();
+  await expect(screen.getByRole("article").filter({ hasText: body })).toBeVisible();
+  await signIn("maintainer");
+  await app.open(path);
+  await expect(
+    screen.getByRole("listitem").filter({ hasText: "Published Fixture" }),
+  ).toHaveCount(0);
 });

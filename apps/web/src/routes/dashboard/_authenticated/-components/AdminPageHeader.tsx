@@ -6,32 +6,13 @@ import { useAdminLayout } from "./AdminLayoutContext";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { MobileModerationMenu } from "./ModerationNavigation";
 
-export function AdminPageHeader({
-  title,
-  manager,
-  userName,
-  userEmail,
-  userImage,
-  action,
-}: {
-  title: string;
-  manager: boolean;
-  userName: string;
-  userEmail?: string | null;
-  userImage?: string | null;
-  action?: ReactNode;
-}) {
+export function AdminPageHeader({ title, action }: { title: string; action?: ReactNode }) {
   const { sidebarOpen, setSidebarOpen } = useAdminLayout();
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-stroke-soft-200 px-3">
       <div className="flex min-w-0 items-center gap-2">
-        <MobileModerationMenu
-          manager={manager}
-          userName={userName}
-          userEmail={userEmail}
-          userImage={userImage}
-        />
+        <MobileModerationMenu />
         <AlignButton.Root
           size="xsmall"
           variant="neutral"

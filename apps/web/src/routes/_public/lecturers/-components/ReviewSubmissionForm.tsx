@@ -1,3 +1,4 @@
+import { FormInput, FormTextarea } from "@/ui/form-control";
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,8 +34,6 @@ import { publishLecturerReviewMutationOptions } from "../-client/mutations";
 import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
 const row = "grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6";
-const control =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm";
 const initialRatings = { clarity: 0, support: 0, organization: 0 };
 const metrics = [
   {
@@ -65,7 +64,7 @@ function submissionErrorMessage(error: unknown) {
   const code = error instanceof Error ? error.message : null;
   return (
     (code && SUBMISSION_ERROR_MESSAGES[code]) ||
-    "Could not confirm publication. Refresh the page before trying again."
+    "Could not confirm submission. Refresh the page before trying again."
   );
 }
 
@@ -104,9 +103,10 @@ function AuthorNameInputBox({
         className={`flex min-h-9 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:outline-2 focus-within:outline-primary-base ${anonymous ? "cursor-not-allowed opacity-50" : ""}`}
       >
         <AuthorIcon aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
-        <input
+        <FormInput
+          variant="bare"
           id="review-author"
-          className="min-h-9 min-w-0 w-full bg-transparent py-1.5 text-base outline-none disabled:cursor-not-allowed sm:text-paragraph-sm"
+          className="min-h-9 min-w-0 w-full bg-transparent py-1.5 outline-none disabled:cursor-not-allowed"
           name="authorName"
           maxLength={80}
           value={anonymous ? text("Anonymous") : authorName}
@@ -114,7 +114,7 @@ function AuthorNameInputBox({
           required={!anonymous}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "review-authorName-error" : undefined}
-          onChange={(event) => onAuthorNameChange(event.target.value)}
+          onValueChange={onAuthorNameChange}
         />
       </div>
       <FieldError name="authorName" error={error} />
@@ -197,7 +197,7 @@ function TermSelectField({
         >
           <SelectTrigger
             id="review-term"
-            className="group/trigger flex h-9 min-h-9 w-full min-w-0 items-center justify-between gap-2 rounded-10 bg-bg-white-0 pl-3 pr-2.5 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base data-placeholder:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent"
+            className="group/trigger flex h-9 min-h-9 w-full min-w-0 items-center justify-between gap-2 rounded-10 bg-bg-white-0 pl-3 pr-2.5 text-left text-form-control text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base data-placeholder:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent"
             aria-invalid={Boolean(error)}
             aria-describedby={error ? "review-termLabel-error" : undefined}
           >
@@ -249,9 +249,8 @@ function ReviewBodyField({
         </Typography>
       </div>
       <div>
-        <textarea
+        <FormTextarea
           id="review-body"
-          className={control}
           name="body"
           maxLength={1000}
           rows={4}
@@ -259,7 +258,7 @@ function ReviewBodyField({
           value={body}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "review-body-error" : undefined}
-          onChange={(event) => onChange(event.target.value)}
+          onValueChange={onChange}
         />
         <div className="mt-1.5 text-text-sub-600">
           <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
@@ -312,7 +311,7 @@ function ReviewFormFooter({
           className="w-full sm:w-auto"
         >
           <Typography as="span" variant="paragraph">
-            {text("Publish review")}
+            {text("Submit review")}
           </Typography>
         </AlignFancyButton.Root>
       </div>
@@ -425,14 +424,14 @@ export function ReviewSubmissionForm({
   lecturerName,
   initialCourseId,
   onClose,
-  onPublished,
+  onSubmitted,
 }: {
   initialCourse?: ReviewCourseOption;
   lecturerId: string;
   lecturerName: string;
   initialCourseId: string;
   onClose: () => void;
-  onPublished: (reviewId: string) => Promise<void>;
+  onSubmitted: (status: "pending" | "published") => Promise<void>;
 }) {
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
@@ -484,7 +483,7 @@ export function ReviewSubmissionForm({
         return;
       }
       const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
-      await onPublished(result.reviewId);
+      await onSubmitted(result.status);
     } catch (error: unknown) {
       setMessage(submissionErrorMessage(error));
     } finally {

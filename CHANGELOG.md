@@ -12,6 +12,28 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Added
 
+- Banner pengumuman kini dapat menampilkan hitung mundur dwibahasa menuju acara dan beralih ke status sedang berlangsung tanpa mengubah jadwal tayangnya.
+- Formulir pengumuman kini menampilkan pratinjau banner langsung dan menyediakan pemilih tanggal serta waktu untuk target hitung mundur.
+
+#### Changed
+
+- Pengumuman kini memakai ID internal untuk pengelolaan dan penyimpanan dismissal; slug tidak lagi diperlukan.
+
+#### Fixed
+
+- Bilah navigasi tetap berada di depan popover saat halaman digulir.
+
+- Isi dan tombol dialog tetap tampil utuh selama animasi penutupan, serta sudut konten dialog tidak lagi terpotong.
+- Ukuran teks isian dashboard dan formulir ulasan dosen kini seragam, termasuk pada laptop dengan layar sentuh.
+- Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.
+- Sidebar dashboard kini menampilkan skeleton penuh selagi izin akses diverifikasi untuk mencegah pergeseran tata letak, serta menyembunyikan menu secara ketat sesuai izin peran pengguna.
+
+## 0.1.0 - 2026-11-24
+
+### 2026-11-24
+
+#### Added
+
 - Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutan yang bisa digeser langsung, semuanya tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
 
 #### Changed
@@ -20,13 +42,15 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
-- Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.
+- Banner pengumuman mengembang dengan halus saat pertama kali dimuat tanpa cache.
+- Kolom isian pada formulir dashboard kini mengikuti skala teks dan tinggi kontrol lain di panel, sehingga label, isian, dan tombol tidak lagi tampak tidak seimbang.
 
 ### 2026-11-23
 
 #### Changed
 
 - Katalog mata kuliah pada formulir ulasan kini memakai 146 mata kuliah dari edisi 2021 dan 2026; mata kuliah yang sama di kedua edisi digabung ke satu identitas dan ulasan yang sudah ada tetap terhubung.
+- Ulasan dosen dengan salah satu rating 2 atau lebih rendah kini masuk antrean Pending dan tidak tampil di halaman publik sampai disetujui admin. Ulasan dengan semua rating 3 ke atas tetap terbit langsung. Halaman moderasi mendapat tab Pending dengan tombol setujui dan sembunyikan, dan notifikasi hanya dikirim untuk ulasan yang masuk antrean Pending.
 
 #### Fixed
 
@@ -39,10 +63,6 @@ Riwayat sebelum changelog ini dibuat tersedia di
 #### Added
 
 - Banner pengumuman situs di atas navbar dengan jadwal tayang (tanggal mulai, tanggal kadaluarsa, dan kontrol aktif manual) serta CTA opsional, dikelola dari halaman baru di dashboard.
-
-Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
-[GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
-Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 ### 2026-11-21
 
@@ -837,3 +857,7 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
   agar isi daftar tetap dapat dijangkau.
 - Tombol `Escape` menutup filter desktop dan mengembalikan fokus ke tombol
   pembukanya tanpa mengganggu penutupan pilihan filter yang sedang terbuka.
+
+Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
+[GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
+Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.

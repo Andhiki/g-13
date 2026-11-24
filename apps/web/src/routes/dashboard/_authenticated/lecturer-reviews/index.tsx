@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
-import { canManageUsers } from "@g13/auth";
 import { RiChatCheckLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility, type loadModerationReviews } from "./-server/handler";
@@ -47,7 +46,7 @@ type ModerationReview = Awaited<ReturnType<typeof loadModerationReviews>>["rows"
 type ReviewConfirmation = {
   input: ModerateReviewInput;
   label: string;
-  status: "published" | "hidden";
+  status: "pending" | "published" | "hidden";
 };
 
 function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
@@ -59,10 +58,13 @@ function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
 function reviewEmptyDescription(needle: string, status: ReviewStatus): string {
   if (needle) return "Try another search term or clear the search to see submitted reviews.";
   if (status === "all") {
-    return "Reviews submitted from public lecturer pages appear here immediately; they are not held for admin approval.";
+    return "Reviews with any rating of 2 or lower wait in Pending; all others publish immediately.";
+  }
+  if (status === "pending") {
+    return "Reviews with a rating of 2 or lower wait here until an admin approves or hides them.";
   }
   if (status === "published") {
-    return "New public submissions are published immediately and will appear here once visitors post them.";
+    return "Reviews with every rating at 3 or higher publish immediately and appear here.";
   }
   return `Reviews appear here after an admin moves them to ${status}.`;
 }
@@ -142,12 +144,14 @@ function ReviewsListBody({
 }
 
 const REVIEW_ACTION_LABELS: Record<ModerateReviewInput["action"], string> = {
+  approve: "Approve review",
   delete: "Delete review",
   hide: "Hide review",
   restore: "Restore review",
 };
 
 const REVIEW_ACTION_SUMMARIES: Record<ModerateReviewInput["action"], string> = {
+  approve: "Publish this review and include it in public scores.",
   delete:
     "This removes the review from public listings and scores. The record stays stored and cannot be restored here.",
   hide: "Remove this review from public listings and scores.",
@@ -192,7 +196,11 @@ function ReviewConfirmModal({
           from={<ReviewStatusBadge status={confirmation.status} deleted={false} />}
           to={
             <ReviewStatusBadge
-              status={confirmation.input.action === "restore" ? "published" : "hidden"}
+              status={
+                confirmation.input.action === "hide" || confirmation.input.action === "delete"
+                  ? "hidden"
+                  : "published"
+              }
               deleted={confirmation.input.action === "delete"}
             />
           }
@@ -290,7 +298,6 @@ function ReviewsContent({
 
 function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
@@ -374,13 +381,7 @@ function LecturerReviewsPage() {
 
   return (
     <>
-      <AdminPageHeader
-        title="Lecturer reviews"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
-      />
+      <AdminPageHeader title="Lecturer reviews" />
       <AdminFilterBar
         ariaLabel="Review status filters"
         tabs={reviewStatusSchema.options.map((value) => ({
