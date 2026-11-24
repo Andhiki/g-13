@@ -88,7 +88,8 @@ for (const catalog of [
     await expect(
       screen.getByRole("button", { name: /inspect.*e2e disposable record/i }),
     ).toBeHidden();
-    await screen.getByRole("button", { name: /^deleted\b/i }).click();
+    // The delete dialog exit overlay can intercept a pointer click.
+    await screen.getByRole("button", { name: /^deleted\b/i }).press("Enter");
     await expect(screen.getByText(revised, { exact: true }).first()).toBeVisible();
     await screen.getByRole("button", { name: "Restore", exact: true }).first().click();
     const confirmRestore = screen.getByRole("dialog", { name: "Confirm restore" });
