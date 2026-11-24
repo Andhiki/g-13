@@ -9,7 +9,7 @@ type ReviewPage = Pick<TestFixtures & WebFixtures, "app" | "browser" | "screen">
 export async function fillReview(
   { app, browser, screen }: ReviewPage,
   body: string,
-  options: { author?: string; rejected?: boolean } = {},
+  options: { author?: string; rejected?: boolean; pending?: boolean } = {},
 ) {
   const token = options.rejected ? "e2e-rejected" : "e2e-verified";
   await browser.route("https://challenges.cloudflare.com/turnstile/**", (route) =>
@@ -37,13 +37,14 @@ export async function fillReview(
   await dialog.getByRole("combobox", { name: /^(semester|periode|term)$/i }).click();
   await dialog.getByRole("option").first().click();
   await expect(dialog).toBeVisible();
-  for (const metric of [
+  for (const [index, metric] of [
     /kejelasan|clarity/i,
     /dukungan|support/i,
     /pengorganisasian|organization/i,
-  ]) {
+  ].entries()) {
+    const value = options.pending && index === 0 ? 2 : 5;
     const rating = dialog.getByRole("radio", {
-      name: new RegExp(`(?:${metric.source}).*5 (?:dari|of) 5`, "i"),
+      name: new RegExp(`(?:${metric.source}).*${value} (?:dari|of) 5`, "i"),
     });
     await rating.click();
   }
