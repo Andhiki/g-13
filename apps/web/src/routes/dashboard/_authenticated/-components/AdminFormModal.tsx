@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from "react";
+import { Input } from "@ui-sdk/react/input";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
@@ -137,7 +138,7 @@ export function AdminFormField({
       >
         {label}
       </Typography>
-      <input
+      <Input
         id={id}
         name={name}
         type={type}
@@ -148,7 +149,7 @@ export function AdminFormField({
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
         className={readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={onChange}
       />
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">

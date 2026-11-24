@@ -1,7 +1,8 @@
-import { useId } from "react";
 import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
-import { AlignSelect } from "@/ui/select";
+import { Input, InputClear, InputGroup } from "@ui-sdk/react/input";
+import { Select } from "@ui-sdk/react/select";
+import { ThesisSelectContent, ThesisSelectItem, ThesisSelectTrigger } from "./ThesisSelect";
 import { thesisTypeLabelKey, type ThesisField, type ThesisType } from "../-shared/thesis";
 
 type SelectOption = { value: string; label: string };
@@ -17,20 +18,15 @@ function FilterSelect({
   options: SelectOption[];
   onChange: (value: string) => void;
 }) {
-  const selected = options.find((option) => option.value === value)?.label ?? options[0]?.label;
   return (
-    <AlignSelect.Root variant="compact" value={value} onValueChange={onChange}>
-      <AlignSelect.Trigger aria-label={label} className="h-9 min-h-9">
-        <AlignSelect.Value>{selected}</AlignSelect.Value>
-      </AlignSelect.Trigger>
-      <AlignSelect.Content>
+    <Select value={value} items={options} onValueChange={(next) => onChange(next ?? "all")}>
+      <ThesisSelectTrigger aria-label={label} />
+      <ThesisSelectContent>
         {options.map((option) => (
-          <AlignSelect.Item key={option.value} value={option.value}>
-            {option.label}
-          </AlignSelect.Item>
+          <ThesisSelectItem key={option.value} {...option} />
         ))}
-      </AlignSelect.Content>
-    </AlignSelect.Root>
+      </ThesisSelectContent>
+    </Select>
   );
 }
 
@@ -60,7 +56,6 @@ export function ThesisSearchFilters({
   onFieldChange: (value: string) => void;
 }) {
   const { text } = useLocale("theses");
-  const searchId = useId();
   const all = "all";
   const yearOptions = [
     { value: all, label: text("All years") },
@@ -78,31 +73,23 @@ export function ThesisSearchFilters({
 
   return (
     <section aria-label={text("Filters")} className="grid gap-3">
-      <label
-        htmlFor={searchId}
-        className="flex h-10 min-w-32 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16 sm:pointer-fine:h-9"
-      >
-        <span className="sr-only">{text("Search theses")}</span>
+      <InputGroup className="flex h-10 min-w-32 flex-1 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-within:ring-2 focus-within:ring-primary-alpha-16 sm:pointer-fine:h-9">
         <RiSearchLine aria-hidden="true" className="size-5 shrink-0 text-text-sub-600" />
-        <input
-          id={searchId}
+        <Input
+          aria-label={text("Search theses")}
           type="search"
-          className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:pointer-fine:text-paragraph-sm"
+          className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:pointer-fine:text-paragraph-sm [&::-webkit-search-cancel-button]:appearance-none"
           placeholder={text("Search by title, author, supervisor, or keyword")}
           value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
+          onValueChange={onQueryChange}
         />
-        {query && (
-          <button
-            type="button"
-            className="relative flex size-8 shrink-0 items-center justify-center rounded-md text-text-sub-600 focus-visible:outline-2 focus-visible:outline-primary-base pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
-            aria-label={text("Clear search")}
-            onClick={() => onQueryChange("")}
-          >
-            <RiCloseLine aria-hidden="true" className="size-4" />
-          </button>
-        )}
-      </label>
+        <InputClear
+          className="relative flex size-8 shrink-0 items-center justify-center rounded-md text-text-sub-600 focus-visible:outline-2 focus-visible:outline-primary-base pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
+          aria-label={text("Clear search")}
+        >
+          <RiCloseLine aria-hidden="true" className="size-4" />
+        </InputClear>
+      </InputGroup>
       {showFilters && (
         <div className="flex flex-wrap items-center gap-2">
           {years.length > 1 && (

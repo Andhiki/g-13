@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { RiCloseLine, RiSearchLine } from "@remixicon/react";
+import { Input, InputClear, InputGroup } from "@ui-sdk/react/input";
 import { AlignButton } from "@/ui/button";
 
 export type AdminFilterTab<T extends string> = {
@@ -65,29 +66,25 @@ export function AdminSearchInput({
   ariaLabel: string;
 }) {
   return (
-    <label className="relative flex flex-1 items-center sm:w-60">
+    <InputGroup className="relative flex flex-1 items-center sm:w-60">
       <RiSearchLine
         className="pointer-events-none absolute left-2.5 size-3.5 text-text-sub-600"
         aria-hidden="true"
       />
-      <input
+      <Input
         type="search"
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={onChange}
         placeholder={placeholder}
         aria-label={ariaLabel}
         className="h-10 w-full appearance-none rounded-md border border-stroke-soft-200 bg-bg-white-0 pl-9 pr-8 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:pointer-fine:h-7 sm:pointer-fine:pl-8 sm:pointer-fine:pr-7 sm:pointer-fine:text-paragraph-xs [&::-webkit-search-cancel-button]:appearance-none"
       />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          aria-label="Clear filter"
-          className="absolute right-1.5 inline-flex size-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
-        >
-          <RiCloseLine className="size-3.5" />
-        </button>
-      )}
-    </label>
+      <InputClear
+        aria-label="Clear filter"
+        className="absolute right-1.5 inline-flex size-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
+      >
+        <RiCloseLine aria-hidden="true" className="size-3.5" />
+      </InputClear>
+    </InputGroup>
   );
 }

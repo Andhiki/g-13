@@ -17,6 +17,10 @@ Riwayat sebelum changelog ini dibuat tersedia di
 - Formulir pengajuan skripsi lewat GitHub Issue dan CTA di `/theses`, dengan catatan privasi dan alur peninjauan maintainer sebelum data diterbitkan.
 - Sub-lab skripsi multi-select dari daftar Simaster, dengan tabel `thesis_fields` dan relasi many-to-many; formulir pengajuan dan dashboard kini memakai pilihan sub-lab, bukan teks bebas.
 
+#### Changed
+
+- Pemilih sub-lab di dashboard skripsi kini bisa dicari dan mendukung pilihan jamak tanpa tombol pengubah.
+
 ### 2026-11-23
 
 #### Changed

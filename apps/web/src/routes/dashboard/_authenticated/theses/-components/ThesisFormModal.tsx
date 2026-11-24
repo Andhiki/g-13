@@ -1,7 +1,21 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { RiAddLine, RiArrowDownLine, RiArrowUpLine, RiDeleteBinLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
-import * as AlignSwitch from "@/ui/switch";
+import {
+  Select,
+  SelectEmpty,
+  SelectGroup,
+  SelectGroupLabel,
+  SelectInput,
+  SelectList,
+} from "@ui-sdk/react/select";
+import { Switch, SwitchThumb } from "@ui-sdk/react/switch";
+import { Textarea } from "@ui-sdk/react/textarea";
+import {
+  ThesisSelectContent,
+  ThesisSelectItem,
+  ThesisSelectTrigger,
+} from "@/routes/_public/theses/-components/ThesisSelect";
 import { Typography } from "@/ui/typography";
 import {
   AdminForm,
@@ -107,7 +121,7 @@ function TextAreaField({
       >
         {label}
       </Typography>
-      <textarea
+      <Textarea
         id={id}
         name={name}
         rows={rows}
@@ -117,7 +131,7 @@ function TextAreaField({
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
         className={textAreaClass}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={onChange}
       />
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
@@ -157,21 +171,24 @@ function SelectField({
       >
         {label}
       </Typography>
-      <select
-        id={id}
+      <Select
         name={name}
         value={value}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-        className={fieldControlClass}
-        onChange={(event) => onChange(event.target.value)}
+        items={options}
+        onValueChange={(next) => onChange(next ?? "")}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+        <ThesisSelectTrigger
+          id={id}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+          className="w-full"
+        />
+        <ThesisSelectContent>
+          {options.map((option) => (
+            <ThesisSelectItem key={option.value} {...option} />
+          ))}
+        </ThesisSelectContent>
+      </Select>
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
           {error}
@@ -211,12 +228,15 @@ function SwitchField({
           </Typography>
         )}
       </div>
-      <AlignSwitch.Root
+      <Switch
         id={id}
         checked={checked}
         aria-invalid={Boolean(error)}
+        className="group/switch h-5 w-8 shrink-0 rounded-full bg-bg-soft-200 p-0.5 focus-visible:outline-2 focus-visible:outline-primary-base data-checked:bg-primary-base"
         onCheckedChange={onCheckedChange}
-      />
+      >
+        <SwitchThumb className="block size-4 rounded-full bg-static-white shadow-switch-thumb transition-transform group-data-checked/switch:translate-x-3" />
+      </Switch>
     </div>
   );
 }
@@ -238,33 +258,49 @@ function FieldMultiSelect({
     group.push(field);
     groups.set(field.lab, group);
   }
+  const items = Array.from(groups, ([label, options]) => ({
+    type: "group" as const,
+    label,
+    items: options.map((field) => ({ value: field.id, label: field.name })),
+  }));
   const errorId = "thesis-fields-error";
   return (
     <div>
-      <select
-        id="thesis-fields"
+      <Select
         name="fieldIds"
         multiple
-        size={10}
+        items={items}
         value={selected}
-        aria-labelledby="thesis-fields-heading"
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-        className={`${fieldControlClass} min-h-44 py-1`}
-        onChange={(event) =>
-          onChange([...event.currentTarget.selectedOptions].map((option) => option.value))
-        }
+        onValueChange={onChange}
+        placeholder="Choose sub-labs"
       >
-        {[...groups.entries()].map(([lab, options]) => (
-          <optgroup key={lab} label={lab}>
-            {options.map((field) => (
-              <option key={field.id} value={field.id}>
-                {field.name}
-              </option>
+        <ThesisSelectTrigger
+          aria-labelledby="thesis-fields-heading"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+          className="w-full"
+        />
+        <ThesisSelectContent>
+          <SelectInput
+            aria-label="Search sub-labs"
+            placeholder="Search sub-labs"
+            className={fieldControlClass}
+          />
+          <SelectEmpty className="p-2 text-text-sub-600">No matching sub-labs</SelectEmpty>
+          <SelectList>
+            {items.map((group) => (
+              <SelectGroup key={group.label}>
+                <SelectGroupLabel className="px-2 py-1 text-label-xs text-text-sub-600">
+                  {group.label}
+                </SelectGroupLabel>
+                {group.items.map((item) => (
+                  <ThesisSelectItem key={item.value} {...item} />
+                ))}
+              </SelectGroup>
             ))}
-          </optgroup>
-        ))}
-      </select>
+          </SelectList>
+        </ThesisSelectContent>
+      </Select>
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
           {error}
@@ -292,7 +328,7 @@ function FieldsSection({
           Sub-labs
         </Typography>
         <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
-          Optional. Choose one or more lab sub-fields. Use Ctrl/Cmd or Shift to select multiple.
+          Optional. Select any sub-labs that apply.
         </Typography>
       </div>
       <FieldMultiSelect fields={fields} selected={selected} error={error} onChange={onChange} />
