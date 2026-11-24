@@ -30,6 +30,8 @@ function announcementCopy(row: ActiveAnnouncement, language: Language, defaultCt
 export function AnnouncementBanner() {
   const { text, language } = useLocale();
   const { data } = useQuery({ ...activeAnnouncementsQuery(), retry: false });
+  const [startedWithoutCache] = useState(() => data === undefined);
+  const reducedMotion = useReducedMotion();
   const [dismissed, setDismissed] = useState<DismissedAnnouncements>({});
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export function AnnouncementBanner() {
     const apply = () => {
       document.documentElement.style.setProperty(
         "--app-banner-height",
-        `${Math.round(bars.getBoundingClientRect().height)}px`,
+        `${bars.getBoundingClientRect().height}px`,
       );
     };
     apply();
@@ -75,11 +77,20 @@ export function AnnouncementBanner() {
     });
   }
 
-  if (!visible) return null;
+  if (data === undefined) return null;
 
   return (
-    <section aria-label={text("Pengumuman")} className="bg-primary-base text-static-white">
-      <div ref={barListRef}>
+    <m.section
+      ref={barListRef}
+      aria-label={visible ? text("Pengumuman") : undefined}
+      className="bg-primary-base text-static-white"
+      initial={
+        startedWithoutCache && visible && !reducedMotion ? { height: 0, overflow: "hidden" } : false
+      }
+      animate={{ height: "auto", transitionEnd: { overflow: "visible" } }}
+      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+    >
+      {visible && (
         <AnimatePresence initial={false}>
           {rows.map((row) => {
             const copy = announcementCopy(row, language, text("Selengkapnya"));
@@ -98,8 +109,8 @@ export function AnnouncementBanner() {
             );
           })}
         </AnimatePresence>
-      </div>
-    </section>
+      )}
+    </m.section>
   );
 }
 
