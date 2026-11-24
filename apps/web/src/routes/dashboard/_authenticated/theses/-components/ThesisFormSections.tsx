@@ -43,24 +43,11 @@ export function BasicSection({
   return (
     <section className="space-y-4">
       <AdminFormField
-        id="thesis-slug"
-        name="slug"
-        label={editing ? "Slug" : "Slug (optional)"}
-        maxLength={120}
-        placeholder={
-          editing ? "Slug is permanent" : "Auto-generated from the title and year if empty"
-        }
-        value={slug}
-        readOnly={editing}
-        error={errors.slug}
-        onChange={(value) => onChange("slug", value)}
-      />
-      <AdminFormField
         id="thesis-title"
         name="title"
         label="Title"
         maxLength={300}
-        placeholder="Thesis title"
+        placeholder=""
         value={title}
         error={errors.title}
         onChange={(value) => onChange("title", value)}
@@ -117,6 +104,19 @@ export function BasicSection({
         error={errors.language}
         onChange={(value) => onChange("language", value)}
       />
+      <AdminFormField
+        id="thesis-slug"
+        name="slug"
+        label={editing ? "Slug" : "Slug (optional)"}
+        maxLength={120}
+        placeholder={
+          editing ? "Slug is permanent" : "Auto-generated from the title and year if empty"
+        }
+        value={slug}
+        readOnly={editing}
+        error={errors.slug}
+        onChange={(value) => onChange("slug", value)}
+      />
     </section>
   );
 }
@@ -151,7 +151,7 @@ export function AbstractSection({
         label="Abstract (Indonesian)"
         value={abstract}
         maxLength={50_000}
-        placeholder="Paste the abstract as plain text."
+        placeholder="Plain text"
         error={errors.abstract}
         onChange={(value) => onChange("abstract", value)}
       />
@@ -163,7 +163,7 @@ export function AbstractSection({
         label="Abstract (English, optional)"
         value={abstractEn}
         maxLength={50_000}
-        placeholder="Paste the English abstract when available."
+        placeholder=""
         error={errors.abstractEn}
         onChange={(value) => onChange("abstractEn", value)}
       />
@@ -180,7 +180,7 @@ export function AbstractSection({
       <SwitchField
         id="thesis-abstract-public"
         label="Publish abstract"
-        description="Only enable after the author has consented. The abstract stays hidden otherwise."
+        description="Requires the author’s permission to publish the abstract."
         checked={abstractPublic}
         error={errors.abstractPublic}
         onCheckedChange={onAbstractPublicChange}
@@ -245,7 +245,7 @@ export function ContactSection({
       <SwitchField
         id="thesis-contact-public"
         label="Show contact"
-        description="Only enable after the author has consented to publish this contact."
+        description="Requires the author’s permission to publish their contact details."
         checked={contactPublic}
         error={errors.contactPublic}
         onCheckedChange={onContactPublicChange}

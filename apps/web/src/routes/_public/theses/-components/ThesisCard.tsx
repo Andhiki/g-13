@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
+import type { ThesisSearch } from "../-shared/schema";
 import { thesisTypeLabelKey, type ThesisCard as ThesisCardData } from "../-shared/thesis";
 
-export function ThesisCard({ thesis }: { thesis: ThesisCardData }) {
+export function ThesisCard({ thesis, search }: { thesis: ThesisCardData; search: ThesisSearch }) {
   const { text } = useLocale("theses");
   const typeLabel = text(thesisTypeLabelKey(thesis.type));
   const supervisorNames = thesis.supervisors.map((supervisor) => supervisor.name).join(", ");
@@ -12,6 +13,7 @@ export function ThesisCard({ thesis }: { thesis: ThesisCardData }) {
       <Link
         to="/theses/$slug"
         params={{ slug: thesis.slug }}
+        search={search}
         aria-labelledby={`thesis-card-title-${thesis.slug}`}
         className="absolute inset-0 z-0 rounded-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
       />

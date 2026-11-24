@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ThesesIndexPage } from "./theses/-components/ThesesIndexPage";
 import { loadThesesIndex } from "./theses/-server/handler";
+import { thesisSearchSchema } from "./theses/-shared/schema";
 import { Loading } from "@/ui/loading";
 
 export const Route = createFileRoute("/_public/theses/")({
+  validateSearch: thesisSearchSchema,
   loader: () => loadThesesIndex(),
   pendingMs: 150,
   pendingMinMs: 300,

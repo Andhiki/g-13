@@ -23,6 +23,7 @@ export const thesisSupervisorRoleSchema = z.enum(["main", "co"]);
 
 export const thesisPageSchema = z.object({
   offset: z.number().int().min(0),
+  query: z.string().trim().max(300).default(""),
   status: thesisStatusFilterSchema,
 });
 
@@ -71,7 +72,7 @@ const thesisBaseSchema = z.object({
 });
 
 function refineThesis(value: z.infer<typeof thesisBaseSchema>, ctx: z.RefinementCtx) {
-  if (value.abstractPublic && !value.abstract) {
+  if (value.abstractPublic && !value.abstract && !value.abstractEn) {
     ctx.addIssue({
       code: "custom",
       path: ["abstract"],

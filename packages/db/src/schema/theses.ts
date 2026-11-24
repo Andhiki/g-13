@@ -70,7 +70,7 @@ export const theses = sqliteTable(
     ),
     check(
       "theses_abstract_public_content",
-      sql`${table.abstractPublic} = 0 or (${table.abstract} is not null and length(trim(${table.abstract})) > 0)`,
+      sql`${table.abstractPublic} = 0 or (length(trim(coalesce(${table.abstract}, ''))) > 0 or length(trim(coalesce(${table.abstractEn}, ''))) > 0)`,
     ),
     check(
       "theses_contact_public_content",

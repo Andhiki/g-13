@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiExternalLinkLine, RiMailLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
@@ -13,11 +13,15 @@ import {
   type ThesisSupervisor,
 } from "../-shared/thesis";
 
+const route = getRouteApi("/_public/theses/$slug");
+
 function BackLink() {
+  const search = route.useSearch();
   const { text } = useLocale("theses");
   return (
     <Link
       to="/theses"
+      search={search}
       className="inline-flex items-center gap-1.5 text-label-sm text-text-sub-600 hover:text-text-strong-950"
     >
       <RiArrowLeftLine aria-hidden="true" className="size-4" />
@@ -208,9 +212,6 @@ function FullTextSection({ thesis }: { thesis: ThesisDetail }) {
       <Typography as="h2" variant="subtitle2" id="thesis-full-text" className="m-0">
         {text("Full text")}
       </Typography>
-      <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-3">
-        {text("This site does not host the full text.")}
-      </Typography>
       {thesis.repositoryUrl && (
         <Typography as="p" variant="paragraph" className="mb-0 mt-3">
           <a
@@ -220,7 +221,7 @@ function FullTextSection({ thesis }: { thesis: ThesisDetail }) {
             className="inline-flex items-center gap-1.5 break-all text-primary-base hover:underline"
           >
             <RiExternalLinkLine aria-hidden="true" className="size-4 shrink-0" />
-            {text("View thesis link")}
+            {text("Open thesis")}
           </a>
         </Typography>
       )}
@@ -265,7 +266,9 @@ function NoteSection() {
           {text("Correction or removal")}
         </Typography>
         <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
-          {text("If something is wrong or you want this record removed, contact the maintainer.")}{" "}
+          {text(
+            "Comment on your submission or contact the maintainer to request a correction or removal.",
+          )}{" "}
           <a
             href="https://github.com/Andhiki"
             target="_blank"
@@ -273,6 +276,7 @@ function NoteSection() {
             className="text-primary-base hover:underline"
           >
             {text("Contact the maintainer")}
+            <RiExternalLinkLine aria-hidden="true" className="ml-1 inline size-3.5" />
           </a>
         </Typography>
       </section>

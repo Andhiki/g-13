@@ -1,4 +1,4 @@
-import { RiGithubFill } from "@remixicon/react";
+import { RiExternalLinkLine, RiGithubFill } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignLinkButton } from "@/ui/link-button";
@@ -16,12 +16,10 @@ export function ThesisSubmissionCta() {
       className="rounded-10 border border-stroke-soft-200 bg-bg-weak-50 p-4 sm:p-5"
     >
       <Typography as="h2" variant="subtitle2" id="thesis-submission-heading" className="m-0">
-        {text("Have a thesis to showcase?")}
+        {text("Submit your thesis")}
       </Typography>
       <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-2">
-        {text(
-          "Submit your thesis through GitHub. A maintainer will review it before it appears here.",
-        )}
+        {text("A maintainer reviews each submission before publication.")}
       </Typography>
       <Typography as="p" variant="caption" color="muted" className="mb-0 mt-2">
         {text(
@@ -32,7 +30,8 @@ export function ThesisSubmissionCta() {
         <AlignFancyButton.Root asChild size="small">
           <a href={thesisSubmissionUrl} target="_blank" rel="noopener noreferrer">
             <RiGithubFill aria-hidden="true" className="size-4" />
-            {text("Open the submission form")}
+            {text("Submit on GitHub")}
+            <RiExternalLinkLine aria-hidden="true" className="size-3.5" />
           </a>
         </AlignFancyButton.Root>
         <AlignLinkButton.Root
@@ -42,10 +41,16 @@ export function ThesisSubmissionCta() {
           className="h-auto whitespace-normal text-start"
         >
           <a href={maintainerProfileUrl} target="_blank" rel="noopener noreferrer">
-            {text("No GitHub or need private contact? Contact the maintainer.")}
+            {text("Contact the maintainer")}
+            <RiExternalLinkLine aria-hidden="true" className="ml-1 inline size-3.5" />
           </a>
         </AlignLinkButton.Root>
       </div>
+      <Typography as="p" variant="caption" color="muted" className="mb-0 mt-2">
+        {text(
+          "Contact the maintainer if you need a private channel or don’t have a GitHub account.",
+        )}
+      </Typography>
     </section>
   );
 }

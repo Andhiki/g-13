@@ -1,104 +1,106 @@
-import { useDeferredValue, useMemo, useState } from "react";
-import { RiFileTextLine, RiSearchLine } from "@remixicon/react";
+import { useDeferredValue, useMemo } from "react";
+import { getRouteApi } from "@tanstack/react-router";
 import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { AlignEmptyState } from "@/ui/empty-state";
 import { Typography } from "@/ui/typography";
 import { ThesisCard } from "./ThesisCard";
 import { ThesisSearchFilters } from "./ThesisSearchFilters";
-import { filterTheses, type ThesesIndexData, type ThesisType } from "../-shared/thesis";
+import type { ThesisSearch } from "../-shared/schema";
+import { filterTheses, type ThesesIndexData } from "../-shared/thesis";
 
-const all = "all";
+const route = getRouteApi("/_public/theses/");
 
 function ThesesEmpty() {
   const { text } = useLocale("theses");
   return (
     <AlignEmptyState.Root align="center">
-      <AlignEmptyState.Icon>
-        <RiFileTextLine />
-      </AlignEmptyState.Icon>
       <AlignEmptyState.Title>{text("No theses yet")}</AlignEmptyState.Title>
-      <AlignEmptyState.Description>
-        {text("Theses will appear here once an author submits one.")}
-      </AlignEmptyState.Description>
     </AlignEmptyState.Root>
   );
 }
 
-function NoMatch({ onClear }: { onClear: () => void }) {
+function NoMatch() {
   const { text } = useLocale("theses");
   return (
     <AlignEmptyState.Root align="center">
-      <AlignEmptyState.Icon>
-        <RiSearchLine />
-      </AlignEmptyState.Icon>
-      <AlignEmptyState.Title>{text("No theses match this search.")}</AlignEmptyState.Title>
+      <AlignEmptyState.Title>{text("No matching theses")}</AlignEmptyState.Title>
       <AlignEmptyState.Description>
         {text("Try another keyword or clear the filters.")}
       </AlignEmptyState.Description>
-      <AlignEmptyState.Actions>
-        <AlignButton.Root size="small" variant="neutral" mode="stroke" onClick={onClear}>
-          {text("Clear filters")}
-        </AlignButton.Root>
-      </AlignEmptyState.Actions>
     </AlignEmptyState.Root>
   );
 }
 
 export function ThesesBrowser({ data }: { data: ThesesIndexData }) {
   const { text } = useLocale("theses");
-  const [query, setQuery] = useState("");
-  const [year, setYear] = useState(all);
-  const [type, setType] = useState(all);
-  const [field, setField] = useState(all);
-  const deferredQuery = useDeferredValue(query);
+  const search = route.useSearch();
+  const navigate = route.useNavigate();
+  const { q = "", year, type, field } = search;
+  const deferredQuery = useDeferredValue(q);
   const filtered = useMemo(
     () =>
       filterTheses(data.items, {
         query: deferredQuery,
-        year: year === all ? null : Number(year),
-        type: type === all ? null : (type as ThesisType),
-        field: field === all ? null : field,
+        year: year ?? null,
+        type: type ?? null,
+        field: field ?? null,
       }),
     [data.items, deferredQuery, year, type, field],
   );
-  const clearAll = () => {
-    setQuery("");
-    setYear(all);
-    setType(all);
-    setField(all);
-  };
+
+  function updateSearch(patch: ThesisSearch) {
+    void navigate({
+      search: (current) => ({ ...current, ...patch }),
+      replace: true,
+      resetScroll: false,
+    });
+  }
 
   if (data.items.length === 0) return <ThesesEmpty />;
 
   return (
     <div className="grid gap-4">
       <ThesisSearchFilters
-        query={query}
+        query={q}
         year={year}
         type={type}
         field={field}
         years={data.years}
         types={data.types}
         fields={data.fields}
-        onQueryChange={setQuery}
-        onYearChange={setYear}
-        onTypeChange={setType}
-        onFieldChange={setField}
+        onQueryChange={(value) => updateSearch({ q: value || undefined })}
+        onYearChange={(value) => updateSearch({ year: value })}
+        onTypeChange={(value) => updateSearch({ type: value })}
+        onFieldChange={(value) => updateSearch({ field: value })}
       />
-      <Typography as="p" variant="caption" color="muted" role="status" className="m-0">
-        {text("{{count}} theses", { count: filtered.length })}
-      </Typography>
+      <div className="flex flex-wrap items-center gap-3">
+        <Typography as="p" variant="caption" color="muted" role="status" className="m-0">
+          {text("{{count}} theses", { count: filtered.length })}
+        </Typography>
+        {(q || year !== undefined || type || field) && (
+          <AlignButton.Root
+            size="xxsmall"
+            variant="neutral"
+            mode="stroke"
+            onClick={() =>
+              updateSearch({ q: undefined, year: undefined, type: undefined, field: undefined })
+            }
+          >
+            {text("Clear filters")}
+          </AlignButton.Root>
+        )}
+      </div>
       {filtered.length ? (
         <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
           {filtered.map((thesis) => (
             <li key={thesis.slug} className="min-w-0">
-              <ThesisCard thesis={thesis} />
+              <ThesisCard thesis={thesis} search={search} />
             </li>
           ))}
         </ul>
       ) : (
-        <NoMatch onClear={clearAll} />
+        <NoMatch />
       )}
     </div>
   );

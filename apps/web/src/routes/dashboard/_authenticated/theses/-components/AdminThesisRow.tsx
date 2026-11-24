@@ -25,28 +25,28 @@ export function AdminThesisRow({
   return (
     <AdminTableRow
       selected={false}
-      onSelect={() => {
-        if (!deleted) onEdit(thesis);
-      }}
+      onSelect={deleted ? undefined : () => onEdit(thesis)}
       className={`${thesisTableColumns} lg:items-center`}
     >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <AdminTableInspectButton
-            ariaLabel={deleted ? thesis.title : `Edit ${thesis.title}`}
-            selected={false}
-            onSelect={() => {
-              if (!deleted) onEdit(thesis);
-            }}
-          >
-            {thesis.title}
-          </AdminTableInspectButton>
+          {deleted ? (
+            <Typography variant="label">{thesis.title}</Typography>
+          ) : (
+            <AdminTableInspectButton
+              ariaLabel={`Edit ${thesis.title}`}
+              selected={false}
+              onSelect={() => onEdit(thesis)}
+            >
+              {thesis.title}
+            </AdminTableInspectButton>
+          )}
           <div className="lg:hidden">
             <ThesisStatusBadge status={deleted ? "deleted" : thesis.status} />
           </div>
         </div>
         <Typography variant="paragraph" color="muted" className="mt-0.5 block truncate">
-          {thesis.authorName} · {thesis.year}
+          {thesis.authorName}
         </Typography>
         <Typography variant="code" color="muted" className="mt-0.5 block truncate">
           {thesis.id}

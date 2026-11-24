@@ -108,7 +108,18 @@ async function getAdminKeywords(db: Database, thesisIds: string[]) {
   return grouped;
 }
 
-export async function listAdminTheses(db: Database, offset: number, status: ThesisStatusFilter) {
+function thesisSearch(query: string) {
+  return query
+    ? sql`instr(lower(${theses.title} || ' ' || ${theses.authorName} || ' ' || ${theses.id}), lower(${query})) > 0`
+    : undefined;
+}
+
+export async function listAdminTheses(
+  db: Database,
+  offset: number,
+  status: ThesisStatusFilter,
+  query: string,
+) {
   const where =
     status === "deleted"
       ? isNotNull(theses.deletedAt)
@@ -117,8 +128,8 @@ export async function listAdminTheses(db: Database, offset: number, status: Thes
   const rows = await db
     .select(thesisColumns)
     .from(theses)
-    .where(where)
-    .orderBy(desc(theses.updatedAt), asc(theses.title))
+    .where(and(where, thesisSearch(query)))
+    .orderBy(desc(theses.updatedAt), asc(theses.title), asc(theses.id))
     .limit(51)
     .offset(offset);
   if (rows.length === 0) return [];
@@ -136,7 +147,7 @@ export async function listAdminTheses(db: Database, offset: number, status: Thes
   }));
 }
 
-export async function getAdminThesisCounts(db: Database) {
+export async function getAdminThesisCounts(db: Database, query: string) {
   const [row] = await db
     .select({
       draft: sql<number>`coalesce(sum(case when ${theses.status} = 'draft' and ${theses.deletedAt} is null then 1 else 0 end), 0)`,
@@ -144,7 +155,8 @@ export async function getAdminThesisCounts(db: Database) {
       hidden: sql<number>`coalesce(sum(case when ${theses.status} = 'hidden' and ${theses.deletedAt} is null then 1 else 0 end), 0)`,
       deleted: sql<number>`coalesce(sum(case when ${theses.deletedAt} is not null then 1 else 0 end), 0)`,
     })
-    .from(theses);
+    .from(theses)
+    .where(thesisSearch(query));
   return {
     draft: Number(row?.draft ?? 0),
     published: Number(row?.published ?? 0),

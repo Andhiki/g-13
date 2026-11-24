@@ -2,6 +2,7 @@ import { ConfirmActionModal } from "@/routes/dashboard/_authenticated/-component
 import { ConfirmationChange } from "@/routes/dashboard/_authenticated/-components/ConfirmationChange";
 import type { AdminThesis } from "./AdminThesisRow";
 import { ThesisStatusBadge } from "./ThesisStatusBadge";
+import { THESIS_ADMIN_ERRORS } from "../-shared/errors";
 import type { ThesisLifecycleInput } from "../-shared/schemas";
 
 export type ThesisConfirmation = {
@@ -10,10 +11,10 @@ export type ThesisConfirmation = {
 };
 
 const actionTitles: Record<ThesisLifecycleInput["action"], string> = {
-  publish: "Confirm publish",
-  hide: "Confirm hide",
-  delete: "Confirm delete",
-  restore: "Confirm restore",
+  publish: "Publish thesis?",
+  hide: "Hide thesis?",
+  delete: "Delete thesis?",
+  restore: "Restore thesis?",
 };
 
 const actionLabels: Record<ThesisLifecycleInput["action"], string> = {
@@ -25,22 +26,21 @@ const actionLabels: Record<ThesisLifecycleInput["action"], string> = {
 
 const actionSummaries: Record<ThesisLifecycleInput["action"], string> = {
   publish:
-    "This makes the thesis visible on the public directory. The record must have a title, author, year, supervisor, and recorded author consent.",
-  hide: "This removes the thesis from the public directory. The record stays stored and can be published again.",
-  delete:
-    "This moves the thesis to Deleted and removes it from the public directory. You can restore it later as a draft.",
-  restore: "This restores the thesis as a draft. Publish it again when the record is ready.",
+    "The thesis will appear in the public directory. Publishing requires recorded author consent.",
+  hide: "The thesis will leave the public directory. You can publish it again.",
+  delete: "You can restore this thesis as a draft. Hold the delete button to confirm.",
+  restore: "The thesis will return to Draft.",
 };
 
 export function ThesisLifecycleModal({
   confirmation,
-  isError,
+  error,
   isPending,
   onClose,
   onConfirm,
 }: {
   confirmation: ThesisConfirmation | null;
-  isError: boolean;
+  error: Error | null;
   isPending: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -66,11 +66,22 @@ export function ThesisLifecycleModal({
       description={
         <span>
           <strong className="text-text-strong-950">{confirmation?.thesis.title}</strong>.{" "}
+          {action === "delete" &&
+            fromStatus === "published" &&
+            "The thesis will leave the public directory. "}
           {actionSummaries[action]}
         </span>
       }
       confirmLabel={actionLabels[action]}
-      error={isError ? "Update failed. Refresh and try again." : undefined}
+      error={
+        error?.message === THESIS_ADMIN_ERRORS.CONSENT_REQUIRED
+          ? "Edit the thesis to add the author’s consent date and source before publishing."
+          : error?.message === THESIS_ADMIN_ERRORS.THESIS_ACTION_UNAVAILABLE && action === "publish"
+            ? "Check that the thesis is still available and has a title, author, and supervisor."
+            : error
+              ? "Update failed. Refresh and try again."
+              : undefined
+      }
       pending={isPending}
       onClose={onClose}
       onConfirm={onConfirm}

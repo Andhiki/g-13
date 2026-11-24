@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { canManageUsers } from "@g13/auth";
@@ -56,17 +56,17 @@ function emptyTitle(needle: string, status: ThesisStatusFilter): string {
 }
 
 function emptyDescription(needle: string, status: ThesisStatusFilter): string {
-  if (needle) return "Try another search term or clear the search to see theses.";
+  if (needle) return "Try another search term.";
   if (status === "draft") {
-    return "New theses start as drafts. Add the author submission here, then publish it when the record and consent are ready.";
+    return "New theses start as drafts.";
   }
   if (status === "published") {
-    return "Published theses appear on the public directory immediately. Publish a draft or restore a deleted record to see it here.";
+    return "Publish a draft to list it in the public directory.";
   }
   if (status === "hidden") {
-    return "Hidden theses are preserved here and can be published again.";
+    return "You can publish hidden theses again.";
   }
-  return "Deleted theses can be restored as drafts without losing their stored data.";
+  return "Restore a deleted thesis to edit it as a draft.";
 }
 
 function ThesesListBody({
@@ -155,21 +155,21 @@ function AdminThesesPage() {
   });
   const [confirmation, setConfirmation] = useState<ThesisConfirmation | null>(null);
   const queryClient = useQueryClient();
-  const thesesQuery = useQuery(adminThesesQuery(offset, status));
+  const needle = useDeferredValue(query.trim().slice(0, 300));
+  const thesesQuery = useQuery(adminThesesQuery(offset, status, needle));
   const counts = thesesQuery.data?.counts ?? initialData.counts;
   const lecturers = thesesQuery.data?.lecturers ?? initialData.lecturers;
   const fields = thesesQuery.data?.fields ?? initialData.fields;
   const rows = thesesQuery.data?.rows ?? [];
-  const pageRows = rows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) =>
-        `${row.title} ${row.authorName} ${row.id}`.toLowerCase().includes(needle),
-      )
-    : pageRows;
+  const visibleRows = rows.slice(0, 50);
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
-  const hasNext = !needle && rows.length > 50;
+  const total = counts[status];
+  const hasNext = rows.length > 50;
+
+  function changeSearch(value: string) {
+    setQuery(value);
+    setOffset(0);
+  }
 
   async function invalidateThesisQueries() {
     await queryClient.invalidateQueries({ queryKey: ["admin", "theses"] });
@@ -234,7 +234,7 @@ function AdminThesesPage() {
       visibleRows={visibleRows}
       needle={needle}
       status={status}
-      onClearSearch={() => setQuery("")}
+      onClearSearch={() => changeSearch("")}
       onViewDrafts={() => {
         setStatus("draft");
         setOffset(0);
@@ -274,8 +274,8 @@ function AdminThesesPage() {
       >
         <AdminSearchInput
           value={query}
-          onChange={setQuery}
-          placeholder="Filter title, author, or slug…"
+          onChange={changeSearch}
+          placeholder="Search by title, author, or ID"
           ariaLabel="Filter theses"
         />
       </AdminFilterBar>
@@ -283,7 +283,7 @@ function AdminThesesPage() {
         {!thesesQuery.isPending && !thesesQuery.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="theses"
             hasNext={hasNext}
@@ -313,7 +313,7 @@ function AdminThesesPage() {
       />
       <ThesisLifecycleModal
         confirmation={confirmation}
-        isError={lifecycleMutation.isError}
+        error={lifecycleMutation.error}
         isPending={lifecycleMutation.isPending}
         onClose={() => setConfirmation(null)}
         onConfirm={() => {

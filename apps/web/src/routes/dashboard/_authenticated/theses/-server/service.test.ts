@@ -1,6 +1,8 @@
 import { expect, it } from "bun:test";
+import { sql } from "drizzle-orm";
 import { createDatabase } from "@g13/db/client";
 import { lecturers } from "@g13/db/schema/lecturers";
+import { theses } from "@g13/db/schema/theses";
 import { thesisFields } from "@g13/db/schema/thesis-fields";
 import { createTestPlatformProxy } from "@/test/database";
 import { getThesisDetail, getThesesIndex } from "@/routes/_public/theses/-server/read.service";
@@ -58,7 +60,12 @@ it("rejects invalid consent, public content, URLs, and empty supervisor lists", 
     false,
   );
   expect(
-    createThesisSchema.safeParse({ ...baseInput, abstract: null, abstractPublic: true }).success,
+    createThesisSchema.safeParse({
+      ...baseInput,
+      abstract: null,
+      abstractEn: null,
+      abstractPublic: true,
+    }).success,
   ).toBe(false);
   expect(
     createThesisSchema.safeParse({ ...baseInput, contactValue: null, contactPublic: true }).success,
@@ -238,3 +245,43 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
     await platform.dispose();
   }
 }, 30_000);
+
+it("finds theses beyond the first page and publishes an English-only abstract", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.run(sql`
+      with recursive numbers(n) as (values (1) union all select n + 1 from numbers where n < 51)
+      insert into ${theses} (id, title, author_name, year, updated_at)
+      select 'page-row-' || n, 'Example thesis ' || n, 'Sample author', 2026, 4070908800000
+      from numbers
+    `);
+    const input = makeInput({
+      slug: "english-only",
+      title: "Zebra thesis",
+      language: "en",
+      abstract: null,
+      fieldIds: [],
+      supervisors: [{ name: "Example supervisor", lecturerId: null, role: null }],
+    });
+    expect(await createThesis(db, maintainer, input)).toEqual({
+      data: { id: "english-only" },
+      error: null,
+    });
+    expect((await inspectTheses(db, maintainer)).data?.rows.map((row) => row.id)).not.toContain(
+      "english-only",
+    );
+    const search = await inspectTheses(db, maintainer, 0, "draft", "ZEBRA");
+    expect(search.data?.counts.draft).toBe(1);
+    expect(search.data?.rows.map((row) => row.id)).toEqual(["english-only"]);
+    expect(
+      await changeThesisLifecycle(db, maintainer, { thesisId: "english-only", action: "publish" }),
+    ).toEqual({ data: { thesisId: "english-only", action: "publish" }, error: null });
+    expect(await getThesisDetail(db, "english-only")).toMatchObject({
+      abstract: null,
+      abstractEn: "Example abstract.",
+    });
+  } finally {
+    await platform.dispose();
+  }
+});

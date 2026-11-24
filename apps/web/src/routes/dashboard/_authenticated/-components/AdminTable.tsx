@@ -26,17 +26,21 @@ export function AdminTableRow({
 }: {
   className: string;
   selected: boolean;
-  onSelect: () => void;
+  onSelect?: () => void;
   children: ReactNode;
 }) {
   return (
     <article
       data-selected={selected}
-      onClick={(event) => {
-        if (event.target instanceof Element && event.target.closest("button, a")) return;
-        if (!window.getSelection()?.toString()) onSelect();
-      }}
-      className={`grid gap-4 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 xl:cursor-[var(--interactive-cursor)] xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 ${className}`}
+      onClick={
+        onSelect
+          ? (event) => {
+              if (event.target instanceof Element && event.target.closest("button, a")) return;
+              if (!window.getSelection()?.toString()) onSelect();
+            }
+          : undefined
+      }
+      className={`grid gap-4 border-b border-stroke-soft-200 px-4 py-3 transition-colors hover:bg-bg-weak-50/60 xl:data-[selected=true]:bg-primary-alpha-16 xl:data-[selected=true]:hover:bg-primary-alpha-16 ${onSelect ? "xl:cursor-[var(--interactive-cursor)]" : ""} ${className}`}
     >
       {children}
     </article>

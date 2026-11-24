@@ -2,7 +2,12 @@ import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { Input, InputClear, InputGroup } from "@ui-sdk/react/input";
 import { Select } from "@ui-sdk/react/select";
-import { ThesisSelectContent, ThesisSelectItem, ThesisSelectTrigger } from "./ThesisSelect";
+import {
+  ThesisFieldOptions,
+  ThesisSelectContent,
+  ThesisSelectItem,
+  ThesisSelectTrigger,
+} from "./ThesisSelect";
 import { thesisTypeLabelKey, type ThesisField, type ThesisType } from "../-shared/thesis";
 
 type SelectOption = { value: string; label: string };
@@ -44,16 +49,16 @@ export function ThesisSearchFilters({
   onFieldChange,
 }: {
   query: string;
-  year: string;
-  type: string;
-  field: string;
+  year?: number;
+  type?: ThesisType;
+  field?: string;
   years: number[];
   types: ThesisType[];
   fields: ThesisField[];
   onQueryChange: (value: string) => void;
-  onYearChange: (value: string) => void;
-  onTypeChange: (value: string) => void;
-  onFieldChange: (value: string) => void;
+  onYearChange: (value?: number) => void;
+  onTypeChange: (value?: ThesisType) => void;
+  onFieldChange: (value?: string) => void;
 }) {
   const { text } = useLocale("theses");
   const all = "all";
@@ -79,7 +84,8 @@ export function ThesisSearchFilters({
           aria-label={text("Search theses")}
           type="search"
           className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-soft-400 sm:pointer-fine:text-paragraph-sm [&::-webkit-search-cancel-button]:appearance-none"
-          placeholder={text("Search by title, author, supervisor, or keyword")}
+          placeholder={text("Search theses")}
+          maxLength={300}
           value={query}
           onValueChange={onQueryChange}
         />
@@ -95,26 +101,34 @@ export function ThesisSearchFilters({
           {years.length > 1 && (
             <FilterSelect
               label={text("Year")}
-              value={year}
+              value={year === undefined ? all : String(year)}
               options={yearOptions}
-              onChange={onYearChange}
+              onChange={(value) => onYearChange(value === all ? undefined : Number(value))}
             />
           )}
           {types.length > 1 && (
             <FilterSelect
               label={text("Type")}
-              value={type}
+              value={type ?? all}
               options={typeOptions}
-              onChange={onTypeChange}
+              onChange={(value) => onTypeChange(types.find((item) => item === value))}
             />
           )}
           {fields.length > 0 && (
-            <FilterSelect
-              label={text("Sub-labs")}
-              value={field}
-              options={fieldOptions}
-              onChange={onFieldChange}
-            />
+            <Select
+              value={field ?? all}
+              items={fieldOptions}
+              onValueChange={(value) => onFieldChange(value && value !== all ? value : undefined)}
+            >
+              <ThesisSelectTrigger aria-label={text("Sub-labs")} />
+              <ThesisFieldOptions
+                fields={fields}
+                searchLabel={text("Search sub-labs")}
+                emptyLabel={text("No matching sub-labs")}
+              >
+                <ThesisSelectItem value={all} label={text("All sub-labs")} />
+              </ThesisFieldOptions>
+            </Select>
           )}
         </div>
       )}

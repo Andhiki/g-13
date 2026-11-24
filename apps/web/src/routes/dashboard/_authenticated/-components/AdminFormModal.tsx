@@ -39,6 +39,7 @@ export function AdminFormModal({
 export function AdminForm({
   title,
   submitLabel,
+  scrollFields = false,
   pending,
   error,
   onClose,
@@ -47,6 +48,7 @@ export function AdminForm({
 }: {
   title: string;
   submitLabel: string;
+  scrollFields?: boolean;
   pending: boolean;
   error?: string;
   onClose: () => void;
@@ -54,10 +56,21 @@ export function AdminForm({
   children: ReactNode;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const fields = (
+    <fieldset disabled={pending} className="min-w-0 space-y-4 p-5 disabled:opacity-70">
+      {children}
+      {error && (
+        <Typography role="alert" variant="caption" color="danger">
+          {error}
+        </Typography>
+      )}
+    </fieldset>
+  );
 
   return (
     <form
       ref={formRef}
+      className={scrollFields ? "flex min-h-0 flex-1 flex-col" : undefined}
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
@@ -69,22 +82,19 @@ export function AdminForm({
         }
       }}
     >
-      <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
+      <header className="shrink-0 border-b border-stroke-soft-200 px-5 py-4 pr-12">
         <AlignModal.Title asChild>
           <Typography as="h2" variant="subtitle2" color="strong">
             {title}
           </Typography>
         </AlignModal.Title>
       </header>
-      <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
-        {children}
-        {error && (
-          <Typography role="alert" variant="caption" color="danger">
-            {error}
-          </Typography>
-        )}
-      </fieldset>
-      <footer className="flex items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
+      {scrollFields ? (
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{fields}</div>
+      ) : (
+        fields
+      )}
+      <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
         <AlignButton.Root
           size="xsmall"
           variant="neutral"

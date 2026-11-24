@@ -50,7 +50,7 @@ The GitHub issue is public and indexed. Tell authors:
 - Do not include NIM, grades, transcripts, phone numbers, or private email addresses.
 - Only fill the public contact field with an address or URL they want displayed.
 - For private data or if they do not have GitHub, contact the maintainer through the
-  profile linked in [SECURITY.md](../SECURITY.md). Do not ask them to post private data
+  [maintainer’s GitHub profile](https://github.com/Andhiki). Do not ask them to post private data
   in the public issue.
 
 The public contact field is optional. The dashboard marks consent with
@@ -94,7 +94,7 @@ or deleting a record appears on the next request. The public thesis routes are n
 ## Corrections and removal
 
 Authors can request a correction or removal by commenting on their submission issue or
-contacting the maintainer through the private channel in `SECURITY.md`.
+contacting the maintainer through a private channel listed on the [maintainer’s GitHub profile](https://github.com/Andhiki).
 
 - Edit the record in `/dashboard/theses` for corrections.
 - Hide it from public pages when the author wants it removed but the audit record should

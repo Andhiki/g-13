@@ -61,7 +61,7 @@ function SupervisorRow({
     });
   }
   return (
-    <div className="grid gap-3 rounded-10 border border-stroke-soft-200 p-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_140px_auto]">
+    <div className="grid gap-3 rounded-10 border border-stroke-soft-200 p-3 sm:grid-cols-2">
       <SelectField
         id={`supervisor-${index}-lecturer`}
         name={`supervisors.${index}.lecturerId`}
@@ -157,7 +157,7 @@ export function SupervisorEditor({
             Supervisors
           </Typography>
           <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
-            Order is preserved on the public page. Link a lecturer directory profile when possible.
+            Supervisors appear in this order on the public page.
           </Typography>
         </div>
         <AlignButton.Root

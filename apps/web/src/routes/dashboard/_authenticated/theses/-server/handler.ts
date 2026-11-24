@@ -18,7 +18,7 @@ export const loadAdminTheses = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectTheses(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectTheses(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
     );
     if (result.error !== null) rejectThesisAdminOperation(result.error);
     return {

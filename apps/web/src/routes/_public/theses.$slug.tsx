@@ -2,11 +2,13 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ThesisDetailPage } from "./theses/-components/ThesisDetailPage";
 import { loadThesisDetail } from "./theses/-server/handler";
 import { jsonLdFor, metaDescriptionFor } from "./theses/-shared/thesis";
+import { thesisSearchSchema } from "./theses/-shared/schema";
 import { Loading } from "@/ui/loading";
 
 const siteOrigin = "https://csugm.andhiki.tech";
 
 export const Route = createFileRoute("/_public/theses/$slug")({
+  validateSearch: thesisSearchSchema,
   loader: async ({ params }) => {
     const thesis = await loadThesisDetail({ data: { slug: params.slug } });
     if (!thesis) throw notFound();

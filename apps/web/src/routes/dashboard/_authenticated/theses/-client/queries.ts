@@ -4,10 +4,10 @@ import { loadAdminTheses } from "../-server/handler";
 
 const dashboardStaleTime = 5 * 60 * 1000;
 
-export const adminThesesQuery = (offset = 0, status: ThesisStatusFilter = "draft") =>
+export const adminThesesQuery = (offset = 0, status: ThesisStatusFilter = "draft", query = "") =>
   queryOptions({
-    queryKey: ["admin", "theses", offset, status],
-    queryFn: () => loadAdminTheses({ data: { offset, status } }),
+    queryKey: ["admin", "theses", offset, status, query],
+    queryFn: () => loadAdminTheses({ data: { offset, status, query } }),
     staleTime: dashboardStaleTime,
     refetchOnWindowFocus: false,
     retry: false,

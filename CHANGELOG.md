@@ -22,6 +22,8 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Pemilih sub-lab di dashboard skripsi kini bisa dicari dan mendukung pilihan jamak tanpa tombol pengubah.
 - Dashboard skripsi mencatat tanggal izin dari pengajuan penulis.
+- Teks direktori, detail, dashboard, dan formulir pengajuan skripsi diringkas agar tindakan dan syarat publikasi lebih mudah ditemukan.
+- Pencarian skripsi publik menyimpan filter di URL. Dashboard mencari semua data dalam tab status, menampilkan syarat publikasi, dan mendukung abstrak berbahasa Inggris saja.
 - Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
 
 ### 2026-11-23

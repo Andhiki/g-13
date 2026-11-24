@@ -6,16 +6,15 @@ body:
   - type: markdown
     attributes:
       value: |
-        Terima kasih sudah ingin menampilkan skripsimu. Maintainer akan meninjau data ini sebelum menerbitkannya di `/theses`.
+        Maintainer meninjau setiap pengajuan sebelum menerbitkannya.
 
         **Issue ini publik.** Jangan sertakan NIM, nilai, transkrip, nomor HP, atau email pribadi yang tidak ingin kamu tampilkan. Kontak yang kamu isi di bawah akan tampil publik jika datanya diterbitkan.
 
-        Jika kamu tidak punya GitHub atau perlu mengirim data privat, hubungi maintainer melalui profil GitHub yang tercantum di [SECURITY.md](https://github.com/Andhiki/g-13/blob/main/SECURITY.md); jangan menulis data privat di issue ini.
+        Jika kamu tidak punya GitHub atau perlu mengirim data privat, hubungi maintainer melalui kanal privat di [profil GitHub maintainer](https://github.com/Andhiki); jangan menulis data privat di issue ini.
   - type: input
     id: thesis_title
     attributes:
       label: Judul skripsi
-      description: Tulis judul asli skripsi.
       placeholder: "Contoh: Evaluasi Model Machine Learning untuk Prediksi Kondisi Mesin"
     validations:
       required: true
@@ -24,7 +23,6 @@ body:
     attributes:
       label: Nama penulis
       description: Nama yang ingin ditampilkan di halaman publik.
-      placeholder: "Nama lengkap"
     validations:
       required: true
   - type: input
@@ -56,7 +54,6 @@ body:
     attributes:
       label: Abstrak (Inggris, opsional)
       description: Kosongkan jika tidak ada atau tidak ingin ditampilkan.
-      placeholder: "Paste the English abstract as plain text."
   - type: input
     id: keywords
     attributes:
@@ -67,7 +64,7 @@ body:
     id: public_contact
     attributes:
       label: Kontak publik (opsional)
-      description: Email atau URL yang boleh tampil publik. Kosongkan jika tidak ingin kontak ditampilkan.
+      description: Isi email atau URL yang boleh dipublikasikan.
       placeholder: "nama@example.com atau https://..."
   - type: input
     id: repository_url
@@ -79,7 +76,6 @@ body:
     id: fields
     attributes:
       label: Sub-lab (opsional, bisa lebih dari satu)
-      description: Pilih sub-lab yang sesuai dengan penelitianmu. Kamu bisa memilih lebih dari satu.
       multiple: true
       options:
         - "Lab SKJ - Big Data Processing"
@@ -103,6 +99,7 @@ body:
         - "Lab Elins - Sensor Network, IoT"
         - "Lab Elins - Signal Processing"
         - "Lab Elins - Embedded system"
+        - "Lab Elins - Pattern Recognition"
         - "Lab Elins (Elektronika dan Instrumentasi)"
         - "Lab AK - Pengolahan Citra"
         - "Lab AK - Digital"
@@ -128,6 +125,7 @@ body:
         - "Lab SC - Computer Vision"
         - "Lab SC - Intelligent Agent"
         - "Lab SC - AI"
+        - "Lab SC - Pattern Recognition"
         - "Lab SC (Sistem Cerdas)"
         - "Lab RPLD - Software models, architectures, and patterns"
         - "Lab RPLD - Business process management and modeling"
@@ -145,8 +143,6 @@ body:
         - "Lab RPLD - e-Government"
         - "Lab RPLD - IT Project Management"
         - "Lab RPLD - Software quality assurance"
-        - "Lab Elins - Pattern Recognition"
-        - "Lab SC - Pattern Recognition"
   - type: input
     id: batch
     attributes:
@@ -165,4 +161,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        Setelah dikirim, maintainer akan meninjau data, memasukkannya lewat dashboard, menerbitkannya, lalu menautkan URL publik di issue ini dan menutup issue. Jika ada kesalahan atau ingin menghapus data, komentar di issue ini atau hubungi maintainer.
+        Jika skripsimu terbit, tautannya akan muncul di issue ini. Untuk meminta koreksi atau penghapusan data, komentar di sini atau hubungi maintainer.

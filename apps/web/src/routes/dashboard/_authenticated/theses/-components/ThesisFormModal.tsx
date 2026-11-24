@@ -44,7 +44,7 @@ export function ThesisFormModal({
     <AdminFormModal
       open={open}
       pending={pending}
-      contentClassName="max-w-[760px]"
+      contentClassName="flex max-w-[760px] flex-col overflow-hidden"
       onClose={onClose}
     >
       <ThesisFormBody
@@ -190,6 +190,7 @@ function ThesisFormBody({
   return (
     <AdminForm
       title={editing ? "Edit thesis" : "Add thesis"}
+      scrollFields
       submitLabel={editing ? "Save changes" : "Add thesis"}
       pending={pending}
       error={formError ?? error}

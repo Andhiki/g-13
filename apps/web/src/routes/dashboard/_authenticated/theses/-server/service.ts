@@ -53,11 +53,12 @@ export async function inspectTheses(
   actor: Actor,
   offset = 0,
   status: ThesisStatusFilter = "draft",
+  query = "",
 ): Promise<ThesisAdminResult<ThesisListData>> {
   if (!canModerate(actor.role)) return { data: null, error: THESIS_ADMIN_ERRORS.FORBIDDEN };
   const [rows, counts, lecturers, fields] = await Promise.all([
-    listAdminTheses(db, offset, status),
-    getAdminThesisCounts(db),
+    listAdminTheses(db, offset, status, query),
+    getAdminThesisCounts(db, query),
     getAdminThesisLecturers(db),
     getAdminThesisFields(db),
   ]);

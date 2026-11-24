@@ -1,13 +1,8 @@
-import {
-  Select,
-  SelectEmpty,
-  SelectGroup,
-  SelectGroupLabel,
-  SelectInput,
-  SelectList,
-} from "@ui-sdk/react/select";
+import { Select } from "@ui-sdk/react/select";
+import { RiCloseLine } from "@remixicon/react";
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch";
 import {
+  ThesisFieldOptions,
   ThesisSelectContent,
   ThesisSelectItem,
   ThesisSelectTrigger,
@@ -29,9 +24,6 @@ export type SupervisorDraft = {
   role: "main" | "co" | "";
 };
 export type FieldErrors = Record<string, string | undefined>;
-
-const fieldControlClass =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
 
 export const typeOptions = thesisTypeSchema.options.map((value) => ({
   value,
@@ -188,12 +180,6 @@ function FieldMultiSelect({
   error?: string;
   onChange: (fieldIds: string[]) => void;
 }) {
-  const groups = new Map<string, FieldOption[]>();
-  for (const field of fields) {
-    const group = groups.get(field.lab) ?? [];
-    group.push(field);
-    groups.set(field.lab, group);
-  }
   const errorId = "thesis-fields-error";
   return (
     <div>
@@ -203,35 +189,42 @@ function FieldMultiSelect({
         itemToLabel={(id) => fields.find((field) => field.id === id)?.name ?? id}
         value={selected}
         onValueChange={onChange}
-        placeholder="Choose sub-labs"
+        placeholder="None selected"
       >
         <ThesisSelectTrigger
           aria-labelledby="thesis-fields-heading"
+          valueLabel={selected.length ? `${selected.length} selected` : undefined}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className="w-full"
         />
-        <ThesisSelectContent>
-          <SelectInput
-            aria-label="Search sub-labs"
-            placeholder="Search sub-labs"
-            className={fieldControlClass}
-          />
-          <SelectEmpty className="p-2 text-text-sub-600">No matching sub-labs</SelectEmpty>
-          <SelectList>
-            {Array.from(groups, ([lab, options]) => (
-              <SelectGroup key={lab}>
-                <SelectGroupLabel className="px-2 py-1 text-label-xs text-text-sub-600">
-                  {lab}
-                </SelectGroupLabel>
-                {options.map((field) => (
-                  <ThesisSelectItem key={field.id} value={field.id} label={field.name} />
-                ))}
-              </SelectGroup>
-            ))}
-          </SelectList>
-        </ThesisSelectContent>
+        <ThesisFieldOptions
+          fields={fields}
+          searchLabel="Search sub-labs"
+          emptyLabel="No matching sub-labs"
+          multiple
+        />
       </Select>
+      {selected.length > 0 && (
+        <ul className="mt-2 flex list-none flex-wrap gap-2 p-0">
+          {selected.map((id) => {
+            const label = fields.find((field) => field.id === id)?.name ?? id;
+            return (
+              <li key={id}>
+                <button
+                  type="button"
+                  aria-label={`Remove ${label}`}
+                  className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-1 text-label-xs hover:bg-bg-soft-200 focus-visible:outline-2 focus-visible:outline-primary-base"
+                  onClick={() => onChange(selected.filter((value) => value !== id))}
+                >
+                  {label}
+                  <RiCloseLine aria-hidden="true" className="size-3.5 shrink-0" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
           {error}
@@ -254,14 +247,9 @@ export function FieldsSection({
 }) {
   return (
     <section className="space-y-3">
-      <div>
-        <Typography as="h3" id="thesis-fields-heading" variant="label" className="m-0">
-          Sub-labs
-        </Typography>
-        <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
-          Optional. Select any sub-labs that apply.
-        </Typography>
-      </div>
+      <Typography as="h3" id="thesis-fields-heading" variant="label" className="m-0">
+        Sub-labs (optional)
+      </Typography>
       <FieldMultiSelect fields={fields} selected={selected} error={error} onChange={onChange} />
     </section>
   );
