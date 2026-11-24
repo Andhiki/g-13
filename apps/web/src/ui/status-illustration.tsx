@@ -1,44 +1,3 @@
-function MascotFigure({ broken }: { broken: boolean }) {
-  return (
-    <g
-      transform={
-        broken
-          ? "translate(324 190) rotate(-8) scale(1.35)"
-          : "translate(324 186) rotate(8) scale(1.35)"
-      }
-    >
-      <ellipse cx="24" cy="54" rx="30" ry="5" className="fill-stroke-soft-200" />
-      <path
-        d="M11 41 7 53M35 41l5 12"
-        className="stroke-primary-base"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <rect width="48" height="44" rx="15" className="fill-primary-base" />
-      <path
-        d="M-8 25 1 30M47 27l12-9"
-        className="stroke-primary-base"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <g className="fill-static-white">
-        <ellipse cx="17" cy="18" rx="4" ry="5" />
-        <ellipse cx="32" cy="18" rx="4" ry="5" />
-      </g>
-      <g className="fill-static-black">
-        <circle cx="18" cy="19" r="2" />
-        <circle cx="33" cy="19" r="2" />
-      </g>
-      <path
-        d={broken ? "M21 32q4-5 8 0" : "M22 31h6"}
-        className="stroke-static-white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </g>
-  );
-}
-
 export function StatusIllustration({ kind }: { kind: "notFound" | "error" }) {
   const broken = kind === "error";
   return (
@@ -78,7 +37,42 @@ export function StatusIllustration({ kind }: { kind: "notFound" | "error" }) {
       />
       <circle cx="70" cy="226" r="6" className="fill-primary-base" />
       <circle cx="70" cy="226" r="12" className="stroke-primary-base" opacity="0.25" />
-      <MascotFigure broken={broken} />
+      <g
+        transform={
+          broken
+            ? "translate(324 190) rotate(-8) scale(1.35)"
+            : "translate(324 186) rotate(8) scale(1.35)"
+        }
+      >
+        <ellipse cx="24" cy="54" rx="30" ry="5" className="fill-stroke-soft-200" />
+        <path
+          d="M11 41 7 53M35 41l5 12"
+          className="stroke-primary-base"
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
+        <rect width="48" height="44" rx="15" className="fill-primary-base" />
+        <path
+          d="M-8 25 1 30M47 27l12-9"
+          className="stroke-primary-base"
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
+        <g className="fill-static-white">
+          <ellipse cx="17" cy="18" rx="4" ry="5" />
+          <ellipse cx="32" cy="18" rx="4" ry="5" />
+        </g>
+        <g className="fill-static-black">
+          <circle cx="18" cy="19" r="2" />
+          <circle cx="33" cy="19" r="2" />
+        </g>
+        <path
+          d={broken ? "M21 32q4-5 8 0" : "M22 31h6"}
+          className="stroke-static-white"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </g>
       {broken ? (
         <g
           className="stroke-primary-base"

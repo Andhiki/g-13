@@ -37,11 +37,3 @@ _Avoid_: Versi kurikulum
 **Wajib minat (WM)**:
 Mata kuliah yang wajib dipenuhi dalam bidang peminatan yang dipilih pada kurikulum 2026.
 _Avoid_: Wajib untuk semua mahasiswa, pilihan bebas
-
-**Dosen (lecturer)**:
-Pengajar yang tercatat pada direktori ulasan komunitas. Gunakan “dosen” dalam bahasa Indonesia dan “lecturer” dalam bahasa Inggris pada skema, API, rute, fitur, dan antarmuka; “professor” hanya untuk jabatan akademik profesor.
-_Avoid_: Professor untuk menyebut semua dosen
-
-**Aplikasi**:
-Rujuk produk ini sebagai aplikasi pada teks antarmuka pengguna; `g-13` hanya dipakai untuk nama internal repositori dan paket.
-_Avoid_: g-13 pada teks pengguna

@@ -1,3 +1,0 @@
--- Reference data (lecturers and courses) is seeded by the initial migration in
--- packages/db/migrations/0000_*.sql so every fresh database gets it.
--- Add local-only fixtures below if needed.

@@ -14,8 +14,6 @@ Daftar ini mencatat sumber yang diketahui; ini bukan bukti izin redistribusi.
 | Ikon perusahaan | Sumber, lisensi, dan perubahan setiap aset dicatat di [company-logos/README.md](apps/web/public/company-logos/README.md). Merek tetap milik pemilik masing-masing; lisensi aset tidak memberikan hak merek. |
 | GIF Sonic | `apps/web/public/theme/sonic-dancing.gif`; [asal aset](apps/web/public/theme/README.md). Sumber Tenor dan referensi portfolio-magic tidak membuktikan lisensi terbuka. Konfirmasi izin atau ganti dengan aset orisinal/berlisensi jelas sebelum mempromosikan paket aset sebagai bebas digunakan ulang. |
 | Dependensi dan font | Lisensi masing-masing paket tetap berlaku; periksa notice di paket yang didistribusikan. `bun.lock` mengunci versi dependensi. |
-| Skill agent ui-sdk | `.agents/skills/ui-sdk/` disalin dari [vercel-labs/ui](https://github.com/vercel-labs/ui) pada commit `855bc7fd`, tercatat di `skills-lock.json`. Paket `@ui-sdk/core` dan `@ui-sdk/react` berlisensi Apache-2.0. |
-| Skill agent gestures | `.agents/skills/gestures/` disalin dari [emilkowalski/skills](https://github.com/emilkowalski/skills) pada commit `64eb3deb`, tercatat di `skills-lock.json`, berlisensi MIT. |
 | Font Geist | [Geist oleh Vercel](https://github.com/vercel/geist-font), didistribusikan melalui `@fontsource-variable/geist` dengan lisensi SIL Open Font License 1.1. Web menggunakan subset bernama internal G13GeistSubset; lisensi disalin ke `apps/web/src/fonts/geist-LICENSE.txt`. Font trailer tidak diubah; lisensinya di `apps/trailer/public/geist-OFL.txt`. |
 
 Kontributor harus menyertakan URL asal, pemilik, lisensi, serta modifikasi untuk
@@ -24,8 +22,6 @@ materi pihak ketiga baru. Atribusi saja tidak menggantikan izin pemakaian.
 Font Inter untuk web berasal dari [Inter Project](https://github.com/rsms/inter) melalui `@fontsource-variable/inter`, berlisensi SIL OFL 1.1. Subset memakai nama internal G13InterSubset; lisensi tersedia di `apps/web/src/fonts/inter-LICENSE.txt`.
 
 ## Lisensi AlignUI
-
-Popover diadaptasi dari [AlignUI Next.js TypeScript starter, commit f37bd913](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/popover.tsx), sesuai [dokumentasi Popover v1.2](https://alignui.com/docs/v1.2/ui/popover). Adaptasi memakai `twMerge` dan ekspor namespace `AlignPopover`; perilaku tetap menggunakan Radix UI.
 
 MIT License
 

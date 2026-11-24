@@ -1,7 +1,7 @@
 import { rename } from "node:fs/promises";
 import { resolve } from "node:path";
-import { examArchive, archiveSource } from "@/routes/_public/exam/-shared/catalog";
-import type { ExamCourse, ExamPaper } from "@/routes/_public/exam/-shared/contracts";
+import { examArchive, archiveSource } from "../src/features/exam-archive/catalog";
+import type { ExamCourse, ExamPaper } from "../src/features/exam-archive/contracts";
 
 type SourceCourse = { name: string; folderId: string };
 type SourceFile = { id: string; name: string; mimeType: string; createdAt: string | null };
@@ -238,7 +238,7 @@ async function main() {
       "Usage: bun scripts/import-exam-archive.ts <candidate.ts>; review before replacing the human-maintained catalog",
     );
   const target = resolve(output);
-  const liveCatalog = resolve(import.meta.dir, "../src/routes/_public/exam/-shared/catalog.ts");
+  const liveCatalog = resolve(import.meta.dir, "../src/features/exam-archive/catalog.ts");
   if (target === liveCatalog)
     throw new Error(
       "Write a candidate file; never overwrite the human-maintained catalog directly",

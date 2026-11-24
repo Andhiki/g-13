@@ -1,0 +1,9 @@
+# Copy to `.dev.vars` for local development, or set with `wrangler secret put`.
+# Never commit real values.
+
+# Strapi API token with read-only access to the `Alumni` collection.
+# The token is only read by the server route in src/routes/api/alumni.ts.
+STRAPI_API_TOKEN=
+
+# Optional: override the Strapi origin. Defaults to https://strapi.kagamailkomp.id
+STRAPI_ORIGIN=

@@ -36,8 +36,8 @@ stale directives. That limitation does not apply to this app's configured mechan
 
 Local evidence: `apps/web/src/start.ts`, `apps/web/src/cache-policy.ts`,
 `apps/web/src/routes/alumni_.all.tsx`, `apps/web/src/routes/api/alumni.ts`,
-`apps/web/src/routes/alumni/-server/upstream.ts`, and
-`apps/web/src/routes/alumni/-client/useAlumniDirectory.ts`.
+`apps/web/src/features/alumni/upstream.ts`, and
+`apps/web/src/features/alumni/useAlumniDirectory.ts`.
 
 Cloudflare specifically documents that `s-maxage`, `must-revalidate`, and
 `proxy-revalidate` suppress both stale-while-revalidate and stale-if-error. For

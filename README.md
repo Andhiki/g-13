@@ -72,8 +72,8 @@ first. Before `bun run dev`, build the curriculum package once with
 
 ## Where to find things
 
-- `apps/web/src/routes/` — route entries and colocated feature code in ignored
-  `-` folders, including the course map, roadmap, and exam archive.
+- `apps/web/src/features/` — website features, including the course map,
+  roadmap, and exam archive.
 - `apps/web/src/ui/` — shared buttons, dialogs, and other interface pieces.
 - `packages/curriculum/src/curricula/` — data and rules for each curriculum.
 - `packages/curriculum/src/contracts/` — shared descriptions of the data’s shape.
@@ -85,11 +85,6 @@ first. Before `bun run dev`, build the curriculum package once with
 The alumni directory reads from a Strapi collection through a server route. It needs
 a `STRAPI_API_TOKEN` secret; see the
 [alumni directory guide](docs/alumni-directory.md) before running or deploying it.
-
-Anonymous lecturer reviews are protected by a per-IP rate limit and an invisible
-Cloudflare Turnstile check. Set `REVIEW_RATE_LIMIT_SECRET`, `TURNSTILE_SITE_KEY`, and
-`TURNSTILE_SECRET_KEY`; see the
-[lecturer reviews guide](docs/lecturer-reviews.md) before running or deploying it.
 
 For website changes, start in `apps/web/`. For curriculum changes, start in
 `packages/curriculum/` and include an official source. Read the

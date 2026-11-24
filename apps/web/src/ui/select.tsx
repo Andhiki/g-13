@@ -5,7 +5,7 @@ import { extendTailwindMerge } from "tailwind-merge";
 import { createContext, useContext, type ComponentProps } from "react";
 
 const twMerge = extendTailwindMerge({
-  extend: { classGroups: { "font-size": ["text-paragraph-sm", "text-paragraph-xs"] } },
+  extend: { classGroups: { "font-size": ["text-paragraph-sm"] } },
 });
 
 type SelectVariant = "default" | "compact";
@@ -32,10 +32,8 @@ function Trigger({
   return (
     <SelectPrimitive.Trigger
       className={twMerge(
-        "group/trigger flex h-10 min-h-10 min-w-0 shrink-0 items-center rounded-10 bg-bg-white-0 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 hover:ring-transparent focus:outline-none focus-visible:ring-stroke-strong-950 focus-visible:text-text-strong-950 focus-visible:outline-stroke-strong-950/35 data-[placeholder]:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent",
-        variant === "compact"
-          ? "w-auto gap-1 pl-3 pr-2.5 focus-visible:outline-[1.5px] focus-visible:outline-offset-1"
-          : "w-full gap-2 pl-3 pr-2.5 focus-visible:outline-2 focus-visible:outline-offset-1",
+        "group/trigger flex h-10 min-h-10 min-w-0 shrink-0 items-center rounded-10 bg-bg-white-0 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 hover:ring-transparent focus:shadow-button-important-focus focus:outline-none focus:ring-stroke-strong-950 focus:text-text-strong-950 data-[placeholder]:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent",
+        variant === "compact" ? "w-auto gap-1 pl-3 pr-2.5" : "w-full gap-2 pl-3 pr-2.5",
         className,
       )}
       {...props}

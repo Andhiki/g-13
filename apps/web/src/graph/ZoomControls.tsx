@@ -6,58 +6,25 @@ import { RiAddLine, RiSubtractLine, RiFocus3Line, RiKeyboardLine } from "@remixi
 import { useReducedMotion } from "motion/react";
 import { AlignButton } from "../ui/button";
 import { AlignKbd } from "../ui/kbd";
-import { shortcuts } from "../ui/shortcuts";
 import { Typography } from "../ui/typography";
-
-type ListedShortcut = ReturnType<typeof shortcuts.list>[number] & { description: string };
-
-function ShortcutList({ items }: { items: ListedShortcut[] }) {
-  const { text } = useLocale();
-  return (
-    <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
-      {items.map((item) => (
-        <div key={item.keys} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
-          <dt>
-            <Typography as="span" variant="caption" color="muted">
-              {text(item.description, { v0: item.keys })}
-            </Typography>
-          </dt>
-          <dd className="m-0 justify-self-end">
-            <AlignKbd.Root>{item.hint}</AlignKbd.Root>
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
 
 export function ZoomControls({
   active = true,
   onReset,
   selected,
+  lastSemester,
+  shortcuts,
   className = "",
 }: {
   active?: boolean;
   className?: string;
   onReset: () => void;
   selected: boolean;
-  /** Still accepted (and ignored) while CurriculumMap and RoadmapGraph stop passing them. */
+  lastSemester: number;
+  shortcuts: { key: string; description: string }[];
 }) {
+  const { text } = useLocale();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  // Snapshot before opening: the panel is a popup, and a help screen must list the page's
-  // shortcuts even though the registry pauses them behind the panel it is rendered in.
-  const [listed, setListed] = useState<ListedShortcut[]>([]);
-  const changeOpen = (open: boolean) => {
-    if (open) {
-      setListed(
-        shortcuts
-          .list()
-          .filter((item): item is ListedShortcut => !!item.description)
-          .sort((a, b) => Number(/^\d/.test(b.keys)) - Number(/^\d/.test(a.keys))),
-      );
-    }
-    setShortcutsOpen(open);
-  };
   return (
     <Panel
       position="bottom-right"
@@ -74,9 +41,36 @@ export function ZoomControls({
             anchor="bottom"
             className="bottom-0"
             open={shortcutsOpen}
-            onOpenChange={changeOpen}
+            onOpenChange={setShortcutsOpen}
           >
-            <ShortcutList items={listed} />
+            <dl className="m-0 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
+              <div className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
+                <dt>
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    {text("Ke semester")}
+                  </Typography>
+                </dt>
+                <dd className="m-0 flex items-center justify-end gap-1">
+                  <AlignKbd.Root>1</AlignKbd.Root>
+                  <Typography as="span" variant="caption" className="text-text-sub-600">
+                    -
+                  </Typography>
+                  <AlignKbd.Root>{lastSemester}</AlignKbd.Root>
+                </dd>
+              </div>
+              {shortcuts.map(({ key, description }) => (
+                <div key={key} className="col-span-2 grid grid-cols-subgrid items-center gap-x-3">
+                  <dt>
+                    <Typography as="span" variant="caption" className="text-text-sub-600">
+                      {text(description)}
+                    </Typography>
+                  </dt>
+                  <dd className="m-0 justify-self-end">
+                    <AlignKbd.Root>{key}</AlignKbd.Root>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </MapControlPanel>
         </div>
         {active && !selected && <ZoomButtons onReset={onReset} />}
@@ -126,8 +120,7 @@ function ZoomButtons({ onReset }: { onReset: () => void }) {
       <Typography
         as="span"
         variant="label"
-        color="muted"
-        className="min-w-10 text-center tabular-nums"
+        className="min-w-10 text-center tabular-nums text-text-sub-600"
         aria-label={text("Zoom {{v0}}%", { v0: percent })}
       >
         {percent}%

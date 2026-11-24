@@ -6,7 +6,6 @@ export const typographyVariants = tv(
     variants: {
       variant: {
         title: "font-display text-title-h4",
-        pageTitle: "font-display text-title-h3 sm:text-title-h2",
         subtitle1: "font-display text-label-lg",
         subtitle2: "font-display text-label-md",
         paragraph: "text-paragraph-sm",
@@ -17,22 +16,8 @@ export const typographyVariants = tv(
         graphTitle: "font-display text-title-h1 max-[650px]:text-title-h4",
         question: "font-display text-title-h5 sm:text-title-h4",
       },
-      weight: {
-        inherit: "",
-        medium: "font-medium",
-        semibold: "font-semibold",
-        bold: "font-bold",
-      },
-      color: {
-        inherit: "",
-        strong: "text-text-strong-950",
-        muted: "text-text-sub-600",
-        soft: "text-text-soft-400",
-        brand: "text-primary-base",
-        danger: "text-error-base",
-      },
     },
-    defaultVariants: { variant: "paragraph", weight: "inherit", color: "inherit" },
+    defaultVariants: { variant: "paragraph" },
   },
   {
     twMergeConfig: {
@@ -75,8 +60,6 @@ type TypographyProps<T extends TextElement> = ComponentPropsWithRef<T> &
 export function Typography<T extends TextElement = "p">({
   as,
   variant,
-  weight,
-  color,
   className,
   ...props
 }: TypographyProps<T>) {
@@ -84,8 +67,6 @@ export function Typography<T extends TextElement = "p">({
     ...props,
     className: typographyVariants({
       variant,
-      weight,
-      color,
       className: [as?.startsWith("h") && "font-display", className],
     }),
   });

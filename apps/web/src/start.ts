@@ -4,14 +4,6 @@ import { cachePolicy } from "./cache-policy";
 const cacheHeaders = createMiddleware().server(async ({ next, request }) => {
   const result = await next();
   result.response.headers.set("Cache-Control", cachePolicy(request, result.response));
-  if (import.meta.env.MODE === "staging" || import.meta.env.MODE === "local-e2e") {
-    result.response.headers.set("X-Robots-Tag", "noindex, nofollow");
-  }
-  if (import.meta.env.MODE === "local-e2e") {
-    result.response.headers.set("Cache-Control", "no-store");
-    result.response.headers.delete("CDN-Cache-Control");
-    result.response.headers.set("X-E2E-Revision", import.meta.env.VITE_E2E_REVISION ?? "local");
-  }
   return result;
 });
 

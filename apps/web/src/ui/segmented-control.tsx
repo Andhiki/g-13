@@ -1,88 +1,102 @@
-// AlignUI SegmentedControl v0.0.0 — rebuilt on ui-sdk's segmented control.
+// AlignUI SegmentedControl v0.0.0
 
 "use client";
 
 import * as React from "react";
-import {
-  SegmentedControl as SegmentedControlPrimitive,
-  SegmentedControlIndicator as SegmentedControlIndicatorPrimitive,
-  SegmentedControlItem as SegmentedControlItemPrimitive,
-  type SegmentedControlItemProps,
-  type SegmentedControlItemState,
-  type SegmentedControlIndicatorState,
-  type SegmentedControlOptions,
-  type SegmentedControlState,
-} from "@ui-sdk/react/segmented-control";
-import type { PartProps } from "@ui-sdk/react/primitive";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+import mergeRefs from "merge-refs";
+import { Slottable } from "@radix-ui/react-slot";
 import { clsx as cn } from "clsx";
+import { useTabObserver } from "./use-tab-observer";
 
-// The wrappers merge static classes, so callers pass class strings, not render functions.
-type ClassProps<Tag extends keyof React.JSX.IntrinsicElements, State> = Omit<
-  PartProps<Tag, State>,
-  "className" | "children"
-> & {
-  children?: React.ReactNode;
-  className?: string;
-};
+const SegmentedControlRoot = TabsPrimitive.Root;
+SegmentedControlRoot.displayName = "SegmentedControlRoot";
 
-type RootProps<T extends string = string> = Omit<
-  ClassProps<"div", SegmentedControlState>,
-  "defaultValue" | "onChange" | "onSelect"
-> &
-  SegmentedControlOptions<T>;
+const SegmentedControlList = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & {
+    floatingBgClassName?: string;
+  }
+>(({ children, className, floatingBgClassName, ...rest }, forwardedRef) => {
+  const [lineStyle, setLineStyle] = React.useState({ width: 0, left: 0 });
 
-type ItemProps = Omit<ClassProps<"button", SegmentedControlItemState>, "value" | "onSelect"> &
-  SegmentedControlItemProps;
+  const { mounted, listRef } = useTabObserver({
+    onActiveTabChange: (_, activeTab) => {
+      const { offsetWidth: width, offsetLeft: left } = activeTab;
+      setLineStyle((previous) =>
+        previous.width === width && previous.left === left ? previous : { width, left },
+      );
+    },
+  });
 
-type IndicatorProps = ClassProps<"span", SegmentedControlIndicatorState>;
-
-function Root<T extends string>({ className, ...props }: RootProps<T>) {
   return (
-    <SegmentedControlPrimitive
+    <TabsPrimitive.List
+      ref={mergeRefs(forwardedRef, listRef)}
       className={cn(
-        // track
-        "relative isolate grid auto-cols-fr grid-flow-col gap-1 rounded-10 bg-bg-weak-50 p-1",
+        "relative isolate grid w-full auto-cols-fr grid-flow-col gap-1 rounded-10 bg-bg-weak-50 p-1",
         className,
       )}
-      {...props}
-    />
-  );
-}
+      {...rest}
+    >
+      <Slottable>{children}</Slottable>
 
-function Indicator({ className, ...props }: IndicatorProps) {
-  return (
-    <SegmentedControlIndicatorPrimitive
-      className={cn(
-        // floating bg: the CSS variables measure the checked item inside this track
-        "absolute -z-10 rounded-md bg-bg-white-0 shadow-toggle-switch",
-        "top-[var(--segmented-control-indicator-top)] left-[var(--segmented-control-indicator-left)]",
-        "h-[var(--segmented-control-indicator-height)] w-[var(--segmented-control-indicator-width)]",
-        "transition-[top,left,width,height] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
-        // no slide-in on the first placement
-        "data-[activation-direction=none]:transition-none",
-        className,
-      )}
-      {...props}
-    />
+      {/* floating bg */}
+      <div
+        className={cn(
+          "absolute inset-y-1 left-0 -z-10 rounded-md bg-bg-white-0 shadow-toggle-switch transition-transform duration-200",
+          {
+            hidden: !mounted,
+          },
+          floatingBgClassName,
+        )}
+        style={{
+          transform: `translate3d(${lineStyle.left}px, 0, 0)`,
+          width: `${lineStyle.width}px`,
+          transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)",
+        }}
+        aria-hidden="true"
+      />
+    </TabsPrimitive.List>
   );
-}
+});
+SegmentedControlList.displayName = "SegmentedControlList";
 
-function Item({ className, ...props }: ItemProps) {
+const SegmentedControlTrigger = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...rest }, forwardedRef) => {
   return (
-    <SegmentedControlItemPrimitive
+    <TabsPrimitive.Trigger
+      ref={forwardedRef}
       className={cn(
-        // base; z-10 lifts the label above the indicator
-        "relative z-10 flex h-7 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-label-sm text-text-soft-400 outline-none pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-full pointer-coarse:before:min-h-11 pointer-coarse:before:min-w-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
+        // base
+        "peer",
+        "relative z-10 h-7 whitespace-nowrap rounded-md px-1 text-label-sm text-text-soft-400 outline-none",
+        "flex items-center justify-center gap-1.5",
         "transition duration-200 ease-out",
         // focus
         "focus:outline-none",
-        // checked
-        "data-checked:text-text-strong-950",
+        // active
+        "data-[state=active]:text-text-strong-950",
         className,
       )}
-      {...props}
+      {...rest}
     />
   );
-}
+});
+SegmentedControlTrigger.displayName = "SegmentedControlTrigger";
 
-export { Root, Indicator, Item };
+const SegmentedControlContent = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ ...rest }, forwardedRef) => {
+  return <TabsPrimitive.Content ref={forwardedRef} {...rest} />;
+});
+SegmentedControlContent.displayName = "SegmentedControlContent";
+
+export {
+  SegmentedControlRoot as Root,
+  SegmentedControlList as List,
+  SegmentedControlTrigger as Trigger,
+  SegmentedControlContent as Content,
+};

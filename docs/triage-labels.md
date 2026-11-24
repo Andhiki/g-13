@@ -1,6 +1,6 @@
 # Triage labels
 
-Use these labels on an open GitHub issue:
+Use these values in an open ticket's Status field:
 
 - needs-triage: requires maintainer evaluation.
 - needs-info: requires more information.
@@ -8,4 +8,4 @@ Use these labels on an open GitHub issue:
 - ready-for-human: requires human implementation.
 - wontfix: will not be implemented.
 
-Completed issues are closed.
+Completed tickets use `Status: completed`.

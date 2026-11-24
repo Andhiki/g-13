@@ -49,45 +49,6 @@ const courseStyles = tv({
 
 const tab = "h-[25px] truncate rounded-t-lg border-b-0 px-3 pt-[3px] text-text-sub-600";
 
-function CourseNodeMetadata({
-  course,
-  choice,
-  credit,
-  surface,
-  creditClass,
-}: {
-  course: CourseNodeData["course"];
-  choice: boolean;
-  credit: number | null;
-  surface: ReturnType<typeof courseStyles>["surface"];
-  creditClass: string;
-}) {
-  const { text, courseName } = useLocale();
-  return (
-    <div
-      data-course-metadata
-      className="absolute inset-x-0 top-0 flex items-center [[data-compact-nodes=true]_&]:hidden"
-    >
-      <Typography
-        as="span"
-        variant="caption"
-        className={surface({ class: tab + " max-w-[calc(100%-72px)]" })}
-      >
-        {course.code || (choice ? text("Slot pilihan") : courseName(course))}
-      </Typography>
-      <Typography
-        as="span"
-        variant="caption"
-        className={surface({
-          class: tab + " -ml-px flex-none " + creditClass,
-        })}
-      >
-        {credit === null ? "—" : credit + text(" SKS")}
-      </Typography>
-    </div>
-  );
-}
-
 export const CourseNode = memo(function CourseNode({
   data,
 }: NodeProps<Node<CourseNodeData, "course">>) {
@@ -124,13 +85,27 @@ export const CourseNode = memo(function CourseNode({
         aria-label={text("Buka detail ") + courseName(course)}
         aria-pressed={data.state === "selected"}
       >
-        <CourseNodeMetadata
-          course={course}
-          choice={choice}
-          credit={credit}
-          surface={styles.surface}
-          creditClass={styles.credit()}
-        />
+        <div
+          data-course-metadata
+          className="absolute inset-x-0 top-0 flex items-center [[data-compact-nodes=true]_&]:hidden"
+        >
+          <Typography
+            as="span"
+            variant="caption"
+            className={styles.surface({ class: tab + " max-w-[calc(100%-72px)]" })}
+          >
+            {course.code || (choice ? text("Slot pilihan") : courseName(course))}
+          </Typography>
+          <Typography
+            as="span"
+            variant="caption"
+            className={styles.surface({
+              class: tab + " -ml-px flex-none " + styles.credit(),
+            })}
+          >
+            {credit === null ? "—" : credit + text(" SKS")}
+          </Typography>
+        </div>
         <Typography
           data-course-title
           as="strong"

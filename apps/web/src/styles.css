@@ -1,12 +1,10 @@
-@layer ui-sdk;
-
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./alignui.css";
 @import "./fonts/fonts.css";
 
 :root {
-  --app-header-height: calc(64px + env(safe-area-inset-top, 0px) + var(--app-banner-height, 0px));
+  --app-header-height: calc(64px + env(safe-area-inset-top, 0px));
   --interactive-cursor: default;
 }
 
@@ -30,11 +28,6 @@
   }
 }
 
-/* Sonner injects its own system font stack on the toaster; keep toasts on the app font. */
-:root [data-sonner-toaster] {
-  font-family: var(--font-sans);
-}
-
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
@@ -52,13 +45,8 @@ html {
 
 :is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]):not(
     :disabled
-  ):not([aria-disabled="true"]):not([data-disabled]):not([data-slot="drawer-handle"]):active {
+  ):not([aria-disabled="true"]):not([data-disabled]):active {
   opacity: 0.7;
-}
-
-/* Cancel backdrop transition when Dialog presents as a sheet so swipe opacity tracks 1:1. */
-[data-slot="dialog-backdrop"]:has(+ [data-slot="dialog-viewport"]) {
-  transition: none;
 }
 
 @media (any-pointer: coarse) {

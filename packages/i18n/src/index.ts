@@ -13,7 +13,6 @@ const resourcesData = {
         curriculum: "Kurikulum",
         examArchive: "Arsip Ujian",
         alumni: "Alumni",
-        lecturers: "Dosen",
         resources: "Sumber Belajar",
         roadmap: "Roadmap",
         faq: "FAQ",
@@ -62,7 +61,6 @@ const resourcesData = {
         curriculum: "Curriculum",
         examArchive: "Exam archive",
         alumni: "Alumni",
-        lecturers: "Lecturers",
         resources: "Learning resources",
         roadmap: "Roadmap",
         faq: "FAQ",
@@ -136,8 +134,6 @@ declare module "i18next" {
       exam: Record<string, string>;
       resources: Record<string, string>;
       alumni: Record<string, string>;
-      lecturers: Record<string, string>;
-      notifications: Record<string, string>;
       faq: Record<string, string>;
     };
   }

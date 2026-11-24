@@ -1,261 +1,401 @@
-// Built on @ui-sdk/react/drawer. The sheet's translate, backdrop dim, drag, snap points and the
-// reduced-motion fade belong to the library; this wrapper only owns surfaces and the asChild
-// translation the call sites use.
-import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import {
-  Drawer as UixDrawer,
-  DrawerBackdrop,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHandle,
-  DrawerTitle,
-  DrawerTrigger,
-  type DrawerContentState,
-  type DrawerHandleState,
-  type DrawerProps,
-  type DrawerSide,
-  type SnapPoint,
-} from "@ui-sdk/react/drawer";
-import type { PartProps } from "@ui-sdk/react/primitive";
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentPropsWithoutRef,
+  type MutableRefObject,
+  type ReactNode,
+  type Ref,
+} from "react";
+import { createPortal } from "react-dom";
 import { twMerge } from "tailwind-merge";
 
-// Like Radix's asChild: the part's props land on the single child element. Narrowed with
-// isValidElement so anything else fails loudly.
-function childElementOf(children: React.ReactNode, name: string): React.ReactElement {
-  const nodes = React.Children.toArray(children);
-  if (nodes.length !== 1 || !React.isValidElement(nodes[0])) {
-    throw new Error(`${name} with asChild takes exactly one child element.`);
-  }
-  return nodes[0];
+type DrawerContextValue = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  modal: boolean;
+  contentId: string;
+  titleId: string;
+  descriptionId: string;
+  triggerRef: MutableRefObject<HTMLElement | null>;
+};
+
+const DrawerContext = createContext<DrawerContextValue | null>(null);
+
+function useDrawer() {
+  const context = useContext(DrawerContext);
+  if (!context) throw new Error("AlignDrawer components must be used inside AlignDrawer.Root");
+  return context;
 }
 
-function focusTargetAfterCallback(
-  handler: (event: Event) => void,
-  type: string,
-): () => HTMLElement | null {
-  return (): HTMLElement | null => {
-    const event = new Event(type, { cancelable: true });
-    handler(event);
-    if (event.defaultPrevented) {
-      return document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    }
-    return null;
-  };
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
+  if (typeof ref === "function") ref(value);
+  else if (ref) ref.current = value;
 }
 
-const DrawerContext = React.createContext<{
-  side: DrawerSide;
-  modal: boolean | "trap-focus";
-}>({ side: "left", modal: true });
-
-type RootProps = Omit<
-  DrawerProps,
-  "onOpenChange" | "side" | "snapPoints" | "defaultSnapPoint" | "onSnapPointChange"
-> & {
-  side?: DrawerSide;
+type RootProps = {
+  children?: ReactNode;
+  open?: boolean;
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  snapPoints?: SnapPoint[];
-  defaultSnapPoint?: SnapPoint;
-  onSnapPointChange?: (snapPoint: SnapPoint) => void;
+  modal?: boolean;
 };
 
 function Root({
   children,
-  side = "left",
-  modal = true,
+  open: openProp,
+  defaultOpen = false,
   onOpenChange,
-  snapPoints,
-  defaultSnapPoint,
-  onSnapPointChange,
-  ...props
+  modal = true,
 }: RootProps) {
-  return (
-    <UixDrawer
-      {...props}
-      side={side}
-      modal={modal}
-      snapPoints={snapPoints}
-      defaultSnapPoint={defaultSnapPoint}
-      onSnapPointChange={onSnapPointChange ? (point) => onSnapPointChange(point) : undefined}
-      onOpenChange={(open) => onOpenChange?.(open)}
-    >
-      <DrawerContext.Provider value={{ side, modal }}>{children}</DrawerContext.Provider>
-    </UixDrawer>
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const controlled = openProp !== undefined;
+  const open = controlled ? openProp : uncontrolledOpen;
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const id = useId();
+
+  const setOpen = useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen === open) return;
+      if (!controlled) setUncontrolledOpen(nextOpen);
+      onOpenChange?.(nextOpen);
+    },
+    [controlled, onOpenChange, open],
   );
+
+  const context = useMemo(
+    () => ({
+      open,
+      setOpen,
+      modal,
+      contentId: `${id}-content`,
+      titleId: `${id}-title`,
+      descriptionId: `${id}-description`,
+      triggerRef,
+    }),
+    [id, modal, open, setOpen],
+  );
+
+  return <DrawerContext.Provider value={context}>{children}</DrawerContext.Provider>;
 }
 
-type TriggerProps = Omit<
-  React.ComponentProps<typeof DrawerTrigger>,
-  "children" | "className" | "render" | "style"
-> & {
-  asChild?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-};
+type TriggerProps = ComponentPropsWithoutRef<"button"> & { asChild?: boolean };
 
-const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(function Trigger(
-  { asChild, className, children, ...props },
-  ref,
-) {
-  return (
-    <DrawerTrigger
-      ref={ref}
-      className={className}
-      render={asChild ? childElementOf(children, "AlignDrawer.Trigger") : undefined}
-      {...props}
-    >
-      {asChild ? undefined : children}
-    </DrawerTrigger>
-  );
-});
-Trigger.displayName = "AlignDrawerTrigger";
-
-type ContentProps = Omit<
-  PartProps<"div", DrawerContentState>,
-  "children" | "className" | "render" | "style"
-> & {
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  onOpenAutoFocus?: (event: Event) => void;
-};
-
-const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
-  { className, style, onOpenAutoFocus, children, ...props },
+const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(function Trigger(
+  { asChild = false, onClick, ...props },
   forwardedRef,
 ) {
-  const { side, modal } = React.useContext(DrawerContext);
-  return (
-    <>
-      {modal === true && (
-        <DrawerBackdrop className="fixed inset-0 bg-overlay backdrop-blur-[10px]" />
-      )}
-      <DrawerContent
-        {...props}
-        ref={forwardedRef}
-        initialFocus={
-          onOpenAutoFocus
-            ? focusTargetAfterCallback(onOpenAutoFocus, "align-drawer-open-auto-focus")
-            : undefined
-        }
-        style={style}
-        className={twMerge(
-          "relative flex w-full max-w-[400px] flex-col border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] focus:outline-none after:pointer-events-none after:absolute after:bg-inherit after:content-[''] data-[side=left]:border-r data-[side=left]:after:inset-y-0 data-[side=left]:after:right-full data-[side=left]:after:w-24 data-[side=right]:border-l data-[side=right]:after:inset-y-0 data-[side=right]:after:left-full data-[side=right]:after:w-24 data-[side=bottom]:border-t data-[side=bottom]:after:-inset-x-px data-[side=bottom]:after:top-full data-[side=bottom]:after:h-24 data-[side=top]:border-b data-[side=top]:after:-inset-x-px data-[side=top]:after:bottom-full data-[side=top]:after:h-24",
-          (side === "bottom" || side === "top") && "h-auto max-h-[85dvh] max-w-none",
-          side === "bottom" && "rounded-t-10 pt-0",
-          side === "top" && "rounded-b-10 pb-0",
-          className,
-        )}
-      >
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
-          {children}
-        </div>
-      </DrawerContent>
-    </>
+  const { open, setOpen, contentId, triggerRef } = useDrawer();
+  const Component = asChild ? Slot : "button";
+  const ref = useCallback(
+    (node: HTMLButtonElement | null) => {
+      triggerRef.current = node;
+      assignRef(forwardedRef, node);
+    },
+    [forwardedRef, triggerRef],
   );
-});
-Content.displayName = "AlignDrawerContent";
 
-type HandleProps = Omit<PartProps<"button", DrawerHandleState>, "className" | "children"> & {
-  className?: string;
-  children?: React.ReactNode;
-};
-
-function Handle({ className, children, ...props }: HandleProps) {
   return (
-    <div className={twMerge("flex shrink-0 justify-center py-1.5", className)}>
-      <DrawerHandle
-        {...props}
-        className="relative flex h-6 w-24 cursor-grab items-center justify-center rounded-lg outline-none select-none active:cursor-grabbing before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-[''] focus-visible:[&>span]:bg-primary-base"
-      >
-        <span className="h-1 w-10 rounded-full bg-stroke-soft-200" aria-hidden="true">
-          {children}
-        </span>
-      </DrawerHandle>
-    </div>
-  );
-}
-
-function Grip({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      aria-hidden="true"
-      className={twMerge("flex shrink-0 justify-center pt-2.5 pb-1", className)}
-      {...props}
-    >
-      <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
-    </div>
-  );
-}
-
-type TitleProps = Omit<PartProps<"h2">, "children" | "className" | "render" | "style"> & {
-  asChild?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-};
-
-function Title({ asChild, className, children, ...props }: TitleProps) {
-  return (
-    <DrawerTitle
-      className={className}
-      render={asChild ? childElementOf(children, "AlignDrawer.Title") : undefined}
-      {...props}
-    >
-      {asChild ? undefined : children}
-    </DrawerTitle>
-  );
-}
-
-type DescriptionProps = Omit<PartProps<"p">, "children" | "className" | "render" | "style"> & {
-  asChild?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-};
-
-function Description({ asChild, className, children, ...props }: DescriptionProps) {
-  return (
-    <DrawerDescription
-      className={className}
-      render={asChild ? childElementOf(children, "AlignDrawer.Description") : undefined}
-      {...props}
-    >
-      {asChild ? undefined : children}
-    </DrawerDescription>
-  );
-}
-
-type CloseProps = Omit<
-  React.ComponentProps<typeof DrawerClose>,
-  "children" | "className" | "render" | "style"
-> & {
-  asChild?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-};
-
-const Close = React.forwardRef<HTMLButtonElement, CloseProps>(function Close(
-  { asChild, className, children, ...props },
-  ref,
-) {
-  return (
-    <DrawerClose
+    <Component
       ref={ref}
-      className={className}
-      render={asChild ? childElementOf(children, "AlignDrawer.Close") : undefined}
+      type={asChild ? undefined : "button"}
+      aria-haspopup="dialog"
+      aria-expanded={open}
+      aria-controls={open ? contentId : undefined}
       {...props}
-    >
-      {asChild ? undefined : children}
-    </DrawerClose>
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) setOpen(true);
+      }}
+    />
   );
 });
-Close.displayName = "AlignDrawerClose";
 
-function Header({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+type CloseProps = ComponentPropsWithoutRef<"button"> & { asChild?: boolean };
+
+const Close = forwardRef<HTMLButtonElement, CloseProps>(function Close(
+  { asChild = false, onClick, ...props },
+  forwardedRef,
+) {
+  const { setOpen } = useDrawer();
+  const Component = asChild ? Slot : "button";
+
+  return (
+    <Component
+      ref={forwardedRef}
+      type={asChild ? undefined : "button"}
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) setOpen(false);
+      }}
+    />
+  );
+});
+
+type CancelableEvent = {
+  defaultPrevented: boolean;
+  preventDefault: () => void;
+};
+
+type ContentProps = Omit<ComponentPropsWithoutRef<"div">, "onOpenAutoFocus"> & {
+  modal?: boolean;
+  side?: "left" | "bottom";
+  onOpenAutoFocus?: (event: CancelableEvent) => void;
+  onInteractOutside?: (event: PointerEvent) => void;
+};
+
+const focusableSelector =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const drawerMotion =
+  "data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=open]:animate-in data-[state=closed]:duration-200 data-[state=closed]:ease-out data-[state=closed]:animate-out data-[state=closed]:[animation-fill-mode:forwards] data-[state=closed]:pointer-events-none motion-reduce:animate-none";
+
+const Content = forwardRef<HTMLDivElement, ContentProps>(function Content(
+  {
+    className,
+    children,
+    modal,
+    side = "left",
+    id,
+    role,
+    tabIndex,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    onOpenAutoFocus,
+    onInteractOutside,
+    onAnimationEnd,
+    ...props
+  },
+  forwardedRef,
+) {
+  const context = useDrawer();
+  const isModal = modal ?? context.modal;
+  const { open, setOpen } = context;
+  const [present, setPresent] = useState(open);
+  const [mounted, setMounted] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const portalRef = useRef<HTMLDivElement | null>(null);
+  const setOpenRef = useRef(setOpen);
+  setOpenRef.current = setOpen;
+  const onOpenAutoFocusRef = useRef(onOpenAutoFocus);
+  const onInteractOutsideRef = useRef(onInteractOutside);
+  onOpenAutoFocusRef.current = onOpenAutoFocus;
+  onInteractOutsideRef.current = onInteractOutside;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      setPresent(true);
+      return;
+    }
+    if (!present) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPresent(false);
+  }, [open, present]);
+
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      contentRef.current = node;
+      assignRef(forwardedRef, node);
+    },
+    [forwardedRef],
+  );
+
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!open || !present || !mounted || !content) return;
+
+    const previousFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const body = document.body;
+    const portal = portalRef.current;
+    const previousOverflow = body.style.overflow;
+    const inertSiblings = isModal
+      ? [...body.children]
+          .filter((child): child is HTMLElement => child instanceof HTMLElement && child !== portal)
+          .map((child) => ({ child, inert: child.inert }))
+      : [];
+
+    if (isModal) {
+      for (const { child } of inertSiblings) child.inert = true;
+      body.style.overflow = "hidden";
+    }
+
+    const focusable = () => [...content.querySelectorAll<HTMLElement>(focusableSelector)];
+    const onKeyDown = (event: KeyboardEvent) => {
+      const insideListbox =
+        event.target instanceof Element && event.target.closest('[role="listbox"]') !== null;
+      if (insideListbox && (event.key === "Escape" || event.key === "Tab")) return;
+      if (event.key === "Escape" && !event.defaultPrevented) {
+        event.preventDefault();
+        event.stopPropagation();
+        setOpenRef.current(false);
+        return;
+      }
+      if (!isModal || event.key !== "Tab") return;
+      const elements = focusable();
+      if (!elements.length) {
+        event.preventDefault();
+        content.focus();
+        return;
+      }
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || !content.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last || !content.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    const onFocusIn = (event: FocusEvent) => {
+      const insideListbox =
+        event.target instanceof Element && event.target.closest('[role="listbox"]') !== null;
+      if (!isModal || content.contains(event.target as Node) || insideListbox) return;
+      (focusable()[0] ?? content).focus();
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (isModal || content.contains(event.target as Node)) return;
+      onInteractOutsideRef.current?.(event);
+      if (!event.defaultPrevented) setOpenRef.current(false);
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("focusin", onFocusIn, true);
+    document.addEventListener("pointerdown", onPointerDown, true);
+
+    const focusEvent: CancelableEvent = {
+      defaultPrevented: false,
+      preventDefault() {
+        this.defaultPrevented = true;
+      },
+    };
+    onOpenAutoFocusRef.current?.(focusEvent);
+    if (!focusEvent.defaultPrevented && !content.contains(document.activeElement)) {
+      (focusable()[0] ?? content).focus({ preventScroll: true });
+    }
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true);
+      document.removeEventListener("focusin", onFocusIn, true);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      if (isModal) {
+        for (const { child, inert } of inertSiblings) child.inert = inert;
+        body.style.overflow = previousOverflow;
+      }
+      const restoreTarget =
+        previousFocus?.isConnected && previousFocus !== body
+          ? previousFocus
+          : context.triggerRef.current;
+      restoreTarget?.focus({ preventScroll: true });
+    };
+  }, [context.triggerRef, isModal, mounted, open, present]);
+
+  const handleOverlayPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    onInteractOutsideRef.current?.(event.nativeEvent);
+    if (!event.defaultPrevented && !event.nativeEvent.defaultPrevented) setOpen(false);
+  };
+
+  if (!present || !mounted) return null;
+
+  const bottom = side === "bottom";
+  const state = open ? "open" : "closed";
+  const contentClassName = twMerge(
+    isModal
+      ? "size-full max-w-[400px] overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] border-r border-stroke-soft-200 bg-bg-white-0"
+      : "fixed inset-y-0 left-0 z-50 w-full max-w-[400px] overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] border-r border-stroke-soft-200 bg-bg-white-0",
+    drawerMotion,
+    isModal && bottom
+      ? "data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full fixed inset-x-0 bottom-0 h-auto max-h-[85dvh] pt-0 max-w-none rounded-t-10 border-t border-r-0"
+      : "data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
+    className,
+  );
+  const panel = (
+    <div
+      ref={setRefs}
+      id={id ?? context.contentId}
+      role={role ?? "dialog"}
+      tabIndex={tabIndex ?? -1}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy ?? context.titleId}
+      aria-describedby={ariaDescribedBy ?? context.descriptionId}
+      aria-modal={isModal && open ? true : undefined}
+      data-state={state}
+      className={contentClassName}
+      onAnimationEnd={(event) => {
+        onAnimationEnd?.(event);
+        if (event.target === event.currentTarget && !open) setPresent(false);
+      }}
+      {...props}
+    >
+      <div className="relative flex size-full flex-col">{children}</div>
+    </div>
+  );
+  const content = (
+    <div
+      ref={portalRef}
+      data-align-drawer-portal=""
+      className="contents"
+      aria-hidden={!open || undefined}
+      inert={!open}
+    >
+      {isModal ? (
+        <div
+          className={twMerge(
+            "fixed inset-0 z-50 grid grid-cols-1 place-items-start overflow-hidden bg-overlay backdrop-blur-[10px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:[animation-fill-mode:forwards] data-[state=open]:fade-in-0 data-[state=open]:duration-200 data-[state=closed]:duration-200 motion-reduce:animate-none",
+            bottom && "items-end",
+          )}
+          data-state={state}
+          onPointerDown={handleOverlayPointerDown}
+        >
+          {panel}
+        </div>
+      ) : (
+        panel
+      )}
+    </div>
+  );
+
+  return createPortal(content, document.body);
+});
+
+type TitleProps = ComponentPropsWithoutRef<"h2"> & { asChild?: boolean };
+
+function Title({ asChild = false, ...props }: TitleProps) {
+  const { titleId } = useDrawer();
+  const Component = asChild ? Slot : "h2";
+  return <Component id={props.id ?? titleId} {...props} />;
+}
+
+type DescriptionProps = ComponentPropsWithoutRef<"p"> & { asChild?: boolean };
+
+function Description({ asChild = false, ...props }: DescriptionProps) {
+  const { descriptionId } = useDrawer();
+  const Component = asChild ? Slot : "p";
+  return <Component id={props.id ?? descriptionId} {...props} />;
+}
+
+function Header({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return (
     <div
       className={twMerge("flex items-center gap-3 border-stroke-soft-200 p-5", className)}
@@ -264,26 +404,8 @@ function Header({ className, ...props }: React.ComponentPropsWithoutRef<"div">) 
   );
 }
 
-function Body({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      className={twMerge("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
-      {...props}
-    />
-  );
+function Body({ className, ...props }: ComponentPropsWithoutRef<"div">) {
+  return <div className={twMerge("flex-1 overscroll-contain", className)} {...props} />;
 }
 
-export const AlignDrawer = {
-  Root,
-  Trigger,
-  Close,
-  Content,
-  Header,
-  Title,
-  Description,
-  Body,
-  Handle,
-  Grip,
-};
-
-export type { SnapPoint };
+export const AlignDrawer = { Root, Trigger, Close, Content, Header, Title, Description, Body };

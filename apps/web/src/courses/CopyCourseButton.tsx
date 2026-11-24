@@ -27,20 +27,24 @@ export function CopyCourseButton({ value, label }: { value: string; label: strin
     opacity: 0,
     scale: reducedMotion ? 1 : 0.25,
   };
-  const copyValue = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setStatus("copied");
-      toast.custom(() => <SuccessToast message={text("{{v0}} disalin", { v0: label })} />);
-    } catch {
-      setStatus("error");
-    }
-  };
   return (
     <AlignTooltip.Provider>
       <AlignTooltip.Root>
         <AlignTooltip.Trigger asChild>
-          <CompactButton aria-label={statusLabel} onClick={copyValue}>
+          <CompactButton
+            aria-label={statusLabel}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(value);
+                setStatus("copied");
+                toast.custom(() => (
+                  <SuccessToast message={text("{{v0}} disalin", { v0: label })} />
+                ));
+              } catch {
+                setStatus("error");
+              }
+            }}
+          >
             <span className="grid size-4" aria-hidden="true">
               <AnimatePresence initial={false}>
                 <m.span

@@ -99,13 +99,10 @@ const AccordionContent = React.forwardRef<
   return (
     <AccordionPrimitive.Content
       ref={forwardedRef}
-      forceMount
-      className="grid grid-rows-[0fr] opacity-0 invisible pointer-events-none transition-[grid-template-rows,opacity,visibility] duration-200 ease-out data-[state=open]:grid-rows-[1fr] data-[state=open]:opacity-100 data-[state=open]:visible data-[state=open]:pointer-events-auto motion-reduce:transition-none"
+      className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
       {...rest}
     >
-      <div className="min-h-0 overflow-hidden">
-        <div className={cn("text-paragraph-sm text-text-sub-600", className)}>{children}</div>
-      </div>
+      <div className={cn("text-paragraph-sm text-text-sub-600", className)}>{children}</div>
     </AccordionPrimitive.Content>
   );
 });

@@ -25,39 +25,6 @@ skill proyek tersedia di [AGENTS.md](AGENTS.md).
 Agent dapat memakai [skill PR body](.agents/skills/pr-body/SKILL.md) yang tersedia
 di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
 
-## Regresi browser di staging
-
-Suite browser memakai [e2e](https://e2e.com/docs) dengan Chromium pada viewport
-1440 × 900. Jalankan dengan Bun sesuai versi di `package.json` dan Node.js
-22.23 atau lebih baru pada jalur 22, atau Node.js 24.22 atau lebih baru.
-
-```sh
-bun install --frozen-lockfile
-node node_modules/@e2e-dev/web/dist/bin.js install chromium
-bun run test:e2e:smoke
-```
-
-Smoke mengunjungi staging bersama sebagai pengunjung tanpa sesi. Hasil
-dilaporkan per rute. Kegagalan upstream alumni menampilkan status HTTP terpisah
-dari skenario retry yang memakai data fixture. Setelah workflow tersedia pada
-branch default, smoke juga bisa dijalankan dari tab Actions melalui **Staging
-browser tests**. Laporan, JUnit, dan trace kegagalan tersedia di `.e2e/` dan
-sebagai artefak Actions.
-
-`bun run test:e2e` menjalankan skenario fungsional pada Worker lokal dengan D1
-SQLite sementara. Perintah ini menerapkan migrasi ke direktori temporer, memulai
-Worker lokal, menjalankan browser Chromium, lalu menghentikan Worker dan menghapus
-database tersebut. Sesi, data ulasan, dan batas rate limit dibuat langsung pada
-D1 lokal. Tidak diperlukan akun Cloudflare, token, deployment Worker, atau
-database D1 jangka panjang.
-
-Workflow **Staging browser tests** menjalankan suite fungsional tersebut untuk
-setiap PR ke `staging`, termasuk PR dari fork, setelah membangun paket workspace
-dan memasang Chromium. Workflow manual tetap menjalankan smoke test read-only
-terhadap staging bersama. Mode `local-e2e` menggunakan fixture alumni, Turnstile,
-dan kredensial GitHub dummy agar skenario tidak menghubungi layanan eksternal.
-Pemeriksaan data dan logika aplikasi tetap dijalankan dengan `bun run check`.
-
 ## Changelog
 
 Untuk perubahan yang berdampak pada pengguna, tambahkan ringkasan singkat dalam
@@ -83,8 +50,7 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
 
 ## Struktur dan kebiasaan kode
 
-- `apps/web/src/routes/`: routing dan implementasi fitur di folder berawalan `-`
-  yang diabaikan generator rute; `apps/web/src/ui/`: primitif UI.
+- `apps/web/src/routes/`: routing; `apps/web/src/features/`: fitur; `apps/web/src/ui/`: primitif UI.
 - `apps/web/src/graph/` dan `apps/web/src/courses/`: perilaku graf dan komponen mata
   kuliah yang dipakai bersama oleh peta kurikulum dan roadmap. Modul bersama tidak
   mengimpor implementasi fitur.
@@ -97,15 +63,12 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
   pemeriksaan teks, posisi piksel, ukuran, tata letak, atau animasi.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run format` dan
   `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
-- Aturan design system untuk `apps/web` didefinisikan di `.oxlintrc.json` lewat
-  plugin `@shadcn/lint`. Tambahkan aturan baru di berkas itu, bukan sebagai
-  argumen CLI tiap paket, lalu pastikan `bun run lint` tetap lolos. Berkas yang
-  sama juga dibaca `bun lint` setelah linter bawaan Bun tersedia di rilis stabil.
 - Commit `bun.lock` bersama perubahan dependensi. Tidak perlu dependensi baru
   untuk sesuatu yang sudah tersedia di proyek.
 
-GitHub Issues adalah pintu masuk kontributor publik sekaligus satu-satunya pelacak
-isu proyek, sesuai [panduan agent](docs/issue-tracker.md).
+GitHub Issues adalah pintu masuk kontributor publik. Tiket Markdown `.scratch/`
+tetap dipakai untuk rencana implementasi lokal sesuai
+[panduan agent](docs/issue-tracker.md); kontributor tidak wajib membuatnya.
 
 ## Hak cipta dan keamanan
 

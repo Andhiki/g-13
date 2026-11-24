@@ -2,10 +2,26 @@
 
 Be concise. Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution, verification, and changelog requirements. Use the relevant skill under `.agents/skills/`.
 
-For substantial work, use only the stages needed from the curated `gthirteen` skillset: `gthirteen:grill-with-docs` for domain decisions, `gthirteen:to-spec` for behavior, `gthirteen:to-tickets` for implementation tickets, and `gthirteen:implement` for implementation. GitHub Issues are the skillset's spec and progress tracking. For every task, read the relevant issues first — spec, tickets, blockers, and their labels per [docs/triage-labels.md](docs/triage-labels.md), following [docs/issue-tracker.md](docs/issue-tracker.md) — and keep them updated: post progress comments as work advances and close a ticket once its acceptance criteria are met.
+For substantial work, use only the stages needed: `gthirteen:grill-with-docs` for domain decisions, `gthirteen:to-spec` for behavior, `gthirteen:to-tickets` for implementation tickets, and `gthirteen:implement` for implementation.
 
-For curriculum and exam archive work, use the corresponding `gthirteen` skill. Before domain exploration, read [docs/domain.md](docs/domain.md), `CONTEXT.md`, and relevant decisions in `docs/adr/`.
+For curriculum and exam archive work, use the corresponding `gthirteen` skill. Before domain exploration, read [docs/domain.md](docs/domain.md), `CONTEXT.md`, and relevant decisions in `docs/adr/`. Local issues follow [docs/issue-tracker.md](docs/issue-tracker.md) and [docs/triage-labels.md](docs/triage-labels.md).
 
 For browser preview failures caused by missing Linux libraries, see [docs/browser-preview.md](docs/browser-preview.md).
 
-Before using ui-sdk, follow the `ui-sdk` skill in `.agents/skills/ui-sdk/` and read `apps/web/node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `apps/web/node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it.
+## Lessons
+
+- When diagnosing caching, reproduce client navigation and retry requests before treating document cache hits as proof the user flow works.
+
+- When labeling the alumni class tabs, use “All” or “Semua” for the unfiltered tab.
+
+- When acting as a review sub-agent, report findings only; let the parent agent apply fixes.
+
+- When redesigning alumni cards from references, retain the dense grid and a centered max-width page; use references for compact role and education lines rather than copying their layout.
+
+- When writing user-facing copy, refer to the app rather than its internal name g-13.
+
+- When changing frontend UI, take a screenshot and show it to the user.
+
+- When designing the GitHub star toast, give the GitHub icon prominence and right-align actions with the primary button last.
+
+- When placing course metadata and badges in a row, align them in a shared flex container and inspect the result.

@@ -8,185 +8,15 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
-### 2026-11-24
-
-#### Added
-
-- Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutan yang bisa digeser langsung, semuanya tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
-
-#### Changed
-
-- Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
-
-### 2026-11-23
-
-#### Changed
-
-- Katalog mata kuliah pada formulir ulasan kini memakai 146 mata kuliah dari edisi 2021 dan 2026; mata kuliah yang sama di kedua edisi digabung ke satu identitas dan ulasan yang sudah ada tetap terhubung.
-- Ulasan dosen dengan salah satu rating 2 atau lebih rendah kini masuk antrean Pending dan tidak tampil di halaman publik sampai disetujui admin. Ulasan dengan semua rating 3 ke atas tetap terbit langsung. Halaman moderasi mendapat tab Pending dengan tombol setujui dan sembunyikan.
-
-#### Fixed
-
-- Pilihan semester pada formulir ulasan dosen kini menampilkan daftar pilihan dan tidak lagi menutup formulir saat diklik.
-- Toast kini memakai Inter Variable, typeface yang sama dengan teks lain di aplikasi, alih-alih font bawaan Sonner.
-- Badge kategori mata kuliah kini memakai bentuk tag dengan sudut membulat dan padding lebih lega, sehingga label panjang tetap rapi saat membungkus ke dua baris.
-
-### 2026-11-22
-
-#### Added
-
-- Banner pengumuman situs di atas navbar dengan jadwal tayang (tanggal mulai, tanggal kadaluarsa, dan kontrol aktif manual) serta CTA opsional, dikelola dari halaman baru di dashboard.
-
 Ada ide supaya g-13 makin enak dipakai? Ceritakan lewat
 [GitHub Issues](https://github.com/Andhiki/g-13/issues/new/choose).
 Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
-### 2026-11-21
-
-#### Fixed
-
-- Panel detail mata kuliah di desktop kini tidak lagi menampilkan latar belakang buram di atas header dan graf mata kuliah.
-
-#### Changed
-
-- Navigasi alfabet pada direktori alumni dipindahkan ke sisi kiri layar agar tidak berbenturan dengan bilah gulir, dengan pelacakan gestur 1:1 dan efek pegas di ujung daftar.
-
-- Dukungan gestur dan area sentuh: rating bintang ulasan dosen kini dapat digeser secara horizontal, banner pengumuman dapat digeser ke atas untuk ditutup, notifikasi di perangkat sentuh dapat digeser ke kiri untuk diarsipkan, menu seluler serta modal responsif kini tampil sebagai panel geser (drawer/sheet), aksi hapus/cabut akses memerlukan tekan-tahan konfirmasi, dan area ketuk tombol serta kontrol antarmuka ditingkatkan untuk kenyamanan perangkat sentuh.
-
-- Filter semester pada roadmap kini diperbarui secara kontinu saat peta digeser tanpa pantulan berlebih, dan akordeon kini menggunakan transisi CSS yang mulus saat dibuka atau ditutup ulang.
-
-#### Added
-
-- Menambahkan verifikasi Cloudflare Turnstile (widget tak terlihat) pada formulir ulasan dosen untuk menekan spam; pengiriman ditolak bila verifikasi keamanan gagal.
-
-#### Changed
-
-- Tombol akun di sidebar dashboard kini memakai gaya ghost selebar nama depan dengan ikon panah bawah, dan menu akun tampil lebih lebar serta ringkas di atas kiri dengan alamat email di bagian atas.
-
-- Notifikasi tidak lagi menghitung jumlah total untuk setiap filter agar daftar tetap cepat tanpa pemindaian tabel penuh. Tab filter tampil tanpa angka, dan ikon lonceng menampilkan titik (bukan angka) saat ada notifikasi yang belum dibaca.
-
-- Formulir ulasan dosen kini menyertakan token keamanan saat menerbitkan dan menampilkan pesan yang sesuai ketika verifikasi keamanan gagal atau kedaluwarsa.
-
-### 2026-11-20
-
-#### Added
-
-- Menambahkan halaman dashboard untuk mengelola data mata kuliah dan dosen dengan dukungan tambah, ubah, hapus sementara (`deletedAt`), dan pemulihan data agar riwayat ulasan tetap terjaga.
-
-#### Changed
-
-- Menghapus garis bawah pada nama di kartu dosen.
-
-- Dashboard mendukung moderasi dan notifikasi di layar kecil. Tanggal akun memakai bulan dan tahun, daftar dosen memakai dua kolom di layar lebar, dan ulasan ditampilkan lebih ringkas.
-
-- Ukuran teks pada lencana dan label mata kuliah diperkecil agar nama dosen lebih menonjol pada tabel moderasi.
-
-- Kartu ulasan menempatkan isi ulasan di atas, memakai label mata kuliah yang seragam, dan meringkas skor penilaian.
-
-- Menyederhanakan teks dan ikon pada tabel dashboard.
-
-- Kondisi kosong dashboard kini menjelaskan sumber data dan langkah selanjutnya, termasuk bahwa ulasan publik langsung terbit setelah dikirim.
-
-- Mengurangi jarak horizontal di sisi tautan navigasi sidebar dashboard dan memberi latar sidebar Omahti gelap rona charcoal hangat.
-
-- Indikator muat dashboard menggunakan warna teks netral.
-
-- Menandai notifikasi sebagai dibaca langsung memperbarui daftar dan indikator belum dibaca sambil menunggu server.
-
-- Dashboard menampilkan kondisi kosong yang seragam dan pratinjau sebelum dan sesudah untuk perubahan peran dan status ulasan.
-
-- Notifikasi dashboard dapat digulir tanpa tombol halaman, menu akun menampilkan avatar GitHub, dan pilihan peran memakai ikon akses.
-
-- Admin dapat mencabut akses moderasi lewat pilihan peran User. Notifikasi dimuat saat dashboard dibuka dan diperbarui setiap menit selama jendela aktif.
-
-- Sidebar, panel detail, dan pemilih peran dashboard kini membuka dan menutup dengan transisi.
-
-- Panel notifikasi menggunakan indikator muat ringkas.
-
-- Memperjelas pengurutan dan ringkasan rating ulasan dosen, serta menampilkan semester berjalan di bagian atas pilihan semester.
-
-- Halaman publik statis (beranda, arsip ujian, FAQ, resources, roadmap) kini di-prerender saat build; halaman dosen dan dashboard dirender di klien agar hemat CPU.
-- Login produksi kini berfungsi di kedua domain (`csugm.omahti.com` dan `csugm.andhiki.tech`) dengan satu aplikasi OAuth GitHub; sesi tetap terpisah di masing-masing domain.
-- Merapikan antarmuka dashboard moderasi: pengalihan otomatis dari `/dashboard/login` bagi akun terverifikasi, tampilan menunggu persetujuan tanpa tombol keluar dengan arahan menghubungi maintainer/admin, tombol buka/tutup sidebar kiri dan panel detail kanan, paginasi di bagian atas, tampilan rating bintang serta teks pengalaman yang dapat diperluas di panel detail ulasan, kursor baris mengikuti pengaturan kursor, indikator muat Sonic GIF, cache tab filter agar perpindahan tab tidak memuat ulang, menu Pengaturan di dashboard, manajemen peran dua langkah di panel detail akun, status muat tombol universal (`isLoading`), penyempurnaan cincin fokus tombol/tautan, serta penyelarasan dialog konfirmasi.
-
-#### Fixed
-
-- Kartu mata kuliah memakai tampilan detail saat peta pertama kali dimuat, dan ketukan pada latar menu samping hanya menutup menu.
-
-- Nama mata kuliah yang panjang tidak lagi meluap dari filter ulasan di layar kecil.
-
-- Menyamakan ukuran kontrol sidebar, meratakan bintang pada ulasan, dan merapikan tabel dashboard dengan label mata kuliah yang konsisten.
-
-- Menyamakan jarak di kedua sisi tautan sidebar dashboard.
-
-- Daftar dan detail akun di dashboard kini menampilkan avatar GitHub jika tersedia.
-
-- Dialog moderasi tetap menampilkan status muat sampai data dashboard selesai diperbarui.
-
-- Ikon tombol berganti menjadi indikator muat di posisi yang sama, lalu kembali setelah proses selesai.
-
-- Header dan tata letak dashboard kini mengikuti rute yang sudah siap ditampilkan agar perpindahan halaman lebih mulus.
-
-- Halaman `/dashboard/login` tidak lagi menampilkan pesan galat autentikasi bagi pengunjung yang sudah memiliki sesi; halaman menampilkan tombol lanjut ke dashboard atau keluar.
-
-### 2026-11-19
-
-#### Fixed
-
-- Tautan notifikasi ke ulasan yang berada di luar halaman pertama moderasi kini membuka ulasan tersebut di panel detail, bukan ulasan lain.
-- Akun yang perannya diturunkan tidak lagi melihat notifikasi moderasi atau persetujuan akun yang diterima sebelumnya.
-
-### 2026-11-18
-
-#### Changed
-
-- Memindahkan halaman moderasi ke `/dashboard` dan halaman login ke `/dashboard/login`; login tetap dapat diakses tanpa autentikasi.
-- Mengalihkan permintaan dashboard tanpa cookie sesi langsung ke login; RPC terlindungi tetap memeriksa sesi dan peran terbaru di server.
-- Menata kode halaman, validasi, layanan, kueri, dan tes di sekitar rute masing-masing tanpa mengubah perilaku aplikasi.
-
-### 2026-11-17
-
-#### Added
-
-- Menyediakan login GitHub dan antarmuka moderasi terlindungi di `/admin` untuk meninjau, menyembunyikan, memulihkan ulasan tersembunyi, dan menyetujui akun serta menetapkan peran; login tidak memberi hak istimewa otomatis.
-
-#### Changed
-
-- Meratakan posisi vertikal isi baris moderasi dan memusatkan status persetujuan, tanggal bergabung, penilaian, peran, serta aksi sesuai kepala kolom.
-- Membedakan baris terpilih dengan isian hangat berwarna merek yang peka tema tanpa garis aksen, serta menyamakan jarak nama dosen, lencana status, dan metadata mata kuliah.
-- Memindahkan sakelar anonim ke bawah label nama tampilan; kolom tetap terlihat dengan nilai “Anonim” dan ikon samaran saat aktif, sementara draf nama tetap tersimpan dan tidak dikirim pada ulasan anonim.
-
-### 2026-11-16
-
-#### Changed
-
-- Merapikan sidebar moderasi menjadi navigasi tombol dengan wordmark SVG “Moderation”, memindahkan navigasi ponsel ke drawer, membedakan kepala tabel dari sidebar, serta menambahkan tombol buka/tutup panel detail desktop.
-- Memperhalus sorotan baris terpilih, memperjelas hierarki nama dan metadata, serta merapikan gaya aksi moderasi tanpa menyembunyikan label tindakan.
-- Menambatkan paginasi di panel daftar dan tindakan di bagian bawah panel detail, menjaga kepala kolom tetap terlihat saat daftar panjang digulir, serta menyelaraskan status peran akun sendiri dengan pilihan peran.
-
 ### 2026-11-15
 
-#### Added
-
-- Menambahkan fondasi autentikasi GitHub, skema sesi, dan RPC moderasi dengan pemeriksaan sesi serta peran di server. Akun baru tetap tanpa hak istimewa sampai admin menyetujui dan menetapkan peran; ulasan publik tetap dapat diterbitkan tanpa akun. Bootstrap admin dan verifikasi CPU Workers tetap menjadi penghalang peluncuran.
-
 #### Changed
 
-- Menampilkan nama dosen pada judul dialog ulasan, menambahkan ikon pengguna pada nama tampilan, serta menghapus deskripsi pembuka dan bantuan berulang pada mata kuliah, semester, dan pengalaman.
 - Mempercepat animasi kontrol, kuis roadmap, dan umpan balik salin serta memperhalus respons tab dan penutupan panel.
-- Merapikan tombol batal dan terbitkan ulasan menjadi selebar konten dan rata kanan di desktop, dengan lebar seimbang di ponsel tetap dipertahankan.
-- Menghapus judul penilaian yang berulang pada formulir ulasan; jarak antarbagian membedakan identitas kuliah dan penilaian tanpa mengganggu keselarasan label dan kontrol.
-- Membatasi formulir ulasan ke detail dosen, menempatkan nama tampilan di awal, serta menyusun label dan kontrol berdampingan di desktop. Mata kuliah dapat dicari dalam dua bahasa dan semester dipilih dari 2021/2022 hingga semester berjalan.
-- Mengganti kotak ulasan kosong pada detail dosen dengan tampilan ringkas berisi ikon, penjelasan, dan tombol tulis ulasan; pilihan mata kuliah tetap terbawa ke formulir.
-
-#### Fixed
-
-- Mempertahankan warna tombol dan pilihan saat memakai tipografi ringkas, sehingga penyesuaian ukuran teks tidak menghapus warna aksi atau status.
-- Menggunakan popover AlignUI untuk panduan penilaian dosen agar posisi mengikuti ruang layar, dapat ditutup dengan Escape atau klik di luar, dan fokus kembali ke tombol info.
-- Mengembalikan sakelar anonim yang aktif secara bawaan pada formulir ulasan; nama tampilan wajib diisi hanya saat mode anonim dimatikan.
-- Meringkas tombol, pencarian, filter, dan pilihan menu pada direktori, detail, serta formulir ulasan dosen menggunakan ukuran kontrol kecil; tombol tulis ulasan tetap memakai gaya FancyButton dengan teks kecil.
-- Menyeragamkan pilihan pengurutan dosen dan ulasan dengan filter mata kuliah memakai komponen seleksi yang sama, termasuk ukuran teks menu, animasi panah, serta sorotan hover dan fokus.
-- Langsung memperbarui jumlah dan status suka ulasan dosen saat ditekan, serta mengembalikannya jika penyimpanan gagal.
 
 ### 2026-11-14
 
@@ -196,50 +26,15 @@ Usulan fitur, laporan bug, dan koreksi kurikulum semuanya diterima.
 
 #### Fixed
 
-- Menyamakan ukuran teks tombol pada ajakan memberi bintang di GitHub dengan teks pesannya.
 - Menggunakan cache data alumni yang sama saat membuka direktori dan mencoba ulang, serta menyajikan data lama saat pembaruan atau sumber data terganggu.
 - Menyembunyikan scrollbar pada tab angkatan alumni tanpa menonaktifkan pengguliran horizontal.
 
 #### Changed
 
-- Memusatkan daftar dosen dalam satu kolom dan merapikan pengantar direktori.
-- Meringkas ringkasan penilaian dosen di ponsel tanpa menyembunyikan informasi, mendekatkan label dengan bintang ringkasan pada desktop, serta merapikan ruang bawah kartu ulasan.
-- Menyelaraskan chip perluasan mata kuliah dengan area sentuh yang aman, memperjelas pengurutan di ponsel, dan memperbesar tombol suka.
-- Merapikan jarak formulir dan pilihan bintang tanpa mengurangi area sentuh, serta mempersingkat petunjuk pencarian mata kuliah.
-
 - Membuat pencarian alumni yang melekat transparan dengan efek kaca dan mempercepat animasinya menjadi 120 ms.
-
-- Menambahkan filter mata kuliah pada ulasan di halaman detail dosen.
 
 - Menyimpan sementara halaman direktori alumni agar tetap tersedia saat sumber data mengalami gangguan sementara.
 - Mengganti pilihan angkatan pada direktori alumni dengan tab yang dapat digeser, serta menambahkan pintasan `/` dan animasi pada pencarian yang tetap terlihat saat menggulir.
-
-- Membuka akses langsung ke direktori dan ulasan dosen; peluncuran produksi tetap memerlukan D1, secret pembatasan laju, dan kesiapan penanganan laporan.
-
-- Mengecilkan nama dosen pada halaman detail agar lebih ringkas.
-
-- Merapatkan jarak vertikal halaman detail dosen pada desktop.
-
-- Memperbarui direktori dan halaman detail dosen saat ulasan diterbitkan atau suka diubah.
-
-- Mengajak pengunjung menjadi pengulas pertama pada kartu dosen yang belum memiliki ulasan.
-
-- Mengubah direktori dosen menjadi ringkasan dengan tautan ke halaman detail khusus; ulasan lengkap, pengurutan ulasan, dan tombol suka tersedia di halaman dosen.
-- Memadatkan kartu dosen, menampilkan rating sebagai lima bintang, membatasi tampilan awal mata kuliah menjadi tiga, dan menghapus petunjuk pencarian.
-- Merapikan rincian rating ulasan pada layar kecil agar label aspek tidak keluar dari panel.
-- Merapikan dialog ulasan dengan garis vertikal pada penilaian, petunjuk di placeholder, dan footer yang lebih rapat.
-- Memindahkan panduan rating dan catatan ulasan belum terverifikasi ke popover ikon info setelah tombol tulis ulasan pada direktori dan detail dosen.
-- Memindahkan formulir ulasan ke dialog AlignUI dan merangkum kartu dosen menjadi nama, jumlah ulasan, rating keseluruhan, serta mata kuliah yang diulas.
-- Menghapus keterangan batas pengiriman dan privasi dari formulir ulasan.
-- Menggabungkan pencarian dosen dan mata kuliah serta menu urutan, merangkum kartu dosen, dan menghaluskan buka-tutup formulir ulasan.
-- Menyelaraskan halaman dosen dengan pola pengantar di kiri dan konten di kanan, serta menambahkan pengurutan dosen dan ulasan.
-- Mempermudah pengisian ulasan dengan penilaian bintang, pencarian mata kuliah dalam satu kolom, pilihan dosen dari kartu, dan pesan validasi per kolom.
-
-#### Added
-
-- Menyukai dan membatalkan suka pada ulasan dosen tanpa akun.
-- Formulir ulasan dosen tanpa akun, dengan nama atau anonim, penerbitan langsung, dan pembatasan pengiriman per IP.
-- Menambahkan direktori dosen di `/lecturers` dan halaman detail `/lecturers/$lecturerId` dengan ulasan komunitas, filter mata kuliah dwibahasa, rata-rata metrik, dan penjelasan bahwa ulasan belum terverifikasi.
 
 ### 2026-11-12
 
