@@ -48,6 +48,17 @@
         "apps/web/src/**/*.{ts,tsx}"
       ],
       "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^\\.\\./\\.\\./\\.\\.(?:/|$)",
+                "message": "Use the @/ alias for imports more than two directories up."
+              }
+            ]
+          }
+        ],
         "shadcn/no-raw-colors": "error",
         "shadcn/no-unknown-classes": [
           "error",
