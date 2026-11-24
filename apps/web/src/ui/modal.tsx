@@ -165,6 +165,30 @@ function Root({ presentation = "auto", ...props }: React.ComponentProps<typeof D
   return <Dialog presentation={presentation} {...props} />;
 }
 
+const ModalOpenContext = React.createContext(false);
+
+export function useModalOpen() {
+  return React.useContext(ModalOpenContext);
+}
+
+function ModalBody({ open, children }: { open: boolean; children: React.ReactNode }) {
+  const [lastOpenChildren, setLastOpenChildren] = React.useState(children);
+
+  // The SDK keeps the panel visible on exit even if the caller clears its content on close.
+  if (open && children !== lastOpenChildren) setLastOpenChildren(children);
+
+  return (
+    <ModalOpenContext.Provider value={open}>
+      <div
+        inert={!open}
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]"
+      >
+        {open ? children : lastOpenChildren}
+      </div>
+    </ModalOpenContext.Provider>
+  );
+}
+
 const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
   (
     {
@@ -214,9 +238,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
                   <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
                 </div>
               )}
-              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
-                {children}
-              </div>
+              <ModalBody open={state.open}>{children}</ModalBody>
               {state.presentation === "sheet" && (
                 <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
               )}

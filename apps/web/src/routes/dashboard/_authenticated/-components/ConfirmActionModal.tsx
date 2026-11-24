@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignModal } from "@/ui/modal";
+import { AlignModal, useModalOpen } from "@/ui/modal";
 import { Typography } from "@/ui/typography";
 
 const HOLD_DURATION_MS = 850;
@@ -9,15 +9,14 @@ const CANCEL_DURATION_MS = 150;
 
 function HoldConfirmButton({
   confirmLabel,
-  open,
   pending,
   onConfirm,
 }: {
   confirmLabel: string;
-  open: boolean;
   pending: boolean;
   onConfirm: () => void;
 }) {
+  const open = useModalOpen();
   const [holding, setHolding] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -106,14 +105,12 @@ function HoldConfirmButton({
 function ConfirmActionFooter({
   destructive,
   confirmLabel,
-  open,
   pending,
   onClose,
   onConfirm,
 }: {
   destructive: boolean;
   confirmLabel: string;
-  open: boolean;
   pending: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -131,12 +128,7 @@ function ConfirmActionFooter({
         Cancel
       </AlignButton.Root>
       {destructive ? (
-        <HoldConfirmButton
-          confirmLabel={confirmLabel}
-          open={open}
-          pending={pending}
-          onConfirm={onConfirm}
-        />
+        <HoldConfirmButton confirmLabel={confirmLabel} pending={pending} onConfirm={onConfirm} />
       ) : (
         <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
           {confirmLabel}
@@ -196,7 +188,6 @@ export function ConfirmActionModal({
         <ConfirmActionFooter
           destructive={destructive}
           confirmLabel={confirmLabel}
-          open={open}
           pending={pending}
           onClose={onClose}
           onConfirm={onConfirm}
