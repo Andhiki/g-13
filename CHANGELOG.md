@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Fixed
+
+- Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.
+
 ## 0.1.0 - 2026-11-24
 
 ### 2026-11-24
