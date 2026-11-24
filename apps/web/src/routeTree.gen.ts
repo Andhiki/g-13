@@ -34,6 +34,7 @@ import { Route as DashboardAuthenticatedCoursesIndexRouteImport } from './routes
 import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from './routes/dashboard/_authenticated/lecturer-reviews/index'
 import { Route as DashboardAuthenticatedLecturersIndexRouteImport } from './routes/dashboard/_authenticated/lecturers/index'
 import { Route as DashboardAuthenticatedNotificationsIndexRouteImport } from './routes/dashboard/_authenticated/notifications/index'
+import { Route as DashboardAuthenticatedThesesIndexRouteImport } from './routes/dashboard/_authenticated/theses/index'
 import { Route as DashboardAuthenticatedUsersIndexRouteImport } from './routes/dashboard/_authenticated/users/index'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -167,6 +168,12 @@ const DashboardAuthenticatedNotificationsIndexRoute =
     path: '/notifications/',
     getParentRoute: () => DashboardAuthenticatedRouteRoute,
   } as any)
+const DashboardAuthenticatedThesesIndexRoute =
+  DashboardAuthenticatedThesesIndexRouteImport.update({
+    id: '/theses/',
+    path: '/theses/',
+    getParentRoute: () => DashboardAuthenticatedRouteRoute,
+  } as any)
 const DashboardAuthenticatedUsersIndexRoute =
   DashboardAuthenticatedUsersIndexRouteImport.update({
     id: '/users/',
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
+  '/dashboard/theses/': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -222,6 +230,7 @@ export interface FileRoutesByTo {
   '/dashboard/lecturer-reviews': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/lecturers': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications': typeof DashboardAuthenticatedNotificationsIndexRoute
+  '/dashboard/theses': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/users': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -251,6 +260,7 @@ export interface FileRoutesById {
   '/dashboard/_authenticated/lecturer-reviews/': typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   '/dashboard/_authenticated/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/_authenticated/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
+  '/dashboard/_authenticated/theses/': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/_authenticated/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/dashboard/lecturer-reviews/'
     | '/dashboard/lecturers/'
     | '/dashboard/notifications/'
+    | '/dashboard/theses/'
     | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/dashboard/lecturer-reviews'
     | '/dashboard/lecturers'
     | '/dashboard/notifications'
+    | '/dashboard/theses'
     | '/dashboard/users'
   id:
     | '__root__'
@@ -331,6 +343,7 @@ export interface FileRouteTypes {
     | '/dashboard/_authenticated/lecturer-reviews/'
     | '/dashboard/_authenticated/lecturers/'
     | '/dashboard/_authenticated/notifications/'
+    | '/dashboard/_authenticated/theses/'
     | '/dashboard/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
@@ -519,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthenticatedNotificationsIndexRouteImport
       parentRoute: typeof DashboardAuthenticatedRouteRoute
     }
+    '/dashboard/_authenticated/theses/': {
+      id: '/dashboard/_authenticated/theses/'
+      path: '/theses'
+      fullPath: '/dashboard/theses/'
+      preLoaderRoute: typeof DashboardAuthenticatedThesesIndexRouteImport
+      parentRoute: typeof DashboardAuthenticatedRouteRoute
+    }
     '/dashboard/_authenticated/users/': {
       id: '/dashboard/_authenticated/users/'
       path: '/users'
@@ -580,6 +600,7 @@ interface DashboardAuthenticatedRouteRouteChildren {
   DashboardAuthenticatedLecturerReviewsIndexRoute: typeof DashboardAuthenticatedLecturerReviewsIndexRoute
   DashboardAuthenticatedLecturersIndexRoute: typeof DashboardAuthenticatedLecturersIndexRoute
   DashboardAuthenticatedNotificationsIndexRoute: typeof DashboardAuthenticatedNotificationsIndexRoute
+  DashboardAuthenticatedThesesIndexRoute: typeof DashboardAuthenticatedThesesIndexRoute
   DashboardAuthenticatedUsersIndexRoute: typeof DashboardAuthenticatedUsersIndexRoute
 }
 
@@ -596,6 +617,8 @@ const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRoute
       DashboardAuthenticatedLecturersIndexRoute,
     DashboardAuthenticatedNotificationsIndexRoute:
       DashboardAuthenticatedNotificationsIndexRoute,
+    DashboardAuthenticatedThesesIndexRoute:
+      DashboardAuthenticatedThesesIndexRoute,
     DashboardAuthenticatedUsersIndexRoute:
       DashboardAuthenticatedUsersIndexRoute,
   }

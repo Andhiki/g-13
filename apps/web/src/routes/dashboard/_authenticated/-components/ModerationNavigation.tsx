@@ -13,6 +13,7 @@ import {
   RiChatCheckLine,
   RiCloseLine,
   RiExternalLinkLine,
+  RiFileTextLine,
   RiGroupLine,
   RiMegaphoneLine,
   RiLogoutBoxLine,
@@ -55,6 +56,7 @@ const sectionGroups = [
     items: [
       { to: "/dashboard/courses", label: "Courses", Icon: RiBookOpenLine },
       { to: "/dashboard/lecturers", label: "Lecturers", Icon: RiUserVoiceLine },
+      { to: "/dashboard/theses", label: "Theses", Icon: RiFileTextLine },
     ],
   },
 ] satisfies ModerationSectionGroup[];
