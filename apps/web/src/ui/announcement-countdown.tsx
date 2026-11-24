@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type AnnouncementCountdownUnit = "day" | "hour" | "minute" | "second";
 export type AnnouncementCountdownPart = { unit: AnnouncementCountdownUnit; value: number };
@@ -62,29 +62,22 @@ export function resolveAnnouncementCountdown(
   };
 }
 
-export function useAnnouncementClock(targets: readonly (number | null)[]): number | null {
-  const targetKey = targets
-    .filter((target): target is number => target !== null)
-    .sort((left, right) => left - right)
-    .join(",");
-  const targetsRef = useRef(targets);
+export function useAnnouncementClock(latestTarget: number | null): number | null {
   const [now, setNow] = useState<number | null>(null);
-  targetsRef.current = targets;
 
   useEffect(() => {
-    const tick = () => setNow(Date.now());
-    tick();
-    if (!targetsRef.current.some((target) => target !== null && target > Date.now())) return;
+    if (latestTarget === null) return;
+    const current = Date.now();
+    setNow(current);
+    if (latestTarget <= current) return;
 
     const timer = window.setInterval(() => {
-      const current = Date.now();
-      setNow(current);
-      if (!targetsRef.current.some((target) => target !== null && target > current)) {
-        window.clearInterval(timer);
-      }
+      const tick = Date.now();
+      setNow(tick);
+      if (latestTarget <= tick) window.clearInterval(timer);
     }, 1_000);
     return () => window.clearInterval(timer);
-  }, [targetKey]);
+  }, [latestTarget]);
 
   return now;
 }

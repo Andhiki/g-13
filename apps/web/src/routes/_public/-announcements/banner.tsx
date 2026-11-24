@@ -27,7 +27,11 @@ export function AnnouncementBanner() {
   }, []);
 
   const rows = data ? filterAnnouncementsNotDismissed(data, dismissed) : [];
-  const countdownNow = useAnnouncementClock(rows.map((row) => row.countdownAt?.getTime() ?? null));
+  const latestCountdown = rows.reduce(
+    (latest, row) => Math.max(latest, row.countdownAt?.getTime() ?? 0),
+    0,
+  );
+  const countdownNow = useAnnouncementClock(latestCountdown || null);
   const barListRef = useRef<HTMLDivElement | null>(null);
   const visible = rows.length > 0;
 
