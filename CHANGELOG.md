@@ -14,6 +14,10 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 - Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutan yang bisa digeser langsung, semuanya tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
 
+#### Changed
+
+- Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
+
 ### 2026-11-23
 
 #### Changed
