@@ -8,8 +8,6 @@ export const announcementPageSchema = z.object({
   status: announcementStatusSchema,
 });
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
 const nonEmpty = z.string().trim().min(1);
 const requiredId = () => nonEmpty.max(100);
 const positiveInt = () => z.number().int().positive();
@@ -43,12 +41,6 @@ export function hasValidScheduleWindow(input: {
 }
 
 export const announcementFieldsShape = z.object({
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .max(80, "The slug must be 80 characters or fewer.")
-    .regex(/^$|^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and dashes."),
   titleId: localizedText("Indonesian title", 120),
   titleEn: localizedText("English title", 120),
   bodyId: localizedText("Indonesian message", 280),
@@ -65,6 +57,7 @@ export const announcementFieldsShape = z.object({
   ctaLabelEn: optionalLocalizedText(60),
   startsAt: z.number().int().positive("Pick a start date."),
   endsAt: positiveInt().nullable(),
+  countdownAt: positiveInt().nullable(),
   enabled: z.boolean(),
 });
 export type AnnouncementFieldsInput = z.infer<typeof announcementFieldsShape>;
@@ -80,13 +73,6 @@ export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
 
 export const updateAnnouncementSchema = announcementFieldsShape.safeExtend({
   announcementId: requiredId(),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1, "Enter a slug.")
-    .max(80, "The slug must be 80 characters or fewer.")
-    .regex(slugPattern, "Use lowercase letters, numbers, and dashes."),
 });
 export type UpdateAnnouncementInput = z.infer<typeof updateAnnouncementSchema>;
 

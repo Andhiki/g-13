@@ -329,5 +329,20 @@
   "Menyusun bintang satu per satu…": "Lining up the stars…",
   "Pengumuman": "Announcement",
   "Tutup pengumuman": "Dismiss announcement",
-  "Selengkapnya": "Learn more"
+  "Selengkapnya": "Learn more",
+  "Starts in": "Starts in",
+  "Happening now": "Happening now",
+  "less than a minute": "less than a minute",
+  "day": "day",
+  "days": "days",
+  "hour": "hour",
+  "hours": "hours",
+  "minute": "minute",
+  "minutes": "minutes",
+  "second": "second",
+  "seconds": "seconds",
+  "day short": "d",
+  "hour short": "h",
+  "minute short": "m",
+  "second short": "s"
 }

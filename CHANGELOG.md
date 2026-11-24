@@ -10,6 +10,15 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ### 2026-11-24
 
+#### Added
+
+- Banner pengumuman kini dapat menampilkan hitung mundur dwibahasa menuju acara dan beralih ke status sedang berlangsung tanpa mengubah jadwal tayangnya.
+- Formulir pengumuman kini menampilkan pratinjau banner langsung dan menyediakan pemilih tanggal serta waktu untuk target hitung mundur.
+
+#### Changed
+
+- Pengumuman kini memakai ID internal untuk pengelolaan dan penyimpanan dismissal; slug tidak lagi diperlukan.
+
 #### Fixed
 
 - Bilah navigasi tetap berada di depan popover saat halaman digulir.

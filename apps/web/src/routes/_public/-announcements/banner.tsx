@@ -1,9 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { Language } from "@g13/i18n";
 import { AnimatePresence, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
-import { RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
-import { AlignButton } from "@/ui/button";
+import { AnnouncementBannerRow, resolveAnnouncementCopy } from "@/ui/announcement-banner";
+import { useAnnouncementClock } from "@/ui/announcement-countdown";
 import { useLocale } from "@/useLocale";
 import { activeAnnouncementsQuery } from "./queries";
 import {
@@ -13,19 +12,6 @@ import {
   parseDismissedAnnouncements,
   type DismissedAnnouncements,
 } from "./dismissals";
-import type { ActiveAnnouncement } from "./repository";
-
-function announcementCopy(row: ActiveAnnouncement, language: Language, defaultCtaLabel: string) {
-  return {
-    title: language === "en" ? row.titleEn : row.titleId,
-    body: language === "en" ? row.bodyEn : row.bodyId,
-    ctaLabel: row.ctaHref
-      ? (language === "en" && row.ctaLabelEn) ||
-        (language === "id" && row.ctaLabelId) ||
-        defaultCtaLabel
-      : null,
-  };
-}
 
 export function AnnouncementBanner() {
   const { text, language } = useLocale();
@@ -41,6 +27,7 @@ export function AnnouncementBanner() {
   }, []);
 
   const rows = data ? filterAnnouncementsNotDismissed(data, dismissed) : [];
+  const countdownNow = useAnnouncementClock(rows.map((row) => row.countdownAt?.getTime() ?? null));
   const barListRef = useRef<HTMLDivElement | null>(null);
   const visible = rows.length > 0;
 
@@ -67,9 +54,9 @@ export function AnnouncementBanner() {
     };
   }, [visible, rows.length]);
 
-  function dismiss(slug: string) {
+  function dismiss(announcementId: string) {
     setDismissed((current) => {
-      const next = dismissAnnouncement(current, slug);
+      const next = dismissAnnouncement(current, announcementId);
       try {
         window.localStorage.setItem(DISMISSED_ANNOUNCEMENTS_KEY, JSON.stringify(next));
       } catch {}
@@ -93,18 +80,20 @@ export function AnnouncementBanner() {
       {visible && (
         <AnimatePresence initial={false}>
           {rows.map((row) => {
-            const copy = announcementCopy(row, language, text("Selengkapnya"));
-            const external = row.ctaHref !== null && !row.ctaHref.startsWith("/");
+            const copy = resolveAnnouncementCopy(row, language, text("Selengkapnya"));
             return (
               <AnnouncementRow
                 key={row.id}
                 title={copy.title}
                 body={copy.body}
                 ctaLabel={copy.ctaLabel}
-                ctaHref={row.ctaHref}
-                external={external}
+                ctaHref={copy.ctaHref}
+                external={copy.external}
                 closeLabel={text("Tutup pengumuman")}
-                onDismiss={() => dismiss(row.slug)}
+                countdownAt={row.countdownAt?.getTime() ?? null}
+                countdownNow={countdownNow}
+                countdownText={text}
+                onDismiss={() => dismiss(row.id)}
               />
             );
           })}
@@ -121,6 +110,9 @@ function AnnouncementRow({
   ctaHref,
   external,
   closeLabel,
+  countdownAt,
+  countdownNow,
+  countdownText,
   onDismiss,
 }: {
   title: string;
@@ -129,6 +121,9 @@ function AnnouncementRow({
   ctaHref: string | null;
   external: boolean;
   closeLabel: string;
+  countdownAt: number | null;
+  countdownNow: number | null;
+  countdownText: (key: string) => string;
   onDismiss: () => void;
 }) {
   const reducedMotion = useReducedMotion();
@@ -151,40 +146,20 @@ function AnnouncementRow({
         opacity: 0,
         transition: { duration: reducedMotion ? 0 : 0.18, ease: [0.32, 0.72, 0, 1] },
       }}
-      className="flex min-h-11 touch-pan-x items-center gap-3 overflow-hidden border-t border-static-white/20 py-1.5 pl-4 pr-2 first:border-t-0 md:pl-6 md:pr-3"
+      className="touch-pan-x overflow-hidden border-t border-static-white/20 first:border-t-0"
     >
-      <p className="min-w-0 flex-1 text-label-sm">
-        <span className="font-semibold">{title}</span>{" "}
-        <span className="text-static-white/75">{body}</span>
-      </p>
-      {ctaHref && ctaLabel && (
-        <AlignButton.Root
-          asChild
-          variant="neutral-inverse"
-          mode="filled"
-          size="xxsmall"
-          className="shrink-0"
-        >
-          <a href={ctaHref} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-            {ctaLabel}
-            <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />
-          </a>
-        </AlignButton.Root>
-      )}
-      <AlignButton.Root
-        variant="neutral"
-        mode="ghost"
-        size="xsmall"
-        iconOnly
-        className={
-          // oxlint-disable-next-line shadcn/no-restyle -- banner close button sits on the announcement's colored surface: static-white icon with a translucent white hover
-          "size-7 shrink-0 text-static-white hover:bg-static-white/10"
-        }
-        aria-label={closeLabel}
-        onClick={onDismiss}
-      >
-        <RiCloseLine aria-hidden="true" className="size-4" />
-      </AlignButton.Root>
+      <AnnouncementBannerRow
+        title={title}
+        body={body}
+        ctaLabel={ctaLabel}
+        ctaHref={ctaHref}
+        external={external}
+        closeLabel={closeLabel}
+        countdownAt={countdownAt}
+        countdownNow={countdownNow}
+        countdownText={countdownText}
+        onDismiss={onDismiss}
+      />
     </m.div>
   );
 }

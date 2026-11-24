@@ -16,7 +16,6 @@ const day = 24 * 60 * 60 * 1000;
 
 function createBulletin(input: Partial<Parameters<typeof createAnnouncement>[2]> = {}) {
   return {
-    slug: "midterm-schedule",
     titleId: "Jadwal UTS sudah terbit",
     titleEn: "Midterm schedule is out",
     bodyId: "Cek arsip ujian untuk soal UTS tahun-tahun sebelumnya.",
@@ -26,6 +25,7 @@ function createBulletin(input: Partial<Parameters<typeof createAnnouncement>[2]>
     ctaLabelEn: "Open archive",
     startsAt: Date.now() - day,
     endsAt: null,
+    countdownAt: null,
     enabled: true,
     ...input,
   };
@@ -48,7 +48,7 @@ async function seedUsers(db: ReturnType<typeof createDatabase>) {
   });
 }
 
-it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for announcements", async () => {
+it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for announcements", async () => {
   const platform = await createTestPlatformProxy();
   try {
     const db = createDatabase(platform.env.DB);
@@ -70,24 +70,20 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
     }
 
     // A live, enabled announcement is publicly visible right away.
-    const created = resultData(await createAnnouncement(db, admin, createBulletin()));
+    const created = resultData(
+      await createAnnouncement(db, admin, createBulletin({ countdownAt: now + day })),
+    );
     expect(created.id).toBeTruthy();
     const live = await getActiveAnnouncements(db, now);
-    expect(live.map((row) => row.slug)).toEqual(["midterm-schedule"]);
-
-    // Slug conflicts are rejected.
-    expect(await createAnnouncement(db, admin, createBulletin({ titleId: "Duplikat" }))).toEqual({
-      data: null,
-      error: ANNOUNCEMENT_ADMIN_ERRORS.SLUG_IN_USE,
-    });
+    expect(live.map((row) => row.id)).toEqual([created.id]);
+    expect(live[0]?.countdownAt?.getTime()).toBe(now + day);
+    expect((await getActiveAnnouncements(db, now + 2 * day)).map((row) => row.id)).toEqual([
+      created.id,
+    ]);
 
     // An expiry before the start is rejected.
     expect(
-      await createAnnouncement(
-        db,
-        admin,
-        createBulletin({ slug: "backwards", startsAt: now, endsAt: now - day }),
-      ),
+      await createAnnouncement(db, admin, createBulletin({ startsAt: now, endsAt: now - day })),
     ).toEqual({ data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE });
 
     // Editing keeps the announcement live with new copy.
@@ -99,6 +95,7 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
     ).toEqual({ data: { announcementId: created.id }, error: null });
     const afterEdit = await getActiveAnnouncements(db, now);
     expect(afterEdit[0]?.titleId).toBe("Jadwal UTS diperbarui");
+    expect(afterEdit[0]?.countdownAt).toBeNull();
 
     // Disabling hides it from the public banner and files it under disabled.
     expect(
@@ -130,7 +127,6 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
         db,
         admin,
         createBulletin({
-          slug: "no-cta",
           ctaHref: "",
           ctaLabelId: "",
           ctaLabelEn: "",
@@ -147,6 +143,15 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
     expect(
       announcementFieldsShape.safeParse(createBulletin({ ctaHref: "not-a-link" })).success,
     ).toBe(false);
+    expect(announcementFieldsShape.safeParse(createBulletin({ countdownAt: null })).success).toBe(
+      true,
+    );
+    expect(announcementFieldsShape.safeParse(createBulletin({ countdownAt: now })).success).toBe(
+      true,
+    );
+    expect(announcementFieldsShape.safeParse(createBulletin({ countdownAt: 0 })).success).toBe(
+      false,
+    );
     await changeAnnouncementLifecycle(db, admin, {
       announcementId: withoutCta.id,
       action: "delete",
@@ -156,7 +161,7 @@ it("enforces RBAC, CRUD, slug conflicts, toggles, and public visibility for anno
     expect(
       await updateAnnouncement(db, admin, {
         announcementId: "missing",
-        ...createBulletin({ slug: "other-slug" }),
+        ...createBulletin(),
       }),
     ).toEqual({ data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE });
     expect(
@@ -199,32 +204,32 @@ it("schedules announcements by start and expiry windows", async () => {
       await createAnnouncement(
         db,
         admin,
-        createBulletin({ slug: "future", startsAt: now + day, endsAt: now + 2 * day }),
+        createBulletin({ startsAt: now + day, endsAt: now + 2 * day }),
       ),
     );
-    resultData(
+    const expiring = resultData(
       await createAnnouncement(
         db,
         admin,
-        createBulletin({ slug: "expiring", startsAt: now - day, endsAt: now + day }),
+        createBulletin({ startsAt: now - day, endsAt: now + day }),
       ),
     );
     const expired = resultData(
       await createAnnouncement(
         db,
         admin,
-        createBulletin({ slug: "expired", startsAt: now - 2 * day, endsAt: now - day }),
+        createBulletin({ startsAt: now - 2 * day, endsAt: now - day }),
       ),
     );
 
     // Nothing is public at its scheduled slot beyond the future one or ended ones.
-    expect((await getActiveAnnouncements(db, now)).map((row) => row.slug)).toEqual(["expiring"]);
+    expect((await getActiveAnnouncements(db, now)).map((row) => row.id)).toEqual([expiring.id]);
 
     const before = resultData(await inspectAnnouncements(db, admin, 0, "scheduled"));
     expect(before.rows.map((row) => row.id)).toEqual([scheduled.id]);
 
     const during = await getActiveAnnouncements(db, now + day / 2);
-    expect(during.map((row) => row.slug)).toEqual(["expiring"]);
+    expect(during.map((row) => row.id)).toEqual([expiring.id]);
 
     const afterEverything = await getActiveAnnouncements(db, now + 2 * day);
     expect(afterEverything).toEqual([]);

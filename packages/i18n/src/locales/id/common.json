@@ -329,5 +329,20 @@
   "Menyusun bintang satu per satu…": "Menyusun bintang satu per satu…",
   "Pengumuman": "Pengumuman",
   "Tutup pengumuman": "Tutup pengumuman",
-  "Selengkapnya": "Selengkapnya"
+  "Selengkapnya": "Selengkapnya",
+  "Starts in": "Dimulai dalam",
+  "Happening now": "Sedang berlangsung",
+  "less than a minute": "kurang dari satu menit",
+  "day": "hari",
+  "days": "hari",
+  "hour": "jam",
+  "hours": "jam",
+  "minute": "menit",
+  "minutes": "menit",
+  "second": "detik",
+  "seconds": "detik",
+  "day short": "h",
+  "hour short": "j",
+  "minute short": "m",
+  "second short": "d"
 }
