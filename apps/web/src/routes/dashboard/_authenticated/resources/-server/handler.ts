@@ -5,6 +5,7 @@ import { authorize } from "@/server/auth-middleware";
 import { runServerOperation } from "@/server/server-function-error";
 import {
   createResourceSchema,
+  reorderResourcesSchema,
   resourceLifecycleSchema,
   resourcePageSchema,
   updateResourceSchema,
@@ -14,6 +15,7 @@ import {
   changeResourceLifecycle,
   createResource,
   inspectResources,
+  reorderResources,
   updateResource,
 } from "./service";
 
@@ -69,6 +71,18 @@ export const changeAdminResourceLifecycle = createServerFn({ method: "POST" })
     const { session } = context;
     const result = await runServerOperation(() =>
       changeResourceLifecycle(createDatabase(env.DB), session.user, data),
+    );
+    if (result.error !== null) rejectResourceAdminOperation(result.error);
+    return result.data;
+  });
+
+export const reorderAdminResources = createServerFn({ method: "POST" })
+  .middleware([authorize("moderate")])
+  .validator(reorderResourcesSchema)
+  .handler(async ({ data, context }) => {
+    const { session } = context;
+    const result = await runServerOperation(() =>
+      reorderResources(createDatabase(env.DB), session.user, data),
     );
     if (result.error !== null) rejectResourceAdminOperation(result.error);
     return result.data;

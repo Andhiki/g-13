@@ -1,4 +1,4 @@
-import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
 import { allocateCatalogId } from "@/routes/dashboard/_authenticated/-server/slug";
@@ -68,6 +68,7 @@ export async function getNextResourceSortOrder(db: Database): Promise<number> {
 
 export async function createResourceRecord(db: Database, input: CreateResourceInput) {
   const id = await allocateResourceId(db, input.titleEn);
+  const sortOrder = await getNextResourceSortOrder(db);
   const [created] = await db
     .insert(learningResources)
     .values({
@@ -77,7 +78,7 @@ export async function createResourceRecord(db: Database, input: CreateResourceIn
       descriptionId: input.descriptionId,
       descriptionEn: input.descriptionEn,
       url: input.url,
-      sortOrder: input.sortOrder,
+      sortOrder,
     })
     .returning({ id: learningResources.id });
   return created;
@@ -95,7 +96,6 @@ export async function updateResourceRecord(
       descriptionId: input.descriptionId,
       descriptionEn: input.descriptionEn,
       url: input.url,
-      sortOrder: input.sortOrder,
       updatedAt: new Date(),
     })
     .where(and(eq(learningResources.id, input.resourceId), isNull(learningResources.deletedAt)))
@@ -123,4 +123,33 @@ export async function setResourceDeletedState(
     )
     .returning({ id: learningResources.id });
   return updated !== undefined;
+}
+
+/** Current sort-order slots for the requested rows, in the same order the admin list renders them. */
+export async function listResourceSortOrders(db: Database, ids: string[]) {
+  return db
+    .select({ id: learningResources.id, sortOrder: learningResources.sortOrder })
+    .from(learningResources)
+    .where(inArray(learningResources.id, ids))
+    .orderBy(
+      asc(learningResources.sortOrder),
+      asc(learningResources.titleId),
+      asc(learningResources.id),
+    );
+}
+
+/** Writes the permuted slots in one D1 batch so a partial reorder cannot be observed. */
+export async function applyResourceSortOrders(
+  db: Database,
+  updates: Array<{ id: string; sortOrder: number }>,
+): Promise<void> {
+  const [first, ...rest] = updates;
+  if (!first) return;
+  const updatedAt = new Date();
+  const statementFor = (update: { id: string; sortOrder: number }) =>
+    db
+      .update(learningResources)
+      .set({ sortOrder: update.sortOrder, updatedAt })
+      .where(eq(learningResources.id, update.id));
+  await db.batch([statementFor(first), ...rest.map(statementFor)]);
 }

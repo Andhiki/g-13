@@ -3,15 +3,17 @@ import type { createDatabase } from "@g13/db/client";
 import { RESOURCE_ADMIN_ERRORS, type ResourceAdminResult } from "../-shared/errors";
 import type {
   CreateResourceInput,
+  ReorderResourcesInput,
   ResourceLifecycleInput,
   ResourceStatus,
   UpdateResourceInput,
 } from "../-shared/schemas";
 import {
+  applyResourceSortOrders,
   createResourceRecord,
   getAdminResourceCounts,
-  getNextResourceSortOrder,
   listAdminResources,
+  listResourceSortOrders,
   setResourceDeletedState,
   updateResourceRecord,
 } from "./repository";
@@ -22,7 +24,6 @@ type Actor = { id: string; role?: string | null };
 export type ResourceListData = {
   rows: Awaited<ReturnType<typeof listAdminResources>>;
   counts: Awaited<ReturnType<typeof getAdminResourceCounts>>;
-  nextSortOrder: number;
 };
 
 export async function inspectResources(
@@ -32,12 +33,11 @@ export async function inspectResources(
   status: ResourceStatus = "active",
 ): Promise<ResourceAdminResult<ResourceListData>> {
   if (!canModerate(actor.role)) return { data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, nextSortOrder] = await Promise.all([
+  const [rows, counts] = await Promise.all([
     listAdminResources(db, offset, status),
     getAdminResourceCounts(db),
-    getNextResourceSortOrder(db),
   ]);
-  return { data: { rows, counts, nextSortOrder }, error: null };
+  return { data: { rows, counts }, error: null };
 }
 
 export async function createResource(
@@ -71,5 +71,25 @@ export async function changeResourceLifecycle(
   if (!(await setResourceDeletedState(db, input))) {
     return { data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE };
   }
+  return { data: input, error: null };
+}
+
+export async function reorderResources(
+  db: Database,
+  actor: Actor,
+  input: ReorderResourcesInput,
+): Promise<ResourceAdminResult<ReorderResourcesInput>> {
+  if (!canModerate(actor.role)) return { data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN };
+  const currentRows = await listResourceSortOrders(db, input.orderedIds);
+  if (currentRows.length !== input.orderedIds.length) {
+    return { data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE };
+  }
+  await applyResourceSortOrders(
+    db,
+    input.orderedIds.map((id, index) => ({
+      id,
+      sortOrder: currentRows[index].sortOrder,
+    })),
+  );
   return { data: input, error: null };
 }

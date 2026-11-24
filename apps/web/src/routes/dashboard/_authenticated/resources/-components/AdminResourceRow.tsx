@@ -1,3 +1,6 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { RiDraggable } from "@remixicon/react";
 import {
   AdminTableInspectButton,
   AdminTableRow,
@@ -25,12 +28,14 @@ function linkLabel(url: string): string {
 export function AdminResourceRow({
   resource,
   selected,
+  sortable,
   onSelect,
   onEdit,
   onLifecycle,
 }: {
   resource: AdminResource;
   selected: boolean;
+  sortable: boolean;
   onSelect: () => void;
   onEdit: (resource: AdminResource) => void;
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
@@ -38,63 +43,94 @@ export function AdminResourceRow({
   const { language } = useLocale("notifications");
   const deleted = resource.deletedAt !== null;
   const label = resource.titleId;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: resource.id,
+    disabled: !sortable,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   return (
-    <AdminTableRow
-      selected={selected}
-      onSelect={onSelect}
-      className={`${resourceTableColumns} lg:items-center`}
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? "relative z-20 opacity-80" : undefined}
     >
-      <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2">
-          <AdminTableInspectButton
-            ariaLabel={`Inspect ${label}`}
-            selected={selected}
-            onSelect={onSelect}
-          >
-            {resource.titleId}
-          </AdminTableInspectButton>
-          <div className="lg:hidden">
-            <RecordStatusBadge deleted={deleted} />
+      <AdminTableRow
+        selected={selected}
+        onSelect={onSelect}
+        className={`${resourceTableColumns} lg:items-center`}
+      >
+        <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              className={`flex size-6 shrink-0 touch-none items-center justify-center rounded text-text-sub-600 outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base ${
+                sortable
+                  ? "cursor-grab hover:bg-bg-soft-200/60 hover:text-text-strong-950 active:cursor-grabbing"
+                  : "cursor-not-allowed opacity-40"
+              }`}
+              aria-label={`Reorder ${label}`}
+              title={sortable ? "Drag to reorder" : "Clear the search to reorder"}
+              disabled={!sortable}
+              {...attributes}
+              {...listeners}
+            >
+              <RiDraggable aria-hidden="true" className="size-4" />
+            </button>
+            <div className="min-w-0 flex-1">
+              <AdminTableInspectButton
+                ariaLabel={`Inspect ${label}`}
+                selected={selected}
+                onSelect={onSelect}
+              >
+                {resource.titleId}
+              </AdminTableInspectButton>
+              <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
+                {resource.titleEn}
+              </Typography>
+            </div>
+            <div className="lg:hidden">
+              <RecordStatusBadge deleted={deleted} />
+            </div>
           </div>
         </div>
-        <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
-          {resource.titleEn}
+
+        <div className="min-w-0">
+          <a
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={resource.url}
+            className="block truncate text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+          >
+            {linkLabel(resource.url)}
+          </a>
+        </div>
+
+        <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
+          <span className="lg:hidden">Order: </span>
+          {resource.sortOrder}
         </Typography>
-      </div>
 
-      <div className="min-w-0">
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={resource.url}
-          className="block truncate text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+        <Typography
+          variant="caption"
+          color="muted"
+          className="tabular-nums"
+          title={resource.updatedAt.toISOString()}
         >
-          {linkLabel(resource.url)}
-        </a>
-      </div>
+          {formatRelativeTime(resource.updatedAt.getTime(), language)}
+        </Typography>
 
-      <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
-        <span className="lg:hidden">Order: </span>
-        {resource.sortOrder}
-      </Typography>
-
-      <Typography
-        variant="caption"
-        color="muted"
-        className="tabular-nums"
-        title={resource.updatedAt.toISOString()}
-      >
-        {formatRelativeTime(resource.updatedAt.getTime(), language)}
-      </Typography>
-
-      <CatalogRowActions
-        deleted={deleted}
-        onEdit={() => onEdit(resource)}
-        onDelete={() => onLifecycle({ resourceId: resource.id, action: "delete" }, label)}
-        onRestore={() => onLifecycle({ resourceId: resource.id, action: "restore" }, label)}
-      />
-    </AdminTableRow>
+        <CatalogRowActions
+          deleted={deleted}
+          onEdit={() => onEdit(resource)}
+          onDelete={() => onLifecycle({ resourceId: resource.id, action: "delete" }, label)}
+          onRestore={() => onLifecycle({ resourceId: resource.id, action: "restore" }, label)}
+        />
+      </AdminTableRow>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   AdminFormField,
   AdminFormModal,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
+import { Typography } from "@/ui/typography";
 import { resourceFieldsSchema, type ResourceFieldsInput } from "../-shared/schemas";
 import type { AdminResource } from "./AdminResourceRow";
 
@@ -12,7 +13,6 @@ type FieldErrors = Partial<Record<keyof ResourceFieldsInput, string>>;
 export function ResourceFormModal({
   open,
   resource,
-  nextSortOrder,
   pending,
   error,
   onClose,
@@ -20,7 +20,6 @@ export function ResourceFormModal({
 }: {
   open: boolean;
   resource: AdminResource | null;
-  nextSortOrder: number;
   pending: boolean;
   error?: string;
   onClose: () => void;
@@ -36,7 +35,6 @@ export function ResourceFormModal({
       <ResourceFormBody
         key={resource?.id ?? "new"}
         resource={resource}
-        nextSortOrder={nextSortOrder}
         pending={pending}
         error={error}
         onClose={onClose}
@@ -48,14 +46,12 @@ export function ResourceFormModal({
 
 function ResourceFormBody({
   resource,
-  nextSortOrder,
   pending,
   error,
   onClose,
   onSubmit,
 }: {
   resource: AdminResource | null;
-  nextSortOrder: number;
   pending: boolean;
   error?: string;
   onClose: () => void;
@@ -66,7 +62,6 @@ function ResourceFormBody({
   const [descriptionId, setDescriptionId] = useState(resource?.descriptionId ?? "");
   const [descriptionEn, setDescriptionEn] = useState(resource?.descriptionEn ?? "");
   const [url, setUrl] = useState(resource?.url ?? "");
-  const [sortOrder, setSortOrder] = useState(String(resource?.sortOrder ?? nextSortOrder));
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const editing = resource !== null;
@@ -74,18 +69,12 @@ function ResourceFormBody({
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
 
   const handleFormSubmit = () => {
-    const parsedOrder = sortOrder.trim() === "" ? Number.NaN : Number(sortOrder);
-    if (!Number.isFinite(parsedOrder)) {
-      setFieldErrors({ sortOrder: "Enter a whole number between 0 and 9999." });
-      return false;
-    }
     const parsed = resourceFieldsSchema.safeParse({
       titleId,
       titleEn,
       descriptionId,
       descriptionEn,
       url,
-      sortOrder: parsedOrder,
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
@@ -165,35 +154,24 @@ function ResourceFormBody({
           clearFieldError("descriptionEn");
         }}
       />
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_120px]">
-        <AdminFormField
-          id="resource-url"
-          name="url"
-          label="Link"
-          maxLength={500}
-          placeholder="https://example.com"
-          value={url}
-          error={fieldErrors.url}
-          onChange={(value) => {
-            setUrl(value);
-            clearFieldError("url");
-          }}
-        />
-        <AdminFormField
-          id="resource-sort-order"
-          name="sortOrder"
-          label="Order"
-          maxLength={4}
-          type="number"
-          placeholder="0"
-          value={sortOrder}
-          error={fieldErrors.sortOrder}
-          onChange={(value) => {
-            setSortOrder(value);
-            clearFieldError("sortOrder");
-          }}
-        />
-      </div>
+      <AdminFormField
+        id="resource-url"
+        name="url"
+        label="Link"
+        maxLength={500}
+        placeholder="https://example.com"
+        value={url}
+        error={fieldErrors.url}
+        onChange={(value) => {
+          setUrl(value);
+          clearFieldError("url");
+        }}
+      />
+      <Typography variant="caption" color="muted" className="block">
+        {editing
+          ? "Order is managed by dragging rows on the resources list."
+          : "New resources are added to the end; drag rows on the list to change the order."}
+      </Typography>
     </AdminForm>
   );
 }

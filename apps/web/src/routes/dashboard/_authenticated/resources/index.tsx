@@ -1,6 +1,21 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { canManageUsers } from "@g13/auth";
 import { RiLinksLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
@@ -28,6 +43,8 @@ import { ResourceInspector } from "./-components/ResourceInspector";
 import {
   changeAdminResourceLifecycle,
   createAdminResource,
+  loadAdminResources,
+  reorderAdminResources,
   updateAdminResource,
 } from "./-server/handler";
 import {
@@ -97,12 +114,14 @@ function ResourcesListBody({
   status,
   activeCount,
   selectedId,
+  sortable,
   onClearSearch,
   onViewActive,
   onCreate,
   onSelect,
   onEdit,
   onLifecycle,
+  onReorder,
 }: {
   queryState: { isError: boolean; isPending: boolean };
   visibleRows: AdminResource[];
@@ -110,13 +129,20 @@ function ResourcesListBody({
   status: ResourceStatus;
   activeCount: number;
   selectedId?: string;
+  sortable: boolean;
   onClearSearch: () => void;
   onViewActive: () => void;
   onCreate: () => void;
   onSelect: (id: string) => void;
   onEdit: (resource: AdminResource) => void;
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
+  onReorder: (orderedIds: string[]) => void;
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
   if (queryState.isError) {
     return (
       <div className="p-4">
@@ -136,12 +162,22 @@ function ResourcesListBody({
       ? "Links shown on the public resources page are managed here. Add one to recommend a new learning resource."
       : "Deleted resources are kept here and can be restored to the public page.";
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const ids = visibleRows.map((resource) => resource.id);
+    const oldIndex = ids.indexOf(String(active.id));
+    const newIndex = ids.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+    onReorder(arrayMove(ids, oldIndex, newIndex));
+  };
+
   return (
     <>
       <AdminTableHeader
         className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${resourceTableColumns}`}
       >
-        <span>Resource</span>
+        <span className="pl-8">Resource</span>
         <span>Link</span>
         <span className="text-right">Order</span>
         <span>Updated</span>
@@ -162,16 +198,24 @@ function ResourcesListBody({
           })}
         />
       )}
-      {visibleRows.map((resource) => (
-        <AdminResourceRow
-          key={resource.id}
-          resource={resource}
-          selected={selectedId === resource.id}
-          onSelect={() => onSelect(resource.id)}
-          onEdit={onEdit}
-          onLifecycle={onLifecycle}
-        />
-      ))}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={visibleRows.map((resource) => resource.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {visibleRows.map((resource) => (
+            <AdminResourceRow
+              key={resource.id}
+              resource={resource}
+              selected={selectedId === resource.id}
+              sortable={sortable}
+              onSelect={() => onSelect(resource.id)}
+              onEdit={onEdit}
+              onLifecycle={onLifecycle}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
     </>
   );
 }
@@ -233,6 +277,8 @@ function ResourcesContent({
   selectedResource,
   detailsVisible,
   mobileDetailsOpen,
+  sortable,
+  reorderError,
   onMobileDetailsOpenChange,
   onPreviousPage,
   onNextPage,
@@ -242,6 +288,7 @@ function ResourcesContent({
   onSelect,
   onEdit,
   onLifecycle,
+  onReorder,
 }: {
   queryState: { isError: boolean; isPending: boolean };
   visibleRows: AdminResource[];
@@ -255,6 +302,8 @@ function ResourcesContent({
   selectedResource: AdminResource | undefined;
   detailsVisible: boolean;
   mobileDetailsOpen: boolean;
+  sortable: boolean;
+  reorderError: boolean;
   onMobileDetailsOpenChange: (open: boolean) => void;
   onPreviousPage: () => void;
   onNextPage: () => void;
@@ -264,6 +313,7 @@ function ResourcesContent({
   onSelect: (id: string) => void;
   onEdit: (resource: AdminResource) => void;
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
+  onReorder: (orderedIds: string[]) => void;
 }) {
   return (
     <div className="flex min-h-0 flex-1">
@@ -279,6 +329,13 @@ function ResourcesContent({
             onNext={onNextPage}
           />
         )}
+        {reorderError && !queryState.isPending && !queryState.isError && (
+          <div className="border-b border-stroke-soft-200 px-4 py-2">
+            <Typography role="alert" variant="caption" color="danger">
+              Could not save the new order. Refresh and try again.
+            </Typography>
+          </div>
+        )}
         <div
           className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
         >
@@ -289,12 +346,14 @@ function ResourcesContent({
             status={status}
             activeCount={activeCount}
             selectedId={selectedResource?.id}
+            sortable={sortable}
             onClearSearch={onClearSearch}
             onViewActive={onViewActive}
             onCreate={onCreate}
             onSelect={onSelect}
             onEdit={onEdit}
             onLifecycle={onLifecycle}
+            onReorder={onReorder}
           />
         </div>
       </div>
@@ -317,6 +376,118 @@ function ResourcesContent({
   );
 }
 
+type ResourceIdentity = Awaited<ReturnType<typeof loadAdminResources>>["identity"];
+type ResourceCounts = Awaited<ReturnType<typeof loadAdminResources>>["counts"];
+
+function ResourcesToolbar({
+  identity,
+  counts,
+  status,
+  query,
+  selectedAvailable,
+  detailsVisible,
+  onStatusChange,
+  onQueryChange,
+  onToggleDetails,
+  onCreate,
+}: {
+  identity: ResourceIdentity;
+  counts: ResourceCounts;
+  status: ResourceStatus;
+  query: string;
+  selectedAvailable: boolean;
+  detailsVisible: boolean;
+  onStatusChange: (status: ResourceStatus) => void;
+  onQueryChange: (value: string) => void;
+  onToggleDetails: () => void;
+  onCreate: () => void;
+}) {
+  return (
+    <>
+      <AdminPageHeader
+        title="Learning resources"
+        manager={canManageUsers(identity.role)}
+        userName={identity.name}
+        userEmail={identity.email}
+        userImage={identity.image}
+        action={
+          <AlignFancyButton.Root size="xxsmall" onClick={onCreate}>
+            Add resource
+          </AlignFancyButton.Root>
+        }
+      />
+      <AdminFilterBar
+        ariaLabel="Resource status filters"
+        tabs={resourceStatusSchema.options.map((value) => ({
+          value,
+          label: value === "active" ? "Active" : "Deleted",
+          count: counts[value],
+        }))}
+        activeTab={status}
+        onTabChange={onStatusChange}
+      >
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <AdminSearchInput
+            value={query}
+            onChange={onQueryChange}
+            placeholder="Filter title, description, or link…"
+            ariaLabel="Filter learning resources"
+          />
+          <DetailsToggleButton
+            available={selectedAvailable}
+            visible={detailsVisible}
+            onToggle={onToggleDetails}
+          />
+        </div>
+      </AdminFilterBar>
+    </>
+  );
+}
+
+function ResourcesModals({
+  formState,
+  formPending,
+  formError,
+  confirmation,
+  lifecyclePending,
+  lifecycleError,
+  onCloseForm,
+  onCloseConfirmation,
+  onSave,
+  onConfirmLifecycle,
+}: {
+  formState: { open: boolean; resource: AdminResource | null };
+  formPending: boolean;
+  formError?: string;
+  confirmation: { input: ResourceLifecycleInput; label: string } | null;
+  lifecyclePending: boolean;
+  lifecycleError: boolean;
+  onCloseForm: () => void;
+  onCloseConfirmation: () => void;
+  onSave: (values: ResourceFieldsInput) => void;
+  onConfirmLifecycle: () => void;
+}) {
+  return (
+    <>
+      <ResourceFormModal
+        open={formState.open}
+        resource={formState.resource}
+        pending={formPending}
+        error={formError}
+        onClose={onCloseForm}
+        onSubmit={onSave}
+      />
+      <ResourceLifecycleModal
+        confirmation={confirmation}
+        isError={lifecycleError}
+        isPending={lifecyclePending}
+        onClose={onCloseConfirmation}
+        onConfirm={onConfirmLifecycle}
+      />
+    </>
+  );
+}
+
 function AdminResourcesPage() {
   const initialData = Route.useLoaderData();
   const { identity } = initialData;
@@ -326,6 +497,7 @@ function AdminResourcesPage() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
+  const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
   const [formModal, setFormModal] = useState<{ open: boolean; resource: AdminResource | null }>({
     open: false,
     resource: null,
@@ -338,9 +510,13 @@ function AdminResourcesPage() {
   const queryClient = useQueryClient();
   const resourcesQuery = useQuery(adminResourcesQuery(offset, status));
   const counts = resourcesQuery.data?.counts ?? initialData.counts;
-  const nextSortOrder = resourcesQuery.data?.nextSortOrder ?? initialData.nextSortOrder;
   const resourceRows = resourcesQuery.data?.rows ?? [];
-  const pageRows = resourceRows.slice(0, 50);
+  const basePageRows = resourceRows.slice(0, 50);
+  const pageRows = orderedIds
+    ? orderedIds
+        .map((id) => basePageRows.find((row) => row.id === id))
+        .filter((row): row is AdminResource => row !== undefined)
+    : basePageRows;
   const needle = query.trim().toLowerCase();
   const visibleRows = needle
     ? pageRows.filter((row) =>
@@ -376,6 +552,7 @@ function AdminResourcesPage() {
     },
     onSuccess: async (result) => {
       await invalidateResourceQueries();
+      setOrderedIds(null);
       setFormModal({ open: false, resource: null });
       if (result.created) {
         setStatus("active");
@@ -389,9 +566,26 @@ function AdminResourcesPage() {
     mutationFn: (input: ResourceLifecycleInput) => changeAdminResourceLifecycle({ data: input }),
     onSuccess: async () => {
       await invalidateResourceQueries();
+      setOrderedIds(null);
       setConfirmation(null);
     },
   });
+
+  const reorderMutation = useMutation({
+    mutationFn: (ids: string[]) => reorderAdminResources({ data: { orderedIds: ids } }),
+    onSuccess: async () => {
+      await invalidateResourceQueries();
+      setOrderedIds(null);
+    },
+    onError: () => setOrderedIds(null),
+  });
+
+  function reorderResources(ids: string[]) {
+    setOrderedIds(ids);
+    reorderMutation.mutate(ids);
+  }
+
+  const sortable = !needle && !reorderMutation.isPending && visibleRows.length > 1;
 
   function openCreateModal() {
     saveMutation.reset();
@@ -408,52 +602,25 @@ function AdminResourcesPage() {
     setConfirmation({ input, label });
   }
 
-  const searchAndDetails = (
-    <div className="flex w-full items-center gap-2 sm:w-auto">
-      <AdminSearchInput
-        value={query}
-        onChange={setQuery}
-        placeholder="Filter title, description, or link…"
-        ariaLabel="Filter learning resources"
-      />
-      <DetailsToggleButton
-        available={!!selectedResource}
-        visible={detailsVisible}
-        onToggle={() => setDetailsOpen((open) => !open)}
-      />
-    </div>
-  );
-
   return (
     <>
-      <AdminPageHeader
-        title="Learning resources"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
-        action={
-          <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
-            Add resource
-          </AlignFancyButton.Root>
-        }
-      />
-      <AdminFilterBar
-        ariaLabel="Resource status filters"
-        tabs={resourceStatusSchema.options.map((value) => ({
-          value,
-          label: value === "active" ? "Active" : "Deleted",
-          count: counts[value],
-        }))}
-        activeTab={status}
-        onTabChange={(value) => {
+      <ResourcesToolbar
+        identity={identity}
+        counts={counts}
+        status={status}
+        query={query}
+        selectedAvailable={!!selectedResource}
+        detailsVisible={detailsVisible}
+        onStatusChange={(value) => {
           setStatus(value);
           setOffset(0);
           setSelectedId(null);
+          setOrderedIds(null);
         }}
-      >
-        {searchAndDetails}
-      </AdminFilterBar>
+        onQueryChange={setQuery}
+        onToggleDetails={() => setDetailsOpen((open) => !open)}
+        onCreate={openCreateModal}
+      />
       <ResourcesContent
         queryState={resourcesQuery}
         visibleRows={visibleRows}
@@ -467,14 +634,23 @@ function AdminResourcesPage() {
         selectedResource={selectedResource}
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
+        sortable={sortable}
+        reorderError={reorderMutation.isError}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        onPreviousPage={() => {
+          setOrderedIds(null);
+          setOffset((current) => Math.max(0, current - 50));
+        }}
+        onNextPage={() => {
+          setOrderedIds(null);
+          setOffset((current) => current + 50);
+        }}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
           setOffset(0);
           setSelectedId(null);
+          setOrderedIds(null);
         }}
         onCreate={openCreateModal}
         onSelect={(id) => {
@@ -484,22 +660,21 @@ function AdminResourcesPage() {
         }}
         onEdit={openEditModal}
         onLifecycle={confirmLifecycle}
+        onReorder={reorderResources}
       />
-      <ResourceFormModal
-        open={formModal.open}
-        resource={formModal.resource}
-        nextSortOrder={nextSortOrder}
-        pending={saveMutation.isPending}
-        error={saveMutation.isError ? "Could not save resource. Refresh and try again." : undefined}
-        onClose={() => setFormModal({ open: false, resource: null })}
-        onSubmit={(values) => saveMutation.mutate({ resourceId: formModal.resource?.id, values })}
-      />
-      <ResourceLifecycleModal
+      <ResourcesModals
+        formState={formModal}
+        formPending={saveMutation.isPending}
+        formError={
+          saveMutation.isError ? "Could not save resource. Refresh and try again." : undefined
+        }
         confirmation={confirmation}
-        isError={lifecycleMutation.isError}
-        isPending={lifecycleMutation.isPending}
-        onClose={() => setConfirmation(null)}
-        onConfirm={() => {
+        lifecyclePending={lifecycleMutation.isPending}
+        lifecycleError={lifecycleMutation.isError}
+        onCloseForm={() => setFormModal({ open: false, resource: null })}
+        onCloseConfirmation={() => setConfirmation(null)}
+        onSave={(values) => saveMutation.mutate({ resourceId: formModal.resource?.id, values })}
+        onConfirmLifecycle={() => {
           if (confirmation) lifecycleMutation.mutate(confirmation.input);
         }}
       />

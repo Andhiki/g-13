@@ -36,11 +36,6 @@ export const resourceFieldsSchema = z.object({
     .min(1, "Enter the link.")
     .max(500, "The link must be 500 characters or fewer.")
     .refine(isHttpsResourceUrl, "Enter a full https:// address."),
-  sortOrder: z
-    .number()
-    .int("Enter a whole number for the order.")
-    .min(0, "The order must be between 0 and 9999.")
-    .max(9999, "The order must be between 0 and 9999."),
 });
 export type ResourceFieldsInput = z.infer<typeof resourceFieldsSchema>;
 
@@ -60,3 +55,16 @@ export const resourceLifecycleSchema = z.object({
   action: z.enum(["delete", "restore"]),
 });
 export type ResourceLifecycleInput = z.infer<typeof resourceLifecycleSchema>;
+
+/**
+ * The client sends the current page in its new visual order. The server permutes the existing
+ * sort-order values of exactly those rows, so rows on other pages keep their position.
+ */
+export const reorderResourcesSchema = z.object({
+  orderedIds: z
+    .array(requiredId())
+    .min(1, "Send at least one resource.")
+    .max(100, "Reorder at most 100 resources at once.")
+    .refine((ids) => new Set(ids).size === ids.length, "Resource ids must be unique."),
+});
+export type ReorderResourcesInput = z.infer<typeof reorderResourcesSchema>;
