@@ -25,17 +25,54 @@ export function isHttpsResourceUrl(value: string): boolean {
   }
 }
 
+/**
+ * Accepts the forms maintainers paste in practice: bare hosts, `http://`, or a trailing slash.
+ * Invalid input is returned unchanged so the schema can reject it with a field error.
+ */
+export function normalizeResourceUrl(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed === "") return "";
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+
+  let candidate = trimmed;
+  if (candidate.startsWith("//")) {
+    candidate = `https:${candidate}`;
+  } else if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(candidate)) {
+    const schemeLike = candidate.match(/^([a-z][a-z0-9+.-]*):/i);
+    if (schemeLike && !schemeLike[1].includes(".")) return candidate;
+    candidate = `https://${candidate}`;
+  }
+
+  try {
+    const url = new URL(candidate);
+    if (url.protocol === "http:") url.protocol = "https:";
+    if (url.protocol !== "https:") return candidate;
+    const auth = url.username ? `${url.username}${url.password ? `:${url.password}` : ""}@` : "";
+    // Strip only the root slash so paths that rely on a trailing slash keep working.
+    const path = url.pathname === "/" ? "" : url.pathname;
+    return `${url.protocol}//${auth}${url.host}${path}${url.search}${url.hash}`;
+  } catch {
+    return candidate;
+  }
+}
+
+export const resourceUrlSchema = z
+  .string()
+  .transform(normalizeResourceUrl)
+  .pipe(
+    z
+      .string()
+      .min(1, "Enter the link.")
+      .max(500, "The link must be 500 characters or fewer.")
+      .refine(isHttpsResourceUrl, "Enter a full https:// address."),
+  );
+
 export const resourceFieldsSchema = z.object({
   titleId: localizedText("Indonesian title", 120),
   titleEn: localizedText("English title", 120),
   descriptionId: localizedText("Indonesian description", 400),
   descriptionEn: localizedText("English description", 400),
-  url: z
-    .string()
-    .trim()
-    .min(1, "Enter the link.")
-    .max(500, "The link must be 500 characters or fewer.")
-    .refine(isHttpsResourceUrl, "Enter a full https:// address."),
+  url: resourceUrlSchema,
 });
 export type ResourceFieldsInput = z.infer<typeof resourceFieldsSchema>;
 

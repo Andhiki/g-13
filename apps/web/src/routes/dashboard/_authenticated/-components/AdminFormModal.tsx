@@ -112,8 +112,11 @@ export function AdminFormField({
   type = "text",
   multiline = false,
   rows = 3,
+  inputMode,
+  autoComplete,
   readOnly = false,
   onChange,
+  onBlur,
 }: {
   id: string;
   name: string;
@@ -125,8 +128,11 @@ export function AdminFormField({
   type?: "text" | "datetime-local" | "number";
   multiline?: boolean;
   rows?: number;
+  inputMode?: "text" | "url" | "numeric";
+  autoComplete?: string;
   readOnly?: boolean;
   onChange: (value: string) => void;
+  onBlur?: () => void;
 }) {
   const errorId = `${id}-error`;
   const controlClassName = readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass;
@@ -140,6 +146,7 @@ export function AdminFormField({
     "aria-describedby": error ? errorId : undefined,
     className: controlClassName,
     onChange: (event: { target: { value: string } }) => onChange(event.target.value),
+    onBlur,
   };
 
   return (
@@ -164,6 +171,8 @@ export function AdminFormField({
         <input
           {...controlProps}
           type={type}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
           maxLength={type === "text" ? maxLength : undefined}
           step={type === "number" ? 1 : undefined}
         />

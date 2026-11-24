@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { RiDraggable } from "@remixicon/react";
+import { RiDraggable, RiExternalLinkLine } from "@remixicon/react";
 import {
   AdminTableInspectButton,
   AdminTableRow,
@@ -12,18 +12,11 @@ import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import type { loadAdminResources } from "../-server/handler";
 import type { ResourceLifecycleInput } from "../-shared/schemas";
+import { ResourceFavicon, resourceHost } from "./ResourceFavicon";
 
-export const resourceTableColumns = "lg:grid-cols-[minmax(0,1fr)_180px_64px_104px_148px]";
+export const resourceTableColumns = "lg:grid-cols-[minmax(0,1fr)_220px_120px_148px]";
 
 export type AdminResource = Awaited<ReturnType<typeof loadAdminResources>>["rows"][number];
-
-function linkLabel(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return url;
-  }
-}
 
 export function AdminResourceRow({
   resource,
@@ -104,16 +97,17 @@ export function AdminResourceRow({
             target="_blank"
             rel="noopener noreferrer"
             title={resource.url}
-            className="block truncate text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+            aria-label={`${resourceHost(resource.url)} — open ${label} in a new tab`}
+            className="group flex min-w-0 items-center gap-1.5 text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
           >
-            {linkLabel(resource.url)}
+            <ResourceFavicon url={resource.url} />
+            <span className="truncate">{resourceHost(resource.url)}</span>
+            <RiExternalLinkLine
+              aria-hidden="true"
+              className="size-3.5 shrink-0 text-text-soft-400 group-hover:text-text-strong-950"
+            />
           </a>
         </div>
-
-        <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
-          <span className="lg:hidden">Order: </span>
-          {resource.sortOrder}
-        </Typography>
 
         <Typography
           variant="caption"

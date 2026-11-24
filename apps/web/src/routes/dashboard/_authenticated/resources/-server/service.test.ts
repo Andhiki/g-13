@@ -243,16 +243,18 @@ it("keeps deleted rows' order slots when reordering the active page", async () =
   }
 }, 30_000);
 
-it("validates bilingual copy, https links, and reorder payloads", () => {
+it("validates bilingual copy, normalizes links, and validates reorder payloads", () => {
   expect(resourceFieldsSchema.safeParse(resourceFields()).success).toBe(true);
 
-  for (const url of [
-    "http://example.com",
-    "/exam",
-    "https://",
-    "example.com",
-    "ftp://example.com",
-  ]) {
+  const normalized = (url: string) => resourceFieldsSchema.parse(resourceFields({ url })).url;
+  expect(normalized("  example.com/path/  ")).toBe("https://example.com/path/");
+  expect(normalized("http://example.com/")).toBe("https://example.com");
+  expect(normalized("https://example.com/")).toBe("https://example.com");
+  expect(normalized("https://example.com/foo/")).toBe("https://example.com/foo/");
+  expect(normalized("https://example.com/?q=1")).toBe("https://example.com?q=1");
+  expect(normalized("//example.com")).toBe("https://example.com");
+
+  for (const url of ["/exam", "https://", "ftp://example.com", "mailto:test@example.com"]) {
     expect(resourceFieldsSchema.safeParse(resourceFields({ url })).success, url).toBe(false);
   }
 

@@ -179,7 +179,6 @@ function ResourcesListBody({
       >
         <span className="pl-8">Resource</span>
         <span>Link</span>
-        <span className="text-right">Order</span>
         <span>Updated</span>
         <span className="text-right">Actions</span>
       </AdminTableHeader>

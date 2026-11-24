@@ -1,12 +1,18 @@
 import { useState } from "react";
+import { RiExternalLinkLine } from "@remixicon/react";
 import {
   AdminForm,
   AdminFormField,
   AdminFormModal,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { Typography } from "@/ui/typography";
-import { resourceFieldsSchema, type ResourceFieldsInput } from "../-shared/schemas";
+import {
+  resourceFieldsSchema,
+  resourceUrlSchema,
+  type ResourceFieldsInput,
+} from "../-shared/schemas";
 import type { AdminResource } from "./AdminResourceRow";
+import { ResourceFavicon, resourceHost } from "./ResourceFavicon";
 
 type FieldErrors = Partial<Record<keyof ResourceFieldsInput, string>>;
 
@@ -68,6 +74,17 @@ function ResourceFormBody({
   const clearFieldError = (field: keyof ResourceFieldsInput) =>
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
 
+  const validateField = (field: keyof ResourceFieldsInput, value: string) => {
+    const parsed = resourceFieldsSchema.shape[field].safeParse(value);
+    if (field === "url" && parsed.success) setUrl(parsed.data);
+    setFieldErrors((current) => ({
+      ...current,
+      [field]: parsed.success ? undefined : parsed.error.issues[0]?.message,
+    }));
+  };
+
+  const previewUrl = resourceUrlSchema.safeParse(url);
+
   const handleFormSubmit = () => {
     const parsed = resourceFieldsSchema.safeParse({
       titleId,
@@ -98,34 +115,34 @@ function ResourceFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <AdminFormField
-          id="resource-title-id"
-          name="titleId"
-          label="Title (Indonesian)"
-          maxLength={120}
-          placeholder="e.g. Arsip ujian HIMAKOM UGM"
-          value={titleId}
-          error={fieldErrors.titleId}
-          onChange={(value) => {
-            setTitleId(value);
-            clearFieldError("titleId");
-          }}
-        />
-        <AdminFormField
-          id="resource-title-en"
-          name="titleEn"
-          label="Title (English)"
-          maxLength={120}
-          placeholder="e.g. HIMAKOM UGM exam archive"
-          value={titleEn}
-          error={fieldErrors.titleEn}
-          onChange={(value) => {
-            setTitleEn(value);
-            clearFieldError("titleEn");
-          }}
-        />
-      </div>
+      <AdminFormField
+        id="resource-title-id"
+        name="titleId"
+        label="Title (Indonesian)"
+        maxLength={120}
+        placeholder="e.g. Arsip ujian HIMAKOM UGM"
+        value={titleId}
+        error={fieldErrors.titleId}
+        onChange={(value) => {
+          setTitleId(value);
+          clearFieldError("titleId");
+        }}
+        onBlur={() => validateField("titleId", titleId)}
+      />
+      <AdminFormField
+        id="resource-title-en"
+        name="titleEn"
+        label="Title (English)"
+        maxLength={120}
+        placeholder="e.g. HIMAKOM UGM exam archive"
+        value={titleEn}
+        error={fieldErrors.titleEn}
+        onChange={(value) => {
+          setTitleEn(value);
+          clearFieldError("titleEn");
+        }}
+        onBlur={() => validateField("titleEn", titleEn)}
+      />
       <AdminFormField
         id="resource-description-id"
         name="descriptionId"
@@ -139,6 +156,7 @@ function ResourceFormBody({
           setDescriptionId(value);
           clearFieldError("descriptionId");
         }}
+        onBlur={() => validateField("descriptionId", descriptionId)}
       />
       <AdminFormField
         id="resource-description-en"
@@ -153,6 +171,7 @@ function ResourceFormBody({
           setDescriptionEn(value);
           clearFieldError("descriptionEn");
         }}
+        onBlur={() => validateField("descriptionEn", descriptionEn)}
       />
       <AdminFormField
         id="resource-url"
@@ -160,13 +179,33 @@ function ResourceFormBody({
         label="Link"
         maxLength={500}
         placeholder="https://example.com"
+        inputMode="url"
+        autoComplete="url"
         value={url}
         error={fieldErrors.url}
         onChange={(value) => {
           setUrl(value);
           clearFieldError("url");
         }}
+        onBlur={() => validateField("url", url)}
       />
+      {previewUrl.success && (
+        <div className="flex items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2">
+          <ResourceFavicon url={previewUrl.data} />
+          <Typography variant="caption" color="strong" className="min-w-0 truncate">
+            {resourceHost(previewUrl.data)}
+          </Typography>
+          <a
+            href={previewUrl.data}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex shrink-0 items-center gap-1 text-label-xs text-primary-base underline-offset-2 hover:underline"
+          >
+            Open link
+            <RiExternalLinkLine aria-hidden="true" className="size-3.5" />
+          </a>
+        </div>
+      )}
       <Typography variant="caption" color="muted" className="block">
         {editing
           ? "Order is managed by dragging rows on the resources list."
