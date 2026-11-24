@@ -15,6 +15,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 - Direktori skripsi publik di `/theses` dengan pencarian dan filter, halaman detail berisi abstrak, dosen pembimbing, tautan naskah, dan JSON-LD. Data hanya tampil setelah penulis menyetujui publikasi; abstrak dan kontak tetap disembunyikan bila belum disetujui.
 - Dashboard skripsi untuk menambah, mengubah, menerbitkan, menyembunyikan, menghapus, dan memulihkan data skripsi, termasuk dosen pembimbing, kata kunci, dan sumber izin penulis.
 - Formulir pengajuan skripsi lewat GitHub Issue dan CTA di `/theses`, dengan catatan privasi dan alur peninjauan maintainer sebelum data diterbitkan.
+- Sub-lab skripsi multi-select dari daftar Simaster, dengan tabel `thesis_fields` dan relasi many-to-many; formulir pengajuan dan dashboard kini memakai pilihan sub-lab, bukan teks bebas.
 
 ### 2026-11-23
 

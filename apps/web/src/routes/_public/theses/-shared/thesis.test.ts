@@ -20,7 +20,7 @@ const record: ThesisDetailRecord = {
   authorBatch: 2022,
   year: 2026,
   type: "skripsi",
-  field: "Sistem Cerdas",
+  fields: [{ id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" }],
   keywords: ["machine learning", "evaluasi"],
   supervisors: [
     {
@@ -57,7 +57,7 @@ test("card DTO never exposes abstract, contact, or consent internals", () => {
     authorBatch: 2022,
     year: 2026,
     type: "skripsi",
-    field: "Sistem Cerdas",
+    fields: [{ id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" }],
     keywords: ["machine learning", "evaluasi"],
   });
   expect(card.supervisors).toEqual([
@@ -123,7 +123,13 @@ test("index data and filters cover title, author, supervisor, keyword, year, typ
     authorName: "Bima Contoh",
     year: 2025,
     type: "product-innovation",
-    field: "Rekayasa Perangkat Lunak dan Data",
+    fields: [
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+    ],
     keywords: ["sistem informasi"],
     supervisors: [
       {
@@ -138,12 +144,25 @@ test("index data and filters cover title, author, supervisor, keyword, year, typ
   const data = composeThesesIndex([record, second]);
   expect(data.years).toEqual([2026, 2025]);
   expect(data.types).toEqual(["skripsi", "product-innovation"]);
-  expect(data.fields).toEqual(["Rekayasa Perangkat Lunak dan Data", "Sistem Cerdas"]);
+  expect(data.fields).toEqual([
+    {
+      id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+      name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+      lab: "Lab RPLD",
+    },
+    {
+      id: "lab-sc-sistem-cerdas",
+      name: "Lab SC (Sistem Cerdas)",
+      lab: "Lab SC",
+    },
+  ]);
   expect(filterTheses(data.items, { query: "nur rokhman" })).toHaveLength(1);
   expect(filterTheses(data.items, { query: "machine learning" })).toHaveLength(1);
   expect(filterTheses(data.items, { year: 2025 })[0]?.slug).toBe("kedua-2025");
   expect(filterTheses(data.items, { type: "product-innovation" })[0]?.slug).toBe("kedua-2025");
-  expect(filterTheses(data.items, { field: "Sistem Cerdas" })[0]?.slug).toBe("contoh-skripsi-2026");
+  expect(filterTheses(data.items, { field: "lab-sc-sistem-cerdas" })[0]?.slug).toBe(
+    "contoh-skripsi-2026",
+  );
   expect(filterTheses(data.items, { query: "tidak ada" })).toHaveLength(0);
 });
 

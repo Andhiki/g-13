@@ -75,12 +75,78 @@ body:
       label: Tautan naskah/ETD (opsional)
       description: Tautan ETD UGM, DOI, repositori, atau publikasi yang sudah terverifikasi. Situs ini tidak menyimpan naskah lengkap.
       placeholder: "https://etd.repository.ugm.ac.id/..."
-  - type: input
-    id: field
+  - type: dropdown
+    id: fields
     attributes:
-      label: Peminatan atau sub-lab (opsional)
-      description: Isi jika kamu ingin menampilkan peminatan/lab penelitian.
-      placeholder: "Contoh: Sistem Cerdas"
+      label: Sub-lab (opsional, bisa lebih dari satu)
+      description: Pilih sub-lab yang sesuai dengan penelitianmu. Kamu bisa memilih lebih dari satu.
+      multiple: true
+      options:
+        - "Lab SKJ - Big Data Processing"
+        - "Lab SKJ - Big Data Architecture"
+        - "Lab SKJ - Smart City Infrastructures"
+        - "Lab SKJ - Intelligent Environment"
+        - "Lab SKJ - Infrastructure Data Center"
+        - "Lab SKJ - Security and Preservation"
+        - "Lab SKJ - Cyber Security"
+        - "Lab SKJ - Distributed Network & System"
+        - "Lab SKJ - High Speed Network & Management"
+        - "Lab SKJ - Operating System & Architecture"
+        - "Lab SKJ - Cyber Physical System"
+        - "Lab SKJ - Cloud Computing"
+        - "Lab SKJ (Sistem Komputer dan Jaringan)"
+        - "Lab Elins - Robotics"
+        - "Lab Elins - Image Processing"
+        - "Lab Elins - Industrial Instrumentation"
+        - "Lab Elins - Sensor Tranduser"
+        - "Lab Elins - Telecommunication"
+        - "Lab Elins - Sensor Network, IoT"
+        - "Lab Elins - Signal Processing"
+        - "Lab Elins - Embedded system"
+        - "Lab Elins (Elektronika dan Instrumentasi)"
+        - "Lab AK - Pengolahan Citra"
+        - "Lab AK - Digital"
+        - "Lab AK - Kriptologi"
+        - "Lab AK - Verifikasi dan Validasi"
+        - "Lab AK - Sains Komputasional"
+        - "Lab AK - Metode Formal"
+        - "Lab AK - Metode Numerik"
+        - "Lab AK - Grafika Komputer"
+        - "Lab AK - Algoritma"
+        - "Lab AK - Pemrograman Parallel"
+        - "Lab AK - GPU & Parallel Computing"
+        - "Lab AK - Approximation Algorithm"
+        - "Lab AK - Kompresi Data"
+        - "Lab AK (Algoritma dan Komputasi)"
+        - "Lab SC - Kecerdasan Komputasional"
+        - "Lab SC - Pembelajaran Mesin"
+        - "Lab SC - Sistem Pendukung Keputusan"
+        - "Lab SC - Logika Fuzzy"
+        - "Lab SC - Sistem Pakar dan Penalaran Komputer"
+        - "Lab SC - Bioinformatika"
+        - "Lab SC - NLP"
+        - "Lab SC - Computer Vision"
+        - "Lab SC - Intelligent Agent"
+        - "Lab SC - AI"
+        - "Lab SC (Sistem Cerdas)"
+        - "Lab RPLD - Software models, architectures, and patterns"
+        - "Lab RPLD - Business process management and modeling"
+        - "Lab RPLD - Software engineering processes, methods, practices, and tools"
+        - "Lab RPLD - Code analysis"
+        - "Lab RPLD - Human computer interactions"
+        - "Lab RPLD - User interfaces and experiences"
+        - "Lab RPLD - Gamification"
+        - "Lab RPLD - Virtual/augmented reality and immersive technologies"
+        - "Lab RPLD - Data models, databases, and information retrieval"
+        - "Lab RPLD - Big data analysis and visualization"
+        - "Lab RPLD - Web, mobile, and ubiquitous computing"
+        - "Lab RPLD - Enterprise systems"
+        - "Lab RPLD (Rekayasa Perangkat Lunak dan Data)"
+        - "Lab RPLD - e-Government"
+        - "Lab RPLD - IT Project Management"
+        - "Lab RPLD - Software quality assurance"
+        - "Lab Elins - Pattern Recognition"
+        - "Lab SC - Pattern Recognition"
   - type: input
     id: batch
     attributes:

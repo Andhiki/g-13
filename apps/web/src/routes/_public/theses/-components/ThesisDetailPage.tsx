@@ -103,7 +103,19 @@ function MetadataSection({ thesis }: { thesis: ThesisDetail }) {
       <dl className="m-0 mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-[8rem_minmax(0,1fr)]">
         <MetadataRow label={text("Year")}>{thesis.year}</MetadataRow>
         <MetadataRow label={text("Type")}>{text(thesisTypeLabelKey(thesis.type))}</MetadataRow>
-        {thesis.field && <MetadataRow label={text("Field")}>{thesis.field}</MetadataRow>}
+        {thesis.fields.length > 0 && (
+          <MetadataRow label={text("Sub-labs")}>
+            <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
+              {thesis.fields.map((field) => (
+                <li key={field.id}>
+                  <span className="inline-block rounded-md bg-bg-weak-50 px-2.5 py-1 text-label-2xs">
+                    {field.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </MetadataRow>
+        )}
         <MetadataRow label={text("Language")}>
           {text(thesisLanguageLabelKey(thesis.language))}
         </MetadataRow>

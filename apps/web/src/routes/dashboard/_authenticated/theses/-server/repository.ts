@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
 import type { createDatabase } from "@g13/db/client";
 import { lecturers } from "@g13/db/schema/lecturers";
+import { thesisFieldLinks, thesisFields } from "@g13/db/schema/thesis-fields";
 import { theses, thesisKeywords, thesisSupervisors } from "@g13/db/schema/theses";
 import {
   allocateCatalogId,
@@ -22,7 +23,6 @@ const thesisColumns = {
   authorBatch: theses.authorBatch,
   year: theses.year,
   type: theses.type,
-  field: theses.field,
   language: theses.language,
   abstract: theses.abstract,
   abstractEn: theses.abstractEn,
@@ -68,6 +68,29 @@ async function getAdminSupervisors(db: Database, thesisIds: string[]) {
   return grouped;
 }
 
+async function getAdminFields(db: Database, thesisIds: string[]) {
+  if (thesisIds.length === 0) return new Map<string, { id: string; name: string; lab: string }[]>();
+  const rows = await db
+    .select({
+      thesisId: thesisFieldLinks.thesisId,
+      id: thesisFields.id,
+      name: thesisFields.name,
+      lab: thesisFields.lab,
+    })
+    .from(thesisFieldLinks)
+    .innerJoin(thesisFields, eq(thesisFields.id, thesisFieldLinks.fieldId))
+    .where(inArray(thesisFieldLinks.thesisId, thesisIds))
+    .orderBy(asc(thesisFieldLinks.thesisId), asc(thesisFields.lab), asc(thesisFields.position));
+
+  const grouped = new Map<string, { id: string; name: string; lab: string }[]>();
+  for (const row of rows) {
+    const fields = grouped.get(row.thesisId) ?? [];
+    fields.push({ id: row.id, name: row.name, lab: row.lab });
+    grouped.set(row.thesisId, fields);
+  }
+  return grouped;
+}
+
 async function getAdminKeywords(db: Database, thesisIds: string[]) {
   if (thesisIds.length === 0) return new Map<string, string[]>();
   const rows = await db
@@ -100,14 +123,16 @@ export async function listAdminTheses(db: Database, offset: number, status: Thes
     .offset(offset);
   if (rows.length === 0) return [];
   const ids = rows.map((row) => row.id);
-  const [supervisors, keywords] = await Promise.all([
+  const [supervisors, keywords, fields] = await Promise.all([
     getAdminSupervisors(db, ids),
     getAdminKeywords(db, ids),
+    getAdminFields(db, ids),
   ]);
   return rows.map((row) => ({
     ...row,
     supervisors: supervisors.get(row.id) ?? [],
     keywords: keywords.get(row.id) ?? [],
+    fields: fields.get(row.id) ?? [],
   }));
 }
 
@@ -136,17 +161,26 @@ export async function getAdminThesisLecturers(db: Database) {
     .orderBy(asc(lecturers.name));
 }
 
+export async function getAdminThesisFields(db: Database) {
+  return db
+    .select({ id: thesisFields.id, name: thesisFields.name, lab: thesisFields.lab })
+    .from(thesisFields)
+    .orderBy(asc(thesisFields.lab), asc(thesisFields.position), asc(thesisFields.name));
+}
+
 export async function getAdminThesisById(db: Database, thesisId: string) {
   const [row] = await db.select(thesisColumns).from(theses).where(eq(theses.id, thesisId));
   if (!row) return null;
-  const [supervisors, keywords] = await Promise.all([
+  const [supervisors, keywords, fields] = await Promise.all([
     getAdminSupervisors(db, [thesisId]),
     getAdminKeywords(db, [thesisId]),
+    getAdminFields(db, [thesisId]),
   ]);
   return {
     ...row,
     supervisors: supervisors.get(thesisId) ?? [],
     keywords: keywords.get(thesisId) ?? [],
+    fields: fields.get(thesisId) ?? [],
   };
 }
 
@@ -179,6 +213,10 @@ function keywordRows(thesisId: string, keywords: string[]) {
   return [...new Set(keywords)].map((keyword) => ({ thesisId, keyword }));
 }
 
+function fieldRows(thesisId: string, fieldIds: string[]) {
+  return [...new Set(fieldIds)].map((fieldId) => ({ thesisId, fieldId }));
+}
+
 function thesisValues(
   input: CreateThesisInput | UpdateThesisInput,
   consentAt: Date | null,
@@ -190,7 +228,6 @@ function thesisValues(
     authorBatch: input.authorBatch,
     year: input.year,
     type: input.type,
-    field: input.field,
     language: input.language,
     abstract: input.abstract,
     abstractEn: input.abstractEn,
@@ -214,17 +251,24 @@ export async function createThesisRecord(
 ): Promise<void> {
   const supervisors = supervisorRows(id, input);
   const keywords = keywordRows(id, input.keywords);
-  if (keywords.length > 0) {
+  const fields = fieldRows(id, input.fieldIds);
+  const insertThesis = db
+    .insert(theses)
+    .values({ id, ...thesisValues(input, consentAt, consentSource) });
+  const insertSupervisors = db.insert(thesisSupervisors).values(supervisors);
+  if (keywords.length > 0 && fields.length > 0) {
     await db.batch([
-      db.insert(theses).values({ id, ...thesisValues(input, consentAt, consentSource) }),
-      db.insert(thesisSupervisors).values(supervisors),
+      insertThesis,
+      insertSupervisors,
       db.insert(thesisKeywords).values(keywords),
+      db.insert(thesisFieldLinks).values(fields),
     ]);
+  } else if (keywords.length > 0) {
+    await db.batch([insertThesis, insertSupervisors, db.insert(thesisKeywords).values(keywords)]);
+  } else if (fields.length > 0) {
+    await db.batch([insertThesis, insertSupervisors, db.insert(thesisFieldLinks).values(fields)]);
   } else {
-    await db.batch([
-      db.insert(theses).values({ id, ...thesisValues(input, consentAt, consentSource) }),
-      db.insert(thesisSupervisors).values(supervisors),
-    ]);
+    await db.batch([insertThesis, insertSupervisors]);
   }
 }
 
@@ -237,23 +281,45 @@ export async function updateThesisRecord(
 ): Promise<void> {
   const supervisors = supervisorRows(id, input);
   const keywords = keywordRows(id, input.keywords);
+  const fields = fieldRows(id, input.fieldIds);
   const update = db
     .update(theses)
     .set({ ...thesisValues(input, consentAt, consentSource), updatedAt: new Date() })
     .where(eq(theses.id, id));
   const deleteSupervisors = db.delete(thesisSupervisors).where(eq(thesisSupervisors.thesisId, id));
   const deleteKeywords = db.delete(thesisKeywords).where(eq(thesisKeywords.thesisId, id));
+  const deleteFields = db.delete(thesisFieldLinks).where(eq(thesisFieldLinks.thesisId, id));
   const insertSupervisors = db.insert(thesisSupervisors).values(supervisors);
-  if (keywords.length > 0) {
+  if (keywords.length > 0 && fields.length > 0) {
     await db.batch([
       update,
       deleteSupervisors,
       deleteKeywords,
+      deleteFields,
+      insertSupervisors,
+      db.insert(thesisKeywords).values(keywords),
+      db.insert(thesisFieldLinks).values(fields),
+    ]);
+  } else if (keywords.length > 0) {
+    await db.batch([
+      update,
+      deleteSupervisors,
+      deleteKeywords,
+      deleteFields,
       insertSupervisors,
       db.insert(thesisKeywords).values(keywords),
     ]);
+  } else if (fields.length > 0) {
+    await db.batch([
+      update,
+      deleteSupervisors,
+      deleteKeywords,
+      deleteFields,
+      insertSupervisors,
+      db.insert(thesisFieldLinks).values(fields),
+    ]);
   } else {
-    await db.batch([update, deleteSupervisors, deleteKeywords, insertSupervisors]);
+    await db.batch([update, deleteSupervisors, deleteKeywords, deleteFields, insertSupervisors]);
   }
 }
 

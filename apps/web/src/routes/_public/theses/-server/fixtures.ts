@@ -1,5 +1,6 @@
 import type { createDatabase } from "@g13/db/client";
 import { lecturers } from "@g13/db/schema/lecturers";
+import { thesisFieldLinks, thesisFields } from "@g13/db/schema/thesis-fields";
 import { theses, thesisKeywords, thesisSupervisors } from "@g13/db/schema/theses";
 
 type Database = ReturnType<typeof createDatabase>;
@@ -26,7 +27,6 @@ export const thesisFixtures = {
     authorBatch: 2022,
     year: 2026,
     type: "skripsi" as const,
-    field: "Sistem Cerdas",
     language: "id" as const,
     repositoryUrl: "https://etd.repository.ugm.ac.id/home/detail_pencarian/000001",
     contactChannel: "email" as const,
@@ -46,7 +46,6 @@ export const thesisFixtures = {
     authorBatch: 2021,
     year: 2025,
     type: "skripsi" as const,
-    field: "Rekayasa Perangkat Lunak dan Data",
     language: "id" as const,
     repositoryUrl: null,
     contactChannel: null,
@@ -66,7 +65,6 @@ export const thesisFixtures = {
     authorBatch: null,
     year: 2024,
     type: "skripsi" as const,
-    field: null,
     language: "id" as const,
     repositoryUrl: null,
     contactChannel: null,
@@ -86,7 +84,6 @@ export const thesisFixtures = {
     authorBatch: 2023,
     year: 2026,
     type: "skripsi" as const,
-    field: null,
     language: "id" as const,
     repositoryUrl: null,
     contactChannel: null,
@@ -106,7 +103,6 @@ export const thesisFixtures = {
     authorBatch: null,
     year: 2023,
     type: "skripsi" as const,
-    field: null,
     language: "id" as const,
     repositoryUrl: null,
     contactChannel: null,
@@ -126,7 +122,6 @@ export const thesisFixtures = {
     authorBatch: null,
     year: 2022,
     type: "skripsi" as const,
-    field: null,
     language: "id" as const,
     repositoryUrl: null,
     contactChannel: null,
@@ -143,9 +138,28 @@ export const thesisFixtures = {
 export async function seedThesisFixtures(db: Database): Promise<void> {
   const { full, noAbstractConsent, metadataOnly, draft, hidden, deleted } = thesisFixtures;
   await db.insert(lecturers).values([thesisFixtures.lecturer, thesisFixtures.deletedLecturer]);
+  await db.insert(thesisFields).values([
+    {
+      id: "lab-sc-sistem-cerdas",
+      name: "Lab SC (Sistem Cerdas)",
+      lab: "Lab SC",
+      position: 47,
+    },
+    {
+      id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+      name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+      lab: "Lab RPLD",
+      position: 60,
+    },
+  ]);
   for (const thesis of [full, noAbstractConsent, metadataOnly, draft, hidden, deleted]) {
     await db.insert(theses).values(thesis);
   }
+  await db.insert(thesisFieldLinks).values([
+    { thesisId: full.id, fieldId: "lab-sc-sistem-cerdas" },
+    { thesisId: full.id, fieldId: "lab-rpld-rekayasa-perangkat-lunak-dan-data" },
+    { thesisId: noAbstractConsent.id, fieldId: "lab-rpld-rekayasa-perangkat-lunak-dan-data" },
+  ]);
   await db.insert(thesisSupervisors).values([
     {
       thesisId: full.id,

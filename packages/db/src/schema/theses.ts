@@ -32,7 +32,6 @@ export const theses = sqliteTable(
     authorBatch: integer("author_batch"),
     year: integer("year").notNull(),
     type: text("type", { enum: thesisTypes }).notNull().default("skripsi"),
-    field: text("field"),
     language: text("language", { enum: thesisLanguages }).notNull().default("id"),
     repositoryUrl: text("repository_url"),
     contactChannel: text("contact_channel", { enum: thesisContactChannels }),

@@ -15,6 +15,12 @@ export type ThesisSupervisorRecord = {
   role: ThesisSupervisorRole | null;
 };
 
+export type ThesisFieldRecord = {
+  id: string;
+  name: string;
+  lab: string;
+};
+
 export type ThesisCardRecord = {
   id: string;
   title: string;
@@ -22,7 +28,7 @@ export type ThesisCardRecord = {
   authorBatch: number | null;
   year: number;
   type: ThesisType;
-  field: string | null;
+  fields: ThesisFieldRecord[];
   keywords: string[];
   supervisors: ThesisSupervisorRecord[];
 };
@@ -44,6 +50,12 @@ export type ThesisSupervisor = {
   role: ThesisSupervisorRole | null;
 };
 
+export type ThesisField = {
+  id: string;
+  name: string;
+  lab: string;
+};
+
 export type ThesisCard = {
   slug: string;
   title: string;
@@ -51,7 +63,7 @@ export type ThesisCard = {
   authorBatch: number | null;
   year: number;
   type: ThesisType;
-  field: string | null;
+  fields: ThesisField[];
   keywords: string[];
   supervisors: ThesisSupervisor[];
 };
@@ -73,7 +85,7 @@ export type ThesesIndexData = {
   items: ThesisCard[];
   years: number[];
   types: ThesisType[];
-  fields: string[];
+  fields: ThesisField[];
 };
 
 export type ThesesIndexState =
@@ -158,7 +170,7 @@ export function toThesisCard(record: ThesisCardRecord): ThesisCard {
     authorBatch: record.authorBatch,
     year: record.year,
     type: record.type,
-    field: record.field,
+    fields: record.fields.map((field) => ({ ...field })),
     keywords: [...record.keywords],
     supervisors: record.supervisors.map(publicSupervisor),
   };
@@ -187,9 +199,16 @@ export function thesisTypes(items: ThesisCard[]): ThesisType[] {
   return thesisTypeOrder.filter((type) => present.has(type));
 }
 
-export function thesisFields(items: ThesisCard[]): string[] {
-  return [...new Set(items.flatMap((item) => (item.field ? [item.field] : [])))].sort(
-    (left, right) => left.localeCompare(right, "id", { sensitivity: "base" }),
+export function collectThesisFields(items: ThesisCard[]): ThesisField[] {
+  const fields = new Map<string, ThesisField>();
+  for (const item of items) {
+    for (const field of item.fields) fields.set(field.id, field);
+  }
+  return [...fields.values()].sort(
+    (left, right) =>
+      left.lab.localeCompare(right.lab, "id", { sensitivity: "base" }) ||
+      left.name.localeCompare(right.name, "id", { sensitivity: "base" }) ||
+      left.id.localeCompare(right.id),
   );
 }
 
@@ -199,7 +218,7 @@ export function composeThesesIndex(records: ThesisCardRecord[]): ThesesIndexData
     items,
     years: thesisYears(items),
     types: thesisTypes(items),
-    fields: thesisFields(items),
+    fields: collectThesisFields(items),
   };
 }
 
@@ -215,12 +234,12 @@ export function filterTheses(items: ThesisCard[], filter: ThesisFilter): ThesisC
   return items.filter((item) => {
     if (filter.year != null && item.year !== filter.year) return false;
     if (filter.type && item.type !== filter.type) return false;
-    if (filter.field && item.field !== filter.field) return false;
+    if (filter.field && !item.fields.some((field) => field.id === filter.field)) return false;
     if (!query) return true;
     const haystack = [
       item.title,
       item.authorName,
-      item.field ?? "",
+      ...item.fields.map((field) => field.name),
       ...item.keywords,
       ...item.supervisors.map((supervisor) => supervisor.name),
     ]

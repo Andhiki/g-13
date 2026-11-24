@@ -18,7 +18,30 @@ it("returns only published theses, withholds unconsented content, and keeps supe
     ]);
     expect(index.years).toEqual([2026, 2025, 2024]);
     expect(index.types).toEqual(["skripsi"]);
-    expect(index.fields).toEqual(["Rekayasa Perangkat Lunak dan Data", "Sistem Cerdas"]);
+    expect(index.fields).toEqual([
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+      { id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" },
+    ]);
+    expect(index.items[0]?.fields).toEqual([
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+      { id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" },
+    ]);
+    expect(index.items[1]?.fields).toEqual([
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+    ]);
+    expect(index.items[2]?.fields).toEqual([]);
     expect(JSON.stringify(index)).not.toContain("Abstrak ini tidak boleh");
     expect(JSON.stringify(index)).not.toContain("This abstract must not");
     expect(JSON.stringify(index)).not.toContain("ayu.contoh@example.com");

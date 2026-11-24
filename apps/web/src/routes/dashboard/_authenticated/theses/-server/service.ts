@@ -12,6 +12,7 @@ import {
   createThesisRecord,
   getAdminThesisById,
   getAdminThesisCounts,
+  getAdminThesisFields,
   getAdminThesisLecturers,
   listAdminTheses,
   setThesisLifecycle,
@@ -26,6 +27,7 @@ type ThesisListData = {
   rows: Awaited<ReturnType<typeof listAdminTheses>>;
   counts: Awaited<ReturnType<typeof getAdminThesisCounts>>;
   lecturers: Awaited<ReturnType<typeof getAdminThesisLecturers>>;
+  fields: Awaited<ReturnType<typeof getAdminThesisFields>>;
 };
 
 function requiresConsent(input: CreateThesisInput | UpdateThesisInput): boolean {
@@ -53,12 +55,13 @@ export async function inspectTheses(
   status: ThesisStatusFilter = "draft",
 ): Promise<ThesisAdminResult<ThesisListData>> {
   if (!canModerate(actor.role)) return { data: null, error: THESIS_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, lecturers] = await Promise.all([
+  const [rows, counts, lecturers, fields] = await Promise.all([
     listAdminTheses(db, offset, status),
     getAdminThesisCounts(db),
     getAdminThesisLecturers(db),
+    getAdminThesisFields(db),
   ]);
-  return { data: { rows, counts, lecturers }, error: null };
+  return { data: { rows, counts, lecturers, fields }, error: null };
 }
 
 export async function createThesis(

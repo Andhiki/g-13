@@ -158,6 +158,7 @@ function AdminThesesPage() {
   const thesesQuery = useQuery(adminThesesQuery(offset, status));
   const counts = thesesQuery.data?.counts ?? initialData.counts;
   const lecturers = thesesQuery.data?.lecturers ?? initialData.lecturers;
+  const fields = thesesQuery.data?.fields ?? initialData.fields;
   const rows = thesesQuery.data?.rows ?? [];
   const pageRows = rows.slice(0, 50);
   const needle = query.trim().toLowerCase();
@@ -296,6 +297,7 @@ function AdminThesesPage() {
         open={formModal.open}
         thesis={formModal.thesis}
         lecturers={lecturers}
+        fields={fields}
         pending={saveMutation.isPending}
         error={
           saveMutation.isError

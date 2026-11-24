@@ -41,7 +41,7 @@ const thesisBaseSchema = z.object({
   authorBatch: z.number().int().min(1945).max(2100).nullable(),
   year: z.number().int().min(1945).max(2100),
   type: thesisTypeSchema.default("skripsi"),
-  field: z.string().trim().max(120).nullable(),
+  fieldIds: z.array(z.string().trim().min(1).max(120)).max(20, "Use at most 20 sub-labs."),
   language: thesisLanguageSchema.default("id"),
   abstract: z.string().trim().max(50_000).nullable(),
   abstractEn: z.string().trim().max(50_000).nullable(),

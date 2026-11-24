@@ -22,6 +22,7 @@ import {
 import type { AdminThesis } from "./AdminThesisRow";
 
 type LecturerOption = { id: string; name: string };
+type FieldOption = { id: string; name: string; lab: string };
 type SupervisorDraft = {
   key: string;
   lecturerId: string;
@@ -220,6 +221,96 @@ function SwitchField({
   );
 }
 
+function FieldMultiSelect({
+  fields,
+  selected,
+  error,
+  onChange,
+}: {
+  fields: FieldOption[];
+  selected: string[];
+  error?: string;
+  onChange: (fieldIds: string[]) => void;
+}) {
+  const groups = new Map<string, FieldOption[]>();
+  for (const field of fields) {
+    const group = groups.get(field.lab) ?? [];
+    group.push(field);
+    groups.set(field.lab, group);
+  }
+  const errorId = "thesis-fields-error";
+  return (
+    <div>
+      <Typography
+        as="label"
+        variant="labelSmall"
+        color="strong"
+        htmlFor="thesis-fields"
+        className="mb-1.5 block"
+      >
+        Sub-labs
+      </Typography>
+      <Typography as="p" variant="caption" color="muted" className="mb-1.5">
+        Select one or more sub-labs. Use Ctrl/Cmd or Shift to select multiple.
+      </Typography>
+      <select
+        id="thesis-fields"
+        name="fieldIds"
+        multiple
+        size={10}
+        value={selected}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={`${fieldControlClass} min-h-44 py-1`}
+        onChange={(event) =>
+          onChange([...event.currentTarget.selectedOptions].map((option) => option.value))
+        }
+      >
+        {[...groups.entries()].map(([lab, options]) => (
+          <optgroup key={lab} label={lab}>
+            {options.map((field) => (
+              <option key={field.id} value={field.id}>
+                {field.name}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+      {error && (
+        <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
+          {error}
+        </Typography>
+      )}
+    </div>
+  );
+}
+
+function FieldsSection({
+  fields,
+  selected,
+  error,
+  onChange,
+}: {
+  fields: FieldOption[];
+  selected: string[];
+  error?: string;
+  onChange: (fieldIds: string[]) => void;
+}) {
+  return (
+    <section className="space-y-3">
+      <div>
+        <Typography as="h3" variant="label" className="m-0">
+          Sub-labs
+        </Typography>
+        <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
+          Optional. Choose the lab sub-fields that describe the thesis.
+        </Typography>
+      </div>
+      <FieldMultiSelect fields={fields} selected={selected} error={error} onChange={onChange} />
+    </section>
+  );
+}
+
 function newSupervisor(): SupervisorDraft {
   return { key: crypto.randomUUID(), lecturerId: "", name: "", role: "" };
 }
@@ -382,8 +473,7 @@ function SupervisorEditor({
   );
 }
 
-type BasicField =
-  "slug" | "title" | "authorName" | "authorBatch" | "year" | "type" | "field" | "language";
+type BasicField = "slug" | "title" | "authorName" | "authorBatch" | "year" | "type" | "language";
 
 type AbstractField = "abstract" | "abstractEn" | "keywords";
 type ContactField = "repositoryUrl" | "contactChannel" | "contactValue";
@@ -397,7 +487,6 @@ function BasicSection({
   authorBatch,
   year,
   type,
-  field,
   language,
   errors,
   onChange,
@@ -409,7 +498,6 @@ function BasicSection({
   authorBatch: string;
   year: string;
   type: string;
-  field: string;
   language: string;
   errors: FieldErrors;
   onChange: (field: BasicField, value: string) => void;
@@ -482,27 +570,15 @@ function BasicSection({
           onChange={(value) => onChange("type", value)}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <AdminFormField
-          id="thesis-field"
-          name="field"
-          label="Peminatan (optional)"
-          maxLength={120}
-          placeholder="e.g. Sistem Cerdas"
-          value={field}
-          error={errors.field}
-          onChange={(value) => onChange("field", value)}
-        />
-        <SelectField
-          id="thesis-language"
-          name="language"
-          label="Language"
-          value={language}
-          options={languageOptions}
-          error={errors.language}
-          onChange={(value) => onChange("language", value)}
-        />
-      </div>
+      <SelectField
+        id="thesis-language"
+        name="language"
+        label="Language"
+        value={language}
+        options={languageOptions}
+        error={errors.language}
+        onChange={(value) => onChange("language", value)}
+      />
     </section>
   );
 }
@@ -697,7 +773,6 @@ function useThesisFormHandlers({
   setAuthorBatch,
   setYear,
   setType,
-  setField,
   setLanguage,
   setAbstract,
   setAbstractEn,
@@ -719,7 +794,6 @@ function useThesisFormHandlers({
   setAuthorBatch: (value: string) => void;
   setYear: (value: string) => void;
   setType: (value: ThesisType) => void;
-  setField: (value: string) => void;
   setLanguage: (value: ThesisLanguage) => void;
   setAbstract: (value: string) => void;
   setAbstractEn: (value: string) => void;
@@ -754,9 +828,6 @@ function useThesisFormHandlers({
         break;
       case "type":
         setType(value as ThesisType);
-        break;
-      case "field":
-        setField(value);
         break;
       case "language":
         setLanguage(value as ThesisLanguage);
@@ -843,10 +914,104 @@ function useThesisFormHandlers({
   };
 }
 
+function parseThesisFormValues({
+  editing,
+  slug,
+  title,
+  authorName,
+  authorBatch,
+  year,
+  type,
+  fieldIds,
+  language,
+  abstract,
+  abstractEn,
+  keywords,
+  repositoryUrl,
+  contactChannel,
+  contactValue,
+  abstractPublic,
+  contactPublic,
+  consentRecorded,
+  consentSource,
+  status,
+  supervisors,
+}: {
+  editing: boolean;
+  slug: string;
+  title: string;
+  authorName: string;
+  authorBatch: string;
+  year: string;
+  type: string;
+  fieldIds: string[];
+  language: string;
+  abstract: string;
+  abstractEn: string;
+  keywords: string;
+  repositoryUrl: string;
+  contactChannel: string;
+  contactValue: string;
+  abstractPublic: boolean;
+  contactPublic: boolean;
+  consentRecorded: boolean;
+  consentSource: string;
+  status: string;
+  supervisors: SupervisorDraft[];
+}):
+  | { ok: true; data: CreateThesisInput }
+  | { ok: false; fieldErrors: FieldErrors; formError: string } {
+  const parsed = createThesisSchema.safeParse({
+    slug: editing ? undefined : slug,
+    title,
+    authorName,
+    authorBatch: authorBatch.trim() === "" ? null : Number(authorBatch),
+    year: Number(year),
+    type,
+    fieldIds,
+    language,
+    abstract: abstract.trim() || null,
+    abstractEn: abstractEn.trim() || null,
+    keywords: splitKeywords(keywords),
+    repositoryUrl: repositoryUrl.trim() || null,
+    contactChannel: contactChannel === "none" ? null : contactChannel,
+    contactValue: contactValue.trim() || null,
+    abstractPublic,
+    contactPublic,
+    consentRecorded,
+    consentSource: consentSource.trim() || null,
+    status,
+    supervisors: supervisors.map((supervisor) => ({
+      lecturerId: supervisor.lecturerId || null,
+      name: supervisor.name,
+      role: supervisor.role === "main" || supervisor.role === "co" ? supervisor.role : null,
+    })),
+  });
+  if (parsed.success) return { ok: true, data: parsed.data };
+  const fieldErrors: FieldErrors = {};
+  let firstError: string | undefined;
+  for (const issue of parsed.error.issues) {
+    const path = issue.path.map(String).join(".");
+    if (path.startsWith("supervisors.")) {
+      fieldErrors[path] = issue.message;
+      firstError ??= issue.message;
+    } else {
+      const key = String(issue.path[0] ?? "form");
+      fieldErrors[key] ??= issue.message;
+    }
+  }
+  return {
+    ok: false,
+    fieldErrors,
+    formError: firstError ?? parsed.error.issues[0]?.message ?? "Check the fields below.",
+  };
+}
+
 export function ThesisFormModal({
   open,
   thesis,
   lecturers,
+  fields,
   pending,
   error,
   onClose,
@@ -855,6 +1020,7 @@ export function ThesisFormModal({
   open: boolean;
   thesis: AdminThesis | null;
   lecturers: LecturerOption[];
+  fields: FieldOption[];
   pending: boolean;
   error?: string;
   onClose: () => void;
@@ -871,6 +1037,7 @@ export function ThesisFormModal({
         key={thesis?.id ?? "new"}
         thesis={thesis}
         lecturers={lecturers}
+        fields={fields}
         pending={pending}
         error={error}
         onClose={onClose}
@@ -883,6 +1050,7 @@ export function ThesisFormModal({
 function ThesisFormBody({
   thesis,
   lecturers,
+  fields,
   pending,
   error,
   onClose,
@@ -890,6 +1058,7 @@ function ThesisFormBody({
 }: {
   thesis: AdminThesis | null;
   lecturers: LecturerOption[];
+  fields: FieldOption[];
   pending: boolean;
   error?: string;
   onClose: () => void;
@@ -906,7 +1075,7 @@ function ThesisFormBody({
   );
   const [year, setYear] = useState(thesis ? String(thesis.year) : "");
   const [type, setType] = useState(thesis?.type ?? "skripsi");
-  const [field, setField] = useState(thesis?.field ?? "");
+  const [fieldIds, setFieldIds] = useState(thesis?.fields.map((field) => field.id) ?? []);
   const [language, setLanguage] = useState(thesis?.language ?? "id");
   const [abstract, setAbstract] = useState(thesis?.abstract ?? "");
   const [abstractEn, setAbstractEn] = useState(thesis?.abstractEn ?? "");
@@ -930,6 +1099,11 @@ function ThesisFormBody({
     setFormError(undefined);
   };
 
+  const changeFieldIds = (fieldIds: string[]) => {
+    setFieldIds(fieldIds);
+    clearFieldError("fieldIds");
+  };
+
   const {
     handleBasicChange,
     handleAbstractChange,
@@ -949,7 +1123,6 @@ function ThesisFormBody({
     setAuthorBatch,
     setYear,
     setType,
-    setField,
     setLanguage,
     setAbstract,
     setAbstractEn,
@@ -967,52 +1140,37 @@ function ThesisFormBody({
   });
 
   const handleSubmit = () => {
-    const parsed = createThesisSchema.safeParse({
-      slug: editing ? undefined : slug,
+    const result = parseThesisFormValues({
+      editing,
+      slug,
       title,
       authorName,
-      authorBatch: authorBatch.trim() === "" ? null : Number(authorBatch),
-      year: Number(year),
+      authorBatch,
+      year,
       type,
-      field: field.trim() || null,
+      fieldIds,
       language,
-      abstract: abstract.trim() || null,
-      abstractEn: abstractEn.trim() || null,
-      keywords: splitKeywords(keywords),
-      repositoryUrl: repositoryUrl.trim() || null,
-      contactChannel: contactChannel === "none" ? null : contactChannel,
-      contactValue: contactValue.trim() || null,
+      abstract,
+      abstractEn,
+      keywords,
+      repositoryUrl,
+      contactChannel,
+      contactValue,
       abstractPublic,
       contactPublic,
       consentRecorded,
-      consentSource: consentSource.trim() || null,
+      consentSource,
       status,
-      supervisors: supervisors.map((supervisor) => ({
-        lecturerId: supervisor.lecturerId || null,
-        name: supervisor.name,
-        role: supervisor.role === "main" || supervisor.role === "co" ? supervisor.role : null,
-      })),
+      supervisors,
     });
-    if (!parsed.success) {
-      const nextErrors: FieldErrors = {};
-      let firstError: string | undefined;
-      for (const issue of parsed.error.issues) {
-        const path = issue.path.map(String).join(".");
-        if (path.startsWith("supervisors.")) {
-          nextErrors[path] = issue.message;
-          firstError ??= issue.message;
-        } else {
-          const key = String(issue.path[0] ?? "form");
-          nextErrors[key] ??= issue.message;
-        }
-      }
-      setFieldErrors(nextErrors);
-      setFormError(firstError ?? parsed.error.issues[0]?.message ?? "Check the fields below.");
+    if (!result.ok) {
+      setFieldErrors(result.fieldErrors);
+      setFormError(result.formError);
       return false;
     }
     setFieldErrors({});
     setFormError(undefined);
-    onSubmit(parsed.data);
+    onSubmit(result.data);
     return true;
   };
 
@@ -1033,10 +1191,15 @@ function ThesisFormBody({
         authorBatch={authorBatch}
         year={year}
         type={type}
-        field={field}
         language={language}
         errors={fieldErrors}
         onChange={handleBasicChange}
+      />
+      <FieldsSection
+        fields={fields}
+        selected={fieldIds}
+        error={fieldErrors.fieldIds}
+        onChange={changeFieldIds}
       />
       <SupervisorEditor
         supervisors={supervisors}

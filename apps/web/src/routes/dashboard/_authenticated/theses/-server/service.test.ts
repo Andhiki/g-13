@@ -1,6 +1,7 @@
 import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { lecturers } from "@g13/db/schema/lecturers";
+import { thesisFields } from "@g13/db/schema/thesis-fields";
 import { createTestPlatformProxy } from "@/test/database";
 import { getThesisDetail, getThesesIndex } from "@/routes/_public/theses/-server/read.service";
 import { THESIS_ADMIN_ERRORS } from "../-shared/errors";
@@ -19,7 +20,7 @@ const baseInput = {
   authorBatch: 2022,
   year: 2026,
   type: "skripsi" as const,
-  field: "Sistem Cerdas",
+  fieldIds: ["lab-sc-sistem-cerdas", "lab-rpld-rekayasa-perangkat-lunak-dan-data"],
   language: "id" as const,
   abstract: "Abstrak contoh.",
   abstractEn: "Example abstract.",
@@ -70,6 +71,20 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
   try {
     const db = createDatabase(platform.env.DB);
     await db.insert(lecturers).values({ id: "nur-rokhman", name: "Dr. Nur Rokhman" });
+    await db.insert(thesisFields).values([
+      {
+        id: "lab-sc-sistem-cerdas",
+        name: "Lab SC (Sistem Cerdas)",
+        lab: "Lab SC",
+        position: 47,
+      },
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+        position: 60,
+      },
+    ]);
     const input = makeInput();
 
     expect(await inspectTheses(db, regularUser)).toEqual({
@@ -97,6 +112,14 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
       { name: "Dr. Pembimbing Eksternal", lecturerId: null, role: "co" },
     ]);
     expect(record?.keywords).toEqual(["evaluasi", "machine learning"]);
+    expect(record?.fields).toEqual([
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+      { id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" },
+    ]);
     expect((await getThesesIndex(db)).items).toHaveLength(0);
 
     expect(await createThesis(db, admin, makeInput({ title: "Another" }))).toEqual({
@@ -179,6 +202,14 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
     expect(draftList.data?.rows.map((row) => row.id).sort()).toEqual([id, noConsentId].sort());
     expect(draftList.data?.counts.draft).toBe(2);
     expect(draftList.data?.lecturers).toEqual([{ id: "nur-rokhman", name: "Dr. Nur Rokhman" }]);
+    expect(draftList.data?.fields).toEqual([
+      {
+        id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+        name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+        lab: "Lab RPLD",
+      },
+      { id: "lab-sc-sistem-cerdas", name: "Lab SC (Sistem Cerdas)", lab: "Lab SC" },
+    ]);
 
     const auto = await createThesis(
       db,

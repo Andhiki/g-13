@@ -30,16 +30,18 @@ Optional:
 - Keywords.
 - Public contact (email or URL).
 - Repository/ETD/DOI link.
-- Peminatan or sub-lab.
+- One or more sub-labs from the curated list.
 - Batch.
 
 The public DTO never returns `consent_at`, `consent_source`, status, timestamps, deleted
 records, withheld abstracts, or withheld contact details. A record can be published as
 metadata-only.
 
-The `peminatan`/sub-lab value is currently a free-text field. A curated multi-select
-sub-lab model is a follow-up; until then, use the single text field and keep the wording
-consistent with the author's submission.
+Sub-labs come from the curated list in
+[`data/thesis-fields.json`](data/thesis-fields.json), captured from Simaster's `Bidang I`
+dropdown on 2026-11-24. The GitHub issue form uses the same static list with multiple
+selection; the dashboard reads the `thesis_fields` table. Update both the data file and
+the issue form when the list changes.
 
 ## Submission privacy
 
@@ -125,8 +127,8 @@ Then verify manually:
 
 1. Open `/theses` and confirm the `Have a thesis to showcase?` CTA links to
    `https://github.com/Andhiki/g-13/issues/new?template=thesis_submission.yml`.
-2. Confirm the issue form shows the required fields, the consent checkboxes, and the
-   privacy warning.
+2. Confirm the issue form shows the required fields, the consent checkboxes, the sub-lab
+   dropdown, and the privacy warning.
 3. Submit a test issue (or use a maintainer-authored test issue) and confirm the
    `thesis-submission` and `needs-triage` labels.
 4. Enter and publish the test record in `/dashboard/theses`.

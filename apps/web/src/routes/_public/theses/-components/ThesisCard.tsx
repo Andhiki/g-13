@@ -40,8 +40,14 @@ export function ThesisCard({ thesis }: { thesis: ThesisCardData }) {
         )}
         <Typography as="p" variant="caption" color="muted" className="mb-0 mt-3 break-words">
           {thesis.year} · {typeLabel}
-          {thesis.field ? ` · ${thesis.field}` : ""}
         </Typography>
+        {thesis.fields.length > 0 && (
+          <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1 break-words">
+            {text("Sub-labs: {{names}}", {
+              names: thesis.fields.map((field) => field.name).join(", "),
+            })}
+          </Typography>
+        )}
       </div>
     </article>
   );

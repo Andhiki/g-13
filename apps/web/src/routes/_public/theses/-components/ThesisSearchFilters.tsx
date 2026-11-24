@@ -2,7 +2,7 @@ import { useId } from "react";
 import { RiCloseLine, RiSearchLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { AlignSelect } from "@/ui/select";
-import { thesisTypeLabelKey, type ThesisType } from "../-shared/thesis";
+import { thesisTypeLabelKey, type ThesisField, type ThesisType } from "../-shared/thesis";
 
 type SelectOption = { value: string; label: string };
 
@@ -53,7 +53,7 @@ export function ThesisSearchFilters({
   field: string;
   years: number[];
   types: ThesisType[];
-  fields: string[];
+  fields: ThesisField[];
   onQueryChange: (value: string) => void;
   onYearChange: (value: string) => void;
   onTypeChange: (value: string) => void;
@@ -71,8 +71,8 @@ export function ThesisSearchFilters({
     ...types.map((value) => ({ value, label: text(thesisTypeLabelKey(value)) })),
   ];
   const fieldOptions = [
-    { value: all, label: text("All fields") },
-    ...fields.map((value) => ({ value, label: value })),
+    { value: all, label: text("All sub-labs") },
+    ...fields.map((field) => ({ value: field.id, label: field.name })),
   ];
   const showFilters = years.length > 1 || types.length > 1 || fields.length > 0;
 
@@ -123,7 +123,7 @@ export function ThesisSearchFilters({
           )}
           {fields.length > 0 && (
             <FilterSelect
-              label={text("Field")}
+              label={text("Sub-labs")}
               value={field}
               options={fieldOptions}
               onChange={onFieldChange}
