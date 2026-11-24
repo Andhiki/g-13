@@ -1,5 +1,5 @@
 import { createAuth } from "@g13/auth/server";
-import { canManageUsers, canModerate } from "@g13/auth";
+import { hasPermission, type Permission } from "@g13/auth";
 import { createDatabase } from "@g13/db/client";
 import { parseAuthEnvironment } from "@g13/env";
 import { env } from "cloudflare:workers";
@@ -56,15 +56,10 @@ export async function requireAuthenticatedSession(headers: Headers) {
   return session;
 }
 
-export async function requireAdminSession(
-  headers: Headers,
-  permission: "moderate" | "manage-users",
-) {
+export async function requireAdminSession(headers: Headers, permission: Permission) {
   const session = await requireAuthenticatedSession(headers);
-  const allowed =
-    permission === "manage-users"
-      ? canManageUsers(session.user.role)
-      : canModerate(session.user.role);
-  if (!allowed) throw new Response("Access denied", { status: 403 });
+  if (!hasPermission(session.user.role, permission)) {
+    throw new Response("Access denied", { status: 403 });
+  }
   return session;
 }

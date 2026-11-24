@@ -1,26 +1,15 @@
 import { useState } from "react";
-import {
-  Link,
-  useRouter,
-  type AbsoluteToPath,
-  type RegisteredRouter,
-} from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import type { Role } from "@g13/auth";
 import {
-  type RemixiconComponentType,
   RiArrowDownSLine,
-  RiBookOpenLine,
-  RiChatCheckLine,
   RiCloseLine,
   RiExternalLinkLine,
-  RiGroupLine,
-  RiLinksLine,
-  RiMegaphoneLine,
   RiLogoutBoxLine,
   RiMenuLine,
   RiSettings3Line,
   RiUser3Line,
-  RiUserVoiceLine,
 } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignDrawer } from "@/ui/drawer";
@@ -28,41 +17,18 @@ import { AlignDropdown } from "@/ui/dropdown";
 import { SettingsModal } from "@/ui/settings";
 import { Typography } from "@/ui/typography";
 import { authClient } from "@/routes/-auth/client/auth";
+import { useDashboardIdentity, type DashboardIdentity } from "../-client/identity";
 import { useAdminLayout } from "./AdminLayoutContext";
 import { NotificationsPopover } from "./NotificationsPopover";
-
-type ModerationSection = {
-  to: AbsoluteToPath<RegisteredRouter, string>;
-  label: string;
-  Icon: RemixiconComponentType;
-};
-
-type ModerationSectionGroup = {
-  heading: string;
-  items: ModerationSection[];
-};
-
-const sectionGroups = [
-  {
-    heading: "Moderation",
-    items: [
-      { to: "/dashboard/lecturer-reviews", label: "Lecturer reviews", Icon: RiChatCheckLine },
-      { to: "/dashboard/users", label: "User access", Icon: RiGroupLine },
-      { to: "/dashboard/announcements", label: "Announcements", Icon: RiMegaphoneLine },
-    ],
-  },
-  {
-    heading: "Catalog",
-    items: [
-      { to: "/dashboard/courses", label: "Courses", Icon: RiBookOpenLine },
-      { to: "/dashboard/lecturers", label: "Lecturers", Icon: RiUserVoiceLine },
-      { to: "/dashboard/resources", label: "Learning resources", Icon: RiLinksLine },
-    ],
-  },
-] satisfies ModerationSectionGroup[];
+import { getVisibleSectionGroups, type ModerationSection } from "./navigation-sections";
 
 const navLinkClass =
   "flex w-full items-center gap-2 rounded-lg px-2.5 text-label-xs text-text-sub-600 outline-none transition-colors hover:bg-bg-soft-200/60 hover:text-text-strong-950 focus-visible:outline-[1.5px] focus-visible:outline-offset-0 focus-visible:outline-stroke-strong-950/35 aria-[current=page]:bg-bg-soft-200 aria-[current=page]:font-medium aria-[current=page]:text-text-strong-950";
+
+const SKELETON_GROUPS = [
+  { key: "primary", headingWidth: "w-16", itemWidths: ["w-28", "w-24", "w-28"] },
+  { key: "secondary", headingWidth: "w-12", itemWidths: ["w-20", "w-20", "w-32"] },
+] as const;
 
 type AccountProps = { userName: string; userEmail?: string | null; userImage?: string | null };
 
@@ -232,50 +198,86 @@ function ModerationNavItem({
 }
 
 function ModerationNavSections({
-  manager,
+  role,
   closeOnNavigate = false,
 }: {
-  manager: boolean;
+  role: Role;
   closeOnNavigate?: boolean;
 }) {
+  const groups = getVisibleSectionGroups(role);
   return (
     <nav aria-label="Moderation sections" className="space-y-4">
-      {sectionGroups.map((group) => {
-        const items = group.items.filter(
-          (section) =>
-            manager ||
-            (section.to !== "/dashboard/users" && section.to !== "/dashboard/announcements"),
-        );
-        if (items.length === 0) return null;
-        return (
-          <div key={group.heading} className="space-y-1">
-            <div className="px-2.5">
-              <Typography variant="caption" color="muted">
-                {group.heading}
-              </Typography>
-            </div>
-            <div className="space-y-0.5">
-              {items.map((section) => (
-                <ModerationNavItem
-                  key={section.to}
-                  section={section}
-                  closeOnNavigate={closeOnNavigate}
-                />
-              ))}
-            </div>
+      {groups.map((group) => (
+        <div key={group.heading} className="space-y-1">
+          <div className="px-2.5">
+            <Typography variant="caption" color="muted">
+              {group.heading}
+            </Typography>
           </div>
-        );
-      })}
+          <div className="space-y-0.5">
+            {group.items.map((section) => (
+              <ModerationNavItem
+                key={section.to}
+                section={section}
+                closeOnNavigate={closeOnNavigate}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
     </nav>
   );
 }
 
-export function ModerationSidebar({
-  manager,
-  userName,
-  userEmail,
-  userImage,
-}: AccountProps & { manager: boolean }) {
+function ModerationSidebarSkeleton({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading navigation"
+      className="flex min-h-0 flex-1 flex-col"
+    >
+      <span className="sr-only">Loading navigation</span>
+      <div aria-hidden="true" className="space-y-4">
+        {SKELETON_GROUPS.map((group) => (
+          <div key={group.key} className="space-y-1">
+            <div className="px-2.5 py-0.5">
+              <div
+                className={`h-3 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none ${group.headingWidth}`}
+              />
+            </div>
+            <div className="space-y-0.5">
+              {group.itemWidths.map((widthClass, index) => (
+                <div
+                  key={`${group.key}-${index}`}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 ${mobile ? "min-h-11" : "h-8"}`}
+                >
+                  <div className="size-4 shrink-0 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none" />
+                  <div
+                    className={`h-3 animate-pulse rounded bg-bg-soft-200/70 motion-reduce:animate-none ${widthClass}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div aria-hidden="true" className="mt-auto pt-4">
+        <div className="flex items-center justify-between gap-1 border-t border-stroke-soft-200 pt-2">
+          <div className="flex h-7 items-center gap-2 px-2">
+            <div className="size-5 shrink-0 animate-pulse rounded-full bg-bg-soft-200/80 motion-reduce:animate-none" />
+            <div className="h-3 w-16 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none" />
+          </div>
+          {!mobile && (
+            <div className="size-7 shrink-0 animate-pulse rounded-lg bg-bg-soft-200/70 motion-reduce:animate-none" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ModerationSidebar({ identity }: { identity?: DashboardIdentity }) {
   const { sidebarOpen } = useAdminLayout();
   return (
     <div
@@ -284,19 +286,24 @@ export function ModerationSidebar({
       className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
     >
       <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-1 pr-2.5">
-        <ModerationNavSections manager={manager} />
-        <NavigationFooter userName={userName} userEmail={userEmail} userImage={userImage} />
+        {identity ? (
+          <>
+            <ModerationNavSections role={identity.role} />
+            <NavigationFooter
+              userName={identity.name}
+              userEmail={identity.email}
+              userImage={identity.image}
+            />
+          </>
+        ) : (
+          <ModerationSidebarSkeleton />
+        )}
       </aside>
     </div>
   );
 }
 
-function MobileDrawerContent({
-  manager,
-  userName,
-  userEmail,
-  userImage,
-}: AccountProps & { manager: boolean }) {
+function MobileDrawerContent({ identity }: { identity?: DashboardIdentity }) {
   return (
     <AlignDrawer.Content className="max-w-[220px]">
       <AlignDrawer.Title className="sr-only">Moderation navigation</AlignDrawer.Title>
@@ -318,19 +325,26 @@ function MobileDrawerContent({
         </AlignDrawer.Close>
       </AlignDrawer.Header>
       <AlignDrawer.Body className="flex min-h-0 flex-1 flex-col px-2 pb-2">
-        <ModerationNavSections manager={manager} closeOnNavigate />
-        <NavigationFooter userName={userName} userEmail={userEmail} userImage={userImage} mobile />
+        {identity ? (
+          <>
+            <ModerationNavSections role={identity.role} closeOnNavigate />
+            <NavigationFooter
+              userName={identity.name}
+              userEmail={identity.email}
+              userImage={identity.image}
+              mobile
+            />
+          </>
+        ) : (
+          <ModerationSidebarSkeleton mobile />
+        )}
       </AlignDrawer.Body>
     </AlignDrawer.Content>
   );
 }
 
-export function MobileModerationMenu({
-  manager,
-  userName,
-  userEmail,
-  userImage,
-}: AccountProps & { manager: boolean }) {
+export function MobileModerationMenu() {
+  const identity = useDashboardIdentity();
   return (
     <AlignDrawer.Root side="left">
       <AlignDrawer.Trigger asChild>
@@ -345,12 +359,7 @@ export function MobileModerationMenu({
           <RiMenuLine className="size-5" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <MobileDrawerContent
-        manager={manager}
-        userName={userName}
-        userEmail={userEmail}
-        userImage={userImage}
-      />
+      <MobileDrawerContent identity={identity} />
     </AlignDrawer.Root>
   );
 }

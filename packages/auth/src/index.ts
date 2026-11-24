@@ -1,4 +1,10 @@
-export type Role = "user" | "maintainer" | "admin";
+export const ROLES = ["user", "maintainer", "admin"] as const;
+export type Role = (typeof ROLES)[number];
+export type Permission = "moderate" | "manage-users";
+
+export function isRole(value: unknown): value is Role {
+  return typeof value === "string" && (ROLES as readonly string[]).includes(value);
+}
 
 export function canModerate(role: unknown): role is "maintainer" | "admin" {
   return role === "admin" || role === "maintainer";
@@ -6,6 +12,15 @@ export function canModerate(role: unknown): role is "maintainer" | "admin" {
 
 export function canManageUsers(role: unknown): role is "admin" {
   return role === "admin";
+}
+
+const permissionChecks: Record<Permission, (role: Role) => boolean> = {
+  moderate: canModerate,
+  "manage-users": canManageUsers,
+};
+
+export function hasPermission(role: Role | null | undefined, permission: Permission): boolean {
+  return role != null && permissionChecks[permission](role);
 }
 
 /**

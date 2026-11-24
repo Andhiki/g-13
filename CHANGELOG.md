@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Fixed
+
+- Sidebar dashboard kini menampilkan skeleton penuh selagi izin akses diverifikasi untuk mencegah pergeseran tata letak, serta menyembunyikan menu secara ketat sesuai izin peran pengguna.
+
 ## 0.1.0 - 2026-11-24
 
 ### 2026-11-24

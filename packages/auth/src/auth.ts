@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { eq } from "drizzle-orm";
 import { authAccount, authSession, authUser, authVerification } from "@g13/db/schema/auth";
 import type { createDatabase } from "@g13/db/client";
-import { isAllowlistedAdmin } from "./index";
+import { isAllowlistedAdmin, ROLES } from "./index";
 import { consumeAuthLimit } from "./repository";
 
 export type AuthBaseURL =
@@ -91,7 +91,7 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
     },
     user: {
       additionalFields: {
-        role: { type: "string", defaultValue: "user", input: false },
+        role: { type: [...ROLES], defaultValue: "user", input: false },
       },
     },
     account: {
