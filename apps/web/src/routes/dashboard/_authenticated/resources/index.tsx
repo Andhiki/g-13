@@ -49,6 +49,7 @@ import {
 } from "./-server/handler";
 import {
   resourceStatusSchema,
+  type ReorderResourcesInput,
   type ResourceFieldsInput,
   type ResourceLifecycleInput,
   type ResourceStatus,
@@ -136,7 +137,7 @@ function ResourcesListBody({
   onSelect: (id: string) => void;
   onEdit: (resource: AdminResource) => void;
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
-  onReorder: (orderedIds: string[]) => void;
+  onReorder: (movedId: string, orderedIds: string[]) => void;
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -169,7 +170,7 @@ function ResourcesListBody({
     const oldIndex = ids.indexOf(String(active.id));
     const newIndex = ids.indexOf(String(over.id));
     if (oldIndex < 0 || newIndex < 0) return;
-    onReorder(arrayMove(ids, oldIndex, newIndex));
+    onReorder(String(active.id), arrayMove(ids, oldIndex, newIndex));
   };
 
   return (
@@ -312,7 +313,7 @@ function ResourcesContent({
   onSelect: (id: string) => void;
   onEdit: (resource: AdminResource) => void;
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
-  onReorder: (orderedIds: string[]) => void;
+  onReorder: (movedId: string, orderedIds: string[]) => void;
 }) {
   return (
     <div className="flex min-h-0 flex-1">
@@ -571,7 +572,7 @@ function AdminResourcesPage() {
   });
 
   const reorderMutation = useMutation({
-    mutationFn: (ids: string[]) => reorderAdminResources({ data: { orderedIds: ids } }),
+    mutationFn: (input: ReorderResourcesInput) => reorderAdminResources({ data: input }),
     onSuccess: async () => {
       await invalidateResourceQueries();
       setOrderedIds(null);
@@ -579,9 +580,9 @@ function AdminResourcesPage() {
     onError: () => setOrderedIds(null),
   });
 
-  function reorderResources(ids: string[]) {
+  function reorderResources(movedId: string, ids: string[]) {
     setOrderedIds(ids);
-    reorderMutation.mutate(ids);
+    reorderMutation.mutate({ movedId, orderedIds: ids });
   }
 
   const sortable = !needle && !reorderMutation.isPending && visibleRows.length > 1;
