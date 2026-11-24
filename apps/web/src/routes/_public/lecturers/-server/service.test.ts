@@ -1,10 +1,8 @@
 import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
-import { authUser } from "@g13/db/schema/auth";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { lecturers } from "@g13/db/schema/lecturers";
-import { notificationEvents } from "@g13/db/schema/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { submissionInputSchema } from "../-shared/submission-schema";
@@ -21,8 +19,8 @@ const rawInput = {
   anonymous: false,
   authorName: " Student ",
   clarity: 5,
-  support: 4,
-  organization: 3,
+  support: 3,
+  organization: 1,
   body: " Helpful examples ",
 };
 
@@ -40,14 +38,6 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
       { id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" },
       { id: "deleted-course", code: "CS102", nameId: "Dihapus", nameEn: "Deleted", deletedAt },
     ]);
-    await db.insert(authUser).values({
-      id: "admin",
-      name: "Admin",
-      email: "admin@example.com",
-      role: "admin",
-      createdAt: deletedAt,
-      updatedAt: deletedAt,
-    });
 
     const input = submissionInputSchema.parse(rawInput);
     const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
@@ -69,7 +59,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     }
 
     expect(await submitReview(db, input, context)).toMatchObject({
-      data: { reviewId: expect.any(String), status: "published" },
+      data: { reviewId: expect.any(String) },
       error: null,
     });
     expect(
@@ -78,34 +68,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         submissionInputSchema.parse({ ...rawInput, anonymous: true }),
         context,
       ),
-    ).toMatchObject({ data: { reviewId: expect.any(String), status: "published" }, error: null });
-    expect(await db.select().from(notificationEvents)).toEqual([]);
-
-    // Any rating of 2 or lower waits for moderation and never reaches public reads.
-    const pendingInput = submissionInputSchema.parse({
-      ...rawInput,
-      organization: 2,
-      body: "Pending feedback",
-    });
-    const pendingSubmission = await submitReview(db, pendingInput, {
-      ...context,
-      ip: "192.0.2.9",
-    });
-    const pendingReviewId = pendingSubmission.data?.reviewId ?? "";
-    expect(pendingSubmission).toMatchObject({
-      data: { reviewId: expect.any(String), status: "pending" },
-      error: null,
-    });
-    const storedPending = (await db.select().from(reviews)).find(
-      (row) => row.id === pendingReviewId,
-    );
-    expect(storedPending?.status).toBe("pending");
-    expect(
-      (await getLecturerDetail(db, "p"))?.reviews.some((row) => row.body === "Pending feedback"),
-    ).toBe(false);
-    expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
-      pendingReviewId,
-    ]);
+    ).toMatchObject({ data: { reviewId: expect.any(String) }, error: null });
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,
     // while existing published reviews for soft-deleted courses remain visible on active lecturers.
@@ -164,9 +127,9 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     const visibleLecturer = directory.lecturers.find((row) => row.id === "p");
     expect(visibleLecturer).toMatchObject({
       reviewCount: 3,
-      overallAverage: (4 + 4 + 3) / 3,
+      overallAverage: 3,
       courses: [
-        { courseId: "c", code: "CS101", overallAverage: 4 },
+        { courseId: "c", code: "CS101", overallAverage: 3 },
         { courseId: "deleted-course", code: "CS102", overallAverage: 3 },
       ],
     });

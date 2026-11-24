@@ -8,7 +8,7 @@ When Playwright's cached Chromium cannot start because Linux shared libraries su
 ```bash
 LD_PRELOAD=/usr/lib/libstdc++.so.6 \
 LD_LIBRARY_PATH=/home/molly/.cache/JetBrains/RemoteDev/dist/<active-runtime>/plugins/remote-dev-server/selfcontained/lib \
-bun <playwright-script>.mjs
+node <playwright-script>.mjs
 ```
 
-`LD_PRELOAD` prevents the JetBrains runtime's older `libstdc++.so.6` from breaking Bun. Keep these overrides out of project configuration. Remove temporary preview files after verification.
+`LD_PRELOAD` prevents the JetBrains runtime's older `libstdc++.so.6` from breaking the system Node binary. Keep these overrides out of project configuration. Remove temporary preview files after verification.

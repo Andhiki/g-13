@@ -65,7 +65,7 @@ function submissionErrorMessage(error: unknown) {
   const code = error instanceof Error ? error.message : null;
   return (
     (code && SUBMISSION_ERROR_MESSAGES[code]) ||
-    "Could not confirm submission. Refresh the page before trying again."
+    "Could not confirm publication. Refresh the page before trying again."
   );
 }
 
@@ -312,7 +312,7 @@ function ReviewFormFooter({
           className="w-full sm:w-auto"
         >
           <Typography as="span" variant="paragraph">
-            {text("Submit review")}
+            {text("Publish review")}
           </Typography>
         </AlignFancyButton.Root>
       </div>
@@ -425,14 +425,14 @@ export function ReviewSubmissionForm({
   lecturerName,
   initialCourseId,
   onClose,
-  onSubmitted,
+  onPublished,
 }: {
   initialCourse?: ReviewCourseOption;
   lecturerId: string;
   lecturerName: string;
   initialCourseId: string;
   onClose: () => void;
-  onSubmitted: (status: "pending" | "published") => Promise<void>;
+  onPublished: (reviewId: string) => Promise<void>;
 }) {
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
@@ -484,7 +484,7 @@ export function ReviewSubmissionForm({
         return;
       }
       const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
-      await onSubmitted(result.status);
+      await onPublished(result.reviewId);
     } catch (error: unknown) {
       setMessage(submissionErrorMessage(error));
     } finally {

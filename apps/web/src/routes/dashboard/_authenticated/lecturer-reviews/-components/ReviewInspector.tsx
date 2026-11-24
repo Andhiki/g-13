@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  RiCheckLine,
-  RiDeleteBinLine,
-  RiEyeLine,
-  RiEyeOffLine,
-  RiLockLine,
-} from "@remixicon/react";
+import { RiDeleteBinLine, RiEyeLine, RiEyeOffLine, RiLockLine } from "@remixicon/react";
 import {
   AdminInspectorMeta,
   AdminInspectorMetaRow,
@@ -24,14 +18,12 @@ type Review = Awaited<ReturnType<typeof loadModerationReviews>>["rows"][number];
 
 function ReviewInspectorFooter({
   deleted,
-  pending,
   hidden,
   reviewId,
   label,
   onAction,
 }: {
   deleted: boolean;
-  pending: boolean;
   hidden: boolean;
   reviewId: string;
   label: string;
@@ -44,34 +36,6 @@ function ReviewInspectorFooter({
         <Typography variant="caption" color="muted">
           Read only
         </Typography>
-      </div>
-    );
-  }
-  if (pending) {
-    return (
-      <div className="grid grid-cols-2 gap-2">
-        <AlignButton.Root
-          size="small"
-          variant="neutral"
-          mode="stroke"
-          compact
-          className="w-full"
-          onClick={() => onAction({ reviewId, action: "hide" }, label)}
-        >
-          <RiEyeOffLine className="size-3.5" />
-          Hide
-        </AlignButton.Root>
-        <AlignButton.Root
-          size="small"
-          variant="primary"
-          mode="lighter"
-          compact
-          className="w-full"
-          onClick={() => onAction({ reviewId, action: "approve" }, label)}
-        >
-          <RiCheckLine className="size-3.5" />
-          Approve
-        </AlignButton.Root>
       </div>
     );
   }
@@ -164,7 +128,6 @@ export function ReviewInspector({
   const [canExpand, setCanExpand] = useState(false);
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const deleted = review.deletedAt !== null;
-  const pending = review.status === "pending";
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
@@ -194,7 +157,6 @@ export function ReviewInspector({
       footer={
         <ReviewInspectorFooter
           deleted={deleted}
-          pending={pending}
           hidden={hidden}
           reviewId={review.id}
           label={label}
@@ -217,10 +179,7 @@ export function ReviewInspector({
         <AdminInspectorMetaRow label="Author" valueClassName="break-words">
           {review.authorName}
         </AdminInspectorMetaRow>
-        <AdminInspectorMetaRow
-          label={pending ? "Submitted" : "Published"}
-          title={formatAbsoluteTime(createdMs, language)}
-        >
+        <AdminInspectorMetaRow label="Published" title={formatAbsoluteTime(createdMs, language)}>
           {formatRelativeTime(createdMs, language)}
         </AdminInspectorMetaRow>
       </AdminInspectorMeta>

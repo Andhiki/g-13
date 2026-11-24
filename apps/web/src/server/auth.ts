@@ -6,7 +6,6 @@ import { env } from "cloudflare:workers";
 import { dispatchNotification } from "./notifications";
 
 let cachedAuth: ReturnType<typeof buildAuth> | undefined;
-let cachedConfig: ReturnType<typeof parseAuthEnvironment> | undefined;
 
 // Bindings and secrets are fixed for the isolate, so build Better Auth once and reuse it
 // instead of paying its setup cost on every protected request.
@@ -15,13 +14,8 @@ export function requestAuth() {
   return cachedAuth;
 }
 
-export function requestAuthConfig() {
-  cachedConfig ??= parseAuthEnvironment(env);
-  return cachedConfig;
-}
-
 function buildAuth() {
-  const config = requestAuthConfig();
+  const config = parseAuthEnvironment(env);
   const db = createDatabase(env.DB);
   return createAuth(db, {
     secret: config.BETTER_AUTH_SECRET,
