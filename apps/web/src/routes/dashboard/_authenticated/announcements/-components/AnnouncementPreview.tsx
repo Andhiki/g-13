@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { Language } from "@g13/i18n";
+import { loadMessages } from "@g13/i18n/messages";
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -9,22 +10,8 @@ import { AnnouncementBannerRow, resolveAnnouncementCopy } from "@/ui/announcemen
 import { useAnnouncementClock } from "@/ui/announcement-countdown";
 import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-value";
 import { Typography } from "@/ui/typography";
+import { toast } from "@/ui/toast";
 import { useTranslation } from "react-i18next";
-import type { AnnouncementStatus } from "../-shared/schemas";
-import { resolveAnnouncementStatus } from "../-shared/status";
-
-function previewStatusCaption(status: AnnouncementStatus): string {
-  switch (status) {
-    case "live":
-      return "Live on the site now";
-    case "scheduled":
-      return "Scheduled";
-    case "expired":
-      return "Expired";
-    case "disabled":
-      return "Disabled";
-  }
-}
 
 export function AnnouncementPreview({
   titleId,
@@ -34,10 +21,7 @@ export function AnnouncementPreview({
   ctaHref,
   ctaLabelId,
   ctaLabelEn,
-  startsAt,
-  endsAt,
   countdownAt,
-  enabled,
 }: {
   titleId: string;
   titleEn: string;
@@ -46,10 +30,7 @@ export function AnnouncementPreview({
   ctaHref: string;
   ctaLabelId: string;
   ctaLabelEn: string;
-  startsAt: DateTimeParts;
-  endsAt: DateTimeParts;
   countdownAt: DateTimeParts;
-  enabled: boolean;
 }) {
   const { i18n } = useTranslation("common");
   const [previewLanguage, setPreviewLanguage] = useState<Language>(
@@ -58,20 +39,19 @@ export function AnnouncementPreview({
   const previewText = i18n.getFixedT(previewLanguage, "common");
   const headingId = useId();
 
-  const now = Date.now();
-  const startsAtMs = dateTimePartsToTimestamp(startsAt);
-  const endsAtMs = dateTimePartsToTimestamp(endsAt);
+  async function changePreviewLanguage(language: Language) {
+    try {
+      if (!i18n.hasResourceBundle(language, "common")) {
+        i18n.addResourceBundle(language, "common", await loadMessages(language, "common"));
+      }
+      setPreviewLanguage(language);
+    } catch {
+      toast.error(i18n.t("language.loadFailed"));
+    }
+  }
+
   const countdownAtMs = dateTimePartsToTimestamp(countdownAt);
   const countdownNow = useAnnouncementClock(countdownAtMs);
-  const status = resolveAnnouncementStatus(
-    {
-      enabled,
-      startsAt: new Date(startsAtMs ?? now),
-      endsAt: endsAtMs === null ? null : new Date(endsAtMs),
-    },
-    now,
-  );
-
   const defaultCtaLabel = previewLanguage === "en" ? "Learn more" : "Selengkapnya";
   const closeLabel = previewLanguage === "en" ? "Dismiss announcement" : "Tutup pengumuman";
   const titlePlaceholder = previewLanguage === "en" ? "Midterm schedule" : "Jadwal UTS";
@@ -100,22 +80,14 @@ export function AnnouncementPreview({
       className="border-b border-stroke-soft-200 bg-bg-weak-50/50 pt-3.5"
     >
       <div className="mb-2.5 flex items-center justify-between gap-3 px-5">
-        <div className="flex min-w-0 items-center gap-2">
-          <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
-            Preview
-          </Typography>
-          <span aria-hidden="true" className="text-text-sub-600">
-            ·
-          </span>
-          <Typography variant="caption" color="muted" className="truncate">
-            {previewStatusCaption(status)}
-          </Typography>
-        </div>
+        <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
+          Banner preview
+        </Typography>
         <SegmentedControl
           aria-label="Preview language"
           value={previewLanguage}
           onValueChange={(next) => {
-            if (next === "id" || next === "en") setPreviewLanguage(next);
+            if (next === "id" || next === "en") void changePreviewLanguage(next);
           }}
           className="relative isolate inline-flex shrink-0 items-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-0.5"
         >

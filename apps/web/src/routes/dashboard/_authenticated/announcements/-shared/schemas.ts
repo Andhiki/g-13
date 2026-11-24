@@ -57,7 +57,7 @@ export const announcementFieldsShape = z.object({
   ctaLabelEn: optionalLocalizedText(60),
   startsAt: z.number().int().positive("Pick a start date."),
   endsAt: positiveInt().nullable(),
-  countdownAt: positiveInt().nullable(),
+  countdownAt: positiveInt().nullable().default(null),
   enabled: z.boolean(),
 });
 export type AnnouncementFieldsInput = z.infer<typeof announcementFieldsShape>;

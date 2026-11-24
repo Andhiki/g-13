@@ -143,9 +143,12 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
     expect(
       announcementFieldsShape.safeParse(createBulletin({ ctaHref: "not-a-link" })).success,
     ).toBe(false);
-    expect(announcementFieldsShape.safeParse(createBulletin({ countdownAt: null })).success).toBe(
-      true,
-    );
+    expect(
+      announcementFieldsShape.parse(createBulletin({ countdownAt: null })).countdownAt,
+    ).toBeNull();
+    expect(
+      announcementFieldsShape.parse({ ...createBulletin(), countdownAt: undefined }).countdownAt,
+    ).toBeNull();
     expect(announcementFieldsShape.safeParse(createBulletin({ countdownAt: now })).success).toBe(
       true,
     );
