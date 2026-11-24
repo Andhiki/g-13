@@ -1,8 +1,21 @@
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { RiArrowRightLine, RiSpyLine, RiUserLine } from "@remixicon/react";
-import { AlignSelect } from "@/ui/select";
+import {
+  RiArrowDownSLine,
+  RiArrowRightLine,
+  RiCheckLine,
+  RiSpyLine,
+  RiUserLine,
+} from "@remixicon/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select";
 import * as AlignSwitch from "@/ui/switch";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { reviewTerms } from "../-client/review-terms";
@@ -163,6 +176,10 @@ function TermSelectField({
   onChange: (value: string) => void;
 }) {
   const { text } = useLocale("lecturers");
+  const termOptions = terms.map((term, index) => ({
+    value: term,
+    label: index === 0 ? text("{{term}} (Current)", { term }) : term,
+  }));
   return (
     <div className={row}>
       <div>
@@ -171,28 +188,43 @@ function TermSelectField({
         </Typography>
       </div>
       <div>
-        <AlignSelect.Root
-          variant="compact"
+        <Select
+          items={termOptions}
           name="termLabel"
-          value={termLabel}
-          onValueChange={onChange}
+          value={termLabel || null}
+          onValueChange={(value) => onChange(value ?? "")}
+          placeholder={text("Select a term")}
         >
-          <AlignSelect.Trigger
+          <SelectTrigger
             id="review-term"
-            className="h-9 min-h-9 w-full"
+            className="group/trigger flex h-9 min-h-9 w-full min-w-0 items-center justify-between gap-2 rounded-10 bg-bg-white-0 pl-3 pr-2.5 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base data-placeholder:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent"
             aria-invalid={Boolean(error)}
             aria-describedby={error ? "review-termLabel-error" : undefined}
           >
-            <AlignSelect.Value placeholder={text("Select a term")} />
-          </AlignSelect.Trigger>
-          <AlignSelect.Content className="w-[var(--radix-select-trigger-width)]">
-            {terms.map((term, index) => (
-              <AlignSelect.Item key={term} value={term}>
-                {index === 0 ? text("{{term}} (Current)", { term }) : term}
-              </AlignSelect.Item>
+            <SelectValue className="min-w-0 truncate" />
+            <RiArrowDownSLine
+              aria-hidden="true"
+              className="size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-data-open/trigger:rotate-180"
+            />
+          </SelectTrigger>
+          <SelectContent
+            sideOffset={8}
+            className="z-50 max-h-[min(196px,var(--available-height))] w-[var(--anchor-width)] overflow-y-auto rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 transition duration-150 ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0"
+          >
+            {termOptions.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="group relative flex min-h-9 cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 pr-9 text-paragraph-sm text-text-strong-950 outline-none data-highlighted:bg-bg-weak-50 data-disabled:pointer-events-none data-disabled:text-text-disabled-300"
+              >
+                {option.label}
+                <SelectItemIndicator className="absolute right-2 top-1/2 -translate-y-1/2 text-text-sub-600">
+                  <RiCheckLine aria-hidden="true" className="size-5" />
+                </SelectItemIndicator>
+              </SelectItem>
             ))}
-          </AlignSelect.Content>
-        </AlignSelect.Root>
+          </SelectContent>
+        </Select>
         <FieldError name="termLabel" error={error} />
       </div>
     </div>

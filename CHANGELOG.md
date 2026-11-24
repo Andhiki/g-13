@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Added
+
+- Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutan yang bisa digeser langsung, semuanya tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
+
 ### 2026-11-23
 
 #### Changed
@@ -17,6 +23,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
+- Pilihan semester pada formulir ulasan dosen kini menampilkan daftar pilihan dan tidak lagi menutup formulir saat diklik.
 - Toast kini memakai Inter Variable, typeface yang sama dengan teks lain di aplikasi, alih-alih font bawaan Sonner.
 - Badge kategori mata kuliah kini memakai bentuk tag dengan sudut membulat dan padding lebih lega, sehingga label panjang tetap rapi saat membungkus ke dua baris.
 

@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { learningResourcesQueryOptions } from "./resources/-client/queries";
 import { ResourcesPage } from "./resources/-components/ResourcesPage";
 
 export const Route = createFileRoute("/_public/resources")({
+  loader: async ({ context }) => {
+    await context.queryClient.fetchQuery(learningResourcesQueryOptions());
+  },
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["Helpful Resources"] },

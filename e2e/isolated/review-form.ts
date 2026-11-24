@@ -34,9 +34,9 @@ export async function fillReview(
   const dialog = screen.getByRole("dialog");
   await dialog.getByRole("combobox", { name: /^(mata kuliah|course)$/i }).fill("E2E101");
   await dialog.getByRole("option", { name: /E2E101/i }).click();
-  await dialog.getByRole("combobox", { name: /^(semester|periode|term)$/i }).press("ArrowDown");
-  await expect(screen.getByRole("option").first()).toBeFocused();
-  await browser.keyboard.press("Enter");
+  await dialog.getByRole("combobox", { name: /^(semester|periode|term)$/i }).click();
+  await dialog.getByRole("option").first().click();
+  await expect(dialog).toBeVisible();
   for (const metric of [
     /kejelasan|clarity/i,
     /dukungan|support/i,
