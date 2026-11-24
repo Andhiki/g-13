@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Added
+
+- Sumber belajar di halaman publik kini dikelola dari dashboard: judul dan deskripsi dwibahasa, tautan, dan urutannya bisa diubah tanpa mengubah kode atau men-deploy ulang. Lima sumber yang sudah ada tetap tersedia.
+
 ### 2026-11-23
 
 #### Changed

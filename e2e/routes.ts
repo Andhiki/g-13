@@ -24,6 +24,7 @@ export const protectedRoutes = [
   "/dashboard/lecturer-reviews",
   "/dashboard/courses",
   "/dashboard/lecturers",
+  "/dashboard/resources",
   "/dashboard/notifications",
   "/dashboard/users",
   "/dashboard/announcements",

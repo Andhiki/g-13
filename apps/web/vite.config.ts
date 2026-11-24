@@ -25,6 +25,7 @@ export default defineConfig({
         filter: ({ path }) =>
           !path.includes("?") &&
           !path.startsWith("/dashboard") &&
+          !path.startsWith("/resources") &&
           !path.startsWith("/lecturers") &&
           !path.startsWith("/alumni") &&
           !path.startsWith("/api"),
