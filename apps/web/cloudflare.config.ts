@@ -50,6 +50,9 @@ export default defineConfig(({ mode }) => {
 			cache: {
 				enabled: !isE2E,
 			},
+			// cf deploy disables these when omitted, so keep the existing URLs alive.
+			workersDev: !isE2E,
+			previewUrls: !isE2E,
 			observability: isStaging
 				? {
 						enabled: true,
@@ -79,7 +82,7 @@ export default defineConfig(({ mode }) => {
 					isE2E
 						? new URL(isolatedOrigin).hostname
 						: isStaging
-							? "g-13-staging.andhikiandre.workers.dev"
+							? "stg.csugm.andhiki.tech,g-13-staging.andhikiandre.workers.dev"
 							: "csugm.omahti.com,csugm.andhiki.tech",
 				),
 				GITHUB_CLIENT_ID: isE2E ? bindings.text("isolated-e2e-client") : bindings.secret(),
