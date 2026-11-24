@@ -50,5 +50,10 @@
   "If something is wrong or you want this record removed, contact the maintainer.": "Jika ada yang keliru atau kamu ingin data ini dihapus, hubungi maintainer.",
   "Contact the maintainer": "Hubungi maintainer",
   "Data and abstract are published with the author's permission.": "Data dan abstrak dipublikasikan atas izin penulis.",
-  "Thesis details": "Detail skripsi"
+  "Thesis details": "Detail skripsi",
+  "Have a thesis to showcase?": "Punya skripsi untuk ditampilkan?",
+  "Submit your thesis through GitHub. A maintainer will review it before it appears here.": "Kirim skripsi lewat GitHub. Maintainer akan meninjaunya sebelum data tampil di sini.",
+  "The issue is public. Do not include NIM, grades, transcripts, phone numbers, or private email addresses.": "Issue ini publik. Jangan sertakan NIM, nilai, transkrip, nomor HP, atau email pribadi.",
+  "Open the submission form": "Buka formulir pengajuan",
+  "No GitHub or need private contact? Contact the maintainer.": "Tidak punya GitHub atau perlu kontak privat? Hubungi maintainer."
 }

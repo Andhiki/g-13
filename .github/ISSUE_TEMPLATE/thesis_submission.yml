@@ -1,0 +1,102 @@
+name: Pengajuan skripsi
+description: Kirim data skripsi untuk ditampilkan di direktori publik Ilmu Komputer UGM.
+title: "[Skripsi] "
+labels: ["thesis-submission", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih sudah ingin menampilkan skripsimu. Maintainer akan meninjau data ini sebelum menerbitkannya di `/theses`.
+
+        **Issue ini publik.** Jangan sertakan NIM, nilai, transkrip, nomor HP, atau email pribadi yang tidak ingin kamu tampilkan. Kontak yang kamu isi di bawah akan tampil publik jika datanya diterbitkan.
+
+        Jika kamu tidak punya GitHub atau perlu mengirim data privat, hubungi maintainer melalui profil GitHub yang tercantum di [SECURITY.md](https://github.com/Andhiki/g-13/blob/main/SECURITY.md); jangan menulis data privat di issue ini.
+  - type: input
+    id: thesis_title
+    attributes:
+      label: Judul skripsi
+      description: Tulis judul asli skripsi.
+      placeholder: "Contoh: Evaluasi Model Machine Learning untuk Prediksi Kondisi Mesin"
+    validations:
+      required: true
+  - type: input
+    id: author_name
+    attributes:
+      label: Nama penulis
+      description: Nama yang ingin ditampilkan di halaman publik.
+      placeholder: "Nama lengkap"
+    validations:
+      required: true
+  - type: input
+    id: year
+    attributes:
+      label: Tahun
+      description: Tahun sidang atau kelulusan, empat digit.
+      placeholder: "2026"
+    validations:
+      required: true
+  - type: textarea
+    id: supervisors
+    attributes:
+      label: Dosen pembimbing
+      description: Satu nama per baris, sesuai urutan yang ingin ditampilkan.
+      placeholder: |
+        Dr. Nur Rokhman, S.Si., M.Kom.
+        Dr. Pembimbing Eksternal
+    validations:
+      required: true
+  - type: textarea
+    id: abstract_id
+    attributes:
+      label: Abstrak (Indonesia, opsional)
+      description: Kosongkan jika tidak ingin abstrak ditampilkan. Jika diisi, abstrak akan tampil publik setelah disetujui.
+      placeholder: "Tempel abstrak sebagai teks biasa."
+  - type: textarea
+    id: abstract_en
+    attributes:
+      label: Abstrak (Inggris, opsional)
+      description: Kosongkan jika tidak ada atau tidak ingin ditampilkan.
+      placeholder: "Paste the English abstract as plain text."
+  - type: input
+    id: keywords
+    attributes:
+      label: Kata kunci (opsional)
+      description: Pisahkan dengan koma.
+      placeholder: "machine learning, evaluasi, prediksi"
+  - type: input
+    id: public_contact
+    attributes:
+      label: Kontak publik (opsional)
+      description: Email atau URL yang boleh tampil publik. Kosongkan jika tidak ingin kontak ditampilkan.
+      placeholder: "nama@example.com atau https://..."
+  - type: input
+    id: repository_url
+    attributes:
+      label: Tautan naskah/ETD (opsional)
+      description: Tautan ETD UGM, DOI, repositori, atau publikasi yang sudah terverifikasi. Situs ini tidak menyimpan naskah lengkap.
+      placeholder: "https://etd.repository.ugm.ac.id/..."
+  - type: input
+    id: field
+    attributes:
+      label: Peminatan atau sub-lab (opsional)
+      description: Isi jika kamu ingin menampilkan peminatan/lab penelitian.
+      placeholder: "Contoh: Sistem Cerdas"
+  - type: input
+    id: batch
+    attributes:
+      label: Angkatan (opsional)
+      description: Tahun masuk, empat digit, jika ingin ditampilkan.
+      placeholder: "2022"
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Persetujuan
+      options:
+        - label: Saya adalah penulis skripsi ini dan menyetujui judul, nama, tahun, dosen pembimbing, serta abstrak dan kontak yang saya isi untuk dipublikasikan di situs ini.
+          required: true
+        - label: Saya memahami issue ini publik dan tidak menyertakan data pribadi yang tidak ingin dipublikasikan.
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        Setelah dikirim, maintainer akan meninjau data, memasukkannya lewat dashboard, menerbitkannya, lalu menautkan URL publik di issue ini dan menutup issue. Jika ada kesalahan atau ingin menghapus data, komentar di issue ini atau hubungi maintainer.

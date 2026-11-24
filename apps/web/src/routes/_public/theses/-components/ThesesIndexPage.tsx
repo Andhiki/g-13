@@ -2,6 +2,7 @@ import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import { ThesesBrowser } from "./ThesesBrowser";
 import { ThesesUnavailable } from "./ThesesUnavailable";
+import { ThesisSubmissionCta } from "./ThesisSubmissionCta";
 import type { ThesesIndexState } from "../-shared/thesis";
 
 export function ThesesIndexPage({ state }: { state: ThesesIndexState }) {
@@ -19,6 +20,7 @@ export function ThesesIndexPage({ state }: { state: ThesesIndexState }) {
             )}
           </Typography>
         </header>
+        <ThesisSubmissionCta />
         {state.status === "unavailable" ? (
           <ThesesUnavailable />
         ) : (
