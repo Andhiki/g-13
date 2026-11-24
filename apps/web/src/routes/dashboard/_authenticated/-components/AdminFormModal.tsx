@@ -110,8 +110,13 @@ export function AdminFormField({
   placeholder,
   error,
   type = "text",
+  multiline = false,
+  rows = 3,
+  inputMode,
+  autoComplete,
   readOnly = false,
   onChange,
+  onBlur,
 }: {
   id: string;
   name: string;
@@ -120,11 +125,29 @@ export function AdminFormField({
   maxLength: number;
   placeholder: string;
   error?: string;
-  type?: "text" | "datetime-local";
+  type?: "text" | "datetime-local" | "number";
+  multiline?: boolean;
+  rows?: number;
+  inputMode?: "text" | "url" | "numeric";
+  autoComplete?: string;
   readOnly?: boolean;
   onChange: (value: string) => void;
+  onBlur?: () => void;
 }) {
   const errorId = `${id}-error`;
+  const controlClassName = readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass;
+  const controlProps = {
+    id,
+    name,
+    placeholder,
+    value,
+    readOnly,
+    "aria-invalid": Boolean(error),
+    "aria-describedby": error ? errorId : undefined,
+    className: controlClassName,
+    onChange: (event: { target: { value: string } }) => onChange(event.target.value),
+    onBlur,
+  };
 
   return (
     <div>
@@ -137,19 +160,23 @@ export function AdminFormField({
       >
         {label}
       </Typography>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        maxLength={type === "text" ? maxLength : undefined}
-        placeholder={placeholder}
-        value={value}
-        readOnly={readOnly}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-        className={readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass}
-        onChange={(event) => onChange(event.target.value)}
-      />
+      {multiline ? (
+        <textarea
+          {...controlProps}
+          rows={rows}
+          maxLength={maxLength}
+          className={`${controlClassName} resize-y`}
+        />
+      ) : (
+        <input
+          {...controlProps}
+          type={type}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          maxLength={type === "text" ? maxLength : undefined}
+          step={type === "number" ? 1 : undefined}
+        />
+      )}
       {error && (
         <Typography variant="caption" color="danger" id={errorId} className="mt-1.5">
           {error}
