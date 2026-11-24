@@ -138,18 +138,20 @@ export async function listResourceSortOrders(db: Database, ids: string[]) {
     );
 }
 
-/** Writes the permuted slots in one D1 batch so a partial reorder cannot be observed. */
+/** Writes only the slots that move, in one D1 batch; only the dragged row gets a new timestamp. */
 export async function applyResourceSortOrders(
   db: Database,
-  updates: Array<{ id: string; sortOrder: number }>,
+  updates: Array<{ id: string; sortOrder: number; touch?: boolean }>,
 ): Promise<void> {
   const [first, ...rest] = updates;
   if (!first) return;
   const updatedAt = new Date();
-  const statementFor = (update: { id: string; sortOrder: number }) =>
+  const statementFor = (update: { id: string; sortOrder: number; touch?: boolean }) =>
     db
       .update(learningResources)
-      .set({ sortOrder: update.sortOrder, updatedAt })
+      .set(
+        update.touch ? { sortOrder: update.sortOrder, updatedAt } : { sortOrder: update.sortOrder },
+      )
       .where(eq(learningResources.id, update.id));
   await db.batch([statementFor(first), ...rest.map(statementFor)]);
 }

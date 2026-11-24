@@ -88,6 +88,9 @@ it("enforces RBAC, CRUD, drag ordering, soft delete, restore, and public visibil
     expect(activeList.rows.map((row) => row.id)).toEqual([first.id, second.id, third.id]);
     expect(activeList.rows.map((row) => row.sortOrder)).toEqual([0, 1, 2]);
     expect(activeList.counts).toEqual({ active: 3, deleted: 0 });
+    const timestampsBefore = new Map(
+      activeList.rows.map((row) => [row.id, row.updatedAt.getTime()]),
+    );
 
     // The public read keeps editorial order and never exposes timestamps.
     const publicRows = await listPublicResources(db);
@@ -101,15 +104,28 @@ it("enforces RBAC, CRUD, drag ordering, soft delete, restore, and public visibil
       url: resourceFields().url,
     });
 
-    // Drag ordering permutes the existing slots of the current page.
+    // Drag ordering shifts only the rows between the old and new position.
     expect(
       await reorderResources(db, maintainer, {
+        movedId: third.id,
         orderedIds: [third.id, first.id, second.id],
       }),
-    ).toEqual({ data: { orderedIds: [third.id, first.id, second.id] }, error: null });
+    ).toEqual({
+      data: { movedId: third.id, orderedIds: [third.id, first.id, second.id] },
+      error: null,
+    });
     const afterReorder = resultData(await inspectResources(db, maintainer));
     expect(afterReorder.rows.map((row) => row.id)).toEqual([third.id, first.id, second.id]);
     expect(afterReorder.rows.map((row) => row.sortOrder)).toEqual([0, 1, 2]);
+    for (const row of afterReorder.rows) {
+      const before = timestampsBefore.get(row.id);
+      if (row.id === third.id) {
+        expect(row.updatedAt.getTime()).toBeGreaterThanOrEqual(before!);
+      } else {
+        // Shifted rows keep their content timestamp; only the dragged row is touched.
+        expect(row.updatedAt.getTime()).toBe(before!);
+      }
+    }
     expect((await listPublicResources(db)).map((row) => row.id)).toEqual([
       third.id,
       first.id,
@@ -170,7 +186,12 @@ it("enforces RBAC, CRUD, drag ordering, soft delete, restore, and public visibil
     expect(
       await changeResourceLifecycle(db, admin, { resourceId: "missing", action: "delete" }),
     ).toEqual({ data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE });
-    expect(await reorderResources(db, admin, { orderedIds: [second.id, "missing"] })).toEqual({
+    expect(
+      await reorderResources(db, admin, {
+        movedId: second.id,
+        orderedIds: [second.id, "missing"],
+      }),
+    ).toEqual({
       data: null,
       error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE,
     });
@@ -185,7 +206,12 @@ it("enforces RBAC, CRUD, drag ordering, soft delete, restore, and public visibil
         ...resourceFields({ titleEn: "Forbidden" }),
       }),
     ).toEqual({ data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN });
-    expect(await reorderResources(db, forbidden, { orderedIds: [second.id, third.id] })).toEqual({
+    expect(
+      await reorderResources(db, forbidden, {
+        movedId: second.id,
+        orderedIds: [second.id, third.id],
+      }),
+    ).toEqual({
       data: null,
       error: RESOURCE_ADMIN_ERRORS.FORBIDDEN,
     });
@@ -222,8 +248,13 @@ it("keeps deleted rows' order slots when reordering the active page", async () =
     );
 
     await changeResourceLifecycle(db, admin, { resourceId: beta.id, action: "delete" });
-    expect(await reorderResources(db, admin, { orderedIds: [gamma.id, alpha.id] })).toEqual({
-      data: { orderedIds: [gamma.id, alpha.id] },
+    expect(
+      await reorderResources(db, admin, {
+        movedId: gamma.id,
+        orderedIds: [gamma.id, alpha.id],
+      }),
+    ).toEqual({
+      data: { movedId: gamma.id, orderedIds: [gamma.id, alpha.id] },
       error: null,
     });
 
@@ -271,8 +302,18 @@ it("validates bilingual copy, normalizes links, and validates reorder payloads",
     resourceFieldsSchema.safeParse(resourceFields({ descriptionEn: "a".repeat(401) })).success,
   ).toBe(false);
 
-  expect(reorderResourcesSchema.safeParse({ orderedIds: ["cs50"] }).success).toBe(true);
-  expect(reorderResourcesSchema.safeParse({ orderedIds: [] }).success).toBe(false);
-  expect(reorderResourcesSchema.safeParse({ orderedIds: ["cs50", "cs50"] }).success).toBe(false);
-  expect(reorderResourcesSchema.safeParse({ orderedIds: ["cs50", ""] }).success).toBe(false);
+  expect(reorderResourcesSchema.safeParse({ movedId: "cs50", orderedIds: ["cs50"] }).success).toBe(
+    true,
+  );
+  expect(reorderResourcesSchema.safeParse({ movedId: "cs50", orderedIds: [] }).success).toBe(false);
+  expect(
+    reorderResourcesSchema.safeParse({ movedId: "cs50", orderedIds: ["cs50", "cs50"] }).success,
+  ).toBe(false);
+  expect(
+    reorderResourcesSchema.safeParse({ movedId: "cs50", orderedIds: ["cs50", ""] }).success,
+  ).toBe(false);
+  expect(
+    reorderResourcesSchema.safeParse({ movedId: "cs50", orderedIds: ["roadmap"] }).success,
+  ).toBe(false);
+  expect(reorderResourcesSchema.safeParse({ orderedIds: ["cs50"] }).success).toBe(false);
 });

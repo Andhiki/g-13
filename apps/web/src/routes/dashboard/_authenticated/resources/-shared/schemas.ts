@@ -97,11 +97,17 @@ export type ResourceLifecycleInput = z.infer<typeof resourceLifecycleSchema>;
  * The client sends the current page in its new visual order. The server permutes the existing
  * sort-order values of exactly those rows, so rows on other pages keep their position.
  */
-export const reorderResourcesSchema = z.object({
-  orderedIds: z
-    .array(requiredId())
-    .min(1, "Send at least one resource.")
-    .max(100, "Reorder at most 100 resources at once.")
-    .refine((ids) => new Set(ids).size === ids.length, "Resource ids must be unique."),
-});
+export const reorderResourcesSchema = z
+  .object({
+    movedId: requiredId(),
+    orderedIds: z
+      .array(requiredId())
+      .min(1, "Send at least one resource.")
+      .max(100, "Reorder at most 100 resources at once.")
+      .refine((ids) => new Set(ids).size === ids.length, "Resource ids must be unique."),
+  })
+  .refine((value) => value.orderedIds.includes(value.movedId), {
+    message: "The moved resource must be part of the ordered list.",
+    path: ["movedId"],
+  });
 export type ReorderResourcesInput = z.infer<typeof reorderResourcesSchema>;

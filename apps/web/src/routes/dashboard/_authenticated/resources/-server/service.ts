@@ -84,12 +84,39 @@ export async function reorderResources(
   if (currentRows.length !== input.orderedIds.length) {
     return { data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE };
   }
-  await applyResourceSortOrders(
-    db,
-    input.orderedIds.map((id, index) => ({
-      id,
-      sortOrder: currentRows[index].sortOrder,
-    })),
-  );
+
+  const currentOrder = currentRows.map((row) => row.id);
+  const slots = currentRows.map((row) => row.sortOrder);
+  const oldIndex = currentOrder.indexOf(input.movedId);
+  const newIndex = input.orderedIds.indexOf(input.movedId);
+  if (oldIndex < 0 || newIndex < 0) {
+    return { data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE };
+  }
+
+  // A single drag moves one row; every other row keeps its relative order.
+  const currentWithoutMoved = currentOrder.filter((id) => id !== input.movedId);
+  const nextWithoutMoved = input.orderedIds.filter((id) => id !== input.movedId);
+  if (currentWithoutMoved.some((id, index) => id !== nextWithoutMoved[index])) {
+    return { data: null, error: RESOURCE_ADMIN_ERRORS.RESOURCE_ACTION_UNAVAILABLE };
+  }
+
+  if (oldIndex === newIndex) return { data: input, error: null };
+
+  // Shift the slots of only the rows between the old and new position, and touch only
+  // the dragged row so the Updated column does not reset for the whole page.
+  const updates: Array<{ id: string; sortOrder: number; touch?: boolean }> = [
+    { id: input.movedId, sortOrder: slots[newIndex], touch: true },
+  ];
+  if (newIndex > oldIndex) {
+    for (let index = oldIndex + 1; index <= newIndex; index++) {
+      updates.push({ id: currentOrder[index], sortOrder: slots[index - 1] });
+    }
+  } else {
+    for (let index = newIndex; index < oldIndex; index++) {
+      updates.push({ id: currentOrder[index], sortOrder: slots[index + 1] });
+    }
+  }
+
+  await applyResourceSortOrders(db, updates);
   return { data: input, error: null };
 }
