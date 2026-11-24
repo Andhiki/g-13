@@ -20,6 +20,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
+- Banner pengumuman mengembang dengan halus saat pertama kali dimuat tanpa cache.
 - Kolom isian pada formulir dashboard kini mengikuti skala teks dan tinggi kontrol lain di panel, sehingga label, isian, dan tombol tidak lagi tampak tidak seimbang.
 
 ### 2026-11-23
