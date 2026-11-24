@@ -61,14 +61,14 @@ value exist.
 
 The author's consent checkboxes are part of the GitHub issue. When entering the record:
 
-1. Set **Author consent recorded** in the dashboard.
+1. Enter the GitHub issue creation date in **Author consent date**. For private
+   consent, use the date the author granted it.
 2. Paste the issue URL into **Consent source**.
 3. Only enable **Publish abstract** or **Show contact** when the author clearly allowed
    those fields.
 
-The service sets `consent_at` on first consent and preserves it on later edits. The
-dashboard never returns the consent source publicly. The public page may state that data
-and abstract are published with the author's permission.
+The dashboard stores the author consent date and source internally. The public page may state
+that data and abstract are published with the author's permission.
 
 ## Workflow
 

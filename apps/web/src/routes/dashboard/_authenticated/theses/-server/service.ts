@@ -35,16 +35,16 @@ function requiresConsent(input: CreateThesisInput | UpdateThesisInput): boolean 
 }
 
 function hasConsent(input: CreateThesisInput | UpdateThesisInput): boolean {
-  return input.consentRecorded && Boolean(input.consentSource);
+  return Boolean(input.consentDate && input.consentSource);
 }
 
-function consentValues(
-  input: CreateThesisInput | UpdateThesisInput,
-  existingConsentAt: Date | null,
-): { consentAt: Date | null; consentSource: string | null } {
+function consentValues(input: CreateThesisInput | UpdateThesisInput): {
+  consentAt: Date | null;
+  consentSource: string | null;
+} {
   return {
-    consentAt: input.consentRecorded ? (existingConsentAt ?? new Date()) : null,
-    consentSource: input.consentRecorded ? input.consentSource : null,
+    consentAt: input.consentDate ? new Date(input.consentDate) : null,
+    consentSource: input.consentDate ? input.consentSource : null,
   };
 }
 
@@ -84,7 +84,7 @@ export async function createThesis(
     id = await allocateThesisId(db, input.title, input.year);
   }
 
-  const consent = consentValues(input, null);
+  const consent = consentValues(input);
   await createThesisRecord(db, id, input, consent.consentAt, consent.consentSource);
   return { data: { id }, error: null };
 }
@@ -103,7 +103,7 @@ export async function updateThesis(
     return { data: null, error: THESIS_ADMIN_ERRORS.CONSENT_REQUIRED };
   }
 
-  const consent = consentValues(input, existing.consentAt);
+  const consent = consentValues(input);
   await updateThesisRecord(db, input.thesisId, input, consent.consentAt, consent.consentSource);
   return { data: { thesisId: input.thesisId }, error: null };
 }

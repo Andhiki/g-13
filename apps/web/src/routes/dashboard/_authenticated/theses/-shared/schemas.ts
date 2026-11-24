@@ -51,7 +51,7 @@ const thesisBaseSchema = z.object({
   contactValue: z.string().trim().max(300).nullable(),
   abstractPublic: z.boolean(),
   contactPublic: z.boolean(),
-  consentRecorded: z.boolean(),
+  consentDate: z.iso.date().nullable(),
   consentSource: z.string().trim().max(500).nullable(),
   status: thesisStatusSchema.default("draft"),
   supervisors: z
@@ -77,15 +77,15 @@ function refineThesis(value: z.infer<typeof thesisBaseSchema>, ctx: z.Refinement
   }
   if (
     (value.abstractPublic || value.contactPublic || value.status === "published") &&
-    !value.consentRecorded
+    !value.consentDate
   ) {
     ctx.addIssue({
       code: "custom",
-      path: ["consentRecorded"],
-      message: "Record author consent before publishing the thesis, abstract, or contact.",
+      path: ["consentDate"],
+      message: "Enter the author consent date before publishing the thesis, abstract, or contact.",
     });
   }
-  if (value.consentRecorded && !value.consentSource) {
+  if (value.consentDate && !value.consentSource) {
     ctx.addIssue({
       code: "custom",
       path: ["consentSource"],

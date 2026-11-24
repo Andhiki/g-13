@@ -30,7 +30,7 @@ const baseInput = {
   contactValue: "ayu@example.com",
   abstractPublic: true,
   contactPublic: true,
-  consentRecorded: true,
+  consentDate: "2025-08-14",
   consentSource: "https://github.com/Andhiki/g-13/issues/999",
   status: "draft" as const,
   supervisors: [
@@ -48,12 +48,15 @@ it("rejects invalid consent, public content, URLs, and empty supervisor lists", 
     createThesisSchema.safeParse({
       ...baseInput,
       status: "published",
-      consentRecorded: false,
+      consentDate: null,
       consentSource: null,
       abstractPublic: false,
       contactPublic: false,
     }).success,
   ).toBe(false);
+  expect(createThesisSchema.safeParse({ ...baseInput, consentDate: "2025-02-29" }).success).toBe(
+    false,
+  );
   expect(
     createThesisSchema.safeParse({ ...baseInput, abstract: null, abstractPublic: true }).success,
   ).toBe(false);
@@ -106,7 +109,7 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
       status: "draft",
       consentSource: "https://github.com/Andhiki/g-13/issues/999",
     });
-    expect(record?.consentAt).toBeInstanceOf(Date);
+    expect(record?.consentAt?.toISOString()).toBe("2025-08-14T00:00:00.000Z");
     expect(record?.supervisors).toEqual([
       { name: "Dr. Nur Rokhman", lecturerId: "nur-rokhman", role: "main" },
       { name: "Dr. Pembimbing Eksternal", lecturerId: null, role: "co" },
@@ -132,7 +135,7 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
       admin,
       makeInput({
         slug: "tanpa-izin-2026",
-        consentRecorded: false,
+        consentDate: null,
         consentSource: null,
         abstractPublic: false,
         contactPublic: false,

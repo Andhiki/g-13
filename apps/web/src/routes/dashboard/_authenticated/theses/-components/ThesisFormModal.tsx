@@ -162,11 +162,17 @@ function SwitchField({
         <Typography as="label" htmlFor={id} variant="labelSmall" color="strong">
           {label}
         </Typography>
-        <Typography as="p" variant="caption" color="muted" className="mb-0 mt-1">
+        <Typography
+          as="p"
+          id={`${id}-description`}
+          variant="caption"
+          color="muted"
+          className="mb-0 mt-1"
+        >
           {description}
         </Typography>
         {error && (
-          <Typography variant="caption" color="danger" className="mt-1">
+          <Typography id={`${id}-error`} variant="caption" color="danger" className="mt-1">
             {error}
           </Typography>
         )}
@@ -176,6 +182,7 @@ function SwitchField({
         checked={checked}
         aria-invalid={Boolean(error)}
         className="group/switch h-5 w-8 shrink-0 rounded-full bg-bg-soft-200 p-0.5 focus-visible:outline-2 focus-visible:outline-primary-base data-checked:bg-primary-base"
+        aria-describedby={error ? `${id}-description ${id}-error` : `${id}-description`}
         onCheckedChange={onCheckedChange}
       >
         <SwitchThumb className="block size-4 rounded-full bg-static-white shadow-switch-thumb transition-transform group-data-checked/switch:translate-x-3" />
@@ -445,7 +452,7 @@ type BasicField = "slug" | "title" | "authorName" | "authorBatch" | "year" | "ty
 
 type AbstractField = "abstract" | "abstractEn" | "keywords";
 type ContactField = "repositoryUrl" | "contactChannel" | "contactValue";
-type ConsentField = "consentSource" | "status";
+type ConsentField = "consentDate" | "consentSource" | "status";
 
 function BasicSection({
   editing,
@@ -685,32 +692,33 @@ function ContactSection({
 }
 
 function ConsentSection({
-  consentRecorded,
+  consentDate,
   consentSource,
   status,
   errors,
   onChange,
-  onConsentRecordedChange,
 }: {
-  consentRecorded: boolean;
+  consentDate: string;
   consentSource: string;
   status: string;
   errors: FieldErrors;
   onChange: (field: ConsentField, value: string) => void;
-  onConsentRecordedChange: (checked: boolean) => void;
 }) {
   return (
     <section className="space-y-4">
       <Typography as="h3" variant="label" className="m-0">
         Consent and status
       </Typography>
-      <SwitchField
-        id="thesis-consent-recorded"
-        label="Author consent recorded"
-        description="Required before publishing the thesis, abstract, or contact."
-        checked={consentRecorded}
-        error={errors.consentRecorded}
-        onCheckedChange={onConsentRecordedChange}
+      <AdminFormField
+        id="thesis-consent-date"
+        name="consentDate"
+        label="Author consent date"
+        type="date"
+        maxLength={10}
+        placeholder=""
+        value={consentDate}
+        error={errors.consentDate}
+        onChange={(value) => onChange("consentDate", value)}
       />
       <AdminFormField
         id="thesis-consent-source"
@@ -754,7 +762,7 @@ function useThesisFormHandlers({
   setContactValue,
   setAbstractPublic,
   setContactPublic,
-  setConsentRecorded,
+  setConsentDate,
   setConsentSource,
   setStatus,
   setSupervisors,
@@ -775,7 +783,7 @@ function useThesisFormHandlers({
   setContactValue: (value: string) => void;
   setAbstractPublic: (value: boolean) => void;
   setContactPublic: (value: boolean) => void;
-  setConsentRecorded: (value: boolean) => void;
+  setConsentDate: (value: string) => void;
   setConsentSource: (value: string) => void;
   setStatus: (value: ThesisStatus) => void;
   setSupervisors: Dispatch<SetStateAction<SupervisorDraft[]>>;
@@ -823,7 +831,8 @@ function useThesisFormHandlers({
   };
 
   const handleConsentChange = (fieldName: ConsentField, value: string) => {
-    if (fieldName === "consentSource") setConsentSource(value);
+    if (fieldName === "consentDate") setConsentDate(value);
+    else if (fieldName === "consentSource") setConsentSource(value);
     else setStatus(value as ThesisStatus);
     clearFieldError(fieldName);
   };
@@ -866,11 +875,6 @@ function useThesisFormHandlers({
     clearFieldError("contactPublic");
   };
 
-  const changeConsentRecorded = (checked: boolean) => {
-    setConsentRecorded(checked);
-    clearFieldError("consentRecorded");
-  };
-
   return {
     handleBasicChange,
     handleAbstractChange,
@@ -882,7 +886,6 @@ function useThesisFormHandlers({
     addSupervisor,
     changeAbstractPublic,
     changeContactPublic,
-    changeConsentRecorded,
   };
 }
 
@@ -904,7 +907,7 @@ function parseThesisFormValues({
   contactValue,
   abstractPublic,
   contactPublic,
-  consentRecorded,
+  consentDate,
   consentSource,
   status,
   supervisors,
@@ -926,7 +929,7 @@ function parseThesisFormValues({
   contactValue: string;
   abstractPublic: boolean;
   contactPublic: boolean;
-  consentRecorded: boolean;
+  consentDate: string;
   consentSource: string;
   status: string;
   supervisors: SupervisorDraft[];
@@ -950,7 +953,7 @@ function parseThesisFormValues({
     contactValue: contactValue.trim() || null,
     abstractPublic,
     contactPublic,
-    consentRecorded,
+    consentDate: consentDate || null,
     consentSource: consentSource.trim() || null,
     status,
     supervisors: supervisors.map((supervisor) => ({
@@ -1057,8 +1060,8 @@ function ThesisFormBody({
   const [contactValue, setContactValue] = useState(thesis?.contactValue ?? "");
   const [abstractPublic, setAbstractPublic] = useState(thesis?.abstractPublic ?? false);
   const [contactPublic, setContactPublic] = useState(thesis?.contactPublic ?? false);
-  const [consentRecorded, setConsentRecorded] = useState(
-    thesis ? thesis.consentAt !== null : false,
+  const [consentDate, setConsentDate] = useState(
+    thesis?.consentAt?.toISOString().slice(0, 10) ?? "",
   );
   const [consentSource, setConsentSource] = useState(thesis?.consentSource ?? "");
   const [status, setStatus] = useState(thesis?.status ?? "draft");
@@ -1087,7 +1090,6 @@ function ThesisFormBody({
     addSupervisor,
     changeAbstractPublic,
     changeContactPublic,
-    changeConsentRecorded,
   } = useThesisFormHandlers({
     setSlug,
     setTitle,
@@ -1104,7 +1106,7 @@ function ThesisFormBody({
     setContactValue,
     setAbstractPublic,
     setContactPublic,
-    setConsentRecorded,
+    setConsentDate,
     setConsentSource,
     setStatus,
     setSupervisors,
@@ -1130,7 +1132,7 @@ function ThesisFormBody({
       contactValue,
       abstractPublic,
       contactPublic,
-      consentRecorded,
+      consentDate,
       consentSource,
       status,
       supervisors,
@@ -1201,12 +1203,11 @@ function ThesisFormBody({
         onContactPublicChange={changeContactPublic}
       />
       <ConsentSection
-        consentRecorded={consentRecorded}
+        consentDate={consentDate}
         consentSource={consentSource}
         status={status}
         errors={fieldErrors}
         onChange={handleConsentChange}
-        onConsentRecordedChange={changeConsentRecorded}
       />
     </AdminForm>
   );

@@ -21,6 +21,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 #### Changed
 
 - Pemilih sub-lab di dashboard skripsi kini bisa dicari dan mendukung pilihan jamak tanpa tombol pengubah.
+- Dashboard skripsi mencatat tanggal izin dari pengajuan penulis.
 - Latar sidebar dashboard kini menyatu dengan latar halaman pada tema gelap Omahti; sorotan tautan memakai warna permukaan standar, bukan lagi rona charcoal hangat.
 
 ### 2026-11-23

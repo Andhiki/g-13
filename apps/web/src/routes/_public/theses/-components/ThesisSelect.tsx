@@ -12,7 +12,7 @@ export function ThesisSelectTrigger({ className, ...props }: ComponentProps<type
   return (
     <SelectTrigger
       {...props}
-      className={`flex min-h-9 min-w-0 items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-left text-base text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm ${className ?? ""}`}
+      className={`flex min-h-9 min-w-0 max-w-full items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-left text-base text-text-strong-950 focus-visible:outline-2 focus-visible:outline-primary-base sm:text-paragraph-sm ${className ?? ""}`}
     >
       <SelectValue maxLabels={1} className="min-w-0 truncate" />
       <RiArrowDownSLine aria-hidden="true" className="ml-auto size-5 shrink-0 text-text-sub-600" />
