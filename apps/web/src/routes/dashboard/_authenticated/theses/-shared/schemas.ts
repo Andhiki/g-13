@@ -26,9 +26,19 @@ export const thesisPageSchema = z.object({
   status: thesisStatusFilterSchema,
 });
 
+const trimmedText = z.string().trim();
+const nonEmptyText = trimmedText.min(1);
+const thesisId = nonEmptyText.max(120);
+const year = z.number().int();
+const academicYear = year.min(1945).max(2100);
+const keyword = nonEmptyText.max(80);
+const subLabIds = z.array(nonEmptyText.max(120));
+const keywords = z.array(keyword);
+const abstractText = trimmedText.max(50_000).nullable();
+
 export const thesisSupervisorFieldsSchema = z.object({
-  lecturerId: z.string().trim().max(100).nullable(),
-  name: z.string().trim().min(1, "Enter the supervisor name.").max(200),
+  lecturerId: trimmedText.max(100).nullable(),
+  name: trimmedText.min(1, "Enter the supervisor name.").max(200),
   role: thesisSupervisorRoleSchema.nullable(),
 });
 export type ThesisSupervisorFieldsInput = z.infer<typeof thesisSupervisorFieldsSchema>;
@@ -36,23 +46,23 @@ export type ThesisSupervisorFieldsInput = z.infer<typeof thesisSupervisorFieldsS
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const thesisBaseSchema = z.object({
-  title: z.string().trim().min(1, "Enter the thesis title.").max(300),
-  authorName: z.string().trim().min(1, "Enter the author name.").max(200),
-  authorBatch: z.number().int().min(1945).max(2100).nullable(),
-  year: z.number().int().min(1945).max(2100),
+  title: trimmedText.min(1, "Enter the thesis title.").max(300),
+  authorName: trimmedText.min(1, "Enter the author name.").max(200),
+  authorBatch: academicYear.nullable(),
+  year: academicYear,
   type: thesisTypeSchema.default("skripsi"),
-  fieldIds: z.array(z.string().trim().min(1).max(120)).max(20, "Use at most 20 sub-labs."),
+  fieldIds: subLabIds.max(20, "Use at most 20 sub-labs."),
   language: thesisLanguageSchema.default("id"),
-  abstract: z.string().trim().max(50_000).nullable(),
-  abstractEn: z.string().trim().max(50_000).nullable(),
-  keywords: z.array(z.string().trim().min(1).max(80)).max(30, "Use at most 30 keywords."),
-  repositoryUrl: z.string().trim().max(500).nullable(),
+  abstract: abstractText,
+  abstractEn: abstractText,
+  keywords: keywords.max(30, "Use at most 30 keywords."),
+  repositoryUrl: trimmedText.max(500).nullable(),
   contactChannel: thesisContactChannelSchema.nullable(),
-  contactValue: z.string().trim().max(300).nullable(),
+  contactValue: trimmedText.max(300).nullable(),
   abstractPublic: z.boolean(),
   contactPublic: z.boolean(),
   consentDate: z.iso.date().nullable(),
-  consentSource: z.string().trim().max(500).nullable(),
+  consentSource: trimmedText.max(500).nullable(),
   status: thesisStatusSchema.default("draft"),
   supervisors: z
     .array(thesisSupervisorFieldsSchema)
@@ -138,9 +148,7 @@ export type ThesisFieldsInput = z.infer<typeof thesisFieldsSchema>;
 
 export const createThesisSchema = thesisBaseSchema
   .extend({
-    slug: z
-      .string()
-      .trim()
+    slug: trimmedText
       .max(120)
       .optional()
       .transform((value) => value || undefined),
@@ -148,13 +156,11 @@ export const createThesisSchema = thesisBaseSchema
   .superRefine(refineThesis);
 export type CreateThesisInput = z.infer<typeof createThesisSchema>;
 
-export const updateThesisSchema = thesisBaseSchema
-  .extend({ thesisId: z.string().trim().min(1).max(120) })
-  .superRefine(refineThesis);
+export const updateThesisSchema = thesisBaseSchema.extend({ thesisId }).superRefine(refineThesis);
 export type UpdateThesisInput = z.infer<typeof updateThesisSchema>;
 
 export const thesisLifecycleSchema = z.object({
-  thesisId: z.string().trim().min(1).max(120),
+  thesisId,
   action: z.enum(["publish", "hide", "delete", "restore"]),
 });
 export type ThesisLifecycleInput = z.infer<typeof thesisLifecycleSchema>;

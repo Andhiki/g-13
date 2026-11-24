@@ -193,18 +193,26 @@ it("enforces roles, consent, slug uniqueness, lifecycle, and public visibility",
     await changeThesisLifecycle(db, admin, { thesisId: id, action: "delete" });
     expect(await getThesisDetail(db, id)).toBeNull();
     const deletedList = await inspectTheses(db, admin, 0, "deleted");
-    expect(deletedList.data?.rows.map((row) => row.id)).toEqual([id]);
-    expect(deletedList.data?.counts.deleted).toBe(1);
+    expect(deletedList.data).toMatchObject({
+      rows: [{ id }],
+      counts: { deleted: 1 },
+    });
 
     await changeThesisLifecycle(db, admin, { thesisId: id, action: "restore" });
-    const restored = await getAdminThesisById(db, id);
+    const [restored, restoredPublicDetail] = await Promise.all([
+      getAdminThesisById(db, id),
+      getThesisDetail(db, id),
+    ]);
     expect(restored).toMatchObject({ status: "draft", deletedAt: null });
-    expect(await getThesisDetail(db, id)).toBeNull();
+    expect(restoredPublicDetail).toBeNull();
 
     const draftList = await inspectTheses(db, maintainer, 0, "draft");
-    expect(draftList.data?.rows.map((row) => row.id).sort()).toEqual([id, noConsentId].sort());
-    expect(draftList.data?.counts.draft).toBe(2);
-    expect(draftList.data?.lecturers).toEqual([{ id: "nur-rokhman", name: "Dr. Nur Rokhman" }]);
+    const drafts = draftList.data?.rows.map(({ id: thesisId }) => thesisId);
+    expect(drafts?.sort()).toEqual([id, noConsentId].sort());
+    expect(draftList.data).toMatchObject({
+      counts: { draft: 2 },
+      lecturers: [{ id: "nur-rokhman", name: "Dr. Nur Rokhman" }],
+    });
     expect(draftList.data?.fields).toEqual([
       {
         id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",

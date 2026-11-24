@@ -228,6 +228,23 @@ function AdminThesesPage() {
     setConfirmation({ thesis, action });
   }
 
+  const list = (
+    <ThesesListBody
+      queryState={thesesQuery}
+      visibleRows={visibleRows}
+      needle={needle}
+      status={status}
+      onClearSearch={() => setQuery("")}
+      onViewDrafts={() => {
+        setStatus("draft");
+        setOffset(0);
+      }}
+      onCreate={openCreateModal}
+      onEdit={openEditModal}
+      onAction={confirmAction}
+    />
+  );
+
   return (
     <>
       <AdminPageHeader
@@ -277,20 +294,7 @@ function AdminThesesPage() {
         <div
           className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
         >
-          <ThesesListBody
-            queryState={thesesQuery}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            onClearSearch={() => setQuery("")}
-            onViewDrafts={() => {
-              setStatus("draft");
-              setOffset(0);
-            }}
-            onCreate={openCreateModal}
-            onEdit={openEditModal}
-            onAction={confirmAction}
-          />
+          {list}
         </div>
       </div>
       <ThesisFormModal
