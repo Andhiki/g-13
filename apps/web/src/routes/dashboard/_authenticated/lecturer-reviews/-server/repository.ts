@@ -57,6 +57,7 @@ export async function getModerationCounts(db: Database) {
   const [counts] = await db
     .select({
       all: sql<number>`count(*)`,
+      pending: sql<number>`coalesce(sum(case when ${reviews.status} = 'pending' and ${reviews.deletedAt} is null then 1 else 0 end), 0)`,
       published: sql<number>`coalesce(sum(case when ${reviews.status} = 'published' and ${reviews.deletedAt} is null then 1 else 0 end), 0)`,
       hidden: sql<number>`coalesce(sum(case when ${reviews.status} = 'hidden' and ${reviews.deletedAt} is null then 1 else 0 end), 0)`,
       deleted: sql<number>`coalesce(sum(case when ${reviews.deletedAt} is not null then 1 else 0 end), 0)`,

@@ -16,7 +16,7 @@ export async function submitReview(
     secret: string;
     now?: number;
   },
-): Promise<ReviewOperationResult<{ reviewId: string }>> {
+): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
   const ip = context.ip;
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   const references = await getReviewReferences(db, review);
@@ -26,11 +26,15 @@ export async function submitReview(
   const { anonymous, ...values } = review;
   const reviewId = crypto.randomUUID();
   const authorName = anonymous ? "Anonymous" : review.authorName;
+  const status =
+    review.clarity <= 2 || review.support <= 2 || review.organization <= 2
+      ? "pending"
+      : "published";
   await createReview(db, {
     ...values,
     id: reviewId,
     authorName,
-    status: "published",
+    status,
   });
   try {
     await dispatchNotification(db, {
@@ -52,5 +56,5 @@ export async function submitReview(
   } catch {
     // Notification delivery is non-blocking for review submission.
   }
-  return { data: { reviewId }, error: null };
+  return { data: { reviewId, status }, error: null };
 }

@@ -178,7 +178,7 @@ export async function createReview(
     support: number;
     organization: number;
     body: string;
-    status: "published" | "hidden";
+    status: "pending" | "published" | "hidden";
   },
 ): Promise<void> {
   await db.insert(reviews).values(review);
