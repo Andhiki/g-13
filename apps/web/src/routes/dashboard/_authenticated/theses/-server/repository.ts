@@ -327,24 +327,20 @@ export async function setThesisLifecycle(
   db: Database,
   input: ThesisLifecycleInput,
 ): Promise<boolean> {
-  const now = new Date();
-  const updatedAt = now;
-  const condition =
-    input.action === "restore"
-      ? and(eq(theses.id, input.thesisId), isNotNull(theses.deletedAt))
-      : and(eq(theses.id, input.thesisId), isNull(theses.deletedAt));
-  const values =
-    input.action === "publish"
-      ? { status: "published" as const, updatedAt }
-      : input.action === "hide"
-        ? { status: "hidden" as const, updatedAt }
-        : input.action === "delete"
-          ? { deletedAt: now, updatedAt }
-          : { deletedAt: null, status: "draft" as const, updatedAt };
+  const updatedAt = new Date();
+  const deletedAt =
+    input.action === "restore" ? isNotNull(theses.deletedAt) : isNull(theses.deletedAt);
+  const changes = {
+    publish: { status: "published" },
+    hide: { status: "hidden" },
+    delete: { deletedAt: updatedAt },
+    restore: { deletedAt: null, status: "draft" },
+  } satisfies Record<ThesisLifecycleInput["action"], Partial<typeof theses.$inferInsert>>;
+
   const [updated] = await db
     .update(theses)
-    .set(values)
-    .where(condition)
+    .set({ ...changes[input.action], updatedAt })
+    .where(and(eq(theses.id, input.thesisId), deletedAt))
     .returning({ id: theses.id });
   return updated !== undefined;
 }
