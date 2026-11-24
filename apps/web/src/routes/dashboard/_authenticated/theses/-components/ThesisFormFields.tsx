@@ -194,18 +194,13 @@ function FieldMultiSelect({
     group.push(field);
     groups.set(field.lab, group);
   }
-  const items = Array.from(groups, ([label, options]) => ({
-    type: "group" as const,
-    label,
-    items: options.map((field) => ({ value: field.id, label: field.name })),
-  }));
   const errorId = "thesis-fields-error";
   return (
     <div>
       <Select
         name="fieldIds"
         multiple
-        items={items}
+        itemToLabel={(id) => fields.find((field) => field.id === id)?.name ?? id}
         value={selected}
         onValueChange={onChange}
         placeholder="Choose sub-labs"
@@ -224,13 +219,13 @@ function FieldMultiSelect({
           />
           <SelectEmpty className="p-2 text-text-sub-600">No matching sub-labs</SelectEmpty>
           <SelectList>
-            {items.map((group) => (
-              <SelectGroup key={group.label}>
+            {Array.from(groups, ([lab, options]) => (
+              <SelectGroup key={lab}>
                 <SelectGroupLabel className="px-2 py-1 text-label-xs text-text-sub-600">
-                  {group.label}
+                  {lab}
                 </SelectGroupLabel>
-                {group.items.map((item) => (
-                  <ThesisSelectItem key={item.value} {...item} />
+                {options.map((field) => (
+                  <ThesisSelectItem key={field.id} value={field.id} label={field.name} />
                 ))}
               </SelectGroup>
             ))}
