@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-24
+
+#### Added
+
+- Direktori skripsi publik di `/theses` dengan pencarian dan filter, halaman detail berisi abstrak, dosen pembimbing, tautan naskah, dan JSON-LD. Data hanya tampil setelah penulis menyetujui publikasi; abstrak dan kontak tetap disembunyikan bila belum disetujui.
+
 ### 2026-11-23
 
 #### Changed

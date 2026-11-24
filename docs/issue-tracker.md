@@ -4,6 +4,15 @@ All specs and implementation tickets live on **GitHub Issues** (`Andhiki/g-13`).
 There is no local tracker. Publish a spec as its own issue, then one issue per
 ticket, referencing blockers by issue number.
 
+## Parent issues and sub-issues
+
+A feature that spans several tickets gets one parent issue containing the problem,
+shared decisions, contracts, and umbrella acceptance criteria. Create one sub-issue
+per implementation ticket with `gh issue create --parent <parent-number>` (or link
+an existing issue with `gh issue edit <child> --parent <parent-number>`). Each child
+stays self-contained and lists only genuine blockers. The parent tracks completion
+and closes when all sub-issues are closed; do not implement the parent directly.
+
 Keep every issue self-contained — external contributors and agents read only
 GitHub. An issue carries what to build, acceptance criteria, and Blocked by
 (referencing issue numbers). Discussion happens in issue comments; append
