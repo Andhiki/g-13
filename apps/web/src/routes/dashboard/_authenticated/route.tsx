@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, isMatch, Outlet, redirect, useMatches } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
+import { useDashboardIdentity, useSyncDashboardIdentity } from "./-client/identity";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
 import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
 import { notificationPopoverQuery } from "./notifications/-client/queries";
@@ -32,8 +32,8 @@ function subscribeToWindowFocus(onChange: () => void) {
 }
 
 function AdminLayout() {
-  const identityMatch = useMatches().find((match) => isMatch(match, "loaderData.identity"));
-  const identity = identityMatch?.loaderData?.identity;
+  useSyncDashboardIdentity();
+  const identity = useDashboardIdentity();
   const focused = useSyncExternalStore(
     subscribeToWindowFocus,
     () => document.hasFocus(),
@@ -48,14 +48,7 @@ function AdminLayout() {
     <AdminLayoutProvider>
       <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
         <div className="flex h-full min-h-0 flex-col md:flex-row">
-          {identity && (
-            <ModerationSidebar
-              manager={canManageUsers(identity.role)}
-              userName={identity.name}
-              userEmail={"email" in identity ? identity.email : null}
-              userImage={"image" in identity ? identity.image : null}
-            />
-          )}
+          <ModerationSidebar identity={identity} />
           <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border">
             <Outlet />
           </section>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
 import { RiUserVoiceLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -317,7 +316,6 @@ function LecturersContent({
 
 function AdminLecturersPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<LecturerStatus>("active");
@@ -421,10 +419,6 @@ function AdminLecturersPage() {
     <>
       <AdminPageHeader
         title="Lecturers"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
             Add lecturer

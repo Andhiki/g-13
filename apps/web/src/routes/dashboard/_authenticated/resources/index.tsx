@@ -16,7 +16,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { canManageUsers } from "@g13/auth";
 import { RiLinksLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -376,11 +375,9 @@ function ResourcesContent({
   );
 }
 
-type ResourceIdentity = Awaited<ReturnType<typeof loadAdminResources>>["identity"];
 type ResourceCounts = Awaited<ReturnType<typeof loadAdminResources>>["counts"];
 
 function ResourcesToolbar({
-  identity,
   counts,
   status,
   query,
@@ -391,7 +388,6 @@ function ResourcesToolbar({
   onToggleDetails,
   onCreate,
 }: {
-  identity: ResourceIdentity;
   counts: ResourceCounts;
   status: ResourceStatus;
   query: string;
@@ -406,10 +402,6 @@ function ResourcesToolbar({
     <>
       <AdminPageHeader
         title="Learning resources"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={onCreate}>
             Add resource
@@ -490,7 +482,6 @@ function ResourcesModals({
 
 function AdminResourcesPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<ResourceStatus>("active");
@@ -605,7 +596,6 @@ function AdminResourcesPage() {
   return (
     <>
       <ResourcesToolbar
-        identity={identity}
         counts={counts}
         status={status}
         query={query}
