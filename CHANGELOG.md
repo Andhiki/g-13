@@ -12,6 +12,8 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Fixed
 
+- Bilah navigasi tetap berada di depan popover saat halaman digulir.
+
 - Isi dan tombol dialog tetap tampil utuh selama animasi penutupan, serta sudut konten dialog tidak lagi terpotong.
 - Ukuran teks isian dashboard dan formulir ulasan dosen kini seragam, termasuk pada laptop dengan layar sentuh.
 - Login GitHub lewat `csugm.omahti.com` tidak lagi gagal dengan galat `state_mismatch`. Aplikasi kini menentukan URL callback OAuth dari host yang benar-benar dibuka browser, memakai `Origin` pada permintaan masuk dan cookie callback, sehingga cookie state, callback, dan sesi tetap berada di domain yang dibuka pengguna meski proxy menulis ulang host permintaan.

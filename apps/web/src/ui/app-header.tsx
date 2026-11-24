@@ -229,7 +229,7 @@ export function AppHeader({ announcement }: { announcement?: ReactNode } = {}) {
 
   return (
     <AlignDrawer.Root open={menuOpen} onOpenChange={setMenuOpen} side="right">
-      <div className="fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)] text-text-strong-950">
+      <div className="fixed inset-x-0 top-0 z-60 pt-[env(safe-area-inset-top)] text-text-strong-950">
         {announcement}
         <header className="flex h-16 items-center gap-1 border-b border-stroke-soft-200 bg-bg-white-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:gap-6 md:pl-[max(1.5rem,env(safe-area-inset-left))] md:pr-[max(1.5rem,env(safe-area-inset-right))]">
           <BrandLogo />
