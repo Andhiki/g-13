@@ -13,15 +13,28 @@
     "build": "turbo run build",
     "preview": "bun run --cwd apps/web preview",
     "deploy": "bun run --cwd apps/web deploy",
-    "typecheck": "turbo run typecheck",
+    "deploy:staging": "bun run --cwd apps/web deploy:staging",
+    "db:generate": "bun run --cwd packages/db db:generate",
+    "db:push:local": "cf d1 raw 4961475b-b620-4a57-8e09-520e8c17578b --local --persist-to apps/web/.cloudflare/state --sql=\"$(bun run --cwd packages/db db:export | sed 's/CREATE TABLE /CREATE TABLE IF NOT EXISTS /g; s/CREATE INDEX /CREATE INDEX IF NOT EXISTS /g; s/CREATE UNIQUE INDEX /CREATE UNIQUE INDEX IF NOT EXISTS /g')\"",
+    "db:migrate:local": "cf d1 migrations apply 4961475b-b620-4a57-8e09-520e8c17578b --local --dir packages/db/migrations --persist-to apps/web/.cloudflare/state",
+    "db:seed": "cf d1 raw 4961475b-b620-4a57-8e09-520e8c17578b --local --persist-to apps/web/.cloudflare/state --sql=\"$(cat packages/db/seed.sql)\"",
+    "typecheck": "turbo run typecheck && bun run typecheck:e2e",
+    "typecheck:e2e": "bun check --no-script -p e2e/tsconfig.json",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
-    "check": "turbo run lint format:check typecheck test",
-    "test": "turbo run test"
+    "check": "turbo run lint format:check typecheck test && bun run typecheck:e2e",
+    "test": "turbo run test",
+    "test:e2e": "node e2e/run-local.ts",
+    "test:e2e:smoke": "E2E_MODE=smoke E2E_TELEMETRY_DISABLED=1 node node_modules/e2e/dist/cli/bin.js run",
+    "db:migrate": "test -n \"$D1_DATABASE_ID\" || { echo \"D1_DATABASE_ID is required; refusing to run migrations\"; exit 1; }; cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
   },
   "devDependencies": {
+    "@e2e-dev/web": "0.16.1",
+    "@shadcn/lint": "^0.2.5",
+    "cf": "^1.0.0-rc.0",
+    "e2e": "0.24.0",
     "turbo": "^2.11.10"
   },
   "packageManager": "bun@1.4.4"

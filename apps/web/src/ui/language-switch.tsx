@@ -43,36 +43,36 @@ export function LanguageSwitch() {
   return (
     <SegmentedControl.Root
       className="shrink-0"
-      activationMode="manual"
       value={language}
       onValueChange={(value) => {
         if (value === "id" || value === "en") void changeLanguage(value);
       }}
+      aria-label={t("settings.language")}
+      aria-busy={pending}
     >
-      <SegmentedControl.List aria-label={t("settings.language")} aria-busy={pending}>
-        <SegmentedControl.Trigger
-          value="en"
-          lang="en"
-          aria-label="English"
-          disabled={pending}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
-        >
-          <Typography as="span" variant="label">
-            English
-          </Typography>
-        </SegmentedControl.Trigger>
-        <SegmentedControl.Trigger
-          value="id"
-          lang="id"
-          aria-label="Bahasa Indonesia"
-          disabled={pending}
-          className="focus-visible:ring-2 focus-visible:ring-primary-base"
-        >
-          <Typography as="span" variant="label">
-            Bahasa Indonesia
-          </Typography>
-        </SegmentedControl.Trigger>
-      </SegmentedControl.List>
+      <SegmentedControl.Indicator />
+      <SegmentedControl.Item
+        value="en"
+        lang="en"
+        aria-label="English"
+        disabled={pending}
+        className="focus-visible:ring-2 focus-visible:ring-primary-base"
+      >
+        <Typography as="span" variant="label">
+          EN
+        </Typography>
+      </SegmentedControl.Item>
+      <SegmentedControl.Item
+        value="id"
+        lang="id"
+        aria-label="Bahasa Indonesia"
+        disabled={pending}
+        className="focus-visible:ring-2 focus-visible:ring-primary-base"
+      >
+        <Typography as="span" variant="label">
+          ID
+        </Typography>
+      </SegmentedControl.Item>
     </SegmentedControl.Root>
   );
 }

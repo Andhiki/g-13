@@ -1,13 +1,18 @@
 // Adapted from AlignUI FancyButton v0.0.0. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
 import type { ComponentProps } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { tv } from "tailwind-variants";
+import { createTV, type VariantProps } from "tailwind-variants";
+import { ButtonContent, type ButtonContentProps } from "./button-spinner";
+
+const tv = createTV({
+  twMergeConfig: { extend: { classGroups: { "font-size": ["text-label-sm", "text-label-xs"] } } },
+});
 
 const fancyButton = tv({
   base: [
-    "group relative inline-flex items-center justify-center whitespace-nowrap text-label-sm outline-none",
-    "h-10 gap-3 rounded-10 px-3.5 transition duration-200 ease-out",
-    "bg-primary-base text-static-white dark:text-static-black shadow-fancy-buttons-primary focus-visible:shadow-button-primary-focus",
+    "group relative inline-flex items-center justify-center whitespace-nowrap outline-none",
+    "transition duration-200 ease-out focus:outline-none",
+    "bg-primary-base text-static-white dark:text-static-black shadow-fancy-buttons-primary focus-visible:outline-primary-base/55",
     "disabled:pointer-events-none disabled:text-text-disabled-300",
     "disabled:bg-bg-weak-50 disabled:bg-none disabled:shadow-none disabled:before:hidden disabled:after:hidden",
     "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit]",
@@ -16,21 +21,77 @@ const fancyButton = tv({
     "after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-to-b after:from-static-white after:to-transparent",
     "after:pointer-events-none after:opacity-[.16] after:transition after:duration-200 after:ease-out hover:after:opacity-[.24]",
   ],
+  variants: {
+    size: {
+      medium:
+        "h-10 gap-3 rounded-10 px-3.5 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2",
+      small:
+        "h-9 gap-2.5 rounded-lg px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-1",
+      xsmall:
+        "h-8 gap-2 rounded-lg px-3 text-label-sm focus-visible:outline-[1.5px] focus-visible:outline-offset-1",
+      xxsmall:
+        "h-7 gap-1.5 rounded-lg px-2.5 text-label-xs focus-visible:outline-[1.5px] focus-visible:outline-offset-0",
+    },
+    compact: { true: "" },
+  },
+  compoundVariants: [
+    {
+      size: "small",
+      compact: true,
+      class: "gap-1.5 text-label-xs",
+    },
+    {
+      size: "medium",
+      compact: true,
+      class: "gap-2 px-3",
+    },
+  ],
+  defaultVariants: { size: "medium" },
 });
+
+type FancyButtonProps = ComponentProps<"button"> &
+  VariantProps<typeof fancyButton> &
+  ButtonContentProps & { asChild?: boolean; isLoading?: boolean };
 
 function Root({
   asChild = false,
+  size,
+  compact,
   className,
   type = "button",
+  isLoading = false,
+  icon,
+  iconPosition,
+  disabled,
+  children,
   ...props
-}: ComponentProps<"button"> & { asChild?: boolean }) {
-  const Component = asChild ? Slot : "button";
+}: FancyButtonProps) {
+  const classes = fancyButton({ size, compact, className });
+  if (asChild) {
+    return (
+      <Slot className={classes} {...props}>
+        {children}
+      </Slot>
+    );
+  }
+  const spinnerSize = size === "xxsmall" || size === "xsmall" ? "sm" : "md";
   return (
-    <Component
-      className={fancyButton({ className })}
-      type={asChild ? undefined : type}
+    <button
+      className={classes}
+      type={type}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       {...props}
-    />
+    >
+      <ButtonContent
+        icon={icon}
+        iconPosition={iconPosition}
+        isLoading={isLoading}
+        size={spinnerSize}
+      >
+        {children}
+      </ButtonContent>
+    </button>
   );
 }
 

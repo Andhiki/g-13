@@ -1,0 +1,31 @@
+{
+  "name": "@g13/env",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bun --bun tsdown",
+    "typecheck": "bun check --no-script",
+    "test": "bun test",
+    "lint": "oxlint --deny-warnings src tsdown.config.ts",
+    "lint:fix": "oxlint --fix src tsdown.config.ts",
+    "format": "bun fmt src tsdown.config.ts package.json tsconfig.json",
+    "format:check": "bun fmt --check src tsdown.config.ts package.json tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "oxlint": "^1.90.0",
+    "tsdown": "^0.23.4",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,120 @@
+# Needs the production environment's CLOUDFLARE_API_TOKEN with these account policies:
+# - Workers Scripts: Edit (deploy the worker and its bindings)
+# - D1: Edit (apply migrations)
+# Account Settings: Read is optional because CLOUDFLARE_ACCOUNT_ID is set below.
+#
+# After a successful deploy, tags the deployed commit as vX.Y.Z and publishes a
+# GitHub Release. The first release uses apps/web/package.json's version; later
+# releases bump from the commits since the last v* tag (breaking -> major,
+# feat -> minor, otherwise patch, with the Unreleased changelog as a fallback).
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Verify, migrate, and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 0f1162f3c5692f21189157353ef26e56
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Check
+        run: bun run check
+      - name: Build
+        run: bun run build
+      - name: Apply D1 migrations
+        env:
+          # Production database ID from apps/web/cloudflare.config.ts.
+          D1_DATABASE_ID: 4961475b-b620-4a57-8e09-520e8c17578b
+        run: bun run db:migrate
+      - name: Deploy
+        run: bun run deploy
+
+  release:
+    name: Tag and release
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Tag and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          head_tag=$(git tag --points-at HEAD --list 'v[0-9]*' | head -n1 || true)
+          if [ -n "$head_tag" ]; then
+            echo "HEAD is already tagged $head_tag; skipping."
+            exit 0
+          fi
+
+          latest=$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n1 || true)
+          if [ -n "$latest" ]; then
+            if [ "$(git rev-list --count "$latest..HEAD")" -eq 0 ]; then
+              echo "No commits since $latest; skipping."
+              exit 0
+            fi
+            range="$latest..HEAD"
+          else
+            range="HEAD"
+          fi
+
+          if [ -z "$latest" ]; then
+            version=$(python3 -c 'import json; print(json.load(open("apps/web/package.json"))["version"])')
+          else
+            log=$(git log "$range" --format='%s%n%b')
+            bump=patch
+            if printf '%s\n' "$log" | grep -qE '(^[a-z]+(\([^)]+\))?!:)|(^BREAKING[ -]CHANGE:)'; then
+              bump=major
+            elif printf '%s\n' "$log" | grep -qE '^feat(\([^)]+\))?:'; then
+              bump=minor
+            else
+              unreleased=$(awk '/^## Unreleased/{found=1; next} /^## /{found=0} found' CHANGELOG.md)
+              if printf '%s\n' "$unreleased" | grep -qE '^#### (Added|Changed)'; then
+                bump=minor
+              fi
+            fi
+
+            IFS=. read -r major minor patch <<< "${latest#v}"
+            case "$bump" in
+              major) major=$((major + 1)); minor=0; patch=0 ;;
+              minor) minor=$((minor + 1)); patch=0 ;;
+              patch) patch=$((patch + 1)) ;;
+            esac
+            version="$major.$minor.$patch"
+          fi
+
+          tag="v$version"
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "Tag $tag already exists; skipping."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" -m "Release $tag"
+          git push origin "$tag"
+          gh release create "$tag" --title "$tag" --generate-notes --verify-tag

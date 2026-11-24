@@ -1,91 +1,251 @@
 // Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import { useLocale } from "../useLocale";
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+// Built on @ui-sdk/react/dialog. The dialog part renders full screen and holds the dimmed,
+// blurred centering surface (it is today's overlay, including every overlayClassName override),
+// while the card inside restores the pre-refactor panel styling. Presses outside the layer fall
+// through the pointer-events-none surface, so ui-sdk still sees them as outside presses.
 import { RiCloseLine } from "@remixicon/react";
-import { twMerge } from "tailwind-merge";
+import * as React from "react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+  type DialogContentState,
+} from "@ui-sdk/react/dialog";
+import type { PartProps } from "@ui-sdk/react/primitive";
+import { extendTailwindMerge } from "tailwind-merge";
+import { useLocale } from "../useLocale";
 import { CompactButton } from "./compact-button";
 
-const Root = DialogPrimitive.Root;
-const Title = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, asChild, ...props }, ref) => (
-  <DialogPrimitive.Title
-    asChild={asChild}
-    ref={ref}
-    className={twMerge(!asChild && "text-label-sm text-text-strong-950", className)}
-    {...props}
-  />
-));
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": [
+        {
+          text: [
+            (value: string) =>
+              /^(title-h[1-6]|label-(2xs|xs|sm|md|lg|xl)|paragraph-(xs|sm|md|lg|xl))$/.test(value),
+          ],
+        },
+      ],
+    },
+  },
+});
+
+// Like Radix's asChild: the part's props land on the single child element. Narrowed with
+// isValidElement so no cast is needed and anything else fails loudly, as Radix does.
+function childElementOf(children: React.ReactNode, name: string): React.ReactElement {
+  const nodes = React.Children.toArray(children);
+  if (nodes.length !== 1 || !React.isValidElement(nodes[0])) {
+    throw new Error(`${name} with asChild takes exactly one child element.`);
+  }
+  return nodes[0];
+}
+
+type ModalTitleProps = Omit<
+  React.ComponentProps<typeof DialogTitle>,
+  "children" | "className" | "render" | "style"
+> & {
+  asChild?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const Title = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
+  ({ asChild, className, children, ...props }, ref) => (
+    <DialogTitle
+      ref={ref}
+      className={twMerge(!asChild && "text-label-sm text-text-strong-950", className)}
+      render={asChild ? childElementOf(children, "Modal.Title") : undefined}
+      {...props}
+    />
+  ),
+);
 Title.displayName = "ModalTitle";
 
-const Description = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, asChild, ...props }, ref) => (
-  <DialogPrimitive.Description
-    asChild={asChild}
-    ref={ref}
-    className={twMerge(!asChild && "text-paragraph-xs text-text-sub-600", className)}
-    {...props}
-  />
-));
+type ModalDescriptionProps = Omit<
+  React.ComponentProps<typeof DialogDescription>,
+  "children" | "className" | "render" | "style"
+> & {
+  asChild?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const Description = React.forwardRef<HTMLParagraphElement, ModalDescriptionProps>(
+  ({ asChild, className, children, ...props }, ref) => (
+    <DialogDescription
+      ref={ref}
+      className={twMerge(!asChild && "text-paragraph-xs text-text-sub-600", className)}
+      render={asChild ? childElementOf(children, "Modal.Description") : undefined}
+      {...props}
+    />
+  ),
+);
 Description.displayName = "ModalDescription";
 
-const Overlay = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={twMerge(
-      "fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto overscroll-contain bg-overlay pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-[10px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className,
-    )}
-    {...props}
-  />
-));
-Overlay.displayName = "ModalOverlay";
+type ModalTriggerProps = Omit<
+  React.ComponentProps<typeof DialogTrigger>,
+  "children" | "className" | "render" | "style"
+> & {
+  asChild?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+};
 
-const Content = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-    overlayClassName?: string;
-    showClose?: boolean;
-  }
->(({ className, overlayClassName, children, showClose = true, ...props }, ref) => {
-  const { text } = useLocale("common");
-  return (
-    <DialogPrimitive.Portal>
-      <Overlay className={overlayClassName}>
-        <DialogPrimitive.Content
-          ref={ref}
+const Trigger = React.forwardRef<HTMLButtonElement, ModalTriggerProps>(
+  ({ asChild, className, children, ...props }, ref) => (
+    <DialogTrigger
+      ref={ref}
+      className={className}
+      render={asChild ? childElementOf(children, "Modal.Trigger") : undefined}
+      {...props}
+    />
+  ),
+);
+Trigger.displayName = "ModalTrigger";
+
+type ModalCloseProps = Omit<
+  React.ComponentProps<typeof DialogClose>,
+  "children" | "className" | "render" | "style"
+> & {
+  asChild?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const Close = React.forwardRef<HTMLButtonElement, ModalCloseProps>(
+  ({ asChild, className, children, ...props }, ref) => (
+    <DialogClose
+      ref={ref}
+      className={className}
+      render={asChild ? childElementOf(children, "Modal.Close") : undefined}
+      {...props}
+    />
+  ),
+);
+Close.displayName = "ModalClose";
+
+type ModalContentProps = Omit<
+  PartProps<"div", DialogContentState>,
+  "children" | "className" | "render" | "style"
+> & {
+  children?: React.ReactNode;
+  className?: string;
+  overlayClassName?: string;
+  showClose?: boolean;
+  // Radix-era name for the focus hooks, kept so the call sites read the same. ui-sdk owns Escape
+  // through its layer stack, so there is no escape hook to expose any more.
+  onOpenAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (event: Event) => void;
+};
+
+// Radix's onOpenAutoFocus/onCloseAutoFocus fired with a cancelable event and delegated focus to
+// the caller when it was prevented. The closest ui-sdk equivalent is initialFocus/finalFocus: run
+// the callback, and when it prevented, treat whatever it focused as the focus target. Without a
+// prevented callback, ui-sdk keeps its own auto-focus/trigger-return behavior.
+function focusTargetAfterCallback(
+  handler: (event: Event) => void,
+  type: string,
+): () => HTMLElement | null {
+  return (): HTMLElement | null => {
+    const event = new Event(type, { cancelable: true });
+    handler(event);
+    if (event.defaultPrevented) {
+      return document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    return null;
+  };
+}
+
+function Root({ presentation = "auto", ...props }: React.ComponentProps<typeof Dialog>) {
+  return <Dialog presentation={presentation} {...props} />;
+}
+
+const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
+  (
+    {
+      className,
+      overlayClassName,
+      children,
+      showClose = true,
+      onOpenAutoFocus,
+      onCloseAutoFocus,
+      ...props
+    },
+    ref,
+  ) => {
+    const { text } = useLocale("common");
+    return (
+      <>
+        <DialogBackdrop
           className={twMerge(
-            "relative w-full max-w-[400px] rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            className,
+            "fixed inset-0 z-50 bg-overlay backdrop-blur-[10px] transition-opacity duration-150 ease-[ease] data-starting-style:opacity-0 data-ending-style:opacity-0",
+            overlayClassName,
           )}
+        />
+        <DialogContent
+          ref={ref}
           {...props}
-        >
-          {children}
-          {showClose && (
-            <DialogPrimitive.Close asChild>
-              <CompactButton className="absolute top-4 right-4" aria-label={text("Tutup dialog")}>
-                <RiCloseLine aria-hidden="true" />
-              </CompactButton>
-            </DialogPrimitive.Close>
+          initialFocus={
+            onOpenAutoFocus
+              ? focusTargetAfterCallback(onOpenAutoFocus, "open-auto-focus")
+              : undefined
+          }
+          finalFocus={
+            onCloseAutoFocus
+              ? focusTargetAfterCallback(onCloseAutoFocus, "close-auto-focus")
+              : undefined
+          }
+          className={twMerge(
+            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
+            "data-[presentation=sheet]:relative data-[presentation=sheet]:inset-auto data-[presentation=sheet]:my-0 data-[presentation=sheet]:h-auto data-[presentation=sheet]:max-h-[85dvh] data-[presentation=sheet]:w-full data-[presentation=sheet]:max-w-none data-[presentation=sheet]:rounded-b-none data-[presentation=sheet]:transition-none data-[presentation=sheet]:data-starting-style:scale-100 data-[presentation=sheet]:data-starting-style:opacity-100 data-[presentation=sheet]:data-ending-style:scale-100 data-[presentation=sheet]:data-ending-style:opacity-100 data-[presentation=sheet]:after:pointer-events-none data-[presentation=sheet]:after:absolute data-[presentation=sheet]:after:inset-x-0 data-[presentation=sheet]:after:top-full data-[presentation=sheet]:after:h-24 data-[presentation=sheet]:after:bg-inherit data-[presentation=sheet]:after:content-['']",
+            className,
+            "data-[presentation=sheet]:overflow-visible",
           )}
-        </DialogPrimitive.Content>
-      </Overlay>
-    </DialogPrimitive.Portal>
-  );
-});
+        >
+          {(state) => (
+            <>
+              {state.presentation === "sheet" && (
+                <div aria-hidden="true" className="flex shrink-0 justify-center pt-2.5 pb-1">
+                  <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
+                </div>
+              )}
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
+                {children}
+              </div>
+              {state.presentation === "sheet" && (
+                <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
+              )}
+              {showClose && (
+                <DialogClose
+                  data-drawer-no-drag=""
+                  render={
+                    <CompactButton
+                      className="absolute top-4 right-4 z-10"
+                      aria-label={text("Tutup dialog")}
+                    />
+                  }
+                >
+                  <RiCloseLine aria-hidden="true" />
+                </DialogClose>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </>
+    );
+  },
+);
 Content.displayName = "ModalContent";
 
 export const AlignModal = {
   Root,
-  Trigger: DialogPrimitive.Trigger,
-  Close: DialogPrimitive.Close,
+  Trigger,
+  Close,
   Title,
   Description,
   Content,

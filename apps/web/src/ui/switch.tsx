@@ -11,7 +11,7 @@ const Root = React.forwardRef<
     ref={ref}
     disabled={disabled}
     className={clsx(
-      "group/switch block h-5 w-8 shrink-0 p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2",
+      "group/switch relative block h-5 w-8 shrink-0 rounded-full p-0.5 outline-none focus-visible:outline-[1.5px] focus-visible:outline-offset-1 focus-visible:outline-primary-base/55 pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']",
       className,
     )}
     {...props}
@@ -20,7 +20,7 @@ const Root = React.forwardRef<
       className={clsx(
         "h-4 w-7 rounded-full bg-bg-soft-200 p-0.5 outline-none transition duration-200 ease-out",
         !disabled &&
-          "group-hover/switch:bg-bg-sub-300 group-focus-visible/switch:bg-bg-sub-300 group-active/switch:bg-bg-soft-200 group-data-[state=checked]/switch:bg-primary-base group-hover:data-[state=checked]/switch:bg-primary-darker group-active:data-[state=checked]/switch:bg-primary-base",
+          "group-hover/switch:bg-bg-sub-300 group-focus-visible/switch:bg-bg-sub-300 group-active/switch:bg-bg-soft-200 group-data-[state=checked]/switch:bg-primary-base group-data-[state=checked]/switch:group-hover/switch:bg-primary-darker group-data-[state=checked]/switch:group-active/switch:bg-primary-base",
         disabled && "bg-bg-white-0 p-[3px] ring-1 ring-inset ring-stroke-soft-200",
       )}
     >

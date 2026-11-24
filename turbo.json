@@ -30,5 +30,5 @@
       "dependsOn": ["build"]
     }
   },
-  "globalDependencies": ["bunfig.toml"]
+  "globalDependencies": ["bunfig.toml", ".oxlintrc.json"]
 }

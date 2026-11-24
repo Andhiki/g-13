@@ -1,11 +1,11 @@
 import { useLocale } from "../useLocale";
 import { Typography } from "../ui/typography";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { RiCloseLine, RiStackLine } from "@remixicon/react";
 import { AlignButton } from "../ui/button";
 import { AlignDrawer } from "../ui/drawer";
-import { useKeyboardShortcuts } from "../ui/use-keyboard-shortcuts";
+import { useKeyboardShortcuts } from "../ui/shortcuts";
 
 const compactQuery = "(width < 1100px)";
 
@@ -28,6 +28,40 @@ const defaultPanelCopy: PanelCopy = {
   description: "Pilih versi kurikulum.",
 };
 
+function MapControlDrawerHeader({ copy }: { copy: PanelCopy }) {
+  const { text, language } = useLocale();
+  return (
+    <div className="flex items-start gap-3 px-5 pt-2 pb-4">
+      <div className="min-w-0 flex-1">
+        <AlignDrawer.Title asChild>
+          <Typography as="h2" variant="label" color="strong">
+            {text(copy.title)}
+          </Typography>
+        </AlignDrawer.Title>
+        <AlignDrawer.Description asChild>
+          <Typography as="p" variant="caption" color="muted" className="mt-1">
+            {text(copy.description)}
+          </Typography>
+        </AlignDrawer.Description>
+      </div>
+      <AlignDrawer.Close asChild>
+        <AlignButton.Root
+          data-drawer-no-drag=""
+          variant="neutral"
+          mode="ghost"
+          size="medium"
+          className="size-10 shrink-0 p-2.5"
+          aria-label={text("closePanel", {
+            name: text(copy.title).toLocaleLowerCase(language),
+          })}
+        >
+          <RiCloseLine className="size-5" aria-hidden="true" />
+        </AlignButton.Root>
+      </AlignDrawer.Close>
+    </div>
+  );
+}
+
 function MapControlDrawer({
   children,
   copy,
@@ -39,10 +73,10 @@ function MapControlDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { text, language } = useLocale();
+  const { text } = useLocale();
   const Icon = copy.icon;
   return (
-    <AlignDrawer.Root open={open} onOpenChange={onOpenChange}>
+    <AlignDrawer.Root open={open} onOpenChange={onOpenChange} side="bottom">
       <AlignDrawer.Trigger asChild>
         <AlignButton.Root
           variant="neutral"
@@ -57,34 +91,9 @@ function MapControlDrawer({
           <Icon className="size-5" aria-hidden="true" />
         </AlignButton.Root>
       </AlignDrawer.Trigger>
-      <AlignDrawer.Content side="bottom">
-        <div className="flex items-start gap-3 p-5">
-          <div className="min-w-0 flex-1">
-            <AlignDrawer.Title asChild>
-              <Typography as="h2" variant="label" className="text-text-strong-950">
-                {text(copy.title)}
-              </Typography>
-            </AlignDrawer.Title>
-            <AlignDrawer.Description asChild>
-              <Typography as="p" variant="caption" className="mt-1 text-text-sub-600">
-                {text(copy.description)}
-              </Typography>
-            </AlignDrawer.Description>
-          </div>
-          <AlignDrawer.Close asChild>
-            <AlignButton.Root
-              variant="neutral"
-              mode="ghost"
-              size="medium"
-              className="size-10 shrink-0 p-2.5"
-              aria-label={text("closePanel", {
-                name: text(copy.title).toLocaleLowerCase(language),
-              })}
-            >
-              <RiCloseLine className="size-5" aria-hidden="true" />
-            </AlignButton.Root>
-          </AlignDrawer.Close>
-        </div>
+      <AlignDrawer.Content>
+        <AlignDrawer.Grip />
+        <MapControlDrawerHeader copy={copy} />
         <div className="flex min-h-0 flex-col gap-5 overflow-y-auto overscroll-contain px-5 pb-5">
           {children}
         </div>
@@ -93,12 +102,86 @@ function MapControlDrawer({
   );
 }
 
+function PanelToggleIcons({
+  icon: Icon,
+  open,
+  reducedMotion,
+}: {
+  icon: typeof RiStackLine;
+  open: boolean;
+  reducedMotion: boolean | null;
+}) {
+  const transition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.2, ease: [0.23, 1, 0.32, 1] as const };
+  return (
+    <>
+      {[
+        { ItemIcon: Icon, name: "toggle", active: !open },
+        { ItemIcon: RiCloseLine, name: "close", active: open },
+      ].map(({ ItemIcon, name, active }) => (
+        <m.span
+          key={name}
+          initial={false}
+          animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.9 }}
+          transition={transition}
+          className="absolute flex size-5 items-center justify-center"
+          aria-hidden="true"
+        >
+          <ItemIcon className="size-5" />
+        </m.span>
+      ))}
+    </>
+  );
+}
+
+function MapControlPanelBody({
+  controlsId,
+  open,
+  reducedMotion,
+  width,
+  anchor,
+  title,
+  children,
+}: {
+  controlsId: string;
+  open: boolean;
+  reducedMotion: boolean | null;
+  width: number;
+  anchor: "top" | "bottom";
+  title: string;
+  children: ReactNode;
+}) {
+  const { text } = useLocale();
+  return (
+    <m.div
+      id={controlsId}
+      inert={!open}
+      aria-hidden={!open}
+      initial={false}
+      animate={{ opacity: open ? 1 : 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
+      className={`relative flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
+      style={{ width }}
+    >
+      <Typography
+        as="h2"
+        variant="label"
+        className={`m-0 pr-8 ${anchor === "bottom" ? "order-last" : ""}`}
+      >
+        {text(title)}
+      </Typography>
+      {children}
+    </m.div>
+  );
+}
+
 export function MapControlPanel({
   children,
   label,
   title,
   openLabel,
-  icon: Icon,
+  icon,
   controlsId,
   shortcut,
   width = 300,
@@ -123,20 +206,28 @@ export function MapControlPanel({
   const { text, language } = useLocale();
   const toggle = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
+  // Escape closes the panel while it is open, including from inside its fields;
+  // selects in the panel take Escape first, and modals pause page shortcuts.
+  useKeyboardShortcuts(
+    open
+      ? {
+          escape: {
+            run: () => {
+              onOpenChange(false);
+              toggle.current?.focus();
+            },
+            allowInInput: true,
+          },
+        }
+      : {},
+  );
 
-  useEffect(() => {
-    if (!open) return;
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape" || event.defaultPrevented) return;
-      if (event.target instanceof Element && event.target.closest('[role="listbox"]')) return;
-      event.preventDefault();
-      event.stopPropagation();
-      onOpenChange(false);
-      toggle.current?.focus();
-    }
-    window.addEventListener("keydown", closeOnEscape, true);
-    return () => window.removeEventListener("keydown", closeOnEscape, true);
-  }, [open, onOpenChange]);
+  const toggleLabel =
+    !open && openLabel
+      ? text(openLabel)
+      : text(open ? "closePanel" : "openPanel", {
+          name: text(title).toLocaleLowerCase(language),
+        });
 
   return (
     <section
@@ -170,60 +261,82 @@ export function MapControlPanel({
         mode="ghost"
         size="medium"
         className={`pointer-events-auto absolute right-0 ${anchor === "bottom" ? "bottom-0" : "top-0"} z-10 size-10 p-2.5`}
-        aria-label={
-          !open && openLabel
-            ? text(openLabel)
-            : text(open ? "closePanel" : "openPanel", {
-                name: text(title).toLocaleLowerCase(language),
-              })
-        }
+        aria-label={toggleLabel}
         title={!open && openLabel ? text(openLabel) : undefined}
         aria-expanded={open}
         aria-controls={controlsId}
         aria-keyshortcuts={shortcut}
         onClick={() => onOpenChange(!open)}
       >
-        {[
-          { Icon, name: "toggle", active: !open },
-          { Icon: RiCloseLine, name: "close", active: open },
-        ].map(({ Icon, name, active }) => (
-          <m.span
-            key={name}
-            initial={false}
-            animate={{
-              opacity: active ? 1 : 0,
-              scale: active ? 1 : 0.9,
-            }}
-            transition={
-              reducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }
-            }
-            className="absolute flex size-5 items-center justify-center"
-            aria-hidden="true"
-          >
-            <Icon className="size-5" />
-          </m.span>
-        ))}
+        <PanelToggleIcons icon={icon} open={open} reducedMotion={reducedMotion} />
       </AlignButton.Root>
-      <m.div
-        id={controlsId}
-        inert={!open}
-        aria-hidden={!open}
-        initial={false}
-        animate={{ opacity: open ? 1 : 0 }}
-        transition={{ duration: reducedMotion ? 0 : 0.1, delay: open && !reducedMotion ? 0.1 : 0 }}
-        className={`relative flex flex-col gap-3 p-4 ${open ? "pointer-events-auto" : "pointer-events-none"}`}
-        style={{ width }}
+      <MapControlPanelBody
+        controlsId={controlsId}
+        open={open}
+        reducedMotion={reducedMotion}
+        width={width}
+        anchor={anchor}
+        title={title}
       >
-        <Typography
-          as="h2"
-          variant="label"
-          className={`m-0 pr-8 ${anchor === "bottom" ? "order-last" : ""}`}
-        >
-          {text(title)}
-        </Typography>
         {children}
-      </m.div>
+      </MapControlPanelBody>
     </section>
+  );
+}
+
+function OverlayControlsColumn({
+  search,
+  searchLeading,
+  home,
+  panelCopy,
+  controlsLabel,
+  compact,
+  panelOpen,
+  setPanelOpen,
+  children,
+}: {
+  search: ReactNode;
+  searchLeading?: ReactNode;
+  home?: ReactNode;
+  panelCopy: PanelCopy;
+  controlsLabel: string;
+  compact: boolean;
+  panelOpen: boolean;
+  setPanelOpen: (open: boolean) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
+      <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
+        {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
+        {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
+        <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
+        <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
+          <MapControlDrawer
+            copy={panelCopy}
+            open={compact && panelOpen}
+            onOpenChange={setPanelOpen}
+          >
+            {children}
+          </MapControlDrawer>
+        </div>
+      </div>
+      {!compact && (
+        <MapControlPanel
+          label={controlsLabel}
+          title={panelCopy.title}
+          openLabel={panelCopy.openLabel}
+          icon={panelCopy.icon}
+          controlsId="desktop-map-controls"
+          shortcut="F"
+          className={`${search || searchLeading ? "top-[52px]" : "top-0"} max-[1100px]:hidden`}
+          open={panelOpen}
+          onOpenChange={setPanelOpen}
+        >
+          {children}
+        </MapControlPanel>
+      )}
+    </div>
   );
 }
 
@@ -236,6 +349,7 @@ export function Overlay({
   controlsLabel,
   home,
   panelCopy = defaultPanelCopy,
+  shortcutDescription,
 }: {
   navigation: ReactNode;
   search: ReactNode;
@@ -245,9 +359,12 @@ export function Overlay({
   controlsLabel: string;
   home?: ReactNode;
   panelCopy?: PanelCopy;
+  shortcutDescription?: string;
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
-  useKeyboardShortcuts({ f: () => setPanelOpen((open) => !open) });
+  useKeyboardShortcuts({
+    f: { run: () => setPanelOpen((open) => !open), description: shortcutDescription },
+  });
 
   const compact = useSyncExternalStore(
     subscribeToCompactControls,
@@ -270,37 +387,18 @@ export function Overlay({
         >
           {navigation}
         </div>
-        <div className="relative flex min-w-0 flex-1 basis-0 flex-col items-end gap-3 max-[1100px]:contents">
-          <div className="flex min-h-10 w-[348px] items-center gap-2 max-[1100px]:order-1 max-[1100px]:w-full">
-            {home && <div className="pointer-events-auto shrink-0 min-[1100px]:hidden">{home}</div>}
-            {searchLeading && <div className="pointer-events-auto shrink-0">{searchLeading}</div>}
-            <div className="pointer-events-auto min-w-0 flex-1 min-[1100px]:order-2">{search}</div>
-            <div className="pointer-events-auto size-10 shrink-0 min-[1100px]:hidden">
-              <MapControlDrawer
-                copy={panelCopy}
-                open={compact && panelOpen}
-                onOpenChange={setPanelOpen}
-              >
-                {children}
-              </MapControlDrawer>
-            </div>
-          </div>
-          {!compact && (
-            <MapControlPanel
-              label={controlsLabel}
-              title={panelCopy.title}
-              openLabel={panelCopy.openLabel}
-              icon={panelCopy.icon}
-              controlsId="desktop-map-controls"
-              shortcut="F"
-              className={`${search || searchLeading ? "top-[52px]" : "top-0"} max-[1100px]:hidden`}
-              open={panelOpen}
-              onOpenChange={setPanelOpen}
-            >
-              {children}
-            </MapControlPanel>
-          )}
-        </div>
+        <OverlayControlsColumn
+          search={search}
+          searchLeading={searchLeading}
+          home={home}
+          panelCopy={panelCopy}
+          controlsLabel={controlsLabel}
+          compact={compact}
+          panelOpen={panelOpen}
+          setPanelOpen={setPanelOpen}
+        >
+          {children}
+        </OverlayControlsColumn>
       </div>
       {viewControl && (
         <div className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 max-[1100px]:right-[max(0.75rem,env(safe-area-inset-right))] max-[1100px]:bottom-[max(0.75rem,env(safe-area-inset-bottom))]">

@@ -1,0 +1,95 @@
+{
+  "jsPlugins": [
+    "@shadcn/lint"
+  ],
+  "settings": {
+    "shadcn": {
+      "componentImports": [
+        "^@/ui(/|$)"
+      ],
+      "themeImports": [
+        "^@/ui/"
+      ],
+      "mergeFunctions": [
+        "clsx",
+        "cn",
+        "twMerge"
+      ],
+      "variantFunctions": [
+        "tv",
+        "createTV"
+      ]
+    }
+  },
+  "rules": {
+    "no-dupe-else-if": "error",
+    "max-nested-callbacks": "error",
+    "max-depth": "error",
+    "max-lines-per-function": [
+      "error",
+      {
+        "max": 200
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "apps/web/src/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "shadcn/no-raw-colors": "error",
+        "shadcn/no-unknown-classes": [
+          "error",
+          {
+            "allow": [
+              "nodrag",
+              "nopan"
+            ]
+          }
+        ],
+        "shadcn/require-static-classes": "error",
+        "shadcn/no-restyle": [
+          "error",
+          {
+            "allow": [
+              "layout",
+              "spacing",
+              "typography",
+              "color",
+              "shape",
+              "motion",
+              "appearance"
+            ],
+            "contracts": [
+              {
+                "pattern": "^Typography$",
+                "allow": [
+                  "layout",
+                  "truncate",
+                  "tabular-nums",
+                  "break-words",
+                  "line-clamp"
+                ]
+              },
+              {
+                "pattern": "^(AlignButtonRoot|AlignFancyButtonRoot)$",
+                "allow": [
+                  "layout"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/web/src/ui/**"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off"
+      }
+    }
+  ]
+}

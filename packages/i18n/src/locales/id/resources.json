@@ -1,16 +1,5 @@
 {
-  "CS50’s Introduction to Computer Science": "CS50’s Introduction to Computer Science",
-  "We recommend CS50 as your starting point as a computer science student. You’ll learn data types, data structures, loops, recursion, APIs, and problem solving. You’ll also get that amazing feeling of copying and pasting commands into your terminal.": "Kami merekomendasikan CS50 sebagai titik awalmu sebagai mahasiswa ilmu komputer. Kamu akan belajar tipe data, struktur data, perulangan, rekursi, API, dan pemecahan masalah. Kamu juga akan merasakan serunya menyalin dan menempel perintah ke terminalmu.",
-  "DIKE UGM Skripsi LaTeX template": "Template LaTeX Skripsi DIKE UGM",
-  "We made this ready-to-use proposal and skripsi template for you. It works well with coding agents, even if you’ve never used LaTeX.": "Kami menyiapkan template proposal dan skripsi yang langsung bisa kamu pakai. Template ini cocok dipakai bersama coding agent, meski kamu belum pernah menggunakan LaTeX.",
-  "HIMAKOM UGM exam archive": "Arsip ujian HIMAKOM UGM",
-  "We recommend checking these past exam papers before your next exam. See what questions came up and use them to guide your study.": "Kami sarankan kamu melihat kumpulan soal ujian ini sebelum ujian berikutnya. Cek soal-soal yang pernah keluar dan gunakan sebagai panduan belajar.",
   "Looking for a place to start?": "Bingung harus mulai dari mana?",
-  "Pick a resource that fits what you need and explore it at your own pace.": "Pilih sumber yang sesuai kebutuhanmu dan pelajari dengan ritmemu sendiri.",
   "Helpful resources": "Sumber belajar",
-  "(opens in a new tab)": "(dibuka di tab baru)",
-  "roadmap.sh": "roadmap.sh",
-  "We recommend roadmap.sh if you have no idea where to start on your way to a career in tech. Pick a path, see what you need to learn, and take it one step at a time.": "Kami merekomendasikan roadmap.sh kalau kamu belum tahu harus mulai dari mana untuk meniti karier di bidang teknologi. Pilih jalur, lihat apa yang perlu dipelajari, lalu jalani satu langkah demi satu langkah.",
-  "KKN Automation": "KKN Automation",
-  "We recommend this tool for lazy people (most likely you) who want to automate KKN attendance and forget about it altogether.": "Kami merekomendasikan alat ini buat kamu yang malas (kemungkinan besar kamu) supaya presensi KKN-mu otomatis dan bisa kamu lupakan."
+  "(opens in a new tab)": "(dibuka di tab baru)"
 }

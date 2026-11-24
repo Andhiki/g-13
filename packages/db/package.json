@@ -1,0 +1,62 @@
+{
+  "name": "@g13/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": {
+      "types": "./dist/client.d.mts",
+      "import": "./dist/client.mjs"
+    },
+    "./schema/announcements": {
+      "types": "./dist/schema/announcements.d.mts",
+      "import": "./dist/schema/announcements.mjs"
+    },
+    "./schema/auth": {
+      "types": "./dist/schema/auth.d.mts",
+      "import": "./dist/schema/auth.mjs"
+    },
+    "./schema/courses": {
+      "types": "./dist/schema/courses.d.mts",
+      "import": "./dist/schema/courses.mjs"
+    },
+    "./schema/learning-resources": {
+      "types": "./dist/schema/learning-resources.d.mts",
+      "import": "./dist/schema/learning-resources.mjs"
+    },
+    "./schema/lecturers": {
+      "types": "./dist/schema/lecturers.d.mts",
+      "import": "./dist/schema/lecturers.mjs"
+    },
+    "./schema/lecturer-reviews": {
+      "types": "./dist/schema/lecturer-reviews.d.mts",
+      "import": "./dist/schema/lecturer-reviews.mjs"
+    },
+    "./schema/notifications": {
+      "types": "./dist/schema/notifications.d.mts",
+      "import": "./dist/schema/notifications.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bun --bun tsdown",
+    "db:export": "drizzle-kit export --config drizzle.config.ts",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "typecheck": "bun check --no-script",
+    "lint": "oxlint --deny-warnings src tsdown.config.ts drizzle.config.ts",
+    "lint:fix": "oxlint --fix src tsdown.config.ts drizzle.config.ts",
+    "format": "bun fmt src tsdown.config.ts drizzle.config.ts package.json tsconfig.json",
+    "format:check": "bun fmt --check src tsdown.config.ts drizzle.config.ts package.json tsconfig.json"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261023.1",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "drizzle-kit": "0.31.11",
+    "oxlint": "^1.90.0",
+    "tsdown": "^0.23.4",
+    "typescript": "^7.0.2"
+  }
+}

@@ -18,6 +18,109 @@ import { SemesterIndicator } from "./SemesterIndicator";
 
 import type { CourseDetailsProps } from "./CourseDetails";
 
+function CoursePanelHeader({
+  course,
+  credit,
+  labels,
+}: {
+  course: Course;
+  credit: number | null;
+  labels: string[];
+}) {
+  const { text, courseName } = useLocale();
+  return (
+    <AlignDrawer.Header className="shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
+      <div className="min-w-0 flex-1">
+        <Typography as="p" variant="caption" color="muted" className="m-0">
+          {course.code || text("Mata kuliah pilihan")}
+        </Typography>
+        <div className="mt-2 flex items-center gap-3">
+          {credit !== null && (
+            <span
+              role="img"
+              aria-label={text("{{v0}} SKS", { v0: credit })}
+              className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 text-text-strong-950"
+            >
+              <Typography as="span" variant="label" className="font-display" aria-hidden="true">
+                {credit}
+              </Typography>
+            </span>
+          )}
+          <AlignDrawer.Title asChild>
+            <Typography as="h2" variant="subtitle1" color="strong" className="m-0 min-w-0">
+              {courseName(course)}
+            </Typography>
+          </AlignDrawer.Title>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2" aria-label={text("Kategori mata kuliah")}>
+          {labels.map((label) => (
+            <AlignBadge.Root variant="light" size="medium" shape="tag" key={label}>
+              {text(label)}
+            </AlignBadge.Root>
+          ))}
+        </div>
+      </div>
+    </AlignDrawer.Header>
+  );
+}
+
+function RelatedCourseList({
+  courses,
+  select,
+}: {
+  courses: Course[];
+  select: (id: string) => void;
+}) {
+  const { text, courseName } = useLocale();
+  return (
+    <ul className="-mx-2 divide-y divide-stroke-soft-200">
+      {courses.map((item) => (
+        <li key={item.id}>
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+            onClick={() => select(item.id)}
+            aria-label={text("Buka detail ") + courseName(item)}
+          >
+            <Typography as="span" className="min-w-0">
+              {courseName(item)}
+            </Typography>
+            <RiArrowRightLine className="size-4 shrink-0 text-text-sub-600" aria-hidden="true" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function CourseSyllabusAccordion({ data, course }: { data: Curriculum; course: Course }) {
+  const { text } = useLocale();
+  return (
+    <div className="mt-2">
+      <Accordion.Root
+        key={`${data.id}-${course.id}`}
+        type="single"
+        collapsible
+        defaultValue="syllabus"
+      >
+        <Accordion.Item value="syllabus">
+          <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
+            <Accordion.Trigger>
+              <Typography as="span" variant="subtitle1">
+                {text("Silabus")}
+              </Typography>
+              <Accordion.Arrow aria-hidden="true" />
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>
+            <CourseSyllabus key={`${data.id}-${course.code}`} data={data} code={course.code} />
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>
+    </div>
+  );
+}
+
 export function CourseDetailsPanel({
   course,
   data,
@@ -40,38 +143,7 @@ export function CourseDetailsPanel({
   const credit = creditsFor(course);
   return (
     <>
-      <AlignDrawer.Header className="max-[650px]:touch-none shrink-0 items-start gap-4 p-4 pt-0 pr-20 sm:p-5 sm:pr-24">
-        <div className="min-w-0 flex-1">
-          <Typography as="p" variant="caption" className="m-0 text-text-sub-600">
-            {course.code || text("Mata kuliah pilihan")}
-          </Typography>
-          <div className="mt-2 flex items-center gap-3">
-            {credit !== null && (
-              <span
-                role="img"
-                aria-label={text("{{v0}} SKS", { v0: credit })}
-                className="flex size-[34px] shrink-0 items-center justify-center rounded-full border border-stroke-sub-300 text-text-strong-950"
-              >
-                <Typography as="span" variant="label" className="font-display" aria-hidden="true">
-                  {credit}
-                </Typography>
-              </span>
-            )}
-            <AlignDrawer.Title asChild>
-              <Typography as="h2" variant="subtitle1" className="m-0 min-w-0 text-text-strong-950">
-                {courseName(course)}
-              </Typography>
-            </AlignDrawer.Title>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2" aria-label={text("Kategori mata kuliah")}>
-            {labels.map((label) => (
-              <AlignBadge.Root variant="light" size="medium" key={label}>
-                {text(label)}
-              </AlignBadge.Root>
-            ))}
-          </div>
-        </div>
-      </AlignDrawer.Header>
+      <CoursePanelHeader course={course} credit={credit} labels={labels} />
       <AlignDrawer.Description asChild>
         <Typography as="p" variant="caption" className="sr-only">
           {text("Informasi akademik mata kuliah")} {courseName(course)}.
@@ -81,71 +153,26 @@ export function CourseDetailsPanel({
         <div className="px-4 pb-4 pt-0 sm:px-5 sm:pb-5">
           <div className="mb-6">
             {credit === null && (
-              <Typography as="p" variant="caption" className="mt-2 text-text-sub-600">
+              <Typography as="p" variant="caption" color="muted" className="mt-2">
                 {text("SKS belum dinyatakan")}
               </Typography>
             )}
             <SemesterIndicator label={semesterLabel(course, text)} />
           </div>
-          <div className="mt-2">
-            <Accordion.Root
-              key={`${data.id}-${course.id}`}
-              type="single"
-              collapsible
-              defaultValue="syllabus"
-            >
-              <Accordion.Item value="syllabus">
-                <Accordion.Header className="m-0 text-label-sm text-text-strong-950">
-                  <Accordion.Trigger>
-                    <Typography as="span" variant="subtitle1">
-                      {text("Silabus")}
-                    </Typography>
-                    <Accordion.Arrow aria-hidden="true" />
-                  </Accordion.Trigger>
-                </Accordion.Header>
-                <Accordion.Content>
-                  <CourseSyllabus
-                    key={`${data.id}-${course.code}`}
-                    data={data}
-                    code={course.code}
-                  />
-                </Accordion.Content>
-              </Accordion.Item>
-            </Accordion.Root>
-          </div>
+          <CourseSyllabusAccordion data={data} course={course} />
           {(prereqs.length > 0 || requirements.length > 0) && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
-              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
+              <Typography as="h3" variant="subtitle2" color="strong" className="m-0 py-3">
                 {text("Prasyarat")}
               </Typography>
-              {prereqs.length > 0 && (
-                <ul className="-mx-2 divide-y divide-stroke-soft-200">
-                  {prereqs.map((item) => (
-                    <li key={item.id}>
-                      <button
-                        type="button"
-                        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                        onClick={() => select(item.id)}
-                        aria-label={text("Buka detail ") + courseName(item)}
-                      >
-                        <Typography as="span" className="min-w-0">
-                          {courseName(item)}
-                        </Typography>
-                        <RiArrowRightLine
-                          className="size-4 shrink-0 text-text-sub-600"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {prereqs.length > 0 && <RelatedCourseList courses={prereqs} select={select} />}
               {requirements.map((item) => (
                 <Typography
                   as="p"
                   variant="paragraph"
+                  color="muted"
                   key={item}
-                  className="mb-0 mt-2 text-text-sub-600"
+                  className="mb-0 mt-2"
                 >
                   {text(item)}
                 </Typography>
@@ -154,29 +181,10 @@ export function CourseDetailsPanel({
           )}
           {next.length > 0 && (
             <section className="mt-4 border-t border-stroke-soft-200 pt-2">
-              <Typography as="h3" variant="subtitle2" className="m-0 py-3 text-text-strong-950">
+              <Typography as="h3" variant="subtitle2" color="strong" className="m-0 py-3">
                 {text("Menjadi prasyarat untuk")}
               </Typography>
-              <ul className="-mx-2 divide-y divide-stroke-soft-200">
-                {next.map((item) => (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left text-text-strong-950 transition-colors hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                      onClick={() => select(item.id)}
-                      aria-label={text("Buka detail ") + courseName(item)}
-                    >
-                      <Typography as="span" className="min-w-0">
-                        {courseName(item)}
-                      </Typography>
-                      <RiArrowRightLine
-                        className="size-4 shrink-0 text-text-sub-600"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <RelatedCourseList courses={next} select={select} />
             </section>
           )}
         </div>
@@ -195,7 +203,7 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
       {syllabus ? (
         <>
           {versions.length > 1 && (
-            <Typography as="p" variant="caption" className="mt-3 text-text-sub-600">
+            <Typography as="p" variant="caption" color="muted" className="mt-3">
               {text("Dokumen kurikulum memuat")} {versions.length}{" "}
               {text("versi silabus untuk kode ini. Keduanya ditampilkan sesuai halaman sumber.")}
             </Typography>
@@ -220,17 +228,50 @@ function CourseSyllabus({ data, code }: { data: Curriculum; code: string }) {
   );
 }
 
+function SyllabusReferences({ references }: { references: string[] }) {
+  const { text } = useLocale();
+  if (references.length === 0) return null;
+  return (
+    <>
+      <Typography as="h3" variant="subtitle2" color="strong" className="mt-4">
+        {text("Referensi")}
+      </Typography>
+      <ul className="mt-3 list-disc space-y-1 pl-5">
+        {references.map((reference, index) => (
+          <li key={index} className="pl-1">
+            <a
+              href={`https://www.google.com/search?q=${encodeURIComponent(reference)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
+              aria-label={text("{{v0}} (cari di Google, tab baru)", { v0: reference })}
+            >
+              <Typography as="span" variant="paragraph">
+                {reference}
+              </Typography>{" "}
+              <RiArrowRightUpLine
+                className="inline-block size-3.5 align-text-bottom"
+                aria-hidden="true"
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; sourceTitle: string }) {
   const { text } = useLocale();
   const topics = syllabusPoints(syllabus.syllabus);
   return (
     <>
-      <Typography as="p" variant="caption" className="mb-4 mt-3 text-text-sub-600">
+      <Typography as="p" variant="caption" color="muted" className="mb-4 mt-3">
         {text("sourceText")}
       </Typography>
       {syllabus.description && (
         <>
-          <Typography as="h3" variant="subtitle2" className="mt-3 text-text-strong-950">
+          <Typography as="h3" variant="subtitle2" color="strong" className="mt-3">
             {text("Tujuan pembelajaran")}
           </Typography>
           <Typography as="p" variant="paragraph" className="mt-2" lang="id">
@@ -253,34 +294,7 @@ function SyllabusContent({ syllabus, sourceTitle }: { syllabus: Syllabus; source
           {syllabus.syllabus}
         </Typography>
       )}
-      {syllabus.references.length > 0 && (
-        <>
-          <Typography as="h3" variant="subtitle2" className="mt-4 text-text-strong-950">
-            {text("Referensi")}
-          </Typography>
-          <ul className="mt-3 list-disc space-y-1 pl-5">
-            {syllabus.references.map((reference, index) => (
-              <li key={index} className="pl-1">
-                <a
-                  href={`https://www.google.com/search?q=${encodeURIComponent(reference)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-base underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base"
-                  aria-label={text("{{v0}} (cari di Google, tab baru)", { v0: reference })}
-                >
-                  <Typography as="span" variant="paragraph">
-                    {reference}
-                  </Typography>{" "}
-                  <RiArrowRightUpLine
-                    className="inline-block size-3.5 align-text-bottom"
-                    aria-hidden="true"
-                  />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+      <SyllabusReferences references={syllabus.references} />
       <Typography as="p" variant="caption" className="mt-4 ">
         {text("Sumber:")} {sourceTitle}
         {text(", halaman cetak")} {syllabus.printedPage} {text("(halaman PDF")} {syllabus.pdfPage}

@@ -22,12 +22,12 @@ function StarNudgeToast({
       <p className="m-0 min-w-0 flex-1 text-label-sm">{message}</p>
       <div className="ml-auto flex basis-full items-center justify-end gap-2 sm:basis-auto">
         <AlignButton.Root variant="neutral" mode="ghost" size="xsmall" onClick={onLater}>
-          {laterLabel}
+          <span className="text-label-sm">{laterLabel}</span>
         </AlignButton.Root>
         <AlignButton.Root asChild variant="neutral" mode="filled" size="xsmall">
           <a href={GITHUB_REPOSITORY_URL} target="_blank" rel="noreferrer" onClick={onStar}>
             <RiStarFill className="size-4" aria-hidden="true" />
-            {starLabel}
+            <span className="text-label-sm">{starLabel}</span>
           </a>
         </AlignButton.Root>
       </div>

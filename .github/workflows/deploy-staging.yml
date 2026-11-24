@@ -1,0 +1,41 @@
+# Needs CLOUDFLARE_API_TOKEN with these account policies:
+# - Workers Scripts: Edit (deploy the worker and its bindings)
+# - D1: Edit (apply migrations)
+# Account Settings: Read is optional because CLOUDFLARE_ACCOUNT_ID is set below.
+name: Deploy staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Migrate and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 0f1162f3c5692f21189157353ef26e56
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Build packages and web app
+        run: bun run build:packages && bun run --cwd apps/web build:staging
+      - name: Apply D1 migrations
+        env:
+          # Staging database ID from apps/web/cloudflare.config.ts.
+          D1_DATABASE_ID: 5b5d43e1-399d-4844-b782-5ca632690089
+        run: bun run db:migrate
+      - name: Deploy
+        run: bun run deploy:staging
