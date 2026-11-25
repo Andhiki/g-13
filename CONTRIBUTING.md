@@ -61,20 +61,18 @@ terhadap staging bersama. Mode `local-e2e` menggunakan fixture alumni, Turnstile
 dan kredensial GitHub dummy agar skenario tidak menghubungi layanan eksternal.
 Pemeriksaan data dan logika aplikasi tetap dijalankan dengan `bun run check`.
 
-## Changelog
+## Catatan rilis
 
-Untuk perubahan yang berdampak pada pengguna, tambahkan ringkasan singkat dalam
-bahasa Indonesia ke bagian `Unreleased` di [CHANGELOG.md](CHANGELOG.md).
-Kelompokkan entri di bawah `### YYYY-MM-DD` berdasarkan tanggal perubahan dicatat,
-dengan tanggal terbaru di atas. Untuk tanggal yang sama, tambahkan poin ke bagian
-yang sudah ada; untuk tanggal berbeda, buat bagian baru. Gunakan subbagian
-`#### Added`, `#### Changed`, atau `#### Fixed` sesuai kebutuhan; fokus pada fitur, perilaku,
-dan koreksi kurikulum. Perubahan internal tanpa dampak pengguna tidak perlu entri.
-Untuk koreksi kurikulum atau prasyarat, sertakan tautan sumber resmi atau PR
-yang memuat buktinya. Setelah rilis terkonfirmasi, maintainer memindahkan kumpulan
-entri beserta kelompok tanggalnya ke bagian rilis berformat
-`## <versi> - <tanggal rilis>`, lalu mengosongkan `Unreleased` untuk perubahan
-berikutnya. Jangan menyalin ulang atau menghapus riwayat perubahan lama.
+[GitHub Releases](https://github.com/Andhiki/g-13/releases) menyimpan riwayat rilis publik.
+Untuk perubahan yang berdampak pada pengguna, jelaskan hasilnya secara singkat dalam bahasa
+Indonesia di deskripsi PR. Untuk koreksi kurikulum atau prasyarat, sertakan edisi, kode mata
+kuliah, sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi.
+
+Setelah deploy produksi berhasil, workflow membuat tag SemVer dan menerbitkan catatan awal
+dari daftar perubahan GitHub. Sebagai bagian dari promosi, maintainer memperbarui deskripsi
+rilis di GitHub dengan ringkasan perubahan utama, penyempurnaan, dan perbaikan bug yang
+benar-benar masuk ke tag tersebut. Cantumkan bagian yang relevan dan pertahankan tautan
+perbandingan versi serta atribusi kontributor.
 
 ## Koreksi kurikulum
 
