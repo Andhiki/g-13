@@ -20,7 +20,7 @@ export function rejectRateLimitedReview(resetAt: number): never {
   const retryAfter = Math.max(0, Math.ceil((resetAt - Date.now()) / 1_000));
   setResponseHeader("Retry-After", String(retryAfter));
   setResponseStatus(429);
-  throw new Error(REVIEW_ERRORS.RATE_LIMIT, { cause: resetAt });
+  throw { code: REVIEW_ERRORS.RATE_LIMIT, resetAt };
 }
 
 export function rejectSubmissionOperation(error: OtherReviewError): never {

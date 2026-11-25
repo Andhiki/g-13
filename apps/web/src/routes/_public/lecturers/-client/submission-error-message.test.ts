@@ -8,7 +8,7 @@ const text = (key: string, values?: Record<string, unknown>) =>
 test("a rate-limited submission formats the server reset time in local time", () => {
   const now = new Date(2026, 10, 25, 10, 15).getTime();
   const resetAt = new Date(2026, 10, 25, 14, 0).getTime();
-  const error = new Error(REVIEW_ERRORS.RATE_LIMIT, { cause: resetAt });
+  const error = { code: REVIEW_ERRORS.RATE_LIMIT, resetAt };
   expect(submissionErrorMessage(error, text, now)).toBe(
     "Submission limit reached. Resets at 14:00.",
   );

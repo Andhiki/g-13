@@ -18,11 +18,18 @@ export function submissionErrorMessage(
   text: (key: string, values?: Record<string, unknown>) => string,
   now = Date.now(),
 ) {
+  const rateLimit =
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === REVIEW_ERRORS.RATE_LIMIT;
   const code = error instanceof Error ? error.message : null;
-  if (code === REVIEW_ERRORS.RATE_LIMIT) {
-    const cause = error instanceof Error ? error.cause : undefined;
+  if (rateLimit || code === REVIEW_ERRORS.RATE_LIMIT) {
+    const timestamp = rateLimit && "resetAt" in error ? error.resetAt : undefined;
     const resetAt =
-      typeof cause === "number" && Number.isFinite(cause) ? cause : reviewRateLimitResetAt(now);
+      typeof timestamp === "number" && Number.isFinite(timestamp)
+        ? timestamp
+        : reviewRateLimitResetAt(now);
     return text("Submission limit reached. Resets at {{time}}.", {
       time: formatResetTime(resetAt),
     });
