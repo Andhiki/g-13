@@ -1,4 +1,5 @@
 import type { createDatabase } from "@g13/db/client";
+import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { allowReviewAction } from "./rate-limit";
 import { addReviewLike, getVisibleReviewId, removeReviewLike } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
@@ -15,8 +16,10 @@ export async function setReviewLike(
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   if (!(await getVisibleReviewId(db, input.reviewId)))
     return { data: null, error: REVIEW_ERRORS.INVALID };
-  if (!(await allowReviewAction(db, { ...context, ip }, "like")))
-    return { data: null, error: REVIEW_ERRORS.RATE_LIMIT };
+  const now = context.now ?? Date.now();
+  if (!(await allowReviewAction(db, { ...context, ip, now }, "like"))) {
+    return { data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: reviewRateLimitResetAt(now) };
+  }
   const { reviewId, browserId } = input;
   if (input.liked) await addReviewLike(db, { reviewId, browserId });
   else await removeReviewLike(db, { reviewId, browserId });
