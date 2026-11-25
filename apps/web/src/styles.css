@@ -40,8 +40,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-:is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
-  touch-action: manipulation;
+/* Keep this in the base layer so element-level touch utilities such as `touch-none` can win. */
+@layer base {
+  :is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
+    touch-action: manipulation;
+  }
 }
 
 :is(button, [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
