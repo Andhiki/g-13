@@ -1,0 +1,2 @@
+CREATE INDEX `review_likes_browser_id_idx` ON `review_likes` (`browser_id`);--> statement-breakpoint
+CREATE INDEX `review_submission_limits_expires_at_idx` ON `review_submission_limits` (`expires_at`);
