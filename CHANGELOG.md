@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-25
+
+#### Changed
+
+- Halaman publik selain peta kurikulum dan roadmap tidak lagi mengunduh data kurikulum lengkap saat pertama dibuka. Validasi parameter tautan kini memakai indeks ringkas, sehingga pemuatan awal halaman tersebut sekitar 100 KB lebih kecil.
+
 ### 2026-11-24
 
 #### Added
