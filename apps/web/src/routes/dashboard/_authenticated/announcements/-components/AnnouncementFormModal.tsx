@@ -1,4 +1,6 @@
-import { useRef, useState } from "react";
+import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
+import { useRef, useState, type ReactNode } from "react";
+import { AlignSelect } from "@/ui/select";
 import * as AlignSwitch from "@/ui/switch";
 import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
 import {
@@ -23,6 +25,11 @@ import {
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
 import { AnnouncementPreview } from "./AnnouncementPreview";
 
+const variantLabels = { primary: "Primary", error: "Error", neutral: "Neutral" } satisfies Record<
+  AnnouncementVariant,
+  string
+>;
+
 type FieldErrors = Partial<Record<keyof AnnouncementFieldsInput, string>>;
 type DateTimeErrorParts = Partial<
   Record<"startsAt" | "endsAt" | "countdownAt", "date" | "time" | "both">
@@ -41,8 +48,10 @@ export function AnnouncementFormModal({
   error,
   onClose,
   onSubmit,
+  children,
 }: {
   open: boolean;
+  children?: ReactNode;
   announcement: AdminAnnouncement | null;
   pending: boolean;
   error?: string;
@@ -64,6 +73,7 @@ export function AnnouncementFormModal({
         onClose={onClose}
         onSubmit={onSubmit}
       />
+      {children}
     </AdminFormModal>
   );
 }
@@ -82,6 +92,7 @@ function parseAnnouncementFields(values: {
   startsAtIssue: DateTimeControlIssue | null;
   endsAtIssue: DateTimeControlIssue | null;
   countdownAtIssue: DateTimeControlIssue | null;
+  variant: AnnouncementVariant;
   enabled: boolean;
 }) {
   const errors: FieldErrors = {};
@@ -121,6 +132,7 @@ function parseAnnouncementFields(values: {
     endsAt: timestamps.endsAt,
     countdownAt: timestamps.countdownAt,
     enabled: values.enabled,
+    variant: values.variant,
   });
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
@@ -377,6 +389,7 @@ function AnnouncementFormBody({
       ? timestampToDateTimeParts(announcement.countdownAt.getTime())
       : EMPTY_DATE_TIME_PARTS,
   );
+  const [variant, setVariant] = useState<AnnouncementVariant>(announcement?.variant ?? "primary");
   const [enabled, setEnabled] = useState(announcement?.enabled ?? true);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [errorParts, setErrorParts] = useState<DateTimeErrorParts>({});
@@ -408,6 +421,7 @@ function AnnouncementFormBody({
       endsAtIssue: endsAtRef.current?.getIssue() ?? null,
       countdownAtIssue: countdownAtRef.current?.getIssue() ?? null,
       enabled,
+      variant,
     });
     if (!result.ok) {
       setFieldErrors(result.errors);
@@ -427,6 +441,7 @@ function AnnouncementFormBody({
       error={error}
       beforeFields={
         <AnnouncementPreview
+          variant={variant}
           titleId={titleId}
           titleEn={titleEn}
           bodyId={bodyId}
@@ -443,6 +458,27 @@ function AnnouncementFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
+      <div className="space-y-1.5">
+        <Typography as="label" htmlFor="announcement-variant" variant="labelSmall">
+          Variant
+        </Typography>
+        <AlignSelect.Root
+          value={variant}
+          disabled={pending}
+          onValueChange={(value) => setVariant(announcementFieldsShape.shape.variant.parse(value))}
+        >
+          <AlignSelect.Trigger id="announcement-variant">
+            <AlignSelect.Value />
+          </AlignSelect.Trigger>
+          <AlignSelect.Content>
+            {announcementVariants.map((option) => (
+              <AlignSelect.Item key={option} value={option}>
+                {variantLabels[option]}
+              </AlignSelect.Item>
+            ))}
+          </AlignSelect.Content>
+        </AlignSelect.Root>
+      </div>
       <AnnouncementTextFields
         titleId={titleId}
         titleEn={titleEn}

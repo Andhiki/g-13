@@ -1,3 +1,4 @@
+import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import type { Language } from "@g13/i18n";
 import { RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { clsx } from "clsx";
@@ -38,7 +39,14 @@ export function resolveAnnouncementCopy(
   };
 }
 
+const announcementSurfaces = {
+  primary: "bg-primary-base",
+  error: "bg-red-800",
+  neutral: "bg-neutral-700",
+} satisfies Record<AnnouncementVariant, string>;
+
 export function AnnouncementBannerRow({
+  variant,
   title,
   body,
   titlePlaceholder,
@@ -56,6 +64,7 @@ export function AnnouncementBannerRow({
 }: {
   title: string;
   body: string;
+  variant: AnnouncementVariant;
   titlePlaceholder?: string;
   bodyPlaceholder?: string;
   ctaLabel: string | null;
@@ -77,7 +86,8 @@ export function AnnouncementBannerRow({
   return (
     <div
       className={clsx(
-        "flex min-h-11 items-center gap-3 py-1.5 pl-4 pr-2 md:pl-6 md:pr-3",
+        "flex min-h-11 items-center gap-3 py-1.5 pl-4 pr-2 md:pl-6 md:pr-3 text-static-white",
+        announcementSurfaces[variant],
         className,
       )}
     >

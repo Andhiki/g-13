@@ -1,3 +1,4 @@
+import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
@@ -74,7 +75,6 @@ export function AnnouncementBanner() {
     <m.section
       ref={barListRef}
       aria-label={visible ? text("Pengumuman") : undefined}
-      className="bg-primary-base text-static-white"
       initial={
         startedWithoutCache && visible && !reducedMotion ? { height: 0, overflow: "hidden" } : false
       }
@@ -88,6 +88,7 @@ export function AnnouncementBanner() {
             return (
               <AnnouncementRow
                 key={row.id}
+                variant={row.variant}
                 title={copy.title}
                 body={copy.body}
                 ctaLabel={copy.ctaLabel}
@@ -108,6 +109,7 @@ export function AnnouncementBanner() {
 }
 
 function AnnouncementRow({
+  variant,
   title,
   body,
   ctaLabel,
@@ -119,6 +121,7 @@ function AnnouncementRow({
   countdownText,
   onDismiss,
 }: {
+  variant: AnnouncementVariant;
   title: string;
   body: string;
   ctaLabel: string | null;
@@ -150,9 +153,11 @@ function AnnouncementRow({
         opacity: 0,
         transition: { duration: reducedMotion ? 0 : 0.18, ease: [0.32, 0.72, 0, 1] },
       }}
-      className="touch-pan-x overflow-hidden border-t border-static-white/20 first:border-t-0"
+      className="group touch-pan-x overflow-hidden"
     >
       <AnnouncementBannerRow
+        className="border-t border-static-white/20 group-first:border-t-0"
+        variant={variant}
         title={title}
         body={body}
         ctaLabel={ctaLabel}
