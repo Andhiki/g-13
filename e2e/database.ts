@@ -129,18 +129,42 @@ export async function seedSession(role: Role, expired = false) {
   return [{ name: "better-auth.session_token", ...attributes }];
 }
 
-export async function exhaustReviewLimit(action: "submission" | "like") {
+export async function exhaustReviewLimit(action: "submission" | "like", browserId?: string) {
   const secret = required("E2E_REVIEW_RATE_LIMIT_SECRET");
+  if (action === "submission" && !browserId) {
+    throw new Error("Missing browser id for submission limit exhaustion");
+  }
   const window = Math.floor(Date.now() / 3_600_000);
+  const windows = [window, window + 1];
+  const buckets =
+    action === "submission"
+      ? [
+          {
+            identity: (hour: number) => `submission:browser:${hour}:${browserId}`,
+            limit: 3,
+          },
+          {
+            identity: (hour: number) => `submission:ip:${hour}:192.0.2.60`,
+            limit: 20,
+          },
+        ]
+      : [
+          {
+            identity: (hour: number) => `like:${hour}:192.0.2.60`,
+            limit: 60,
+          },
+        ];
   await localD1({
-    batch: [window, window + 1].map((hour) => ({
-      sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)
-            ON CONFLICT("key") DO UPDATE SET "count" = excluded."count", "expires_at" = excluded."expires_at"`,
-      params: [
-        createHmac("sha256", secret).update(`${action}:${hour}:192.0.2.60`).digest("hex"),
-        action === "submission" ? 3 : 60,
-        (hour + 1) * 3_600_000,
-      ],
-    })),
+    batch: buckets.flatMap(({ identity, limit }) =>
+      windows.map((hour) => ({
+        sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)
+              ON CONFLICT("key") DO UPDATE SET "count" = excluded."count", "expires_at" = excluded."expires_at"`,
+        params: [
+          createHmac("sha256", secret).update(identity(hour)).digest("hex"),
+          limit,
+          (hour + 1) * 3_600_000,
+        ],
+      })),
+    ),
   });
 }

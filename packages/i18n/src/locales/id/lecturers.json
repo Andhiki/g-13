@@ -38,7 +38,7 @@
   "Submit review": "Kirim ulasan",
   "Your review is published.": "Ulasanmu telah terbit.",
   "Your review is awaiting moderation.": "Ulasanmu sedang menunggu moderasi.",
-  "Submission limit reached. Try again next hour.": "Batas pengiriman tercapai. Coba lagi pada jam berikutnya.",
+  "Submission limit reached. Resets at {{time}}.": "Batas pengiriman tercapai. Coba lagi setelah pukul {{time}}.",
   "Check all fields and select a lecturer and course.": "Periksa semua kolom dan pilih dosen serta mata kuliah.",
   "Reviews are temporarily unavailable. Please try again later.": "Ulasan sementara tidak tersedia. Silakan coba lagi nanti.",
   "Could not confirm submission. Refresh the page before trying again.": "Pengiriman belum dapat dipastikan. Muat ulang halaman sebelum mencoba lagi.",

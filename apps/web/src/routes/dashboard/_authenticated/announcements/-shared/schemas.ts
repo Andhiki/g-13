@@ -1,3 +1,4 @@
+import { announcementVariants } from "@g13/db/schema/announcements";
 import { z } from "zod";
 
 export const announcementStatusSchema = z.enum(["live", "scheduled", "expired", "disabled"]);
@@ -41,10 +42,12 @@ export function hasValidScheduleWindow(input: {
 }
 
 export const announcementFieldsShape = z.object({
+  variant: z.enum(announcementVariants).default("primary"),
   titleId: localizedText("Indonesian title", 120),
   titleEn: localizedText("English title", 120),
   bodyId: localizedText("Indonesian message", 280),
   bodyEn: localizedText("English message", 280),
+  ctaOpenInNewTab: z.boolean().default(false),
   ctaHref: z
     .string()
     .trim()
@@ -68,10 +71,12 @@ export const announcementFieldsSchema = announcementFieldsShape.refine(hasValidS
   path: ["endsAt"],
 });
 
-export const createAnnouncementSchema = announcementFieldsShape;
+const confirmedConflictIds = z.array(requiredId()).optional();
+
+export const createAnnouncementSchema = announcementFieldsShape.extend({ confirmedConflictIds });
 export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
 
-export const updateAnnouncementSchema = announcementFieldsShape.safeExtend({
+export const updateAnnouncementSchema = createAnnouncementSchema.extend({
   announcementId: requiredId(),
 });
 export type UpdateAnnouncementInput = z.infer<typeof updateAnnouncementSchema>;
@@ -79,5 +84,6 @@ export type UpdateAnnouncementInput = z.infer<typeof updateAnnouncementSchema>;
 export const announcementLifecycleSchema = z.object({
   announcementId: requiredId(),
   action: z.enum(["enable", "disable", "delete"]),
+  confirmedConflictIds,
 });
 export type AnnouncementLifecycleInput = z.infer<typeof announcementLifecycleSchema>;

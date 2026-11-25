@@ -38,7 +38,7 @@
   "Submit review": "Submit review",
   "Your review is published.": "Your review is published.",
   "Your review is awaiting moderation.": "Your review is awaiting moderation.",
-  "Submission limit reached. Try again next hour.": "Submission limit reached. Try again next hour.",
+  "Submission limit reached. Resets at {{time}}.": "Submission limit reached. Resets at {{time}}.",
   "Check all fields and select a lecturer and course.": "Check all fields and select a lecturer and course.",
   "Reviews are temporarily unavailable. Please try again later.": "Reviews are temporarily unavailable. Please try again later.",
   "Could not confirm submission. Refresh the page before trying again.": "Could not confirm submission. Refresh the page before trying again.",

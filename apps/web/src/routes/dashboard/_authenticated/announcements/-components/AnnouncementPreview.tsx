@@ -1,3 +1,4 @@
+import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useId, useState } from "react";
 import type { Language } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
@@ -12,25 +13,36 @@ import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-val
 import { Typography } from "@/ui/typography";
 import { toast } from "@/ui/toast";
 import { useTranslation } from "react-i18next";
+import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
 
 export function AnnouncementPreview({
+  variant,
   titleId,
   titleEn,
   bodyId,
   bodyEn,
   ctaHref,
+  ctaOpenInNewTab,
   ctaLabelId,
   ctaLabelEn,
   countdownAt,
+  startsAt,
+  endsAt,
+  enabled,
 }: {
+  variant: AnnouncementVariant;
   titleId: string;
   titleEn: string;
   bodyId: string;
   bodyEn: string;
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
   countdownAt: DateTimeParts;
+  startsAt: DateTimeParts;
+  endsAt: DateTimeParts;
+  enabled: boolean;
 }) {
   const { i18n } = useTranslation("common");
   const [previewLanguage, setPreviewLanguage] = useState<Language>(
@@ -51,7 +63,18 @@ export function AnnouncementPreview({
   }
 
   const countdownAtMs = dateTimePartsToTimestamp(countdownAt);
-  const countdownNow = useAnnouncementClock(countdownAtMs);
+  const startsAtMs = dateTimePartsToTimestamp(startsAt);
+  const endsAtMs = dateTimePartsToTimestamp(endsAt);
+  const latestTarget = Math.max(countdownAtMs ?? 0, startsAtMs ?? 0, endsAtMs ?? 0);
+  const now = Math.max(useAnnouncementClock(latestTarget) ?? 0, Date.now());
+  const scheduleStatus = resolveAnnouncementStatus(
+    {
+      enabled,
+      startsAt: new Date(startsAtMs ?? now),
+      endsAt: endsAtMs === null ? null : new Date(endsAtMs),
+    },
+    now,
+  );
   const defaultCtaLabel = previewLanguage === "en" ? "Learn more" : "Selengkapnya";
   const closeLabel = previewLanguage === "en" ? "Dismiss announcement" : "Tutup pengumuman";
   const titlePlaceholder = previewLanguage === "en" ? "Midterm schedule" : "Jadwal UTS";
@@ -67,6 +90,7 @@ export function AnnouncementPreview({
       bodyId,
       bodyEn,
       ctaHref,
+      ctaOpenInNewTab,
       ctaLabelId,
       ctaLabelEn,
     },
@@ -80,9 +104,16 @@ export function AnnouncementPreview({
       className="border-b border-stroke-soft-200 bg-bg-weak-50/50 pt-3.5"
     >
       <div className="mb-2.5 flex items-center justify-between gap-3 px-5">
-        <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
-          Banner preview
-        </Typography>
+        <div>
+          <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
+            Banner preview
+          </Typography>
+          <Typography as="p" variant="caption" color="muted">
+            {scheduleStatus === "live"
+              ? "Live on the site now"
+              : announcementStatusLabel(scheduleStatus)}
+          </Typography>
+        </div>
         <SegmentedControl
           aria-label="Preview language"
           value={previewLanguage}
@@ -106,23 +137,22 @@ export function AnnouncementPreview({
           </SegmentedControlItem>
         </SegmentedControl>
       </div>
-      <div className="bg-primary-base text-static-white">
-        <AnnouncementBannerRow
-          title={copy.title}
-          body={copy.body}
-          titlePlaceholder={titlePlaceholder}
-          bodyPlaceholder={bodyPlaceholder}
-          ctaLabel={copy.ctaLabel}
-          ctaHref={copy.ctaHref}
-          external={copy.external}
-          closeLabel={closeLabel}
-          interactiveCta={false}
-          countdownAt={countdownAtMs}
-          countdownNow={countdownNow}
-          countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
-          onDismiss={() => {}}
-        />
-      </div>
+      <AnnouncementBannerRow
+        variant={variant}
+        title={copy.title}
+        body={copy.body}
+        titlePlaceholder={titlePlaceholder}
+        bodyPlaceholder={bodyPlaceholder}
+        ctaLabel={copy.ctaLabel}
+        ctaHref={copy.ctaHref}
+        ctaOpenInNewTab={copy.ctaOpenInNewTab}
+        closeLabel={closeLabel}
+        interactiveCta={false}
+        countdownAt={countdownAtMs}
+        countdownNow={now}
+        countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
+        onDismiss={() => {}}
+      />
     </section>
   );
 }

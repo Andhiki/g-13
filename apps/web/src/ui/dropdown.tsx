@@ -1,50 +1,92 @@
-// Adapted from AlignUI Dropdown v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu";
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import {
+  Menu,
+  MenuContent as MenuContentPrimitive,
+  MenuItem as MenuItemPrimitive,
+  MenuItemIcon as MenuItemIconPrimitive,
+  MenuItemIndicator,
+  MenuRadioGroup,
+  MenuRadioItem as MenuRadioItemPrimitive,
+  MenuSeparator as MenuSeparatorPrimitive,
+  MenuTrigger as MenuTriggerPrimitive,
+} from "@ui-sdk/react/menu";
 import { RiCheckLine } from "@remixicon/react";
 import { twMerge } from "tailwind-merge";
-import type { ComponentProps } from "react";
+import { Children, isValidElement, type ComponentProps, type ReactNode } from "react";
 
-const Root = DropdownPrimitive.Root;
-const Trigger = DropdownPrimitive.Trigger;
-const RadioGroup = DropdownPrimitive.RadioGroup;
+const Root = Menu;
+
+type AsChildProps = { asChild?: boolean; children?: ReactNode };
+
+function childElementOf(children: ReactNode, name: string) {
+  const nodes = Children.toArray(children);
+  if (nodes.length !== 1 || !isValidElement(nodes[0])) {
+    throw new Error(`${name} with asChild takes exactly one child element.`);
+  }
+  return nodes[0];
+}
+
+function Trigger({
+  asChild,
+  children,
+  ...props
+}: ComponentProps<typeof MenuTriggerPrimitive> & AsChildProps) {
+  return (
+    <MenuTriggerPrimitive
+      render={asChild ? childElementOf(children, "Dropdown.Trigger") : undefined}
+      {...props}
+    >
+      {asChild ? undefined : children}
+    </MenuTriggerPrimitive>
+  );
+}
+
+const RadioGroup = MenuRadioGroup;
 
 function Content({
   className,
   sideOffset = 8,
   ...props
-}: ComponentProps<typeof DropdownPrimitive.Content>) {
+}: ComponentProps<typeof MenuContentPrimitive>) {
   return (
-    <DropdownPrimitive.Portal>
-      <DropdownPrimitive.Content
-        className={twMerge(
-          "z-50 w-max overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 flex flex-col gap-1 data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
-        )}
-        sideOffset={sideOffset}
-        {...props}
-      />
-    </DropdownPrimitive.Portal>
+    <MenuContentPrimitive
+      className={twMerge(
+        "z-50 flex w-max flex-col gap-1 overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom data-starting-style:animate-in data-starting-style:fade-in-0 data-ending-style:animate-out data-ending-style:fade-out-0 data-ending-style:zoom-out-95 data-starting-style:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        typeof className === "string" ? className : undefined,
+      )}
+      sideOffset={sideOffset}
+      {...props}
+    />
   );
 }
 
-function Item({ className, children, ...props }: ComponentProps<typeof DropdownPrimitive.Item>) {
+function Item({
+  asChild,
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof MenuItemPrimitive> & AsChildProps) {
   return (
-    <DropdownPrimitive.Item
+    <MenuItemPrimitive
       className={twMerge(
-        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-xs font-medium text-text-strong-950 outline-none transition duration-200 ease-out data-[highlighted]:bg-bg-weak-50 data-[disabled]:text-text-disabled-300",
-        className,
+        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-xs font-medium text-text-strong-950 outline-none transition duration-200 ease-out data-highlighted:bg-bg-weak-50 data-disabled:text-text-disabled-300",
+        typeof className === "string" ? className : undefined,
       )}
+      render={asChild ? childElementOf(children, "Dropdown.Item") : undefined}
       {...props}
     >
-      {children}
-    </DropdownPrimitive.Item>
+      {asChild ? undefined : (children as ReactNode)}
+    </MenuItemPrimitive>
   );
 }
 
-function Separator({ className, ...props }: ComponentProps<typeof DropdownPrimitive.Separator>) {
+function Separator({ className, ...props }: ComponentProps<typeof MenuSeparatorPrimitive>) {
   return (
-    <DropdownPrimitive.Separator
-      className={twMerge("my-1 h-px bg-stroke-soft-200", className)}
+    <MenuSeparatorPrimitive
+      className={twMerge(
+        "my-1 h-px bg-stroke-soft-200",
+        typeof className === "string" ? className : undefined,
+      )}
       {...props}
     />
   );
@@ -54,30 +96,30 @@ function RadioItem({
   className,
   children,
   ...props
-}: ComponentProps<typeof DropdownPrimitive.RadioItem>) {
+}: ComponentProps<typeof MenuRadioItemPrimitive>) {
   return (
-    <DropdownPrimitive.RadioItem
+    <MenuRadioItemPrimitive
       className={twMerge(
-        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out data-[highlighted]:bg-bg-weak-50 data-[disabled]:text-text-disabled-300",
-        className,
+        "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out data-highlighted:bg-bg-weak-50 data-disabled:text-text-disabled-300",
+        typeof className === "string" ? className : undefined,
       )}
       {...props}
     >
-      {children}
+      {children as ReactNode}
       <span className="ml-auto flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-        <DropdownPrimitive.ItemIndicator asChild>
+        <MenuItemIndicator render={<span />}>
           <RiCheckLine className="size-5 text-text-sub-600" />
-        </DropdownPrimitive.ItemIndicator>
+        </MenuItemIndicator>
       </span>
-    </DropdownPrimitive.RadioItem>
+    </MenuRadioItemPrimitive>
   );
 }
 
 function ItemIcon({ children, ...props }: ComponentProps<"div">) {
   return (
-    <div className="size-5 text-text-sub-600" {...props}>
+    <MenuItemIconPrimitive render={<div />} className="size-5 text-text-sub-600" {...props}>
       {children}
-    </div>
+    </MenuItemIconPrimitive>
   );
 }
 

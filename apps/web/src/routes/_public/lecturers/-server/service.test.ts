@@ -38,7 +38,7 @@ it("rejects review bodies shorter than the minimum after trimming", () => {
   ).toBe(false);
 });
 
-it("publishes reviews, excludes hidden/deleted entries from public metrics, and atomically limits IPs", async () => {
+it("publishes reviews, excludes hidden/deleted entries from public metrics, and atomically limits submissions without a browser per IP", async () => {
   const platform = await createTestPlatformProxy();
   try {
     const db = createDatabase(platform.env.DB);
@@ -219,6 +219,77 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
   }
 }, 30_000);
 
+it("limits submissions per browser and keeps an IP ceiling", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db.insert(courses).values({
+      id: "c",
+      code: "CS101",
+      nameId: "Dasar Komputer",
+      nameEn: "Computer Basics",
+    });
+    const input = submissionInputSchema.parse(rawInput);
+    const secret = "test-secret-".repeat(4);
+    const now = 7_200_000;
+    const ip = "198.51.100.23";
+    const browserA = crypto.randomUUID();
+    const browserB = crypto.randomUUID();
+
+    // Two browsers behind the same shared IP each get their own hourly quota.
+    for (const browserId of [browserA, browserB]) {
+      for (let i = 0; i < 3; i++) {
+        expect(await submitReview(db, input, { ip, browserId, secret, now })).toMatchObject({
+          error: null,
+        });
+      }
+      expect(await submitReview(db, input, { ip, browserId, secret, now })).toEqual({
+        data: null,
+        error: REVIEW_ERRORS.RATE_LIMIT,
+      });
+    }
+
+    // The quota follows the browser, not the network.
+    expect(
+      await submitReview(db, input, { ip: "198.51.100.24", browserId: browserA, secret, now }),
+    ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT });
+
+    // The IP backstop allows 14 more of the 21 rotated-browser attempts (6 used above).
+    let allowed = 0;
+    let rejected = 0;
+    for (let browser = 0; browser < 7; browser++) {
+      const browserId = crypto.randomUUID();
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const result = await submitReview(db, input, { ip, browserId, secret, now });
+        if (result.error === null) allowed++;
+        else if (result.error === REVIEW_ERRORS.RATE_LIMIT) rejected++;
+      }
+    }
+    expect(allowed).toBe(14);
+    expect(rejected).toBe(7);
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("uses the rate-limit cleanup and browser like lookup indexes", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    const cleanup = await db.$client
+      .prepare("EXPLAIN QUERY PLAN DELETE FROM review_submission_limits WHERE expires_at <= 0")
+      .all();
+    const browserLikes = await db.$client
+      .prepare("EXPLAIN QUERY PLAN SELECT review_id FROM review_likes WHERE browser_id = 'browser'")
+      .all();
+    expect(JSON.stringify(cleanup)).toContain("review_submission_limits_expires_at_idx");
+    expect(JSON.stringify(browserLikes)).toContain("review_likes_browser_id_idx");
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
 it("pages the review course picker by keyset, orders by the active language, and searches code and names", async () => {
   const platform = await createTestPlatformProxy();
   try {
@@ -392,6 +463,12 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     expect(await setReviewLike(db, input, context)).toEqual({
       data: null,
       error: REVIEW_ERRORS.RATE_LIMIT,
+    });
+
+    // Likes use a separate bucket; exhausting them must not consume submissions.
+    expect(await submitReview(db, submissionInputSchema.parse(rawInput), context)).toMatchObject({
+      data: { reviewId: expect.any(String) },
+      error: null,
     });
   } finally {
     await platform.dispose();

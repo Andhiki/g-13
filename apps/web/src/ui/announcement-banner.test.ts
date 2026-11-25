@@ -7,6 +7,7 @@ const baseAnnouncement: AnnouncementCopySource = {
   bodyId: "Jadwal UTS sudah terbit, cek arsip ujian.",
   bodyEn: "Midterm schedule is out, check the exam archive.",
   ctaHref: "/exam",
+  ctaOpenInNewTab: false,
   ctaLabelId: "Buka arsip",
   ctaLabelEn: "Open archive",
 };
@@ -18,7 +19,7 @@ describe("resolveAnnouncementCopy", () => {
       body: "Jadwal UTS sudah terbit, cek arsip ujian.",
       ctaHref: "/exam",
       ctaLabel: "Buka arsip",
-      external: false,
+      ctaOpenInNewTab: false,
     });
 
     expect(resolveAnnouncementCopy(baseAnnouncement, "en", "Learn more")).toEqual({
@@ -26,7 +27,7 @@ describe("resolveAnnouncementCopy", () => {
       body: "Midterm schedule is out, check the exam archive.",
       ctaHref: "/exam",
       ctaLabel: "Open archive",
-      external: false,
+      ctaOpenInNewTab: false,
     });
   });
 
@@ -38,7 +39,7 @@ describe("resolveAnnouncementCopy", () => {
       body: "Jadwal UTS sudah terbit, cek arsip ujian.",
       ctaHref: null,
       ctaLabel: null,
-      external: false,
+      ctaOpenInNewTab: false,
     });
 
     expect(
@@ -48,7 +49,7 @@ describe("resolveAnnouncementCopy", () => {
       body: "Midterm schedule is out, check the exam archive.",
       ctaHref: null,
       ctaLabel: null,
-      external: false,
+      ctaOpenInNewTab: false,
     });
   });
 
@@ -64,7 +65,7 @@ describe("resolveAnnouncementCopy", () => {
       body: "Jadwal UTS sudah terbit, cek arsip ujian.",
       ctaHref: "/exam",
       ctaLabel: "Selengkapnya",
-      external: false,
+      ctaOpenInNewTab: false,
     });
 
     expect(
@@ -78,22 +79,23 @@ describe("resolveAnnouncementCopy", () => {
       body: "Midterm schedule is out, check the exam archive.",
       ctaHref: "/exam",
       ctaLabel: "Learn more",
-      external: false,
+      ctaOpenInNewTab: false,
     });
   });
 
-  test("marks non-slash links as external", () => {
-    expect(
-      resolveAnnouncementCopy(
-        { ...baseAnnouncement, ctaHref: "https://ugm.ac.id/uts" },
-        "en",
-        "Learn more",
-      ).external,
-    ).toBe(true);
-
-    expect(
-      resolveAnnouncementCopy({ ...baseAnnouncement, ctaHref: "/exam" }, "en", "Learn more")
-        .external,
-    ).toBe(false);
+  test("opens internal or external links in a new tab only when requested", () => {
+    for (const ctaHref of ["/exam", "https://ugm.ac.id/uts"]) {
+      expect(
+        resolveAnnouncementCopy({ ...baseAnnouncement, ctaHref }, "en", "Learn more")
+          .ctaOpenInNewTab,
+      ).toBe(false);
+      expect(
+        resolveAnnouncementCopy(
+          { ...baseAnnouncement, ctaHref, ctaOpenInNewTab: true },
+          "en",
+          "Learn more",
+        ).ctaOpenInNewTab,
+      ).toBe(true);
+    }
   });
 });

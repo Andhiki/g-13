@@ -126,7 +126,7 @@ export function AdminFormField({
   maxLength: number;
   placeholder: string;
   error?: string;
-  type?: "text" | "datetime-local" | "number";
+  type?: "text" | "number";
   multiline?: boolean;
   rows?: number;
   inputMode?: "text" | "url" | "numeric";

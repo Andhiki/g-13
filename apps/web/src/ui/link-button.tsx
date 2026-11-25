@@ -1,6 +1,7 @@
-// Adapted from AlignUI LinkButton v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import type { ComponentProps } from "react";
-import { Slot } from "@radix-ui/react-slot";
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import type { ComponentProps, MouseEvent } from "react";
+import { Children, isValidElement } from "react";
+import { Button } from "@ui-sdk/react/button";
 import { tv, type VariantProps } from "tailwind-variants";
 
 const linkButtonVariants = tv(
@@ -44,11 +45,28 @@ function Root({
   size,
   underline,
   className,
+  children,
+  onClick,
+  type,
   ...props
 }: ComponentProps<"button"> & VariantProps<typeof linkButtonVariants> & { asChild?: boolean }) {
-  const Component = asChild ? Slot : "button";
+  const classes = linkButtonVariants({ variant, size, underline, className });
+  const handleClick = onClick
+    ? (event: MouseEvent<HTMLElement>) => onClick(event as MouseEvent<HTMLButtonElement>)
+    : undefined;
+  if (asChild) {
+    const child = Children.toArray(children);
+    if (child.length !== 1 || !isValidElement(child[0])) {
+      throw new Error("LinkButton.Root with asChild takes exactly one child element.");
+    }
+    return (
+      <Button render={child[0]} className={classes} type={type} onClick={handleClick} {...props} />
+    );
+  }
   return (
-    <Component className={linkButtonVariants({ variant, size, underline, className })} {...props} />
+    <Button className={classes} type={type ?? "button"} onClick={handleClick} {...props}>
+      {children}
+    </Button>
   );
 }
 

@@ -93,7 +93,7 @@ export function RatingGuidePopover() {
         sideOffset={8}
         showArrow={false}
         aria-labelledby="rating-guide-title"
-        className="w-[min(24rem,calc(100vw-2.5rem))] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto rounded-10 p-4 text-left focus:outline-none"
+        className="w-[min(24rem,calc(100vw-2.5rem))] max-h-[var(--available-height)] overflow-y-auto rounded-10 p-4 text-left focus:outline-none"
       >
         <RatingGuideBody />
       </AlignPopover.Content>

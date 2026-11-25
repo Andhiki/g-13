@@ -57,19 +57,31 @@ const metrics = [
   },
 ] satisfies { name: keyof typeof initialRatings; label: string; hint: string }[];
 const SUBMISSION_ERROR_MESSAGES: Record<string, string> = {
-  [REVIEW_ERRORS.RATE_LIMIT]: "Submission limit reached. Try again next hour.",
   [REVIEW_ERRORS.CAPTCHA]: "Security verification failed. Please try again.",
   [REVIEW_ERRORS.INVALID]:
     "The lecturer or course may no longer be available. Refresh the page and try again.",
   [REVIEW_ERRORS.UNAVAILABLE]: "Reviews are temporarily unavailable. Please try again later.",
 };
 
-function submissionErrorMessage(error: unknown) {
+function nextRateLimitReset(now = new Date()): string {
+  const reset = new Date((Math.floor(now.getTime() / 3_600_000) + 1) * 3_600_000);
+  return `${String(reset.getHours()).padStart(2, "0")}:${String(reset.getMinutes()).padStart(2, "0")}`;
+}
+
+function submissionErrorMessage(
+  error: unknown,
+  text: (key: string, values?: Record<string, unknown>) => string,
+) {
   const code = error instanceof Error ? error.message : null;
-  return (
-    (code && SUBMISSION_ERROR_MESSAGES[code]) ||
-    "Could not confirm submission. Refresh the page before trying again."
-  );
+  if (code === REVIEW_ERRORS.RATE_LIMIT) {
+    return text("Submission limit reached. Resets at {{time}}.", {
+      time: nextRateLimitReset(),
+    });
+  }
+  const key = code ? SUBMISSION_ERROR_MESSAGES[code] : undefined;
+  return key
+    ? text(key)
+    : text("Could not confirm submission. Refresh the page before trying again.");
 }
 
 function FieldError({ name, error }: { name: keyof SubmissionErrors; error?: string }) {
@@ -294,7 +306,7 @@ function ReviewFormFooter({
       {message && (
         <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
           <Typography as="p" variant="paragraph" className="m-0">
-            {text(message)}
+            {message}
           </Typography>
         </div>
       )}
@@ -431,6 +443,7 @@ export function ReviewSubmissionForm({
   lecturerId,
   lecturerName,
   initialCourseId,
+  browserId,
   onClose,
   onSubmitted,
 }: {
@@ -438,6 +451,7 @@ export function ReviewSubmissionForm({
   lecturerId: string;
   lecturerName: string;
   initialCourseId: string;
+  browserId: string | null;
   onClose: () => void;
   onSubmitted: (status: "pending" | "published") => Promise<void>;
 }) {
@@ -487,13 +501,13 @@ export function ReviewSubmissionForm({
     try {
       const turnstileToken = siteKey ? await turnstileRef.current?.execute() : "";
       if (!turnstileToken) {
-        setMessage("Complete the security check and try again.");
+        setMessage(text("Complete the security check and try again."));
         return;
       }
-      const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
+      const result = await publishMutation.mutateAsync({ ...input, turnstileToken, browserId });
       await onSubmitted(result.status);
     } catch (error: unknown) {
-      setMessage(submissionErrorMessage(error));
+      setMessage(submissionErrorMessage(error, text));
     } finally {
       setSubmitting(false);
     }

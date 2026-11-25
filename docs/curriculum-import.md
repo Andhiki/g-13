@@ -151,8 +151,8 @@ strings and absent course/syllabus lookups return `undefined`.
 5. Run `bun run check` and `bun run build`. Inspect both curriculum exploration
    and roadmap results, including source warnings.
 6. Keep provenance and unresolved ambiguity in source data or structured audit
-   evidence. Add a sourced `CHANGELOG.md` entry for new editions or academic
-   corrections. Do not ship temporary extraction scripts.
+   evidence. Summarize new editions or academic corrections with sources in the
+   pull request description. Do not ship temporary extraction scripts.
 
 ## Remove an edition
 

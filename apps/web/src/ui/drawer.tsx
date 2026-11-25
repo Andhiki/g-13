@@ -20,8 +20,8 @@ import {
 import type { PartProps } from "@ui-sdk/react/primitive";
 import { twMerge } from "tailwind-merge";
 
-// Like Radix's asChild: the part's props land on the single child element. Narrowed with
-// isValidElement so anything else fails loudly.
+// The asChild part's props land on the single child element. Narrowing with isValidElement keeps
+// the render contract explicit and fails loudly for invalid composition.
 function childElementOf(children: React.ReactNode, name: string): React.ReactElement {
   const nodes = React.Children.toArray(children);
   if (nodes.length !== 1 || !React.isValidElement(nodes[0])) {

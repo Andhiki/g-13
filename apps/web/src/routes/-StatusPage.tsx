@@ -1,4 +1,4 @@
-import { defaultCurriculumId } from "@g13/curriculum";
+import { defaultCurriculumId } from "@g13/curriculum/ids";
 import { StatusIllustration } from "../ui/status-illustration";
 import { Typography } from "../ui/typography";
 import { AlignButton } from "../ui/button";

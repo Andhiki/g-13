@@ -3,7 +3,7 @@ import { m, useReducedMotion } from "motion/react";
 import { RiRouteLine } from "@remixicon/react";
 import { AlignDrawer } from "./drawer";
 import { Link } from "@tanstack/react-router";
-import { defaultCurriculumId } from "@g13/curriculum";
+import { defaultCurriculumId } from "@g13/curriculum/ids";
 import { Image } from "@unpic/react";
 import { themeMode, useThemeMode } from "./theme-preference";
 import { useKeyboardShortcuts } from "./shortcuts";
