@@ -93,3 +93,36 @@ test("Keyboard opens the intended learning resource in a separate tab", async ({
   await expect(browser).toHaveURL(url);
   expect(browser.tabs()).toHaveLength(2);
 });
+
+test("Settings paints its panel above the backdrop and restores focus on close", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await app.open("/faq");
+  const trigger = screen.getByRole("button", { name: /^(pengaturan|settings)$/i }).first();
+  await trigger.focus();
+  await browser.keyboard.press("Enter");
+
+  const dialog = screen.getByRole("dialog", { name: /^(pengaturan|settings)$/i });
+  const close = dialog.getByRole("button", { name: /tutup dialog|close dialog/i });
+  await expect(close).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const panel = document.querySelector('[role="dialog"][data-open]');
+        if (!panel) return false;
+        const bounds = panel.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          bounds.left + bounds.width / 2,
+          bounds.top + bounds.height / 2,
+        );
+        return hit !== null && panel.contains(hit);
+      }),
+    )
+    .toBe(true);
+
+  await close.click();
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});

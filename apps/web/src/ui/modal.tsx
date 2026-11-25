@@ -1,8 +1,4 @@
 // Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-// Built on @ui-sdk/react/dialog. The dialog part renders full screen and holds the dimmed,
-// blurred centering surface (it is today's overlay, including every overlayClassName override),
-// while the card inside restores the pre-refactor panel styling. Presses outside the layer fall
-// through the pointer-events-none surface, so ui-sdk still sees them as outside presses.
 import { RiCloseLine } from "@remixicon/react";
 import * as React from "react";
 import {
