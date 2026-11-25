@@ -7,7 +7,7 @@ import { lecturers } from "@g13/db/schema/lecturers";
 import { notificationEvents } from "@g13/db/schema/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
-import { submissionInputSchema } from "../-shared/submission-schema";
+import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
 import { setReviewLike } from "./likes.service";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
@@ -23,8 +23,20 @@ const rawInput = {
   clarity: 5,
   support: 4,
   organization: 3,
-  body: " Helpful examples ",
+  body: " Helpful examples and clear slides ",
 };
+
+it("rejects review bodies shorter than the minimum after trimming", () => {
+  const minimum = "A".repeat(REVIEW_BODY_MIN_LENGTH);
+  expect(submissionInputSchema.safeParse({ ...rawInput, body: minimum }).success).toBe(true);
+  expect(
+    submissionInputSchema.safeParse({ ...rawInput, body: "A".repeat(REVIEW_BODY_MIN_LENGTH - 1) })
+      .success,
+  ).toBe(false);
+  expect(
+    submissionInputSchema.safeParse({ ...rawInput, body: ` ${minimum.slice(1)} ` }).success,
+  ).toBe(false);
+});
 
 it("publishes reviews, excludes hidden/deleted entries from public metrics, and atomically limits submissions without a browser per IP", async () => {
   const platform = await createTestPlatformProxy();
@@ -85,7 +97,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     const pendingInput = submissionInputSchema.parse({
       ...rawInput,
       organization: 2,
-      body: "Pending feedback",
+      body: "Pending feedback needs a closer look",
     });
     const pendingSubmission = await submitReview(db, pendingInput, {
       ...context,
