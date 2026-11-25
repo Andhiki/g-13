@@ -104,7 +104,12 @@ function conflictQueries(
   // json_each binds the whole confirmed set with one D1 parameter.
   const confirmed = sql`(select value from json_each(${JSON.stringify(confirmedIds)}))`;
   const conflicts = db
-    .select({ id: announcements.id, titleEn: announcements.titleEn })
+    .select({
+      id: announcements.id,
+      titleEn: announcements.titleEn,
+      startsAt: announcements.startsAt,
+      endsAt: announcements.endsAt,
+    })
     .from(announcements)
     .where(and(targetExists, condition))
     .orderBy(announcements.id);

@@ -2,6 +2,8 @@ import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { formatAbsoluteTime } from "@/date-format";
+import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
@@ -326,6 +328,8 @@ function AnnouncementReplacementModal({
   onClose: () => void;
   onConfirm: (ids: string[]) => void;
 }) {
+  const { language } = useLocale("notifications");
+
   return (
     <ConfirmActionModal
       open
@@ -337,9 +341,17 @@ function AnnouncementReplacementModal({
       onClose={onClose}
       onConfirm={() => onConfirm(conflicts.map(({ id }) => id))}
     >
-      <ul className="mt-3 list-disc space-y-1 pl-5 text-paragraph-sm">
-        {conflicts.map(({ id, titleEn }) => (
-          <li key={id}>{titleEn}</li>
+      <ul className="mt-3 max-h-48 divide-y divide-stroke-soft-200 overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-weak-50">
+        {conflicts.map(({ id, titleEn, startsAt, endsAt }) => (
+          <li key={id} className="space-y-1 px-3 py-2">
+            <Typography variant="labelSmall" color="strong" className="wrap-break-word">
+              {titleEn}
+            </Typography>
+            <Typography variant="caption" color="muted">
+              {formatAbsoluteTime(startsAt.getTime(), language)}{" "}
+              {endsAt ? `→ ${formatAbsoluteTime(endsAt.getTime(), language)}` : "· No expiry"}
+            </Typography>
+          </li>
         ))}
       </ul>
     </ConfirmActionModal>

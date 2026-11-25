@@ -293,8 +293,13 @@ it("requires confirmation for every overlapping enabled window before replacing 
     );
     const replacement = createBulletin({ startsAt: now, endsAt: null });
     const conflicts = [
-      { id: first.id, titleEn: "First" },
-      { id: second.id, titleEn: "Second" },
+      {
+        id: first.id,
+        titleEn: "First",
+        startsAt: new Date(now - day),
+        endsAt: new Date(now + day),
+      },
+      { id: second.id, titleEn: "Second", startsAt: new Date(now + day), endsAt: null },
     ].sort((a, b) => a.id.localeCompare(b.id));
     const blocked = { data: null, error: "SCHEDULE_CONFLICT" as const, conflicts };
     expect(await createAnnouncement(db, admin, replacement)).toEqual(blocked);
