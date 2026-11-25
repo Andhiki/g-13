@@ -30,5 +30,8 @@ export const reviewLikeInputSchema = z.object({
 export type ReviewLikeInput = z.output<typeof reviewLikeInputSchema>;
 
 export const publishReviewInputSchema = submissionInputSchema.and(
-  z.object({ turnstileToken: trimmedText(2048).min(1) }),
+  z.object({
+    browserId: browserIdSchema.nullable().optional(),
+    turnstileToken: trimmedText(2048).min(1),
+  }),
 );

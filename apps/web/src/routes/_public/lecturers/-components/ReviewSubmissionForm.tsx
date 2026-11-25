@@ -423,6 +423,7 @@ export function ReviewSubmissionForm({
   lecturerId,
   lecturerName,
   initialCourseId,
+  browserId,
   onClose,
   onSubmitted,
 }: {
@@ -430,6 +431,7 @@ export function ReviewSubmissionForm({
   lecturerId: string;
   lecturerName: string;
   initialCourseId: string;
+  browserId: string | null;
   onClose: () => void;
   onSubmitted: (status: "pending" | "published") => Promise<void>;
 }) {
@@ -482,7 +484,7 @@ export function ReviewSubmissionForm({
         setMessage("Complete the security check and try again.");
         return;
       }
-      const result = await publishMutation.mutateAsync({ ...input, turnstileToken });
+      const result = await publishMutation.mutateAsync({ ...input, turnstileToken, browserId });
       await onSubmitted(result.status);
     } catch (error: unknown) {
       setMessage(submissionErrorMessage(error));

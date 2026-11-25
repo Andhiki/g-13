@@ -7,6 +7,7 @@ export function ReviewSubmissionDialog({
   lecturerId,
   lecturerName,
   courseId,
+  browserId,
   open,
   onClose,
   onSubmitted,
@@ -15,6 +16,7 @@ export function ReviewSubmissionDialog({
   lecturerId: string;
   lecturerName: string;
   courseId: string;
+  browserId: string | null;
   open: boolean;
   onClose: () => void;
   onSubmitted: (status: "pending" | "published") => Promise<void>;
@@ -36,6 +38,7 @@ export function ReviewSubmissionDialog({
             lecturerId={lecturerId}
             lecturerName={lecturerName}
             initialCourseId={courseId}
+            browserId={browserId}
             onClose={onClose}
             onSubmitted={onSubmitted}
           />
