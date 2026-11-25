@@ -252,6 +252,7 @@ function FaqFilterBar({
           <AlignLinkButton.Root
             key={section.id}
             type="button"
+            className="h-auto max-w-full text-left whitespace-normal"
             variant={selectedSection === section.id ? "primary" : "gray"}
             underline={selectedSection === section.id}
             aria-pressed={selectedSection === section.id}
@@ -366,7 +367,7 @@ export function FaqPage() {
   );
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
         <header className="lg:sticky lg:top-28 lg:self-start">
           <Typography as="h1" variant="pageTitle" className="m-0">
             {text("FAQ")}
@@ -378,7 +379,7 @@ export function FaqPage() {
           </Typography>
         </header>
 
-        <section aria-label={text("FAQ")} className="grid content-start">
+        <section aria-label={text("FAQ")} className="grid grid-cols-1 content-start">
           <FaqSearchInput
             searchInput={searchInput}
             query={query}
