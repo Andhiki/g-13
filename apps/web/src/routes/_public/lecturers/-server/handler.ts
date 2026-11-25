@@ -15,7 +15,6 @@ import {
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
 import { rejectReviewLikeOperation, rejectSubmissionOperation } from "./failures";
-import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
 import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 import { verifyTurnstileToken } from "./turnstile";

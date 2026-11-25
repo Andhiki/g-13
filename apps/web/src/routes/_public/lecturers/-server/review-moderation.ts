@@ -12,7 +12,7 @@ const scopedCategories = ["harassment", "harassment/threatening", "hate", "hate/
 const promotion =
   /\b(promo|promotion|discount|diskon|sale|jual beli|jasa|investasi|investment|loan|pinjaman|crypto|cryptocurrency|giveaway|undian|free trial|kursus online|online course|gift card|kartu hadiah)\b/i;
 const solicitation =
-  /\b(order now|buy now|beli sekarang|pesan sekarang|klik link|click (the )?link|join (my|our)|follow (me|us)|register now|daftar sekarang|sign up now|shop now|claim (your|this) (offer|discount|gift)|use (my|our) (code|link)|gunakan kode|hubungi (kami|saya) untuk (membeli|memesan|mendaftar)|contact (me|us) to (buy|order|register)|dm me to (buy|order|register)|message me to (buy|order|register))\b/i;
+  /\b(order now|buy now|beli sekarang|pesan sekarang|register now|daftar sekarang|sign up now|shop now|invest now|claim (your|this) (offer|discount|gift|profit)|use (my|our) (code|link)|gunakan kode|limited[ -]time offer|guaranteed returns?|hubungi (kami|saya) untuk (membeli|memesan|mendaftar)|contact (me|us) to (buy|order|register)|dm me (to|for) (buying|purchase|prices|orders|registration)|message me (to|for) (buying|purchase|prices|orders|registration)|join (my|our) (paid|crypto|investment) (group|channel|course)|follow (me|us) for (offers|discounts|promotions))\b/i;
 const contactDetails =
   /(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b|(?:\+?\d[\d .()-]{7,}\d)/i;
 

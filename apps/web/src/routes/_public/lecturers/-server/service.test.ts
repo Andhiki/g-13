@@ -68,11 +68,16 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
 
     const input = submissionInputSchema.parse(rawInput);
+    let classifierCalls = 0;
     const context = {
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
       now: 3_600_000,
-      ...clearScreening,
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
     };
 
     expect(await submitReview(db, input, { ...context, ip: null })).toEqual({
@@ -90,6 +95,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         error: REVIEW_ERRORS.INVALID,
       });
     }
+    expect(classifierCalls).toBe(0);
 
     expect(await submitReview(db, input, context)).toMatchObject({
       data: { reviewId: expect.any(String), status: "published" },
@@ -102,6 +108,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         context,
       ),
     ).toMatchObject({ data: { reviewId: expect.any(String), status: "published" }, error: null });
+    expect(classifierCalls).toBe(2);
     expect(await db.select().from(notificationEvents)).toEqual([]);
 
     // Any rating of 2 or lower waits for moderation and never reaches public reads.
@@ -129,6 +136,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
       pendingReviewId,
     ]);
+    expect(classifierCalls).toBe(3);
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,
     // while existing published reviews for soft-deleted courses remain visible on active lecturers.
@@ -217,12 +225,15 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     );
     expect(attempts.filter((result) => result.error === null)).toHaveLength(1);
     expect(attempts.filter((result) => result.error === REVIEW_ERRORS.RATE_LIMIT)).toHaveLength(4);
+    expect(classifierCalls).toBe(4);
     expect(await submitReview(db, input, { ...context, ip: "192.0.2.2" })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(5);
     expect(await submitReview(db, input, { ...context, now: 7_200_000 })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(6);
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
   } finally {
@@ -235,7 +246,9 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
   try {
     const db = createDatabase(platform.env.DB);
     await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
-    await db.insert(courses).values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
 
     const screened: { body: string; displayName?: string }[] = [];
     const outcomes = ["clear", "flagged", "unscorable", "clear", "clear"] as const;
@@ -258,7 +271,9 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     const flagged = await submitReview(db, input, context("192.0.2.32"));
     expect(flagged.data?.status).toBe("pending");
     expect(
-      (await getLecturerDetail(db, "p"))?.reviews.some((review) => review.id === flagged.data?.reviewId),
+      (await getLecturerDetail(db, "p"))?.reviews.some(
+        (review) => review.id === flagged.data?.reviewId,
+      ),
     ).toBe(false);
 
     const unscorable = await submitReview(db, input, context("192.0.2.33"));
@@ -322,6 +337,14 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     const secret = "test-secret-".repeat(4);
     const now = 7_200_000;
     const ip = "198.51.100.23";
+    let classifierCalls = 0;
+    const screening = {
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
+    };
     const browserA = crypto.randomUUID();
     const browserB = crypto.randomUUID();
 
@@ -329,14 +352,12 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     for (const browserId of [browserA, browserB]) {
       for (let i = 0; i < 3; i++) {
         expect(
-          await submitReview(db, input, { ip, browserId, secret, now, ...clearScreening }),
+          await submitReview(db, input, { ip, browserId, secret, now, ...screening }),
         ).toMatchObject({
           error: null,
         });
       }
-      expect(
-        await submitReview(db, input, { ip, browserId, secret, now, ...clearScreening }),
-      ).toEqual({
+      expect(await submitReview(db, input, { ip, browserId, secret, now, ...screening })).toEqual({
         data: null,
         error: REVIEW_ERRORS.RATE_LIMIT,
       });
@@ -349,7 +370,7 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
         browserId: browserA,
         secret,
         now,
-        ...clearScreening,
+        ...screening,
       }),
     ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT });
 
@@ -364,7 +385,7 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
           browserId,
           secret,
           now,
-          ...clearScreening,
+          ...screening,
         });
         if (result.error === null) allowed++;
         else if (result.error === REVIEW_ERRORS.RATE_LIMIT) rejected++;
@@ -372,6 +393,7 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     }
     expect(allowed).toBe(14);
     expect(rejected).toBe(7);
+    expect(classifierCalls).toBe(20);
   } finally {
     await platform.dispose();
   }

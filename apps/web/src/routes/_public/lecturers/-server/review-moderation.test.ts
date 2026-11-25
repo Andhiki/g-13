@@ -19,9 +19,7 @@ function moderationResponse(...categories: Record<string, unknown>[]) {
 
 it("flags explicit spam promotion while preserving criticism with contact details", () => {
   expect(
-    isObviousReviewSpam(
-      "Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789",
-    ),
+    isObviousReviewSpam("Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789"),
   ).toBe(true);
   expect(
     isObviousReviewSpam("The lecturer ignored questions. I would not recommend this class."),
@@ -29,6 +27,11 @@ it("flags explicit spam promotion while preserving criticism with contact detail
   expect(
     isObviousReviewSpam(
       "The investment material was taught too quickly. Contact the lecturer on WhatsApp at +62 812 3456 7890.",
+    ),
+  ).toBe(false);
+  expect(
+    isObviousReviewSpam(
+      "The investment topic moved too quickly. The lecturer's office-hours link is https://example.edu/office-hours.",
     ),
   ).toBe(false);
   expect(
