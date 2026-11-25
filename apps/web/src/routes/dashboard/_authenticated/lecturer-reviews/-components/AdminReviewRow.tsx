@@ -71,7 +71,7 @@ export function AdminReviewRow({
           color="strong"
           className={
             // oxlint-disable-next-line shadcn/no-restyle -- moderation row body tuned to 13px alongside its two-line clamp; no label scale matches
-            "whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
+            "whitespace-pre-wrap break-words text-[13px] max-lg:line-clamp-1 xl:line-clamp-2"
           }
         >
           {review.body}

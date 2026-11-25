@@ -6,7 +6,7 @@
 # After a successful deploy, tags the deployed commit as vX.Y.Z and publishes a
 # GitHub Release. The first release uses apps/web/package.json's version; later
 # releases bump from the commits since the last v* tag (breaking -> major,
-# feat -> minor, otherwise patch, with the Unreleased changelog as a fallback).
+# feat -> minor, otherwise patch).
 name: Deploy production
 
 on:
@@ -93,11 +93,6 @@ jobs:
               bump=major
             elif printf '%s\n' "$log" | grep -qE '^feat(\([^)]+\))?:'; then
               bump=minor
-            else
-              unreleased=$(awk '/^## Unreleased/{found=1; next} /^## /{found=0} found' CHANGELOG.md)
-              if printf '%s\n' "$unreleased" | grep -qE '^#### (Added|Changed)'; then
-                bump=minor
-              fi
             fi
 
             IFS=. read -r major minor patch <<< "${latest#v}"
