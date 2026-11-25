@@ -54,6 +54,7 @@ it("requires a server rate-limit secret of at least 32 characters", () => {
   expect(parseSubmissionEnvironment({ REVIEW_RATE_LIMIT_SECRET: "s".repeat(32) })).toMatchObject({
     TURNSTILE_SITE_KEY: "",
     TURNSTILE_SECRET_KEY: "",
+    OPENAI_API_KEY: "",
   });
   expect(
     parseSubmissionEnvironment({
@@ -61,7 +62,17 @@ it("requires a server rate-limit secret of at least 32 characters", () => {
       TURNSTILE_SITE_KEY: "  site-key  ",
       TURNSTILE_SECRET_KEY: "  secret-key  ",
     }),
-  ).toMatchObject({ TURNSTILE_SITE_KEY: "site-key", TURNSTILE_SECRET_KEY: "secret-key" });
+  ).toMatchObject({
+    TURNSTILE_SITE_KEY: "site-key",
+    TURNSTILE_SECRET_KEY: "secret-key",
+    OPENAI_API_KEY: "",
+  });
+  expect(
+    parseSubmissionEnvironment({
+      REVIEW_RATE_LIMIT_SECRET: "s".repeat(32),
+      OPENAI_API_KEY: "  openai-key  ",
+    }).OPENAI_API_KEY,
+  ).toBe("openai-key");
 });
 
 it("parses the bootstrap admin allowlist", () => {
