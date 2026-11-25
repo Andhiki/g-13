@@ -4,7 +4,7 @@ import { authUser } from "@g13/db/schema/auth";
 import { getActiveAnnouncements } from "@/routes/_public/-announcements/service";
 import { createTestPlatformProxy } from "@/test/database";
 import { announcementFieldsShape } from "../-shared/schemas";
-import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementAdminResult } from "../-shared/errors";
+import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementWriteResult } from "../-shared/errors";
 import {
   changeAnnouncementLifecycle,
   createAnnouncement,
@@ -14,24 +14,28 @@ import {
 
 const day = 24 * 60 * 60 * 1000;
 
-function createBulletin(input: Partial<Parameters<typeof createAnnouncement>[2]> = {}) {
+type CreateAnnouncementInput = Parameters<typeof createAnnouncement>[2];
+
+function createBulletin(input: Partial<CreateAnnouncementInput> = {}): CreateAnnouncementInput {
   return {
     titleId: "Jadwal UTS sudah terbit",
     titleEn: "Midterm schedule is out",
     bodyId: "Cek arsip ujian untuk soal UTS tahun-tahun sebelumnya.",
     bodyEn: "Check the exam archive for past midterm papers.",
     ctaHref: "/exam",
+    ctaOpenInNewTab: false,
     ctaLabelId: "Buka arsip",
     ctaLabelEn: "Open archive",
     startsAt: Date.now() - day,
     endsAt: null,
     countdownAt: null,
+    variant: "primary",
     enabled: true,
     ...input,
   };
 }
 
-function resultData<T>(result: AnnouncementAdminResult<T>): T {
+function resultData<T>(result: AnnouncementWriteResult<T>): T {
   if (result.error !== null) throw new Error(result.error);
   return result.data;
 }
@@ -71,11 +75,17 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
 
     // A live, enabled announcement is publicly visible right away.
     const created = resultData(
-      await createAnnouncement(db, admin, createBulletin({ countdownAt: now + day })),
+      await createAnnouncement(
+        db,
+        admin,
+        createBulletin({ countdownAt: now + day, variant: "error", ctaOpenInNewTab: true }),
+      ),
     );
     expect(created.id).toBeTruthy();
     const live = await getActiveAnnouncements(db, now);
     expect(live.map((row) => row.id)).toEqual([created.id]);
+    expect(live[0]?.variant).toBe("error");
+    expect(live[0]?.ctaOpenInNewTab).toBe(true);
     expect(live[0]?.countdownAt?.getTime()).toBe(now + day);
     expect((await getActiveAnnouncements(db, now + 2 * day)).map((row) => row.id)).toEqual([
       created.id,
@@ -90,11 +100,13 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
     expect(
       await updateAnnouncement(db, admin, {
         announcementId: created.id,
-        ...createBulletin({ titleId: "Jadwal UTS diperbarui" }),
+        ...createBulletin({ titleId: "Jadwal UTS diperbarui", variant: "neutral" }),
       }),
     ).toEqual({ data: { announcementId: created.id }, error: null });
     const afterEdit = await getActiveAnnouncements(db, now);
     expect(afterEdit[0]?.titleId).toBe("Jadwal UTS diperbarui");
+    expect(afterEdit[0]?.variant).toBe("neutral");
+    expect(afterEdit[0]?.ctaOpenInNewTab).toBe(false);
     expect(afterEdit[0]?.countdownAt).toBeNull();
 
     // Disabling hides it from the public banner and files it under disabled.
@@ -127,7 +139,9 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
         db,
         admin,
         createBulletin({
+          confirmedConflictIds: [created.id],
           ctaHref: "",
+          ctaOpenInNewTab: true,
           ctaLabelId: "",
           ctaLabelEn: "",
           startsAt: now - day,
@@ -136,6 +150,7 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
       ),
     );
     const rowsWithNoCta = await getActiveAnnouncements(db, now);
+    expect(rowsWithNoCta.find((row) => row.id === withoutCta.id)?.ctaOpenInNewTab).toBe(false);
     expect(rowsWithNoCta.find((row) => row.id === withoutCta.id)?.ctaHref).toBeNull();
 
     // Empty CTA link is a valid form value, so the optional field is actually optional.
@@ -251,3 +266,115 @@ it("schedules announcements by start and expiry windows", async () => {
 function maintainerActor() {
   return { id: "maintainer", role: "maintainer" };
 }
+
+it("requires confirmation for every overlapping enabled window before replacing announcements", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedUsers(db);
+    const admin = { id: "admin-1", role: "admin" };
+    const now = Date.now();
+    const first = resultData(
+      await createAnnouncement(
+        db,
+        admin,
+        createBulletin({
+          titleEn: "First",
+          startsAt: now - day,
+          endsAt: now + day,
+        }),
+      ),
+    );
+    const second = resultData(
+      await createAnnouncement(
+        db,
+        admin,
+        createBulletin({
+          titleEn: "Second",
+          startsAt: now + day,
+          endsAt: null,
+        }),
+      ),
+    );
+    const replacement = createBulletin({ startsAt: now, endsAt: null });
+    const conflicts = [
+      {
+        id: first.id,
+        titleEn: "First",
+        startsAt: new Date(now - day),
+        endsAt: new Date(now + day),
+      },
+      { id: second.id, titleEn: "Second", startsAt: new Date(now + day), endsAt: null },
+    ].sort((a, b) => a.id.localeCompare(b.id));
+    const blocked = { data: null, error: "SCHEDULE_CONFLICT" as const, conflicts };
+    expect(await createAnnouncement(db, admin, replacement)).toEqual(blocked);
+
+    const draft = resultData(
+      await createAnnouncement(db, admin, { ...replacement, enabled: false }),
+    );
+    expect(
+      await updateAnnouncement(db, admin, {
+        ...replacement,
+        announcementId: draft.id,
+        confirmedConflictIds: [first.id],
+      }),
+    ).toEqual(blocked);
+    const enable = { announcementId: draft.id, action: "enable" as const };
+    expect(await changeAnnouncementLifecycle(db, admin, enable)).toEqual(blocked);
+    expect(
+      await changeAnnouncementLifecycle(db, admin, {
+        ...enable,
+        confirmedConflictIds: [first.id],
+      }),
+    ).toEqual(blocked);
+    expect((await getActiveAnnouncements(db, now)).map(({ id }) => id)).toEqual([first.id]);
+    expect((await getActiveAnnouncements(db, now + day)).map(({ id }) => id)).toEqual([second.id]);
+
+    resultData(
+      await changeAnnouncementLifecycle(db, admin, {
+        ...enable,
+        confirmedConflictIds: conflicts.map(({ id }) => id),
+      }),
+    );
+    expect((await getActiveAnnouncements(db, now)).map(({ id }) => id)).toEqual([draft.id]);
+    expect((await getActiveAnnouncements(db, now + day)).map(({ id }) => id)).toEqual([draft.id]);
+    const successor = resultData(
+      await createAnnouncement(db, admin, {
+        ...replacement,
+        confirmedConflictIds: [draft.id],
+      }),
+    );
+    resultData(
+      await updateAnnouncement(db, admin, {
+        ...replacement,
+        announcementId: draft.id,
+        confirmedConflictIds: [successor.id],
+      }),
+    );
+    expect((await getActiveAnnouncements(db, now)).map(({ id }) => id)).toEqual([draft.id]);
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("allows only one of two concurrent overlapping enables to succeed without confirmation", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedUsers(db);
+    const admin = { id: "admin-1", role: "admin" };
+    const draft = createBulletin({ enabled: false });
+    const first = resultData(await createAnnouncement(db, admin, draft));
+    const second = resultData(await createAnnouncement(db, admin, draft));
+    const results = await Promise.all(
+      [first, second].map(({ id }) =>
+        changeAnnouncementLifecycle(db, admin, { announcementId: id, action: "enable" }),
+      ),
+    );
+    expect(results.filter(({ error }) => error === null)).toHaveLength(1);
+    expect(results.filter(({ error }) => error === "SCHEDULE_CONFLICT")).toHaveLength(1);
+    expect(await getActiveAnnouncements(db, Date.now())).toHaveLength(1);
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);

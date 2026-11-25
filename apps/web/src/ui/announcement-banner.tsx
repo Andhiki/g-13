@@ -1,3 +1,4 @@
+import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import type { Language } from "@g13/i18n";
 import { RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
 import { clsx } from "clsx";
@@ -10,6 +11,7 @@ export type AnnouncementCopySource = {
   bodyId: string;
   bodyEn: string;
   ctaHref: string | null;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
 };
@@ -19,7 +21,7 @@ export type ResolvedAnnouncementCopy = {
   body: string;
   ctaHref: string | null;
   ctaLabel: string | null;
-  external: boolean;
+  ctaOpenInNewTab: boolean;
 };
 
 export function resolveAnnouncementCopy(
@@ -34,18 +36,25 @@ export function resolveAnnouncementCopy(
     body: language === "en" ? row.bodyEn : row.bodyId,
     ctaHref,
     ctaLabel: ctaHref ? (localizedCta ?? defaultCtaLabel) : null,
-    external: ctaHref !== null && !ctaHref.startsWith("/"),
+    ctaOpenInNewTab: ctaHref !== null && row.ctaOpenInNewTab,
   };
 }
 
+const announcementSurfaces = {
+  primary: "bg-primary-base",
+  error: "bg-red-800",
+  neutral: "bg-neutral-700",
+} satisfies Record<AnnouncementVariant, string>;
+
 export function AnnouncementBannerRow({
+  variant,
   title,
   body,
   titlePlaceholder,
   bodyPlaceholder,
   ctaLabel,
   ctaHref,
-  external,
+  ctaOpenInNewTab,
   closeLabel,
   onDismiss,
   interactiveCta = true,
@@ -56,11 +65,12 @@ export function AnnouncementBannerRow({
 }: {
   title: string;
   body: string;
+  variant: AnnouncementVariant;
   titlePlaceholder?: string;
   bodyPlaceholder?: string;
   ctaLabel: string | null;
   ctaHref: string | null;
-  external: boolean;
+  ctaOpenInNewTab: boolean;
   closeLabel: string;
   onDismiss: () => void;
   interactiveCta?: boolean;
@@ -77,7 +87,8 @@ export function AnnouncementBannerRow({
   return (
     <div
       className={clsx(
-        "flex min-h-11 items-center gap-3 py-1.5 pl-4 pr-2 md:pl-6 md:pr-3",
+        "flex min-h-11 items-center gap-3 py-1.5 pl-4 pr-2 md:pl-6 md:pr-3 text-static-white",
+        announcementSurfaces[variant],
         className,
       )}
     >
@@ -108,10 +119,10 @@ export function AnnouncementBannerRow({
           >
             <a
               href={ctaHref}
-              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              {...(ctaOpenInNewTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             >
               {ctaLabel}
-              <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />
+              {ctaOpenInNewTab && <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />}
             </a>
           </AlignButton.Root>
         ) : (
@@ -123,7 +134,7 @@ export function AnnouncementBannerRow({
             onClick={(event) => event.preventDefault()}
           >
             {ctaLabel}
-            <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />
+            {ctaOpenInNewTab && <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />}
           </AlignButton.Root>
         ))}
       <AlignButton.Root

@@ -1,6 +1,6 @@
-// Adapted from AlignUI Button v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import type { ComponentProps } from "react";
-import { Slot } from "@radix-ui/react-slot";
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import { Button } from "@ui-sdk/react/button";
+import { isValidElement, type ComponentProps, type MouseEvent } from "react";
 import { createTV, type VariantProps } from "tailwind-variants";
 import { ButtonContent, type ButtonContentProps } from "./button-spinner";
 
@@ -126,7 +126,7 @@ export const buttonVariants = tv({
     {
       variant: "nav",
       class:
-        "bg-transparent ring-transparent gap-1.5 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-[state=open]:bg-bg-soft-200",
+        "bg-transparent ring-transparent gap-1.5 rounded-lg px-2 text-label-xs text-text-strong-950 hover:bg-bg-soft-200/60 data-open:bg-bg-soft-200",
     },
     {
       size: "medium",
@@ -204,6 +204,7 @@ function Root({
   icon,
   iconPosition,
   disabled,
+  onClick,
   children,
   ...props
 }: ButtonProps) {
@@ -218,19 +219,24 @@ function Root({
     steady,
     className,
   });
-  if (asChild)
-    return (
-      <Slot className={classes} {...props}>
-        {children}
-      </Slot>
-    );
+  // Keep loading controlled by isLoading, even if a caller returns a promise.
+  const handleClick = onClick
+    ? (event: MouseEvent<HTMLElement>) => {
+        onClick(event as MouseEvent<HTMLButtonElement>);
+      }
+    : undefined;
+  if (asChild) {
+    if (!isValidElement(children)) return null;
+    return <Button render={children} className={classes} onClick={handleClick} {...props} />;
+  }
   const spinnerSize = size === "xxsmall" || size === "xsmall" ? "sm" : "md";
   return (
-    <button
+    <Button
       className={classes}
       type={type}
       disabled={disabled || isLoading}
       aria-busy={isLoading || undefined}
+      onClick={handleClick}
       {...props}
     >
       <ButtonContent
@@ -241,7 +247,7 @@ function Root({
       >
         {children}
       </ButtonContent>
-    </button>
+    </Button>
   );
 }
 

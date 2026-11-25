@@ -11,7 +11,7 @@ import {
 } from "react";
 import { RiArrowLeftLine, RiSearchLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-import * as Tabs from "@radix-ui/react-tabs";
+import { Tabs as TabsPrimitive, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs";
 import { animate, m, useMotionValue, useReducedMotion } from "motion/react";
 import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
@@ -25,11 +25,18 @@ import { useAlumniDirectory } from "../-client/useAlumniDirectory";
 
 const allBatches = "semua";
 const tabClassName =
-  "relative shrink-0 whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-label-sm text-text-sub-600 transition-colors hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-base data-[state=active]:border-primary-base data-[state=active]:text-text-strong-950";
+  "relative shrink-0 whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-label-sm text-text-sub-600 transition-colors hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-base data-selected:border-primary-base data-selected:text-text-strong-950";
 const letterOf = (name: string) => name[0]?.toLocaleUpperCase("id") ?? "#";
 
 const TICK_SCALES = [1, 0.833, 0.667] as const;
 const TICK_OPACITIES = ["1", "0.7", "0.5"] as const;
+
+const Tabs = {
+  Root: TabsPrimitive,
+  List: TabsList,
+  Trigger: TabsTab,
+  Content: TabsPanel,
+};
 
 function AlumniSearchBar({
   searchId,
@@ -246,7 +253,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
           <h1 className="sr-only">{text("Semua alumni")}</h1>
         </header>
 
-        <Tabs.Root value={batch} onValueChange={setBatch}>
+        <Tabs.Root value={batch} onValueChange={(value) => setBatch(value ?? allBatches)}>
           <div ref={stickyMarkerRef} aria-hidden="true" className="relative top-3" />
           <AlumniSearchBar
             searchId={searchId}

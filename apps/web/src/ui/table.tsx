@@ -1,4 +1,4 @@
-// Adapted from AlignUI Table v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 import { forwardRef, type ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
 

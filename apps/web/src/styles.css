@@ -2,7 +2,7 @@
 
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./alignui.css";
+@import "./design-tokens.css";
 @import "./fonts/fonts.css";
 
 :root {
@@ -28,11 +28,6 @@
       @slot;
     }
   }
-}
-
-/* Sonner injects its own system font stack on the toaster; keep toasts on the app font. */
-:root [data-sonner-toaster] {
-  font-family: var(--font-sans);
 }
 
 html {

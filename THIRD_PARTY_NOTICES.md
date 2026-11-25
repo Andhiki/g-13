@@ -6,7 +6,7 @@ Daftar ini mencatat sumber yang diketahui; ini bukan bukti izin redistribusi.
 | Materi | Asal dan ketentuan |
 | --- | --- |
 | Inspirasi peta kurikulum | [course.csui.dev](https://course.csui.dev/). Dikreditkan sebagai inspirasi konsep; kode dan aset visual situs tidak disalin. Atribusi ini tidak menyatakan kerja sama atau pengesahan. |
-| Komponen UI dan token AlignUI | Lihat [notice MIT AlignUI](#lisensi-alignui) serta keputusan penggunaan [AlignUI](docs/adr/0002-alignui-source.md). Pertahankan notice tersebut. |
+| Gaya dan token desain turunan AlignUI | Lihat [notice MIT AlignUI](#lisensi-alignui). |
 | Arsip ujian Himakom UGM | Nama mata kuliah dan metadata berkas bersumber dari [arsip Himakom UGM](https://himakom.ugm.ac.id/exam/) beserta folder Drive yang ditautkan. Pengelompokan dinormalisasi menjadi mata kuliah dan tahun. PDF tetap di Drive sumber; hak atas isi berkas tetap milik pemiliknya dan tidak dilisensikan ulang oleh proyek ini. |
 | Dokumen UGM dan ekstraksi | Sumber ada di `packages/curriculum/sources/`; page manifests dan audit terstruktur ada di `packages/curriculum/data/`; setiap slice menyimpan sumber dan provenance baris. Tidak ada pemberian lisensi ulang atas isi dokumen UGM. Izin redistribusi PDF, snapshot, dan teks ekstraksi masih perlu dikonfirmasi. |
 | Logo HIMAKOM UGM | `apps/web/public/brand/himakom-*.png` dan salinan trailer di `apps/trailer/public/brand/himakom.png`; aset resmi dari [HIMAKOM UGM](https://himakom.ugm.ac.id/), sumber dicatat di [asal aset](apps/web/public/brand/README.md). Berkas tidak dimodifikasi. Hak logo tetap milik pemiliknya dan tidak dilisensikan ulang oleh proyek ini. |
@@ -25,7 +25,7 @@ Font Inter untuk web berasal dari [Inter Project](https://github.com/rsms/inter)
 
 ## Lisensi AlignUI
 
-Popover diadaptasi dari [AlignUI Next.js TypeScript starter, commit f37bd913](https://github.com/alignui/alignui-nextjs-typescript-starter/blob/f37bd913a058ceca39d5bfc2369ec420018e5716/components/ui/popover.tsx), sesuai [dokumentasi Popover v1.2](https://alignui.com/docs/v1.2/ui/popover). Adaptasi memakai `twMerge` dan ekspor namespace `AlignPopover`; perilaku tetap menggunakan Radix UI.
+Sebagian gaya komponen dan token desain diadaptasi dari [AlignUI Next.js TypeScript starter, commit f37bd913](https://github.com/alignui/alignui-nextjs-typescript-starter/tree/f37bd913a058ceca39d5bfc2369ec420018e5716).
 
 MIT License
 

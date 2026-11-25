@@ -185,7 +185,7 @@ function CourseFilterSelect({
           </AlignSelect.Value>
         </span>
       </AlignSelect.Trigger>
-      <AlignSelect.Content className="w-[min(20rem,var(--radix-select-content-available-width))] max-w-[calc(100vw-1rem)]">
+      <AlignSelect.Content className="w-[min(20rem,var(--available-width))] max-w-[calc(100vw-1rem)]">
         <AlignSelect.Item value="all">{text("All courses")}</AlignSelect.Item>
         {courses.map((course) => (
           <AlignSelect.Item key={course.id} value={course.id}>

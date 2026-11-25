@@ -39,7 +39,7 @@ export const blurPreference = createPreference({
   storage: createLocalStorage("g13-blur"),
 });
 
-// The dark styles select on the `.dark` class (alignui.css), which the
+// The dark styles select on the `.dark` class (design-tokens.css), which the
 // preference layer cannot write: preferencesScript only sets data-*
 // attributes. This applies the saved mode before the first paint, the way
 // next-themes' script used to.

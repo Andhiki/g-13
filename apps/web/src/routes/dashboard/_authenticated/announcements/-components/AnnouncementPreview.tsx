@@ -1,3 +1,4 @@
+import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useId, useState } from "react";
 import type { Language } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
@@ -15,11 +16,13 @@ import { useTranslation } from "react-i18next";
 import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
 
 export function AnnouncementPreview({
+  variant,
   titleId,
   titleEn,
   bodyId,
   bodyEn,
   ctaHref,
+  ctaOpenInNewTab,
   ctaLabelId,
   ctaLabelEn,
   countdownAt,
@@ -27,11 +30,13 @@ export function AnnouncementPreview({
   endsAt,
   enabled,
 }: {
+  variant: AnnouncementVariant;
   titleId: string;
   titleEn: string;
   bodyId: string;
   bodyEn: string;
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
   countdownAt: DateTimeParts;
@@ -85,6 +90,7 @@ export function AnnouncementPreview({
       bodyId,
       bodyEn,
       ctaHref,
+      ctaOpenInNewTab,
       ctaLabelId,
       ctaLabelEn,
     },
@@ -131,23 +137,22 @@ export function AnnouncementPreview({
           </SegmentedControlItem>
         </SegmentedControl>
       </div>
-      <div className="bg-primary-base text-static-white">
-        <AnnouncementBannerRow
-          title={copy.title}
-          body={copy.body}
-          titlePlaceholder={titlePlaceholder}
-          bodyPlaceholder={bodyPlaceholder}
-          ctaLabel={copy.ctaLabel}
-          ctaHref={copy.ctaHref}
-          external={copy.external}
-          closeLabel={closeLabel}
-          interactiveCta={false}
-          countdownAt={countdownAtMs}
-          countdownNow={now}
-          countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
-          onDismiss={() => {}}
-        />
-      </div>
+      <AnnouncementBannerRow
+        variant={variant}
+        title={copy.title}
+        body={copy.body}
+        titlePlaceholder={titlePlaceholder}
+        bodyPlaceholder={bodyPlaceholder}
+        ctaLabel={copy.ctaLabel}
+        ctaHref={copy.ctaHref}
+        ctaOpenInNewTab={copy.ctaOpenInNewTab}
+        closeLabel={closeLabel}
+        interactiveCta={false}
+        countdownAt={countdownAtMs}
+        countdownNow={now}
+        countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
+        onDismiss={() => {}}
+      />
     </section>
   );
 }
