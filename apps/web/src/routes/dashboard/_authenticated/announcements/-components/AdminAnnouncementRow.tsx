@@ -110,7 +110,7 @@ export function AdminAnnouncementRow({
         <AnnouncementStatusBadge announcement={announcement} />
       </div>
 
-      <div className="flex items-center justify-end lg:gap-1">
+      <div className="hidden items-center justify-end gap-1 lg:flex">
         <AdminTableAction label="Edit" variant="neutral" onClick={() => onEdit(announcement)}>
           <RiEditLine aria-hidden="true" className="size-3.5" />
         </AdminTableAction>

@@ -135,18 +135,6 @@ export function AdminResourceRow({
 
         <CatalogRowActions
           deleted={deleted}
-          leadingAction={
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={resource.url}
-              aria-label={linkLabel}
-              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35 lg:hidden"
-            >
-              <RiExternalLinkLine aria-hidden="true" className="size-4" />
-            </a>
-          }
           onEdit={() => onEdit(resource)}
           onDelete={() => onLifecycle({ resourceId: resource.id, action: "delete" }, label)}
           onRestore={() => onLifecycle({ resourceId: resource.id, action: "restore" }, label)}

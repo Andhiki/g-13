@@ -36,7 +36,7 @@ function AdminUserRow({
     <AdminTableRow
       selected={selected}
       onSelect={onSelect}
-      className={`${userTableColumns} items-center`}
+      className={`grid-cols-[minmax(0,1fr)_auto] ${userTableColumns} items-center`}
     >
       <div className="flex min-w-0 items-center gap-2.5">
         <AccountAvatar name={user.name} image={user.image} />

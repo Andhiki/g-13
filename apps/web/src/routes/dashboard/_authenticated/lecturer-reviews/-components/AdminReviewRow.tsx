@@ -107,7 +107,7 @@ export function AdminReviewRow({
       </div>
 
       {!deleted && (
-        <div className="flex items-center justify-end lg:gap-1">
+        <div className="hidden items-center justify-end gap-1 lg:flex">
           {pending ? (
             <>
               <AdminTableAction

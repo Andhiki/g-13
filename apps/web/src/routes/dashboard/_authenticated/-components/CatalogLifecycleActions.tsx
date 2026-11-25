@@ -1,5 +1,4 @@
 import { RiDeleteBinLine, RiEditLine, RiRestartLine } from "@remixicon/react";
-import type { ReactNode } from "react";
 import { AdminTableAction } from "./AdminTable";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -9,17 +8,14 @@ export function CatalogRowActions({
   onEdit,
   onDelete,
   onRestore,
-  leadingAction,
 }: {
   deleted: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onRestore: () => void;
-  leadingAction?: ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-end lg:gap-1">
-      {leadingAction}
+    <div className="hidden items-center justify-end gap-1 lg:flex">
       {!deleted ? (
         <>
           <AdminTableAction label="Edit" onClick={onEdit}>
