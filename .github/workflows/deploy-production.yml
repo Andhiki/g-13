@@ -4,9 +4,10 @@
 # Account Settings: Read is optional because CLOUDFLARE_ACCOUNT_ID is set below.
 #
 # After a successful deploy, tags the deployed commit as vX.Y.Z and publishes a
-# GitHub Release. The first release uses apps/web/package.json's version; later
-# releases bump from the commits since the last v* tag (breaking -> major,
-# feat -> minor, otherwise patch).
+# GitHub Release. The release PR title names the version, for example
+# "release: promote staging to production (v0.3.1)". Without one, the first
+# release uses apps/web/package.json's version and later releases bump from the
+# commits since the last v* tag (breaking -> major, feat -> minor, otherwise patch).
 name: Deploy production
 
 on:
@@ -56,6 +57,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -84,24 +86,33 @@ jobs:
             range="HEAD"
           fi
 
-          if [ -z "$latest" ]; then
-            version=$(python3 -c 'import json; print(json.load(open("apps/web/package.json"))["version"])')
-          else
-            log=$(git log "$range" --format='%s%n%b')
-            bump=patch
-            if printf '%s\n' "$log" | grep -qE '(^[a-z]+(\([^)]+\))?!:)|(^BREAKING[ -]CHANGE:)'; then
-              bump=major
-            elif printf '%s\n' "$log" | grep -qE '^feat(\([^)]+\))?:'; then
-              bump=minor
-            fi
+          # The release PR title names the version, for example "(v0.3.1)".
+          pr_title=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '.[0].title // ""' 2>/dev/null || true)
+          version=$(printf '%s\n' "$pr_title" \
+            | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' \
+            | head -n1 | sed 's/^v//' || true)
 
-            IFS=. read -r major minor patch <<< "${latest#v}"
-            case "$bump" in
-              major) major=$((major + 1)); minor=0; patch=0 ;;
-              minor) minor=$((minor + 1)); patch=0 ;;
-              patch) patch=$((patch + 1)) ;;
-            esac
-            version="$major.$minor.$patch"
+          if [ -z "$version" ]; then
+            if [ -z "$latest" ]; then
+              version=$(python3 -c 'import json; print(json.load(open("apps/web/package.json"))["version"])')
+            else
+              log=$(git log "$range" --format='%s%n%b')
+              bump=patch
+              if printf '%s\n' "$log" | grep -qE '(^[a-z]+(\([^)]+\))?!:)|(^BREAKING[ -]CHANGE:)'; then
+                bump=major
+              elif printf '%s\n' "$log" | grep -qE '^feat(\([^)]+\))?:'; then
+                bump=minor
+              fi
+
+              IFS=. read -r major minor patch <<< "${latest#v}"
+              case "$bump" in
+                major) major=$((major + 1)); minor=0; patch=0 ;;
+                minor) minor=$((minor + 1)); patch=0 ;;
+                patch) patch=$((patch + 1)) ;;
+              esac
+              version="$major.$minor.$patch"
+            fi
           fi
 
           tag="v$version"
