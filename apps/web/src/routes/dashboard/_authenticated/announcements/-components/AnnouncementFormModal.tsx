@@ -435,6 +435,9 @@ function AnnouncementFormBody({
           ctaLabelId={ctaLabelId}
           ctaLabelEn={ctaLabelEn}
           countdownAt={countdownAt}
+          startsAt={startsAt}
+          endsAt={endsAt}
+          enabled={enabled}
         />
       }
       onClose={onClose}

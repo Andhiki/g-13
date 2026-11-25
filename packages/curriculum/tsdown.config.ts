@@ -1,9 +1,10 @@
 import { defineConfig } from "tsdown";
 
 import { registry } from "./src/registry-data";
+import { searchParams } from "./src/search-index-data";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/index.ts", "src/ids.ts", "src/search-index.ts"],
   plugins: [
     {
       name: "precompute-curricula",
@@ -17,6 +18,15 @@ export default defineConfig({
             return `${JSON.stringify(id)}: (() => { const all = ${JSON.stringify(all)}; return { curriculum: { ...${JSON.stringify(metadata)}, all, core: [${references(core)}], electives: [${references(electives)}] }, rules: ${JSON.stringify(rules)}, syllabi: ${JSON.stringify(syllabi)} }; })()`;
           });
           return `export const registry = {${entries.join(",")}};`;
+        },
+      },
+    },
+    {
+      name: "precompute-search-params",
+      transform: {
+        filter: { id: /\/search-index-data\.ts$/ },
+        handler() {
+          return `export const searchParams = ${JSON.stringify(searchParams)};`;
         },
       },
     },
