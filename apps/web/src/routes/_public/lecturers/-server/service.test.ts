@@ -235,13 +235,14 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
       expect(await submitReview(db, input, { ip, browserId, secret, now })).toEqual({
         data: null,
         error: REVIEW_ERRORS.RATE_LIMIT,
+        resetAt: 10_800_000,
       });
     }
 
     // The quota follows the browser, not the network.
     expect(
       await submitReview(db, input, { ip: "198.51.100.24", browserId: browserA, secret, now }),
-    ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT });
+    ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: 10_800_000 });
 
     // The IP backstop allows 14 more of the 21 rotated-browser attempts (6 used above).
     let allowed = 0;
@@ -451,6 +452,7 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     expect(await setReviewLike(db, input, context)).toEqual({
       data: null,
       error: REVIEW_ERRORS.RATE_LIMIT,
+      resetAt: 7_200_000,
     });
 
     // Likes use a separate bucket; exhausting them must not consume submissions.

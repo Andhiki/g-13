@@ -14,7 +14,11 @@ import {
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
-import { rejectReviewLikeOperation, rejectSubmissionOperation } from "./failures";
+import {
+  rejectRateLimitedReview,
+  rejectReviewLikeOperation,
+  rejectSubmissionOperation,
+} from "./failures";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
 import { submitReview } from "./submission.service";
@@ -59,6 +63,7 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
       if (!verified) return { data: null, error: REVIEW_ERRORS.CAPTCHA } as const;
       return submitReview(createDatabase(env.DB), review, { ip, browserId, secret });
     });
+    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectSubmissionOperation(result.error);
     return result.data;
   });
@@ -77,6 +82,7 @@ export const updateReviewLike = createServerFn({ method: "POST" })
       const ip = reviewClientIp(getRequest());
       return setReviewLike(createDatabase(env.DB), data, { ip, secret });
     });
+    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectReviewLikeOperation(result.error);
     return result.data;
   });

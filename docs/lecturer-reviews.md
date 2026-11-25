@@ -34,6 +34,11 @@ three-per-hour limit. Likes have a separate bucket and never consume submission
 limits. The browser identifier is a client-controlled hint, not an authenticated
 identity; Turnstile remains the primary gate for every submission.
 
+Rate-limited submissions and likes return HTTP 429 with a `Retry-After` header
+containing the number of seconds until the quota resets at the next UTC hour,
+rounded up. The submission form displays the server's reset timestamp in the
+visitor's local time and falls back to the browser clock if no timestamp arrives.
+
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them
 from the dashboard. Reviews with every rating at 3 or higher publish immediately.
