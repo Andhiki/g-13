@@ -68,13 +68,20 @@ Untuk perubahan yang berdampak pada pengguna, jelaskan hasilnya secara singkat d
 Indonesia di deskripsi PR. Untuk koreksi kurikulum atau prasyarat, sertakan edisi, kode mata
 kuliah, sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi.
 
-Setelah deploy produksi berhasil, workflow membuat tag SemVer dan menerbitkan catatan awal
-dari daftar perubahan GitHub. Judul PR promosi ke `main` menentukan nomor versi, misalnya
-`release: promote staging to production (v0.3.1)`; tanpa nomor versi, workflow menaikkan
-versi dari tipe commit sejak tag terakhir. Sebagai bagian dari promosi, maintainer memperbarui deskripsi
-rilis di GitHub dengan ringkasan perubahan utama, penyempurnaan, dan perbaikan bug yang
-benar-benar masuk ke tag tersebut. Cantumkan bagian yang relevan dan pertahankan tautan
-perbandingan versi serta atribusi kontributor.
+PR promosi dari `staging` ke `main` membawa seluruh perubahan yang ada di
+`staging`. Pilih satu label versi: `release:patch` untuk perbaikan,
+`release:minor` untuk fitur kompatibel, atau `release:major` untuk perubahan
+yang memutus kompatibilitas. Pemeriksaan PR menampilkan versi yang diusulkan.
+
+Jika perbaikan perlu terbit sebelum perubahan lain di `staging`, buat branch
+`hotfix/<nama>` dari `main` dan cherry-pick hanya commit perbaikannya. Buka PR
+ke `main` dengan label `release:patch`. Setelah rilis, gabungkan `main` kembali
+ke `staging` agar riwayat perbaikan terbawa.
+
+Workflow memverifikasi PR dan label sebelum deploy produksi. Setelah deploy
+berhasil, workflow menandai commit yang dideploy dengan tag SemVer dan
+menerbitkan catatan awal. Maintainer memperbarui catatan itu dalam bahasa
+Indonesia dan mempertahankan tautan perbandingan serta atribusi kontributor.
 
 ## Koreksi kurikulum
 
