@@ -8,6 +8,12 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 ## Unreleased
 
+### 2026-11-25
+
+#### Changed
+
+- Arsip ujian di ponsel kini memakai gulir halaman penuh, sehingga daftar mata kuliah tidak lagi terjepit di dalam kotak yang bisa digulir sendiri, dan kolom pencarian tetap menempel di bawah header saat halaman digulir.
+
 ### 2026-11-24
 
 #### Added
