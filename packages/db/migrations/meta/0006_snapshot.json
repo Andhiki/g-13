@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "aeb149ba-312d-4d48-af03-cc0914fbba99",
+  "id": "9f435377-d05a-41e4-bf18-639c735c633d",
   "prevId": "51c72d73-b6dc-4b05-94d4-271fabde6945",
   "tables": {
     "announcements": {
@@ -13,14 +13,6 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
-        },
-        "variant": {
-          "name": "variant",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'primary'"
         },
         "title_id": {
           "name": "title_id",
@@ -49,14 +41,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "cta_open_in_new_tab": {
-          "name": "cta_open_in_new_tab",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         },
         "cta_href": {
           "name": "cta_href",
@@ -151,10 +135,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
-        "announcements_variant": {
-          "name": "announcements_variant",
-          "value": "\"announcements\".\"variant\" in ('primary', 'error', 'neutral')"
-        },
         "announcements_window": {
           "name": "announcements_window",
           "value": "\"announcements\".\"ends_at\" is null or \"announcements\".\"ends_at\" > \"announcements\".\"starts_at\""
@@ -722,7 +702,15 @@
           "default": "(unixepoch() * 1000)"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "review_likes_browser_id_idx": {
+          "name": "review_likes_browser_id_idx",
+          "columns": [
+            "browser_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "review_likes_review_id_reviews_id_fk": {
           "name": "review_likes_review_id_reviews_id_fk",
@@ -775,7 +763,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "review_submission_limits_expires_at_idx": {
+          "name": "review_submission_limits_expires_at_idx",
+          "columns": [
+            "expires_at"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

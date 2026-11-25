@@ -34,15 +34,18 @@ Submissions are also gated by Cloudflare Turnstile (invisible widget). Set
 fail-closed, so reviews are rejected when the secret is missing or Siteverify fails.
 See [docs/lecturer-reviews.md](../../docs/lecturer-reviews.md).
 
-The limits are three validated review submissions and 60 like actions per IP per
-UTC clock hour, shared across workers through an atomic D1 upsert. Likes use a
-random identifier stored in the browser; clearing storage allows another like.
-Failed writes may consume an attempt. Only a window-specific HMAC and counter are
-stored separately from reviews. Expired
-counters are deleted on subsequent valid submission activity; a quiet deployment
-may retain expired hashes until the next submission. Raw IPs are not stored here;
-infrastructure logging has separate retention. Secret rotation resets limits.
-Tests initialize ephemeral D1 databases from the generated migrations.
+The submission limit is three validated reviews per browser per UTC hour, with a
+20-submissions-per-IP hourly backstop. Likes remain 60 per IP per UTC hour.
+Counters are shared across workers through atomic D1 upserts. Reviews and likes
+use a random browser identifier; clearing storage allows another like and starts
+a fresh submission bucket, while the IP backstop still applies. Without a browser
+identifier, submissions fall back to three per IP per hour. Failed writes may
+consume an attempt. Only a window-specific HMAC and counter are stored separately
+from reviews. Expired counters are deleted on subsequent valid submission
+activity; a quiet deployment may retain expired hashes until the next submission.
+Raw IPs are not stored here; infrastructure logging has separate retention.
+Secret rotation resets limits. Tests initialize ephemeral D1 databases from the
+generated migrations.
 
 Public launch requires a production D1 database with migrations and seed applied,
 the server-only rate-limit secret, and a named human owner ready to review reports

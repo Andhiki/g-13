@@ -50,14 +50,14 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
       const { REVIEW_RATE_LIMIT_SECRET: secret, TURNSTILE_SECRET_KEY: turnstileSecret } =
         parseSubmissionEnvironment(env);
       const ip = reviewClientIp(getRequest());
-      const { turnstileToken, ...review } = data;
+      const { turnstileToken, browserId, ...review } = data;
       const verified = await verifyTurnstileToken({
         secret: turnstileSecret,
         token: turnstileToken,
         remoteip: ip,
       });
       if (!verified) return { data: null, error: REVIEW_ERRORS.CAPTCHA } as const;
-      return submitReview(createDatabase(env.DB), review, { ip, secret });
+      return submitReview(createDatabase(env.DB), review, { ip, browserId, secret });
     });
     if (result.error !== null) return rejectSubmissionOperation(result.error);
     return result.data;

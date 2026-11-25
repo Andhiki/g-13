@@ -88,9 +88,9 @@ The alumni directory reads from a Strapi collection through a server route. It n
 a `STRAPI_API_TOKEN` secret; see the
 [alumni directory guide](docs/alumni-directory.md) before running or deploying it.
 
-Anonymous lecturer reviews are protected by a per-IP rate limit and an invisible
-Cloudflare Turnstile check. Set `REVIEW_RATE_LIMIT_SECRET`, `TURNSTILE_SITE_KEY`, and
-`TURNSTILE_SECRET_KEY`; see the
+Anonymous lecturer reviews are protected by a per-browser rate limit with a per-IP
+backstop and an invisible Cloudflare Turnstile check. Set
+`REVIEW_RATE_LIMIT_SECRET`, `TURNSTILE_SITE_KEY`, and `TURNSTILE_SECRET_KEY`; see the
 [lecturer reviews guide](docs/lecturer-reviews.md) before running or deploying it.
 
 For website changes, start in `apps/web/`. For curriculum changes, start in
