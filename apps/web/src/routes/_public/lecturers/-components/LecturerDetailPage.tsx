@@ -372,6 +372,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         lecturerId={data.lecturer.id}
         lecturerName={data.lecturer.name}
         courseId={courseId ?? ""}
+        browserId={browserId}
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
         onSubmitted={async (status) => {

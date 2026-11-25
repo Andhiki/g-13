@@ -87,7 +87,18 @@ for (const failure of [
   },
 ]) {
   test(`Review submission recovery: ${failure.name}`, async ({ app, browser, screen }) => {
-    if (failure.name === "submission limit reached") await exhaustReviewLimit("submission");
+    if (failure.name === "submission limit reached") {
+      await app.open(profile);
+      await expect
+        .poll(() =>
+          browser.evaluate(() => Boolean(localStorage.getItem("lecturer-review-browser-id"))),
+        )
+        .toBe(true);
+      const browserId = await browser.evaluate(
+        () => localStorage.getItem("lecturer-review-browser-id") ?? "",
+      );
+      await exhaustReviewLimit("submission", browserId);
+    }
     const body = `This disposable review should never appear ${randomUUID()}.`;
     await (await fillReview({ app, browser, screen }, body, failure)).click();
     await expect(screen.getByRole("dialog").getByText(failure.text)).toBeVisible();

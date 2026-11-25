@@ -2,8 +2,9 @@
 
 The lecturer directory (`/lecturers` and `/lecturers/$lecturerId`) accepts community
 reviews without an account. Each submission is protected on the server by two layers:
-an hourly per-IP rate limit and a [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)
-check. Both run inside the `publishLecturerReview` server function in
+an hourly per-browser rate limit with a per-IP backstop, and a
+[Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) check. Both run
+inside the `publishLecturerReview` server function in
 [`handler.ts`](../apps/web/src/routes/_public/lecturers/-server/handler.ts); the
 browser never calls Cloudflare's Siteverify endpoint itself.
 
@@ -15,11 +16,23 @@ Browser (dialog on /lecturers/$lecturerId)
   │  invisible Turnstile challenge → token
   ▼
 publishLecturerReview (server function)
-  │  verifyTurnstileToken(secret, token, remoteip)   ── fail → 400 "captcha"
-  │  allowReviewAction(rate limit: 3 / IP / UTC hour) ── fail → 429 "rate-limit"
+  │  verifyTurnstileToken(secret, token, remoteip)    ── fail → 400 "captcha"
+  │  allowReviewAction(
+  │    3 / browser / UTC hour,
+  │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
   ▼
 submitReview → D1
 ```
+
+The submission limit follows the browser, not the network. The browser sends the
+random `lecturer-review-browser-id` UUID it already uses for likes; the server
+HMACs it with `REVIEW_RATE_LIMIT_SECRET` before storing the counter. Visitors who
+share a campus network, office NAT, or a mobile carrier's CGNAT therefore keep
+their own quota. The per-IP ceiling bounds abuse from someone rotating browser
+identifiers. When browser storage is unavailable, the IP keeps the strict
+three-per-hour limit. Likes have a separate bucket and never consume submission
+limits. The browser identifier is a client-controlled hint, not an authenticated
+identity; Turnstile remains the primary gate for every submission.
 
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them
@@ -114,8 +127,9 @@ the rejection path. Production keys reject dummy tokens and vice versa.
 Invisible mode requires referencing Cloudflare's
 [Turnstile Privacy Addendum](https://www.cloudflare.com/trust-hub/privacy-and-compliance/)
 in the app's own privacy policy. The server passes the visitor's `CF-Connecting-IP` to
-Siteverify as `remoteip` and uses the same IP for the hourly rate limit; raw IPs are
-not stored in review records (see `packages/db/README.md`).
+Siteverify as `remoteip` and uses the same IP for the hourly per-IP backstop; the
+browser identifier is HMAC'd before storage. Raw IPs are not stored in review records
+(see `packages/db/README.md`).
 
 ## Verifying a change
 
