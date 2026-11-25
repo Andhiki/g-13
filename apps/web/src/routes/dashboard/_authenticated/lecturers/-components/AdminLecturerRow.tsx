@@ -1,5 +1,6 @@
 import {
   AdminTableInspectButton,
+  AdminTableMeta,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { CatalogRowActions } from "@/routes/dashboard/_authenticated/-components/CatalogLifecycleActions";
@@ -42,17 +43,24 @@ export function AdminLecturerRow({
           >
             {lecturer.name}
           </AdminTableInspectButton>
-          <div className="lg:hidden">
+          <div className="shrink-0 lg:hidden">
             <RecordStatusBadge deleted={deleted} />
           </div>
         </div>
-        <Typography variant="code" color="muted" className="mt-0.5 block truncate">
+        <Typography variant="code" color="muted" className="mt-0.5 hidden truncate lg:block">
           {lecturer.id}
         </Typography>
+        <AdminTableMeta>
+          <span className="shrink-0">Reviews: {lecturer.reviewCount}</span>
+          <span className="truncate font-mono">· {lecturer.id}</span>
+        </AdminTableMeta>
       </div>
 
-      <Typography variant="caption" color="muted" className="tabular-nums lg:text-right">
-        <span className="lg:hidden">Reviews: </span>
+      <Typography
+        variant="caption"
+        color="muted"
+        className="hidden tabular-nums lg:block lg:text-right"
+      >
         {lecturer.reviewCount}
       </Typography>
 

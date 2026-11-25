@@ -3,6 +3,7 @@ import { AlignBadge } from "@/ui/badge";
 import {
   AdminTableHeader,
   AdminTableInspectButton,
+  AdminTableMeta,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { formatMonthYear } from "@/date-format";
@@ -11,7 +12,7 @@ import { Typography } from "@/ui/typography";
 import type { loadAdminUsers } from "../-server/handler";
 import { AccountAvatar } from "./AccountAvatar";
 
-const userTableColumns = "grid-cols-[minmax(0,1fr)_120px] md:grid-cols-[minmax(0,1fr)_104px_120px]";
+const userTableColumns = "lg:grid-cols-[minmax(0,1fr)_104px_120px]";
 
 type Users = Awaited<ReturnType<typeof loadAdminUsers>>["rows"];
 
@@ -29,6 +30,8 @@ function AdminUserRow({
   onSelect: () => void;
 }) {
   const approved = canModerate(user.role);
+  const joined = formatMonthYear(user.createdAt, language);
+  const summary = `${user.email} · ${joined}`;
   return (
     <AdminTableRow
       selected={selected}
@@ -47,22 +50,24 @@ function AdminUserRow({
           >
             {user.name}
           </AdminTableInspectButton>
-          <Typography variant="caption" color="muted" className="truncate">
+          <Typography variant="caption" color="muted" className="hidden truncate lg:block">
             {user.email}
           </Typography>
-          <Typography variant="caption" color="muted" className="mt-1 tabular-nums md:hidden">
-            {formatMonthYear(user.createdAt, language)}
-          </Typography>
+          <AdminTableMeta>
+            <span className="truncate" title={summary}>
+              {summary}
+            </span>
+          </AdminTableMeta>
         </div>
       </div>
       <Typography
         variant="caption"
         color="strong"
-        className="hidden text-center tabular-nums md:block"
+        className="hidden text-center tabular-nums lg:block"
       >
-        {formatMonthYear(user.createdAt, language)}
+        {joined}
       </Typography>
-      <div className="flex justify-end md:justify-center">
+      <div className="flex justify-end max-lg:self-start lg:justify-center">
         <AlignBadge.Root
           size="medium"
           variant={approved ? "light" : "warning"}
@@ -97,10 +102,10 @@ export function AdminUserList({
   const { language } = useLocale();
   return (
     <>
-      <AdminTableHeader className={`grid md:sticky md:top-0 md:z-10 ${userTableColumns}`}>
+      <AdminTableHeader className={`hidden lg:sticky lg:top-0 lg:z-10 lg:grid ${userTableColumns}`}>
         <span>Account</span>
-        <span className="hidden text-center md:block">Joined</span>
-        <span className="text-right md:text-center">Role</span>
+        <span className="text-center">Joined</span>
+        <span className="text-center">Role</span>
       </AdminTableHeader>
       {users.slice(0, 50).map((user) => (
         <AdminUserRow
