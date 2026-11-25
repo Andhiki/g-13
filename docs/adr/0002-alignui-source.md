@@ -1,3 +1,5 @@
-# Use AlignUI component source in the web app
+# Use ui-sdk primitives in the web app
 
-Use MIT-licensed AlignUI component source and design tokens, adapted into `apps/web/src/ui/`, rather than adding a runtime component package. Standard controls keep AlignUI behavior and variants; domain-specific layouts remain in their owning feature. The source is the AlignUI Next.js TypeScript starter at commit `f37bd913a058ceca39d5bfc2369ec420018e5716`; retain its license in `THIRD_PARTY_NOTICES.md`.
+Use `@ui-sdk/react` for shared interactive controls. Components in `apps/web/src/ui/` expose the app's variants and apply its Tailwind styles and design tokens. Keep presentational elements such as badges, breadcrumbs, key labels, and tables as semantic HTML where ui-sdk has no equivalent. Domain-specific layouts belong to their owning feature.
+
+The design tokens and some styles still derive from the original starter. Their source and MIT license are recorded in [Third-Party Notices](../../THIRD_PARTY_NOTICES.md).

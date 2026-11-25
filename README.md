@@ -121,7 +121,6 @@ Verify UI changes manually. Automated tests cover data and application logic, no
 ## Acknowledgements
 
 - [course.csui.dev](https://course.csui.dev) inspired this project.
-- [AlignUI](https://www.alignui.com) provides UI components used in this project.
 
 ## License and sources
 
