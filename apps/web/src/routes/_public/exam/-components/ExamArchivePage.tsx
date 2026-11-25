@@ -297,7 +297,7 @@ function ExamArchiveList({
       onKeyDown={(event) =>
         handleArchiveListKeyDown(event, parent?.location, focusNextFolder, onOpenFolder)
       }
-      className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base"
+      className="min-h-0 flex-1 p-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-base lg:overflow-y-auto lg:overscroll-contain"
     >
       {parent && (
         <Link
@@ -359,8 +359,8 @@ function ExamArchiveExplorer({
   const { text } = useLocale("exam");
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label={text("Penjelajah arsip ujian")}>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-stroke-soft-200 lg:border-l lg:border-t-0">
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 px-3 py-2">
+      <div className="flex min-h-0 flex-1 flex-col border-t border-stroke-soft-200 lg:overflow-hidden lg:border-l lg:border-t-0">
+        <div className="sticky top-[var(--app-header-height)] z-20 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stroke-soft-200 bg-bg-white-0 px-3 py-2 lg:static">
           <ExamBreadcrumbs breadcrumbs={folder.breadcrumbs} />
           {location.length === 0 && (
             <ExamFolderSearch
@@ -514,7 +514,7 @@ export function ExamArchivePage() {
   };
 
   return (
-    <main className="flex h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950 lg:grid lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)]">
+    <main className="flex min-h-[calc(100dvh-var(--app-header-height))] flex-col bg-bg-white-0 text-text-strong-950 lg:grid lg:h-[calc(100dvh-var(--app-header-height))] lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)]">
       <header className="shrink-0 px-5 py-10 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
         <Typography as="h1" variant="pageTitle" className="m-0">
           {text("Arsip Ujian")}

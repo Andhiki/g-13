@@ -12,6 +12,7 @@ Riwayat sebelum changelog ini dibuat tersedia di
 
 #### Changed
 
+- Arsip ujian di ponsel kini memakai gulir halaman penuh, sehingga daftar mata kuliah tidak lagi terjepit di dalam kotak yang bisa digulir sendiri, dan kolom pencarian tetap menempel di bawah header saat halaman digulir.
 - Halaman publik selain peta kurikulum dan roadmap tidak lagi mengunduh data kurikulum lengkap saat pertama dibuka. Validasi parameter tautan kini memakai indeks ringkas, sehingga pemuatan awal halaman tersebut sekitar 100 KB lebih kecil.
 
 ### 2026-11-24
