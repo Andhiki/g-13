@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const REVIEW_BODY_MIN_LENGTH = 20;
+export const REVIEW_BODY_MAX_LENGTH = 1000;
+
 const trimmed = z.string().trim();
 const requiredTrimmed = (max: number) => trimmed.min(1).max(max);
 const integerRating = z.number().int();
@@ -12,7 +15,7 @@ const submissionFieldsSchema = z.object({
   clarity: ratingScore(),
   support: ratingScore(),
   organization: ratingScore(),
-  body: requiredTrimmed(1000),
+  body: trimmed.min(REVIEW_BODY_MIN_LENGTH).max(REVIEW_BODY_MAX_LENGTH),
 });
 
 export const submissionFieldSchema = submissionFieldsSchema
