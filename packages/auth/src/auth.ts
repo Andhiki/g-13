@@ -135,6 +135,11 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       },
     },
     advanced: {
+      // The omahti proxy worker may rewrite the request host, so the auth route
+      // normalizes each request to the browser-facing origin and forwards it here
+      // through x-forwarded-host/x-forwarded-proto. Client supplied proxy headers
+      // are stripped first, and only hosts in allowedHosts are accepted.
+      trustedProxyHeaders: true,
       disableOriginCheck: false,
       disableCSRFCheck: false,
       ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },

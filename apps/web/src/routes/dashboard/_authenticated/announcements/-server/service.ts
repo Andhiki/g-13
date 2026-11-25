@@ -1,4 +1,3 @@
-import { slugifyCatalogText } from "@/routes/dashboard/_authenticated/-server/slug";
 import { canManageUsers } from "@g13/auth";
 import type { createDatabase } from "@g13/db/client";
 import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementAdminResult } from "../-shared/errors";
@@ -12,7 +11,6 @@ import {
   createAnnouncementRecord,
   deleteAnnouncement,
   getAnnouncementCounts,
-  isSlugTaken,
   listAdminAnnouncements,
   setAnnouncementEnabled,
   updateAnnouncementRecord,
@@ -42,17 +40,6 @@ export async function inspectAnnouncements(
   return { data: { rows, counts }, error: null };
 }
 
-async function resolveUniqueSlug(
-  db: Database,
-  slug: string,
-  fallbackSource: string,
-  excludeId?: string,
-): Promise<string | null> {
-  const base = slug === "" ? slugifyCatalogText(fallbackSource, "announcement") : slug;
-  if (await isSlugTaken(db, base, excludeId)) return null;
-  return base;
-}
-
 export async function createAnnouncement(
   db: Database,
   actor: Actor,
@@ -63,9 +50,7 @@ export async function createAnnouncement(
   if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
-  const slug = await resolveUniqueSlug(db, input.slug, input.titleId);
-  if (slug === null) return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.SLUG_IN_USE };
-  const created = await createAnnouncementRecord(db, { ...input, slug }, actor.id);
+  const created = await createAnnouncementRecord(db, input, actor.id);
   return { data: created, error: null };
 }
 
@@ -79,9 +64,7 @@ export async function updateAnnouncement(
   if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
-  const slug = await resolveUniqueSlug(db, input.slug, input.titleId, input.announcementId);
-  if (slug === null) return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.SLUG_IN_USE };
-  if (!(await updateAnnouncementRecord(db, { ...input, slug }))) {
+  if (!(await updateAnnouncementRecord(db, input))) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE };
   }
   return { data: { announcementId: input.announcementId }, error: null };

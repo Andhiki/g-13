@@ -6,7 +6,6 @@ type Database = ReturnType<typeof createDatabase>;
 
 export type ActiveAnnouncement = {
   id: string;
-  slug: string;
   titleId: string;
   titleEn: string;
   bodyId: string;
@@ -14,6 +13,7 @@ export type ActiveAnnouncement = {
   ctaHref: string | null;
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
+  countdownAt: Date | null;
 };
 
 export async function listActiveAnnouncements(
@@ -23,7 +23,6 @@ export async function listActiveAnnouncements(
   return db
     .select({
       id: announcements.id,
-      slug: announcements.slug,
       titleId: announcements.titleId,
       titleEn: announcements.titleEn,
       bodyId: announcements.bodyId,
@@ -31,6 +30,7 @@ export async function listActiveAnnouncements(
       ctaHref: announcements.ctaHref,
       ctaLabelId: announcements.ctaLabelId,
       ctaLabelEn: announcements.ctaLabelEn,
+      countdownAt: announcements.countdownAt,
     })
     .from(announcements)
     .where(
