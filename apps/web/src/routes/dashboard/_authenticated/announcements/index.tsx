@@ -1,7 +1,9 @@
 import { RiMegaphoneLine } from "@remixicon/react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { formatAbsoluteTime } from "@/date-format";
+import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
@@ -30,6 +32,7 @@ import {
   type AnnouncementLifecycleInput,
   type AnnouncementStatus,
 } from "./-shared/schemas";
+import type { AnnouncementConflict } from "./-shared/errors";
 import { announcementStatusLabel } from "./-shared/status";
 
 const emptyStateCopy: Record<AnnouncementStatus, { title: string; description: string }> = {
@@ -263,12 +266,14 @@ function AnnouncementsContent({
 }
 
 function AnnouncementLifecycleModal({
+  children,
   confirmation,
   isError,
   isPending,
   onClose,
   onConfirm,
 }: {
+  children?: ReactNode;
   confirmation: { input: AnnouncementLifecycleInput; label: string } | null;
   isError: boolean;
   isPending: boolean;
@@ -294,7 +299,62 @@ function AnnouncementLifecycleModal({
       pending={isPending}
       onClose={onClose}
       onConfirm={onConfirm}
-    />
+    >
+      {children}
+    </ConfirmActionModal>
+  );
+}
+
+type SavePayload = {
+  announcementId?: string;
+  values: AnnouncementFieldsInput;
+  confirmedConflictIds?: string[];
+};
+
+type Replacement = { conflicts: AnnouncementConflict[] } & (
+  { kind: "save"; payload: SavePayload } | { kind: "enable"; input: AnnouncementLifecycleInput }
+);
+
+function AnnouncementReplacementModal({
+  conflicts,
+  pending,
+  isError,
+  onClose,
+  onConfirm,
+}: {
+  conflicts: AnnouncementConflict[];
+  pending: boolean;
+  isError: boolean;
+  onClose: () => void;
+  onConfirm: (ids: string[]) => void;
+}) {
+  const { language } = useLocale("notifications");
+
+  return (
+    <ConfirmActionModal
+      open
+      title="Replace overlapping announcements?"
+      description="This schedule overlaps with the enabled announcements below. Confirming will disable them and enable this announcement."
+      confirmLabel="Disable and enable"
+      pending={pending}
+      error={isError ? "Replacement failed. Try again." : undefined}
+      onClose={onClose}
+      onConfirm={() => onConfirm(conflicts.map(({ id }) => id))}
+    >
+      <ul className="mt-3 max-h-48 divide-y divide-stroke-soft-200 overflow-y-auto rounded-10 border border-stroke-soft-200 bg-bg-weak-50">
+        {conflicts.map(({ id, titleEn, startsAt, endsAt }) => (
+          <li key={id} className="space-y-1 px-3 py-2">
+            <Typography variant="labelSmall" color="strong" className="wrap-break-word">
+              {titleEn}
+            </Typography>
+            <Typography variant="caption" color="muted">
+              {formatAbsoluteTime(startsAt.getTime(), language)}{" "}
+              {endsAt ? `→ ${formatAbsoluteTime(endsAt.getTime(), language)}` : "· No expiry"}
+            </Typography>
+          </li>
+        ))}
+      </ul>
+    </ConfirmActionModal>
   );
 }
 
@@ -317,6 +377,8 @@ function AdminAnnouncementsPage() {
     input: AnnouncementLifecycleInput;
     label: string;
   } | null>(null);
+
+  const [replacement, setReplacement] = useState<Replacement | null>(null);
 
   const queryClient = useQueryClient();
   const announcementsQuery = useQuery(adminAnnouncementsQuery(offset, status));
@@ -347,17 +409,21 @@ function AdminAnnouncementsPage() {
   }
 
   const saveMutation = useMutation({
-    mutationFn: async (payload: { announcementId?: string; values: AnnouncementFieldsInput }) => {
-      if (payload.announcementId) {
-        const updated = await updateAdminAnnouncement({
-          data: { announcementId: payload.announcementId, ...payload.values },
-        });
-        return { id: updated.announcementId, created: false };
+    mutationFn: async ({ announcementId, values, confirmedConflictIds }: SavePayload) => {
+      const data = { ...values, confirmedConflictIds };
+      if (announcementId) {
+        const updated = await updateAdminAnnouncement({ data: { ...data, announcementId } });
+        return "conflicts" in updated ? updated : { id: updated.announcementId, created: false };
       }
-      const created = await createAdminAnnouncement({ data: payload.values });
-      return { id: created.id, created: true };
+      const created = await createAdminAnnouncement({ data });
+      return "conflicts" in created ? created : { id: created.id, created: true };
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result, payload) => {
+      if ("conflicts" in result) {
+        setReplacement({ kind: "save", payload, conflicts: result.conflicts });
+        return;
+      }
+      setReplacement(null);
       await invalidateAnnouncementQueries();
       setFormModal({ open: false, announcement: null });
       if (result.created) {
@@ -371,7 +437,12 @@ function AdminAnnouncementsPage() {
   const lifecycleMutation = useMutation({
     mutationFn: (input: AnnouncementLifecycleInput) =>
       changeAdminAnnouncementLifecycle({ data: input }),
-    onSuccess: async () => {
+    onSuccess: async (result, input) => {
+      if ("conflicts" in result) {
+        setReplacement({ kind: "enable", input, conflicts: result.conflicts });
+        return;
+      }
+      setReplacement(null);
       await invalidateAnnouncementQueries();
       setConfirmation(null);
     },
@@ -459,27 +530,98 @@ function AdminAnnouncementsPage() {
         onEdit={openEditModal}
         onLifecycle={confirmLifecycle}
       />
+      <AnnouncementMutationModals
+        formModal={formModal}
+        confirmation={confirmation}
+        replacement={replacement}
+        onCancelReplacement={() => setReplacement(null)}
+        saveMutation={saveMutation}
+        lifecycleMutation={lifecycleMutation}
+        onCloseForm={() => setFormModal({ open: false, announcement: null })}
+        onCloseLifecycle={() => setConfirmation(null)}
+      />
+    </>
+  );
+}
+
+function AnnouncementMutationModals({
+  formModal,
+  confirmation,
+  replacement,
+  onCancelReplacement,
+  saveMutation,
+  lifecycleMutation,
+  onCloseForm,
+  onCloseLifecycle,
+}: {
+  formModal: { open: boolean; announcement: AdminAnnouncement | null };
+  confirmation: { input: AnnouncementLifecycleInput; label: string } | null;
+  replacement: Replacement | null;
+  onCancelReplacement: () => void;
+  saveMutation: {
+    isPending: boolean;
+    isError: boolean;
+    reset: () => void;
+    mutate: (payload: SavePayload) => void;
+  };
+  lifecycleMutation: {
+    isPending: boolean;
+    isError: boolean;
+    reset: () => void;
+    mutate: (input: AnnouncementLifecycleInput) => void;
+  };
+  onCloseForm: () => void;
+  onCloseLifecycle: () => void;
+}) {
+  const replacementMutation = replacement?.kind === "save" ? saveMutation : lifecycleMutation;
+  const replacementModal = replacement && (
+    <AnnouncementReplacementModal
+      conflicts={replacement.conflicts}
+      pending={replacementMutation.isPending}
+      isError={replacementMutation.isError}
+      onClose={() => {
+        replacementMutation.reset();
+        onCancelReplacement();
+      }}
+      onConfirm={(confirmedConflictIds) => {
+        if (replacement.kind === "save") {
+          saveMutation.mutate({ ...replacement.payload, confirmedConflictIds });
+        } else {
+          lifecycleMutation.mutate({ ...replacement.input, confirmedConflictIds });
+        }
+      }}
+    />
+  );
+
+  return (
+    <>
       <AnnouncementFormModal
         open={formModal.open}
         announcement={formModal.announcement}
         pending={saveMutation.isPending}
         error={
-          saveMutation.isError ? "Could not save announcement. Refresh and try again." : undefined
+          saveMutation.isError && !replacement
+            ? "Could not save announcement. Refresh and try again."
+            : undefined
         }
-        onClose={() => setFormModal({ open: false, announcement: null })}
+        onClose={onCloseForm}
         onSubmit={(values) =>
           saveMutation.mutate({ announcementId: formModal.announcement?.id, values })
         }
-      />
+      >
+        {replacement?.kind === "save" && replacementModal}
+      </AnnouncementFormModal>
       <AnnouncementLifecycleModal
         confirmation={confirmation}
-        isError={lifecycleMutation.isError}
+        isError={lifecycleMutation.isError && !replacement}
         isPending={lifecycleMutation.isPending}
-        onClose={() => setConfirmation(null)}
+        onClose={onCloseLifecycle}
         onConfirm={() => {
           if (confirmation) lifecycleMutation.mutate(confirmation.input);
         }}
-      />
+      >
+        {replacement?.kind === "enable" && replacementModal}
+      </AnnouncementLifecycleModal>
     </>
   );
 }
