@@ -261,6 +261,23 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
   }
 }, 30_000);
 
+it("uses the rate-limit cleanup and browser like lookup indexes", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    const cleanup = await db.$client
+      .prepare("EXPLAIN QUERY PLAN DELETE FROM review_submission_limits WHERE expires_at <= 0")
+      .all();
+    const browserLikes = await db.$client
+      .prepare("EXPLAIN QUERY PLAN SELECT review_id FROM review_likes WHERE browser_id = 'browser'")
+      .all();
+    expect(JSON.stringify(cleanup)).toContain("review_submission_limits_expires_at_idx");
+    expect(JSON.stringify(browserLikes)).toContain("review_likes_browser_id_idx");
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
 it("pages the review course picker by keyset, orders by the active language, and searches code and names", async () => {
   const platform = await createTestPlatformProxy();
   try {
