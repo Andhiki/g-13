@@ -1,4 +1,5 @@
 import type { createDatabase } from "@g13/db/client";
+import { REVIEW_RATE_LIMIT_WINDOW_MS, reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
@@ -37,7 +38,7 @@ async function deriveReviewActionKey(secret: string, identity: string): Promise<
 
 async function incrementLimit(
   db: Database,
-  context: { secret: string; now: number; window: number },
+  context: { secret: string; now: number },
   identity: string,
   limit: number,
 ): Promise<boolean> {
@@ -45,7 +46,7 @@ async function incrementLimit(
   return incrementReviewActionLimit(db, {
     key,
     now: context.now,
-    expiresAt: (context.window + 1) * 3_600_000,
+    expiresAt: reviewRateLimitResetAt(context.now),
     limit,
   });
 }
@@ -56,8 +57,8 @@ export async function allowReviewAction(
   action: "submission" | "like",
 ): Promise<boolean> {
   const now = context.now ?? Date.now();
-  const window = Math.floor(now / 3_600_000);
-  const limits = { secret: context.secret, now, window };
+  const window = Math.floor(now / REVIEW_RATE_LIMIT_WINDOW_MS);
+  const limits = { secret: context.secret, now };
   if (action === "like") {
     return incrementLimit(db, limits, createLikeIpIdentity(context.ip, window), LIKE_LIMIT_PER_IP);
   }

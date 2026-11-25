@@ -27,7 +27,7 @@ import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
 import type { ReviewCourseOption } from "../-shared/course-search";
 import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
-import { REVIEW_ERRORS } from "../-shared/errors";
+import { submissionErrorMessage } from "../-client/submission-error-message";
 import {
   REVIEW_BODY_MAX_LENGTH,
   REVIEW_BODY_MIN_LENGTH,
@@ -56,34 +56,6 @@ const metrics = [
     hint: "How well were the course materials and activities structured?",
   },
 ] satisfies { name: keyof typeof initialRatings; label: string; hint: string }[];
-const SUBMISSION_ERROR_MESSAGES: Record<string, string> = {
-  [REVIEW_ERRORS.CAPTCHA]: "Security verification failed. Please try again.",
-  [REVIEW_ERRORS.INVALID]:
-    "The lecturer or course may no longer be available. Refresh the page and try again.",
-  [REVIEW_ERRORS.UNAVAILABLE]: "Reviews are temporarily unavailable. Please try again later.",
-};
-
-function nextRateLimitReset(now = new Date()): string {
-  const reset = new Date((Math.floor(now.getTime() / 3_600_000) + 1) * 3_600_000);
-  return `${String(reset.getHours()).padStart(2, "0")}:${String(reset.getMinutes()).padStart(2, "0")}`;
-}
-
-function submissionErrorMessage(
-  error: unknown,
-  text: (key: string, values?: Record<string, unknown>) => string,
-) {
-  const code = error instanceof Error ? error.message : null;
-  if (code === REVIEW_ERRORS.RATE_LIMIT) {
-    return text("Submission limit reached. Resets at {{time}}.", {
-      time: nextRateLimitReset(),
-    });
-  }
-  const key = code ? SUBMISSION_ERROR_MESSAGES[code] : undefined;
-  return key
-    ? text(key)
-    : text("Could not confirm submission. Refresh the page before trying again.");
-}
-
 function FieldError({ name, error }: { name: keyof SubmissionErrors; error?: string }) {
   const { text } = useLocale("lecturers");
   if (!error) return null;
