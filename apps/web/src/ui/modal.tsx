@@ -1,4 +1,4 @@
-// Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 import { RiCloseLine } from "@remixicon/react";
 import * as React from "react";
 import {
@@ -31,8 +31,8 @@ const twMerge = extendTailwindMerge({
   },
 });
 
-// Like Radix's asChild: the part's props land on the single child element. Narrowed with
-// isValidElement so no cast is needed and anything else fails loudly, as Radix does.
+// The asChild part's props land on the single child element. Narrowing with isValidElement keeps
+// the render contract explicit and fails loudly for invalid composition.
 function childElementOf(children: React.ReactNode, name: string): React.ReactElement {
   const nodes = React.Children.toArray(children);
   if (nodes.length !== 1 || !React.isValidElement(nodes[0])) {
@@ -133,16 +133,16 @@ type ModalContentProps = Omit<
   className?: string;
   overlayClassName?: string;
   showClose?: boolean;
-  // Radix-era name for the focus hooks, kept so the call sites read the same. ui-sdk owns Escape
-  // through its layer stack, so there is no escape hook to expose any more.
+  // Legacy focus-hook names are kept so existing call sites remain source-compatible. ui-sdk owns
+  // Escape through its layer stack, so there is no escape hook to expose here.
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
 };
 
-// Radix's onOpenAutoFocus/onCloseAutoFocus fired with a cancelable event and delegated focus to
-// the caller when it was prevented. The closest ui-sdk equivalent is initialFocus/finalFocus: run
-// the callback, and when it prevented, treat whatever it focused as the focus target. Without a
-// prevented callback, ui-sdk keeps its own auto-focus/trigger-return behavior.
+// The legacy focus callbacks fired with a cancelable event and delegated focus to the caller when
+// prevented. The closest ui-sdk equivalent is initialFocus/finalFocus: run the callback, and when
+// it prevented, treat whatever it focused as the focus target. Without a prevented callback,
+// ui-sdk keeps its own auto-focus/trigger-return behavior.
 function focusTargetAfterCallback(
   handler: (event: Event) => void,
   type: string,

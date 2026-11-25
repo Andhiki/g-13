@@ -1,4 +1,4 @@
-// Adapted from AlignUI CompactButton v0.0.0. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 import { Button } from "@ui-sdk/react/button";
 import type { ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
