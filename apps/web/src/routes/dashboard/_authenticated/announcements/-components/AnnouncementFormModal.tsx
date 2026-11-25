@@ -1,6 +1,5 @@
 import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useRef, useState, type ReactNode } from "react";
-import { AlignSelect } from "@/ui/select";
 import * as AlignSwitch from "@/ui/switch";
 import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
 import {
@@ -458,27 +457,27 @@ function AnnouncementFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
-      <div className="space-y-1.5">
-        <Typography as="label" htmlFor="announcement-variant" variant="labelSmall">
-          Variant
-        </Typography>
-        <AlignSelect.Root
-          value={variant}
-          disabled={pending}
-          onValueChange={(value) => setVariant(announcementFieldsShape.shape.variant.parse(value))}
-        >
-          <AlignSelect.Trigger id="announcement-variant">
-            <AlignSelect.Value />
-          </AlignSelect.Trigger>
-          <AlignSelect.Content>
-            {announcementVariants.map((option) => (
-              <AlignSelect.Item key={option} value={option}>
-                {variantLabels[option]}
-              </AlignSelect.Item>
-            ))}
-          </AlignSelect.Content>
-        </AlignSelect.Root>
-      </div>
+      <fieldset className="space-y-1.5">
+        <legend className="text-label-sm text-text-strong-950">Variant</legend>
+        <div className="flex flex-wrap gap-2">
+          {announcementVariants.map((option) => (
+            <label
+              key={option}
+              className="flex min-h-9 cursor-pointer items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 has-checked:border-primary-base"
+            >
+              <input
+                type="radio"
+                name="variant"
+                value={option}
+                checked={variant === option}
+                onChange={() => setVariant(option)}
+                className="size-4 accent-primary-base"
+              />
+              {variantLabels[option]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <AnnouncementTextFields
         titleId={titleId}
         titleEn={titleEn}
