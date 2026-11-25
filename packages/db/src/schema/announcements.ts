@@ -14,6 +14,7 @@ export const announcements = sqliteTable(
     titleEn: text("title_en").notNull(),
     bodyId: text("body_id").notNull(),
     bodyEn: text("body_en").notNull(),
+    ctaOpenInNewTab: integer("cta_open_in_new_tab", { mode: "boolean" }).notNull().default(false),
     ctaHref: text("cta_href"),
     ctaLabelId: text("cta_label_id"),
     ctaLabelEn: text("cta_label_en"),

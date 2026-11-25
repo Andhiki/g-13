@@ -83,6 +83,7 @@ function parseAnnouncementFields(values: {
   bodyId: string;
   bodyEn: string;
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
   startsAt: DateTimeParts;
@@ -125,6 +126,7 @@ function parseAnnouncementFields(values: {
     bodyId: values.bodyId,
     bodyEn: values.bodyEn,
     ctaHref: values.ctaHref,
+    ctaOpenInNewTab: values.ctaOpenInNewTab,
     ctaLabelId: values.ctaLabelId,
     ctaLabelEn: values.ctaLabelEn,
     startsAt: timestamps.startsAt ?? 0,
@@ -218,6 +220,7 @@ function AnnouncementTextFields({
 
 function AnnouncementScheduleAndCtaFields({
   ctaHref,
+  ctaOpenInNewTab,
   ctaLabelId,
   ctaLabelEn,
   startsAt,
@@ -231,6 +234,7 @@ function AnnouncementScheduleAndCtaFields({
   endsAtRef,
   countdownAtRef,
   onCtaHrefChange,
+  onCtaOpenInNewTabChange,
   onCtaLabelIdChange,
   onCtaLabelEnChange,
   onStartsAtChange,
@@ -242,6 +246,7 @@ function AnnouncementScheduleAndCtaFields({
   onEnabledChange,
 }: {
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
   startsAt: DateTimeParts;
@@ -255,6 +260,7 @@ function AnnouncementScheduleAndCtaFields({
   endsAtRef: { current: DateTimeFieldHandle | null };
   countdownAtRef: { current: DateTimeFieldHandle | null };
   onCtaHrefChange: (value: string) => void;
+  onCtaOpenInNewTabChange: (checked: boolean) => void;
   onCtaLabelIdChange: (value: string) => void;
   onCtaLabelEnChange: (value: string) => void;
   onStartsAtChange: (value: DateTimeParts) => void;
@@ -277,6 +283,18 @@ function AnnouncementScheduleAndCtaFields({
         error={fieldErrors.ctaHref}
         onChange={onCtaHrefChange}
       />
+      {ctaHref.trim() && (
+        <div className="flex items-center justify-between gap-2">
+          <Typography as="label" htmlFor="announcement-cta-new-tab" variant="labelSmall">
+            Open in new tab
+          </Typography>
+          <AlignSwitch.Root
+            id="announcement-cta-new-tab"
+            checked={ctaOpenInNewTab}
+            onCheckedChange={onCtaOpenInNewTabChange}
+          />
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <AdminFormField
           id="announcement-cta-label-id"
@@ -373,6 +391,7 @@ function AnnouncementFormBody({
   const [bodyId, setBodyId] = useState(announcement?.bodyId ?? "");
   const [bodyEn, setBodyEn] = useState(announcement?.bodyEn ?? "");
   const [ctaHref, setCtaHref] = useState(announcement?.ctaHref ?? "");
+  const [ctaOpenInNewTab, setCtaOpenInNewTab] = useState(announcement?.ctaOpenInNewTab ?? false);
   const [ctaLabelId, setCtaLabelId] = useState(announcement?.ctaLabelId ?? "");
   const [ctaLabelEn, setCtaLabelEn] = useState(announcement?.ctaLabelEn ?? "");
   const [startsAt, setStartsAt] = useState<DateTimeParts>(() =>
@@ -411,6 +430,7 @@ function AnnouncementFormBody({
       bodyId,
       bodyEn,
       ctaHref,
+      ctaOpenInNewTab,
       ctaLabelId,
       ctaLabelEn,
       startsAt,
@@ -446,6 +466,7 @@ function AnnouncementFormBody({
           bodyId={bodyId}
           bodyEn={bodyEn}
           ctaHref={ctaHref}
+          ctaOpenInNewTab={ctaOpenInNewTab}
           ctaLabelId={ctaLabelId}
           ctaLabelEn={ctaLabelEn}
           countdownAt={countdownAt}
@@ -503,6 +524,7 @@ function AnnouncementFormBody({
       />
       <AnnouncementScheduleAndCtaFields
         ctaHref={ctaHref}
+        ctaOpenInNewTab={ctaOpenInNewTab}
         ctaLabelId={ctaLabelId}
         ctaLabelEn={ctaLabelEn}
         startsAt={startsAt}
@@ -515,8 +537,10 @@ function AnnouncementFormBody({
         startsAtRef={startsAtRef}
         endsAtRef={endsAtRef}
         countdownAtRef={countdownAtRef}
+        onCtaOpenInNewTabChange={setCtaOpenInNewTab}
         onCtaHrefChange={(value) => {
           setCtaHref(value);
+          if (!value.trim()) setCtaOpenInNewTab(false);
           clearFieldError("ctaHref");
         }}
         onCtaLabelIdChange={(value) => {

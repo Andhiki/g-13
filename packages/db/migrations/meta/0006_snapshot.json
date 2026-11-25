@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f8ba407d-3ad4-4170-9d1a-ca4ead7aa11a",
+  "id": "aeb149ba-312d-4d48-af03-cc0914fbba99",
   "prevId": "51c72d73-b6dc-4b05-94d4-271fabde6945",
   "tables": {
     "announcements": {
@@ -49,6 +49,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "cta_open_in_new_tab": {
+          "name": "cta_open_in_new_tab",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "cta_href": {
           "name": "cta_href",

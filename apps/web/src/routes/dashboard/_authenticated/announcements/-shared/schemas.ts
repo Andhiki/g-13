@@ -47,6 +47,7 @@ export const announcementFieldsShape = z.object({
   titleEn: localizedText("English title", 120),
   bodyId: localizedText("Indonesian message", 280),
   bodyEn: localizedText("English message", 280),
+  ctaOpenInNewTab: z.boolean().default(false),
   ctaHref: z
     .string()
     .trim()

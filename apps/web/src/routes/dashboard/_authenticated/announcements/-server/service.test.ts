@@ -23,6 +23,7 @@ function createBulletin(input: Partial<CreateAnnouncementInput> = {}): CreateAnn
     bodyId: "Cek arsip ujian untuk soal UTS tahun-tahun sebelumnya.",
     bodyEn: "Check the exam archive for past midterm papers.",
     ctaHref: "/exam",
+    ctaOpenInNewTab: false,
     ctaLabelId: "Buka arsip",
     ctaLabelEn: "Open archive",
     startsAt: Date.now() - day,
@@ -77,13 +78,14 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
       await createAnnouncement(
         db,
         admin,
-        createBulletin({ countdownAt: now + day, variant: "error" }),
+        createBulletin({ countdownAt: now + day, variant: "error", ctaOpenInNewTab: true }),
       ),
     );
     expect(created.id).toBeTruthy();
     const live = await getActiveAnnouncements(db, now);
     expect(live.map((row) => row.id)).toEqual([created.id]);
     expect(live[0]?.variant).toBe("error");
+    expect(live[0]?.ctaOpenInNewTab).toBe(true);
     expect(live[0]?.countdownAt?.getTime()).toBe(now + day);
     expect((await getActiveAnnouncements(db, now + 2 * day)).map((row) => row.id)).toEqual([
       created.id,
@@ -104,6 +106,7 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
     const afterEdit = await getActiveAnnouncements(db, now);
     expect(afterEdit[0]?.titleId).toBe("Jadwal UTS diperbarui");
     expect(afterEdit[0]?.variant).toBe("neutral");
+    expect(afterEdit[0]?.ctaOpenInNewTab).toBe(false);
     expect(afterEdit[0]?.countdownAt).toBeNull();
 
     // Disabling hides it from the public banner and files it under disabled.
@@ -138,6 +141,7 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
         createBulletin({
           confirmedConflictIds: [created.id],
           ctaHref: "",
+          ctaOpenInNewTab: true,
           ctaLabelId: "",
           ctaLabelEn: "",
           startsAt: now - day,
@@ -146,6 +150,7 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
       ),
     );
     const rowsWithNoCta = await getActiveAnnouncements(db, now);
+    expect(rowsWithNoCta.find((row) => row.id === withoutCta.id)?.ctaOpenInNewTab).toBe(false);
     expect(rowsWithNoCta.find((row) => row.id === withoutCta.id)?.ctaHref).toBeNull();
 
     // Empty CTA link is a valid form value, so the optional field is actually optional.

@@ -76,6 +76,7 @@ function announcementValues(input: CreateAnnouncementInput) {
     bodyId: input.bodyId,
     bodyEn: input.bodyEn,
     ctaHref: input.ctaHref || null,
+    ctaOpenInNewTab: Boolean(input.ctaHref) && input.ctaOpenInNewTab,
     ctaLabelId: input.ctaLabelId || null,
     ctaLabelEn: input.ctaLabelEn || null,
     startsAt: new Date(input.startsAt),

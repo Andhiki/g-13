@@ -22,6 +22,7 @@ export function AnnouncementPreview({
   bodyId,
   bodyEn,
   ctaHref,
+  ctaOpenInNewTab,
   ctaLabelId,
   ctaLabelEn,
   countdownAt,
@@ -35,6 +36,7 @@ export function AnnouncementPreview({
   bodyId: string;
   bodyEn: string;
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
   countdownAt: DateTimeParts;
@@ -88,6 +90,7 @@ export function AnnouncementPreview({
       bodyId,
       bodyEn,
       ctaHref,
+      ctaOpenInNewTab,
       ctaLabelId,
       ctaLabelEn,
     },
@@ -142,7 +145,7 @@ export function AnnouncementPreview({
         bodyPlaceholder={bodyPlaceholder}
         ctaLabel={copy.ctaLabel}
         ctaHref={copy.ctaHref}
-        external={copy.external}
+        ctaOpenInNewTab={copy.ctaOpenInNewTab}
         closeLabel={closeLabel}
         interactiveCta={false}
         countdownAt={countdownAtMs}

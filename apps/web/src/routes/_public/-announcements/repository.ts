@@ -12,6 +12,7 @@ export type ActiveAnnouncement = {
   bodyId: string;
   bodyEn: string;
   ctaHref: string | null;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
   countdownAt: Date | null;
@@ -30,6 +31,7 @@ export async function listActiveAnnouncements(
       bodyId: announcements.bodyId,
       bodyEn: announcements.bodyEn,
       ctaHref: announcements.ctaHref,
+      ctaOpenInNewTab: announcements.ctaOpenInNewTab,
       ctaLabelId: announcements.ctaLabelId,
       ctaLabelEn: announcements.ctaLabelEn,
       countdownAt: announcements.countdownAt,

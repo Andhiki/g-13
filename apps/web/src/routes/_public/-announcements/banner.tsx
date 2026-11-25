@@ -93,7 +93,7 @@ export function AnnouncementBanner() {
                 body={copy.body}
                 ctaLabel={copy.ctaLabel}
                 ctaHref={copy.ctaHref}
-                external={copy.external}
+                ctaOpenInNewTab={copy.ctaOpenInNewTab}
                 closeLabel={text("Tutup pengumuman")}
                 countdownAt={row.countdownAt?.getTime() ?? null}
                 countdownNow={countdownNow}
@@ -114,7 +114,7 @@ function AnnouncementRow({
   body,
   ctaLabel,
   ctaHref,
-  external,
+  ctaOpenInNewTab,
   closeLabel,
   countdownAt,
   countdownNow,
@@ -126,7 +126,7 @@ function AnnouncementRow({
   body: string;
   ctaLabel: string | null;
   ctaHref: string | null;
-  external: boolean;
+  ctaOpenInNewTab: boolean;
   closeLabel: string;
   countdownAt: number | null;
   countdownNow: number | null;
@@ -162,7 +162,7 @@ function AnnouncementRow({
         body={body}
         ctaLabel={ctaLabel}
         ctaHref={ctaHref}
-        external={external}
+        ctaOpenInNewTab={ctaOpenInNewTab}
         closeLabel={closeLabel}
         countdownAt={countdownAt}
         countdownNow={countdownNow}

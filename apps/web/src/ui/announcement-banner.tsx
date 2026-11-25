@@ -11,6 +11,7 @@ export type AnnouncementCopySource = {
   bodyId: string;
   bodyEn: string;
   ctaHref: string | null;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
 };
@@ -20,7 +21,7 @@ export type ResolvedAnnouncementCopy = {
   body: string;
   ctaHref: string | null;
   ctaLabel: string | null;
-  external: boolean;
+  ctaOpenInNewTab: boolean;
 };
 
 export function resolveAnnouncementCopy(
@@ -35,7 +36,7 @@ export function resolveAnnouncementCopy(
     body: language === "en" ? row.bodyEn : row.bodyId,
     ctaHref,
     ctaLabel: ctaHref ? (localizedCta ?? defaultCtaLabel) : null,
-    external: ctaHref !== null && !ctaHref.startsWith("/"),
+    ctaOpenInNewTab: ctaHref !== null && row.ctaOpenInNewTab,
   };
 }
 
@@ -53,7 +54,7 @@ export function AnnouncementBannerRow({
   bodyPlaceholder,
   ctaLabel,
   ctaHref,
-  external,
+  ctaOpenInNewTab,
   closeLabel,
   onDismiss,
   interactiveCta = true,
@@ -69,7 +70,7 @@ export function AnnouncementBannerRow({
   bodyPlaceholder?: string;
   ctaLabel: string | null;
   ctaHref: string | null;
-  external: boolean;
+  ctaOpenInNewTab: boolean;
   closeLabel: string;
   onDismiss: () => void;
   interactiveCta?: boolean;
@@ -118,10 +119,10 @@ export function AnnouncementBannerRow({
           >
             <a
               href={ctaHref}
-              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              {...(ctaOpenInNewTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             >
               {ctaLabel}
-              <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />
+              {ctaOpenInNewTab && <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />}
             </a>
           </AlignButton.Root>
         ) : (
@@ -133,7 +134,7 @@ export function AnnouncementBannerRow({
             onClick={(event) => event.preventDefault()}
           >
             {ctaLabel}
-            <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />
+            {ctaOpenInNewTab && <RiArrowRightUpLine aria-hidden="true" className="size-3.5" />}
           </AlignButton.Root>
         ))}
       <AlignButton.Root
