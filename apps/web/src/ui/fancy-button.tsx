@@ -1,6 +1,7 @@
-// Adapted from AlignUI FancyButton v0.0.0. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import type { ComponentProps } from "react";
-import { Slot } from "@radix-ui/react-slot";
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import type { ComponentProps, MouseEvent } from "react";
+import { Children, isValidElement } from "react";
+import { Button } from "@ui-sdk/react/button";
 import { createTV, type VariantProps } from "tailwind-variants";
 import { ButtonContent, type ButtonContentProps } from "./button-spinner";
 
@@ -64,23 +65,37 @@ function Root({
   iconPosition,
   disabled,
   children,
+  onClick,
   ...props
 }: FancyButtonProps) {
   const classes = fancyButton({ size, compact, className });
+  const handleClick = onClick
+    ? (event: MouseEvent<HTMLElement>) => onClick(event as MouseEvent<HTMLButtonElement>)
+    : undefined;
   if (asChild) {
+    const child = Children.toArray(children);
+    if (child.length !== 1 || !isValidElement(child[0])) {
+      throw new Error("FancyButton.Root with asChild takes exactly one child element.");
+    }
     return (
-      <Slot className={classes} {...props}>
-        {children}
-      </Slot>
+      <Button
+        render={child[0]}
+        className={classes}
+        disabled={disabled || isLoading}
+        aria-busy={isLoading || undefined}
+        onClick={handleClick}
+        {...props}
+      />
     );
   }
   const spinnerSize = size === "xxsmall" || size === "xsmall" ? "sm" : "md";
   return (
-    <button
+    <Button
       className={classes}
       type={type}
       disabled={disabled || isLoading}
       aria-busy={isLoading || undefined}
+      onClick={handleClick}
       {...props}
     >
       <ButtonContent
@@ -91,7 +106,7 @@ function Root({
       >
         {children}
       </ButtonContent>
-    </button>
+    </Button>
   );
 }
 

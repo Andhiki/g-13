@@ -1,4 +1,4 @@
-// AlignUI SegmentedControl v0.0.0 — rebuilt on ui-sdk's segmented control.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 
 "use client";
 

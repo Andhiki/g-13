@@ -1,4 +1,5 @@
-// Adapted from AlignUI CompactButton v0.0.0. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import { Button } from "@ui-sdk/react/button";
 import type { ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
@@ -22,7 +23,15 @@ export function CompactButton({
   className,
   size,
   type = "button",
+  onClick,
   ...props
 }: ComponentProps<"button"> & VariantProps<typeof compactButton>) {
-  return <button type={type} className={compactButton({ size, className })} {...props} />;
+  return (
+    <Button
+      render={<button onClick={onClick} />}
+      type={type}
+      className={compactButton({ size, className })}
+      {...props}
+    />
+  );
 }
