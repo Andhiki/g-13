@@ -12,6 +12,7 @@ import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-val
 import { Typography } from "@/ui/typography";
 import { toast } from "@/ui/toast";
 import { useTranslation } from "react-i18next";
+import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
 
 export function AnnouncementPreview({
   titleId,
@@ -22,6 +23,9 @@ export function AnnouncementPreview({
   ctaLabelId,
   ctaLabelEn,
   countdownAt,
+  startsAt,
+  endsAt,
+  enabled,
 }: {
   titleId: string;
   titleEn: string;
@@ -31,6 +35,9 @@ export function AnnouncementPreview({
   ctaLabelId: string;
   ctaLabelEn: string;
   countdownAt: DateTimeParts;
+  startsAt: DateTimeParts;
+  endsAt: DateTimeParts;
+  enabled: boolean;
 }) {
   const { i18n } = useTranslation("common");
   const [previewLanguage, setPreviewLanguage] = useState<Language>(
@@ -51,7 +58,18 @@ export function AnnouncementPreview({
   }
 
   const countdownAtMs = dateTimePartsToTimestamp(countdownAt);
-  const countdownNow = useAnnouncementClock(countdownAtMs);
+  const startsAtMs = dateTimePartsToTimestamp(startsAt);
+  const endsAtMs = dateTimePartsToTimestamp(endsAt);
+  const latestTarget = Math.max(countdownAtMs ?? 0, startsAtMs ?? 0, endsAtMs ?? 0);
+  const now = Math.max(useAnnouncementClock(latestTarget) ?? 0, Date.now());
+  const scheduleStatus = resolveAnnouncementStatus(
+    {
+      enabled,
+      startsAt: new Date(startsAtMs ?? now),
+      endsAt: endsAtMs === null ? null : new Date(endsAtMs),
+    },
+    now,
+  );
   const defaultCtaLabel = previewLanguage === "en" ? "Learn more" : "Selengkapnya";
   const closeLabel = previewLanguage === "en" ? "Dismiss announcement" : "Tutup pengumuman";
   const titlePlaceholder = previewLanguage === "en" ? "Midterm schedule" : "Jadwal UTS";
@@ -80,9 +98,16 @@ export function AnnouncementPreview({
       className="border-b border-stroke-soft-200 bg-bg-weak-50/50 pt-3.5"
     >
       <div className="mb-2.5 flex items-center justify-between gap-3 px-5">
-        <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
-          Banner preview
-        </Typography>
+        <div>
+          <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
+            Banner preview
+          </Typography>
+          <Typography as="p" variant="caption" color="muted">
+            {scheduleStatus === "live"
+              ? "Live on the site now"
+              : announcementStatusLabel(scheduleStatus)}
+          </Typography>
+        </div>
         <SegmentedControl
           aria-label="Preview language"
           value={previewLanguage}
@@ -118,7 +143,7 @@ export function AnnouncementPreview({
           closeLabel={closeLabel}
           interactiveCta={false}
           countdownAt={countdownAtMs}
-          countdownNow={countdownNow}
+          countdownNow={now}
           countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
           onDismiss={() => {}}
         />
