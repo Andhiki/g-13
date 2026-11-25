@@ -28,7 +28,11 @@ import { ReviewCourseField } from "./ReviewCourseField";
 import type { ReviewCourseOption } from "../-shared/course-search";
 import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
 import { REVIEW_ERRORS } from "../-shared/errors";
-import type { ReviewSubmissionInput } from "../-shared/submission-schema";
+import {
+  REVIEW_BODY_MAX_LENGTH,
+  REVIEW_BODY_MIN_LENGTH,
+  type ReviewSubmissionInput,
+} from "../-shared/submission-schema";
 import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submission-errors";
 import { publishLecturerReviewMutationOptions } from "../-client/mutations";
 import { turnstileSiteKeyQueryOptions } from "../-client/queries";
@@ -252,7 +256,8 @@ function ReviewBodyField({
         <FormTextarea
           id="review-body"
           name="body"
-          maxLength={1000}
+          minLength={REVIEW_BODY_MIN_LENGTH}
+          maxLength={REVIEW_BODY_MAX_LENGTH}
           rows={4}
           placeholder={text("What helped you learn? What could be improved?")}
           value={body}
@@ -260,7 +265,10 @@ function ReviewBodyField({
           aria-describedby={error ? "review-body-error" : undefined}
           onValueChange={onChange}
         />
-        <div className="mt-1.5 text-text-sub-600">
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-text-sub-600">
+          <Typography as="span" variant="caption">
+            {text("At least {{count}} characters.", { count: REVIEW_BODY_MIN_LENGTH })}
+          </Typography>
           <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
             {body.length}/1,000
           </Typography>
