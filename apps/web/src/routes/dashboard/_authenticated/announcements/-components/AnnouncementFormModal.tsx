@@ -488,7 +488,7 @@ function AnnouncementFormBody({
           {announcementVariants.map((option) => (
             <label
               key={option}
-              className="flex min-h-9 cursor-pointer items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 has-checked:border-primary-base"
+              className="flex min-h-9 cursor-interactive items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 has-checked:border-primary-base"
             >
               <input
                 type="radio"

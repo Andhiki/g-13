@@ -22,6 +22,10 @@
   cursor: var(--interactive-cursor);
 }
 
+@utility cursor-interactive {
+  cursor: var(--interactive-cursor);
+}
+
 @custom-variant hover {
   @media (hover: hover) and (pointer: fine) {
     &:hover {
