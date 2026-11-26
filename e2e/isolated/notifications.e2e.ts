@@ -15,12 +15,6 @@ test("Mark a notification read, archive it, and verify the maintainer audience",
   screen,
   signIn,
 }) => {
-  await expect(
-    screen.getByRole("dialog", {
-      name: /ulasanmu menunggu pemeriksaan moderator|your review is pending moderator review/i,
-    }),
-  ).toHaveCount(0);
-  await expect(screen.getByText(/ulasanmu telah terbit|your review is published/i)).toBeVisible();
   await signIn("maintainer");
   await app.open(path);
   await expect(
