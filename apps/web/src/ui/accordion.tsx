@@ -12,7 +12,7 @@ import {
 } from "@ui-sdk/react/accordion";
 import { RiAddLine, RiSubtractLine } from "@remixicon/react";
 
-// Keep custom typography and color tokens: tailwind-merge treats both as text colors.
+// Keep custom typography and color tokens: cn treats both as text colors.
 const cn = (...classes: (string | undefined)[]) => classes.filter(Boolean).join(" ");
 
 type AccordionSdkProps = React.ComponentProps<typeof AccordionPrimitive>;

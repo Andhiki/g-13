@@ -1,11 +1,11 @@
 // Derived styling. See THIRD_PARTY_NOTICES.md.
 import type { ComponentProps } from "react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 
 function Root({ className, children, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={twMerge(
+      className={cn(
         "inline-flex h-5 w-fit items-center gap-0.5 whitespace-nowrap rounded bg-bg-white-0 px-1.5 text-text-soft-400 ring-1 ring-inset ring-stroke-soft-200 max-[650px]:hidden",
         className,
       )}

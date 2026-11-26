@@ -1,4 +1,4 @@
-import { clsx } from "clsx";
+import { cn } from "cn";
 import { RiCloseLine, RiEditLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import {
   AdminTableAction,
@@ -24,7 +24,7 @@ function AnnouncementStatusBadge({ announcement }: { announcement: AdminAnnounce
     <AlignBadge.Root
       size="medium"
       variant="light"
-      className={clsx(
+      className={cn(
         "shrink-0",
         status === "live" && "bg-success-lighter text-success-dark",
         status === "scheduled" && "bg-information-lighter text-information-base",

@@ -42,7 +42,7 @@
     "@unpic/react": "^1.0.2",
     "@xyflow/react": "^12.12.0",
     "better-auth": "1.7.25",
-    "clsx": "^2.1.1",
+    "cn": "^0.5.2",
     "i18next": "^26.5.11",
     "indonesian-badwords": "2.7.0",
     "merge-refs": "^2.0.0",
@@ -50,7 +50,6 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-i18next": "^17.1.9",
-    "tailwind-merge": "^3.7.0",
     "tailwind-variants": "^3.3.1",
     "zod": "^4.5.4"
   },

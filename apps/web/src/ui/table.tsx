@@ -1,10 +1,10 @@
 // Derived styling. See THIRD_PARTY_NOTICES.md.
 import { forwardRef, type ComponentProps } from "react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 
 const Root = forwardRef<HTMLTableElement, ComponentProps<"table">>(
   ({ className, ...props }, ref) => (
-    <div className={twMerge("w-full overflow-x-auto", className)}>
+    <div className={cn("w-full overflow-x-auto", className)}>
       <table ref={ref} className="w-full" {...props} />
     </div>
   ),
@@ -18,7 +18,7 @@ function Header(props: ComponentProps<"thead">) {
 function Head({ className, ...props }: ComponentProps<"th">) {
   return (
     <th
-      className={twMerge(
+      className={cn(
         "bg-bg-weak-50 px-3 py-2 text-left text-xs font-normal text-text-sub-600 first:rounded-l-lg last:rounded-r-lg",
         className,
       )}
@@ -37,13 +37,13 @@ function Body(props: ComponentProps<"tbody">) {
 }
 
 function Row({ className, ...props }: ComponentProps<"tr">) {
-  return <tr className={twMerge("group/row", className)} {...props} />;
+  return <tr className={cn("group/row", className)} {...props} />;
 }
 
 function Cell({ className, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className={twMerge(
+      className={cn(
         "h-16 px-3 transition duration-200 ease-out first:rounded-l-xl last:rounded-r-xl group-hover/row:bg-bg-weak-50",
         className,
       )}
