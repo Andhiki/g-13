@@ -139,7 +139,7 @@ function AuthorNameField({
             checked={anonymous}
             onCheckedChange={onAnonymousChange}
           />
-          {text("Publish as Anonymous")}
+          {text("Submit anonymously")}
         </label>
       </div>
       <AuthorNameInputBox

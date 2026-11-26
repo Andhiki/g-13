@@ -6,8 +6,21 @@ import { allowReviewAction } from "./rate-limit";
 import { createReview, getReviewReferences } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewSubmission } from "../-shared/submission-schema";
+import {
+  classifyReviewText,
+  type ReviewScreeningInput,
+  type ReviewScreeningResult,
+} from "./review-moderation";
 
 type Database = ReturnType<typeof createDatabase>;
+
+export function submitReviewAfterCaptcha<T>(
+  verified: boolean,
+  submit: () => Promise<ReviewOperationResult<T>>,
+): Promise<ReviewOperationResult<T>> {
+  if (!verified) return Promise.resolve({ data: null, error: REVIEW_ERRORS.CAPTCHA });
+  return submit();
+}
 
 export async function submitReview(
   db: Database,
@@ -17,6 +30,8 @@ export async function submitReview(
     browserId?: string | null;
     secret: string;
     now?: number;
+    openAiApiKey: string;
+    classify?: (input: ReviewScreeningInput) => Promise<ReviewScreeningResult>;
   },
 ): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
   const ip = context.ip;
@@ -24,16 +39,28 @@ export async function submitReview(
   const references = await getReviewReferences(db, review);
   if (!references) return { data: null, error: REVIEW_ERRORS.INVALID };
   const now = context.now ?? Date.now();
-  if (!(await allowReviewAction(db, { ...context, ip, now }, "submission"))) {
+  if (
+    !(await allowReviewAction(
+      db,
+      { ip, browserId: context.browserId, secret: context.secret, now },
+      "submission",
+    ))
+  ) {
     return { data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: reviewRateLimitResetAt(now) };
   }
   const { anonymous, ...values } = review;
   const reviewId = crypto.randomUUID();
   const authorName = anonymous ? "Anonymous" : review.authorName;
-  const status =
-    review.clarity <= 2 || review.support <= 2 || review.organization <= 2
-      ? "pending"
-      : "published";
+  let screening: ReviewScreeningResult;
+  try {
+    screening = await (
+      context.classify ?? ((input) => classifyReviewText(input, context.openAiApiKey))
+    )(anonymous ? { body: review.body } : { body: review.body, displayName: authorName });
+  } catch {
+    screening = "unscorable";
+  }
+  const ratingPending = Math.min(review.clarity, review.support, review.organization) <= 2;
+  const status = screening === "clear" && !ratingPending ? "published" : "pending";
   await createReview(db, {
     ...values,
     id: reviewId,

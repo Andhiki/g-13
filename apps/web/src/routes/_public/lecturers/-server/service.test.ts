@@ -13,7 +13,13 @@ import { setReviewLike } from "./likes.service";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import type { CoursePickerCursor } from "../-shared/schemas";
-import { submitReview } from "./submission.service";
+import { classifyReviewText } from "./review-moderation";
+import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+
+const clearScreening = {
+  openAiApiKey: "test-key",
+  classify: async () => "clear" as const,
+};
 
 const rawInput = {
   lecturerId: "p",
@@ -57,6 +63,7 @@ it("returns only requested, live pending reviews for the matching lecturer", asy
     const result = await submitReview(db, input, {
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
+      ...clearScreening,
     });
     if (!result.data) throw new Error("Expected a pending review");
     const { reviewId } = result.data;
@@ -110,7 +117,17 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
 
     const input = submissionInputSchema.parse(rawInput);
-    const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
+    let classifierCalls = 0;
+    const context = {
+      ip: "192.0.2.1",
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
+    };
 
     expect(await submitReview(db, input, { ...context, ip: null })).toEqual({
       data: null,
@@ -127,6 +144,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         error: REVIEW_ERRORS.INVALID,
       });
     }
+    expect(classifierCalls).toBe(0);
 
     expect(await submitReview(db, input, context)).toMatchObject({
       data: { reviewId: expect.any(String), status: "published" },
@@ -139,6 +157,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         context,
       ),
     ).toMatchObject({ data: { reviewId: expect.any(String), status: "published" }, error: null });
+    expect(classifierCalls).toBe(2);
     expect(await db.select().from(notificationEvents)).toEqual([]);
 
     // Any rating of 2 or lower waits for moderation and never reaches public reads.
@@ -166,6 +185,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
       pendingReviewId,
     ]);
+    expect(classifierCalls).toBe(3);
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,
     // while existing published reviews for soft-deleted courses remain visible on active lecturers.
@@ -254,18 +274,102 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     );
     expect(attempts.filter((result) => result.error === null)).toHaveLength(1);
     expect(attempts.filter((result) => result.error === REVIEW_ERRORS.RATE_LIMIT)).toHaveLength(4);
+    expect(classifierCalls).toBe(4);
     expect(await submitReview(db, input, { ...context, ip: "192.0.2.2" })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(5);
     expect(await submitReview(db, input, { ...context, now: 7_200_000 })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(6);
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
   } finally {
     await platform.dispose();
   }
 }, 30_000);
+
+it("screens valid review text and sends flagged or unscorable reviews to Pending", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const screened: { body: string; displayName?: string }[] = [];
+    const outcomes = ["clear", "flagged", "unscorable", "clear", "clear"] as const;
+    let outcomeIndex = 0;
+    const context = (ip: string) => ({
+      ip,
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: async (value: { body: string; displayName?: string }) => {
+        screened.push(value);
+        return outcomes[outcomeIndex++] ?? "clear";
+      },
+    });
+    const input = submissionInputSchema.parse(rawInput);
+
+    const published = await submitReview(db, input, context("192.0.2.31"));
+    expect(published.data?.status).toBe("published");
+    expect(screened[0]).toEqual({ body: input.body, displayName: "Student" });
+
+    const flagged = await submitReview(db, input, context("192.0.2.32"));
+    expect(flagged.data?.status).toBe("pending");
+    expect(
+      (await getLecturerDetail(db, "p"))?.reviews.some(
+        (review) => review.id === flagged.data?.reviewId,
+      ),
+    ).toBe(false);
+
+    const unscorable = await submitReview(db, input, context("192.0.2.33"));
+    expect(unscorable.data?.status).toBe("pending");
+
+    const lowRated = await submitReview(
+      db,
+      submissionInputSchema.parse({ ...rawInput, organization: 2 }),
+      context("192.0.2.34"),
+    );
+    expect(lowRated.data?.status).toBe("pending");
+
+    const anonymous = await submitReview(
+      db,
+      submissionInputSchema.parse({ ...rawInput, anonymous: true, authorName: "" }),
+      context("192.0.2.35"),
+    );
+    expect(anonymous.data?.status).toBe("published");
+    expect(screened.at(-1)).toEqual({ body: input.body });
+
+    const localSpam = await submitReview(
+      db,
+      submissionInputSchema.parse({
+        ...rawInput,
+        body: "Promo kursus online, daftar sekarang dan gunakan kode STUDI di https://example.com",
+      }),
+      {
+        ...context("192.0.2.36"),
+        openAiApiKey: "",
+        classify: (value) => classifyReviewText(value, ""),
+      },
+    );
+    expect(localSpam.data?.status).toBe("pending");
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("does not invoke review screening when CAPTCHA verification fails", async () => {
+  let classifierCalls = 0;
+  const result = await submitReviewAfterCaptcha(false, async () => {
+    classifierCalls += 1;
+    return { data: { reviewId: "unexpected", status: "published" as const }, error: null };
+  });
+  expect(result).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
+  expect(classifierCalls).toBe(0);
+});
 
 it("limits submissions per browser and keeps an IP ceiling", async () => {
   const platform = await createTestPlatformProxy();
@@ -282,17 +386,27 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     const secret = "test-secret-".repeat(4);
     const now = 7_200_000;
     const ip = "198.51.100.23";
+    let classifierCalls = 0;
+    const screening = {
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
+    };
     const browserA = crypto.randomUUID();
     const browserB = crypto.randomUUID();
 
     // Two browsers behind the same shared IP each get their own hourly quota.
     for (const browserId of [browserA, browserB]) {
       for (let i = 0; i < 3; i++) {
-        expect(await submitReview(db, input, { ip, browserId, secret, now })).toMatchObject({
+        expect(
+          await submitReview(db, input, { ip, browserId, secret, now, ...screening }),
+        ).toMatchObject({
           error: null,
         });
       }
-      expect(await submitReview(db, input, { ip, browserId, secret, now })).toEqual({
+      expect(await submitReview(db, input, { ip, browserId, secret, now, ...screening })).toEqual({
         data: null,
         error: REVIEW_ERRORS.RATE_LIMIT,
         resetAt: 10_800_000,
@@ -301,7 +415,13 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
 
     // The quota follows the browser, not the network.
     expect(
-      await submitReview(db, input, { ip: "198.51.100.24", browserId: browserA, secret, now }),
+      await submitReview(db, input, {
+        ip: "198.51.100.24",
+        browserId: browserA,
+        secret,
+        now,
+        ...screening,
+      }),
     ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: 10_800_000 });
 
     // The IP backstop allows 14 more of the 21 rotated-browser attempts (6 used above).
@@ -310,13 +430,20 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     for (let browser = 0; browser < 7; browser++) {
       const browserId = crypto.randomUUID();
       for (let attempt = 0; attempt < 3; attempt++) {
-        const result = await submitReview(db, input, { ip, browserId, secret, now });
+        const result = await submitReview(db, input, {
+          ip,
+          browserId,
+          secret,
+          now,
+          ...screening,
+        });
         if (result.error === null) allowed++;
         else if (result.error === REVIEW_ERRORS.RATE_LIMIT) rejected++;
       }
     }
     expect(allowed).toBe(14);
     expect(rejected).toBe(7);
+    expect(classifierCalls).toBe(20);
   } finally {
     await platform.dispose();
   }
@@ -465,7 +592,12 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
 
     const browserId = crypto.randomUUID();
     const input = { reviewId: "r", browserId, liked: true };
-    const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
+    const context = {
+      ip: "192.0.2.1",
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+      ...clearScreening,
+    };
 
     for (const reviewId of ["hidden", "deleted-lecturer-review"]) {
       expect(await setReviewLike(db, { ...input, reviewId }, context)).toEqual({

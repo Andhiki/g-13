@@ -22,8 +22,9 @@ import {
 } from "./failures";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
-import { submitReview } from "./submission.service";
+import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 import { verifyTurnstileToken } from "./turnstile";
+import { classifyReviewText, isObviousReviewSpam } from "./review-moderation";
 
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () =>
   runServerOperation(() => getLecturerDirectory(createDatabase(env.DB))),
@@ -52,8 +53,11 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
   .validator(publishReviewInputSchema)
   .handler(async ({ data }) => {
     const result = await runServerOperation(async () => {
-      const { REVIEW_RATE_LIMIT_SECRET: secret, TURNSTILE_SECRET_KEY: turnstileSecret } =
-        parseSubmissionEnvironment(env);
+      const {
+        REVIEW_RATE_LIMIT_SECRET: secret,
+        TURNSTILE_SECRET_KEY: turnstileSecret,
+        OPENAI_API_KEY: openAiApiKey,
+      } = parseSubmissionEnvironment(env);
       const ip = reviewClientIp(getRequest());
       const { turnstileToken, browserId, ...review } = data;
       const verified = await verifyTurnstileToken({
@@ -61,8 +65,24 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
         token: turnstileToken,
         remoteip: ip,
       });
-      if (!verified) return { data: null, error: REVIEW_ERRORS.CAPTCHA } as const;
-      return submitReview(createDatabase(env.DB), review, { ip, browserId, secret });
+      return submitReviewAfterCaptcha(verified, () => {
+        const classify =
+          env.REVIEW_CLASSIFICATION_TEST_MODE === "clear"
+            ? async (screening: { body: string; displayName?: string }) => {
+                const texts = [screening.body];
+                if (screening.displayName) texts.push(screening.displayName);
+                return texts.some(isObviousReviewSpam) ? ("flagged" as const) : ("clear" as const);
+              }
+            : (screening: { body: string; displayName?: string }) =>
+                classifyReviewText(screening, openAiApiKey);
+        return submitReview(createDatabase(env.DB), review, {
+          ip,
+          browserId,
+          secret,
+          openAiApiKey,
+          classify,
+        });
+      });
     });
     if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectSubmissionOperation(result.error);
