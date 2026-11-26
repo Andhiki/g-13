@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAlumniRouteImport } from './routes/_public/alumni'
 import { Route as PublicExamRouteImport } from './routes/_public/exam'
@@ -24,8 +23,6 @@ import { Route as DashboardAuthenticatedRouteRouteImport } from './routes/dashbo
 import { Route as PublicAlumniAllRouteImport } from './routes/_public/alumni_.all'
 import { Route as PublicLecturersIndexRouteImport } from './routes/_public/lecturers.index'
 import { Route as PublicLecturersLecturerIdRouteImport } from './routes/_public/lecturers.$lecturerId'
-import { Route as PublicThesesIndexRouteImport } from './routes/_public/theses.index'
-import { Route as PublicThesesSlugRouteImport } from './routes/_public/theses.$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardAuthenticatedIndexRouteImport } from './routes/dashboard/_authenticated/index'
 import { Route as DashboardLoginIndexRouteImport } from './routes/dashboard/login/index'
@@ -35,7 +32,6 @@ import { Route as DashboardAuthenticatedLecturerReviewsIndexRouteImport } from '
 import { Route as DashboardAuthenticatedLecturersIndexRouteImport } from './routes/dashboard/_authenticated/lecturers/index'
 import { Route as DashboardAuthenticatedNotificationsIndexRouteImport } from './routes/dashboard/_authenticated/notifications/index'
 import { Route as DashboardAuthenticatedResourcesIndexRouteImport } from './routes/dashboard/_authenticated/resources/index'
-import { Route as DashboardAuthenticatedThesesIndexRouteImport } from './routes/dashboard/_authenticated/theses/index'
 import { Route as DashboardAuthenticatedUsersIndexRouteImport } from './routes/dashboard/_authenticated/users/index'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -45,11 +41,6 @@ const PublicRouteRoute = PublicRouteRouteImport.update({
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -113,16 +104,6 @@ const PublicLecturersLecturerIdRoute =
     path: '/$lecturerId',
     getParentRoute: () => PublicLecturersRoute,
   } as any)
-const PublicThesesIndexRoute = PublicThesesIndexRouteImport.update({
-  id: '/theses/',
-  path: '/theses/',
-  getParentRoute: () => PublicRouteRoute,
-} as any)
-const PublicThesesSlugRoute = PublicThesesSlugRouteImport.update({
-  id: '/theses/$slug',
-  path: '/theses/$slug',
-  getParentRoute: () => PublicRouteRoute,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -175,12 +156,6 @@ const DashboardAuthenticatedResourcesIndexRoute =
     path: '/resources/',
     getParentRoute: () => DashboardAuthenticatedRouteRoute,
   } as any)
-const DashboardAuthenticatedThesesIndexRoute =
-  DashboardAuthenticatedThesesIndexRouteImport.update({
-    id: '/theses/',
-    path: '/theses/',
-    getParentRoute: () => DashboardAuthenticatedRouteRoute,
-  } as any)
 const DashboardAuthenticatedUsersIndexRoute =
   DashboardAuthenticatedUsersIndexRouteImport.update({
     id: '/users/',
@@ -191,7 +166,6 @@ const DashboardAuthenticatedUsersIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alumni': typeof PublicAlumniRoute
   '/exam': typeof PublicExamRoute
   '/faq': typeof PublicFaqRoute
@@ -201,10 +175,8 @@ export interface FileRoutesByFullPath {
   '/api/alumni': typeof ApiAlumniRoute
   '/alumni/all': typeof PublicAlumniAllRoute
   '/lecturers/$lecturerId': typeof PublicLecturersLecturerIdRoute
-  '/theses/$slug': typeof PublicThesesSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/lecturers/': typeof PublicLecturersIndexRoute
-  '/theses/': typeof PublicThesesIndexRoute
   '/dashboard/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
   '/dashboard/announcements/': typeof DashboardAuthenticatedAnnouncementsIndexRoute
@@ -213,12 +185,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/resources/': typeof DashboardAuthenticatedResourcesIndexRoute
-  '/dashboard/theses/': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardAuthenticatedIndexRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alumni': typeof PublicAlumniRoute
   '/exam': typeof PublicExamRoute
   '/faq': typeof PublicFaqRoute
@@ -228,10 +198,8 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/alumni/all': typeof PublicAlumniAllRoute
   '/lecturers/$lecturerId': typeof PublicLecturersLecturerIdRoute
-  '/theses/$slug': typeof PublicThesesSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/lecturers': typeof PublicLecturersIndexRoute
-  '/theses': typeof PublicThesesIndexRoute
   '/dashboard/login': typeof DashboardLoginIndexRoute
   '/dashboard/announcements': typeof DashboardAuthenticatedAnnouncementsIndexRoute
   '/dashboard/courses': typeof DashboardAuthenticatedCoursesIndexRoute
@@ -239,14 +207,12 @@ export interface FileRoutesByTo {
   '/dashboard/lecturers': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/notifications': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/resources': typeof DashboardAuthenticatedResourcesIndexRoute
-  '/dashboard/theses': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/users': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/_authenticated': typeof DashboardAuthenticatedRouteRouteWithChildren
   '/_public/alumni': typeof PublicAlumniRoute
   '/_public/exam': typeof PublicExamRoute
@@ -258,10 +224,8 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_public/alumni_/all': typeof PublicAlumniAllRoute
   '/_public/lecturers/$lecturerId': typeof PublicLecturersLecturerIdRoute
-  '/_public/theses/$slug': typeof PublicThesesSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_public/lecturers/': typeof PublicLecturersIndexRoute
-  '/_public/theses/': typeof PublicThesesIndexRoute
   '/dashboard/_authenticated/': typeof DashboardAuthenticatedIndexRoute
   '/dashboard/login/': typeof DashboardLoginIndexRoute
   '/dashboard/_authenticated/announcements/': typeof DashboardAuthenticatedAnnouncementsIndexRoute
@@ -270,7 +234,6 @@ export interface FileRoutesById {
   '/dashboard/_authenticated/lecturers/': typeof DashboardAuthenticatedLecturersIndexRoute
   '/dashboard/_authenticated/notifications/': typeof DashboardAuthenticatedNotificationsIndexRoute
   '/dashboard/_authenticated/resources/': typeof DashboardAuthenticatedResourcesIndexRoute
-  '/dashboard/_authenticated/theses/': typeof DashboardAuthenticatedThesesIndexRoute
   '/dashboard/_authenticated/users/': typeof DashboardAuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -278,7 +241,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
-    | '/sitemap.xml'
     | '/alumni'
     | '/exam'
     | '/faq'
@@ -288,10 +250,8 @@ export interface FileRouteTypes {
     | '/api/alumni'
     | '/alumni/all'
     | '/lecturers/$lecturerId'
-    | '/theses/$slug'
     | '/api/auth/$'
     | '/lecturers/'
-    | '/theses/'
     | '/dashboard/'
     | '/dashboard/login/'
     | '/dashboard/announcements/'
@@ -300,12 +260,10 @@ export interface FileRouteTypes {
     | '/dashboard/lecturers/'
     | '/dashboard/notifications/'
     | '/dashboard/resources/'
-    | '/dashboard/theses/'
     | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
-    | '/sitemap.xml'
     | '/alumni'
     | '/exam'
     | '/faq'
@@ -315,10 +273,8 @@ export interface FileRouteTypes {
     | '/'
     | '/alumni/all'
     | '/lecturers/$lecturerId'
-    | '/theses/$slug'
     | '/api/auth/$'
     | '/lecturers'
-    | '/theses'
     | '/dashboard/login'
     | '/dashboard/announcements'
     | '/dashboard/courses'
@@ -326,13 +282,11 @@ export interface FileRouteTypes {
     | '/dashboard/lecturers'
     | '/dashboard/notifications'
     | '/dashboard/resources'
-    | '/dashboard/theses'
     | '/dashboard/users'
   id:
     | '__root__'
     | '/_public'
     | '/dashboard'
-    | '/sitemap.xml'
     | '/dashboard/_authenticated'
     | '/_public/alumni'
     | '/_public/exam'
@@ -344,10 +298,8 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_public/alumni_/all'
     | '/_public/lecturers/$lecturerId'
-    | '/_public/theses/$slug'
     | '/api/auth/$'
     | '/_public/lecturers/'
-    | '/_public/theses/'
     | '/dashboard/_authenticated/'
     | '/dashboard/login/'
     | '/dashboard/_authenticated/announcements/'
@@ -356,14 +308,12 @@ export interface FileRouteTypes {
     | '/dashboard/_authenticated/lecturers/'
     | '/dashboard/_authenticated/notifications/'
     | '/dashboard/_authenticated/resources/'
-    | '/dashboard/_authenticated/theses/'
     | '/dashboard/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiAlumniRoute: typeof ApiAlumniRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -382,13 +332,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -475,20 +418,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLecturersLecturerIdRouteImport
       parentRoute: typeof PublicLecturersRoute
     }
-    '/_public/theses/': {
-      id: '/_public/theses/'
-      path: '/theses'
-      fullPath: '/theses/'
-      preLoaderRoute: typeof PublicThesesIndexRouteImport
-      parentRoute: typeof PublicRouteRoute
-    }
-    '/_public/theses/$slug': {
-      id: '/_public/theses/$slug'
-      path: '/theses/$slug'
-      fullPath: '/theses/$slug'
-      preLoaderRoute: typeof PublicThesesSlugRouteImport
-      parentRoute: typeof PublicRouteRoute
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -552,13 +481,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthenticatedResourcesIndexRouteImport
       parentRoute: typeof DashboardAuthenticatedRouteRoute
     }
-    '/dashboard/_authenticated/theses/': {
-      id: '/dashboard/_authenticated/theses/'
-      path: '/theses'
-      fullPath: '/dashboard/theses/'
-      preLoaderRoute: typeof DashboardAuthenticatedThesesIndexRouteImport
-      parentRoute: typeof DashboardAuthenticatedRouteRoute
-    }
     '/dashboard/_authenticated/users/': {
       id: '/dashboard/_authenticated/users/'
       path: '/users'
@@ -592,8 +514,6 @@ interface PublicRouteRouteChildren {
   PublicRoadmapRoute: typeof PublicRoadmapRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicAlumniAllRoute: typeof PublicAlumniAllRoute
-  PublicThesesSlugRoute: typeof PublicThesesSlugRoute
-  PublicThesesIndexRoute: typeof PublicThesesIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
@@ -605,8 +525,6 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicRoadmapRoute: PublicRoadmapRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicAlumniAllRoute: PublicAlumniAllRoute,
-  PublicThesesSlugRoute: PublicThesesSlugRoute,
-  PublicThesesIndexRoute: PublicThesesIndexRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
@@ -621,7 +539,6 @@ interface DashboardAuthenticatedRouteRouteChildren {
   DashboardAuthenticatedLecturersIndexRoute: typeof DashboardAuthenticatedLecturersIndexRoute
   DashboardAuthenticatedNotificationsIndexRoute: typeof DashboardAuthenticatedNotificationsIndexRoute
   DashboardAuthenticatedResourcesIndexRoute: typeof DashboardAuthenticatedResourcesIndexRoute
-  DashboardAuthenticatedThesesIndexRoute: typeof DashboardAuthenticatedThesesIndexRoute
   DashboardAuthenticatedUsersIndexRoute: typeof DashboardAuthenticatedUsersIndexRoute
 }
 
@@ -640,8 +557,6 @@ const DashboardAuthenticatedRouteRouteChildren: DashboardAuthenticatedRouteRoute
       DashboardAuthenticatedNotificationsIndexRoute,
     DashboardAuthenticatedResourcesIndexRoute:
       DashboardAuthenticatedResourcesIndexRoute,
-    DashboardAuthenticatedThesesIndexRoute:
-      DashboardAuthenticatedThesesIndexRoute,
     DashboardAuthenticatedUsersIndexRoute:
       DashboardAuthenticatedUsersIndexRoute,
   }
@@ -669,7 +584,6 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiAlumniRoute: ApiAlumniRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

@@ -181,12 +181,6 @@ export function AlumniPage() {
               <RiArrowRightLine aria-hidden="true" className="size-5" />
             </Link>
           </AlignFancyButton.Root>
-          <AlignButton.Root asChild variant="neutral" mode="stroke" className="mt-3">
-            <Link to="/theses">
-              {text("Jelajahi skripsi alumni")}
-              <RiArrowRightLine aria-hidden="true" className="size-5" />
-            </Link>
-          </AlignButton.Root>
         </header>
         <section aria-label={text("Alumni stories")} className="grid content-start gap-4">
           {alumniProfiles.map((story) => (
