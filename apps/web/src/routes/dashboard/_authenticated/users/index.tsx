@@ -2,7 +2,7 @@ import { RiGroupLine } from "@remixicon/react";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { canManageUsers, canModerate } from "@g13/auth";
+import { canModerate } from "@g13/auth";
 import { changeUserRole, type loadAdminUsers } from "./-server/handler";
 import { adminUsersQuery } from "./-client/queries";
 import { userStatusSchema, type AssignRoleInput, type UserStatus } from "./-shared/schemas";
@@ -271,13 +271,7 @@ function AdminUsersPage() {
 
   return (
     <>
-      <AdminPageHeader
-        title="User access"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
-      />
+      <AdminPageHeader title="User access" />
       <AdminFilterBar
         ariaLabel="Account approval filters"
         tabs={userStatusSchema.options.map((value) => ({

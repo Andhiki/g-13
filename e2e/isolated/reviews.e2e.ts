@@ -6,6 +6,12 @@ import { test } from "../isolated-test.ts";
 import { notFound } from "../routes.ts";
 import { isolatedOrigin } from "../targets.ts";
 
+function expectRetryAfter(response: { status: number; headers: Readonly<Record<string, string>> }) {
+  expect(response.status).toBe(429);
+  expect(response.headers["retry-after"]).toMatch(/^\d+$/);
+  expect(Number(response.headers["retry-after"])).toBeLessThanOrEqual(3_600);
+}
+
 const profileCount = (count: number) => new RegExp(`\\b${count} (ulasan|reviews?)\\b`, "i");
 
 test("Find a lecturer by course and filter and sort the published reviews", async ({
@@ -87,10 +93,45 @@ for (const failure of [
   },
 ]) {
   test(`Review submission recovery: ${failure.name}`, async ({ app, browser, screen }) => {
-    if (failure.name === "submission limit reached") await exhaustReviewLimit("submission");
+    if (failure.name === "submission limit reached") {
+      await app.open(profile);
+      await expect
+        .poll(() =>
+          browser.evaluate(() => Boolean(localStorage.getItem("lecturer-review-browser-id"))),
+        )
+        .toBe(true);
+      const browserId = await browser.evaluate(
+        () => localStorage.getItem("lecturer-review-browser-id") ?? "",
+      );
+      await exhaustReviewLimit("submission", browserId);
+    }
     const body = `This disposable review should never appear ${randomUUID()}.`;
-    await (await fillReview({ app, browser, screen }, body, failure)).click();
-    await expect(screen.getByRole("dialog").getByText(failure.text)).toBeVisible();
+    const submit = await fillReview({ app, browser, screen }, body, failure);
+    const limitReached = failure.name === "submission limit reached";
+    if (limitReached) {
+      await browser.evaluate(() => {
+        const now = Date.now.bind(Date);
+        Date.now = () => now() + 3 * 3_600_000;
+        return null;
+      });
+    }
+    const response = limitReached ? browser.waitForResponse("**/_serverFn/**") : undefined;
+    const before = Date.now();
+    await submit.click();
+    const message = screen.getByRole("dialog").getByText(failure.text);
+    if (response) {
+      expectRetryAfter(await response);
+      const resetTimes = await browser.evaluate(
+        (timestamps) =>
+          timestamps.map((timestamp) => {
+            const reset = new Date((Math.floor(timestamp / 3_600_000) + 1) * 3_600_000);
+            return `${String(reset.getHours()).padStart(2, "0")}:${String(reset.getMinutes()).padStart(2, "0")}`;
+          }),
+        [before, Date.now()],
+      );
+      await expect(message).toHaveText(new RegExp(resetTimes.join("|")));
+    }
+    await expect(message).toBeVisible();
     await expect(screen.getByRole("article").filter({ hasText: body })).toBeHidden();
   });
 }
@@ -135,11 +176,19 @@ test("Like, reload, and unlike a published review", async ({ app, browser, scree
   await expect(review.getByRole("button", { name: like })).toHaveText("0");
 });
 
-test("A rate-limited like rolls back the count and pressed state", async ({ app, screen }) => {
+test("A rate-limited like rolls back the count and pressed state", async ({
+  app,
+  browser,
+  screen,
+}) => {
   await exhaustReviewLimit("like");
   await app.open(profile);
   const review = screen.getByRole("article").filter({ hasText: fixture.review });
-  await review.getByRole("button", { name: like }).click();
+  const likeButton = review.getByRole("button", { name: like });
+  await expect(likeButton).toBeEnabled();
+  const response = browser.waitForResponse("**/_serverFn/**");
+  await likeButton.click();
+  expectRetryAfter(await response);
   await expect(
     screen.getByText(/could not update like|gagal.*suka|tidak dapat memperbarui suka/i),
   ).toBeVisible();

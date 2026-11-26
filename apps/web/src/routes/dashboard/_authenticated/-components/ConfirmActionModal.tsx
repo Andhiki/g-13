@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
-import { AlignModal } from "@/ui/modal";
+import { AlignModal, useModalOpen } from "@/ui/modal";
 import { Typography } from "@/ui/typography";
 
 const HOLD_DURATION_MS = 850;
@@ -9,15 +9,14 @@ const CANCEL_DURATION_MS = 150;
 
 function HoldConfirmButton({
   confirmLabel,
-  open,
   pending,
   onConfirm,
 }: {
   confirmLabel: string;
-  open: boolean;
   pending: boolean;
   onConfirm: () => void;
 }) {
+  const open = useModalOpen();
   const [holding, setHolding] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -106,14 +105,12 @@ function HoldConfirmButton({
 function ConfirmActionFooter({
   destructive,
   confirmLabel,
-  open,
   pending,
   onClose,
   onConfirm,
 }: {
   destructive: boolean;
   confirmLabel: string;
-  open: boolean;
   pending: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -131,12 +128,7 @@ function ConfirmActionFooter({
         Cancel
       </AlignButton.Root>
       {destructive ? (
-        <HoldConfirmButton
-          confirmLabel={confirmLabel}
-          open={open}
-          pending={pending}
-          onConfirm={onConfirm}
-        />
+        <HoldConfirmButton confirmLabel={confirmLabel} pending={pending} onConfirm={onConfirm} />
       ) : (
         <AlignFancyButton.Root size="xsmall" isLoading={pending} onClick={onConfirm}>
           {confirmLabel}
@@ -176,31 +168,32 @@ export function ConfirmActionModal({
         if (!nextOpen && !pending) onClose();
       }}
     >
-      <AlignModal.Content className="p-5">
-        <AlignModal.Title asChild className="pr-8">
-          <Typography as="h2" variant="subtitle2" color="strong">
-            {title}
-          </Typography>
-        </AlignModal.Title>
-        <AlignModal.Description asChild className="mt-2 pr-4">
-          <Typography variant="paragraph" color="muted">
-            {description}
-          </Typography>
-        </AlignModal.Description>
-        {children}
-        {error && (
-          <Typography role="alert" variant="caption" color="danger" className="mt-3">
-            {error}
-          </Typography>
-        )}
-        <ConfirmActionFooter
-          destructive={destructive}
-          confirmLabel={confirmLabel}
-          open={open}
-          pending={pending}
-          onClose={onClose}
-          onConfirm={onConfirm}
-        />
+      <AlignModal.Content>
+        <div className="p-5">
+          <AlignModal.Title asChild className="pr-8">
+            <Typography as="h2" variant="subtitle2" color="strong">
+              {title}
+            </Typography>
+          </AlignModal.Title>
+          <AlignModal.Description asChild className="mt-2 pr-4">
+            <Typography variant="paragraph" color="muted">
+              {description}
+            </Typography>
+          </AlignModal.Description>
+          {children}
+          {error && (
+            <Typography role="alert" variant="caption" color="danger" className="mt-3">
+              {error}
+            </Typography>
+          )}
+          <ConfirmActionFooter
+            destructive={destructive}
+            confirmLabel={confirmLabel}
+            pending={pending}
+            onClose={onClose}
+            onConfirm={onConfirm}
+          />
+        </div>
       </AlignModal.Content>
     </AlignModal.Root>
   );

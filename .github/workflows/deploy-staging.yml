@@ -30,6 +30,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        with:
+          node-version: "26"
       - name: Build packages and web app
         run: bun run build:packages && bun run --cwd apps/web build:staging
       - name: Apply D1 migrations
@@ -38,4 +40,6 @@ jobs:
           D1_DATABASE_ID: 5b5d43e1-399d-4844-b782-5ca632690089
         run: bun run db:migrate
       - name: Deploy
+        # This workflow owns the Worker config, so `--force` lets it replace
+        # bindings that were edited from the Cloudflare dashboard.
         run: bun run deploy:staging

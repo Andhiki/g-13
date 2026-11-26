@@ -1,8 +1,4 @@
-// Adapted from AlignUI Modal v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-// Built on @ui-sdk/react/dialog. The dialog part renders full screen and holds the dimmed,
-// blurred centering surface (it is today's overlay, including every overlayClassName override),
-// while the card inside restores the pre-refactor panel styling. Presses outside the layer fall
-// through the pointer-events-none surface, so ui-sdk still sees them as outside presses.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 import { RiCloseLine } from "@remixicon/react";
 import * as React from "react";
 import {
@@ -35,8 +31,8 @@ const twMerge = extendTailwindMerge({
   },
 });
 
-// Like Radix's asChild: the part's props land on the single child element. Narrowed with
-// isValidElement so no cast is needed and anything else fails loudly, as Radix does.
+// The asChild part's props land on the single child element. Narrowing with isValidElement keeps
+// the render contract explicit and fails loudly for invalid composition.
 function childElementOf(children: React.ReactNode, name: string): React.ReactElement {
   const nodes = React.Children.toArray(children);
   if (nodes.length !== 1 || !React.isValidElement(nodes[0])) {
@@ -137,16 +133,16 @@ type ModalContentProps = Omit<
   className?: string;
   overlayClassName?: string;
   showClose?: boolean;
-  // Radix-era name for the focus hooks, kept so the call sites read the same. ui-sdk owns Escape
-  // through its layer stack, so there is no escape hook to expose any more.
+  // Legacy focus-hook names are kept so existing call sites remain source-compatible. ui-sdk owns
+  // Escape through its layer stack, so there is no escape hook to expose here.
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
 };
 
-// Radix's onOpenAutoFocus/onCloseAutoFocus fired with a cancelable event and delegated focus to
-// the caller when it was prevented. The closest ui-sdk equivalent is initialFocus/finalFocus: run
-// the callback, and when it prevented, treat whatever it focused as the focus target. Without a
-// prevented callback, ui-sdk keeps its own auto-focus/trigger-return behavior.
+// The legacy focus callbacks fired with a cancelable event and delegated focus to the caller when
+// prevented. The closest ui-sdk equivalent is initialFocus/finalFocus: run the callback, and when
+// it prevented, treat whatever it focused as the focus target. Without a prevented callback,
+// ui-sdk keeps its own auto-focus/trigger-return behavior.
 function focusTargetAfterCallback(
   handler: (event: Event) => void,
   type: string,
@@ -163,6 +159,30 @@ function focusTargetAfterCallback(
 
 function Root({ presentation = "auto", ...props }: React.ComponentProps<typeof Dialog>) {
   return <Dialog presentation={presentation} {...props} />;
+}
+
+const ModalOpenContext = React.createContext(false);
+
+export function useModalOpen() {
+  return React.useContext(ModalOpenContext);
+}
+
+function ModalBody({ open, children }: { open: boolean; children: React.ReactNode }) {
+  const [lastOpenChildren, setLastOpenChildren] = React.useState(children);
+
+  // The SDK keeps the panel visible on exit even if the caller clears its content on close.
+  if (open && children !== lastOpenChildren) setLastOpenChildren(children);
+
+  return (
+    <ModalOpenContext.Provider value={open}>
+      <div
+        inert={!open}
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"
+      >
+        {open ? children : lastOpenChildren}
+      </div>
+    </ModalOpenContext.Provider>
+  );
 }
 
 const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
@@ -201,7 +221,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
               : undefined
           }
           className={twMerge(
-            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
+            "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col overflow-hidden rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
             "data-[presentation=sheet]:relative data-[presentation=sheet]:inset-auto data-[presentation=sheet]:my-0 data-[presentation=sheet]:h-auto data-[presentation=sheet]:max-h-[85dvh] data-[presentation=sheet]:w-full data-[presentation=sheet]:max-w-none data-[presentation=sheet]:rounded-b-none data-[presentation=sheet]:transition-none data-[presentation=sheet]:data-starting-style:scale-100 data-[presentation=sheet]:data-starting-style:opacity-100 data-[presentation=sheet]:data-ending-style:scale-100 data-[presentation=sheet]:data-ending-style:opacity-100 data-[presentation=sheet]:after:pointer-events-none data-[presentation=sheet]:after:absolute data-[presentation=sheet]:after:inset-x-0 data-[presentation=sheet]:after:top-full data-[presentation=sheet]:after:h-24 data-[presentation=sheet]:after:bg-inherit data-[presentation=sheet]:after:content-['']",
             className,
             "data-[presentation=sheet]:overflow-visible",
@@ -214,9 +234,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
                   <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
                 </div>
               )}
-              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-[inherit]">
-                {children}
-              </div>
+              <ModalBody open={state.open}>{children}</ModalBody>
               {state.presentation === "sheet" && (
                 <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
               )}

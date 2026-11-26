@@ -13,8 +13,10 @@ the roadmap does not replace department rules.
 ## Run the project on your computer
 
 You’ll need [Git](https://git-scm.com/downloads),
-[Bun 1.4.3](https://bun.sh/docs/installation), and Node.js 22.12 or newer. Some
-of the tools used to run and build the website need Node.js.
+[Bun 1.4.4](https://bun.sh/docs/installation), and Node.js 26.13 or newer, the
+versions pinned in `package.json`. Bun runs the website, the shared packages,
+and the unit tests. Node.js is still required for the Remotion trailer build,
+the Cloudflare CLI, and the local browser E2E runner.
 
 1. Download the project and enter its folder:
 
@@ -86,9 +88,10 @@ The alumni directory reads from a Strapi collection through a server route. It n
 a `STRAPI_API_TOKEN` secret; see the
 [alumni directory guide](docs/alumni-directory.md) before running or deploying it.
 
-Anonymous lecturer reviews are protected by a per-IP rate limit and an invisible
-Cloudflare Turnstile check. Set `REVIEW_RATE_LIMIT_SECRET`, `TURNSTILE_SITE_KEY`, and
-`TURNSTILE_SECRET_KEY`; see the
+Anonymous lecturer reviews are protected by a per-browser rate limit with a per-IP
+backstop and an invisible Cloudflare Turnstile check. Set
+`REVIEW_RATE_LIMIT_SECRET`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, and the
+server-only `OPENAI_API_KEY` used to screen review text; see the
 [lecturer reviews guide](docs/lecturer-reviews.md) before running or deploying it.
 
 For website changes, start in `apps/web/`. For curriculum changes, start in
@@ -119,7 +122,6 @@ Verify UI changes manually. Automated tests cover data and application logic, no
 ## Acknowledgements
 
 - [course.csui.dev](https://course.csui.dev) inspired this project.
-- [AlignUI](https://www.alignui.com) provides UI components used in this project.
 
 ## License and sources
 

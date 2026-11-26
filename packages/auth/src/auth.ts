@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { eq } from "drizzle-orm";
 import { authAccount, authSession, authUser, authVerification } from "@g13/db/schema/auth";
 import type { createDatabase } from "@g13/db/client";
-import { isAllowlistedAdmin } from "./index";
+import { isAllowlistedAdmin, ROLES } from "./index";
 import { consumeAuthLimit } from "./repository";
 
 export type AuthBaseURL =
@@ -91,7 +91,7 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
     },
     user: {
       additionalFields: {
-        role: { type: "string", defaultValue: "user", input: false },
+        role: { type: [...ROLES], defaultValue: "user", input: false },
       },
     },
     account: {
@@ -135,6 +135,11 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       },
     },
     advanced: {
+      // The omahti proxy worker may rewrite the request host, so the auth route
+      // normalizes each request to the browser-facing origin and forwards it here
+      // through x-forwarded-host/x-forwarded-proto. Client supplied proxy headers
+      // are stripped first, and only hosts in allowedHosts are accepted.
+      trustedProxyHeaders: true,
       disableOriginCheck: false,
       disableCSRFCheck: false,
       ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },

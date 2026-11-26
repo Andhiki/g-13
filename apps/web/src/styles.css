@@ -2,7 +2,7 @@
 
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./alignui.css";
+@import "./design-tokens.css";
 @import "./fonts/fonts.css";
 
 :root {
@@ -30,18 +30,16 @@
   }
 }
 
-/* Sonner injects its own system font stack on the toaster; keep toasts on the app font. */
-:root [data-sonner-toaster] {
-  font-family: var(--font-sans);
-}
-
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }
 
-:is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
-  touch-action: manipulation;
+/* Keep this in the base layer so element-level touch utilities such as `touch-none` can win. */
+@layer base {
+  :is(button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
+    touch-action: manipulation;
+  }
 }
 
 :is(button, [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
@@ -61,11 +59,20 @@ html {
   transition: none;
 }
 
-@media (any-pointer: coarse) {
+@utility text-form-control {
+  @apply text-paragraph-sm;
+
+  @media (pointer: coarse) {
+    font-size: max(16px, 1rem);
+    line-height: 1.5;
+  }
+}
+
+@media (pointer: coarse) {
   input,
   textarea,
   select {
-    font-size: max(16px, 1em);
+    font-size: max(16px, 1rem);
   }
 }
 

@@ -19,9 +19,9 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
-          node-version: "24"
+          node-version: "26"
       - name: Install Chromium
-        run: node node_modules/@e2e-dev/web/dist/bin.js install chromium --with-deps
+        run: bun node_modules/@e2e-dev/web/dist/bin.js install chromium --with-deps
       - name: Build workspace packages
         run: bun run build:packages
       - name: Run functional browser scenarios
@@ -47,9 +47,9 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
-          node-version: "24"
+          node-version: "26"
       - name: Install Chromium
-        run: node node_modules/@e2e-dev/web/dist/bin.js install chromium --with-deps
+        run: bun node_modules/@e2e-dev/web/dist/bin.js install chromium --with-deps
       - name: Run read-only smoke against shared staging
         run: bun run test:e2e:smoke
       - name: Upload test report

@@ -1,7 +1,6 @@
 import { useDeferredValue, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
 import { RiFileTextLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -145,7 +144,6 @@ function ThesesListBody({
 
 function AdminThesesPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<ThesisStatusFilter>("draft");
   const [query, setQuery] = useState("");
@@ -249,10 +247,6 @@ function AdminThesesPage() {
     <>
       <AdminPageHeader
         title="Theses"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
             Add thesis

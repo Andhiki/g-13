@@ -4,6 +4,7 @@ import {
   type AcademicOption,
   type CurriculumId,
 } from "@g13/curriculum";
+import type { Exposure } from "./exposure";
 
 export type Choice = AcademicOption;
 export const interests = (curriculum: CurriculumId): Choice[] =>
@@ -18,8 +19,7 @@ export const interests = (curriculum: CurriculumId): Choice[] =>
           : "Termasuk mata kuliah wajib minat.",
     }));
 
-export type Exposure =
-  "exchange" | "internship" | "course" | "competition" | "conference" | "double" | "undecided";
+export type { Exposure };
 
 export function exposureOptions(curriculum: CurriculumId) {
   return [

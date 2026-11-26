@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
-import { canManageUsers } from "@g13/auth";
 import { RiChatCheckLine } from "@remixicon/react";
 import type { ModerateReviewInput } from "./-shared/moderation";
 import { changeReviewVisibility, type loadModerationReviews } from "./-server/handler";
@@ -299,7 +298,6 @@ function ReviewsContent({
 
 function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
@@ -383,13 +381,7 @@ function LecturerReviewsPage() {
 
   return (
     <>
-      <AdminPageHeader
-        title="Lecturer reviews"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
-      />
+      <AdminPageHeader title="Lecturer reviews" />
       <AdminFilterBar
         ariaLabel="Review status filters"
         tabs={reviewStatusSchema.options.map((value) => ({

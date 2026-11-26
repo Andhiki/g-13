@@ -1,56 +1,110 @@
-// Adapted from AlignUI Accordion v0.0.0; plain section styling requested for course details.
+// Derived styling. See THIRD_PARTY_NOTICES.md.
 
 "use client";
 
 import * as React from "react";
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import {
+  Accordion as AccordionPrimitive,
+  AccordionHeader as AccordionHeaderPrimitive,
+  AccordionItem as AccordionItemPrimitive,
+  AccordionPanel,
+  AccordionTrigger as AccordionTriggerPrimitive,
+} from "@ui-sdk/react/accordion";
 import { RiAddLine, RiSubtractLine } from "@remixicon/react";
 
 // Keep custom typography and color tokens: tailwind-merge treats both as text colors.
 const cn = (...classes: (string | undefined)[]) => classes.filter(Boolean).join(" ");
 
-const ACCORDION_ITEM_NAME = "AccordionItem";
+type AccordionSdkProps = React.ComponentProps<typeof AccordionPrimitive>;
+type AccordionChangeDetails = Parameters<NonNullable<AccordionSdkProps["onValueChange"]>>[1];
+type AccordionRootProps = Omit<
+  AccordionSdkProps,
+  "multiple" | "defaultValue" | "value" | "onValueChange"
+> & {
+  type?: "single" | "multiple";
+  defaultValue?: string | string[];
+  value?: string | string[];
+  onValueChange?: (value: string | string[], details: AccordionChangeDetails) => void;
+};
 
-const ACCORDION_ARROW_NAME = "AccordionArrow";
-const ACCORDION_TRIGGER_NAME = "AccordionTrigger";
-const ACCORDION_CONTENT_NAME = "AccordionContent";
+function AccordionRoot({
+  type = "single",
+  collapsible = false,
+  defaultValue,
+  value,
+  onValueChange,
+  ...props
+}: AccordionRootProps) {
+  const multiple = type === "multiple";
+  const toValues = (next: string | string[] | undefined) => {
+    if (next === undefined) return undefined;
+    const values = Array.isArray(next) ? next : [next];
+    return multiple ? values : values.slice(0, 1);
+  };
+  const handleValueChange: AccordionSdkProps["onValueChange"] = onValueChange
+    ? (next, details) => onValueChange(multiple ? next : (next[0] ?? ""), details)
+    : undefined;
 
-const AccordionRoot = AccordionPrimitive.Root;
-const AccordionHeader = AccordionPrimitive.Header;
+  return (
+    <AccordionPrimitive
+      multiple={multiple}
+      collapsible={collapsible}
+      defaultValue={toValues(defaultValue)}
+      value={toValues(value)}
+      onValueChange={handleValueChange}
+      {...props}
+    />
+  );
+}
 
 const AccordionItem = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof AccordionItemPrimitive>
 >(({ className, ...rest }, forwardedRef) => {
   return (
-    <AccordionPrimitive.Item
+    <AccordionItemPrimitive
       ref={forwardedRef}
-      className={cn("group/accordion flow-root", className)}
+      className={cn(
+        "group/accordion flow-root",
+        typeof className === "string" ? className : undefined,
+      )}
       {...rest}
     />
   );
 });
-AccordionItem.displayName = ACCORDION_ITEM_NAME;
+AccordionItem.displayName = "AccordionItem";
+
+const AccordionHeader = React.forwardRef<
+  HTMLHeadingElement,
+  React.ComponentPropsWithoutRef<typeof AccordionHeaderPrimitive>
+>(({ className, ...rest }, forwardedRef) => (
+  <AccordionHeaderPrimitive
+    ref={forwardedRef}
+    className={typeof className === "string" ? className : undefined}
+    {...rest}
+  />
+));
+AccordionHeader.displayName = "AccordionHeader";
 
 const AccordionTrigger = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof AccordionTriggerPrimitive>
 >(({ children, className, ...rest }, forwardedRef) => {
   return (
-    <AccordionPrimitive.Trigger
+    <AccordionTriggerPrimitive
       ref={forwardedRef}
       className={cn(
         "flex min-h-11 w-full items-center justify-between gap-3 py-3 text-left text-label-sm text-text-strong-950",
         "rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base",
-        className,
+        typeof className === "string" ? className : undefined,
       )}
       {...rest}
     >
-      {children}
-    </AccordionPrimitive.Trigger>
+      {children as React.ReactNode}
+    </AccordionTriggerPrimitive>
   );
 });
-AccordionTrigger.displayName = ACCORDION_TRIGGER_NAME;
+AccordionTrigger.displayName = "AccordionTrigger";
 
 type AccordionArrowProps = React.HTMLAttributes<HTMLDivElement> & {
   openIcon?: React.ElementType;
@@ -73,8 +127,8 @@ function AccordionArrow({
           // hover
           "group-hover/accordion:text-text-sub-600",
           // open
-          "group-data-[state=open]/accordion:hidden",
-          className,
+          "group-data-open/accordion:hidden",
+          typeof className === "string" ? className : undefined,
         )}
         {...rest}
       />
@@ -82,7 +136,7 @@ function AccordionArrow({
         className={cn(
           "size-5 text-text-sub-600",
           // close
-          "hidden group-data-[state=open]/accordion:block",
+          "hidden group-data-open/accordion:block",
           className,
         )}
         {...rest}
@@ -90,26 +144,33 @@ function AccordionArrow({
     </>
   );
 }
-AccordionArrow.displayName = ACCORDION_ARROW_NAME;
+AccordionArrow.displayName = "AccordionArrow";
 
 const AccordionContent = React.forwardRef<
-  React.ComponentRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof AccordionPanel>
 >(({ children, className, ...rest }, forwardedRef) => {
   return (
-    <AccordionPrimitive.Content
+    <AccordionPanel
       ref={forwardedRef}
-      forceMount
-      className="grid grid-rows-[0fr] opacity-0 invisible pointer-events-none transition-[grid-template-rows,opacity,visibility] duration-200 ease-out data-[state=open]:grid-rows-[1fr] data-[state=open]:opacity-100 data-[state=open]:visible data-[state=open]:pointer-events-auto motion-reduce:transition-none"
+      keepMounted
+      className="grid grid-rows-[0fr] opacity-0 invisible pointer-events-none transition-[grid-template-rows,opacity,visibility] duration-200 ease-out data-open:grid-rows-[1fr] data-open:opacity-100 data-open:visible data-open:pointer-events-auto motion-reduce:transition-none"
       {...rest}
     >
       <div className="min-h-0 overflow-hidden">
-        <div className={cn("text-paragraph-sm text-text-sub-600", className)}>{children}</div>
+        <div
+          className={cn(
+            "text-paragraph-sm text-text-sub-600",
+            typeof className === "string" ? className : undefined,
+          )}
+        >
+          {children as React.ReactNode}
+        </div>
       </div>
-    </AccordionPrimitive.Content>
+    </AccordionPanel>
   );
 });
-AccordionContent.displayName = ACCORDION_CONTENT_NAME;
+AccordionContent.displayName = "AccordionContent";
 
 export {
   AccordionRoot as Root,

@@ -4,7 +4,6 @@ import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementAdminError } from "../-shar
 const announcementErrorStatuses = {
   [ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN]: 403,
   [ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE]: 409,
-  [ANNOUNCEMENT_ADMIN_ERRORS.SLUG_IN_USE]: 409,
   [ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE]: 400,
 } satisfies Record<AnnouncementAdminError, number>;
 

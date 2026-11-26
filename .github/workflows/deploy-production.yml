@@ -3,10 +3,8 @@
 # - D1: Edit (apply migrations)
 # Account Settings: Read is optional because CLOUDFLARE_ACCOUNT_ID is set below.
 #
-# After a successful deploy, tags the deployed commit as vX.Y.Z and publishes a
-# GitHub Release. The first release uses apps/web/package.json's version; later
-# releases bump from the commits since the last v* tag (breaking -> major,
-# feat -> minor, otherwise patch, with the Unreleased changelog as a fallback).
+# Resolve the version from the merged release PR before deploying.
+# Tag the deployed commit and publish the GitHub Release after success.
 name: Deploy production
 
 on:
@@ -22,7 +20,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  version:
+    name: Resolve production version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          tag=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            | jq -s add | python3 .github/release-version.py resolve)
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            test "$(git rev-list -1 "$tag")" = "$GITHUB_SHA"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Production release: $tag" >> "$GITHUB_STEP_SUMMARY"
+
   deploy:
+    needs: version
     name: Verify, migrate, and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -35,6 +61,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        with:
+          node-version: "26"
       - name: Check
         run: bun run check
       - name: Build
@@ -49,7 +77,7 @@ jobs:
 
   release:
     name: Tag and release
-    needs: deploy
+    needs: [version, deploy]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -61,60 +89,18 @@ jobs:
           fetch-tags: true
       - name: Tag and publish release
         env:
+          RELEASE_TAG: ${{ needs.version.outputs.tag }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
-          head_tag=$(git tag --points-at HEAD --list 'v[0-9]*' | head -n1 || true)
-          if [ -n "$head_tag" ]; then
-            echo "HEAD is already tagged $head_tag; skipping."
-            exit 0
+          if ! git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
+            git push origin "refs/tags/$RELEASE_TAG"
           fi
-
-          latest=$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n1 || true)
-          if [ -n "$latest" ]; then
-            if [ "$(git rev-list --count "$latest..HEAD")" -eq 0 ]; then
-              echo "No commits since $latest; skipping."
-              exit 0
-            fi
-            range="$latest..HEAD"
-          else
-            range="HEAD"
+          test "$(git rev-list -1 "$RELEASE_TAG")" = "$GITHUB_SHA"
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --generate-notes --verify-tag
           fi
-
-          if [ -z "$latest" ]; then
-            version=$(python3 -c 'import json; print(json.load(open("apps/web/package.json"))["version"])')
-          else
-            log=$(git log "$range" --format='%s%n%b')
-            bump=patch
-            if printf '%s\n' "$log" | grep -qE '(^[a-z]+(\([^)]+\))?!:)|(^BREAKING[ -]CHANGE:)'; then
-              bump=major
-            elif printf '%s\n' "$log" | grep -qE '^feat(\([^)]+\))?:'; then
-              bump=minor
-            else
-              unreleased=$(awk '/^## Unreleased/{found=1; next} /^## /{found=0} found' CHANGELOG.md)
-              if printf '%s\n' "$unreleased" | grep -qE '^#### (Added|Changed)'; then
-                bump=minor
-              fi
-            fi
-
-            IFS=. read -r major minor patch <<< "${latest#v}"
-            case "$bump" in
-              major) major=$((major + 1)); minor=0; patch=0 ;;
-              minor) minor=$((minor + 1)); patch=0 ;;
-              patch) patch=$((patch + 1)) ;;
-            esac
-            version="$major.$minor.$patch"
-          fi
-
-          tag="v$version"
-          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-            echo "Tag $tag already exists; skipping."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$tag" -m "Release $tag"
-          git push origin "$tag"
-          gh release create "$tag" --title "$tag" --generate-notes --verify-tag

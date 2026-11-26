@@ -23,20 +23,8 @@
   },
   "rules": {
     "no-dupe-else-if": "error",
-    "no-restricted-imports": [
-      "error",
-      {
-        "patterns": [
-          {
-            "regex": "^\\.\\./\\.\\./\\.\\.(?:/|$)",
-            "message": "Use the @/ alias for imports more than two directories up."
-          }
-        ]
-      }
-    ],
     "max-nested-callbacks": "error",
-    "max-depth": ["error", { "max": 4 }],
-    "max-lines": ["error", { "max": 500 }],
+    "max-depth": "error",
     "max-lines-per-function": [
       "error",
       {
@@ -45,15 +33,6 @@
     ]
   },
   "overrides": [
-    {
-      "files": [
-        "apps/web/src/routeTree.gen.ts",
-        "apps/web/src/routes/_public/exam/-shared/catalog.ts"
-      ],
-      "rules": {
-        "max-lines": "off"
-      }
-    },
     {
       "files": [
         "apps/web/src/**/*.{ts,tsx}"

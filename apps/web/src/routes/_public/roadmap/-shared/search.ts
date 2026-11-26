@@ -1,5 +1,11 @@
-import { getAcademicRules, isCurriculumId, type CurriculumId } from "@g13/curriculum";
-import { electiveOptions, exposureOptions, interests, type Exposure } from "./options";
+import { isCurriculumId, type CurriculumId } from "@g13/curriculum/ids";
+import {
+  allowsDoubleDegreeWithoutInterest,
+  curriculumElectiveIds,
+  hasCurriculumInterest,
+  internshipOptionValues,
+} from "@g13/curriculum/search-index";
+import { exposureValues, type Exposure } from "./exposure";
 
 export type RoadmapSearch = {
   kurikulum?: CurriculumId;
@@ -15,33 +21,26 @@ export type RoadmapSearch = {
   hasil?: true;
 };
 const yesNo = (value: unknown) => (value === "ya" || value === "tidak" ? value : undefined);
+const exposure = (value: unknown): Exposure | undefined => exposureValues.find((x) => x === value);
 export function validateRoadmapSearch(input: Record<string, unknown>): RoadmapSearch {
   const value = typeof input.kurikulum === "number" ? String(input.kurikulum) : input.kurikulum;
   const kurikulum = isCurriculumId(value) ? value : undefined;
   const iup = yesNo(input.iup);
   const magang = yesNo(input.magang);
-  const paparan =
-    kurikulum && iup === "ya"
-      ? exposureOptions(kurikulum).find((x) => x.value === input.paparan)?.value
-      : undefined;
+  const paparan = kurikulum && iup === "ya" ? exposure(input.paparan) : undefined;
   const minat =
     kurikulum &&
-    (interests(kurikulum).some((x) => x.value === input.minat) ||
+    (hasCurriculumInterest(kurikulum, input.minat) ||
       (paparan === "double" &&
-        getAcademicRules(kurikulum).doubleDegreeWithoutInterest &&
+        allowsDoubleDegreeWithoutInterest(kurikulum) &&
         input.minat === "tanpa-minat"))
       ? String(input.minat)
       : undefined;
-  const internship = kurikulum ? getAcademicRules(kurikulum).internship : null;
-  const durations = internship?.kind === "credited" ? internship.options : [];
-  const durasi =
-    magang === "ya" && durations.some((x) => x.value === input.durasi)
-      ? String(input.durasi)
-      : undefined;
+  const durations = kurikulum && magang === "ya" ? internshipOptionValues(kurikulum) : [];
+  const durasi = durations.some((x) => x === input.durasi) ? String(input.durasi) : undefined;
   const ganti: Record<string, string> = {};
   if (kurikulum && input.ganti && typeof input.ganti === "object" && !Array.isArray(input.ganti)) {
-    const available = electiveOptions(kurikulum);
-    const ids = new Set(available.map((x) => x.id));
+    const ids = new Set(curriculumElectiveIds(kurikulum));
     for (const [from, to] of Object.entries(input.ganti).slice(0, 50)) {
       if (typeof to === "string" && ids.has(from) && ids.has(to) && from !== to) ganti[from] = to;
     }

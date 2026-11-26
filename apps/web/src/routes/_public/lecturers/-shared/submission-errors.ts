@@ -21,7 +21,7 @@ export function getSubmissionErrors(value: ReviewSubmissionInput): SubmissionErr
     clarity: "Choose a rating from 1 to 5.",
     support: "Choose a rating from 1 to 5.",
     organization: "Choose a rating from 1 to 5.",
-    body: "Describe your experience using 1–1,000 characters.",
+    body: "Describe your experience using 20–1,000 characters.",
   };
   for (const issue of result.error.issues) {
     const field = submissionFieldSchema.safeParse(issue.path[0]);

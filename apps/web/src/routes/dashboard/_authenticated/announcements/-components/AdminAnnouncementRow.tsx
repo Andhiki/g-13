@@ -1,11 +1,12 @@
 import { clsx } from "clsx";
 import { RiCloseLine, RiEditLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import {
+  AdminTableAction,
   AdminTableInspectButton,
+  AdminTableMeta,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { AlignBadge } from "@/ui/badge";
-import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime } from "@/date-format";
@@ -51,6 +52,16 @@ export function AdminAnnouncementRow({
 }) {
   const { language } = useLocale("notifications");
   const label = announcement.titleId;
+  const start = formatAbsoluteTime(announcement.startsAt.getTime(), language);
+  const expiry =
+    announcement.endsAt === null
+      ? "No expiry"
+      : `→ ${formatAbsoluteTime(announcement.endsAt.getTime(), language)}`;
+  const countdown =
+    announcement.countdownAt === null
+      ? null
+      : `Countdown · ${formatAbsoluteTime(announcement.countdownAt.getTime(), language)}`;
+  const summary = [start, expiry, countdown, announcement.titleEn].filter(Boolean).join(" · ");
 
   return (
     <AdminTableRow
@@ -59,81 +70,78 @@ export function AdminAnnouncementRow({
       className={`${announcementTableColumns} lg:items-center`}
     >
       <div className="min-w-0">
-        <AdminTableInspectButton
-          ariaLabel={`Inspect ${label}`}
-          selected={selected}
-          onSelect={onSelect}
-        >
-          {announcement.titleId}
-        </AdminTableInspectButton>
-        <Typography variant="caption" color="muted" className="mt-0.5 block truncate">
-          {announcement.titleEn} · {announcement.slug}
+        <div className="flex min-w-0 items-center gap-2 lg:block">
+          <AdminTableInspectButton
+            ariaLabel={`Inspect ${label}`}
+            selected={selected}
+            onSelect={onSelect}
+          >
+            {announcement.titleId}
+          </AdminTableInspectButton>
+          <div className="lg:hidden">
+            <AnnouncementStatusBadge announcement={announcement} />
+          </div>
+        </div>
+        <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
+          {announcement.titleEn}
         </Typography>
+        <AdminTableMeta>
+          <span className="truncate" title={summary}>
+            {summary}
+          </span>
+        </AdminTableMeta>
       </div>
 
-      <div className="min-w-0">
+      <div className="hidden min-w-0 lg:block">
         <Typography variant="caption" color="strong" className="block">
-          {formatAbsoluteTime(announcement.startsAt.getTime(), language)}
+          {start}
         </Typography>
         <Typography variant="caption" color="muted" className="mt-0.5 block">
-          {announcement.endsAt === null
-            ? "No expiry"
-            : `→ ${formatAbsoluteTime(announcement.endsAt.getTime(), language)}`}
+          {expiry}
         </Typography>
+        {countdown && (
+          <Typography variant="caption" color="muted" className="mt-0.5 block">
+            {countdown}
+          </Typography>
+        )}
       </div>
 
-      <div>
+      <div className="hidden lg:block">
         <AnnouncementStatusBadge announcement={announcement} />
       </div>
 
-      <div className="flex items-center justify-end gap-1">
-        <AlignButton.Root
-          size="xxsmall"
-          variant="neutral"
-          mode="ghost"
-          compact
-          onClick={() => onEdit(announcement)}
-        >
-          <RiEditLine className="size-3.5" />
-          Edit
-        </AlignButton.Root>
+      <div className="hidden items-center justify-end gap-1 lg:flex">
+        <AdminTableAction label="Edit" variant="neutral" onClick={() => onEdit(announcement)}>
+          <RiEditLine aria-hidden="true" className="size-3.5" />
+        </AdminTableAction>
         {announcement.enabled ? (
-          <AlignButton.Root
-            size="xxsmall"
+          <AdminTableAction
+            label="Disable"
             variant="neutral"
-            mode="ghost"
-            compact
             onClick={() =>
               onLifecycle({ announcementId: announcement.id, action: "disable" }, label)
             }
           >
-            <RiEyeOffLine className="size-3.5" />
-            Disable
-          </AlignButton.Root>
+            <RiEyeOffLine aria-hidden="true" className="size-3.5" />
+          </AdminTableAction>
         ) : (
-          <AlignButton.Root
-            size="xxsmall"
+          <AdminTableAction
+            label="Enable"
             variant="neutral"
-            mode="ghost"
-            compact
             onClick={() =>
               onLifecycle({ announcementId: announcement.id, action: "enable" }, label)
             }
           >
-            <RiEyeLine className="size-3.5" />
-            Enable
-          </AlignButton.Root>
+            <RiEyeLine aria-hidden="true" className="size-3.5" />
+          </AdminTableAction>
         )}
-        <AlignButton.Root
-          size="xxsmall"
+        <AdminTableAction
+          label="Delete"
           variant="error"
-          mode="ghost"
-          compact
           onClick={() => onLifecycle({ announcementId: announcement.id, action: "delete" }, label)}
         >
-          <RiCloseLine className="size-3.5" />
-          Delete
-        </AlignButton.Root>
+          <RiCloseLine aria-hidden="true" className="size-3.5" />
+        </AdminTableAction>
       </div>
     </AdminTableRow>
   );

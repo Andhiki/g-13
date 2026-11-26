@@ -21,6 +21,11 @@ export const coursePickerInputSchema = z.object({
 export type CoursePickerInput = z.infer<typeof coursePickerInputSchema>;
 
 export const lecturerDetailInputSchema = z.object({ lecturerId: z.string().min(1) });
+export const pendingReviewIdSchema = browserIdSchema;
+export const pendingReviewBatchSize = 90;
+export const ownPendingReviewsInputSchema = lecturerDetailInputSchema.extend({
+  reviewIds: z.array(pendingReviewIdSchema).min(1).max(pendingReviewBatchSize),
+});
 export const browserLikesInputSchema = z.object({ browserId: browserIdSchema });
 export const reviewLikeInputSchema = z.object({
   reviewId: z.string().min(1),
@@ -30,5 +35,8 @@ export const reviewLikeInputSchema = z.object({
 export type ReviewLikeInput = z.output<typeof reviewLikeInputSchema>;
 
 export const publishReviewInputSchema = submissionInputSchema.and(
-  z.object({ turnstileToken: trimmedText(2048).min(1) }),
+  z.object({
+    browserId: browserIdSchema.nullable().optional(),
+    turnstileToken: trimmedText(2048).min(1),
+  }),
 );

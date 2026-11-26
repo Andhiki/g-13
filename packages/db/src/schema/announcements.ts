@@ -1,21 +1,26 @@
 import { sql } from "drizzle-orm";
-import { check, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { authUser } from "./auth";
+
+export const announcementVariants = ["primary", "error", "neutral"] as const;
+export type AnnouncementVariant = (typeof announcementVariants)[number];
 
 export const announcements = sqliteTable(
   "announcements",
   {
     id: text("id").primaryKey(),
-    slug: text("slug").notNull(),
+    variant: text("variant", { enum: announcementVariants }).notNull().default("primary"),
     titleId: text("title_id").notNull(),
     titleEn: text("title_en").notNull(),
     bodyId: text("body_id").notNull(),
     bodyEn: text("body_en").notNull(),
+    ctaOpenInNewTab: integer("cta_open_in_new_tab", { mode: "boolean" }).notNull().default(false),
     ctaHref: text("cta_href"),
     ctaLabelId: text("cta_label_id"),
     ctaLabelEn: text("cta_label_en"),
     startsAt: integer("starts_at", { mode: "timestamp_ms" }).notNull(),
     endsAt: integer("ends_at", { mode: "timestamp_ms" }),
+    countdownAt: integer("countdown_at", { mode: "timestamp_ms" }),
     enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
     createdById: text("created_by_id").references(() => authUser.id, { onDelete: "set null" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -26,7 +31,7 @@ export const announcements = sqliteTable(
       .default(sql`(unixepoch() * 1000)`),
   },
   (table) => [
-    uniqueIndex("announcements_slug_unique").on(table.slug),
+    check("announcements_variant", sql`${table.variant} in ('primary', 'error', 'neutral')`),
     check(
       "announcements_window",
       sql`${table.endsAt} is null or ${table.endsAt} > ${table.startsAt}`,

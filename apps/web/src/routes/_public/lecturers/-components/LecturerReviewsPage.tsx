@@ -70,7 +70,7 @@ export function LecturerReviewsPage() {
 
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-10 text-text-strong-950 sm:px-8 sm:py-12 lg:px-12">
-      <div className="mx-auto grid max-w-4xl gap-6 sm:gap-8">
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:gap-8">
         <header>
           <div className="flex items-center gap-2">
             <Typography as="h1" variant="title" className="m-0">
@@ -89,7 +89,7 @@ export function LecturerReviewsPage() {
           />
           <section
             aria-label={text("Lecturers and reviews")}
-            className="mt-4 grid gap-3 sm:grid-cols-2"
+            className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"
           >
             {visibleLecturers.length ? (
               visibleLecturers.map((lecturer) => (

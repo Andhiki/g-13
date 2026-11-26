@@ -1,4 +1,5 @@
 import { AlignModal } from "@/ui/modal";
+import type { SubmittedReview } from "../-client/mutations";
 import type { ReviewCourseOption } from "../-shared/course-search";
 import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
 
@@ -7,6 +8,7 @@ export function ReviewSubmissionDialog({
   lecturerId,
   lecturerName,
   courseId,
+  browserId,
   open,
   onClose,
   onSubmitted,
@@ -15,9 +17,10 @@ export function ReviewSubmissionDialog({
   lecturerId: string;
   lecturerName: string;
   courseId: string;
+  browserId: string | null;
   open: boolean;
   onClose: () => void;
-  onSubmitted: (status: "pending" | "published") => Promise<void>;
+  onSubmitted: (result: SubmittedReview) => void;
 }) {
   return (
     <AlignModal.Root
@@ -36,6 +39,7 @@ export function ReviewSubmissionDialog({
             lecturerId={lecturerId}
             lecturerName={lecturerName}
             initialCourseId={courseId}
+            browserId={browserId}
             onClose={onClose}
             onSubmitted={onSubmitted}
           />

@@ -49,11 +49,18 @@ export const reviewLikes = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => [primaryKey({ columns: [table.reviewId, table.browserId] })],
+  (table) => [
+    primaryKey({ columns: [table.reviewId, table.browserId] }),
+    index("review_likes_browser_id_idx").on(table.browserId),
+  ],
 );
 
-export const reviewSubmissionLimits = sqliteTable("review_submission_limits", {
-  key: text("key").primaryKey(),
-  count: integer("count").notNull(),
-  expiresAt: integer("expires_at").notNull(),
-});
+export const reviewSubmissionLimits = sqliteTable(
+  "review_submission_limits",
+  {
+    key: text("key").primaryKey(),
+    count: integer("count").notNull(),
+    expiresAt: integer("expires_at").notNull(),
+  },
+  (table) => [index("review_submission_limits_expires_at_idx").on(table.expiresAt)],
+);

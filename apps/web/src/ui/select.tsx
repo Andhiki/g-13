@@ -1,8 +1,17 @@
-// Adapted from AlignUI Select v1.2. See docs/adr/0002-alignui-source.md and THIRD_PARTY_NOTICES.md.
-import * as SelectPrimitive from "@radix-ui/react-select";
+// Derived styling. See THIRD_PARTY_NOTICES.md.
+import {
+  Select as SelectPrimitive,
+  SelectContent as SelectContentPrimitive,
+  SelectItem as SelectItemPrimitive,
+  SelectItemIcon as SelectItemIconPrimitive,
+  SelectItemIndicator,
+  SelectTrigger as SelectTriggerPrimitive,
+  SelectValue as SelectValuePrimitive,
+  type SelectProps,
+} from "@ui-sdk/react/select";
 import { RiArrowDownSLine, RiCheckLine } from "@remixicon/react";
 import { extendTailwindMerge } from "tailwind-merge";
-import { createContext, useContext, type ComponentProps } from "react";
+import { createContext, forwardRef, useContext, type ComponentProps, type ReactNode } from "react";
 
 const twMerge = extendTailwindMerge({
   extend: { classGroups: { "font-size": ["text-paragraph-sm", "text-paragraph-xs"] } },
@@ -11,98 +20,104 @@ const twMerge = extendTailwindMerge({
 type SelectVariant = "default" | "compact";
 const SelectContext = createContext<SelectVariant>("default");
 
-function Root({
-  variant = "default",
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Root> & { variant?: SelectVariant }) {
+type SelectRootProps = Omit<
+  SelectProps<string, false>,
+  "multiple" | "value" | "defaultValue" | "onValueChange"
+> & {
+  variant?: SelectVariant;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+};
+
+function Root({ variant = "default", onValueChange, ...props }: SelectRootProps) {
   return (
     <SelectContext.Provider value={variant}>
-      <SelectPrimitive.Root {...props} />
+      <SelectPrimitive
+        {...props}
+        onValueChange={
+          onValueChange ? (value) => value !== null && onValueChange(value) : undefined
+        }
+      />
     </SelectContext.Provider>
   );
 }
-const Value = SelectPrimitive.Value;
 
-function Trigger({
-  children,
-  className,
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Trigger>) {
-  const variant = useContext(SelectContext);
-  return (
-    <SelectPrimitive.Trigger
-      className={twMerge(
-        "group/trigger flex h-10 min-h-10 min-w-0 shrink-0 items-center rounded-10 bg-bg-white-0 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 hover:ring-transparent focus:outline-none focus-visible:ring-stroke-strong-950 focus-visible:text-text-strong-950 focus-visible:outline-stroke-strong-950/35 data-[placeholder]:text-text-sub-600 disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:shadow-none disabled:ring-transparent",
-        variant === "compact"
-          ? "w-auto gap-1 pl-3 pr-2.5 focus-visible:outline-[1.5px] focus-visible:outline-offset-1"
-          : "w-full gap-2 pl-3 pr-2.5 focus-visible:outline-2 focus-visible:outline-offset-1",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <SelectPrimitive.Icon asChild>
-        <RiArrowDownSLine className="ml-auto size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-data-[state=open]/trigger:rotate-180" />
-      </SelectPrimitive.Icon>
-    </SelectPrimitive.Trigger>
-  );
-}
+const Value = SelectValuePrimitive;
 
-function Content({
-  className,
-  children,
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Content>) {
-  return (
-    <SelectPrimitive.Portal>
-      <SelectPrimitive.Content
+const Trigger = forwardRef<HTMLButtonElement, ComponentProps<typeof SelectTriggerPrimitive>>(
+  function Trigger({ children, className, ...props }, forwardedRef) {
+    const variant = useContext(SelectContext);
+    return (
+      <SelectTriggerPrimitive
+        ref={forwardedRef}
         className={twMerge(
-          "relative z-50 overflow-hidden rounded-2xl bg-bg-white-0 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 min-w-[--radix-select-trigger-width] max-w-[max(var(--radix-select-trigger-width),320px)] max-h-[--radix-select-content-available-height] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
+          "group/trigger flex h-10 min-h-10 min-w-0 shrink-0 items-center rounded-10 bg-bg-white-0 text-left text-paragraph-sm text-text-strong-950 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200 outline-none transition duration-200 ease-out hover:bg-bg-weak-50 hover:ring-transparent focus:outline-none focus-visible:ring-stroke-strong-950 focus-visible:text-text-strong-950 data-placeholder:text-text-sub-600 data-disabled:pointer-events-none data-disabled:bg-bg-weak-50 data-disabled:text-text-disabled-300 data-disabled:shadow-none data-disabled:ring-transparent",
+          variant === "compact"
+            ? "w-auto gap-1 pl-3 pr-2.5 focus-visible:outline-[1.5px] focus-visible:outline-offset-1"
+            : "w-full gap-2 pl-3 pr-2.5 focus-visible:outline-2 focus-visible:outline-offset-1",
+          typeof className === "string" ? className : undefined,
         )}
-        position="popper"
-        sideOffset={8}
-        collisionPadding={8}
         {...props}
       >
-        <SelectPrimitive.Viewport className="max-h-[196px] w-full scroll-py-2 overflow-y-auto p-2">
-          {children}
-        </SelectPrimitive.Viewport>
-      </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
+        {children as ReactNode}
+        <RiArrowDownSLine className="ml-auto size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-data-open/trigger:rotate-180" />
+      </SelectTriggerPrimitive>
+    );
+  },
+);
+Trigger.displayName = "SelectTrigger";
+
+function Content({ className, children, ...props }: ComponentProps<typeof SelectContentPrimitive>) {
+  return (
+    <SelectContentPrimitive
+      className={twMerge(
+        "relative z-50 min-w-[var(--anchor-width)] max-w-[max(var(--anchor-width),320px)] max-h-[var(--available-height)] overflow-hidden rounded-2xl bg-bg-white-0 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 motion-reduce:transition-none",
+        typeof className === "string" ? className : undefined,
+      )}
+      sideOffset={8}
+      collisionPadding={8}
+      {...props}
+    >
+      <div className="max-h-[196px] w-full scroll-py-2 overflow-y-auto p-2">
+        {children as ReactNode}
+      </div>
+    </SelectContentPrimitive>
   );
 }
 
-function Item({ className, children, ...props }: ComponentProps<typeof SelectPrimitive.Item>) {
+function Item({ className, children, ...props }: ComponentProps<typeof SelectItemPrimitive>) {
   return (
-    <SelectPrimitive.Item
+    <SelectItemPrimitive
       className={twMerge(
-        "group relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 pr-9 text-paragraph-sm text-text-strong-950 transition duration-200 ease-out data-[disabled]:pointer-events-none data-[disabled]:text-text-disabled-300 data-[highlighted]:bg-bg-weak-50 data-[highlighted]:outline-0",
-        className,
+        "group relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 pr-9 text-paragraph-sm text-text-strong-950 transition duration-200 ease-out data-disabled:pointer-events-none data-disabled:text-text-disabled-300 data-highlighted:bg-bg-weak-50 data-highlighted:outline-0",
+        typeof className === "string" ? className : undefined,
       )}
       {...props}
     >
-      <SelectPrimitive.ItemText asChild>
-        <span className="flex flex-1 items-center gap-2">
-          {typeof children === "string" ? (
-            <span className="line-clamp-1">{children}</span>
-          ) : (
-            children
-          )}
-        </span>
-      </SelectPrimitive.ItemText>
-      <SelectPrimitive.ItemIndicator asChild>
+      <span className="flex flex-1 items-center gap-2">
+        {typeof children === "string" ? (
+          <span className="line-clamp-1">{children}</span>
+        ) : (
+          (children as ReactNode)
+        )}
+      </span>
+      <SelectItemIndicator render={<span />}>
         <RiCheckLine className="absolute right-2 top-1/2 size-5 shrink-0 -translate-y-1/2 text-text-sub-600" />
-      </SelectPrimitive.ItemIndicator>
-    </SelectPrimitive.Item>
+      </SelectItemIndicator>
+    </SelectItemPrimitive>
   );
 }
 
 function ItemIcon({ children, ...props }: ComponentProps<"div">) {
   return (
-    <div className="size-5 shrink-0 text-text-sub-600" {...props}>
+    <SelectItemIconPrimitive
+      render={<div />}
+      className="size-5 shrink-0 text-text-sub-600"
+      {...props}
+    >
       {children}
-    </div>
+    </SelectItemIconPrimitive>
   );
 }
 

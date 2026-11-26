@@ -13,6 +13,10 @@ Fill the repository template in Indonesian or the language requested by the user
 Lead with the user-visible problem and resulting behavior. Keep small PRs brief;
 include a before/after example when it makes the change easier to assess.
 
+For every issue the PR fully resolves, include a standalone `Closes #123` or
+`Resolves #123` line in the visible PR description. Use `Refs #123` for partial
+or related work. Follow the merge rules in `docs/issue-tracker.md` for staging.
+
 Report verification from actual command results: command, outcome, and material
 limits. Leave unrun checks unchecked and explain them. Distinguish local results
 from GitHub CI. For UI changes, attach a screenshot only if capture succeeded;

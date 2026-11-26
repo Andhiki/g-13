@@ -1,13 +1,9 @@
 import { useRef, type ReactNode } from "react";
-import { Input } from "@ui-sdk/react/input";
-import { Textarea } from "@ui-sdk/react/textarea";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
+import { FormInput, FormTextarea } from "@/ui/form-control";
 import { Typography } from "@/ui/typography";
-
-const fieldControlClass =
-  "block min-h-9 w-full rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 text-base text-text-strong-950 placeholder:text-text-sub-600 focus:border-stroke-strong-950 focus:outline-none sm:text-paragraph-sm";
 
 export function AdminFormModal({
   open,
@@ -42,6 +38,7 @@ export function AdminForm({
   scrollFields = false,
   pending,
   error,
+  beforeFields,
   onClose,
   onSubmit,
   children,
@@ -51,6 +48,7 @@ export function AdminForm({
   scrollFields?: boolean;
   pending: boolean;
   error?: string;
+  beforeFields?: ReactNode;
   onClose: () => void;
   onSubmit: () => boolean | void;
   children: ReactNode;
@@ -89,6 +87,7 @@ export function AdminForm({
           </Typography>
         </AlignModal.Title>
       </header>
+      {beforeFields}
       {scrollFields ? (
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{fields}</div>
       ) : (
@@ -127,6 +126,7 @@ export function AdminFormField({
   inputMode,
   autoComplete,
   readOnly = false,
+  showCounter = false,
   onChange,
   onBlur,
 }: {
@@ -143,11 +143,11 @@ export function AdminFormField({
   inputMode?: "text" | "url" | "numeric";
   autoComplete?: string;
   readOnly?: boolean;
+  showCounter?: boolean;
   onChange: (value: string) => void;
   onBlur?: () => void;
 }) {
   const errorId = `${id}-error`;
-  const controlClassName = readOnly ? `${fieldControlClass} text-text-sub-600` : fieldControlClass;
   const controlProps = {
     id,
     name,
@@ -156,32 +156,37 @@ export function AdminFormField({
     readOnly,
     "aria-invalid": Boolean(error),
     "aria-describedby": error ? errorId : undefined,
-    className: controlClassName,
     onValueChange: onChange,
     onBlur,
   };
 
   return (
     <div>
-      <Typography
-        as="label"
-        variant="labelSmall"
-        color="strong"
-        htmlFor={id}
-        className="mb-1.5 block"
-      >
-        {label}
-      </Typography>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <Typography as="label" variant="labelSmall" color="strong" htmlFor={id}>
+          {label}
+        </Typography>
+        {showCounter && (
+          <Typography
+            variant="caption"
+            color={value.length > maxLength ? "danger" : "muted"}
+            className="shrink-0 tabular-nums"
+          >
+            {value.length}/{maxLength}
+          </Typography>
+        )}
+      </div>
       {multiline ? (
-        <Textarea
+        <FormTextarea
           {...controlProps}
           rows={rows}
           maxLength={maxLength}
-          className={`${controlClassName} resize-y`}
+          className="sm:pointer-fine:min-h-8 read-only:text-text-sub-600"
         />
       ) : (
-        <Input
+        <FormInput
           {...controlProps}
+          className="sm:pointer-fine:min-h-8 read-only:text-text-sub-600"
           type={type}
           inputMode={inputMode}
           autoComplete={autoComplete}

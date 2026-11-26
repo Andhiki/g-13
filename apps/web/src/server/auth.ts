@@ -1,11 +1,12 @@
 import { createAuth } from "@g13/auth/server";
-import { canManageUsers, canModerate } from "@g13/auth";
+import { hasPermission, type Permission } from "@g13/auth";
 import { createDatabase } from "@g13/db/client";
 import { parseAuthEnvironment } from "@g13/env";
 import { env } from "cloudflare:workers";
 import { dispatchNotification } from "./notifications";
 
 let cachedAuth: ReturnType<typeof buildAuth> | undefined;
+let cachedConfig: ReturnType<typeof parseAuthEnvironment> | undefined;
 
 // Bindings and secrets are fixed for the isolate, so build Better Auth once and reuse it
 // instead of paying its setup cost on every protected request.
@@ -14,8 +15,13 @@ export function requestAuth() {
   return cachedAuth;
 }
 
+export function requestAuthConfig() {
+  cachedConfig ??= parseAuthEnvironment(env);
+  return cachedConfig;
+}
+
 function buildAuth() {
-  const config = parseAuthEnvironment(env);
+  const config = requestAuthConfig();
   const db = createDatabase(env.DB);
   return createAuth(db, {
     secret: config.BETTER_AUTH_SECRET,
@@ -56,15 +62,10 @@ export async function requireAuthenticatedSession(headers: Headers) {
   return session;
 }
 
-export async function requireAdminSession(
-  headers: Headers,
-  permission: "moderate" | "manage-users",
-) {
+export async function requireAdminSession(headers: Headers, permission: Permission) {
   const session = await requireAuthenticatedSession(headers);
-  const allowed =
-    permission === "manage-users"
-      ? canManageUsers(session.user.role)
-      : canModerate(session.user.role);
-  if (!allowed) throw new Response("Access denied", { status: 403 });
+  if (!hasPermission(session.user.role, permission)) {
+    throw new Response("Access denied", { status: 403 });
+  }
   return session;
 }

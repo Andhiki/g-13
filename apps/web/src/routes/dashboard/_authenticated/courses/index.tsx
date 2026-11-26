@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { canManageUsers } from "@g13/auth";
 import { RiBookOpenLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -314,7 +313,6 @@ function CoursesContent({
 
 function AdminCoursesPage() {
   const initialData = Route.useLoaderData();
-  const { identity } = initialData;
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
   const [offset, setOffset] = useState(0);
   const [status, setStatus] = useState<CourseStatus>("active");
@@ -419,10 +417,6 @@ function AdminCoursesPage() {
     <>
       <AdminPageHeader
         title="Courses"
-        manager={canManageUsers(identity.role)}
-        userName={identity.name}
-        userEmail={identity.email}
-        userImage={identity.image}
         action={
           <AlignFancyButton.Root size="xxsmall" onClick={openCreateModal}>
             Add course

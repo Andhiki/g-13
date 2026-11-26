@@ -1,26 +1,47 @@
-import { useState } from "react";
+import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
+import { useRef, useState, type ReactNode } from "react";
 import * as AlignSwitch from "@/ui/switch";
+import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
+import {
+  dateTimePartsToTimestamp,
+  EMPTY_DATE_TIME_PARTS,
+  hasPartialDateTime,
+  timestampToDateTimeParts,
+  type DateTimeControlIssue,
+  type DateTimeParts,
+} from "@/ui/date-time-value";
 import {
   AdminForm,
   AdminFormField,
   AdminFormModal,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { Typography } from "@/ui/typography";
-import { announcementFieldsSchema, type AnnouncementFieldsInput } from "../-shared/schemas";
+import {
+  announcementFieldsSchema,
+  announcementFieldsShape,
+  ANNOUNCEMENT_BODY_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LINK_MAX_LENGTH,
+  ANNOUNCEMENT_TITLE_MAX_LENGTH,
+  type AnnouncementFieldsInput,
+} from "../-shared/schemas";
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
+import { AnnouncementPreview } from "./AnnouncementPreview";
+
+const variantLabels = { primary: "Primary", error: "Error", neutral: "Neutral" } satisfies Record<
+  AnnouncementVariant,
+  string
+>;
 
 type FieldErrors = Partial<Record<keyof AnnouncementFieldsInput, string>>;
+type DateTimeErrorParts = Partial<
+  Record<"startsAt" | "endsAt" | "countdownAt", "date" | "time" | "both">
+>;
 
-function toDatetimeLocalValue(ms: number): string {
-  const date = new Date(ms);
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
+const announcementFieldKeys = new Set<string>(Object.keys(announcementFieldsShape.shape));
 
-function parseDatetimeLocal(value: string, now: number): number | null {
-  if (value === "") return null;
-  const parsed = new Date(value).getTime();
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : now;
+function isAnnouncementFieldKey(key: PropertyKey): key is keyof AnnouncementFieldsInput {
+  return typeof key === "string" && announcementFieldKeys.has(key);
 }
 
 export function AnnouncementFormModal({
@@ -30,8 +51,10 @@ export function AnnouncementFormModal({
   error,
   onClose,
   onSubmit,
+  children,
 }: {
   open: boolean;
+  children?: ReactNode;
   announcement: AdminAnnouncement | null;
   pending: boolean;
   error?: string;
@@ -39,7 +62,12 @@ export function AnnouncementFormModal({
   onSubmit: (values: AnnouncementFieldsInput) => void;
 }) {
   return (
-    <AdminFormModal open={open} pending={pending} onClose={onClose}>
+    <AdminFormModal
+      open={open}
+      pending={pending}
+      contentClassName="max-w-[900px]"
+      onClose={onClose}
+    >
       <AnnouncementFormBody
         key={announcement?.id ?? "new"}
         announcement={announcement}
@@ -48,68 +76,99 @@ export function AnnouncementFormModal({
         onClose={onClose}
         onSubmit={onSubmit}
       />
+      {children}
     </AdminFormModal>
   );
 }
 
 function parseAnnouncementFields(values: {
-  slug: string;
   titleId: string;
   titleEn: string;
   bodyId: string;
   bodyEn: string;
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
-  startsAtRaw: string;
-  endsAtRaw: string;
+  startsAt: DateTimeParts;
+  endsAt: DateTimeParts;
+  countdownAt: DateTimeParts;
+  startsAtIssue: DateTimeControlIssue | null;
+  endsAtIssue: DateTimeControlIssue | null;
+  countdownAtIssue: DateTimeControlIssue | null;
+  variant: AnnouncementVariant;
   enabled: boolean;
 }) {
-  const now = Date.now();
+  const errors: FieldErrors = {};
+  const errorParts: DateTimeErrorParts = {};
+  const timestamps = {
+    startsAt: dateTimePartsToTimestamp(values.startsAt),
+    endsAt: dateTimePartsToTimestamp(values.endsAt),
+    countdownAt: dateTimePartsToTimestamp(values.countdownAt),
+  };
+  for (const field of ["startsAt", "endsAt", "countdownAt"] as const) {
+    const issue = values[`${field}Issue`];
+    if (issue) {
+      errors[field] = issue.message;
+      errorParts[field] = issue.part;
+    } else if (field !== "startsAt" && hasPartialDateTime(values[field])) {
+      errors[field] = "Pick a date or clear the time.";
+      errorParts[field] = "both";
+    } else if (
+      field === "countdownAt" &&
+      values.countdownAt.date !== null &&
+      timestamps.countdownAt === null
+    ) {
+      errors.countdownAt = "The countdown target must be after Jan 1, 1970.";
+      errorParts.countdownAt = "both";
+    }
+  }
+
   const parsed = announcementFieldsSchema.safeParse({
-    slug: values.slug,
     titleId: values.titleId,
     titleEn: values.titleEn,
     bodyId: values.bodyId,
     bodyEn: values.bodyEn,
     ctaHref: values.ctaHref,
+    ctaOpenInNewTab: values.ctaOpenInNewTab,
     ctaLabelId: values.ctaLabelId,
     ctaLabelEn: values.ctaLabelEn,
-    startsAt: parseDatetimeLocal(values.startsAtRaw, now) ?? now,
-    endsAt: parseDatetimeLocal(values.endsAtRaw, now),
+    startsAt: timestamps.startsAt ?? 0,
+    endsAt: timestamps.endsAt,
+    countdownAt: timestamps.countdownAt,
     enabled: values.enabled,
+    variant: values.variant,
   });
-  if (parsed.success) return { ok: true as const, data: parsed.data };
-  const errors: FieldErrors = {};
-  for (const issue of parsed.error.issues) {
-    const key = issue.path[0] as keyof AnnouncementFieldsInput | undefined;
-    if (key && !errors[key]) errors[key] = issue.message;
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0];
+      if (!key || !isAnnouncementFieldKey(key)) continue;
+      if (!errors[key]) errors[key] = issue.message;
+    }
   }
-  return { ok: false as const, errors };
+
+  if (Object.keys(errors).length > 0 || !parsed.success) {
+    return { ok: false as const, errors, errorParts };
+  }
+  return { ok: true as const, data: parsed.data };
 }
 
 function AnnouncementTextFields({
-  editing,
-  slug,
   titleId,
   titleEn,
   bodyId,
   bodyEn,
   fieldErrors,
-  onSlugChange,
   onTitleIdChange,
   onTitleEnChange,
   onBodyIdChange,
   onBodyEnChange,
 }: {
-  editing: boolean;
-  slug: string;
   titleId: string;
   titleEn: string;
   bodyId: string;
   bodyEn: string;
   fieldErrors: FieldErrors;
-  onSlugChange: (value: string) => void;
   onTitleIdChange: (value: string) => void;
   onTitleEnChange: (value: string) => void;
   onBodyIdChange: (value: string) => void;
@@ -117,22 +176,12 @@ function AnnouncementTextFields({
 }) {
   return (
     <>
-      <AdminFormField
-        id="announcement-slug"
-        name="slug"
-        label={editing ? "Slug" : "Slug (optional)"}
-        maxLength={80}
-        placeholder={editing ? "e.g. midterm-schedule" : "Auto-generated from the title if empty"}
-        value={slug}
-        error={fieldErrors.slug}
-        onChange={onSlugChange}
-      />
       <div className="grid gap-4 sm:grid-cols-2">
         <AdminFormField
           id="announcement-title-id"
           name="titleId"
           label="Title (Indonesian)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Jadwal UTS"
           value={titleId}
           error={fieldErrors.titleId}
@@ -142,7 +191,7 @@ function AnnouncementTextFields({
           id="announcement-title-en"
           name="titleEn"
           label="Title (English)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Midterm schedule"
           value={titleEn}
           error={fieldErrors.titleEn}
@@ -153,7 +202,7 @@ function AnnouncementTextFields({
         id="announcement-body-id"
         name="bodyId"
         label="Message (Indonesian)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Jadwal UTS sudah terbit, cek arsip ujian."
         value={bodyId}
         error={fieldErrors.bodyId}
@@ -163,7 +212,7 @@ function AnnouncementTextFields({
         id="announcement-body-en"
         name="bodyEn"
         label="Message (English)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Midterm schedule is out, check the exam archive."
         value={bodyEn}
         error={fieldErrors.bodyEn}
@@ -175,31 +224,55 @@ function AnnouncementTextFields({
 
 function AnnouncementScheduleAndCtaFields({
   ctaHref,
+  ctaOpenInNewTab,
   ctaLabelId,
   ctaLabelEn,
-  startsAtRaw,
-  endsAtRaw,
+  startsAt,
+  endsAt,
+  countdownAt,
   enabled,
+  pending,
   fieldErrors,
+  errorParts,
+  startsAtRef,
+  endsAtRef,
+  countdownAtRef,
   onCtaHrefChange,
+  onCtaOpenInNewTabChange,
   onCtaLabelIdChange,
   onCtaLabelEnChange,
   onStartsAtChange,
   onEndsAtChange,
+  onCountdownAtChange,
+  onStartsAtActivity,
+  onEndsAtActivity,
+  onCountdownAtActivity,
   onEnabledChange,
 }: {
   ctaHref: string;
+  ctaOpenInNewTab: boolean;
   ctaLabelId: string;
   ctaLabelEn: string;
-  startsAtRaw: string;
-  endsAtRaw: string;
+  startsAt: DateTimeParts;
+  endsAt: DateTimeParts;
+  countdownAt: DateTimeParts;
   enabled: boolean;
+  pending: boolean;
   fieldErrors: FieldErrors;
+  errorParts: DateTimeErrorParts;
+  startsAtRef: { current: DateTimeFieldHandle | null };
+  endsAtRef: { current: DateTimeFieldHandle | null };
+  countdownAtRef: { current: DateTimeFieldHandle | null };
   onCtaHrefChange: (value: string) => void;
+  onCtaOpenInNewTabChange: (checked: boolean) => void;
   onCtaLabelIdChange: (value: string) => void;
   onCtaLabelEnChange: (value: string) => void;
-  onStartsAtChange: (value: string) => void;
-  onEndsAtChange: (value: string) => void;
+  onStartsAtChange: (value: DateTimeParts) => void;
+  onEndsAtChange: (value: DateTimeParts) => void;
+  onCountdownAtChange: (value: DateTimeParts) => void;
+  onStartsAtActivity: () => void;
+  onEndsAtActivity: () => void;
+  onCountdownAtActivity: () => void;
   onEnabledChange: (checked: boolean) => void;
 }) {
   return (
@@ -208,18 +281,30 @@ function AnnouncementScheduleAndCtaFields({
         id="announcement-cta-href"
         name="ctaHref"
         label="CTA link (optional)"
-        maxLength={500}
+        maxLength={ANNOUNCEMENT_CTA_LINK_MAX_LENGTH}
         placeholder="https://example.com or /exam"
         value={ctaHref}
         error={fieldErrors.ctaHref}
         onChange={onCtaHrefChange}
       />
+      {ctaHref.trim() && (
+        <div className="flex items-center justify-between gap-2">
+          <Typography as="label" htmlFor="announcement-cta-new-tab" variant="labelSmall">
+            Open in new tab
+          </Typography>
+          <AlignSwitch.Root
+            id="announcement-cta-new-tab"
+            checked={ctaOpenInNewTab}
+            onCheckedChange={onCtaOpenInNewTabChange}
+          />
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <AdminFormField
           id="announcement-cta-label-id"
           name="ctaLabelId"
           label="CTA label (Indonesian, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Selengkapnya"
           value={ctaLabelId}
           error={fieldErrors.ctaLabelId}
@@ -229,7 +314,7 @@ function AnnouncementScheduleAndCtaFields({
           id="announcement-cta-label-en"
           name="ctaLabelEn"
           label="CTA label (English, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Learn more"
           value={ctaLabelEn}
           error={fieldErrors.ctaLabelEn}
@@ -237,29 +322,46 @@ function AnnouncementScheduleAndCtaFields({
         />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <AdminFormField
+        <DateTimeField
+          ref={startsAtRef}
           id="announcement-starts-at"
           name="startsAt"
-          type="datetime-local"
           label="Start date"
-          maxLength={32}
-          placeholder=""
-          value={startsAtRaw}
+          value={startsAt}
+          required
+          disabled={pending}
           error={fieldErrors.startsAt}
+          errorPart={errorParts.startsAt}
           onChange={onStartsAtChange}
+          onInputActivity={onStartsAtActivity}
         />
-        <AdminFormField
+        <DateTimeField
+          ref={endsAtRef}
           id="announcement-ends-at"
           name="endsAt"
-          type="datetime-local"
           label="Expiry date (optional)"
-          maxLength={32}
-          placeholder=""
-          value={endsAtRaw}
+          value={endsAt}
+          optional
+          disabled={pending}
           error={fieldErrors.endsAt}
+          errorPart={errorParts.endsAt}
           onChange={onEndsAtChange}
+          onInputActivity={onEndsAtActivity}
         />
       </div>
+      <DateTimeField
+        ref={countdownAtRef}
+        id="announcement-countdown-at"
+        name="countdownAt"
+        label="Countdown target (optional)"
+        value={countdownAt}
+        optional
+        disabled={pending}
+        error={fieldErrors.countdownAt}
+        errorPart={errorParts.countdownAt}
+        onChange={onCountdownAtChange}
+        onInputActivity={onCountdownAtActivity}
+      />
       <div className="flex items-center justify-between gap-2">
         <Typography as="label" htmlFor="announcement-enabled" variant="labelSmall">
           Enabled
@@ -288,46 +390,69 @@ function AnnouncementFormBody({
   onClose: () => void;
   onSubmit: (values: AnnouncementFieldsInput) => void;
 }) {
-  const [slug, setSlug] = useState(announcement?.slug ?? "");
   const [titleId, setTitleId] = useState(announcement?.titleId ?? "");
   const [titleEn, setTitleEn] = useState(announcement?.titleEn ?? "");
   const [bodyId, setBodyId] = useState(announcement?.bodyId ?? "");
   const [bodyEn, setBodyEn] = useState(announcement?.bodyEn ?? "");
   const [ctaHref, setCtaHref] = useState(announcement?.ctaHref ?? "");
+  const [ctaOpenInNewTab, setCtaOpenInNewTab] = useState(announcement?.ctaOpenInNewTab ?? false);
   const [ctaLabelId, setCtaLabelId] = useState(announcement?.ctaLabelId ?? "");
   const [ctaLabelEn, setCtaLabelEn] = useState(announcement?.ctaLabelEn ?? "");
-  const [startsAtRaw, setStartsAtRaw] = useState(
-    announcement ? toDatetimeLocalValue(announcement.startsAt.getTime()) : "",
+  const [startsAt, setStartsAt] = useState<DateTimeParts>(() =>
+    timestampToDateTimeParts(announcement ? announcement.startsAt.getTime() : Date.now()),
   );
-  const [endsAtRaw, setEndsAtRaw] = useState(
-    announcement?.endsAt ? toDatetimeLocalValue(announcement.endsAt.getTime()) : "",
+  const [endsAt, setEndsAt] = useState<DateTimeParts>(() =>
+    announcement?.endsAt
+      ? timestampToDateTimeParts(announcement.endsAt.getTime())
+      : EMPTY_DATE_TIME_PARTS,
   );
+  const [countdownAt, setCountdownAt] = useState<DateTimeParts>(() =>
+    announcement?.countdownAt
+      ? timestampToDateTimeParts(announcement.countdownAt.getTime())
+      : EMPTY_DATE_TIME_PARTS,
+  );
+  const [variant, setVariant] = useState<AnnouncementVariant>(announcement?.variant ?? "primary");
   const [enabled, setEnabled] = useState(announcement?.enabled ?? true);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [errorParts, setErrorParts] = useState<DateTimeErrorParts>({});
+  const startsAtRef = useRef<DateTimeFieldHandle>(null);
+  const endsAtRef = useRef<DateTimeFieldHandle>(null);
+  const countdownAtRef = useRef<DateTimeFieldHandle>(null);
 
   const editing = announcement !== null;
   const clearFieldError = (field: keyof AnnouncementFieldsInput) =>
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
+  const clearScheduleError = (field: keyof DateTimeErrorParts) => {
+    clearFieldError(field);
+    setErrorParts((current) => ({ ...current, [field]: undefined }));
+  };
 
   const handleFormSubmit = () => {
     const result = parseAnnouncementFields({
-      slug,
       titleId,
       titleEn,
       bodyId,
       bodyEn,
       ctaHref,
+      ctaOpenInNewTab,
       ctaLabelId,
       ctaLabelEn,
-      startsAtRaw,
-      endsAtRaw,
+      startsAt,
+      endsAt,
+      countdownAt,
+      startsAtIssue: startsAtRef.current?.getIssue() ?? null,
+      endsAtIssue: endsAtRef.current?.getIssue() ?? null,
+      countdownAtIssue: countdownAtRef.current?.getIssue() ?? null,
       enabled,
+      variant,
     });
     if (!result.ok) {
       setFieldErrors(result.errors);
+      setErrorParts(result.errorParts);
       return false;
     }
     setFieldErrors({});
+    setErrorParts({});
     onSubmit(result.data);
   };
 
@@ -337,21 +462,53 @@ function AnnouncementFormBody({
       submitLabel={editing ? "Save changes" : "Add announcement"}
       pending={pending}
       error={error}
+      beforeFields={
+        <AnnouncementPreview
+          variant={variant}
+          titleId={titleId}
+          titleEn={titleEn}
+          bodyId={bodyId}
+          bodyEn={bodyEn}
+          ctaHref={ctaHref}
+          ctaOpenInNewTab={ctaOpenInNewTab}
+          ctaLabelId={ctaLabelId}
+          ctaLabelEn={ctaLabelEn}
+          countdownAt={countdownAt}
+          startsAt={startsAt}
+          endsAt={endsAt}
+          enabled={enabled}
+        />
+      }
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
+      <fieldset className="space-y-1.5">
+        <legend className="text-label-sm text-text-strong-950">Variant</legend>
+        <div className="flex flex-wrap gap-2">
+          {announcementVariants.map((option) => (
+            <label
+              key={option}
+              className="flex min-h-9 cursor-pointer items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 has-checked:border-primary-base"
+            >
+              <input
+                type="radio"
+                name="variant"
+                value={option}
+                checked={variant === option}
+                onChange={() => setVariant(option)}
+                className="size-4 accent-primary-base"
+              />
+              {variantLabels[option]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <AnnouncementTextFields
-        editing={editing}
-        slug={slug}
         titleId={titleId}
         titleEn={titleEn}
         bodyId={bodyId}
         bodyEn={bodyEn}
         fieldErrors={fieldErrors}
-        onSlugChange={(value) => {
-          setSlug(value);
-          clearFieldError("slug");
-        }}
         onTitleIdChange={(value) => {
           setTitleId(value);
           clearFieldError("titleId");
@@ -371,14 +528,23 @@ function AnnouncementFormBody({
       />
       <AnnouncementScheduleAndCtaFields
         ctaHref={ctaHref}
+        ctaOpenInNewTab={ctaOpenInNewTab}
         ctaLabelId={ctaLabelId}
         ctaLabelEn={ctaLabelEn}
-        startsAtRaw={startsAtRaw}
-        endsAtRaw={endsAtRaw}
+        startsAt={startsAt}
+        endsAt={endsAt}
+        countdownAt={countdownAt}
         enabled={enabled}
+        pending={pending}
         fieldErrors={fieldErrors}
+        errorParts={errorParts}
+        startsAtRef={startsAtRef}
+        endsAtRef={endsAtRef}
+        countdownAtRef={countdownAtRef}
+        onCtaOpenInNewTabChange={setCtaOpenInNewTab}
         onCtaHrefChange={(value) => {
           setCtaHref(value);
+          if (!value.trim()) setCtaOpenInNewTab(false);
           clearFieldError("ctaHref");
         }}
         onCtaLabelIdChange={(value) => {
@@ -390,13 +556,20 @@ function AnnouncementFormBody({
           clearFieldError("ctaLabelEn");
         }}
         onStartsAtChange={(value) => {
-          setStartsAtRaw(value);
-          clearFieldError("startsAt");
+          setStartsAt(value);
+          clearScheduleError("startsAt");
         }}
         onEndsAtChange={(value) => {
-          setEndsAtRaw(value);
-          clearFieldError("endsAt");
+          setEndsAt(value);
+          clearScheduleError("endsAt");
         }}
+        onCountdownAtChange={(value) => {
+          setCountdownAt(value);
+          clearScheduleError("countdownAt");
+        }}
+        onStartsAtActivity={() => clearScheduleError("startsAt")}
+        onEndsAtActivity={() => clearScheduleError("endsAt")}
+        onCountdownAtActivity={() => clearScheduleError("countdownAt")}
         onEnabledChange={setEnabled}
       />
     </AdminForm>

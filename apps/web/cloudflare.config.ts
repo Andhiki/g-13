@@ -53,15 +53,24 @@ export default defineConfig(({ mode }) => {
 			// cf deploy disables these when omitted, so keep the existing URLs alive.
 			workersDev: !isE2E,
 			previewUrls: !isE2E,
-			observability: isStaging
-				? {
-						enabled: true,
+			observability: isE2E
+				? undefined
+				: {
 						logs: {
 							enabled: true,
+							headSamplingRate: 1,
 							invocationLogs: true,
+							persist: true,
 						},
-					}
-				: undefined,
+						traces: {
+							enabled: true,
+							headSamplingRate: 1,
+							persist: true,
+						},
+						issues: {
+							enabled: true,
+						},
+					},
 			env: {
 				ALUMNI: bindings.worker({
 					worker: workerName,
@@ -92,6 +101,8 @@ export default defineConfig(({ mode }) => {
 					: bindings.secret(),
 				TURNSTILE_SITE_KEY: isE2E ? bindings.text("isolated-e2e-site") : bindings.secret(),
 				TURNSTILE_SECRET_KEY: isE2E ? bindings.text("isolated-e2e-verifier") : bindings.secret(),
+				OPENAI_API_KEY: isE2E ? bindings.text("") : bindings.secret(),
+				REVIEW_CLASSIFICATION_TEST_MODE: isE2E ? bindings.text("clear") : undefined,
 			},
 		},
 	};

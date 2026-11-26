@@ -1,14 +1,27 @@
 import type { createDatabase } from "@g13/db/client";
+import { REVIEW_RATE_LIMIT_WINDOW_MS, reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
+
+const SUBMISSION_LIMIT_PER_BROWSER = 3;
+const SUBMISSION_LIMIT_PER_IP = 20;
+const LIKE_LIMIT_PER_IP = 60;
 
 function encodeHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function createReviewActionIdentity(action: "submission" | "like", ip: string, window: number) {
-  return `${action}:${window}:${ip}`;
+function createSubmissionBrowserIdentity(browserId: string, window: number) {
+  return `submission:browser:${window}:${browserId.toLowerCase()}`;
+}
+
+function createSubmissionIpIdentity(ip: string, window: number) {
+  return `submission:ip:${window}:${ip}`;
+}
+
+function createLikeIpIdentity(ip: string, window: number) {
+  return `like:${window}:${ip}`;
 }
 
 async function deriveReviewActionKey(secret: string, identity: string): Promise<string> {
@@ -23,21 +36,52 @@ async function deriveReviewActionKey(secret: string, identity: string): Promise<
   return encodeHex(new Uint8Array(signature));
 }
 
+async function incrementLimit(
+  db: Database,
+  context: { secret: string; now: number },
+  identity: string,
+  limit: number,
+): Promise<boolean> {
+  const key = await deriveReviewActionKey(context.secret, identity);
+  return incrementReviewActionLimit(db, {
+    key,
+    now: context.now,
+    expiresAt: reviewRateLimitResetAt(context.now),
+    limit,
+  });
+}
+
 export async function allowReviewAction(
   db: Database,
-  context: { ip: string; secret: string; now?: number },
+  context: { ip: string; browserId?: string | null; secret: string; now?: number },
   action: "submission" | "like",
 ): Promise<boolean> {
   const now = context.now ?? Date.now();
-  const window = Math.floor(now / 3_600_000);
-  const key = await deriveReviewActionKey(
-    context.secret,
-    createReviewActionIdentity(action, context.ip, window),
+  const window = Math.floor(now / REVIEW_RATE_LIMIT_WINDOW_MS);
+  const limits = { secret: context.secret, now };
+  if (action === "like") {
+    return incrementLimit(db, limits, createLikeIpIdentity(context.ip, window), LIKE_LIMIT_PER_IP);
+  }
+  if (!context.browserId) {
+    // Without a browser identifier, the strict per-IP limit is the only bucket.
+    return incrementLimit(
+      db,
+      limits,
+      createSubmissionIpIdentity(context.ip, window),
+      SUBMISSION_LIMIT_PER_BROWSER,
+    );
+  }
+  const browserAllowed = await incrementLimit(
+    db,
+    limits,
+    createSubmissionBrowserIdentity(context.browserId, window),
+    SUBMISSION_LIMIT_PER_BROWSER,
   );
-  return incrementReviewActionLimit(db, {
-    key,
-    now,
-    expiresAt: (window + 1) * 3_600_000,
-    limit: action === "submission" ? 3 : 60,
-  });
+  if (!browserAllowed) return false;
+  return incrementLimit(
+    db,
+    limits,
+    createSubmissionIpIdentity(context.ip, window),
+    SUBMISSION_LIMIT_PER_IP,
+  );
 }
