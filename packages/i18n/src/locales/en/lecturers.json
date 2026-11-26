@@ -105,6 +105,7 @@
   "Like review": "Like review",
   "Unlike review": "Unlike review",
   "Could not update like. Please try again.": "Could not update like. Please try again.",
+  "Like limit reached. Resets at {{time}}.": "Like limit reached. Resets at {{time}}.",
   "Enable browser storage to like reviews.": "Enable browser storage to like reviews.",
   "{{count}} more": "{{count}} more",
   "Show less": "Show less",

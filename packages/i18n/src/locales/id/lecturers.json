@@ -105,6 +105,7 @@
   "Like review": "Sukai ulasan",
   "Unlike review": "Batalkan suka ulasan",
   "Could not update like. Please try again.": "Tidak dapat memperbarui suka. Coba lagi.",
+  "Like limit reached. Resets at {{time}}.": "Batas suka tercapai. Diatur ulang pukul {{time}}.",
   "Enable browser storage to like reviews.": "Aktifkan penyimpanan browser untuk menyukai ulasan.",
   "{{count}} more": "{{count}} lainnya",
   "Show less": "Tampilkan lebih sedikit",

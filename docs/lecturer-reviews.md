@@ -31,14 +31,21 @@ HMACs it with `REVIEW_RATE_LIMIT_SECRET` before storing the counter. Visitors wh
 share a campus network, office NAT, or a mobile carrier's CGNAT therefore keep
 their own quota. The per-IP ceiling bounds abuse from someone rotating browser
 identifiers. When browser storage is unavailable, the IP keeps the strict
-three-per-hour limit. Likes have a separate bucket and never consume submission
-limits. The browser identifier is a client-controlled hint, not an authenticated
-identity; Turnstile remains the primary gate for every submission.
+three-per-hour limit. Likes use separate buckets: 60 per browser per UTC hour with
+a 300-per-IP backstop; when the browser identifier is absent, the stricter
+60-per-IP quota applies. Likes never consume submission limits. The browser
+identifier is a client-controlled hint, not an authenticated identity; Turnstile
+remains the primary gate for every submission.
+
+The strict no-browser like quota is a defensive rate-limit fallback. The public
+like mutation still requires a browser identifier to persist and reload a
+visitor's reaction, so the page disables likes when browser storage is unavailable.
 
 Rate-limited submissions and likes return HTTP 429 with a `Retry-After` header
 containing the number of seconds until the quota resets at the next UTC hour,
-rounded up. The submission form displays the server's reset timestamp in the
-visitor's local time and falls back to the browser clock if no timestamp arrives.
+rounded up. The submission form and like error display the server's reset
+timestamp in the visitor's local time and fall back to the browser clock if no
+timestamp arrives.
 
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them

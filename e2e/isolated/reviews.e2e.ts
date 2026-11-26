@@ -190,7 +190,9 @@ test("A rate-limited like rolls back the count and pressed state", async ({
   await likeButton.click();
   expectRetryAfter(await response);
   await expect(
-    screen.getByText(/could not update like|gagal.*suka|tidak dapat memperbarui suka/i),
+    screen.getByText(
+      /like limit reached\. resets at \d{2}:\d{2}|batas suka tercapai\. diatur ulang pukul \d{2}:\d{2}/i,
+    ),
   ).toBeVisible();
   await expect(review.getByRole("button", { name: like })).toHaveText("0");
 });
