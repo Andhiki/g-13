@@ -46,9 +46,9 @@ function AnnouncementVariantField({
   const labelId = useId();
   return (
     <div className="space-y-1.5">
-      <div id={labelId} className="text-label-sm text-text-strong-950">
+      <Typography id={labelId} variant="label" color="strong">
         Variant
-      </div>
+      </Typography>
       <RadioGroup
         aria-labelledby={labelId}
         name="variant"
@@ -64,7 +64,7 @@ function AnnouncementVariantField({
           <Radio
             key={option}
             value={option}
-            className="group flex min-h-9 cursor-[var(--interactive-cursor)] items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
+            className="group flex min-h-9 cursor-[var(--interactive-cursor)] items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
           >
             <span
               aria-hidden="true"
@@ -72,7 +72,9 @@ function AnnouncementVariantField({
             >
               <RadioIndicator className="size-2 rounded-full bg-primary-base" />
             </span>
-            {variantLabels[option]}
+            <Typography as="span" variant="label" color="strong">
+              {variantLabels[option]}
+            </Typography>
           </Radio>
         ))}
       </RadioGroup>
