@@ -29,11 +29,15 @@ test("normalizes dynamic and opaque path segments", () => {
   expect(normalizeRequestPath("/lecturers/123e4567-e89b-12d3-a456-426614174000")).toBe(
     "/lecturers/:lecturerId",
   );
-  expect(normalizeRequestPath("/dashboard/42")).toBe("/dashboard/:id");
+  expect(normalizeRequestPath("/dashboard/42")).toBe("/:unknown");
+  expect(normalizeRequestPath("/dashboard/lecturer-reviews/")).toBe("/dashboard/lecturer-reviews");
+  expect(normalizeRequestPath("/theses/student-thesis-title")).toBe("/theses/:slug");
+  expect(normalizeRequestPath("/api/auth/verify/student%40example.test")).toBe("/api/auth/:action");
+  expect(normalizeRequestPath("/missing/student%40example.test")).toBe("/:unknown");
   expect(normalizeRequestPath("/_serverFn/0123456789abcdef0123456789abcdef")).toBe(
     "/_serverFn/:serverFn",
   );
-  expect(normalizeRequestPath("/exam/MII21-1201")).toBe("/exam/MII21-1201");
+  expect(normalizeRequestPath("/exam")).toBe("/exam");
 });
 
 test("builds a bounded server error event", () => {
@@ -146,6 +150,21 @@ test("reports uncaught throws and returns a plain 500", async () => {
       status: 500,
       path: "/lecturers/:lecturerId",
     });
+  } finally {
+    capture.restore();
+  }
+});
+
+test("returns a plain 500 when the thrown value cannot be converted to a string", async () => {
+  const capture = captureConsoleErrors();
+  try {
+    const response = await withServerErrorReporting(request("/"), () => {
+      throw Object.create(null);
+    });
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe("Internal Server Error");
+    expect(capture.errors[0]).toMatchObject({ message: "Unprintable thrown value" });
+    expect(capture.errors[1]).toMatchObject({ event: "server_response", status: 500 });
   } finally {
     capture.restore();
   }

@@ -6,7 +6,8 @@ a request ID, method, normalized path, service, environment, and schema
 version. Exceptions include the error type and capped message and stack.
 Response events include the status. The poller joins events by request
 ID and groups requests by a fingerprint that ignores stack line numbers.
-Messages and stacks can contain private data. Keep report output in the
+The web Worker logs static route paths and templates for dynamic routes. It
+records unrecognized paths as `/:unknown`. Messages and stacks can contain private data. Keep report output in the
 maintainer-only channel and use sanitized summaries in public artifacts.
 
 ## Set up on the Kimaki host

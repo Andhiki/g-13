@@ -27,6 +27,14 @@ function truncate(value: string, limit: number): string {
   return value.slice(0, limit - marker.length) + marker;
 }
 
+function describeThrownValue(value: unknown): string {
+  try {
+    return String(value);
+  } catch {
+    return "Unprintable thrown value";
+  }
+}
+
 export type ErrorReporterOptions = {
   service: string;
   environment: string;
@@ -56,7 +64,10 @@ export function createErrorReporter({
       event: "server_error",
       ...requestContext(request),
       errorName: error instanceof Error ? error.name || "Error" : "UnknownError",
-      message: truncate(error instanceof Error ? error.message : String(error), MAX_MESSAGE_LENGTH),
+      message: truncate(
+        error instanceof Error ? error.message : describeThrownValue(error),
+        MAX_MESSAGE_LENGTH,
+      ),
       stack: truncate(error instanceof Error ? (error.stack ?? "") : "", MAX_STACK_LENGTH),
     };
   }
