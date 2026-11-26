@@ -9,12 +9,18 @@ import {
   browserLikesInputSchema,
   coursePickerInputSchema,
   lecturerDetailInputSchema,
+  ownPendingReviewsInputSchema,
   publishReviewInputSchema,
   reviewLikeInputSchema,
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
-import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
-import { rejectReviewLikeOperation, rejectSubmissionOperation } from "./failures";
+import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
+import {
+  rejectRateLimitedReview,
+  rejectReviewLikeOperation,
+  rejectSubmissionOperation,
+} from "./failures";
+import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
 import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 import { verifyTurnstileToken } from "./turnstile";
@@ -78,9 +84,18 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
         });
       });
     });
+    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectSubmissionOperation(result.error);
     return result.data;
   });
+
+export const loadOwnPendingReviews = createServerFn({ method: "POST" })
+  .validator(ownPendingReviewsInputSchema)
+  .handler(async ({ data }) =>
+    runServerOperation(() =>
+      getOwnPendingReviews(createDatabase(env.DB), data.lecturerId, data.reviewIds),
+    ),
+  );
 
 export const loadBrowserLikes = createServerFn({ method: "POST" })
   .validator(browserLikesInputSchema)
@@ -96,6 +111,7 @@ export const updateReviewLike = createServerFn({ method: "POST" })
       const ip = reviewClientIp(getRequest());
       return setReviewLike(createDatabase(env.DB), data, { ip, secret });
     });
+    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectReviewLikeOperation(result.error);
     return result.data;
   });

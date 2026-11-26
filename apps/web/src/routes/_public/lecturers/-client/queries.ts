@@ -6,9 +6,10 @@ import {
   loadCoursePickerPage,
   loadLecturerDetail,
   loadLecturerDirectory,
+  loadOwnPendingReviews,
   loadTurnstileSiteKey,
 } from "../-server/handler";
-import type { CoursePickerCursor } from "../-shared/schemas";
+import { pendingReviewBatchSize, type CoursePickerCursor } from "../-shared/schemas";
 
 const publicDataStaleTime = 5 * 60 * 1000;
 const firstPage: CoursePickerCursor | null = null;
@@ -57,6 +58,26 @@ export function lecturerDetailQueryOptions(lecturerId: string) {
     },
     staleTime: publicDataStaleTime,
     refetchOnWindowFocus: false,
+  });
+}
+
+export function ownPendingReviewsQueryOptions(lecturerId: string, reviewIds: string[]) {
+  return queryOptions({
+    queryKey: ["lecturer-reviews", "own-pending", lecturerId, reviewIds],
+    queryFn: async () => {
+      const batches = [];
+      for (let start = 0; start < reviewIds.length; start += pendingReviewBatchSize) {
+        batches.push(
+          loadOwnPendingReviews({
+            data: { lecturerId, reviewIds: reviewIds.slice(start, start + pendingReviewBatchSize) },
+          }),
+        );
+      }
+      return (await Promise.all(batches))
+        .flat()
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    },
+    enabled: reviewIds.length > 0,
   });
 }
 

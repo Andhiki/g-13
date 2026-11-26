@@ -1,4 +1,5 @@
 import { AlignModal } from "@/ui/modal";
+import type { SubmittedReview } from "../-client/mutations";
 import type { ReviewCourseOption } from "../-shared/course-search";
 import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
 
@@ -19,7 +20,7 @@ export function ReviewSubmissionDialog({
   browserId: string | null;
   open: boolean;
   onClose: () => void;
-  onSubmitted: (status: "pending" | "published") => Promise<void>;
+  onSubmitted: (result: SubmittedReview) => void;
 }) {
   return (
     <AlignModal.Root

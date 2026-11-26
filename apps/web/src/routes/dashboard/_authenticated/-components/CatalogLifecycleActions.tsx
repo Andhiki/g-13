@@ -1,4 +1,5 @@
 import { RiDeleteBinLine, RiEditLine, RiRestartLine } from "@remixicon/react";
+import { AdminTableAction } from "./AdminTable";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 
@@ -14,23 +15,20 @@ export function CatalogRowActions({
   onRestore: () => void;
 }) {
   return (
-    <div className="flex items-center justify-end gap-1">
+    <div className="hidden items-center justify-end gap-1 lg:flex">
       {!deleted ? (
         <>
-          <AlignButton.Root size="xxsmall" variant="neutral" mode="ghost" compact onClick={onEdit}>
-            <RiEditLine className="size-3.5" />
-            Edit
-          </AlignButton.Root>
-          <AlignButton.Root size="xxsmall" variant="error" mode="ghost" compact onClick={onDelete}>
-            <RiDeleteBinLine className="size-3.5" />
-            Delete
-          </AlignButton.Root>
+          <AdminTableAction label="Edit" onClick={onEdit}>
+            <RiEditLine aria-hidden="true" className="size-3.5" />
+          </AdminTableAction>
+          <AdminTableAction label="Delete" variant="error" onClick={onDelete}>
+            <RiDeleteBinLine aria-hidden="true" className="size-3.5" />
+          </AdminTableAction>
         </>
       ) : (
-        <AlignButton.Root size="xxsmall" variant="neutral" mode="ghost" compact onClick={onRestore}>
-          <RiRestartLine className="size-3.5" />
-          Restore
-        </AlignButton.Root>
+        <AdminTableAction label="Restore" onClick={onRestore}>
+          <RiRestartLine aria-hidden="true" className="size-3.5" />
+        </AdminTableAction>
       )}
     </div>
   );
