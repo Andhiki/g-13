@@ -18,10 +18,11 @@ import {
   reorderResources,
   updateResource,
 } from "./service";
+import { validateResourceInput } from "./validation";
 
 export const loadAdminResources = createServerFn({ method: "GET" })
   .middleware([authorize("moderate")])
-  .validator(resourcePageSchema)
+  .validator(validateResourceInput(resourcePageSchema))
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
@@ -42,7 +43,7 @@ export const loadAdminResources = createServerFn({ method: "GET" })
 
 export const createAdminResource = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
-  .validator(createResourceSchema)
+  .validator(validateResourceInput(createResourceSchema))
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
@@ -54,7 +55,7 @@ export const createAdminResource = createServerFn({ method: "POST" })
 
 export const updateAdminResource = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
-  .validator(updateResourceSchema)
+  .validator(validateResourceInput(updateResourceSchema))
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
@@ -66,7 +67,7 @@ export const updateAdminResource = createServerFn({ method: "POST" })
 
 export const changeAdminResourceLifecycle = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
-  .validator(resourceLifecycleSchema)
+  .validator(validateResourceInput(resourceLifecycleSchema))
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
@@ -78,7 +79,7 @@ export const changeAdminResourceLifecycle = createServerFn({ method: "POST" })
 
 export const reorderAdminResources = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
-  .validator(reorderResourcesSchema)
+  .validator(validateResourceInput(reorderResourcesSchema))
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
