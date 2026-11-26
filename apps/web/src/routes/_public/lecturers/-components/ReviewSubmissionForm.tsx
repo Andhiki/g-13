@@ -27,10 +27,14 @@ import { StarRatingField } from "./StarRatingField";
 import { ReviewCourseField } from "./ReviewCourseField";
 import type { ReviewCourseOption } from "../-shared/course-search";
 import { TurnstileField, type TurnstileFieldHandle } from "./TurnstileField";
-import { REVIEW_ERRORS } from "../-shared/errors";
-import type { ReviewSubmissionInput } from "../-shared/submission-schema";
+import { submissionErrorMessage } from "../-client/submission-error-message";
+import {
+  REVIEW_BODY_MAX_LENGTH,
+  REVIEW_BODY_MIN_LENGTH,
+  type ReviewSubmissionInput,
+} from "../-shared/submission-schema";
 import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submission-errors";
-import { publishLecturerReviewMutationOptions } from "../-client/mutations";
+import { publishLecturerReviewMutationOptions, type SubmittedReview } from "../-client/mutations";
 import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
 const row = "grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6";
@@ -52,34 +56,6 @@ const metrics = [
     hint: "How well were the course materials and activities structured?",
   },
 ] satisfies { name: keyof typeof initialRatings; label: string; hint: string }[];
-const SUBMISSION_ERROR_MESSAGES: Record<string, string> = {
-  [REVIEW_ERRORS.CAPTCHA]: "Security verification failed. Please try again.",
-  [REVIEW_ERRORS.INVALID]:
-    "The lecturer or course may no longer be available. Refresh the page and try again.",
-  [REVIEW_ERRORS.UNAVAILABLE]: "Reviews are temporarily unavailable. Please try again later.",
-};
-
-function nextRateLimitReset(now = new Date()): string {
-  const reset = new Date((Math.floor(now.getTime() / 3_600_000) + 1) * 3_600_000);
-  return `${String(reset.getHours()).padStart(2, "0")}:${String(reset.getMinutes()).padStart(2, "0")}`;
-}
-
-function submissionErrorMessage(
-  error: unknown,
-  text: (key: string, values?: Record<string, unknown>) => string,
-) {
-  const code = error instanceof Error ? error.message : null;
-  if (code === REVIEW_ERRORS.RATE_LIMIT) {
-    return text("Submission limit reached. Resets at {{time}}.", {
-      time: nextRateLimitReset(),
-    });
-  }
-  const key = code ? SUBMISSION_ERROR_MESSAGES[code] : undefined;
-  return key
-    ? text(key)
-    : text("Could not confirm submission. Refresh the page before trying again.");
-}
-
 function FieldError({ name, error }: { name: keyof SubmissionErrors; error?: string }) {
   const { text } = useLocale("lecturers");
   if (!error) return null;
@@ -264,7 +240,8 @@ function ReviewBodyField({
         <FormTextarea
           id="review-body"
           name="body"
-          maxLength={1000}
+          minLength={REVIEW_BODY_MIN_LENGTH}
+          maxLength={REVIEW_BODY_MAX_LENGTH}
           rows={4}
           placeholder={text("What helped you learn? What could be improved?")}
           value={body}
@@ -272,7 +249,10 @@ function ReviewBodyField({
           aria-describedby={error ? "review-body-error" : undefined}
           onValueChange={onChange}
         />
-        <div className="mt-1.5 text-text-sub-600">
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-text-sub-600">
+          <Typography as="span" variant="caption">
+            {text("At least {{count}} characters.", { count: REVIEW_BODY_MIN_LENGTH })}
+          </Typography>
           <Typography as="span" variant="caption" className="shrink-0 tabular-nums">
             {body.length}/1,000
           </Typography>
@@ -445,7 +425,7 @@ export function ReviewSubmissionForm({
   initialCourseId: string;
   browserId: string | null;
   onClose: () => void;
-  onSubmitted: (status: "pending" | "published") => Promise<void>;
+  onSubmitted: (result: SubmittedReview) => void;
 }) {
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
@@ -497,7 +477,7 @@ export function ReviewSubmissionForm({
         return;
       }
       const result = await publishMutation.mutateAsync({ ...input, turnstileToken, browserId });
-      await onSubmitted(result.status);
+      onSubmitted(result);
     } catch (error: unknown) {
       setMessage(submissionErrorMessage(error, text));
     } finally {

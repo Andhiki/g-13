@@ -1,6 +1,7 @@
 import type { createDatabase } from "@g13/db/client";
 import { dispatchNotification } from "@/server/notifications";
 
+import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { allowReviewAction } from "./rate-limit";
 import { createReview, getReviewReferences } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
@@ -22,8 +23,10 @@ export async function submitReview(
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   const references = await getReviewReferences(db, review);
   if (!references) return { data: null, error: REVIEW_ERRORS.INVALID };
-  if (!(await allowReviewAction(db, { ...context, ip }, "submission")))
-    return { data: null, error: REVIEW_ERRORS.RATE_LIMIT };
+  const now = context.now ?? Date.now();
+  if (!(await allowReviewAction(db, { ...context, ip, now }, "submission"))) {
+    return { data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: reviewRateLimitResetAt(now) };
+  }
   const { anonymous, ...values } = review;
   const reviewId = crypto.randomUUID();
   const authorName = anonymous ? "Anonymous" : review.authorName;
