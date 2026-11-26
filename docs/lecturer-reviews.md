@@ -20,7 +20,7 @@ publishLecturerReview (server function)
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
-  │  local spam rules + OpenAI moderation
+  │  local spam rules, OpenAI moderation, then local profanity
   ▼
 submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
@@ -49,15 +49,22 @@ timestamp arrives.
 
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them
-from the dashboard. Reviews with every rating at 3 or higher publish immediately.
-Every body is screened. A chosen display name is screened separately; the generated
-`Anonymous` placeholder is omitted. The Worker sends only those text values to OpenAI's
+from the dashboard. Reviews with every rating at 3 or higher publish when screening
+clears them. Every body is screened. A chosen display name is screened separately.
+The generated `Anonymous` placeholder is omitted. The Worker sends only those text values to OpenAI's
 Moderations API with `omni-moderation-latest`. Only `harassment`,
 `harassment/threatening`, `hate`, and `hate/threatening` flags hold a review; other
 category flags and the overall `flagged` value do not. A clear result preserves the
 rating rule above.
 
-Local spam rules are separate from abuse detection and require an obvious promotion
+After OpenAI clears a review, the Worker checks the body and chosen display name
+for profanity. Whole-word matches go to Pending. The matcher uses the conservative
+dictionary from [indonesian-badwords](https://github.com/drizki/indonesian-badwords),
+which excludes common literal terms such as `anjing`. For English, it uses literal
+spellings from general entries rated moderate or higher in
+[@dsojevic/profanity-list](https://github.com/dsojevic/profanity-list).
+
+Local spam rules require an obvious promotion
 combined with an explicit purchase or registration call to action and contact details.
 A negative review, URL, phone number, or ordinary contact information alone does not
 trigger a hold. A local rule match, provider error, timeout, malformed response, or
