@@ -34,7 +34,7 @@ import {
   type ReviewSubmissionInput,
 } from "../-shared/submission-schema";
 import { getSubmissionErrors, type SubmissionErrors } from "../-shared/submission-errors";
-import { publishLecturerReviewMutationOptions } from "../-client/mutations";
+import { publishLecturerReviewMutationOptions, type SubmittedReview } from "../-client/mutations";
 import { turnstileSiteKeyQueryOptions } from "../-client/queries";
 
 const row = "grid min-w-0 gap-2 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-6";
@@ -425,7 +425,7 @@ export function ReviewSubmissionForm({
   initialCourseId: string;
   browserId: string | null;
   onClose: () => void;
-  onSubmitted: (status: "pending" | "published") => Promise<void>;
+  onSubmitted: (result: SubmittedReview) => void;
 }) {
   const { text } = useLocale("lecturers");
   const queryClient = useQueryClient();
@@ -477,7 +477,7 @@ export function ReviewSubmissionForm({
         return;
       }
       const result = await publishMutation.mutateAsync({ ...input, turnstileToken, browserId });
-      await onSubmitted(result.status);
+      onSubmitted(result);
     } catch (error: unknown) {
       setMessage(submissionErrorMessage(error, text));
     } finally {

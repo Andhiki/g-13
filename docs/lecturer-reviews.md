@@ -45,6 +45,15 @@ from the dashboard. Reviews with every rating at 3 or higher publish immediately
 Only pending submissions notify admins and maintainers; immediate publications
 do not.
 
+The confirmation dialog tells the submitter when a review enters moderation.
+The browser saves the random review ID in lecturer-specific local storage so
+the submitter can see the pending card after a reload. The lookup requires at
+least one submitted ID and returns only pending, undeleted reviews for the
+requested lecturer. Pending cards are excluded from public counts, rating
+averages, and likes. Once a review leaves the queue, the browser drops its
+stored ID after the next successful lookup. When local storage is unavailable,
+the submission still shows the confirmation dialog.
+
 The Turnstile widget is **invisible** (`execution: "execute"`, `appearance: "interaction-only"`).
 Nothing is shown for ordinary visitors; the challenge runs only when the form is
 submitted, and the token is generated on demand. See
