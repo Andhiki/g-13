@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { expect, it } from "bun:test";
+import { expect, it, mock } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { courses } from "@g13/db/schema/courses";
@@ -286,6 +286,58 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     expect(classifierCalls).toBe(6);
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("holds Indonesian and English profanity after Omni clears it", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const screened = mock(async () => "clear" as const);
+    const context = {
+      ip: "192.0.2.31",
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: screened,
+    };
+    const reviews = [
+      { body: "Tes anjing ＢＡＮＧＳＡＴ! Contoh ulasan." },
+      { body: "This lecture was FUCKING confusing." },
+      { authorName: "Asshole!" },
+    ];
+    for (const [index, review] of reviews.entries()) {
+      const result = await submitReview(
+        db,
+        submissionInputSchema.parse({ ...rawInput, ...review }),
+        {
+          ...context,
+          ip: `192.0.2.${31 + index}`,
+        },
+      );
+      expect(result.data?.status).toBe("pending");
+    }
+    expect(screened).toHaveBeenCalledTimes(reviews.length);
+    expect(screened).toHaveBeenCalledWith({
+      body: "This lecture was FUCKING confusing.",
+      displayName: "Student",
+    });
+    expect(screened).toHaveBeenCalledWith({ body: rawInput.body.trim(), displayName: "Asshole!" });
+    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+
+    const body = "Kelas membahas anjing dan sex determination. The class moved too fast.";
+    const result = await submitReview(db, submissionInputSchema.parse({ ...rawInput, body }), {
+      ...context,
+      ip: "192.0.2.34",
+    });
+    expect(result.data?.status).toBe("published");
+    expect(screened).toHaveBeenCalledWith({ body, displayName: "Student" });
   } finally {
     await platform.dispose();
   }
