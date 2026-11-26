@@ -1,5 +1,5 @@
 import { getRequest, setResponseStatus } from "@tanstack/react-start/server";
-import { buildServerErrorEvent } from "./error-reporting";
+import { reportError } from "./error-reporting";
 
 export function rejectServerFunction(status: number, code: string): never {
   setResponseStatus(status);
@@ -18,7 +18,7 @@ export async function runServerOperation<T>(operation: () => Promise<T>): Promis
   try {
     return await operation();
   } catch (error: unknown) {
-    console.error(buildServerErrorEvent(error, currentRequest()));
+    reportError(error, currentRequest());
     return rejectServerFunction(500, "INTERNAL_ERROR");
   }
 }

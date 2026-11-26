@@ -1,9 +1,10 @@
 # Production error reporting
 
-The web Worker emits `server_error` for unexpected exceptions and
-`server_response` for 5xx responses. Events contain a request ID, method, and
-normalized path. Exceptions include the error type and capped message and
-stack. Response events include the status. The poller joins events by request
+The `@g13/error-reporting` workspace package emits `server_error` for
+unexpected exceptions and `server_response` for 5xx responses. Events contain
+a request ID, method, normalized path, service, environment, and schema
+version. Exceptions include the error type and capped message and stack.
+Response events include the status. The poller joins events by request
 ID and groups requests by a fingerprint that ignores stack line numbers.
 Messages and stacks can contain private data. Keep report output in the
 maintainer-only channel and use sanitized summaries in public artifacts.
@@ -28,7 +29,7 @@ maintainer-only channel and use sanitized summaries in public artifacts.
 ```sh
 kimaki send --project '<g-13 checkout>' --channel '<private channel>' \
   --send-at '*/10 * * * *' \
-  --pre-run 'bun apps/web/scripts/report-server-errors.ts' --agent build \
+  --pre-run 'bun run report-incidents' --agent build \
   --prompt 'Read routines/production-500-response.md and follow it.'
 ```
 
@@ -49,9 +50,10 @@ on the next run. The first poll starts with a five-minute window. After host
 downtime, polling resumes from the cursor within the Workers Logs retention
 window.
 
-A fingerprint is suppressed for 24 hours after reporting. Each report lists
-up to five incidents. After three fix sessions in an hour or ten in a rolling
-24 hours, new reports carry `reportOnly: true`.
+Each service and environment has its own cursor, cooldown, and fix budget.
+A fingerprint is suppressed for 24 hours after reporting. Each service
+section lists up to five incidents. After three fix sessions in an hour or
+ten in a rolling 24 hours, that service's section carries `reportOnly: true`.
 
 To suppress a known fingerprint, pause the routine, add its 16-character
 fingerprint to the state's `disabled` array, and resume the routine. Remove
@@ -61,7 +63,7 @@ advance, then revoke the old token.
 
 ## Verification
 
-Run `bun apps/web/scripts/report-server-errors.ts --fixture /path/to/events.json`
+Run `bun run report-incidents --fixture /path/to/events.json`
 with a JSON array of synthetic event objects plus an ISO timestamp on each
 object. It requires no credentials and leaves live state untouched. Verify
 the report in the private thread using the playbook's fixture dry-run mode.
@@ -73,3 +75,19 @@ For live verification, configure a temporary private routine with
 that it produces matching Workers Logs and a private report thread, and verify
 that a fixable defect produces a sanitized draft PR against `staging`.
 Remove the seeded failure and temporary routine after the check.
+
+## Add a service
+
+Add `@g13/error-reporting` as a workspace dependency. Call
+`createErrorReporter({ service, environment, normalizePath, log })` and use
+`withServerErrorReporting` at the Fetch boundary or `reportError` where the
+framework catches exceptions. Supply route templates for service-specific
+identifiers and use the same service and environment names in the runner.
+
+Register a monitored service in
+[the service configuration](../packages/error-reporting/scripts/services.ts).
+Give it its own state path, plus a log source that reads the requested time
+range and returns timestamped events. Reuse the Cloudflare adapter for other
+Workers. Omit `draftFix` to report incidents without starting repair work for
+that service. To enable draft fixes, set the repository and base branch
+explicitly and ensure the Kimaki host has a matching checkout.

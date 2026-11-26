@@ -2,7 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildIncidentReport, poll } from "./report-server-errors";
+import { buildIncidentReport } from "./incidents";
+import { poll, reportIncidents } from "./runner";
+import { parseLogRows } from "./rows";
 
 const now = Date.parse("2026-11-25T10:00:00Z");
 const hour = 3_600_000;
@@ -41,7 +43,7 @@ test("joins a request's error and response and fingerprints recurring stack fram
     now,
     dashboard,
   );
-  expect(result.report?.match(/## Incident/g)).toHaveLength(1);
+  expect(result.report?.match(/### Incident/g)).toHaveLength(1);
   expect(result.report).toContain("Occurrences: 2");
   expect(result.report).toContain("GET /dashboard → 503");
   expect(result.report).toContain("TypeError");
@@ -68,7 +70,7 @@ test("caps reports at five and respects each rolling fix budget", () => {
     const result = buildIncidentReport(rows, { ...state, fixSessions }, now, dashboard);
     expect(result.report).toContain("reportOnly: true");
     expect(result.report).toContain("1 additional incidents omitted");
-    expect(result.report?.match(/## Incident/g)).toHaveLength(5);
+    expect(result.report?.match(/### Incident/g)).toHaveLength(5);
     expect(Object.keys(result.state.fingerprints)).toHaveLength(5);
     expect(result.state.fixSessions).toEqual(fixSessions);
   }
@@ -94,16 +96,67 @@ test("reports the third consecutive failure without advancing the cursor", async
 test("fixture CLI exits 0 with a report and 1 with an empty fixture", async () => {
   const directory = await mkdtemp(join(tmpdir(), "g13-report-test-"));
   const fixture = join(directory, "events.json");
-  const script = join(import.meta.dir, "report-server-errors.ts");
+  const script = join(import.meta.dir, "report-incidents.ts");
   try {
     for (const rows of [[response], []]) {
       await writeFile(fixture, JSON.stringify(rows));
       const child = Bun.spawn([process.execPath, script, "--fixture", fixture], { stdout: "pipe" });
       const stdout = await new Response(child.stdout).text();
       expect(await child.exited).toBe(rows.length ? 0 : 1);
-      expect(stdout.includes("## Incident")).toBe(Boolean(rows.length));
+      expect(stdout.includes("### Incident")).toBe(Boolean(rows.length));
     }
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+test("one runner keeps two services and their failures independent", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "g13-services-"));
+  try {
+    let alphaFailed = false;
+    const alpha = { service: "alpha", environment: "production" };
+    const beta = { service: "beta", environment: "production" };
+    const services = [
+      {
+        ...alpha,
+        statePath: join(directory, "alpha.json"),
+        draftFix: { repository: "g13/alpha", baseBranch: "staging" },
+        source: {
+          read: async () => {
+            if (alphaFailed) throw new Error("failed backend");
+            return parseLogRows([response], alpha);
+          },
+        },
+      },
+      {
+        ...beta,
+        statePath: join(directory, "beta.json"),
+        source: {
+          read: async (start: number) => {
+            expect(start).toBe(now - 300_000 + (alphaFailed ? 2000 : 0));
+            return parseLogRows([alphaFailed ? { ...response, path: "/new" } : response], beta);
+          },
+        },
+      },
+    ];
+    const first = await reportIncidents(services, now);
+    expect(first?.match(/### Incident/g)).toHaveLength(2);
+    expect(first).toContain("## alpha (production)");
+    expect(first).toContain("## beta (production)\n\nreportOnly: true");
+    expect(first).toContain("Draft fix target: g13/alpha → staging");
+    const repeat = await reportIncidents(services, now + 2000);
+    expect(repeat).toBeNull();
+    alphaFailed = true;
+    const later = await reportIncidents(services, now + 4000);
+    expect(later).toContain("GET /new");
+    expect(later).not.toContain("alpha");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("rejects events tagged for a different service and accepts legacy rows", () => {
+  const identity = { service: "g-13", environment: "production" };
+  expect(parseLogRows([response], identity)[0]).toMatchObject({ ...identity, schemaVersion: 1 });
+  expect(() => parseLogRows([{ ...response, service: "other" }], identity)).toThrow();
+  expect(() => parseLogRows([{ ...response, schemaVersion: 2 }], identity)).toThrow();
 });
