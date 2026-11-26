@@ -1,7 +1,7 @@
-﻿import { expect } from "e2e";
-import { fixture } from "../database.ts";
-import { test } from "../isolated-test.ts";
-import { fillReview } from "./review-form.ts";
+import { expect } from "e2e";
+import { fixture } from "../fixtures/database.ts";
+import { test } from "../fixtures/local-test.ts";
+import { fillReview, profile } from "../fixtures/review-form.ts";
 
 const path = "/dashboard/notifications";
 const newReview = /ulasan dosen baru|new lecturer review/i;
@@ -61,7 +61,7 @@ test("A failed notification update leaves it actionable, then mark all as read s
   await expect(screen.getByText(emptyUnread).first()).toBeVisible();
 });
 
-test("A pending review notification opens the matching moderation inspector", async ({
+test("A pending review stays private and its notification opens the moderation inspector", async ({
   app,
   browser,
   screen,
@@ -87,6 +87,12 @@ test("A pending review notification opens the matching moderation inspector", as
     review.getByText(/menunggu pemeriksaan moderator|pending moderator review/i),
   ).toBeVisible();
   await expect(review.getByRole("button", { name: /sukai ulasan|like review/i })).toHaveCount(0);
+
+  await app.clearState();
+  await app.open(profile);
+  await expect(screen.getByRole("article").filter({ hasText: fixture.review })).toBeVisible();
+  await expect(screen.getByRole("article").filter({ hasText: body })).toHaveCount(0);
+
   await signIn("maintainer");
   await app.open(path);
   const item = screen.getByRole("listitem").filter({ hasText: "Notification Fixture" });

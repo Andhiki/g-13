@@ -1,4 +1,4 @@
-﻿import { test } from "@e2e-dev/web";
+import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
 
 for (const { edition, semesters } of [
@@ -44,7 +44,7 @@ for (const { edition, semesters } of [
     const params = new URL(link).searchParams;
     expect(params.get("kurikulum")).toContain(edition);
     expect(params.get("lulus")).toBe(String(semesters));
-    await app.restart();
+    await app.clearState();
     await app.open(link);
     await expect(share).toBeVisible();
     expect(new URL(await browser.url()).searchParams.get("lulus")).toBe(String(semesters));
@@ -112,7 +112,7 @@ test("A supported elective replacement survives sharing and a reload", async ({
   expect(JSON.parse(new URL(link).searchParams.get("ganti") ?? "{}")).toEqual({
     PACS262422: "PACS262402",
   });
-  await app.restart();
+  await app.clearState();
   await app.open(link);
   await browser.reload();
   await expect(

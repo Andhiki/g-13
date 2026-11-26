@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: local-sqlite-e2e
-          path: .e2e/
+          path: .e2e/local/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: shared-staging-e2e
-          path: .e2e/
+          path: .e2e/smoke/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7

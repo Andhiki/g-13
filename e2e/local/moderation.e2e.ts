@@ -1,6 +1,6 @@
 import { expect } from "e2e";
-import { fixture } from "../database.ts";
-import { test } from "../isolated-test.ts";
+import { fixture } from "../fixtures/database.ts";
+import { test } from "../fixtures/local-test.ts";
 
 const queue = "/dashboard/lecturer-reviews";
 const profile = `/lecturers/${fixture.lecturerId}`;
@@ -81,15 +81,4 @@ test("Deleting a disposable review removes it and its reaction control from the 
   await expect(screen.getByRole("button", { name: /^(sukai ulasan|like review)$/i })).toHaveCount(
     1,
   );
-});
-
-test("An admin opens the announcements page on the current staging revision", async ({
-  app,
-  screen,
-  signIn,
-}) => {
-  await signIn("admin");
-  await app.open("/dashboard/announcements");
-  await expect(screen.getByRole("heading", { name: "Announcements" })).toBeVisible();
-  await expect(screen.getByRole("button", { name: "Add announcement" }).first()).toBeVisible();
 });
