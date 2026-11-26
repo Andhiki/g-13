@@ -38,6 +38,13 @@ it.each([
   expect(hasReviewContactDetails({ body: `Contact detail: (${detail}).` })).toBe(true);
 });
 
+it.each(["example.org", "office@example.edu", "62-812-3456-7890", "discord.gg/channel"])(
+  "holds a review when the chosen display name contains %s",
+  (displayName) => {
+    expect(hasReviewContactDetails({ body: "The material was clear.", displayName })).toBe(true);
+  },
+);
+
 it("treats standalone S.Kom. as an academic title in review text and display names", () => {
   expect(
     hasReviewContactDetails({ body: "Pak Budi, S.Kom., menjelaskan materi dengan jelas." }),

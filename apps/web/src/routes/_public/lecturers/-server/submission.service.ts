@@ -11,6 +11,7 @@ import {
   type ReviewScreeningInput,
   type ReviewScreeningResult,
 } from "./review-moderation";
+import { hasReviewProfanity } from "./review-profanity";
 
 type Database = ReturnType<typeof createDatabase>;
 
@@ -51,11 +52,20 @@ export async function submitReview(
   const { anonymous, ...values } = review;
   const reviewId = crypto.randomUUID();
   const authorName = anonymous ? "Anonymous" : review.authorName;
+  const screeningInput = anonymous
+    ? { body: review.body }
+    : { body: review.body, displayName: authorName };
   let screening: ReviewScreeningResult;
   try {
     screening = await (
       context.classify ?? ((input) => classifyReviewText(input, context.openAiApiKey))
-    )(anonymous ? { body: review.body } : { body: review.body, displayName: authorName });
+    )(screeningInput);
+    if (
+      screening === "clear" &&
+      [screeningInput.body, screeningInput.displayName ?? ""].some(hasReviewProfanity)
+    ) {
+      screening = "flagged";
+    }
   } catch {
     screening = "unscorable";
   }

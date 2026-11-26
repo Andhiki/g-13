@@ -20,7 +20,7 @@ publishLecturerReview (server function)
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
-  │  local contact-detail check, then OpenAI moderation if clear
+  │  contact-detail check, OpenAI moderation, then local profanity
   ▼
 submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
@@ -56,13 +56,22 @@ does not assess promotional intent or detect obfuscated links such as `example[.
 If the local check is clear, the Worker sends the body and any chosen display name
 to OpenAI's Moderations API with `omni-moderation-latest`. It omits the generated
 `Anonymous` placeholder. Only flags for `harassment`, `harassment/threatening`,
-`hate`, and `hate/threatening` place the review in Pending. Provider errors,
+`hate`, and `hate/threatening` place the review in Pending. Other category flags and the overall `flagged`
+value are ignored. Provider errors,
 timeouts, malformed responses, and missing API keys also send reviews to Pending.
+
+After OpenAI clears a review, the Worker checks the body and chosen display name
+for profanity. Whole-word matches go to Pending. The matcher uses the conservative
+dictionary from [indonesian-badwords](https://github.com/drizki/indonesian-badwords),
+which excludes common literal terms such as `anjing`. For English, it uses literal
+spellings from general entries rated moderate or higher in
+[@dsojevic/profanity-list](https://github.com/dsojevic/profanity-list).
 
 When screening is clear, a review publishes immediately if all three ratings are
 at least 3. A review with any rating of 2 or lower goes to Pending. Pending reviews
 stay out of public listings, ratings, and search aggregates until a moderator approves
 them. Only Pending submissions notify admins and maintainers.
+
 
 The confirmation dialog tells the submitter when a review enters moderation.
 The browser saves the random review ID in lecturer-specific local storage so
