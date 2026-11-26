@@ -315,6 +315,25 @@ function ResourcesContent({
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
   onReorder: (movedId: string, orderedIds: string[]) => void;
 }) {
+  const list = (
+    <ResourcesListBody
+      queryState={queryState}
+      visibleRows={visibleRows}
+      needle={needle}
+      status={status}
+      activeCount={activeCount}
+      selectedId={selectedResource?.id}
+      sortable={sortable}
+      onClearSearch={onClearSearch}
+      onViewActive={onViewActive}
+      onCreate={onCreate}
+      onSelect={onSelect}
+      onEdit={onEdit}
+      onLifecycle={onLifecycle}
+      onReorder={onReorder}
+    />
+  );
+
   return (
     <div className="flex min-h-0 flex-1">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
@@ -339,22 +358,7 @@ function ResourcesContent({
         <div
           className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
         >
-          <ResourcesListBody
-            queryState={queryState}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            activeCount={activeCount}
-            selectedId={selectedResource?.id}
-            sortable={sortable}
-            onClearSearch={onClearSearch}
-            onViewActive={onViewActive}
-            onCreate={onCreate}
-            onSelect={onSelect}
-            onEdit={onEdit}
-            onLifecycle={onLifecycle}
-            onReorder={onReorder}
-          />
+          {list}
         </div>
       </div>
       <AdminInspector
@@ -594,6 +598,11 @@ function AdminResourcesPage() {
     setConfirmation({ input, label });
   }
 
+  const formError = saveMutation.isError
+    ? (resourceMutationErrorMessage(saveMutation.error) ??
+      "Could not save resource. Refresh and try again.")
+    : undefined;
+
   return (
     <>
       <ResourcesToolbar
@@ -656,12 +665,7 @@ function AdminResourcesPage() {
       <ResourcesModals
         formState={formModal}
         formPending={saveMutation.isPending}
-        formError={
-          saveMutation.isError
-            ? (resourceMutationErrorMessage(saveMutation.error) ??
-              "Could not save resource. Refresh and try again.")
-            : undefined
-        }
+        formError={formError}
         confirmation={confirmation}
         lifecyclePending={lifecycleMutation.isPending}
         lifecycleError={lifecycleMutation.isError}

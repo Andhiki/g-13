@@ -21,13 +21,14 @@ export type ThesisLanguage = z.infer<typeof thesisLanguageSchema>;
 export const thesisContactChannelSchema = z.enum(["email", "url"]);
 export const thesisSupervisorRoleSchema = z.enum(["main", "co"]);
 
+const trimmedText = z.string().trim();
+
 export const thesisPageSchema = z.object({
   offset: z.number().int().min(0),
-  query: z.string().trim().max(300).default(""),
+  query: trimmedText.max(300).default(""),
   status: thesisStatusFilterSchema,
 });
 
-const trimmedText = z.string().trim();
 const nonEmptyText = trimmedText.min(1);
 const thesisId = nonEmptyText.max(120);
 const year = z.number().int();

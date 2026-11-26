@@ -239,6 +239,16 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
     [text],
   );
 
+  const results = (
+    <AlumniResultsContent
+      batch={batch}
+      status={directory.status}
+      filtered={filtered}
+      listRef={listRef}
+      onReload={directory.reload}
+    />
+  );
+
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-6xl">
@@ -268,13 +278,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
             onQueryChange={setQuery}
           />
           {directory.status === "ready" && <AlumniBatchTabs batches={batches} />}
-          <AlumniResultsContent
-            batch={batch}
-            status={directory.status}
-            filtered={filtered}
-            listRef={listRef}
-            onReload={directory.reload}
-          />
+          {results}
         </Tabs.Root>
       </div>
       {letters.length > 1 && (

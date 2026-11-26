@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type ComponentProps } from "react";
 import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine, RiStarFill } from "@remixicon/react";
 import { CourseChip } from "@/ui/course-chip";
 import { useLocale } from "@/useLocale";
@@ -382,11 +382,44 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
       .catch(() => undefined);
   };
 
+  const handleReviewSubmitted: ComponentProps<typeof ReviewSubmissionDialog>["onSubmitted"] = ({
+    reviewId,
+    status,
+  }) => {
+    setReviewDialogOpen(false);
+    if (status === "published") {
+      toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
+      return;
+    }
+    try {
+      const ids = [...readPendingReviewIds(pendingStorageKey), reviewId];
+      writePendingReviewIds(pendingStorageKey, ids);
+      setPendingIds(ids);
+      setPendingConfirmation("tracked");
+    } catch {
+      setPendingConfirmation("untracked");
+    }
+  };
+
+  const canLike = browserId !== null && !likesQuery.isPending && !likesQuery.isError;
   const emptyReviews = (
     <EmptyReviewsState
       hasCourseFilter={courseId !== null}
       onWriteReview={() => setReviewDialogOpen(true)}
       onClearFilter={() => setCourseId(null)}
+    />
+  );
+
+  const reviewList = (
+    <ReviewList
+      reviews={reviews}
+      pendingReviews={pendingReviews}
+      language={language}
+      emptyState={emptyReviews}
+      likedReviews={likedReviews}
+      canLike={canLike}
+      likePending={likeMutation.isPending}
+      onLike={handleToggleLike}
     />
   );
 
@@ -415,16 +448,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               {likeError}
             </Typography>
           )}
-          <ReviewList
-            reviews={reviews}
-            pendingReviews={pendingReviews}
-            language={language}
-            emptyState={emptyReviews}
-            likedReviews={likedReviews}
-            canLike={browserId !== null && !likesQuery.isPending && !likesQuery.isError}
-            likePending={likeMutation.isPending}
-            onLike={handleToggleLike}
-          />
+          {reviewList}
         </section>
       </div>
       <ReviewSubmissionDialog
@@ -435,53 +459,61 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         browserId={browserId}
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
-        onSubmitted={({ reviewId, status }) => {
-          setReviewDialogOpen(false);
-          if (status === "published") {
-            toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
-            return;
-          }
-          try {
-            const ids = [...readPendingReviewIds(pendingStorageKey), reviewId];
-            writePendingReviewIds(pendingStorageKey, ids);
-            setPendingIds(ids);
-            setPendingConfirmation("tracked");
-          } catch {
-            setPendingConfirmation("untracked");
-          }
-        }}
+        onSubmitted={handleReviewSubmitted}
       />
-      <AlignModal.Root
+      <PendingReviewConfirmation
         open={pendingConfirmation !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingConfirmation(null);
-        }}
-      >
-        <AlignModal.Content showClose={false}>
-          <div className="flex flex-col gap-3 p-5">
-            <AlignModal.Title asChild>
-              <Typography as="h2" variant="subtitle2" className="m-0">
-                {text("Your review is pending moderator review.")}
-              </Typography>
-            </AlignModal.Title>
-            <AlignModal.Description asChild>
-              <Typography as="p" variant="paragraph" color="muted" className="m-0">
-                {text("A moderator checks reviews before they appear publicly.")}
-                {pendingConfirmation === "tracked" && (
-                  <>
-                    {" "}
-                    {text("Your review will appear here marked as pending until it is approved.")}
-                  </>
-                )}
-              </Typography>
-            </AlignModal.Description>
-            <AlignModal.Close asChild>
-              <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
-            </AlignModal.Close>
-          </div>
-        </AlignModal.Content>
-      </AlignModal.Root>
+        tracked={pendingConfirmation === "tracked"}
+        onClose={() => setPendingConfirmation(null)}
+      />
     </main>
+  );
+}
+
+function PendingReviewConfirmation({
+  open,
+  tracked,
+  onClose,
+}: {
+  open: boolean;
+  tracked: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <AlignModal.Root
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <AlignModal.Content showClose={false}>
+        <PendingReviewConfirmationContent tracked={tracked} />
+      </AlignModal.Content>
+    </AlignModal.Root>
+  );
+}
+
+function PendingReviewConfirmationContent({ tracked }: { tracked: boolean }) {
+  const { text } = useLocale("lecturers");
+  return (
+    <div className="flex flex-col gap-3 p-5">
+      <AlignModal.Title asChild>
+        <Typography as="h2" variant="subtitle2" className="m-0">
+          {text("Your review is pending moderator review.")}
+        </Typography>
+      </AlignModal.Title>
+      <AlignModal.Description asChild>
+        <Typography as="p" variant="paragraph" color="muted" className="m-0">
+          {text("A moderator checks reviews before they appear publicly.")}
+          {tracked && (
+            <> {text("Your review will appear here marked as pending until it is approved.")}</>
+          )}
+        </Typography>
+      </AlignModal.Description>
+      <AlignModal.Close asChild>
+        <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
+      </AlignModal.Close>
+    </div>
   );
 }
 
