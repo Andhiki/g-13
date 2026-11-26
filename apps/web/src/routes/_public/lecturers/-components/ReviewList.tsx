@@ -14,7 +14,7 @@ type Review = Awaited<
 
 type ReviewCardData = Omit<Review, "overall" | "likeCount">;
 
-function ReviewAspectRatings({ review }: { review: ReviewCardData }) {
+function ReviewAspectRatings({ review, pending }: { review: ReviewCardData; pending: boolean }) {
   const { text } = useLocale("lecturers");
   const scores: [string, number][] = [
     ["Clarity", review.clarity],
@@ -28,9 +28,14 @@ function ReviewAspectRatings({ review }: { review: ReviewCardData }) {
           <Typography as="dt" variant="caption" color="muted">
             {text(label)}
           </Typography>
-          <dd className="m-0 flex items-center gap-0.5 text-label-xs tabular-nums">
+          <dd
+            className={`m-0 flex items-center gap-0.5 text-label-xs tabular-nums ${pending ? "text-text-sub-600" : ""}`}
+          >
             {value}
-            <RiStarFill aria-hidden="true" className="size-3.5 text-primary-base" />
+            <RiStarFill
+              aria-hidden="true"
+              className={`size-3.5 ${pending ? "text-text-soft-400" : "text-primary-base"}`}
+            />
           </dd>
         </div>
       ))}
@@ -42,16 +47,19 @@ function ReviewCard({
   review,
   language,
   action,
+  pending = false,
 }: {
   review: ReviewCardData;
   language: "id" | "en";
   action: ReactNode;
+  pending?: boolean;
 }) {
   const { text } = useLocale("lecturers");
   return (
     <article key={review.id} id={`review-${review.id}`} className="min-w-0 py-3 sm:py-4">
       <Typography
         as="p"
+        color={pending ? "muted" : "inherit"}
         className={
           // oxlint-disable-next-line shadcn/no-restyle -- public review body reads best relaxed; the paragraph label scale runs tighter than prose wants
           "m-0 whitespace-pre-wrap break-words leading-relaxed"
@@ -62,10 +70,15 @@ function ReviewCard({
       <div className="mt-2">
         <CourseChip code={review.code} name={courseDisplayName(review, language)} />
       </div>
-      <ReviewAspectRatings review={review} />
+      <ReviewAspectRatings review={review} pending={pending} />
       <footer className="mt-2 flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-          <Typography as="span" variant="labelSmall" className="min-w-0 wrap-anywhere">
+          <Typography
+            as="span"
+            variant="labelSmall"
+            color={pending ? "muted" : "inherit"}
+            className="min-w-0 wrap-anywhere"
+          >
             {review.authorName.toLowerCase() === "anonymous"
               ? text("Anonymous")
               : review.authorName}
@@ -110,6 +123,7 @@ export function ReviewList({
           key={review.id}
           review={review}
           language={language}
+          pending
           action={
             <AlignBadge.Root variant="information" size="medium">
               {text("Pending moderator review")}
