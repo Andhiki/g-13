@@ -20,7 +20,7 @@ publishLecturerReview (server function)
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
-  │  local spam rules + OpenAI moderation
+  │  local spam rules, OpenAI moderation, then local profanity
   ▼
 submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
@@ -31,26 +31,40 @@ HMACs it with `REVIEW_RATE_LIMIT_SECRET` before storing the counter. Visitors wh
 share a campus network, office NAT, or a mobile carrier's CGNAT therefore keep
 their own quota. The per-IP ceiling bounds abuse from someone rotating browser
 identifiers. When browser storage is unavailable, the IP keeps the strict
-three-per-hour limit. Likes have a separate bucket and never consume submission
-limits. The browser identifier is a client-controlled hint, not an authenticated
-identity; Turnstile remains the primary gate for every submission.
+three-per-hour limit. Likes use separate buckets: 60 per browser per UTC hour with
+a 300-per-IP backstop; when the browser identifier is absent, the stricter
+60-per-IP quota applies. Likes never consume submission limits. The browser
+identifier is a client-controlled hint, not an authenticated identity; Turnstile
+remains the primary gate for every submission.
+
+The strict no-browser like quota is a defensive rate-limit fallback. The public
+like mutation still requires a browser identifier to persist and reload a
+visitor's reaction, so the page disables likes when browser storage is unavailable.
 
 Rate-limited submissions and likes return HTTP 429 with a `Retry-After` header
 containing the number of seconds until the quota resets at the next UTC hour,
-rounded up. The submission form displays the server's reset timestamp in the
-visitor's local time and falls back to the browser clock if no timestamp arrives.
+rounded up. The submission form and like error display the server's reset
+timestamp in the visitor's local time and fall back to the browser clock if no
+timestamp arrives.
 
 Reviews with any rating of 2 or lower are stored as `pending` and stay out of
 public listings, ratings, and search aggregates until a moderator approves them
-from the dashboard. Reviews with every rating at 3 or higher publish immediately.
-Every body is screened. A chosen display name is screened separately; the generated
-`Anonymous` placeholder is omitted. The Worker sends only those text values to OpenAI's
+from the dashboard. Reviews with every rating at 3 or higher publish when screening
+clears them. Every body is screened. A chosen display name is screened separately.
+The generated `Anonymous` placeholder is omitted. The Worker sends only those text values to OpenAI's
 Moderations API with `omni-moderation-latest`. Only `harassment`,
 `harassment/threatening`, `hate`, and `hate/threatening` flags hold a review; other
 category flags and the overall `flagged` value do not. A clear result preserves the
 rating rule above.
 
-Local spam rules are separate from abuse detection and require an obvious promotion
+After OpenAI clears a review, the Worker checks the body and chosen display name
+for profanity. Whole-word matches go to Pending. The matcher uses the conservative
+dictionary from [indonesian-badwords](https://github.com/drizki/indonesian-badwords),
+which excludes common literal terms such as `anjing`. For English, it uses literal
+spellings from general entries rated moderate or higher in
+[@dsojevic/profanity-list](https://github.com/dsojevic/profanity-list).
+
+Local spam rules require an obvious promotion
 combined with an explicit purchase or registration call to action and contact details.
 A negative review, URL, phone number, or ordinary contact information alone does not
 trigger a hold. A local rule match, provider error, timeout, malformed response, or
@@ -157,9 +171,12 @@ the rejection path. Production keys reject dummy tokens and vice versa.
 Invisible mode requires referencing Cloudflare's
 [Turnstile Privacy Addendum](https://www.cloudflare.com/trust-hub/privacy-and-compliance/)
 in the app's own privacy policy. The server passes the visitor's `CF-Connecting-IP` to
-Siteverify as `remoteip` and uses the same IP for the hourly backstop; the browser
-identifier is HMAC'd before storage. Raw IPs are not stored in review records (see
-`packages/db/README.md`).
+Siteverify as `remoteip`. The hourly IP quotas for submissions and likes group IPv6
+addresses by their `/64` network, so rotating privacy addresses within a network
+share a quota. IPv4 and IPv4-mapped IPv6 addresses use the same IPv4 quota.
+Rate-limit identities and the submission browser identifier are HMAC'd before
+storage. Raw IPs are not stored in review records
+(see `packages/db/README.md`).
 
 OpenAI receives only the review body and a chosen display name. Review, lecturer, and
 course IDs, ratings, IP addresses, browser IDs, and raw provider responses are not sent

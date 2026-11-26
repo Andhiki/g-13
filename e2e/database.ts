@@ -151,7 +151,7 @@ export async function exhaustReviewLimit(action: "submission" | "like", browserI
       : [
           {
             identity: (hour: number) => `like:${hour}:192.0.2.60`,
-            limit: 60,
+            limit: 300,
           },
         ];
   await localD1({

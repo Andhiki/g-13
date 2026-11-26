@@ -25,6 +25,7 @@ import {
 } from "../-client/queries";
 import { readPendingReviewIds, writePendingReviewIds } from "../-client/pending-review-storage";
 import { updateReviewLikeMutationOptions } from "../-client/mutations";
+import { likeErrorMessage } from "../-client/submission-error-message";
 
 type LecturerDetail = ReturnType<
   typeof useSuspenseQuery<
@@ -368,9 +369,11 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   }, []);
   const likeError = storageUnavailable
     ? text("Enable browser storage to like reviews.")
-    : likesQuery.isError || likeMutation.isError
-      ? text("Could not update like. Please try again.")
-      : "";
+    : likeMutation.isError
+      ? likeErrorMessage(likeMutation.error, text)
+      : likesQuery.isError
+        ? text("Could not update like. Please try again.")
+        : "";
 
   const handleToggleLike = async (reviewId: string, liked: boolean) => {
     if (!browserId) return;
