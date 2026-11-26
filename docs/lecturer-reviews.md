@@ -193,6 +193,34 @@ bun run build
 bun run dev
 ```
 
+## Evaluating contextual moderation
+
+The local synthetic evaluation is separate from the live submission flow. It
+compares the existing exact profanity dictionary with a small explicit typo and
+abbreviation list. It also reports per-field metrics for Qwen when a live run is
+requested. The held-out Indonesian, English, and mixed-language fixtures are
+synthetic and cover wordless attacks, misspellings, abbreviations, academic or
+literal usage, reported speech, ordinary criticism, and missing chosen names.
+
+Run local checks without credentials or network access:
+
+```sh
+bun run --cwd apps/web evaluate:moderation
+```
+
+To send each synthetic review and its optional chosen display name as separate
+fields in one Groq request, first set `GROQ_API_KEY` in the shell, then run:
+
+```sh
+bun run --cwd apps/web evaluate:moderation -- --live
+```
+
+The JSON report separates model uncertainty, request failures, schema or
+validation failures, and local matcher results for each field. It does not save
+raw provider responses. A local-only run does not establish Groq model behavior;
+Qwen must not affect publication until a live Groq evaluation is recorded and
+reviewed. The evaluation code is not called by the submission path.
+
 Open a lecturer detail page, submit a review, and confirm it is stored. Then set
 `TURNSTILE_SECRET_KEY` to the "always fails" secret (or blank) and confirm the
 submission is rejected with the security message. Automated tests cover token

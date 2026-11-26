@@ -16,6 +16,7 @@
     "lint:fix": "oxlint --fix src scripts vite.config.ts",
     "format": "bun fmt src scripts vite.config.ts package.json tsconfig.json",
     "format:check": "bun fmt --check src scripts vite.config.ts package.json tsconfig.json",
+    "evaluate:moderation": "bun scripts/evaluate-review-moderation.ts",
     "check": "bun run lint && bun run format:check && bun run typecheck && bun run test",
     "test": "bun test --preload ./src/test/setup.ts src scripts"
   },
