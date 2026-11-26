@@ -17,7 +17,7 @@ export function LecturerReviewCard({ lecturer }: { lecturer: Lecturer }) {
   const { text, language } = useLocale("lecturers");
   const [showAllCourses, setShowAllCourses] = useState(false);
   return (
-    <article className="isolate relative cursor-pointer rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 focus-within:border-stroke-strong-950 sm:p-4">
+    <article className="isolate relative rounded-10 border border-stroke-soft-200 bg-bg-white-0 p-3 transition-colors hover:border-stroke-strong-950 focus-within:border-stroke-strong-950 sm:p-4">
       <Link
         to="/lecturers/$lecturerId"
         params={{ lecturerId: lecturer.id }}

@@ -1,3 +1,4 @@
+import { Typography } from "@/ui/typography";
 import { RiBriefcaseLine, RiGraduationCapLine, RiLinkedinBoxFill } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
@@ -15,9 +16,14 @@ function AlumniCardHeader({ alumnus }: { alumnus: AlumniCard }) {
       >
         {alumniInitials(alumnus.name)}
       </div>
-      <h3 className="m-0 min-w-0 flex-1 break-words text-label-md text-text-strong-950">
+      <Typography
+        as="h3"
+        variant="subtitle2"
+        color="strong"
+        className="m-0 min-w-0 flex-1 break-words"
+      >
         {alumnus.name}
-      </h3>
+      </Typography>
       {alumnus.linkedin && (
         <AlignButton.Root asChild variant="neutral" mode="ghost" iconOnly className="shrink-0">
           <a
@@ -49,7 +55,7 @@ function AlumniCareerRow({
   return (
     <div className="flex items-start gap-2">
       <RiBriefcaseLine aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-      <p className="m-0 min-w-0 break-words">
+      <Typography as="p" className="m-0 min-w-0 break-words">
         {position && <span className="text-label-sm text-text-strong-950">{position}</span>}
         {position && employer && <span className="mx-1.5">{text("di")}</span>}
         {logo && (
@@ -60,7 +66,7 @@ function AlumniCareerRow({
           />
         )}
         {employer && <span className="text-label-sm text-text-strong-950">{employer}</span>}
-      </p>
+      </Typography>
     </div>
   );
 }
@@ -76,10 +82,10 @@ export function AlumniDirectoryCard({ alumnus }: { alumnus: AlumniCard }) {
         <AlumniCareerRow position={alumnus.position} employer={alumnus.employer} logo={logo} />
         <div className="flex items-start gap-2">
           <RiGraduationCapLine aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          <p className="m-0 min-w-0 break-words">
+          <Typography as="p" className="m-0 min-w-0 break-words">
             {alumnus.education && `${alumnus.education} · `}
             {text("Angkatan {{v0}}", { v0: String(alumnus.batch) })}
-          </p>
+          </Typography>
         </div>
       </div>
     </article>

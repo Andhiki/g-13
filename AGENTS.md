@@ -13,4 +13,6 @@ For curriculum and exam archive work, use the corresponding `gthirteen` skill. B
 
 For browser preview failures caused by missing Linux libraries, see [docs/browser-preview.md](docs/browser-preview.md).
 
+When building UI, reuse components from `@/ui` where they fit. When creating a shared component, check the UI SDK for a suitable primitive before building one from scratch.
+
 Before using ui-sdk, follow the `ui-sdk` skill in `.agents/skills/ui-sdk/` and read `apps/web/node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `apps/web/node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it.

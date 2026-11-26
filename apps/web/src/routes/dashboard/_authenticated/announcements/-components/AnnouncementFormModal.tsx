@@ -64,7 +64,7 @@ function AnnouncementVariantField({
           <Radio
             key={option}
             value={option}
-            className="group flex min-h-9 cursor-[var(--interactive-cursor)] items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
+            className="group flex min-h-9 cursor-interactive items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
           >
             <span
               aria-hidden="true"

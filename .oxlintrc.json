@@ -1,6 +1,7 @@
 {
   "jsPlugins": [
-    "@shadcn/lint"
+    "@shadcn/lint",
+    "./apps/web/scripts/design-system-lint.mjs"
   ],
   "settings": {
     "shadcn": {
@@ -38,11 +39,14 @@
         "apps/web/src/**/*.{ts,tsx}"
       ],
       "rules": {
+        "design-system/respect-cursor-preference": "error",
+        "design-system/require-typography": "error",
         "shadcn/no-raw-colors": "error",
         "shadcn/no-unknown-classes": [
           "error",
           {
             "allow": [
+              "cursor-interactive",
               "nodrag",
               "nopan"
             ]
@@ -88,7 +92,8 @@
         "apps/web/src/ui/**"
       ],
       "rules": {
-        "shadcn/no-restyle": "off"
+        "shadcn/no-restyle": "off",
+        "design-system/require-typography": "off"
       }
     }
   ]
