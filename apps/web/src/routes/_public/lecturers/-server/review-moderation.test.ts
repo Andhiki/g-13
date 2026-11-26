@@ -41,6 +41,7 @@ it("holds links and contact details for moderator review", () => {
     containsContactDetails("The lecturer's office-hours link is https://example.edu/office-hours."),
   ).toBe(true);
   expect(containsContactDetails("Useful reading: example.com/course")).toBe(true);
+  expect(containsContactDetails("Course notes are on ocw.mit.edu.")).toBe(true);
   expect(containsContactDetails("Join the channel at t.me/PwKGames")).toBe(true);
   expect(containsContactDetails("Email me at student@example.com")).toBe(true);
   expect(containsContactDetails("You can reach the lecturer at 081234567890.")).toBe(true);
@@ -53,6 +54,10 @@ it("holds links and contact details for moderator review", () => {
     ),
   ).toBe(false);
   expect(containsContactDetails("Pak Budi, S.Kom., explains the material clearly.")).toBe(false);
+
+  expect(containsContactDetails("Contact the lecturer at 62-812-3456-7890.")).toBe(true);
+  expect(containsContactDetails("NIM 2023123456789")).toBe(false);
+  expect(containsContactDetails("Biayanya Rp100.000.000.000")).toBe(false);
 });
 
 it("flags contact details before making a provider request", async () => {

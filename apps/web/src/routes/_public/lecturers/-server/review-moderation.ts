@@ -11,8 +11,8 @@ type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response
 const scopedCategories = ["harassment", "harassment/threatening", "hate", "hate/threatening"];
 const urlOrEmail = /(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i;
 const bareDomain =
-  /\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:com|net|org|id|io|co|me|ly|ee|gg|link|site|online|xyz|app|dev|info|biz|tv|cc|ru|cn)\b/i;
-const phoneCandidate = /(?:\+\d{1,3}|62|0)[\d\s().-]{7,14}\d/g;
+  /\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:com|net|org|edu|id|io|co|me|ly|ee|gg|link|site|online|xyz|app|dev|info|biz|tv|cc|ru|cn)\b/i;
+const phoneCandidate = /(?<![\p{L}\p{N}_]|\d[.,])(?:\+\d{1,3}|62|0)[\d\s().-]{7,14}\d/gu;
 
 function containsPhoneNumber(text: string): boolean {
   for (const match of text.matchAll(phoneCandidate)) {
