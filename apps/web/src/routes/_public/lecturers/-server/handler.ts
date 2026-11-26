@@ -24,7 +24,7 @@ import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
 import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 import { verifyTurnstileToken } from "./turnstile";
-import { classifyReviewText, isObviousReviewSpam } from "./review-moderation";
+import { hasReviewContactDetails, type ReviewScreeningInput } from "./review-moderation";
 
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () =>
   runServerOperation(() => getLecturerDirectory(createDatabase(env.DB))),
@@ -68,13 +68,9 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
       return submitReviewAfterCaptcha(verified, () => {
         const classify =
           env.REVIEW_CLASSIFICATION_TEST_MODE === "clear"
-            ? async (screening: { body: string; displayName?: string }) => {
-                const texts = [screening.body];
-                if (screening.displayName) texts.push(screening.displayName);
-                return texts.some(isObviousReviewSpam) ? ("flagged" as const) : ("clear" as const);
-              }
-            : (screening: { body: string; displayName?: string }) =>
-                classifyReviewText(screening, openAiApiKey);
+            ? async (screening: ReviewScreeningInput) =>
+                hasReviewContactDetails(screening) ? ("flagged" as const) : ("clear" as const)
+            : undefined;
         return submitReview(createDatabase(env.DB), review, {
           ip,
           browserId,

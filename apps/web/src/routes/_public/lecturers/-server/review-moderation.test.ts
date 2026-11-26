@@ -1,5 +1,5 @@
 import { expect, it } from "bun:test";
-import { classifyReviewText, isObviousReviewSpam } from "./review-moderation";
+import { classifyReviewText, hasReviewContactDetails } from "./review-moderation";
 
 type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -17,42 +17,65 @@ function moderationResponse(...categories: Record<string, unknown>[]) {
   );
 }
 
-it("flags explicit spam promotion while preserving criticism with contact details", () => {
-  expect(
-    isObviousReviewSpam("Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789"),
-  ).toBe(true);
-  expect(
-    isObviousReviewSpam("The lecturer ignored questions. I would not recommend this class."),
-  ).toBe(false);
-  expect(
-    isObviousReviewSpam(
-      "The investment material was taught too quickly. Contact the lecturer on WhatsApp at +62 812 3456 7890.",
-    ),
-  ).toBe(false);
-  expect(
-    isObviousReviewSpam(
-      "The investment topic moved too quickly. The lecturer's office-hours link is https://example.edu/office-hours.",
-    ),
-  ).toBe(false);
-  expect(
-    isObviousReviewSpam(
-      "Materi investasi dijelaskan terlalu cepat. Hubungi dosen lewat WhatsApp di +62 812 3456 7890.",
-    ),
-  ).toBe(false);
-  expect(isObviousReviewSpam("Useful reading: https://example.com/course")).toBe(false);
-  expect(isObviousReviewSpam("You can reach the lecturer at 081234567890.")).toBe(false);
+it.each([
+  "https://example.edu/course",
+  "www.example.edu/course",
+  "example.com",
+  "example.link/path",
+  "office@example.edu",
+  "081234567890",
+  "+62 812 3456 7890",
+  "62-812-3456-7890",
+  "t.me/channel",
+  "wa.me/channel",
+  "chat.whatsapp.com/channel",
+  "discord.gg/channel",
+  "linktr.ee/channel",
+  "s.kom.id",
+  "s.kom/course",
+  "https://s.kom",
+])("holds a review body containing %s on its own", (detail) => {
+  expect(hasReviewContactDetails({ body: `Contact detail: (${detail}).` })).toBe(true);
 });
 
-it("flags obvious local spam before making a provider request", async () => {
+it.each(["example.org", "office@example.edu", "62-812-3456-7890", "discord.gg/channel"])(
+  "holds a review when the chosen display name contains %s",
+  (displayName) => {
+    expect(hasReviewContactDetails({ body: "The material was clear.", displayName })).toBe(true);
+  },
+);
+
+it("treats standalone S.Kom. as an academic title in review text and display names", () => {
+  expect(
+    hasReviewContactDetails({ body: "Pak Budi, S.Kom., menjelaskan materi dengan jelas." }),
+  ).toBe(false);
+  expect(
+    hasReviewContactDetails({ body: "The material was clear.", displayName: "Budi S.Kom" }),
+  ).toBe(false);
+  expect(
+    hasReviewContactDetails({ body: "Pak Budi, S.Kom., shared the notes at example.edu." }),
+  ).toBe(true);
+});
+
+it("preserves clean criticism with course codes, dates, and decimal grades", () => {
+  expect(
+    hasReviewContactDetails({
+      body: "Penjelasan CS101 tanggal 02-11-2026 kurang jelas. Nilai saya 3.75.",
+    }),
+  ).toBe(false);
+});
+
+it("flags a link in the chosen display name before making a provider request", async () => {
   let calls = 0;
   const result = await classifyReviewText(
     {
-      body: "Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789",
+      body: "The course materials were useful.",
+      displayName: "example.com",
     },
-    "",
+    "test-key",
     async () => {
       calls += 1;
-      throw new Error("The local spam rule should short-circuit the provider call");
+      return moderationResponse(clearCategories, clearCategories);
     },
   );
 

@@ -6,8 +6,10 @@ import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { notificationEvents } from "@g13/db/schema/notifications";
+import { moderateLecturerReview } from "@/routes/dashboard/_authenticated/lecturer-reviews/-server/service";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
+import { searchLecturers } from "../-shared/lecturer-search";
 import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
 import { allowReviewAction } from "./rate-limit";
 import { setReviewLike } from "./likes.service";
@@ -364,7 +366,10 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
         return outcomes[outcomeIndex++] ?? "clear";
       },
     });
-    const input = submissionInputSchema.parse(rawInput);
+    const input = submissionInputSchema.parse({
+      ...rawInput,
+      body: "The lecturer ignored questions. I would not recommend the class.",
+    });
 
     const published = await submitReview(db, input, context("192.0.2.31"));
     expect(published.data?.status).toBe("published");
@@ -381,34 +386,88 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     const unscorable = await submitReview(db, input, context("192.0.2.33"));
     expect(unscorable.data?.status).toBe("pending");
 
-    const lowRated = await submitReview(
-      db,
-      submissionInputSchema.parse({ ...rawInput, organization: 2 }),
-      context("192.0.2.34"),
-    );
+    const lowRated = await submitReview(db, { ...input, organization: 2 }, context("192.0.2.34"));
     expect(lowRated.data?.status).toBe("pending");
 
     const anonymous = await submitReview(
       db,
-      submissionInputSchema.parse({ ...rawInput, anonymous: true, authorName: "" }),
+      submissionInputSchema.parse({ ...input, anonymous: true, authorName: "" }),
       context("192.0.2.35"),
     );
     expect(anonymous.data?.status).toBe("published");
     expect(screened.at(-1)).toEqual({ body: input.body });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
 
-    const localSpam = await submitReview(
+it("holds the reported five-star campaign and lets moderators approve a legitimate link", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const campaign = `Guys, gue kaget banget hari ini!
+Cobain spin gratis iseng-iseng, taunya dapet Rp900.000 — dan udah berhasil gue tarik ke rekening!
+Mahjong Ways hari ini lagi gacor-gacornya, sumpah!
+Nih gue kasih kode gratisnya: EY5T999
+https://example.test/#/wheelspinevent?invitationCode=example
+Oh iya, follow channel Telegram kami juga ya! Ada kode bonus GRATIS tiap hari, sayang kalau dilewatin!
+https://t.me/example`;
+    const courseFeedback = "The course guide at https://example.edu/course helped me prepare.";
+    const ratings = { clarity: 5, support: 5, organization: 5 };
+    let providerCalls = 0;
+    const context = {
+      ip: "192.0.2.36",
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: (input: Parameters<typeof classifyReviewText>[0]) =>
+        classifyReviewText(input, "test-key", async () => {
+          providerCalls += 1;
+          throw new Error("Contact matches should skip the moderation provider");
+        }),
+    };
+    const heldReviewIds = [];
+    for (const body of [campaign, courseFeedback]) {
+      const result = await submitReview(
+        db,
+        submissionInputSchema.parse({ ...rawInput, ...ratings, body }),
+        context,
+      );
+      if (result.error !== null) throw new Error(result.error);
+      expect(result.data.status).toBe("pending");
+      heldReviewIds.push(result.data.reviewId);
+    }
+    expect(providerCalls).toBe(0);
+
+    expect(await db.select({ status: reviews.status }).from(reviews)).toEqual([
+      { status: "pending" },
+      { status: "pending" },
+    ]);
+    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+    const directory = await getLecturerDirectory(db);
+    expect(directory.lecturers[0]).toMatchObject({ reviewCount: 0, overallAverage: null });
+    expect(searchLecturers(directory.lecturers, directory.courses, "CS101")).toEqual([]);
+
+    const [, courseReviewId] = heldReviewIds;
+    if (!courseReviewId) throw new Error("Expected the course-link review to be stored");
+    const approval = await moderateLecturerReview(
       db,
-      submissionInputSchema.parse({
-        ...rawInput,
-        body: "Promo kursus online, daftar sekarang dan gunakan kode STUDI di https://example.com",
-      }),
-      {
-        ...context("192.0.2.36"),
-        openAiApiKey: "",
-        classify: (value) => classifyReviewText(value, ""),
-      },
+      { id: "admin", role: "admin" },
+      { action: "approve", reviewId: courseReviewId },
     );
-    expect(localSpam.data?.status).toBe("pending");
+    expect(approval.error).toBeNull();
+    expect(await getLecturerDetail(db, "p")).toMatchObject({
+      lecturer: { reviewCount: 1, overallAverage: 5 },
+      reviews: [{ id: courseReviewId, body: courseFeedback }],
+    });
+    const updatedDirectory = await getLecturerDirectory(db);
+    expect(searchLecturers(updatedDirectory.lecturers, updatedDirectory.courses, "CS101")).toEqual([
+      expect.objectContaining({ id: "p", reviewCount: 1, overallAverage: 5 }),
+    ]);
   } finally {
     await platform.dispose();
   }
