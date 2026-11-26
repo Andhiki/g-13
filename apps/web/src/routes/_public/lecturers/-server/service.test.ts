@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
@@ -10,7 +11,7 @@ import { REVIEW_ERRORS } from "../-shared/errors";
 import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
 import { setReviewLike } from "./likes.service";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
-import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
+import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import type { CoursePickerCursor } from "../-shared/schemas";
 import { submitReview } from "./submission.service";
 
@@ -36,6 +37,53 @@ it("rejects review bodies shorter than the minimum after trimming", () => {
   expect(
     submissionInputSchema.safeParse({ ...rawInput, body: ` ${minimum.slice(1)} ` }).success,
   ).toBe(false);
+});
+
+it("returns only requested, live pending reviews for the matching lecturer", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values([
+      { id: "p", name: "Lecturer" },
+      { id: "other", name: "Other Lecturer" },
+    ]);
+    await db.insert(courses).values({
+      id: "c",
+      code: "CS101",
+      nameId: "Dasar Komputer",
+      nameEn: "Computer Basics",
+    });
+    const input = submissionInputSchema.parse({ ...rawInput, organization: 2 });
+    const result = await submitReview(db, input, {
+      ip: "192.0.2.1",
+      secret: "test-secret-".repeat(4),
+    });
+    if (!result.data) throw new Error("Expected a pending review");
+    const { reviewId } = result.data;
+    const unknownId = crypto.randomUUID();
+    expect(await getOwnPendingReviews(db, "p", [])).toEqual([]);
+    expect(await getOwnPendingReviews(db, "p", [unknownId])).toEqual([]);
+    expect(await getOwnPendingReviews(db, "other", [reviewId])).toEqual([]);
+    expect(await getOwnPendingReviews(db, "p", [reviewId, unknownId])).toEqual([
+      expect.objectContaining({ id: reviewId, body: input.body, code: "CS101" }),
+    ]);
+    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+
+    for (const status of ["published", "hidden"] as const) {
+      await db.update(reviews).set({ status }).where(eq(reviews.id, reviewId));
+      expect(await getOwnPendingReviews(db, "p", [reviewId])).toEqual([]);
+      expect((await getLecturerDetail(db, "p"))?.reviews.map(({ id }) => id)).toEqual(
+        status === "published" ? [reviewId] : [],
+      );
+    }
+    await db
+      .update(reviews)
+      .set({ status: "pending", deletedAt: new Date() })
+      .where(eq(reviews.id, reviewId));
+    expect(await getOwnPendingReviews(db, "p", [reviewId])).toEqual([]);
+  } finally {
+    await platform.dispose();
+  }
 });
 
 it("publishes reviews, excludes hidden/deleted entries from public metrics, and atomically limits submissions without a browser per IP", async () => {

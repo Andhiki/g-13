@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { RiStarFill, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
+import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import { Typography } from "@/ui/typography";
@@ -11,7 +12,9 @@ type Review = Awaited<
   ReturnType<NonNullable<ReturnType<typeof lecturerDetailQueryOptions>["queryFn"]>>
 >["reviews"][number];
 
-function ReviewAspectRatings({ review }: { review: Review }) {
+type ReviewCardData = Omit<Review, "overall" | "likeCount">;
+
+function ReviewAspectRatings({ review }: { review: ReviewCardData }) {
   const { text } = useLocale("lecturers");
   const scores: [string, number][] = [
     ["Clarity", review.clarity],
@@ -38,17 +41,11 @@ function ReviewAspectRatings({ review }: { review: Review }) {
 function ReviewCard({
   review,
   language,
-  liked,
-  canLike,
-  likePending,
-  onLike,
+  action,
 }: {
-  review: Review;
+  review: ReviewCardData;
   language: "id" | "en";
-  liked: boolean;
-  canLike: boolean;
-  likePending: boolean;
-  onLike: (reviewId: string, liked: boolean) => Promise<void>;
+  action: ReactNode;
 }) {
   const { text } = useLocale("lecturers");
   return (
@@ -77,14 +74,7 @@ function ReviewCard({
             {review.termLabel}
           </Typography>
         </div>
-        <ReviewLikeButton
-          reviewId={review.id}
-          count={review.likeCount}
-          liked={liked}
-          canLike={canLike}
-          pending={likePending}
-          onLike={onLike}
-        />
+        {action}
       </footer>
     </article>
   );
@@ -92,6 +82,7 @@ function ReviewCard({
 
 export function ReviewList({
   reviews,
+  pendingReviews,
   language,
   emptyState,
   likedReviews,
@@ -100,6 +91,7 @@ export function ReviewList({
   onLike,
 }: {
   reviews: Review[];
+  pendingReviews: ReviewCardData[];
   language: "id" | "en";
   emptyState: ReactNode;
   likedReviews: string[];
@@ -107,20 +99,39 @@ export function ReviewList({
   likePending: boolean;
   onLike: (reviewId: string, liked: boolean) => Promise<void>;
 }) {
-  if (!reviews.length) {
+  const { text } = useLocale("lecturers");
+  if (!pendingReviews.length && !reviews.length) {
     return emptyState;
   }
   return (
     <div className="divide-y divide-stroke-soft-200 border-y border-stroke-soft-200">
+      {pendingReviews.map((review) => (
+        <ReviewCard
+          key={review.id}
+          review={review}
+          language={language}
+          action={
+            <AlignBadge.Root variant="information" size="medium">
+              {text("Pending moderator review")}
+            </AlignBadge.Root>
+          }
+        />
+      ))}
       {reviews.map((review) => (
         <ReviewCard
           key={review.id}
           review={review}
           language={language}
-          liked={likedReviews.includes(review.id)}
-          canLike={canLike}
-          likePending={likePending}
-          onLike={onLike}
+          action={
+            <ReviewLikeButton
+              reviewId={review.id}
+              count={review.likeCount}
+              liked={likedReviews.includes(review.id)}
+              canLike={canLike}
+              pending={likePending}
+              onLike={onLike}
+            />
+          }
         />
       ))}
     </div>

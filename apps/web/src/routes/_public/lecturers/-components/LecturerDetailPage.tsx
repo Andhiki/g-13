@@ -8,6 +8,7 @@ import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignEmptyState } from "@/ui/empty-state";
 import { AlignButton } from "@/ui/button";
 import { AlignSelect } from "@/ui/select";
+import { AlignModal } from "@/ui/modal";
 import { Typography } from "@/ui/typography";
 import { toast, SuccessToast } from "@/ui/toast";
 import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
@@ -17,7 +18,12 @@ import { ReviewSortMenu } from "./ReviewSortMenu";
 import { RatingStars } from "./LecturerReviewCard";
 import { courseDisplayName } from "../-shared/course-search";
 import { filterReviewsByCourse, orderReviews, type ReviewOrder } from "../-shared/review-order";
-import { lecturerBrowserLikesQueryOptions, lecturerDetailQueryOptions } from "../-client/queries";
+import {
+  lecturerBrowserLikesQueryOptions,
+  lecturerDetailQueryOptions,
+  ownPendingReviewsQueryOptions,
+} from "../-client/queries";
+import { readPendingReviewIds, writePendingReviewIds } from "../-client/pending-review-storage";
 import { updateReviewLikeMutationOptions } from "../-client/mutations";
 
 type LecturerDetail = ReturnType<
@@ -293,6 +299,56 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const [courseId, setCourseId] = useState<string | null>(null);
   const selectedCourse = data.lecturer.courses.find(({ id }) => id === courseId);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [pendingConfirmation, setPendingConfirmation] = useState<"tracked" | "untracked" | null>(
+    null,
+  );
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
+  const pendingStorageKey = `lecturer-pending-reviews:${lecturerId}`;
+  const pendingQuery = useQuery(ownPendingReviewsQueryOptions(lecturerId, pendingIds));
+  const pendingReviews = (pendingQuery.data ?? []).filter(
+    (review) => !data.reviews.some(({ id }) => id === review.id),
+  );
+  useEffect(() => {
+    const syncPendingIds = () => {
+      try {
+        setPendingIds(readPendingReviewIds(pendingStorageKey));
+      } catch {
+        setPendingIds([]);
+      }
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === pendingStorageKey || event.key === null) syncPendingIds();
+    };
+    syncPendingIds();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [pendingStorageKey]);
+  useEffect(() => {
+    if (!pendingQuery.isFetchedAfterMount || pendingQuery.isFetching || !pendingQuery.isSuccess)
+      return;
+    const activeIds = new Set(pendingQuery.data.map(({ id }) => id));
+    const resolvedIds = pendingIds.filter((id) => !activeIds.has(id));
+    if (!resolvedIds.length) return;
+    void queryClient.invalidateQueries({
+      queryKey: lecturerDetailQueryOptions(lecturerId).queryKey,
+    });
+    try {
+      const ids = readPendingReviewIds(pendingStorageKey).filter((id) => !resolvedIds.includes(id));
+      writePendingReviewIds(pendingStorageKey, ids);
+      setPendingIds(ids);
+    } catch {
+      setPendingIds([]);
+    }
+  }, [
+    lecturerId,
+    pendingIds,
+    pendingQuery.data,
+    pendingQuery.isFetchedAfterMount,
+    pendingQuery.isFetching,
+    pendingQuery.isSuccess,
+    pendingStorageKey,
+    queryClient,
+  ]);
   const likesQuery = useQuery({
     ...lecturerBrowserLikesQueryOptions(browserId ?? ""),
     enabled: browserId !== null,
@@ -358,6 +414,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
           )}
           <ReviewList
             reviews={reviews}
+            pendingReviews={pendingReviews}
             language={language}
             emptyState={emptyReviews}
             likedReviews={likedReviews}
@@ -375,19 +432,43 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         browserId={browserId}
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
-        onSubmitted={async (status) => {
+        onSubmitted={({ reviewId, status }) => {
           setReviewDialogOpen(false);
-          toast.custom(() => (
-            <SuccessToast
-              message={
-                status === "pending"
-                  ? text("Your review is awaiting moderation.")
-                  : text("Your review is published.")
-              }
-            />
-          ));
+          if (status === "published") {
+            toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
+            return;
+          }
+          try {
+            const ids = [...readPendingReviewIds(pendingStorageKey), reviewId];
+            writePendingReviewIds(pendingStorageKey, ids);
+            setPendingIds(ids);
+            setPendingConfirmation("tracked");
+          } catch {
+            setPendingConfirmation("untracked");
+          }
         }}
       />
+      <AlignModal.Root
+        open={pendingConfirmation !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirmation(null);
+        }}
+      >
+        <AlignModal.Content showClose={false}>
+          <div className="flex flex-col gap-3 p-5">
+            <AlignModal.Title>{text("Your review is pending moderator review.")}</AlignModal.Title>
+            <AlignModal.Description>
+              {text("A moderator checks reviews before they appear publicly.")}
+              {pendingConfirmation === "tracked" && (
+                <> {text("Your review will appear here marked as pending until it is approved.")}</>
+              )}
+            </AlignModal.Description>
+            <AlignModal.Close asChild>
+              <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
+            </AlignModal.Close>
+          </div>
+        </AlignModal.Content>
+      </AlignModal.Root>
     </main>
   );
 }

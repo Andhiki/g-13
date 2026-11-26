@@ -25,5 +25,8 @@ export const Route = createFileRoute("/_public/lecturers/$lecturerId")({
       ],
     };
   },
-  component: () => <LecturerDetailPage lecturerId={Route.useParams().lecturerId} />,
+  component: () => {
+    const { lecturerId } = Route.useParams();
+    return <LecturerDetailPage key={lecturerId} lecturerId={lecturerId} />;
+  },
 });

@@ -15,6 +15,12 @@ test("Mark a notification read, archive it, and verify the maintainer audience",
   screen,
   signIn,
 }) => {
+  await expect(
+    screen.getByRole("dialog", {
+      name: /ulasanmu menunggu pemeriksaan moderator|your review is pending moderator review/i,
+    }),
+  ).toHaveCount(0);
+  await expect(screen.getByText(/ulasanmu telah terbit|your review is published/i)).toBeVisible();
   await signIn("maintainer");
   await app.open(path);
   await expect(
@@ -74,7 +80,19 @@ test("A pending review notification opens the matching moderation inspector", as
       pending: true,
     })
   ).click();
-  await expect(screen.getByText(/menunggu moderasi|awaiting moderation/i)).toBeVisible();
+  const confirmation = screen.getByRole("dialog", {
+    name: /ulasanmu menunggu pemeriksaan moderator|your review is pending moderator review/i,
+  });
+  await expect(confirmation).toBeVisible();
+  await confirmation.getByRole("button", { name: /mengerti|got it/i }).click();
+  await expect(confirmation).toBeHidden();
+  await browser.reload();
+  const review = screen.getByRole("article").first();
+  await expect(review).toContainText(body);
+  await expect(
+    review.getByText(/menunggu pemeriksaan moderator|pending moderator review/i),
+  ).toBeVisible();
+  await expect(review.getByRole("button", { name: /sukai ulasan|like review/i })).toHaveCount(0);
   await signIn("maintainer");
   await app.open(path);
   const item = screen.getByRole("listitem").filter({ hasText: "Notification Fixture" });
@@ -88,13 +106,17 @@ test("A pending review notification opens the matching moderation inspector", as
 
 test("A published review does not notify moderators", async ({ app, browser, screen, signIn }) => {
   const body = "This review publishes immediately and should not notify moderators.";
-  await (
-    await fillReview({ app, browser, screen }, body, { author: "Published Fixture" })
-  ).click();
+  await (await fillReview({ app, browser, screen }, body, { author: "Published Fixture" })).click();
   await expect(screen.getByRole("article").filter({ hasText: body })).toBeVisible();
+  await expect(
+    screen.getByRole("dialog", {
+      name: /ulasanmu menunggu pemeriksaan moderator|your review is pending moderator review/i,
+    }),
+  ).toHaveCount(0);
+  await expect(screen.getByText(/ulasanmu telah terbit|your review is published/i)).toBeVisible();
   await signIn("maintainer");
   await app.open(path);
-  await expect(
-    screen.getByRole("listitem").filter({ hasText: "Published Fixture" }),
-  ).toHaveCount(0);
+  await expect(screen.getByRole("listitem").filter({ hasText: "Published Fixture" })).toHaveCount(
+    0,
+  );
 });

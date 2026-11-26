@@ -9,11 +9,12 @@ import {
   browserLikesInputSchema,
   coursePickerInputSchema,
   lecturerDetailInputSchema,
+  ownPendingReviewsInputSchema,
   publishReviewInputSchema,
   reviewLikeInputSchema,
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
-import { getBrowserReviewLikes, getCoursePickerPage } from "./repository";
+import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import {
   rejectRateLimitedReview,
   rejectReviewLikeOperation,
@@ -67,6 +68,14 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
     if (result.error !== null) return rejectSubmissionOperation(result.error);
     return result.data;
   });
+
+export const loadOwnPendingReviews = createServerFn({ method: "POST" })
+  .validator(ownPendingReviewsInputSchema)
+  .handler(async ({ data }) =>
+    runServerOperation(() =>
+      getOwnPendingReviews(createDatabase(env.DB), data.lecturerId, data.reviewIds),
+    ),
+  );
 
 export const loadBrowserLikes = createServerFn({ method: "POST" })
   .validator(browserLikesInputSchema)
