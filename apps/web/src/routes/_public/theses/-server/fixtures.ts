@@ -1,0 +1,207 @@
+import type { createDatabase } from "@g13/db/client";
+import { lecturers } from "@g13/db/schema/lecturers";
+import { thesisFieldLinks, thesisFields } from "@g13/db/schema/thesis-fields";
+import { theses, thesisKeywords, thesisSupervisors } from "@g13/db/schema/theses";
+
+type Database = ReturnType<typeof createDatabase>;
+
+const consentAt = new Date("2026-10-01T00:00:00Z");
+const consentSource = "https://github.com/Andhiki/g-13/issues/900";
+const deletedAt = new Date("2026-11-01T00:00:00Z");
+
+export const thesisFixtures = {
+  lecturer: { id: "nur-rokhman", name: "Dr. Nur Rokhman" },
+  deletedLecturer: {
+    id: "dosen-terhapus",
+    name: "Dr. Dosen Terhapus",
+    deletedAt: new Date("2026-01-01T00:00:00Z"),
+  },
+  full: {
+    id: "evaluasi-model-machine-learning-2026",
+    title: "Evaluasi Model Machine Learning untuk Prediksi Kondisi Mesin",
+    abstract:
+      "Penelitian ini mengevaluasi beberapa model pembelajaran mesin.\n\nHasil menunjukkan model terbaik pada data uji.",
+    abstractEn:
+      "This study evaluates several machine-learning models.\n\nThe best model is selected on the test split.",
+    authorName: "Ayu Contoh",
+    authorBatch: 2022,
+    year: 2026,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: "https://etd.repository.ugm.ac.id/home/detail_pencarian/000001",
+    contactChannel: "email" as const,
+    contactValue: "ayu.contoh@example.com",
+    abstractPublic: true,
+    contactPublic: true,
+    consentAt,
+    consentSource,
+    status: "published" as const,
+  },
+  noAbstractConsent: {
+    id: "analisis-data-perkotaan-2025",
+    title: "Analisis Data Perkotaan",
+    abstract: "Abstrak ini tidak boleh tampil di halaman publik.",
+    abstractEn: "This abstract must not appear on the public page.",
+    authorName: "Bima Contoh",
+    authorBatch: 2021,
+    year: 2025,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: null,
+    contactChannel: null,
+    contactValue: null,
+    abstractPublic: false,
+    contactPublic: false,
+    consentAt,
+    consentSource,
+    status: "published" as const,
+  },
+  metadataOnly: {
+    id: "sistem-informasi-akademik-2024",
+    title: "Sistem Informasi Akademik",
+    abstract: null,
+    abstractEn: null,
+    authorName: "Citra Contoh",
+    authorBatch: null,
+    year: 2024,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: null,
+    contactChannel: null,
+    contactValue: null,
+    abstractPublic: false,
+    contactPublic: false,
+    consentAt,
+    consentSource,
+    status: "published" as const,
+  },
+  draft: {
+    id: "draf-skripsi-2026",
+    title: "Draf Skripsi",
+    abstract: null,
+    abstractEn: null,
+    authorName: "Dewi Contoh",
+    authorBatch: 2023,
+    year: 2026,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: null,
+    contactChannel: null,
+    contactValue: null,
+    abstractPublic: false,
+    contactPublic: false,
+    consentAt: null,
+    consentSource: null,
+    status: "draft" as const,
+  },
+  hidden: {
+    id: "skripsi-tersembunyi-2023",
+    title: "Skripsi Tersembunyi",
+    abstract: null,
+    abstractEn: null,
+    authorName: "Eka Contoh",
+    authorBatch: null,
+    year: 2023,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: null,
+    contactChannel: null,
+    contactValue: null,
+    abstractPublic: false,
+    contactPublic: false,
+    consentAt: null,
+    consentSource: null,
+    status: "hidden" as const,
+  },
+  deleted: {
+    id: "skripsi-terhapus-2022",
+    title: "Skripsi Terhapus",
+    abstract: null,
+    abstractEn: null,
+    authorName: "Fajar Contoh",
+    authorBatch: null,
+    year: 2022,
+    type: "skripsi" as const,
+    language: "id" as const,
+    repositoryUrl: null,
+    contactChannel: null,
+    contactValue: null,
+    abstractPublic: false,
+    contactPublic: false,
+    consentAt,
+    consentSource,
+    status: "published" as const,
+    deletedAt,
+  },
+};
+
+export async function seedThesisFixtures(db: Database): Promise<void> {
+  const { full, noAbstractConsent, metadataOnly, draft, hidden, deleted } = thesisFixtures;
+  await db.insert(lecturers).values([thesisFixtures.lecturer, thesisFixtures.deletedLecturer]);
+  await db.insert(thesisFields).values([
+    {
+      id: "lab-sc-sistem-cerdas",
+      name: "Lab SC (Sistem Cerdas)",
+      lab: "Lab SC",
+      position: 47,
+    },
+    {
+      id: "lab-rpld-rekayasa-perangkat-lunak-dan-data",
+      name: "Lab RPLD (Rekayasa Perangkat Lunak dan Data)",
+      lab: "Lab RPLD",
+      position: 60,
+    },
+  ]);
+  for (const thesis of [full, noAbstractConsent, metadataOnly, draft, hidden, deleted]) {
+    await db.insert(theses).values(thesis);
+  }
+  await db.insert(thesisFieldLinks).values([
+    { thesisId: full.id, fieldId: "lab-sc-sistem-cerdas" },
+    { thesisId: full.id, fieldId: "lab-rpld-rekayasa-perangkat-lunak-dan-data" },
+    { thesisId: noAbstractConsent.id, fieldId: "lab-rpld-rekayasa-perangkat-lunak-dan-data" },
+  ]);
+  await db.insert(thesisSupervisors).values([
+    {
+      thesisId: full.id,
+      position: 0,
+      lecturerId: thesisFixtures.lecturer.id,
+      name: "Dr. Nur Rokhman, S.Si., M.Kom.",
+      role: "main",
+    },
+    {
+      thesisId: full.id,
+      position: 1,
+      lecturerId: null,
+      name: "Dr. Pembimbing Eksternal",
+      role: "co",
+    },
+    {
+      thesisId: noAbstractConsent.id,
+      position: 0,
+      lecturerId: thesisFixtures.lecturer.id,
+      name: "Dr. Nur Rokhman, S.Si., M.Kom.",
+      role: null,
+    },
+    {
+      thesisId: metadataOnly.id,
+      position: 0,
+      lecturerId: thesisFixtures.deletedLecturer.id,
+      name: "Dr. Dosen Terhapus, M.Kom.",
+      role: null,
+    },
+    { thesisId: draft.id, position: 0, lecturerId: null, name: "Dosen Draf", role: null },
+    { thesisId: hidden.id, position: 0, lecturerId: null, name: "Dosen Tersembunyi", role: null },
+    { thesisId: deleted.id, position: 0, lecturerId: null, name: "Dosen Terhapus", role: null },
+  ]);
+  await db.insert(thesisKeywords).values([
+    { thesisId: full.id, keyword: "machine learning" },
+    { thesisId: full.id, keyword: "evaluasi" },
+    { thesisId: full.id, keyword: "prediksi" },
+    { thesisId: noAbstractConsent.id, keyword: "data perkotaan" },
+    { thesisId: noAbstractConsent.id, keyword: "analisis" },
+    { thesisId: metadataOnly.id, keyword: "sistem informasi" },
+    { thesisId: draft.id, keyword: "draf" },
+    { thesisId: hidden.id, keyword: "tersembunyi" },
+    { thesisId: deleted.id, keyword: "terhapus" },
+  ]);
+}

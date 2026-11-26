@@ -28,6 +28,8 @@ export default defineConfig({
           !path.startsWith("/resources") &&
           !path.startsWith("/lecturers") &&
           !path.startsWith("/alumni") &&
+          !path.startsWith("/theses") &&
+          !path.startsWith("/sitemap") &&
           !path.startsWith("/api"),
       },
     }),
