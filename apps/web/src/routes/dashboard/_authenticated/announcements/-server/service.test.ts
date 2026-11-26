@@ -104,10 +104,12 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
       }),
     ).toEqual({ data: { announcementId: created.id }, error: null });
     const afterEdit = await getActiveAnnouncements(db, now);
-    expect(afterEdit[0]?.titleId).toBe("Jadwal UTS diperbarui");
-    expect(afterEdit[0]?.variant).toBe("neutral");
-    expect(afterEdit[0]?.ctaOpenInNewTab).toBe(false);
-    expect(afterEdit[0]?.countdownAt).toBeNull();
+    expect(afterEdit[0]).toMatchObject({
+      titleId: "Jadwal UTS diperbarui",
+      variant: "neutral",
+      ctaOpenInNewTab: false,
+      countdownAt: null,
+    });
 
     // Disabling hides it from the public banner and files it under disabled.
     expect(

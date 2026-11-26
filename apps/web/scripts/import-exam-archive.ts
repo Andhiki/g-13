@@ -109,6 +109,20 @@ function yearsIn(name: string) {
   );
 }
 
+type ArchiveYears = Map<string, { createdAt: string | null; papers: Map<string, ExamPaper> }>;
+
+function recordYearFolder(years: ArchiveYears, file: SourceFile) {
+  const label = yearsIn(file.name).at(-1);
+  if (!label) return;
+  const year = years.get(label) ?? { createdAt: file.createdAt, papers: new Map() };
+  year.createdAt ??= file.createdAt;
+  years.set(label, year);
+}
+
+function examLabels(name: string) {
+  return name.toUpperCase().match(/(?<![A-Z])(?:UTS|UAS)(?![A-Z])/g) ?? [];
+}
+
 export function normalizeArchive({
   courses,
   folders,
@@ -122,7 +136,7 @@ export function normalizeArchive({
   const catalog: ExamCourse[] = [];
   let writable = true;
   for (const source of courses) {
-    const years = new Map<string, { createdAt: string | null; papers: Map<string, ExamPaper> }>();
+    const years: ArchiveYears = new Map();
     let failed = false;
     function visit(id: string, ancestors: string[], visited: Set<string>) {
       if (visited.has(id)) {
@@ -147,23 +161,14 @@ export function normalizeArchive({
       }
       for (const file of folder.files) {
         if (file.mimeType === folderMime) {
-          const yearFolder = yearsIn(file.name).at(-1);
-          if (yearFolder) {
-            const year = years.get(yearFolder) ?? { createdAt: file.createdAt, papers: new Map() };
-            year.createdAt ??= file.createdAt;
-            years.set(yearFolder, year);
-          }
+          recordYearFolder(years, file);
           visit(file.id, [...ancestors, file.name], visited);
           continue;
         }
         const filenameYears = [...new Set(yearsIn(file.name))];
         const year = folderYear ?? (filenameYears.length === 1 ? filenameYears[0] : "Tanpa tahun");
-        const fileExams = file.name.toUpperCase().match(/(?<![A-Z])(?:UTS|UAS)(?![A-Z])/g) ?? [];
-        const folderExams =
-          ancestors
-            .join(" ")
-            .toUpperCase()
-            .match(/(?<![A-Z])(?:UTS|UAS)(?![A-Z])/g) ?? [];
+        const fileExams = examLabels(file.name);
+        const folderExams = examLabels(ancestors.join(" "));
         const examLabel = fileExams.length === 1 ? fileExams[0] : folderExams.at(-1);
         const exam = examLabel === "UTS" || examLabel === "UAS" ? examLabel : null;
         if (

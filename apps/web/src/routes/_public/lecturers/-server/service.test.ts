@@ -185,9 +185,8 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     expect(
       (await getLecturerDetail(db, "p"))?.reviews.some((row) => row.body === "Pending feedback"),
     ).toBe(false);
-    expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
-      pendingReviewId,
-    ]);
+    const notifications = await db.select().from(notificationEvents);
+    expect(notifications.map((event) => event.resourceId)).toEqual([pendingReviewId]);
     expect(classifierCalls).toBe(3);
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,

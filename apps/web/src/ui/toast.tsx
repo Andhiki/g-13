@@ -127,6 +127,15 @@ type ToasterProps = Omit<ToastRegionProps, "side" | "align" | "children"> & {
   swipeDirections?: string[];
 };
 
+const toastPositionClasses = {
+  "top-center": "inset-x-4 top-4 bottom-auto mx-auto",
+  "top-left": "start-4 top-4 bottom-auto",
+  "top-right": "end-4 top-4 bottom-auto",
+  "bottom-left": "start-4 bottom-4 top-auto",
+  "bottom-right": "end-4 bottom-4 top-auto",
+  "bottom-center": "inset-x-4 bottom-4 top-auto mx-auto",
+} satisfies Record<NonNullable<ToasterProps["position"]>, string>;
+
 function Toaster({
   position = "bottom-center",
   swipeDirections: _swipeDirections,
@@ -139,18 +148,7 @@ function Toaster({
   ];
   const side = rawSide;
   const normalizedAlign = rawAlign === "left" ? "start" : rawAlign === "right" ? "end" : "center";
-  const positionClass =
-    position === "top-center"
-      ? "inset-x-4 top-4 bottom-auto mx-auto"
-      : position === "top-left"
-        ? "start-4 top-4 bottom-auto"
-        : position === "top-right"
-          ? "end-4 top-4 bottom-auto"
-          : position === "bottom-left"
-            ? "start-4 bottom-4 top-auto"
-            : position === "bottom-right"
-              ? "end-4 bottom-4 top-auto"
-              : "inset-x-4 bottom-4 top-auto mx-auto";
+  const positionClass = toastPositionClasses[position] ?? toastPositionClasses["bottom-center"];
   return (
     <ToastRegion
       side={side}
@@ -158,26 +156,28 @@ function Toaster({
       className={`pointer-events-none fixed z-50 h-[var(--toast-front-height)] w-[min(356px,calc(100vw-2rem))] data-expanded:h-[calc(var(--toast-stack-height)+(var(--toast-count)-1)*12px)] ${positionClass} ${className ?? ""}`}
       {...props}
     >
-      {(toastData) => {
-        const customData =
-          toastData.data && typeof toastData.data === "object" && "custom" in toastData.data
-            ? (toastData.data as { custom?: boolean; className?: string })
-            : undefined;
-        return (
-          <ToastPrimitive
-            className={`${customData ? "pointer-events-auto absolute inset-x-0 bottom-0 z-[calc(100-var(--toast-index))] h-[var(--toast-height)] overflow-visible bg-transparent p-0 shadow-none ring-0" : "pointer-events-auto absolute inset-x-0 bottom-0 z-[calc(100-var(--toast-index))] h-[var(--toast-height)] overflow-hidden rounded-lg bg-bg-white-0 px-2.5 py-2 text-paragraph-sm text-text-strong-950 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200"} [--toast-y:calc(var(--toast-index)*-12px)] translate-x-[var(--toast-swipe-x,0px)] translate-y-[calc(var(--toast-y)+var(--toast-swipe-y,0px))] scale-[calc(1-var(--toast-index)*0.05)] transition-[translate,scale,opacity,height] duration-400 data-expanded:translate-y-[calc(-1*(var(--toast-offset)+var(--toast-index)*12px))] data-expanded:scale-100 data-swiping:transition-none data-starting-style:transition-none data-starting-style:opacity-0 data-ending-style:opacity-0 data-starting-style:data-front:translate-y-full ${customData?.className ?? ""}`}
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <ToastTitle />
-                <ToastDescription />
-              </div>
-              <ToastAction className="shrink-0 rounded-md px-2 py-1 text-label-xs text-primary-base transition hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-primary-base" />
-            </div>
-          </ToastPrimitive>
-        );
-      }}
+      {(data) => <ToastContent data={data.data} />}
     </ToastRegion>
+  );
+}
+
+function ToastContent({ data }: { data: unknown }) {
+  const customData =
+    data && typeof data === "object" && "custom" in data
+      ? (data as { custom?: boolean; className?: string })
+      : undefined;
+  return (
+    <ToastPrimitive
+      className={`${customData ? "pointer-events-auto absolute inset-x-0 bottom-0 z-[calc(100-var(--toast-index))] h-[var(--toast-height)] overflow-visible bg-transparent p-0 shadow-none ring-0" : "pointer-events-auto absolute inset-x-0 bottom-0 z-[calc(100-var(--toast-index))] h-[var(--toast-height)] overflow-hidden rounded-lg bg-bg-white-0 px-2.5 py-2 text-paragraph-sm text-text-strong-950 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200"} [--toast-y:calc(var(--toast-index)*-12px)] translate-x-[var(--toast-swipe-x,0px)] translate-y-[calc(var(--toast-y)+var(--toast-swipe-y,0px))] scale-[calc(1-var(--toast-index)*0.05)] transition-[translate,scale,opacity,height] duration-400 data-expanded:translate-y-[calc(-1*(var(--toast-offset)+var(--toast-index)*12px))] data-expanded:scale-100 data-swiping:transition-none data-starting-style:transition-none data-starting-style:opacity-0 data-ending-style:opacity-0 data-starting-style:data-front:translate-y-full ${customData?.className ?? ""}`}
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <ToastTitle />
+          <ToastDescription />
+        </div>
+        <ToastAction className="shrink-0 rounded-md px-2 py-1 text-label-xs text-primary-base transition hover:bg-bg-weak-50 focus-visible:outline-2 focus-visible:outline-primary-base" />
+      </div>
+    </ToastPrimitive>
   );
 }
 

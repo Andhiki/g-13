@@ -114,28 +114,7 @@ export function AnnouncementPreview({
               : announcementStatusLabel(scheduleStatus)}
           </Typography>
         </div>
-        <SegmentedControl
-          aria-label="Preview language"
-          value={previewLanguage}
-          onValueChange={(next) => {
-            if (next === "id" || next === "en") void changePreviewLanguage(next);
-          }}
-          className="relative isolate inline-flex shrink-0 items-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-0.5"
-        >
-          <SegmentedControlIndicator className="pointer-events-none absolute top-[var(--segmented-control-indicator-top)] left-[var(--segmented-control-indicator-left)] -z-10 h-[var(--segmented-control-indicator-height)] w-[var(--segmented-control-indicator-width)] rounded-md bg-bg-white-0 shadow-regular-xs transition-[top,left,width,height] duration-150 ease-out data-[activation-direction=none]:transition-none" />
-          <SegmentedControlItem
-            value="id"
-            className="relative cursor-[var(--interactive-cursor)] rounded-md px-2 py-0.5 text-label-xs text-text-sub-600 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35 data-checked:text-text-strong-950"
-          >
-            ID
-          </SegmentedControlItem>
-          <SegmentedControlItem
-            value="en"
-            className="relative cursor-[var(--interactive-cursor)] rounded-md px-2 py-0.5 text-label-xs text-text-sub-600 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35 data-checked:text-text-strong-950"
-          >
-            EN
-          </SegmentedControlItem>
-        </SegmentedControl>
+        <PreviewLanguagePicker value={previewLanguage} onChange={changePreviewLanguage} />
       </div>
       <AnnouncementBannerRow
         variant={variant}
@@ -154,5 +133,38 @@ export function AnnouncementPreview({
         onDismiss={() => {}}
       />
     </section>
+  );
+}
+
+function PreviewLanguagePicker({
+  value,
+  onChange,
+}: {
+  value: Language;
+  onChange: (value: Language) => Promise<void>;
+}) {
+  return (
+    <SegmentedControl
+      aria-label="Preview language"
+      value={value}
+      onValueChange={(next) => {
+        if (next === "id" || next === "en") void onChange(next);
+      }}
+      className="relative isolate inline-flex shrink-0 items-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-0.5"
+    >
+      <SegmentedControlIndicator className="pointer-events-none absolute top-[var(--segmented-control-indicator-top)] left-[var(--segmented-control-indicator-left)] -z-10 h-[var(--segmented-control-indicator-height)] w-[var(--segmented-control-indicator-width)] rounded-md bg-bg-white-0 shadow-regular-xs transition-[top,left,width,height] duration-150 ease-out data-[activation-direction=none]:transition-none" />
+      <SegmentedControlItem
+        value="id"
+        className="relative cursor-[var(--interactive-cursor)] rounded-md px-2 py-0.5 text-label-xs text-text-sub-600 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35 data-checked:text-text-strong-950"
+      >
+        ID
+      </SegmentedControlItem>
+      <SegmentedControlItem
+        value="en"
+        className="relative cursor-[var(--interactive-cursor)] rounded-md px-2 py-0.5 text-label-xs text-text-sub-600 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35 data-checked:text-text-strong-950"
+      >
+        EN
+      </SegmentedControlItem>
+    </SegmentedControl>
   );
 }

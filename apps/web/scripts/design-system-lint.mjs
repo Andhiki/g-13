@@ -10,6 +10,15 @@ function isClassValue(node) {
   return false;
 }
 
+function isPointerProperty({ key, value, computed }) {
+  const name = computed || key.type === "Literal" ? key.value : key.name;
+  if (name !== "cursor") return false;
+  if (value.type === "TemplateLiteral" && value.expressions.length === 0) {
+    return value.quasis[0].value.cooked === "pointer";
+  }
+  return value.value === "pointer";
+}
+
 const respectCursorPreference = {
   create(context) {
     function checkClasses(node, value) {
@@ -29,12 +38,7 @@ const respectCursorPreference = {
         checkClasses(node, node.value.cooked);
       },
       Property(node) {
-        const key = node.computed || node.key.type === "Literal" ? node.key.value : node.key.name;
-        const value =
-          node.value.type === "TemplateLiteral" && node.value.expressions.length === 0
-            ? node.value.quasis[0].value.cooked
-            : node.value.value;
-        if (key === "cursor" && value === "pointer") {
+        if (isPointerProperty(node)) {
           context.report({
             node,
             message: "Use cursor: var(--interactive-cursor) for interactive styles.",

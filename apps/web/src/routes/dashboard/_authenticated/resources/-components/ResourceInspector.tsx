@@ -24,6 +24,17 @@ export function ResourceInspector({
   const deleted = resource.deletedAt !== null;
   const label = resource.titleId;
 
+  const link = (
+    <a
+      href={resource.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline-offset-2 hover:underline"
+    >
+      {resource.url}
+    </a>
+  );
+
   return (
     <AdminInspectorPanel
       title="Resource details"
@@ -62,14 +73,7 @@ export function ResourceInspector({
           {resource.id}
         </AdminInspectorMetaRow>
         <AdminInspectorMetaRow label="Link" valueClassName="break-all">
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline-offset-2 hover:underline"
-          >
-            {resource.url}
-          </a>
+          {link}
         </AdminInspectorMetaRow>
         <AdminInspectorMetaRow label="Order" valueClassName="tabular-nums">
           {resource.sortOrder}
