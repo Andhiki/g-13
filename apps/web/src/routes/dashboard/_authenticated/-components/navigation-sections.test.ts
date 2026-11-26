@@ -12,7 +12,12 @@ it("shows all moderation and catalog sections to admins", () => {
   expect(visiblePaths("admin")).toEqual([
     {
       heading: "Moderation",
-      paths: ["/dashboard/lecturer-reviews", "/dashboard/users", "/dashboard/announcements"],
+      paths: [
+        "/dashboard/lecturer-reviews",
+        "/dashboard/theses",
+        "/dashboard/users",
+        "/dashboard/announcements",
+      ],
     },
     {
       heading: "Catalog",
@@ -25,7 +30,7 @@ it("hides admin-only sections from maintainers", () => {
   expect(visiblePaths("maintainer")).toEqual([
     {
       heading: "Moderation",
-      paths: ["/dashboard/lecturer-reviews"],
+      paths: ["/dashboard/lecturer-reviews", "/dashboard/theses"],
     },
     {
       heading: "Catalog",

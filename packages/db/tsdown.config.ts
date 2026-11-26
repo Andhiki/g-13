@@ -10,6 +10,8 @@ export default defineConfig({
     "schema/lecturers": "src/schema/lecturers.ts",
     "schema/lecturer-reviews": "src/schema/lecturer-reviews.ts",
     "schema/notifications": "src/schema/notifications.ts",
+    "schema/theses": "src/schema/theses.ts",
+    "schema/thesis-fields": "src/schema/thesis-fields.ts",
   },
   format: "esm",
   dts: true,
