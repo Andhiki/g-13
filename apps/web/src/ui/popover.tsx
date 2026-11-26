@@ -8,7 +8,7 @@ import {
   PopoverTrigger as PopoverTriggerPrimitive,
 } from "@ui-sdk/react/popover";
 import * as React from "react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 
 type AsChildProps = { asChild?: boolean; children?: React.ReactNode };
 
@@ -110,7 +110,7 @@ const PopoverContent = React.forwardRef<
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         arrowPadding={arrowPadding}
-        className={twMerge(
+        className={cn(
           !unstyled &&
             "w-max rounded-2xl bg-bg-white-0 p-5 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200",
           "z-50",
@@ -137,7 +137,7 @@ const PopoverClose = React.forwardRef<
 >(({ className, unstyled, ...rest }, forwardedRef) => (
   <PopoverClosePrimitive
     ref={forwardedRef}
-    className={twMerge(
+    className={cn(
       !unstyled && "absolute right-4 top-4",
       typeof className === "string" ? className : undefined,
     )}

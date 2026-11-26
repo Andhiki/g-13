@@ -12,11 +12,11 @@ import {
   type DialogContentState,
 } from "@ui-sdk/react/dialog";
 import type { PartProps } from "@ui-sdk/react/primitive";
-import { extendTailwindMerge } from "tailwind-merge";
+import { createCn } from "cn/config";
 import { useLocale } from "../useLocale";
 import { CompactButton } from "./compact-button";
 
-const twMerge = extendTailwindMerge({
+const cn = createCn({
   extend: {
     classGroups: {
       "font-size": [
@@ -54,7 +54,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   ({ asChild, className, children, ...props }, ref) => (
     <DialogTitle
       ref={ref}
-      className={twMerge(!asChild && "text-label-sm text-text-strong-950", className)}
+      className={cn(!asChild && "text-label-sm text-text-strong-950", className)}
       render={asChild ? childElementOf(children, "Modal.Title") : undefined}
       {...props}
     />
@@ -75,7 +75,7 @@ const Description = React.forwardRef<HTMLParagraphElement, ModalDescriptionProps
   ({ asChild, className, children, ...props }, ref) => (
     <DialogDescription
       ref={ref}
-      className={twMerge(!asChild && "text-paragraph-xs text-text-sub-600", className)}
+      className={cn(!asChild && "text-paragraph-xs text-text-sub-600", className)}
       render={asChild ? childElementOf(children, "Modal.Description") : undefined}
       {...props}
     />
@@ -202,7 +202,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
     return (
       <>
         <DialogBackdrop
-          className={twMerge(
+          className={cn(
             "fixed inset-0 z-50 bg-overlay backdrop-blur-[10px] transition-opacity duration-150 ease-[ease] data-starting-style:opacity-0 data-ending-style:opacity-0",
             overlayClassName,
           )}
@@ -220,7 +220,7 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
               ? focusTargetAfterCallback(onCloseAutoFocus, "close-auto-focus")
               : undefined
           }
-          className={twMerge(
+          className={cn(
             "fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[400px] flex-col overflow-hidden rounded-20 bg-bg-white-0 shadow-regular-md focus:outline-none transition-[opacity,scale] duration-150 ease-[ease] data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95",
             "data-[presentation=sheet]:relative data-[presentation=sheet]:inset-auto data-[presentation=sheet]:my-0 data-[presentation=sheet]:h-auto data-[presentation=sheet]:max-h-[85dvh] data-[presentation=sheet]:w-full data-[presentation=sheet]:max-w-none data-[presentation=sheet]:rounded-b-none data-[presentation=sheet]:transition-none data-[presentation=sheet]:data-starting-style:scale-100 data-[presentation=sheet]:data-starting-style:opacity-100 data-[presentation=sheet]:data-ending-style:scale-100 data-[presentation=sheet]:data-ending-style:opacity-100 data-[presentation=sheet]:after:pointer-events-none data-[presentation=sheet]:after:absolute data-[presentation=sheet]:after:inset-x-0 data-[presentation=sheet]:after:top-full data-[presentation=sheet]:after:h-24 data-[presentation=sheet]:after:bg-inherit data-[presentation=sheet]:after:content-['']",
             className,

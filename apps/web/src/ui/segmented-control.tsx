@@ -14,7 +14,7 @@ import {
   type SegmentedControlState,
 } from "@ui-sdk/react/segmented-control";
 import type { PartProps } from "@ui-sdk/react/primitive";
-import { clsx as cn } from "clsx";
+import { clsx as cn } from "cn/lite";
 
 // The wrappers merge static classes, so callers pass class strings, not render functions.
 type ClassProps<Tag extends keyof React.JSX.IntrinsicElements, State> = Omit<
