@@ -1,7 +1,7 @@
 import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { AnnouncementBannerRow, resolveAnnouncementCopy } from "@/ui/announcement-banner";
 import { useAnnouncementClock } from "@/ui/announcement-countdown";
 import { useLocale } from "@/useLocale";
@@ -134,26 +134,15 @@ function AnnouncementRow({
   onDismiss: () => void;
 }) {
   const reducedMotion = useReducedMotion();
-  const dragY = useMotionValue(0);
-  const opacity = useTransform(dragY, [-72, 0], [0.15, 1]);
 
   return (
     <m.div
-      style={reducedMotion ? undefined : { y: dragY, opacity }}
-      drag={reducedMotion ? false : "y"}
-      dragDirectionLock
-      dragConstraints={{ top: -96, bottom: 0 }}
-      dragElastic={{ top: 0.35, bottom: 0.08 }}
-      dragSnapToOrigin
-      onDragEnd={(_, info) => {
-        if (info.offset.y <= -32 || info.velocity.y <= -350) onDismiss();
-      }}
       exit={{
         height: 0,
         opacity: 0,
         transition: { duration: reducedMotion ? 0 : 0.18, ease: [0.32, 0.72, 0, 1] },
       }}
-      className="group touch-pan-x overflow-hidden"
+      className="group overflow-hidden"
     >
       <AnnouncementBannerRow
         className="border-t border-static-white/20 group-first:border-t-0"

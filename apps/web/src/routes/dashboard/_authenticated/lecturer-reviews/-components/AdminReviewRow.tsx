@@ -5,10 +5,11 @@ import {
   RiEyeOffLine,
   RiStarFill,
 } from "@remixicon/react";
-import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import {
+  AdminTableAction,
   AdminTableInspectButton,
+  AdminTableMeta,
   AdminTableRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminTable";
 import { Typography } from "@/ui/typography";
@@ -38,6 +39,9 @@ export function AdminReviewRow({
   const hidden = review.status === "hidden";
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
+  const ratingDetails = `Clarity ${review.clarity}/5 · Support ${review.support}/5 · Organization ${review.organization}/5`;
+  const courseName = language === "en" ? review.courseNameEn : review.courseNameId;
+  const excerpt = `${review.authorName} · ${review.body}`;
 
   return (
     <AdminTableRow
@@ -45,7 +49,7 @@ export function AdminReviewRow({
       onSelect={onSelect}
       className={`${reviewTableColumns} lg:items-center`}
     >
-      <div className="min-w-0 space-y-1">
+      <div className="min-w-0 lg:space-y-1">
         <div className="flex items-center gap-2">
           <AdminTableInspectButton
             ariaLabel={`Inspect ${label}`}
@@ -56,22 +60,35 @@ export function AdminReviewRow({
           </AdminTableInspectButton>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
-        <CourseChip
-          muted
-          code={review.courseCode}
-          name={language === "en" ? review.courseNameEn : review.courseNameId}
-        />
-        <Typography variant="caption" color="muted" className="block truncate">
-          {review.termLabel}
-        </Typography>
+        <AdminTableMeta>
+          <span
+            className="inline-flex shrink-0 items-center gap-0.5 tabular-nums"
+            title={ratingDetails}
+          >
+            <RiStarFill className="size-3 text-warning-base" aria-hidden="true" />
+            {overall.toFixed(1)}
+          </span>
+          <span className="shrink-0 font-mono" title={`${courseName} · ${review.termLabel}`}>
+            {review.courseCode}
+          </span>
+          <span className="truncate" title={excerpt}>
+            · {excerpt}
+          </span>
+        </AdminTableMeta>
+        <div className="hidden lg:contents lg:[&>span]:mb-1">
+          <CourseChip muted code={review.courseCode} name={courseName} />
+          <Typography variant="caption" color="muted" className="block truncate">
+            {review.termLabel}
+          </Typography>
+        </div>
       </div>
 
-      <div className="min-w-0">
+      <div className="hidden min-w-0 lg:block">
         <Typography
           color="strong"
           className={
             // oxlint-disable-next-line shadcn/no-restyle -- moderation row body tuned to 13px alongside its two-line clamp; no label scale matches
-            "whitespace-pre-wrap break-words text-[13px] max-lg:line-clamp-1 xl:line-clamp-2"
+            "whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
           }
         >
           {review.body}
@@ -82,66 +99,53 @@ export function AdminReviewRow({
       </div>
 
       <div
-        className="flex items-center gap-1 text-label-sm text-text-strong-950 tabular-nums"
-        title={`Clarity ${review.clarity}/5 · Support ${review.support}/5 · Organization ${review.organization}/5`}
+        className="hidden items-center gap-1 text-label-sm text-text-strong-950 tabular-nums lg:flex"
+        title={ratingDetails}
       >
         <RiStarFill className="size-3.5 text-warning-base" aria-hidden="true" />
         <span>{overall.toFixed(1)}</span>
       </div>
 
       {!deleted && (
-        <div className="flex items-center justify-end gap-1">
+        <div className="hidden items-center justify-end gap-1 lg:flex">
           {pending ? (
             <>
-              <AlignButton.Root
-                size="xxsmall"
+              <AdminTableAction
+                label="Approve"
                 variant="primary"
-                mode="ghost"
-                compact
                 onClick={() => onAction({ reviewId: review.id, action: "approve" }, label)}
               >
-                <RiCheckLine className="size-3.5" />
-                Approve
-              </AlignButton.Root>
-              <AlignButton.Root
-                size="xxsmall"
+                <RiCheckLine aria-hidden="true" className="size-3.5" />
+              </AdminTableAction>
+              <AdminTableAction
+                label="Hide"
                 variant="neutral"
-                mode="ghost"
-                compact
                 onClick={() => onAction({ reviewId: review.id, action: "hide" }, label)}
               >
-                <RiEyeOffLine className="size-3.5" />
-                Hide
-              </AlignButton.Root>
+                <RiEyeOffLine aria-hidden="true" className="size-3.5" />
+              </AdminTableAction>
             </>
           ) : (
             <>
-              <AlignButton.Root
-                size="xxsmall"
-                variant="neutral"
-                mode="ghost"
-                compact
+              <AdminTableAction
+                label={hidden ? "Restore" : "Hide"}
                 onClick={() =>
                   onAction({ reviewId: review.id, action: hidden ? "restore" : "hide" }, label)
                 }
               >
                 {hidden ? (
-                  <RiEyeLine className="size-3.5" />
+                  <RiEyeLine aria-hidden="true" className="size-3.5" />
                 ) : (
-                  <RiEyeOffLine className="size-3.5" />
+                  <RiEyeOffLine aria-hidden="true" className="size-3.5" />
                 )}
-                {hidden ? "Restore" : "Hide"}
-              </AlignButton.Root>
-              <AlignButton.Root
-                size="xxsmall"
+              </AdminTableAction>
+              <AdminTableAction
+                label="Delete"
                 variant="error"
-                mode="ghost"
-                compact
                 onClick={() => onAction({ reviewId: review.id, action: "delete" }, label)}
               >
-                <RiDeleteBinLine className="size-3.5" />
-                Delete
-              </AlignButton.Root>
+                <RiDeleteBinLine aria-hidden="true" className="size-3.5" />
+              </AdminTableAction>
             </>
           )}
         </div>

@@ -19,6 +19,10 @@ import { Typography } from "@/ui/typography";
 import {
   announcementFieldsSchema,
   announcementFieldsShape,
+  ANNOUNCEMENT_BODY_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LINK_MAX_LENGTH,
+  ANNOUNCEMENT_TITLE_MAX_LENGTH,
   type AnnouncementFieldsInput,
 } from "../-shared/schemas";
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
@@ -177,7 +181,7 @@ function AnnouncementTextFields({
           id="announcement-title-id"
           name="titleId"
           label="Title (Indonesian)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Jadwal UTS"
           value={titleId}
           error={fieldErrors.titleId}
@@ -187,7 +191,7 @@ function AnnouncementTextFields({
           id="announcement-title-en"
           name="titleEn"
           label="Title (English)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Midterm schedule"
           value={titleEn}
           error={fieldErrors.titleEn}
@@ -198,7 +202,7 @@ function AnnouncementTextFields({
         id="announcement-body-id"
         name="bodyId"
         label="Message (Indonesian)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Jadwal UTS sudah terbit, cek arsip ujian."
         value={bodyId}
         error={fieldErrors.bodyId}
@@ -208,7 +212,7 @@ function AnnouncementTextFields({
         id="announcement-body-en"
         name="bodyEn"
         label="Message (English)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Midterm schedule is out, check the exam archive."
         value={bodyEn}
         error={fieldErrors.bodyEn}
@@ -277,7 +281,7 @@ function AnnouncementScheduleAndCtaFields({
         id="announcement-cta-href"
         name="ctaHref"
         label="CTA link (optional)"
-        maxLength={500}
+        maxLength={ANNOUNCEMENT_CTA_LINK_MAX_LENGTH}
         placeholder="https://example.com or /exam"
         value={ctaHref}
         error={fieldErrors.ctaHref}
@@ -300,7 +304,7 @@ function AnnouncementScheduleAndCtaFields({
           id="announcement-cta-label-id"
           name="ctaLabelId"
           label="CTA label (Indonesian, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Selengkapnya"
           value={ctaLabelId}
           error={fieldErrors.ctaLabelId}
@@ -310,7 +314,7 @@ function AnnouncementScheduleAndCtaFields({
           id="announcement-cta-label-en"
           name="ctaLabelEn"
           label="CTA label (English, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Learn more"
           value={ctaLabelEn}
           error={fieldErrors.ctaLabelEn}

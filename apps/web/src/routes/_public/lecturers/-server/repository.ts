@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, isNull, lt, lte, sql, or, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNull, lt, lte, sql, or, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db/schema/lecturer-reviews";
@@ -102,6 +102,39 @@ export async function getLecturerDirectoryData(db: Database) {
   };
 }
 
+const reviewCardFields = {
+  id: reviews.id,
+  lecturerId: reviews.lecturerId,
+  courseId: courses.id,
+  code: courses.code,
+  nameId: courses.nameId,
+  nameEn: courses.nameEn,
+  termLabel: reviews.termLabel,
+  authorName: reviews.authorName,
+  clarity: reviews.clarity,
+  support: reviews.support,
+  organization: reviews.organization,
+  body: reviews.body,
+  createdAt: reviews.createdAt,
+};
+
+export function getOwnPendingReviews(db: Database, lecturerId: string, reviewIds: string[]) {
+  return db
+    .select(reviewCardFields)
+    .from(reviews)
+    .innerJoin(lecturers, and(eq(lecturers.id, reviews.lecturerId), activeLecturer))
+    .innerJoin(courses, eq(courses.id, reviews.courseId))
+    .where(
+      and(
+        eq(reviews.lecturerId, lecturerId),
+        inArray(reviews.id, reviewIds),
+        eq(reviews.status, "pending"),
+        isNull(reviews.deletedAt),
+      ),
+    )
+    .orderBy(desc(reviews.createdAt), asc(reviews.id));
+}
+
 export async function getLecturerDetailData(db: Database, lecturerId: string) {
   const [lecturer] = await db
     .select({ id: lecturers.id, name: lecturers.name })
@@ -113,19 +146,7 @@ export async function getLecturerDetailData(db: Database, lecturerId: string) {
     getCourseCatalog(db),
     db
       .select({
-        id: reviews.id,
-        lecturerId: reviews.lecturerId,
-        courseId: courses.id,
-        code: courses.code,
-        nameId: courses.nameId,
-        nameEn: courses.nameEn,
-        termLabel: reviews.termLabel,
-        authorName: reviews.authorName,
-        clarity: reviews.clarity,
-        support: reviews.support,
-        organization: reviews.organization,
-        body: reviews.body,
-        createdAt: reviews.createdAt,
+        ...reviewCardFields,
         likeCount: sql<number>`(select count(*) from ${reviewLikes} where ${reviewLikes.reviewId} = ${reviews.id})`,
       })
       .from(reviews)

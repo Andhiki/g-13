@@ -6,5 +6,6 @@ declare namespace Cloudflare {
     DB: D1Database;
     ALUMNI: Fetcher;
     E2E_FIXTURE_TOKEN?: string;
+    REVIEW_CLASSIFICATION_TEST_MODE?: string;
   }
 }

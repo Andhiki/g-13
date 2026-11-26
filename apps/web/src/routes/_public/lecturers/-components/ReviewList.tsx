@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { RiStarFill, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { useLocale } from "@/useLocale";
+import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import { Typography } from "@/ui/typography";
@@ -11,7 +12,9 @@ type Review = Awaited<
   ReturnType<NonNullable<ReturnType<typeof lecturerDetailQueryOptions>["queryFn"]>>
 >["reviews"][number];
 
-function ReviewAspectRatings({ review }: { review: Review }) {
+type ReviewCardData = Omit<Review, "overall" | "likeCount">;
+
+function ReviewAspectRatings({ review, pending }: { review: ReviewCardData; pending: boolean }) {
   const { text } = useLocale("lecturers");
   const scores: [string, number][] = [
     ["Clarity", review.clarity],
@@ -25,9 +28,14 @@ function ReviewAspectRatings({ review }: { review: Review }) {
           <Typography as="dt" variant="caption" color="muted">
             {text(label)}
           </Typography>
-          <dd className="m-0 flex items-center gap-0.5 text-label-xs tabular-nums">
+          <dd
+            className={`m-0 flex items-center gap-0.5 text-label-xs tabular-nums ${pending ? "text-text-sub-600" : ""}`}
+          >
             {value}
-            <RiStarFill aria-hidden="true" className="size-3.5 text-primary-base" />
+            <RiStarFill
+              aria-hidden="true"
+              className={`size-3.5 ${pending ? "text-text-soft-400" : "text-primary-base"}`}
+            />
           </dd>
         </div>
       ))}
@@ -38,23 +46,20 @@ function ReviewAspectRatings({ review }: { review: Review }) {
 function ReviewCard({
   review,
   language,
-  liked,
-  canLike,
-  likePending,
-  onLike,
+  action,
+  pending = false,
 }: {
-  review: Review;
+  review: ReviewCardData;
   language: "id" | "en";
-  liked: boolean;
-  canLike: boolean;
-  likePending: boolean;
-  onLike: (reviewId: string, liked: boolean) => Promise<void>;
+  action: ReactNode;
+  pending?: boolean;
 }) {
   const { text } = useLocale("lecturers");
   return (
     <article key={review.id} id={`review-${review.id}`} className="min-w-0 py-3 sm:py-4">
       <Typography
         as="p"
+        color={pending ? "muted" : "inherit"}
         className={
           // oxlint-disable-next-line shadcn/no-restyle -- public review body reads best relaxed; the paragraph label scale runs tighter than prose wants
           "m-0 whitespace-pre-wrap break-words leading-relaxed"
@@ -65,10 +70,15 @@ function ReviewCard({
       <div className="mt-2">
         <CourseChip code={review.code} name={courseDisplayName(review, language)} />
       </div>
-      <ReviewAspectRatings review={review} />
+      <ReviewAspectRatings review={review} pending={pending} />
       <footer className="mt-2 flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-          <Typography as="span" variant="labelSmall" className="min-w-0 wrap-anywhere">
+          <Typography
+            as="span"
+            variant="labelSmall"
+            color={pending ? "muted" : "inherit"}
+            className="min-w-0 wrap-anywhere"
+          >
             {review.authorName.toLowerCase() === "anonymous"
               ? text("Anonymous")
               : review.authorName}
@@ -77,14 +87,7 @@ function ReviewCard({
             {review.termLabel}
           </Typography>
         </div>
-        <ReviewLikeButton
-          reviewId={review.id}
-          count={review.likeCount}
-          liked={liked}
-          canLike={canLike}
-          pending={likePending}
-          onLike={onLike}
-        />
+        {action}
       </footer>
     </article>
   );
@@ -92,6 +95,7 @@ function ReviewCard({
 
 export function ReviewList({
   reviews,
+  pendingReviews,
   language,
   emptyState,
   likedReviews,
@@ -100,6 +104,7 @@ export function ReviewList({
   onLike,
 }: {
   reviews: Review[];
+  pendingReviews: ReviewCardData[];
   language: "id" | "en";
   emptyState: ReactNode;
   likedReviews: string[];
@@ -107,20 +112,40 @@ export function ReviewList({
   likePending: boolean;
   onLike: (reviewId: string, liked: boolean) => Promise<void>;
 }) {
-  if (!reviews.length) {
+  const { text } = useLocale("lecturers");
+  if (!pendingReviews.length && !reviews.length) {
     return emptyState;
   }
   return (
     <div className="divide-y divide-stroke-soft-200 border-y border-stroke-soft-200">
+      {pendingReviews.map((review) => (
+        <ReviewCard
+          key={review.id}
+          review={review}
+          language={language}
+          pending
+          action={
+            <AlignBadge.Root variant="information" size="medium">
+              {text("Pending moderator review")}
+            </AlignBadge.Root>
+          }
+        />
+      ))}
       {reviews.map((review) => (
         <ReviewCard
           key={review.id}
           review={review}
           language={language}
-          liked={likedReviews.includes(review.id)}
-          canLike={canLike}
-          likePending={likePending}
-          onLike={onLike}
+          action={
+            <ReviewLikeButton
+              reviewId={review.id}
+              count={review.likeCount}
+              liked={likedReviews.includes(review.id)}
+              canLike={canLike}
+              pending={likePending}
+              onLike={onLike}
+            />
+          }
         />
       ))}
     </div>

@@ -7,12 +7,15 @@ import {
   lecturerDirectoryQueryOptions,
 } from "./queries";
 
+export type SubmittedReview = Awaited<ReturnType<typeof publishLecturerReview>>;
+
 export function publishLecturerReviewMutationOptions(queryClient: QueryClient) {
   return mutationOptions({
     mutationFn: (
       input: ReviewSubmissionInput & { turnstileToken: string; browserId: string | null },
     ) => publishLecturerReview({ data: input }),
-    onSuccess: async (_result, input) => {
+    onSuccess: async (result, input) => {
+      if (result.status === "pending") return;
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: lecturerDirectoryQueryOptions().queryKey,

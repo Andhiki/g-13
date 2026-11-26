@@ -50,7 +50,7 @@ export async function fillReview(
   }
   await dialog.getByLabel(/pengalamanmu|pengalaman anda|your experience/i).fill(body);
   if (options.author !== undefined) {
-    await dialog.getByLabel(/terbitkan sebagai anonim|publish as anonymous/i).click();
+    await dialog.getByLabel(/kirim sebagai anonim|submit anonymously/i).click();
     await dialog.getByLabel(/nama tampilan|display name/i).fill(options.author);
   }
   await expect.poll(() => browser.evaluate(() => "turnstile" in window)).toBe(true);
