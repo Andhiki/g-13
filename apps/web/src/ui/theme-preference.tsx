@@ -74,6 +74,7 @@ export function AppPreferences({ children }: { children: ReactNode }) {
       blurPreference.subscribe(applyBlur),
       cursorPreference.subscribe(applyCursor),
     ];
+    applyCursor(cursorPreference.get());
     syncMode();
     return () => stops.forEach((stop) => stop());
   }, []);
