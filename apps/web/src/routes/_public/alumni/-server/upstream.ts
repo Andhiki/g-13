@@ -63,10 +63,20 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
       signal: AbortSignal.timeout(alumniUpstream.timeoutMs),
     });
     if (!response.ok) throw new Error(`upstream ${response.status}`);
-    const body = (await response.json()) as StrapiAlumniResponse;
-    pages.push(body);
-    const pageCount = body.meta?.pagination?.pageCount;
-    if (typeof pageCount !== "number" || page >= pageCount) break;
+    const body: unknown = await response.json();
+    if (!body || typeof body !== "object" || !("data" in body) || !Array.isArray(body.data)) {
+      throw new Error("Invalid alumni upstream data");
+    }
+    const result = body as StrapiAlumniResponse;
+    const pageCount = result.meta?.pagination?.pageCount;
+    if (typeof pageCount !== "number" || !Number.isSafeInteger(pageCount) || pageCount < 0) {
+      throw new Error("Invalid alumni upstream pagination");
+    }
+    if (pageCount > alumniUpstream.maxPages) {
+      throw new Error("Alumni upstream page limit exceeded");
+    }
+    pages.push(result);
+    if (page >= pageCount) break;
   }
   return pages;
 }

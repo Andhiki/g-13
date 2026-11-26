@@ -58,6 +58,68 @@ test("rejects upstream errors without returning partial pages", async () => {
   }
 });
 
+test.each([null, { error: "unavailable" }, { data: {} }])(
+  "rejects a successful upstream response with an invalid data envelope",
+  async (body) => {
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body));
+    try {
+      await expect(fetchAlumniPages("test-token")).rejects.toThrow("Invalid alumni upstream data");
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  },
+);
+
+test("rejects a successful upstream response without pagination metadata", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ data: [1] }));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a malformed later page instead of returning a partial directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(Response.json({ data: [1], meta: { pagination: { pageCount: 2 } } }))
+    .mockResolvedValueOnce(Response.json({ data: [], meta: { pagination: { pageCount: "2" } } }));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects directories larger than the upstream page limit instead of returning partial data", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({ data: [1], meta: { pagination: { pageCount: 6 } } }),
+  );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Alumni upstream page limit exceeded",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("accepts a valid empty directory", async () => {
+  const body = { data: [], meta: { pagination: { pageCount: 0 } } };
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body));
+  try {
+    expect(await fetchAlumniPages("test-token")).toEqual([body]);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
 test("directory policies allow stale serving with separate browser and edge freshness", () => {
   expect(alumniCache).toContain("max-age=300");
   expect(alumniCdnCache).toContain("max-age=3600");
