@@ -1,5 +1,6 @@
 import type { createDatabase } from "@g13/db/client";
 import { REVIEW_RATE_LIMIT_WINDOW_MS, reviewRateLimitResetAt } from "../-shared/rate-limit-window";
+import { reviewRateLimitIp } from "./rate-limit-ip";
 import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
@@ -59,15 +60,16 @@ export async function allowReviewAction(
   const now = context.now ?? Date.now();
   const window = Math.floor(now / REVIEW_RATE_LIMIT_WINDOW_MS);
   const limits = { secret: context.secret, now };
+  const ip = reviewRateLimitIp(context.ip);
   if (action === "like") {
-    return incrementLimit(db, limits, createLikeIpIdentity(context.ip, window), LIKE_LIMIT_PER_IP);
+    return incrementLimit(db, limits, createLikeIpIdentity(ip, window), LIKE_LIMIT_PER_IP);
   }
   if (!context.browserId) {
     // Without a browser identifier, the strict per-IP limit is the only bucket.
     return incrementLimit(
       db,
       limits,
-      createSubmissionIpIdentity(context.ip, window),
+      createSubmissionIpIdentity(ip, window),
       SUBMISSION_LIMIT_PER_BROWSER,
     );
   }
@@ -81,7 +83,7 @@ export async function allowReviewAction(
   return incrementLimit(
     db,
     limits,
-    createSubmissionIpIdentity(context.ip, window),
+    createSubmissionIpIdentity(ip, window),
     SUBMISSION_LIMIT_PER_IP,
   );
 }

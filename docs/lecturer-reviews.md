@@ -157,9 +157,12 @@ the rejection path. Production keys reject dummy tokens and vice versa.
 Invisible mode requires referencing Cloudflare's
 [Turnstile Privacy Addendum](https://www.cloudflare.com/trust-hub/privacy-and-compliance/)
 in the app's own privacy policy. The server passes the visitor's `CF-Connecting-IP` to
-Siteverify as `remoteip` and uses the same IP for the hourly backstop; the browser
-identifier is HMAC'd before storage. Raw IPs are not stored in review records (see
-`packages/db/README.md`).
+Siteverify as `remoteip`. The hourly IP quotas for submissions and likes group IPv6
+addresses by their `/64` network, so rotating privacy addresses within a network
+share a quota. IPv4 and IPv4-mapped IPv6 addresses use the same IPv4 quota.
+Rate-limit identities and the submission browser identifier are HMAC'd before
+storage. Raw IPs are not stored in review records
+(see `packages/db/README.md`).
 
 OpenAI receives only the review body and a chosen display name. Review, lecturer, and
 course IDs, ratings, IP addresses, browser IDs, and raw provider responses are not sent

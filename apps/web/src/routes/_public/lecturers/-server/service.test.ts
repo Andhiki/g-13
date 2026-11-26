@@ -9,6 +9,7 @@ import { notificationEvents } from "@g13/db/schema/notifications";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
+import { allowReviewAction } from "./rate-limit";
 import { setReviewLike } from "./likes.service";
 import { getLecturerDetail, getLecturerDirectory } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
@@ -656,3 +657,27 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     await platform.dispose();
   }
 }, 30_000);
+
+it.each([
+  ["submission", 3],
+  ["like", 60],
+] as const)(
+  "%s quotas group IPv6 by network and share IPv4 buckets with mapped addresses",
+  async (action, limit) => {
+    const platform = await createTestPlatformProxy();
+    try {
+      const db = createDatabase(platform.env.DB);
+      const attempt = (ip: string) =>
+        allowReviewAction(db, { ip, secret: "test-secret-".repeat(4), now: 3_600_000 }, action);
+      for (let count = 0; count < limit; count++) {
+        expect(await attempt("2001:db8:0:1::1")).toBe(true);
+        expect(await attempt("192.0.2.7")).toBe(true);
+      }
+      expect(await attempt("2001:0db8:0000:0001:abcd:0:0:2")).toBe(false);
+      expect(await attempt("2001:db8:0:2::1")).toBe(true);
+      expect(await attempt("::ffff:192.0.2.7")).toBe(false);
+    } finally {
+      await platform.dispose();
+    }
+  },
+);
