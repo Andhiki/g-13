@@ -9,16 +9,22 @@ type ModerationResult = { categories: Record<string, unknown> };
 type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
 const scopedCategories = ["harassment", "harassment/threatening", "hate", "hate/threatening"];
-const promotion =
-  /\b(promo|promotion|discount|diskon|sale|jual beli|jasa|investasi|investment|loan|pinjaman|crypto|cryptocurrency|giveaway|undian|free trial|kursus online|online course|gift card|kartu hadiah)\b/i;
-const solicitation =
-  /\b(order now|buy now|beli sekarang|pesan sekarang|register now|daftar sekarang|sign up now|shop now|invest now|claim (your|this) (offer|discount|gift|profit)|use (my|our) (code|link)|gunakan kode|limited[ -]time offer|guaranteed returns?|hubungi (kami|saya) untuk (membeli|memesan|mendaftar)|contact (me|us) to (buy|order|register)|dm me (to|for) (buying|purchase|prices|orders|registration)|message me (to|for) (buying|purchase|prices|orders|registration)|join (my|our) (paid|crypto|investment) (group|channel|course)|follow (me|us) for (offers|discounts|promotions))\b/i;
-const contactDetails =
-  /(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b|(?:\+?\d[\d .()-]{7,}\d)/i;
+const urlOrEmail = /(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i;
+const bareDomain =
+  /\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:com|net|org|id|io|co|me|ly|ee|gg|link|site|online|xyz|app|dev|info|biz|tv|cc|ru|cn)\b/i;
+const phoneCandidate = /(?:\+\d{1,3}|62|0)[\d\s().-]{7,14}\d/g;
 
-/** Conservative local checks: links or contact details alone never count as spam. */
-export function isObviousReviewSpam(text: string): boolean {
-  return promotion.test(text) && solicitation.test(text) && contactDetails.test(text);
+function containsPhoneNumber(text: string): boolean {
+  for (const match of text.matchAll(phoneCandidate)) {
+    const digits = match[0].replace(/\D/gu, "");
+    if (digits.length >= 9 && digits.length <= 16) return true;
+  }
+  return false;
+}
+
+/** Links, email, phone numbers, and messaging channels are held for moderator review. */
+export function containsContactDetails(text: string): boolean {
+  return urlOrEmail.test(text) || bareDomain.test(text) || containsPhoneNumber(text);
 }
 
 function parseModerationResults(value: unknown, expected: number): ModerationResult[] | null {
@@ -52,7 +58,7 @@ export async function classifyReviewText(
   fetcher: ModerationFetcher = fetch,
 ): Promise<ReviewScreeningResult> {
   const texts = [input.body, ...(input.displayName ? [input.displayName] : [])];
-  if (texts.some(isObviousReviewSpam)) return "flagged";
+  if (texts.some(containsContactDetails)) return "flagged";
   if (!apiKey) return "unscorable";
 
   try {

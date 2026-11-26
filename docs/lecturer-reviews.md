@@ -20,7 +20,7 @@ publishLecturerReview (server function)
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
-  │  local spam rules + OpenAI moderation
+  │  contact-detail gate + OpenAI moderation
   ▼
 submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
@@ -57,12 +57,17 @@ Moderations API with `omni-moderation-latest`. Only `harassment`,
 category flags and the overall `flagged` value do not. A clear result preserves the
 rating rule above.
 
-Local spam rules are separate from abuse detection and require an obvious promotion
-combined with an explicit purchase or registration call to action and contact details.
-A negative review, URL, phone number, or ordinary contact information alone does not
-trigger a hold. A local rule match, provider error, timeout, malformed response, or
-missing API key keeps the review Pending for a moderator; submissions are not rejected
-automatically. Only Pending submissions notify admins and maintainers.
+Local contact-detail rules are separate from abuse detection. A review body or chosen
+display name containing a URL, bare domain, email address, phone number, or messaging
+channel is held for moderator review. A negative review, academic title, year range, or
+currency amount does not trigger a hold by itself. Any such link or contact detail is
+held rather than rejected, so a moderator can approve legitimate references.
+
+The gate favors precision over coverage: text-only promotion without a link or contact
+detail still publishes, and obfuscated links such as `example[.]com` are not detected.
+A local rule match, provider error, timeout, malformed response, or missing API key keeps
+the review Pending for a moderator; submissions are not rejected automatically. Only
+Pending submissions notify admins and maintainers.
 
 The confirmation dialog tells the submitter when a review enters moderation.
 The browser saves the random review ID in lecturer-specific local storage so

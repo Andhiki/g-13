@@ -1,5 +1,5 @@
 import { expect, it } from "bun:test";
-import { classifyReviewText, isObviousReviewSpam } from "./review-moderation";
+import { classifyReviewText, containsContactDetails } from "./review-moderation";
 
 type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -17,42 +17,63 @@ function moderationResponse(...categories: Record<string, unknown>[]) {
   );
 }
 
-it("flags explicit spam promotion while preserving criticism with contact details", () => {
+const campaignSample = `Guys, gue kaget banget hari ini!
+Cobain spin gratis iseng-iseng, taunya dapet Rp900.000 — dan udah berhasil gue tarik ke rekening!
+Mahjong Ways hari ini lagi gacor-gacornya, sumpah!
+Nih gue kasih kode gratisnya: EY5T999
+https://pkwgames.link/#/wheelspinevent?invitationCode=JWT067177
+Oh iya, follow channel Telegram kami juga ya! Ada kode bonus GRATIS tiap hari, sayang kalau dilewatin!
+https://t.me/PwKGames`;
+
+it("holds links and contact details for moderator review", () => {
+  expect(containsContactDetails(campaignSample)).toBe(true);
   expect(
-    isObviousReviewSpam("Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789"),
+    containsContactDetails(
+      "Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789",
+    ),
   ).toBe(true);
   expect(
-    isObviousReviewSpam("The lecturer ignored questions. I would not recommend this class."),
+    containsContactDetails(
+      "The investment material was taught too quickly. Contact +62 812 3456 7890.",
+    ),
+  ).toBe(true);
+  expect(
+    containsContactDetails("The lecturer's office-hours link is https://example.edu/office-hours."),
+  ).toBe(true);
+  expect(containsContactDetails("Useful reading: example.com/course")).toBe(true);
+  expect(containsContactDetails("Join the channel at t.me/PwKGames")).toBe(true);
+  expect(containsContactDetails("Email me at student@example.com")).toBe(true);
+  expect(containsContactDetails("You can reach the lecturer at 081234567890.")).toBe(true);
+  expect(
+    containsContactDetails("The lecturer ignored questions. I would not recommend this class."),
   ).toBe(false);
   expect(
-    isObviousReviewSpam(
-      "The investment material was taught too quickly. Contact the lecturer on WhatsApp at +62 812 3456 7890.",
+    containsContactDetails(
+      "The term ran from 2021-2022 and the cohort read about 1.000.000 words.",
     ),
   ).toBe(false);
-  expect(
-    isObviousReviewSpam(
-      "The investment topic moved too quickly. The lecturer's office-hours link is https://example.edu/office-hours.",
-    ),
-  ).toBe(false);
-  expect(
-    isObviousReviewSpam(
-      "Materi investasi dijelaskan terlalu cepat. Hubungi dosen lewat WhatsApp di +62 812 3456 7890.",
-    ),
-  ).toBe(false);
-  expect(isObviousReviewSpam("Useful reading: https://example.com/course")).toBe(false);
-  expect(isObviousReviewSpam("You can reach the lecturer at 081234567890.")).toBe(false);
+  expect(containsContactDetails("Pak Budi, S.Kom., explains the material clearly.")).toBe(false);
 });
 
-it("flags obvious local spam before making a provider request", async () => {
+it("flags contact details before making a provider request", async () => {
+  let calls = 0;
+  const result = await classifyReviewText({ body: campaignSample }, "", async () => {
+    calls += 1;
+    throw new Error("The contact-detail gate should short-circuit the provider call");
+  });
+
+  expect(result).toBe("flagged");
+  expect(calls).toBe(0);
+});
+
+it("holds a display name that contains a link", async () => {
   let calls = 0;
   const result = await classifyReviewText(
-    {
-      body: "Promo jasa kursus online, daftar sekarang di https://wa.me/628123456789",
-    },
+    { body: "The course was difficult.", displayName: "https://spam.example" },
     "",
     async () => {
       calls += 1;
-      throw new Error("The local spam rule should short-circuit the provider call");
+      throw new Error("The contact-detail gate should short-circuit the provider call");
     },
   );
 

@@ -348,7 +348,7 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
       db,
       submissionInputSchema.parse({
         ...rawInput,
-        body: "Promo kursus online, daftar sekarang dan gunakan kode STUDI di https://example.com",
+        body: "Mahjong Ways hari ini lagi gacor-gacornya! Nih gue kasih kode gratisnya: EY5T999 https://pkwgames.link/#/wheelspinevent?invitationCode=JWT067177 https://t.me/PwKGames",
       }),
       {
         ...context("192.0.2.36"),
