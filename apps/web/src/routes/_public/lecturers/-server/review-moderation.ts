@@ -10,6 +10,8 @@ type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response
 
 const scopedCategories = ["harassment", "harassment/threatening", "hate", "hate/threatening"];
 const urlOrEmail = /\b(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i;
+const standaloneComputingDegree =
+  /(?<![\p{L}\p{N}.-])s\.kom(?![\p{L}\p{N}/?#-]|\.[\p{L}\p{N}]|:\d)/giu;
 const bareDomain =
   /(?<![\p{L}\p{N}-])(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+(?:\p{L}{2,63}|xn--[a-z0-9-]{2,59})(?![\p{L}\p{N}-])/iu;
 // Require an Indonesian dialing prefix and enough digits to exclude ordinary dates and grades.
@@ -18,7 +20,10 @@ const indonesianPhone =
 
 export function hasReviewContactDetails({ body, displayName }: ReviewScreeningInput): boolean {
   return [body, displayName ?? ""].some(
-    (text) => urlOrEmail.test(text) || bareDomain.test(text) || indonesianPhone.test(text),
+    (text) =>
+      urlOrEmail.test(text) ||
+      bareDomain.test(text.replace(standaloneComputingDegree, " ")) ||
+      indonesianPhone.test(text),
   );
 }
 

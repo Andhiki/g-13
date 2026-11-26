@@ -31,8 +31,23 @@ it.each([
   "chat.whatsapp.com/channel",
   "discord.gg/channel",
   "linktr.ee/channel",
+  "s.kom.id",
+  "s.kom/course",
+  "https://s.kom",
 ])("holds a review body containing %s on its own", (detail) => {
   expect(hasReviewContactDetails({ body: `Contact detail: (${detail}).` })).toBe(true);
+});
+
+it("treats standalone S.Kom. as an academic title in review text and display names", () => {
+  expect(
+    hasReviewContactDetails({ body: "Pak Budi, S.Kom., menjelaskan materi dengan jelas." }),
+  ).toBe(false);
+  expect(
+    hasReviewContactDetails({ body: "The material was clear.", displayName: "Budi S.Kom" }),
+  ).toBe(false);
+  expect(
+    hasReviewContactDetails({ body: "Pak Budi, S.Kom., shared the notes at example.edu." }),
+  ).toBe(true);
 });
 
 it("preserves clean criticism with course codes, dates, and decimal grades", () => {
