@@ -46,6 +46,7 @@ import {
   reorderAdminResources,
   updateAdminResource,
 } from "./-server/handler";
+import { resourceMutationErrorMessage } from "./-shared/errors";
 import {
   resourceStatusSchema,
   type ReorderResourcesInput,
@@ -656,7 +657,10 @@ function AdminResourcesPage() {
         formState={formModal}
         formPending={saveMutation.isPending}
         formError={
-          saveMutation.isError ? "Could not save resource. Refresh and try again." : undefined
+          saveMutation.isError
+            ? (resourceMutationErrorMessage(saveMutation.error) ??
+              "Could not save resource. Refresh and try again.")
+            : undefined
         }
         confirmation={confirmation}
         lifecyclePending={lifecycleMutation.isPending}
