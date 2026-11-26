@@ -10,7 +10,6 @@ const namespaces: MessageNamespace[] = [
   "resources",
   "alumni",
   "lecturers",
-  "theses",
   "notifications",
 ];
 for (const namespace of namespaces) {

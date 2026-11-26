@@ -4,7 +4,6 @@ import {
   RiBookOpenLine,
   RiChatCheckLine,
   RiGroupLine,
-  RiFileTextLine,
   RiLinksLine,
   RiMegaphoneLine,
   RiUserVoiceLine,
@@ -31,12 +30,6 @@ export const sectionGroups = [
         to: "/dashboard/lecturer-reviews",
         label: "Lecturer reviews",
         Icon: RiChatCheckLine,
-        permission: "moderate",
-      },
-      {
-        to: "/dashboard/theses",
-        label: "Theses",
-        Icon: RiFileTextLine,
         permission: "moderate",
       },
       {

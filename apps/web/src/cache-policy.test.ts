@@ -17,12 +17,5 @@ test("only successful alumni page GETs and the existing API policy are cacheable
       new Response(null, { headers: { "Cache-Control": "public, max-age=300" } }),
     ),
   ).toBe("public, max-age=300");
-  expect(cachePolicy(request("/sitemap.xml"), new Response())).toBe("no-store");
-  expect(
-    cachePolicy(
-      request("/sitemap.xml"),
-      new Response(null, { headers: { "Cache-Control": "public, max-age=3600" } }),
-    ),
-  ).toBe("public, max-age=3600");
   expect(cachePolicy(request("/"), new Response())).toBe("no-store");
 });
