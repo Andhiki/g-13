@@ -25,14 +25,14 @@ describe("verifyTurnstileToken", () => {
     const ok = await verifyTurnstileToken({
       secret: "secret-key",
       token: "token-value",
-      remoteip: "203.0.113.7",
+      remoteip: "2001:db8:0:1::7",
     });
 
     expect(ok).toBe(true);
     expect(received.url).toBe("https://challenges.cloudflare.com/turnstile/v0/siteverify");
     expect(received.body?.get("secret")).toBe("secret-key");
     expect(received.body?.get("response")).toBe("token-value");
-    expect(received.body?.get("remoteip")).toBe("203.0.113.7");
+    expect(received.body?.get("remoteip")).toBe("2001:db8:0:1::7");
   });
 
   it("returns false when Siteverify reports failure", async () => {
