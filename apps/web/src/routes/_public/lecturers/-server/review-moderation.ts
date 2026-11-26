@@ -9,16 +9,17 @@ type ModerationResult = { categories: Record<string, unknown> };
 type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
 const scopedCategories = ["harassment", "harassment/threatening", "hate", "hate/threatening"];
-const promotion =
-  /\b(promo|promotion|discount|diskon|sale|jual beli|jasa|investasi|investment|loan|pinjaman|crypto|cryptocurrency|giveaway|undian|free trial|kursus online|online course|gift card|kartu hadiah)\b/i;
-const solicitation =
-  /\b(order now|buy now|beli sekarang|pesan sekarang|register now|daftar sekarang|sign up now|shop now|invest now|claim (your|this) (offer|discount|gift|profit)|use (my|our) (code|link)|gunakan kode|limited[ -]time offer|guaranteed returns?|hubungi (kami|saya) untuk (membeli|memesan|mendaftar)|contact (me|us) to (buy|order|register)|dm me (to|for) (buying|purchase|prices|orders|registration)|message me (to|for) (buying|purchase|prices|orders|registration)|join (my|our) (paid|crypto|investment) (group|channel|course)|follow (me|us) for (offers|discounts|promotions))\b/i;
-const contactDetails =
-  /(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b|(?:\+?\d[\d .()-]{7,}\d)/i;
+const urlOrEmail = /\b(?:https?:\/\/|www\.)\S+|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i;
+const bareDomain =
+  /(?<![\p{L}\p{N}-])(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+(?:\p{L}{2,63}|xn--[a-z0-9-]{2,59})(?![\p{L}\p{N}-])/iu;
+// Require an Indonesian dialing prefix and enough digits to exclude ordinary dates and grades.
+const indonesianPhone =
+  /(?<![\p{L}\p{N}])(?:0|\+?62)[ .-]*[2-9](?:[ .()-]*\d){7,11}(?![ .()-]*\d)/u;
 
-/** Conservative local checks: links or contact details alone never count as spam. */
-export function isObviousReviewSpam(text: string): boolean {
-  return promotion.test(text) && solicitation.test(text) && contactDetails.test(text);
+export function hasReviewContactDetails({ body, displayName }: ReviewScreeningInput): boolean {
+  return [body, displayName ?? ""].some(
+    (text) => urlOrEmail.test(text) || bareDomain.test(text) || indonesianPhone.test(text),
+  );
 }
 
 function parseModerationResults(value: unknown, expected: number): ModerationResult[] | null {
@@ -51,10 +52,10 @@ export async function classifyReviewText(
   apiKey: string,
   fetcher: ModerationFetcher = fetch,
 ): Promise<ReviewScreeningResult> {
-  const texts = [input.body, ...(input.displayName ? [input.displayName] : [])];
-  if (texts.some(isObviousReviewSpam)) return "flagged";
+  if (hasReviewContactDetails(input)) return "flagged";
   if (!apiKey) return "unscorable";
 
+  const texts = [input.body, ...(input.displayName ? [input.displayName] : [])];
   try {
     const response = await fetcher("https://api.openai.com/v1/moderations", {
       method: "POST",
