@@ -20,7 +20,7 @@ publishLecturerReview (server function)
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
-  │  local spam rules + OpenAI moderation
+  │  local contact-detail check, then OpenAI moderation if clear
   ▼
 submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
@@ -47,22 +47,22 @@ rounded up. The submission form and like error display the server's reset
 timestamp in the visitor's local time and fall back to the browser clock if no
 timestamp arrives.
 
-Reviews with any rating of 2 or lower are stored as `pending` and stay out of
-public listings, ratings, and search aggregates until a moderator approves them
-from the dashboard. Reviews with every rating at 3 or higher publish immediately.
-Every body is screened. A chosen display name is screened separately; the generated
-`Anonymous` placeholder is omitted. The Worker sends only those text values to OpenAI's
-Moderations API with `omni-moderation-latest`. Only `harassment`,
-`harassment/threatening`, `hate`, and `hate/threatening` flags hold a review; other
-category flags and the overall `flagged` value do not. A clear result preserves the
-rating rule above.
+The Worker checks the body and any chosen display name for URLs, bare domains,
+email addresses, and Indonesian phone numbers. Messaging links such as `t.me`
+and `wa.me` also match. A single contact detail places the review in Pending,
+including legitimate course links that a moderator can approve. The local check
+does not assess promotional intent or detect obfuscated links such as `example[.]com`.
 
-Local spam rules are separate from abuse detection and require an obvious promotion
-combined with an explicit purchase or registration call to action and contact details.
-A negative review, URL, phone number, or ordinary contact information alone does not
-trigger a hold. A local rule match, provider error, timeout, malformed response, or
-missing API key keeps the review Pending for a moderator; submissions are not rejected
-automatically. Only Pending submissions notify admins and maintainers.
+If the local check is clear, the Worker sends the body and any chosen display name
+to OpenAI's Moderations API with `omni-moderation-latest`. It omits the generated
+`Anonymous` placeholder. Only flags for `harassment`, `harassment/threatening`,
+`hate`, and `hate/threatening` place the review in Pending. Provider errors,
+timeouts, malformed responses, and missing API keys also send reviews to Pending.
+
+When screening is clear, a review publishes immediately if all three ratings are
+at least 3. A review with any rating of 2 or lower goes to Pending. Pending reviews
+stay out of public listings, ratings, and search aggregates until a moderator approves
+them. Only Pending submissions notify admins and maintainers.
 
 The confirmation dialog tells the submitter when a review enters moderation.
 The browser saves the random review ID in lecturer-specific local storage so
