@@ -5,8 +5,11 @@ import type { LecturerOrder, ReviewOrder } from "../-shared/review-order";
 
 const lecturerOptions: [LecturerOrder, string][] = [
   ["name", "Name A–Z"],
-  ["review-count", "Most reviews"],
+  ["name-desc", "Name Z–A"],
+  ["reviews", "Most reviews"],
+  ["reviews-asc", "Fewest reviews"],
   ["rating", "Highest rating"],
+  ["rating-asc", "Lowest rating"],
 ];
 
 const reviewOptions: [ReviewOrder, string][] = [
@@ -44,7 +47,7 @@ export function ReviewSortMenu(props: Props) {
         <RiSortDesc aria-hidden="true" className="hidden size-5 sm:block" />
         <AlignSelect.Value />
       </AlignSelect.Trigger>
-      <AlignSelect.Content align="end">
+      <AlignSelect.Content align="end" viewportClassName={isLecturer ? "max-h-60" : undefined}>
         {(isLecturer ? lecturerOptions : reviewOptions).map(([value, label]) => (
           <AlignSelect.Item key={value} value={value}>
             {text(label)}

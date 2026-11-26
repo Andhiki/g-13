@@ -1,4 +1,12 @@
-export type LecturerOrder = "name" | "review-count" | "rating";
+export const lecturerOrders = [
+  "name",
+  "name-desc",
+  "reviews",
+  "reviews-asc",
+  "rating",
+  "rating-asc",
+] as const;
+export type LecturerOrder = (typeof lecturerOrders)[number];
 export type ReviewOrder = "newest" | "oldest" | "highest" | "lowest";
 type Review = { id: string; courseId: string; overall: number; createdAt: Date };
 
@@ -22,14 +30,28 @@ export function orderLecturers<
   T extends { id: string; name: string; reviewCount: number; overallAverage: number | null },
 >(lecturers: T[], lecturerOrder: LecturerOrder): T[] {
   return [...lecturers].sort((a, b) => {
-    const byName =
-      a.name.localeCompare(b.name, "id", { sensitivity: "base" }) || a.id.localeCompare(b.id);
-    if (lecturerOrder === "review-count") return b.reviewCount - a.reviewCount || byName;
-    if (lecturerOrder === "rating") {
-      if (a.overallAverage === null || b.overallAverage === null)
-        return Number(b.overallAverage !== null) - Number(a.overallAverage !== null) || byName;
-      return b.overallAverage - a.overallAverage || byName;
+    const byName = a.name.localeCompare(b.name, "id", { sensitivity: "base" });
+    const byId = a.id.localeCompare(b.id);
+    const tieBreak = byName || byId;
+    switch (lecturerOrder) {
+      case "name-desc":
+        return -byName || byId;
+      case "reviews":
+        return b.reviewCount - a.reviewCount || tieBreak;
+      case "reviews-asc":
+        return a.reviewCount - b.reviewCount || tieBreak;
+      case "rating":
+      case "rating-asc":
+        if (a.overallAverage === null || b.overallAverage === null) {
+          return Number(b.overallAverage !== null) - Number(a.overallAverage !== null) || tieBreak;
+        }
+        return (
+          (lecturerOrder === "rating"
+            ? b.overallAverage - a.overallAverage
+            : a.overallAverage - b.overallAverage) || tieBreak
+        );
+      default:
+        return tieBreak;
     }
-    return byName;
   });
 }

@@ -68,7 +68,12 @@ const Trigger = forwardRef<HTMLButtonElement, ComponentProps<typeof SelectTrigge
 );
 Trigger.displayName = "SelectTrigger";
 
-function Content({ className, children, ...props }: ComponentProps<typeof SelectContentPrimitive>) {
+function Content({
+  className,
+  children,
+  viewportClassName,
+  ...props
+}: ComponentProps<typeof SelectContentPrimitive> & { viewportClassName?: string }) {
   return (
     <SelectContentPrimitive
       className={cn(
@@ -79,7 +84,9 @@ function Content({ className, children, ...props }: ComponentProps<typeof Select
       collisionPadding={8}
       {...props}
     >
-      <div className="max-h-[196px] w-full scroll-py-2 overflow-y-auto p-2">
+      <div
+        className={cn("max-h-[196px] w-full scroll-py-2 overflow-y-auto p-2", viewportClassName)}
+      >
         {children as ReactNode}
       </div>
     </SelectContentPrimitive>
