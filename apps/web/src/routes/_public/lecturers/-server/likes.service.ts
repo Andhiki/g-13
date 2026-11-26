@@ -17,7 +17,7 @@ export async function setReviewLike(
   if (!(await getVisibleReviewId(db, input.reviewId)))
     return { data: null, error: REVIEW_ERRORS.INVALID };
   const now = context.now ?? Date.now();
-  if (!(await allowReviewAction(db, { ...context, ip, now }, "like"))) {
+  if (!(await allowReviewAction(db, { ...context, ip, browserId: input.browserId, now }, "like"))) {
     return { data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: reviewRateLimitResetAt(now) };
   }
   const { reviewId, browserId } = input;
