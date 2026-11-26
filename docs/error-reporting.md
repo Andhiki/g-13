@@ -36,8 +36,9 @@ kimaki send --project '<g-13 checkout>' --channel '<private channel>' \
 The pre-run exits 0 when it prints a report. Exit 1 skips the Kimaki session.
 The first two consecutive query failures skip the session. The third sends a
 `monitoring_degraded` report. A successful query resets the failure count.
-If a query reaches its result limit, it counts as a failure and retains the
-cursor. Check the account directly if high log volume causes this condition.
+When a query reaches its result limit, the poller retries with smaller time
+windows. It retains the cursor if any subquery fails or a single millisecond
+still fills the result limit.
 
 ## State and maintenance
 
