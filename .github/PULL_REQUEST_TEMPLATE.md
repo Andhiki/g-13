@@ -1,6 +1,11 @@
 ## Perubahan dan alasan
 
-<!-- Tautkan issue bila ada. Jelaskan perilaku sebelum dan sesudah. -->
+<!--
+Jelaskan perilaku sebelum dan sesudah.
+Untuk setiap isu yang diselesaikan, tulis Closes #123 atau Resolves #123
+di baris tersendiri pada deskripsi PR, di luar komentar ini. Gunakan
+Refs #123 untuk isu terkait atau pekerjaan yang baru selesai sebagian.
+-->
 
 ## Verifikasi
 
