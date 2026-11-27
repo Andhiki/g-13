@@ -18,6 +18,12 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from "../-shared/schemas";
+import {
+  announcementActiveAtCondition,
+  announcementExpiredAtCondition,
+  announcementScheduledAtCondition,
+  enabledAnnouncementOverlapCondition,
+} from "@/routes/-announcements/schedule";
 
 import type { AnnouncementConflict } from "../-shared/errors";
 
@@ -38,11 +44,11 @@ function statusCondition(status: AnnouncementStatus, now: Date): SQL {
   const at = now.getTime();
   switch (status) {
     case "live":
-      return sql`${announcements.enabled} = true and ${announcements.startsAt} <= ${at} and (${announcements.endsAt} is null or ${announcements.endsAt} > ${at})`;
+      return sql`${announcements.enabled} = true and ${announcementActiveAtCondition(at)}`;
     case "scheduled":
-      return sql`${announcements.enabled} = true and ${announcements.startsAt} > ${at}`;
+      return sql`${announcements.enabled} = true and ${announcementScheduledAtCondition(at)}`;
     case "expired":
-      return sql`${announcements.enabled} = true and ${announcements.endsAt} is not null and ${announcements.endsAt} <= ${at}`;
+      return sql`${announcements.enabled} = true and ${announcementExpiredAtCondition(at)}`;
     case "disabled":
       return sql`${announcements.enabled} = false`;
   }
@@ -97,14 +103,6 @@ function announcementValues(input: CreateAnnouncementInput) {
   };
 }
 
-// Keep the end exclusive, matching the public visibility query.
-function overlaps(id: string, startsAt: number | SQL, endsAt: number | null | SQL) {
-  return sql`${announcements.id} <> ${id}
-    and ${announcements.enabled} = true
-    and (${endsAt} is null or ${announcements.startsAt} < ${endsAt})
-    and (${announcements.endsAt} is null or ${announcements.endsAt} > ${startsAt})`;
-}
-
 // Each write runs these operations in one D1 batch. Leave every conflict enabled
 // if any is unconfirmed, and write the target only once its window is clear.
 function conflictQueries(
@@ -155,7 +153,7 @@ export async function createAnnouncementRecord(
 
   const { disable, conflicts, clear } = conflictQueries(
     db,
-    overlaps(id, input.startsAt, input.endsAt),
+    enabledAnnouncementOverlapCondition(id, input.startsAt, input.endsAt),
     input.confirmedConflictIds,
   );
   const now = new Date();
@@ -189,7 +187,7 @@ export async function updateAnnouncementRecord(
 
   const { disable, conflicts, clear } = conflictQueries(
     db,
-    overlaps(id, input.startsAt, input.endsAt),
+    enabledAnnouncementOverlapCondition(id, input.startsAt, input.endsAt),
     input.confirmedConflictIds,
     exists(db.select({ id: announcements.id }).from(announcements).where(target)),
   );
@@ -219,7 +217,7 @@ export async function setAnnouncementEnabled(
   const endsAt = sql`(${db.select({ value: announcements.endsAt }).from(announcements).where(target)})`;
   const { disable, conflicts, clear } = conflictQueries(
     db,
-    overlaps(id, startsAt, endsAt),
+    enabledAnnouncementOverlapCondition(id, startsAt, endsAt),
     confirmedIds,
     exists(db.select({ id: announcements.id }).from(announcements).where(target)),
   );

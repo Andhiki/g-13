@@ -1,4 +1,5 @@
 import type { AnnouncementStatus } from "./schemas";
+import { isAnnouncementWindowActive } from "@/routes/-announcements/schedule";
 
 export type AnnouncementStatusFields = {
   enabled: boolean;
@@ -12,9 +13,10 @@ export function resolveAnnouncementStatus(
   now = Date.now(),
 ): AnnouncementStatus {
   if (!row.enabled) return "disabled";
-  if (row.startsAt.getTime() > now) return "scheduled";
-  if (row.endsAt !== null && row.endsAt.getTime() <= now) return "expired";
-  return "live";
+  const startsAt = row.startsAt.getTime();
+  const endsAt = row.endsAt?.getTime() ?? null;
+  if (isAnnouncementWindowActive(startsAt, endsAt, now)) return "live";
+  return startsAt > now ? "scheduled" : "expired";
 }
 
 export function announcementStatusLabel(status: AnnouncementStatus): string {
