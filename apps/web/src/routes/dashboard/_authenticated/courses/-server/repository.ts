@@ -1,3 +1,4 @@
+import { adminSearchCondition } from "../../-server/search";
 import { and, asc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -11,7 +12,16 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-export async function listAdminCourses(db: Database, offset: number, status: CourseStatus) {
+function searchCondition(query: string) {
+  return adminSearchCondition(query, [courses.code, courses.nameId, courses.nameEn, courses.id]);
+}
+
+export async function listAdminCourses(
+  db: Database,
+  offset: number,
+  status: CourseStatus,
+  query = "",
+) {
   return db
     .select({
       id: courses.id,
@@ -23,20 +33,26 @@ export async function listAdminCourses(db: Database, offset: number, status: Cou
     })
     .from(courses)
     .leftJoin(reviews, eq(reviews.courseId, courses.id))
-    .where(status === "active" ? isNull(courses.deletedAt) : isNotNull(courses.deletedAt))
+    .where(
+      and(
+        status === "active" ? isNull(courses.deletedAt) : isNotNull(courses.deletedAt),
+        searchCondition(query),
+      ),
+    )
     .groupBy(courses.id)
     .orderBy(asc(courses.code), asc(courses.id))
     .limit(51)
     .offset(offset);
 }
 
-export async function getAdminCourseCounts(db: Database) {
+export async function getAdminCourseCounts(db: Database, query = "") {
   const [counts] = await db
     .select({
       active: sql<number>`coalesce(sum(case when ${courses.deletedAt} is null then 1 else 0 end), 0)`,
       deleted: sql<number>`coalesce(sum(case when ${courses.deletedAt} is not null then 1 else 0 end), 0)`,
     })
-    .from(courses);
+    .from(courses)
+    .where(searchCondition(query));
   return counts;
 }
 

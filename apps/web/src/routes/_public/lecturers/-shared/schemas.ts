@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { defaultReviewOrder, reviewOrders } from "./review-order";
 import { submissionInputSchema } from "./submission-schema";
 
 const trimmedText = (max: number) => z.string().trim().max(max);
@@ -21,6 +22,20 @@ export const coursePickerInputSchema = z.object({
 export type CoursePickerInput = z.infer<typeof coursePickerInputSchema>;
 
 export const lecturerDetailInputSchema = z.object({ lecturerId: z.string().min(1) });
+const lecturerReviewCursorSchema = z.object({
+  id: z.string().min(1),
+  createdAt: z.number().int(),
+  rating: z.number().int().min(3).max(15),
+});
+export type LecturerReviewCursor = z.infer<typeof lecturerReviewCursorSchema>;
+
+export const lecturerReviewsInputSchema = lecturerDetailInputSchema.extend({
+  courseId: z.string().min(1).nullable().default(null),
+  order: z.enum(reviewOrders).default(defaultReviewOrder),
+  cursor: lecturerReviewCursorSchema.nullable().default(null),
+});
+export type LecturerReviewsInput = z.infer<typeof lecturerReviewsInputSchema>;
+
 export const pendingReviewIdSchema = browserIdSchema;
 export const pendingReviewBatchSize = 90;
 export const ownPendingReviewsInputSchema = lecturerDetailInputSchema.extend({
