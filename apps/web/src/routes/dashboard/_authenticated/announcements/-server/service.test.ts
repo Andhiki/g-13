@@ -389,3 +389,51 @@ it("allows only one of two concurrent overlapping enables to succeed without con
     await platform.dispose();
   }
 }, 30_000);
+
+it("rejects invalid schedule edits without changing the published announcement", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedUsers(db);
+    const admin = { id: "admin-1", role: "admin" };
+    const publicationCheckTime = Date.now();
+    const originalStartsAt = publicationCheckTime - day;
+    const originalEndsAt = publicationCheckTime + day;
+    const originalAnnouncementInput = createBulletin({
+      startsAt: originalStartsAt,
+      endsAt: originalEndsAt,
+    });
+    const { id: announcementId } = resultData(
+      await createAnnouncement(db, admin, originalAnnouncementInput),
+    );
+
+    for (const invalidEndsAt of [originalStartsAt - 1, originalStartsAt]) {
+      const scheduleUpdateResult = await updateAnnouncement(db, admin, {
+        ...originalAnnouncementInput,
+        announcementId,
+        titleId: "Perubahan yang ditolak",
+        endsAt: invalidEndsAt,
+      });
+      expect(scheduleUpdateResult).toEqual({
+        data: null,
+        error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE,
+      });
+    }
+
+    const activeAnnouncementIds = (await getActiveAnnouncements(db, publicationCheckTime)).map(
+      (announcement) => announcement.id,
+    );
+    expect(activeAnnouncementIds).toEqual([announcementId]);
+    const [publishedAnnouncement] = resultData(
+      await inspectAnnouncements(db, admin, 0, "live"),
+    ).rows;
+    expect(publishedAnnouncement).toMatchObject({
+      id: announcementId,
+      titleId: originalAnnouncementInput.titleId,
+      startsAt: new Date(originalStartsAt),
+      endsAt: new Date(originalEndsAt),
+    });
+  } finally {
+    await platform.dispose();
+  }
+});
