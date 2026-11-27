@@ -292,26 +292,24 @@ function ModerationSidebarSkeleton({ mobile = false }: { mobile?: boolean }) {
 export function ModerationSidebar({ identity }: { identity?: DashboardIdentity }) {
   const { sidebarOpen } = useAdminLayout();
   return (
-    <div
+    <aside
+      id="moderation-sidebar"
       inert={!sidebarOpen}
-      data-open={sidebarOpen}
-      className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
+      className="absolute inset-y-0 start-0 hidden w-(--sidebar-width) flex-col py-2.5 pl-1 pr-2.5 md:flex"
     >
-      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-1 pr-2.5">
-        {identity ? (
-          <>
-            <ModerationNavSections role={identity.role} />
-            <NavigationFooter
-              userName={identity.name}
-              userEmail={identity.email}
-              userImage={identity.image}
-            />
-          </>
-        ) : (
-          <ModerationSidebarSkeleton />
-        )}
-      </aside>
-    </div>
+      {identity ? (
+        <>
+          <ModerationNavSections role={identity.role} />
+          <NavigationFooter
+            userName={identity.name}
+            userEmail={identity.email}
+            userImage={identity.image}
+          />
+        </>
+      ) : (
+        <ModerationSidebarSkeleton />
+      )}
+    </aside>
   );
 }
 

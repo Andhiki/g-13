@@ -26,7 +26,7 @@ export const loadAdminResources = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectResources(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectResources(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
     );
     if (result.error !== null) rejectResourceAdminOperation(result.error);
     return {

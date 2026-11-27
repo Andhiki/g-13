@@ -6,10 +6,18 @@ import { lecturers } from "@g13/db/schema/lecturers";
 import {
   getLecturerDetail,
   getLecturerDirectory,
+  getLecturerReviewsPage,
 } from "@/routes/_public/lecturers/-server/read.service";
 import { createTestPlatformProxy } from "@/test/database";
 import { MODERATION_ERRORS, type ModerationOperationResult } from "../-shared/errors";
 import { inspectReview, inspectReviews, moderateLecturerReview } from "./service";
+
+const firstReviewPage = {
+  lecturerId: "lecturer",
+  order: "newest",
+  cursor: null,
+  courseId: null,
+} as const;
 
 function resultData<T>(result: ModerationOperationResult<T>): T {
   if (result.error !== null) throw new Error(result.error);
@@ -60,11 +68,14 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
       deleted: 0,
     });
 
+    expect(resultData(await inspectReviews(db, admin, 0, "published", "CS Data")).total).toBe(1);
+    expect(resultData(await inspectReviews(db, admin, 0, "pending", "Feedback")).total).toBe(0);
+
     // Hide removes review from public detail and directory aggregates.
     expect(
       await moderateLecturerReview(db, maintainer, { reviewId: "review", action: "hide" }),
     ).toEqual({ data: { reviewId: "review", action: "hide" }, error: null });
-    expect((await getLecturerDetail(db, "lecturer"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
     expect((await getLecturerDirectory(db)).lecturers[0]).toMatchObject({
       reviewCount: 0,
       overallAverage: null,
@@ -97,7 +108,7 @@ it("enforces moderation RBAC, status transitions, and public aggregate updates",
     expect(
       await moderateLecturerReview(db, admin, { reviewId: "review", action: "delete" }),
     ).toEqual({ data: { reviewId: "review", action: "delete" }, error: null });
-    expect((await getLecturerDetail(db, "lecturer"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
     expect(resultData(await inspectReviews(db, admin)).counts).toEqual({
       all: 1,
       pending: 0,
@@ -165,7 +176,7 @@ it("holds pending reviews out of public reads until an admin approves or hides t
         .rows.map(({ id }) => id)
         .sort(),
     ).toEqual(["to-approve", "to-hide"]);
-    expect((await getLecturerDetail(db, "lecturer"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
     expect((await getLecturerDirectory(db)).lecturers[0]).toMatchObject({
       reviewCount: 0,
       overallAverage: null,

@@ -63,6 +63,11 @@ it("enforces RBAC, CRUD, soft delete, restore, and public visibility for lecture
     expect(deletedList.rows.map((r) => r.id)).toEqual([first.id]);
     expect(deletedList.counts).toEqual({ active: 1, deleted: 1 });
 
+    const match = resultData(await inspectLecturers(db, admin, 0, "active", "ashari-2"));
+    expect(match.rows.map(({ id }) => id)).toEqual([duplicate.id]);
+    expect(match.total).toBe(1);
+    expect(resultData(await inspectLecturers(db, admin, 0, "deleted", "ashari-2")).total).toBe(0);
+
     // Editing or deleting an already-deleted lecturer is rejected.
     expect(await updateLecturer(db, admin, { lecturerId: first.id, name: "Edited" })).toEqual({
       data: null,

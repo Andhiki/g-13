@@ -1,7 +1,7 @@
 import type { createDatabase } from "@g13/db/client";
 import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { allowReviewAction } from "./rate-limit";
-import { addReviewLike, getVisibleReviewId, removeReviewLike } from "./repository";
+import { getVisibleReviewId, writeReviewLike } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewLikeInput } from "../-shared/schemas";
 
@@ -11,7 +11,7 @@ export async function setReviewLike(
   db: Database,
   input: ReviewLikeInput,
   context: { ip: string | null; secret: string; now?: number },
-): Promise<ReviewOperationResult<{ reviewId: string; liked: boolean }>> {
+): Promise<ReviewOperationResult<{ reviewId: string; liked: boolean; likeCount: number }>> {
   const ip = context.ip;
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   if (!(await getVisibleReviewId(db, input.reviewId)))
@@ -21,7 +21,6 @@ export async function setReviewLike(
     return { data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: reviewRateLimitResetAt(now) };
   }
   const { reviewId, browserId } = input;
-  if (input.liked) await addReviewLike(db, { reviewId, browserId });
-  else await removeReviewLike(db, { reviewId, browserId });
-  return { data: { reviewId, liked: input.liked }, error: null };
+  const likeCount = await writeReviewLike(db, { reviewId, browserId, liked: input.liked });
+  return { data: { reviewId, liked: input.liked, likeCount }, error: null };
 }

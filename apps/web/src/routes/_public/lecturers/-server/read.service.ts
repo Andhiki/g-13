@@ -1,5 +1,10 @@
+import type { LecturerReviewsInput } from "../-shared/schemas";
 import type { createDatabase } from "@g13/db/client";
-import { getLecturerDetailData, getLecturerDirectoryData } from "./repository";
+import {
+  getLecturerDetailData,
+  getLecturerDirectoryData,
+  getLecturerReviewRows,
+} from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
 type DirectoryData = Awaited<ReturnType<typeof getLecturerDirectoryData>>;
@@ -18,10 +23,6 @@ function equalWeightAverage(
 ): number | null {
   if (clarity === null || support === null || organization === null) return null;
   return (Number(clarity) + Number(support) + Number(organization)) / 3;
-}
-
-function mean(values: number[]): number | null {
-  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
 }
 
 export function composeLecturerDirectory(data: DirectoryData) {
@@ -58,30 +59,29 @@ export function composeLecturerDirectory(data: DirectoryData) {
   };
 }
 
-export function composeLecturerDetail(data: DetailData) {
-  const reviews = data.reviews.map((review) => ({
-    ...review,
-    overall: equalWeightAverage(review.clarity, review.support, review.organization),
-  }));
-  const coursesById = new Map(
-    reviews.map((review) => [
-      review.courseId,
-      { id: review.courseId, code: review.code, nameId: review.nameId, nameEn: review.nameEn },
-    ]),
-  );
-
+function composeLecturerDetail(data: DetailData) {
+  const { lecturer, courses } = data;
   return {
     lecturer: {
-      ...data.lecturer,
-      reviewCount: reviews.length,
-      overallAverage: mean(reviews.map((review) => review.overall)),
-      clarityAverage: mean(reviews.map((review) => review.clarity)),
-      supportAverage: mean(reviews.map((review) => review.support)),
-      organizationAverage: mean(reviews.map((review) => review.organization)),
-      courses: [...coursesById.values()],
+      ...lecturer,
+      overallAverage: equalWeightAverage(
+        lecturer.clarityAverage,
+        lecturer.supportAverage,
+        lecturer.organizationAverage,
+      ),
+      courses,
     },
-    courses: data.courses,
-    reviews,
+  };
+}
+
+export async function getLecturerReviewsPage(db: Database, input: LecturerReviewsInput) {
+  const page = await getLecturerReviewRows(db, input);
+  return {
+    ...page,
+    reviews: page.reviews.map((review) => ({
+      ...review,
+      overall: equalWeightAverage(review.clarity, review.support, review.organization),
+    })),
   };
 }
 

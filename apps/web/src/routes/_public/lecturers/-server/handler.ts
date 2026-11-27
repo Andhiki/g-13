@@ -9,11 +9,12 @@ import {
   browserLikesInputSchema,
   coursePickerInputSchema,
   lecturerDetailInputSchema,
+  lecturerReviewsInputSchema,
   ownPendingReviewsInputSchema,
   publishReviewInputSchema,
   reviewLikeInputSchema,
 } from "../-shared/schemas";
-import { getLecturerDetail, getLecturerDirectory } from "./read.service";
+import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import {
   rejectRateLimitedReview,
@@ -34,6 +35,12 @@ export const loadLecturerDetail = createServerFn({ method: "GET" })
   .validator(lecturerDetailInputSchema)
   .handler(async ({ data }) =>
     runServerOperation(() => getLecturerDetail(createDatabase(env.DB), data.lecturerId)),
+  );
+
+export const loadLecturerReviewsPage = createServerFn({ method: "GET" })
+  .validator(lecturerReviewsInputSchema)
+  .handler(async ({ data }) =>
+    runServerOperation(() => getLecturerReviewsPage(createDatabase(env.DB), data)),
   );
 
 export const loadCoursePickerPage = createServerFn({ method: "GET" })

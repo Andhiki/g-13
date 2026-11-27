@@ -18,7 +18,7 @@ export const loadAdminCourses = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectCourses(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectCourses(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
     );
     if (result.error !== null) rejectCourseAdminOperation(result.error);
     return {

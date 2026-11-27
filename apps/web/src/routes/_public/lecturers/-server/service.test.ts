@@ -13,11 +13,14 @@ import { searchLecturers } from "../-shared/lecturer-search";
 import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
 import { allowReviewAction } from "./rate-limit";
 import { setReviewLike } from "./likes.service";
-import { getLecturerDetail, getLecturerDirectory } from "./read.service";
+import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
-import type { CoursePickerCursor } from "../-shared/schemas";
+import { lecturerReviewsInputSchema, type CoursePickerCursor } from "../-shared/schemas";
+import { reviewOrders } from "../-shared/review-order";
 import { classifyReviewText } from "./review-moderation";
 import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+
+const firstReviewPage = lecturerReviewsInputSchema.parse({ lecturerId: "p" });
 
 const clearScreening = {
   openAiApiKey: "test-key",
@@ -77,14 +80,14 @@ it("returns only requested, live pending reviews for the matching lecturer", asy
     expect(await getOwnPendingReviews(db, "p", [reviewId, unknownId])).toEqual([
       expect.objectContaining({ id: reviewId, body: input.body, code: "CS101" }),
     ]);
-    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
 
     for (const status of ["published", "hidden"] as const) {
       await db.update(reviews).set({ status }).where(eq(reviews.id, reviewId));
       expect(await getOwnPendingReviews(db, "p", [reviewId])).toEqual([]);
-      expect((await getLecturerDetail(db, "p"))?.reviews.map(({ id }) => id)).toEqual(
-        status === "published" ? [reviewId] : [],
-      );
+      expect(
+        (await getLecturerReviewsPage(db, firstReviewPage)).reviews.map(({ id }) => id),
+      ).toEqual(status === "published" ? [reviewId] : []);
     }
     await db
       .update(reviews)
@@ -183,7 +186,9 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     );
     expect(storedPending?.status).toBe("pending");
     expect(
-      (await getLecturerDetail(db, "p"))?.reviews.some((row) => row.body === "Pending feedback"),
+      (await getLecturerReviewsPage(db, firstReviewPage)).reviews.some(
+        (row) => row.body === "Pending feedback",
+      ),
     ).toBe(false);
     const notifications = await db.select().from(notificationEvents);
     expect(notifications.map((event) => event.resourceId)).toEqual([pendingReviewId]);
@@ -260,13 +265,14 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
 
     const detail = await getLecturerDetail(db, "p");
-    expect(detail?.courses.map((row) => row.id)).toEqual(["c"]);
-    expect(detail?.reviews.map((row) => row.authorName).sort()).toEqual([
+    expect(detail?.lecturer.courses.map((row) => row.id).sort()).toEqual(["c", "deleted-course"]);
+    const page = await getLecturerReviewsPage(db, firstReviewPage);
+    expect(page.reviews.map((row) => row.authorName).sort()).toEqual([
       "Anonymous",
       "Student",
       "Student",
     ]);
-    expect(detail?.reviews.some((row) => row.courseId === "deleted-course")).toBe(true);
+    expect(page.reviews.some((row) => row.courseId === "deleted-course")).toBe(true);
     expect(await getLecturerDetail(db, "deleted-lecturer")).toBeNull();
     expect(await getLecturerDetail(db, "missing")).toBeNull();
 
@@ -330,7 +336,7 @@ it("holds Indonesian and English profanity after Omni clears it", async () => {
       displayName: "Student",
     });
     expect(screened).toHaveBeenCalledWith({ body: rawInput.body.trim(), displayName: "Asshole!" });
-    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
 
     const body = "Kelas membahas anjing dan sex determination. The class moved too fast.";
     const result = await submitReview(db, submissionInputSchema.parse({ ...rawInput, body }), {
@@ -377,7 +383,7 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     const flagged = await submitReview(db, input, context("192.0.2.32"));
     expect(flagged.data?.status).toBe("pending");
     expect(
-      (await getLecturerDetail(db, "p"))?.reviews.some(
+      (await getLecturerReviewsPage(db, firstReviewPage)).reviews.some(
         (review) => review.id === flagged.data?.reviewId,
       ),
     ).toBe(false);
@@ -446,7 +452,7 @@ https://t.me/example`;
       { status: "pending" },
       { status: "pending" },
     ]);
-    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
     const directory = await getLecturerDirectory(db);
     expect(directory.lecturers[0]).toMatchObject({ reviewCount: 0, overallAverage: null });
     expect(searchLecturers(directory.lecturers, directory.courses, "CS101")).toEqual([]);
@@ -461,8 +467,10 @@ https://t.me/example`;
     expect(approval.error).toBeNull();
     expect(await getLecturerDetail(db, "p")).toMatchObject({
       lecturer: { reviewCount: 1, overallAverage: 5 },
-      reviews: [{ id: courseReviewId, body: courseFeedback }],
     });
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toMatchObject([
+      { id: courseReviewId, body: courseFeedback },
+    ]);
     const updatedDirectory = await getLecturerDirectory(db);
     expect(searchLecturers(updatedDirectory.lecturers, updatedDirectory.courses, "CS101")).toEqual([
       expect.objectContaining({ id: "p", reviewCount: 1, overallAverage: 5 }),
@@ -722,15 +730,15 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     });
 
     expect(await setReviewLike(db, input, context)).toEqual({
-      data: { reviewId: "r", liked: true },
+      data: { reviewId: "r", liked: true, likeCount: 1 },
       error: null,
     });
     expect(await setReviewLike(db, input, context)).toEqual({
-      data: { reviewId: "r", liked: true },
+      data: { reviewId: "r", liked: true, likeCount: 1 },
       error: null,
     });
     expect(await getBrowserReviewLikes(db, browserId)).toEqual(["r"]);
-    expect((await getLecturerDetail(db, "p"))?.reviews[0]?.likeCount).toBe(1);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews[0]?.likeCount).toBe(1);
 
     await db.$client.prepare("UPDATE reviews SET status = 'hidden' WHERE id = 'r'").run();
     expect(await getBrowserReviewLikes(db, browserId)).toEqual([]);
@@ -743,11 +751,11 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     await db.$client.prepare("UPDATE lecturers SET deleted_at = NULL WHERE id = 'p'").run();
 
     expect(await setReviewLike(db, { ...input, liked: false }, context)).toEqual({
-      data: { reviewId: "r", liked: false },
+      data: { reviewId: "r", liked: false, likeCount: 0 },
       error: null,
     });
     expect(await getBrowserReviewLikes(db, browserId)).toEqual([]);
-    expect((await getLecturerDetail(db, "p"))?.reviews[0]?.likeCount).toBe(0);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews[0]?.likeCount).toBe(0);
 
     for (let i = 0; i < 57; i++) {
       expect((await setReviewLike(db, input, context)).error).toBeNull();
@@ -791,3 +799,79 @@ it.each([
     }
   },
 );
+
+it("paginates only published lecturer reviews in every sort order and course filter", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db.insert(courses).values([
+      { id: "c", code: "CS101", nameId: "Dasar", nameEn: "Basics" },
+      { id: "other", code: "CS102", nameId: "Lanjut", nameEn: "Advanced" },
+    ]);
+    const published = Array.from({ length: 44 }, (_, index) => ({
+      id: `review-${String(index).padStart(2, "0")}`,
+      lecturerId: "p",
+      courseId: index < 41 ? "c" : "other",
+      termLabel: "Term",
+      authorName: "Student",
+      clarity: 2 + (index % 3),
+      support: 4,
+      organization: 5,
+      body: "Example review body",
+      createdAt: new Date(1000 * (index % 2)),
+    }));
+    const [first, ...remaining] = published;
+    await db.batch([
+      db.insert(reviews).values(first!),
+      ...remaining.map((review) => db.insert(reviews).values(review)),
+      db.insert(reviews).values({ ...first!, id: "pending", status: "pending" }),
+      db.insert(reviews).values({ ...first!, id: "deleted", deletedAt: new Date() }),
+    ]);
+
+    const summary = await getLecturerDetail(db, "p");
+    expect(summary?.lecturer.reviewCount).toBe(published.length);
+    expect(summary?.lecturer.overallAverage).toBeCloseTo(
+      published.reduce((sum, row) => sum + row.clarity + row.support + row.organization, 0) /
+        (3 * published.length),
+    );
+    expect(summary?.lecturer.courses.map(({ id }) => id)).toEqual(["c", "other"]);
+
+    for (const order of reviewOrders) {
+      for (const courseId of [null, "c"]) {
+        const expected = published
+          .filter((review) => courseId === null || review.courseId === courseId)
+          .sort((left, right) => {
+            const rating = left.clarity - right.clarity;
+            const youngest = right.createdAt.getTime() - left.createdAt.getTime();
+            const difference = order === "highest" ? -rating : order === "lowest" ? rating : 0;
+            return (
+              difference ||
+              (order === "oldest" ? -youngest : youngest) ||
+              left.id.localeCompare(right.id)
+            );
+          })
+          .map(({ id }) => id);
+        const input = { ...firstReviewPage, order, courseId };
+        const first = await getLecturerReviewsPage(db, input);
+        expect(first.reviews).toHaveLength(20);
+        expect(first.nextCursor).not.toBeNull();
+        const second = await getLecturerReviewsPage(db, { ...input, cursor: first.nextCursor });
+        expect(second.reviews).toHaveLength(20);
+        expect(second.nextCursor).not.toBeNull();
+        const last = await getLecturerReviewsPage(db, { ...input, cursor: second.nextCursor });
+        expect(last.nextCursor).toBeNull();
+        expect([...first.reviews, ...second.reviews, ...last.reviews].map(({ id }) => id)).toEqual(
+          expected,
+        );
+      }
+    }
+    await db.update(lecturers).set({ deletedAt: new Date() });
+    expect(await getLecturerReviewsPage(db, firstReviewPage)).toEqual({
+      reviews: [],
+      nextCursor: null,
+    });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);

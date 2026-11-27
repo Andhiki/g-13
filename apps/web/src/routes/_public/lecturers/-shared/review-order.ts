@@ -7,24 +7,9 @@ export const lecturerOrders = [
   "rating-asc",
 ] as const;
 export type LecturerOrder = (typeof lecturerOrders)[number];
-export type ReviewOrder = "newest" | "oldest" | "highest" | "lowest";
-type Review = { id: string; courseId: string; overall: number; createdAt: Date };
-
-export function filterReviewsByCourse<T extends { courseId: string }>(
-  reviews: T[],
-  courseId: string | null,
-): T[] {
-  return courseId === null ? reviews : reviews.filter((review) => review.courseId === courseId);
-}
-
-export function orderReviews<T extends Review>(reviews: T[], order: ReviewOrder): T[] {
-  return [...reviews].sort((a, b) => {
-    const newest = b.createdAt.getTime() - a.createdAt.getTime();
-    if (order === "highest") return b.overall - a.overall || newest || a.id.localeCompare(b.id);
-    if (order === "lowest") return a.overall - b.overall || newest || a.id.localeCompare(b.id);
-    return (order === "oldest" ? -newest : newest) || a.id.localeCompare(b.id);
-  });
-}
+export const reviewOrders = ["newest", "oldest", "highest", "lowest"] as const;
+export type ReviewOrder = (typeof reviewOrders)[number];
+export const defaultReviewOrder = "newest" satisfies ReviewOrder;
 
 export function orderLecturers<
   T extends { id: string; name: string; reviewCount: number; overallAverage: number | null },

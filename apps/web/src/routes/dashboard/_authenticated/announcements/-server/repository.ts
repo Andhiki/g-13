@@ -1,3 +1,4 @@
+import { adminSearchCondition } from "../../-server/search";
 import {
   and,
   desc,
@@ -24,6 +25,14 @@ type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConflict[] };
 
 type Database = ReturnType<typeof createDatabase>;
 
+function searchCondition(query: string) {
+  return adminSearchCondition(query, [
+    announcements.id,
+    announcements.titleId,
+    announcements.titleEn,
+  ]);
+}
+
 /** Single definition of each schedule state, shared by the list filter and the counts aggregate. */
 function statusCondition(status: AnnouncementStatus, now: Date): SQL {
   const at = now.getTime();
@@ -44,17 +53,18 @@ export async function listAdminAnnouncements(
   offset: number,
   status: AnnouncementStatus,
   now: Date,
+  query = "",
 ) {
   return db
     .select()
     .from(announcements)
-    .where(statusCondition(status, now))
+    .where(and(statusCondition(status, now), searchCondition(query)))
     .orderBy(desc(announcements.startsAt), desc(announcements.id))
     .limit(51)
     .offset(offset);
 }
 
-export async function getAnnouncementCounts(db: Database, now: Date) {
+export async function getAnnouncementCounts(db: Database, now: Date, query = "") {
   const count = (status: AnnouncementStatus) =>
     sql<number>`coalesce(sum(case when ${statusCondition(status, now)} then 1 else 0 end), 0)`;
   const [counts] = await db
@@ -64,7 +74,8 @@ export async function getAnnouncementCounts(db: Database, now: Date) {
       expired: count("expired"),
       disabled: count("disabled"),
     })
-    .from(announcements);
+    .from(announcements)
+    .where(searchCondition(query));
   return counts;
 }
 

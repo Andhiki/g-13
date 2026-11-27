@@ -1,9 +1,9 @@
 import { bindings, defineConfig } from "cf/config";
 import {
-	isolatedOrigin,
-	isolatedResourceName,
+	localOrigin,
+	localE2eResourceName,
 	localE2eDatabaseId,
-} from "../../e2e/targets.ts";
+} from "../../e2e/local-worker.ts";
 
 /**
  * Secret-like files were detected but not read or migrated: .dev.vars.example. Only `secrets.required` entries are migrated.
@@ -24,9 +24,10 @@ const D1 = {
 export default defineConfig(({ mode }) => {
 	const isStaging = mode === "staging";
 	const isE2E = mode === "local-e2e";
-	const workerName = isE2E ? isolatedResourceName : isStaging ? "g-13-staging" : "g-13";
+	const e2eOrigin = isE2E ? localOrigin(process.env.E2E_BASE_URL) : undefined;
+	const workerName = isE2E ? localE2eResourceName : isStaging ? "g-13-staging" : "g-13";
 	const database = isE2E
-		? { name: isolatedResourceName, id: localE2eDatabaseId }
+		? { name: localE2eResourceName, id: localE2eDatabaseId }
 		: isStaging
 			? D1.staging
 			: D1.production;
@@ -85,11 +86,11 @@ export default defineConfig(({ mode }) => {
 				BETTER_AUTH_SECRET: isE2E
 					? bindings.text(requiredE2eSecret("E2E_AUTH_SECRET"))
 					: bindings.secret(),
-				BETTER_AUTH_URL: isE2E ? bindings.text(isolatedOrigin) : bindings.secret(),
+				BETTER_AUTH_URL: e2eOrigin ? bindings.text(e2eOrigin) : bindings.secret(),
 				ADMIN_EMAILS: isE2E ? bindings.text("") : bindings.secret(),
 				BETTER_AUTH_ALLOWED_HOSTS: bindings.text(
-					isE2E
-						? new URL(isolatedOrigin).hostname
+					e2eOrigin
+						? new URL(e2eOrigin).hostname
 						: isStaging
 							? "stg.csugm.andhiki.tech,g-13-staging.andhikiandre.workers.dev"
 							: "csugm.omahti.com,csugm.andhiki.tech",

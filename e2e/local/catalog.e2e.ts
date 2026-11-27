@@ -1,8 +1,8 @@
 import { expect } from "e2e";
 import { randomUUID } from "node:crypto";
-import { fixture } from "../database.ts";
-import { test } from "../isolated-test.ts";
-import { profile } from "./review-form.ts";
+import { fixture } from "../fixtures/database.ts";
+import { test } from "../fixtures/local-test.ts";
+import { profile } from "../fixtures/review-form.ts";
 
 for (const catalog of [
   {

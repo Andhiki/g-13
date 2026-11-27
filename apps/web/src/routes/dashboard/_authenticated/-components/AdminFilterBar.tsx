@@ -1,3 +1,4 @@
+import { adminSearchMaxLength } from "../-shared/admin-search";
 import { FormInput } from "@/ui/form-control";
 import type { ReactNode } from "react";
 import { RiCloseLine, RiSearchLine } from "@remixicon/react";
@@ -74,6 +75,7 @@ export function AdminSearchInput({
       <FormInput
         variant="bare"
         type="search"
+        maxLength={adminSearchMaxLength}
         value={value}
         onValueChange={onChange}
         placeholder={placeholder}

@@ -1,8 +1,7 @@
 import { expect } from "e2e";
 import { test as browserTest } from "@e2e-dev/web";
-import { test } from "../isolated-test.ts";
+import { test } from "../fixtures/local-test.ts";
 import { protectedRoutes } from "../routes.ts";
-import { isolatedOrigin } from "../targets.ts";
 
 const queueURL = /\/dashboard\/lecturer-reviews\/?(?:[?#]|$)/;
 const loginURL = /\/dashboard\/login\/?(?:[?#]|$)/;
@@ -29,7 +28,9 @@ browserTest(
     await expect(browser).toHaveURL(/^https:\/\/github\.com\/login\/oauth\/authorize\?/);
     const url = new URL(await browser.url());
     expect(url.searchParams.get("client_id")).toBe("isolated-e2e-client");
-    expect(url.searchParams.get("redirect_uri")).toBe(`${isolatedOrigin}/api/auth/callback/github`);
+    expect(url.searchParams.get("redirect_uri")).toBe(
+      new URL("/api/auth/callback/github", app.baseUrl).href,
+    );
     expect(url.searchParams.get("state")).toBeTruthy();
   },
 );
