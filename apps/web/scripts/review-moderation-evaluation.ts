@@ -39,7 +39,7 @@ export type EvaluationRecord = {
   errorCode?: string;
 };
 
-type GroqFetcher = (input: string, init?: RequestInit) => Promise<Response>;
+export type GroqFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type GroqResponse = { choices?: { message?: { content?: unknown } }[] };
 
 const decisions = ["clear", "flag", "uncertain"] as const;
@@ -100,7 +100,8 @@ export async function classifyWithGroq(
   apiKey: string,
   fetcher: GroqFetcher = fetch,
 ): Promise<ModelClassification> {
-  if (!apiKey.trim()) {
+  const trimmedKey = apiKey.trim();
+  if (!trimmedKey) {
     return {
       status: "request_error",
       review: null,
@@ -114,13 +115,13 @@ export async function classifyWithGroq(
     response = await fetcher(GROQ_ENDPOINT, {
       method: "POST",
       headers: {
-        authorization: `Bearer ${apiKey}`,
+        authorization: `Bearer ${trimmedKey}`,
         "content-type": "application/json",
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
         temperature: 0,
-        max_completion_tokens: 100,
+        max_completion_tokens: 512,
         messages: [
           { role: "system", content: MODERATION_SYSTEM_PROMPT },
           {
@@ -138,8 +139,16 @@ export async function classifyWithGroq(
       }),
       signal: AbortSignal.timeout(10_000),
     });
-  } catch {
-    return { status: "request_error", review: null, chosenName: null, errorCode: "fetch_failed" };
+  } catch (error) {
+    const isTimeout =
+      error instanceof DOMException &&
+      (error.name === "TimeoutError" || error.name === "AbortError");
+    return {
+      status: "request_error",
+      review: null,
+      chosenName: null,
+      errorCode: isTimeout ? "timeout" : "fetch_failed",
+    };
   }
 
   if (!response.ok) {
@@ -164,7 +173,7 @@ export async function classifyWithGroq(
   }
 
   const message = isRecord(envelope) ? (envelope as GroqResponse).choices?.[0]?.message : null;
-  if (!message || !("content" in message)) {
+  if (!isRecord(message) || !("content" in message)) {
     return {
       status: "request_error",
       review: null,

@@ -118,4 +118,24 @@ export const syntheticModerationCases: SyntheticModerationCase[] = [
     },
     chosenName: { text: "Student Reviewer", expected: "clear" },
   },
+  {
+    id: "id-wordless-attack-name",
+    language: "id",
+    focus: ["wordless-personal-attack"],
+    review: {
+      text: "Penjelasan materi cukup jelas dan terstruktur.",
+      expected: "clear",
+    },
+    chosenName: { text: "DosenPenipu", expected: "flag" },
+  },
+  {
+    id: "id-typo-name",
+    language: "id",
+    focus: ["typo"],
+    review: {
+      text: "Jadwal kuliah sering berubah tanpa pemberitahuan.",
+      expected: "clear",
+    },
+    chosenName: { text: "Si Goblokk", expected: "flag" },
+  },
 ];

@@ -3,40 +3,51 @@ import {
   evaluateSyntheticCases,
   GROQ_MODEL,
   summarizeEvaluation,
+  type GroqFetcher,
 } from "./review-moderation-evaluation";
 
-async function main() {
-  const args: string[] = process.argv.slice(2);
+export type CliOptions = {
+  apiKey?: string;
+  fetcher?: GroqFetcher;
+  stdout?: (text: string) => void;
+  stderr?: (text: string) => void;
+};
+
+export async function runEvaluationCli(args: string[], options: CliOptions = {}): Promise<number> {
+  const stdout = options.stdout ?? console.log;
+  const stderr = options.stderr ?? console.error;
+
   if (args.includes("--help")) {
-    console.log(
+    stdout(
       "Usage: bun run evaluate:moderation [--live]\n\nDefault: run local exact, typo, and abbreviation checks only.\n--live: also send the synthetic review and optional chosen name to Groq using GROQ_API_KEY.",
     );
-    return;
+    return 0;
   }
 
   const unexpectedArgs = args.filter((argument) => argument !== "--live");
   if (unexpectedArgs.length > 0) {
-    console.error(`Unknown argument: ${unexpectedArgs[0]}. Use --help for usage.`);
-    process.exitCode = 2;
-    return;
+    stderr(`Unknown argument: ${unexpectedArgs[0]}. Use --help for usage.`);
+    return 2;
   }
 
   const live = args.includes("--live");
-  const apiKey = process.env.GROQ_API_KEY?.trim();
+  const apiKey = live ? options.apiKey?.trim() : undefined;
   if (live && !apiKey) {
-    console.error("Groq evaluation requested, but GROQ_API_KEY is unset. No request was sent.");
-    process.exitCode = 2;
-    return;
+    stderr("Groq evaluation requested, but GROQ_API_KEY is unset. No request was sent.");
+    return 2;
   }
 
-  const records = await evaluateSyntheticCases(syntheticModerationCases, { apiKey });
+  const records = await evaluateSyntheticCases(syntheticModerationCases, {
+    apiKey,
+    fetcher: options.fetcher,
+  });
   const report = {
     model: GROQ_MODEL,
     mode: live ? "synthetic_with_groq" : "synthetic_local_only",
     cases: records,
     summary: summarizeEvaluation(records),
   };
-  console.log(JSON.stringify(report, null, 2));
+  stdout(JSON.stringify(report, null, 2));
 
   if (
     records.some(
@@ -44,8 +55,15 @@ async function main() {
         record.modelStatus === "request_error" || record.modelStatus === "validation_error",
     )
   ) {
-    process.exitCode = 1;
+    return 1;
   }
+
+  return 0;
 }
 
-if (import.meta.main) await main();
+if (import.meta.main) {
+  const exitCode = await runEvaluationCli(process.argv.slice(2), {
+    apiKey: process.env.GROQ_API_KEY,
+  });
+  if (exitCode !== 0) process.exitCode = exitCode;
+}

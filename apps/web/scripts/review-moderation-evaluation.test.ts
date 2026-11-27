@@ -1,4 +1,5 @@
 import { expect, it } from "bun:test";
+import { runEvaluationCli } from "./evaluate-review-moderation";
 import { syntheticModerationCases } from "./review-moderation-evaluation-fixtures";
 import {
   classifyWithGroq,
@@ -201,4 +202,134 @@ it("reports field-level uncertainty separately from request and validation failu
     requestErrors: 1,
     validationErrors: 1,
   });
+});
+
+it("handles non-record provider messages and timeouts cleanly", async () => {
+  const nonRecordMessage = await classifyWithGroq(
+    { body: "A synthetic review" },
+    "fake-test-key",
+    async () =>
+      new Response(JSON.stringify({ choices: [{ message: "unexpected" }] }), { status: 200 }),
+  );
+  expect(nonRecordMessage).toEqual({
+    status: "request_error",
+    review: null,
+    chosenName: null,
+    errorCode: "missing_provider_content",
+  });
+
+  const timedOut = await classifyWithGroq(
+    { body: "A synthetic review" },
+    "fake-test-key",
+    async () => {
+      throw new DOMException("The operation timed out.", "TimeoutError");
+    },
+  );
+  expect(timedOut).toEqual({
+    status: "request_error",
+    review: null,
+    chosenName: null,
+    errorCode: "timeout",
+  });
+});
+
+it("computes accuracy, precision, and recall across evaluated records", () => {
+  const records = [
+    makeEvaluationRecord(syntheticModerationCases[0]!, {
+      status: "ok",
+      review: "flag",
+      chosenName: "clear",
+    }),
+    makeEvaluationRecord(syntheticModerationCases[1]!, {
+      status: "ok",
+      review: "clear",
+      chosenName: "flag",
+    }),
+    makeEvaluationRecord(syntheticModerationCases[5]!, {
+      status: "ok",
+      review: "clear",
+      chosenName: "clear",
+    }),
+  ];
+  const summary = summarizeEvaluation(records);
+  expect(summary.review.model).toMatchObject({
+    evaluated: 3,
+    truePositive: 1,
+    falsePositive: 0,
+    falseNegative: 1,
+    trueNegative: 1,
+    accuracy: 2 / 3,
+    precision: 1,
+    recall: 0.5,
+  });
+  expect(summary.chosenName.model).toMatchObject({
+    evaluated: 3,
+    truePositive: 0,
+    falsePositive: 1,
+    falseNegative: 0,
+    trueNegative: 2,
+    accuracy: 2 / 3,
+    precision: 0,
+    recall: null,
+  });
+});
+
+it("keeps CLI offline unless --live is passed even when GROQ_API_KEY is set", async () => {
+  let calls = 0;
+  let stdoutText = "";
+  let stderrText = "";
+
+  const offlineCode = await runEvaluationCli([], {
+    apiKey: "should-be-ignored-without-live",
+    fetcher: async () => {
+      calls += 1;
+      return groqResponse({ review: "clear", chosen_name: null });
+    },
+    stdout: (text) => {
+      stdoutText += text;
+    },
+    stderr: (text) => {
+      stderrText += text;
+    },
+  });
+
+  expect(offlineCode).toBe(0);
+  expect(calls).toBe(0);
+  expect(stderrText).toBe("");
+  const offlineReport = JSON.parse(stdoutText) as {
+    mode: string;
+    cases: { modelStatus: string }[];
+  };
+  expect(offlineReport.mode).toBe("synthetic_local_only");
+  expect(offlineReport.cases.every((c) => c.modelStatus === "not_run")).toBe(true);
+
+  let liveMissingKeyStderr = "";
+  const missingKeyCode = await runEvaluationCli(["--live"], {
+    apiKey: "   ",
+    stderr: (text) => {
+      liveMissingKeyStderr += text;
+    },
+  });
+  expect(missingKeyCode).toBe(2);
+  expect(liveMissingKeyStderr).toContain("GROQ_API_KEY is unset");
+
+  let liveStdout = "";
+  const liveCode = await runEvaluationCli(["--live"], {
+    apiKey: "fake-live-key",
+    fetcher: async (_url, init) => {
+      const payload = JSON.parse(JSON.parse(String(init?.body)).messages[1].content) as {
+        chosen_display_name: string | null;
+      };
+      return groqResponse({
+        review: "clear",
+        chosen_name: payload.chosen_display_name === null ? null : "clear",
+      });
+    },
+    stdout: (text) => {
+      liveStdout += text;
+    },
+  });
+  expect(liveCode).toBe(0);
+  const liveReport = JSON.parse(liveStdout) as { mode: string };
+  expect(liveReport.mode).toBe("synthetic_with_groq");
 });
