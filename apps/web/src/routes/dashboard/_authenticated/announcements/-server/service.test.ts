@@ -387,31 +387,42 @@ it("rejects invalid schedule edits without changing the published announcement",
     const db = createDatabase(platform.env.DB);
     await seedUsers(db);
     const admin = { id: "admin-1", role: "admin" };
-    const now = Date.now();
-    const startsAt = now - day;
-    const endsAt = now + day;
-    const original = createBulletin({ startsAt, endsAt });
-    const { id } = resultData(await createAnnouncement(db, admin, original));
+    const publicationCheckTime = Date.now();
+    const originalStartsAt = publicationCheckTime - day;
+    const originalEndsAt = publicationCheckTime + day;
+    const originalAnnouncementInput = createBulletin({
+      startsAt: originalStartsAt,
+      endsAt: originalEndsAt,
+    });
+    const { id: announcementId } = resultData(
+      await createAnnouncement(db, admin, originalAnnouncementInput),
+    );
 
-    for (const invalidExpiry of [startsAt - 1, startsAt]) {
-      const result = await updateAnnouncement(db, admin, {
-        ...original,
-        announcementId: id,
+    for (const invalidEndsAt of [originalStartsAt - 1, originalStartsAt]) {
+      const scheduleUpdateResult = await updateAnnouncement(db, admin, {
+        ...originalAnnouncementInput,
+        announcementId,
         titleId: "Perubahan yang ditolak",
-        endsAt: invalidExpiry,
+        endsAt: invalidEndsAt,
       });
-      expect(result).toEqual({ data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE });
+      expect(scheduleUpdateResult).toEqual({
+        data: null,
+        error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE,
+      });
     }
 
-    expect((await getActiveAnnouncements(db, now)).map((announcement) => announcement.id)).toEqual([
-      id,
-    ]);
-    const [published] = resultData(await inspectAnnouncements(db, admin, 0, "live")).rows;
-    expect(published).toMatchObject({
-      id,
-      titleId: original.titleId,
-      startsAt: new Date(startsAt),
-      endsAt: new Date(endsAt),
+    const activeAnnouncementIds = (await getActiveAnnouncements(db, publicationCheckTime)).map(
+      (announcement) => announcement.id,
+    );
+    expect(activeAnnouncementIds).toEqual([announcementId]);
+    const [publishedAnnouncement] = resultData(
+      await inspectAnnouncements(db, admin, 0, "live"),
+    ).rows;
+    expect(publishedAnnouncement).toMatchObject({
+      id: announcementId,
+      titleId: originalAnnouncementInput.titleId,
+      startsAt: new Date(originalStartsAt),
+      endsAt: new Date(originalEndsAt),
     });
   } finally {
     await platform.dispose();
