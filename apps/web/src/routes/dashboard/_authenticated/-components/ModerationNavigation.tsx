@@ -229,6 +229,37 @@ function ModerationNavSections({
   );
 }
 
+function ModerationSkeletonGroup({
+  group,
+  mobile,
+}: {
+  group: (typeof SKELETON_GROUPS)[number];
+  mobile: boolean;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="px-2.5 py-0.5">
+        <div
+          className={`h-3 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none ${group.headingWidth}`}
+        />
+      </div>
+      <div className="space-y-0.5">
+        {group.itemWidths.map((widthClass, index) => (
+          <div
+            key={`${group.key}-${index}`}
+            className={`flex w-full items-center gap-2 rounded-lg px-2.5 ${mobile ? "min-h-11" : "h-8"}`}
+          >
+            <div className="size-4 shrink-0 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none" />
+            <div
+              className={`h-3 animate-pulse rounded bg-bg-soft-200/70 motion-reduce:animate-none ${widthClass}`}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ModerationSidebarSkeleton({ mobile = false }: { mobile?: boolean }) {
   return (
     <div
@@ -240,26 +271,7 @@ function ModerationSidebarSkeleton({ mobile = false }: { mobile?: boolean }) {
       <span className="sr-only">Loading navigation</span>
       <div aria-hidden="true" className="space-y-4">
         {SKELETON_GROUPS.map((group) => (
-          <div key={group.key} className="space-y-1">
-            <div className="px-2.5 py-0.5">
-              <div
-                className={`h-3 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none ${group.headingWidth}`}
-              />
-            </div>
-            <div className="space-y-0.5">
-              {group.itemWidths.map((widthClass, index) => (
-                <div
-                  key={`${group.key}-${index}`}
-                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 ${mobile ? "min-h-11" : "h-8"}`}
-                >
-                  <div className="size-4 shrink-0 animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none" />
-                  <div
-                    className={`h-3 animate-pulse rounded bg-bg-soft-200/70 motion-reduce:animate-none ${widthClass}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ModerationSkeletonGroup key={group.key} group={group} mobile={mobile} />
         ))}
       </div>
       <div aria-hidden="true" className="mt-auto pt-4">
@@ -280,26 +292,24 @@ function ModerationSidebarSkeleton({ mobile = false }: { mobile?: boolean }) {
 export function ModerationSidebar({ identity }: { identity?: DashboardIdentity }) {
   const { sidebarOpen } = useAdminLayout();
   return (
-    <div
+    <aside
+      id="moderation-sidebar"
       inert={!sidebarOpen}
-      data-open={sidebarOpen}
-      className="hidden w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[220px] md:block motion-reduce:transition-none"
+      className="absolute inset-y-0 start-0 hidden w-(--sidebar-width) flex-col py-2.5 pl-1 pr-2.5 md:flex"
     >
-      <aside id="moderation-sidebar" className="flex h-full w-[220px] flex-col py-2.5 pl-1 pr-2.5">
-        {identity ? (
-          <>
-            <ModerationNavSections role={identity.role} />
-            <NavigationFooter
-              userName={identity.name}
-              userEmail={identity.email}
-              userImage={identity.image}
-            />
-          </>
-        ) : (
-          <ModerationSidebarSkeleton />
-        )}
-      </aside>
-    </div>
+      {identity ? (
+        <>
+          <ModerationNavSections role={identity.role} />
+          <NavigationFooter
+            userName={identity.name}
+            userEmail={identity.email}
+            userImage={identity.image}
+          />
+        </>
+      ) : (
+        <ModerationSidebarSkeleton />
+      )}
+    </aside>
   );
 }
 

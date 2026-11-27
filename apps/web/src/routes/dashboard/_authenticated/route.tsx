@@ -4,7 +4,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { hasDashboardSessionCookie } from "../-shared/session-cookie-presence";
 import { useDashboardIdentity, useSyncDashboardIdentity } from "./-client/identity";
 import { ModerationSidebar } from "./-components/ModerationNavigation";
-import { AdminLayoutProvider } from "./-components/AdminLayoutContext";
+import { AdminLayoutProvider, useAdminLayout } from "./-components/AdminLayoutContext";
 import { notificationPopoverQuery } from "./notifications/-client/queries";
 import { Typography } from "@/ui/typography";
 
@@ -19,7 +19,11 @@ export const Route = createFileRoute("/dashboard/_authenticated")({
       </Typography>
     </main>
   ),
-  component: AdminLayout,
+  component: () => (
+    <AdminLayoutProvider>
+      <AdminLayout />
+    </AdminLayoutProvider>
+  ),
 });
 
 function subscribeToWindowFocus(onChange: () => void) {
@@ -34,6 +38,7 @@ function subscribeToWindowFocus(onChange: () => void) {
 function AdminLayout() {
   useSyncDashboardIdentity();
   const identity = useDashboardIdentity();
+  const { sidebarOpen } = useAdminLayout();
   const focused = useSyncExternalStore(
     subscribeToWindowFocus,
     () => document.hasFocus(),
@@ -45,15 +50,17 @@ function AdminLayout() {
     refetchInterval: focused ? 60_000 : false,
   });
   return (
-    <AdminLayoutProvider>
-      <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
-        <div className="flex h-full min-h-0 flex-col md:flex-row">
-          <ModerationSidebar identity={identity} />
-          <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border">
-            <Outlet />
-          </section>
-        </div>
-      </main>
-    </AdminLayoutProvider>
+    <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
+      <div className="relative h-full min-h-0 [--sidebar-width:220px] md:overflow-clip">
+        <ModerationSidebar identity={identity} />
+        {/* Reveal the stationary sidebar while keeping the panel’s far edge anchored. */}
+        <section
+          data-sidebar-open={sidebarOpen}
+          className="relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border md:absolute md:inset-y-0 md:start-0 md:end-0 md:z-10 md:w-auto md:motion-safe:transition-[inset-inline-start] md:motion-safe:duration-200 md:motion-safe:ease-out md:data-[sidebar-open=true]:start-(--sidebar-width) motion-reduce:transition-none"
+        >
+          <Outlet />
+        </section>
+      </div>
+    </main>
   );
 }

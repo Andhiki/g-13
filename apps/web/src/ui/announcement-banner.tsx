@@ -1,7 +1,7 @@
 import type { AnnouncementVariant } from "@g13/db/schema/announcements";
 import type { Language } from "@g13/i18n";
 import { RiArrowRightUpLine, RiCloseLine } from "@remixicon/react";
-import { clsx } from "clsx";
+import { cn } from "cn";
 import { AlignButton } from "@/ui/button";
 import { AnnouncementCountdown } from "@/ui/announcement-countdown";
 
@@ -86,7 +86,7 @@ export function AnnouncementBannerRow({
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "flex min-h-11 items-center gap-3 py-1.5 pl-4 pr-2 md:pl-6 md:pr-3 text-static-white",
         announcementSurfaces[variant],
         className,

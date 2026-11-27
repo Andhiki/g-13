@@ -26,6 +26,7 @@ type Actor = { id: string; role?: string | null };
 export type AnnouncementListData = {
   rows: Awaited<ReturnType<typeof listAdminAnnouncements>>;
   counts: Awaited<ReturnType<typeof getAnnouncementCounts>>;
+  total: number;
 };
 
 export async function inspectAnnouncements(
@@ -33,15 +34,17 @@ export async function inspectAnnouncements(
   actor: Actor,
   offset = 0,
   status: "live" | "scheduled" | "expired" | "disabled" = "live",
+  query = "",
 ): Promise<AnnouncementAdminResult<AnnouncementListData>> {
   if (!canManageUsers(actor.role))
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
   const now = new Date();
-  const [rows, counts] = await Promise.all([
-    listAdminAnnouncements(db, offset, status, now),
+  const [rows, counts, matchingCounts] = await Promise.all([
+    listAdminAnnouncements(db, offset, status, now, query),
     getAnnouncementCounts(db, now),
+    query ? getAnnouncementCounts(db, now, query) : undefined,
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function createAnnouncement(

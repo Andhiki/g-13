@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -268,7 +269,7 @@ function LecturersContent({
         {!queryState.isPending && !queryState.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="lecturers"
             hasNext={hasNext}
@@ -317,9 +318,8 @@ function LecturersContent({
 function AdminLecturersPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<LecturerStatus>("active");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{ open: boolean; lecturer: AdminLecturer | null }>({
@@ -332,20 +332,21 @@ function AdminLecturersPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const lecturersQuery = useQuery(adminLecturersQuery(offset, status));
+  const lecturersQuery = useQuery(adminLecturersQuery(offset, status, needle));
   const counts = lecturersQuery.data?.counts ?? initialData.counts;
-  const lecturerRows = lecturersQuery.data?.rows ?? [];
-  const pageRows = lecturerRows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) => `${row.name} ${row.id}`.toLowerCase().includes(needle))
-    : pageRows;
+  const listState = {
+    isPending: searchPending || lecturersQuery.isPending,
+    isError: !searchPending && lecturersQuery.isError,
+  };
+  const lecturerRows = searchPending ? [] : (lecturersQuery.data?.rows ?? []);
+  const visibleRows = lecturerRows.slice(0, 50);
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = lecturersQuery.data?.total ?? 0;
   const selectedLecturer =
     visibleRows.find((lecturer) => lecturer.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedLecturer && !lecturersQuery.isPending && !lecturersQuery.isError;
+    detailsOpen && !!selectedLecturer && !listState.isPending && !listState.isError;
 
   async function invalidateLecturerQueries() {
     await Promise.all([
@@ -442,12 +443,12 @@ function AdminLecturersPage() {
         {searchAndDetails}
       </AdminFilterBar>
       <LecturersContent
-        queryState={lecturersQuery}
+        queryState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && lecturerRows.length > 50}
+        hasNext={lecturerRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}

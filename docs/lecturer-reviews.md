@@ -1,12 +1,11 @@
 # Lecturer reviews: submission security and configuration
 
 The lecturer directory (`/lecturers` and `/lecturers/$lecturerId`) accepts community
-reviews without an account. Each submission is protected on the server by two layers:
-an hourly per-browser rate limit with a per-IP backstop, and a
-[Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) check. Both run
-inside the `publishLecturerReview` server function in
-[`handler.ts`](../apps/web/src/routes/_public/lecturers/-server/handler.ts); the
-browser never calls Cloudflare's Siteverify endpoint itself.
+reviews without an account. Submissions use an hourly per-browser limit with a per-IP
+backstop, [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/), and
+server-side text moderation. These checks run through the `publishLecturerReview`
+server function in [`handler.ts`](../apps/web/src/routes/_public/lecturers/-server/handler.ts);
+the browser never calls Cloudflare Siteverify or OpenAI Moderations directly.
 
 ## Submission flow
 
@@ -17,11 +16,13 @@ Browser (dialog on /lecturers/$lecturerId)
   ▼
 publishLecturerReview (server function)
   │  verifyTurnstileToken(secret, token, remoteip)    ── fail → 400 "captcha"
+  │  validate lecturer/course references
   │  allowReviewAction(
   │    3 / browser / UTC hour,
   │    20 / IP / UTC hour backstop)                   ── fail → 429 "rate-limit"
+  │  contact-detail check, OpenAI moderation, then local profanity
   ▼
-submitReview → D1
+submitReview → D1 (pending if flagged, unscorable, or any rating ≤ 2)
 ```
 
 The submission limit follows the browser, not the network. The browser sends the
@@ -30,20 +31,47 @@ HMACs it with `REVIEW_RATE_LIMIT_SECRET` before storing the counter. Visitors wh
 share a campus network, office NAT, or a mobile carrier's CGNAT therefore keep
 their own quota. The per-IP ceiling bounds abuse from someone rotating browser
 identifiers. When browser storage is unavailable, the IP keeps the strict
-three-per-hour limit. Likes have a separate bucket and never consume submission
-limits. The browser identifier is a client-controlled hint, not an authenticated
-identity; Turnstile remains the primary gate for every submission.
+three-per-hour limit. Likes use separate buckets: 60 per browser per UTC hour with
+a 300-per-IP backstop; when the browser identifier is absent, the stricter
+60-per-IP quota applies. Likes never consume submission limits. The browser
+identifier is a client-controlled hint, not an authenticated identity; Turnstile
+remains the primary gate for every submission.
+
+The strict no-browser like quota is a defensive rate-limit fallback. The public
+like mutation still requires a browser identifier to persist and reload a
+visitor's reaction, so the page disables likes when browser storage is unavailable.
 
 Rate-limited submissions and likes return HTTP 429 with a `Retry-After` header
 containing the number of seconds until the quota resets at the next UTC hour,
-rounded up. The submission form displays the server's reset timestamp in the
-visitor's local time and falls back to the browser clock if no timestamp arrives.
+rounded up. The submission form and like error display the server's reset
+timestamp in the visitor's local time and fall back to the browser clock if no
+timestamp arrives.
 
-Reviews with any rating of 2 or lower are stored as `pending` and stay out of
-public listings, ratings, and search aggregates until a moderator approves them
-from the dashboard. Reviews with every rating at 3 or higher publish immediately.
-Only pending submissions notify admins and maintainers; immediate publications
-do not.
+The Worker checks the body and any chosen display name for URLs, bare domains,
+email addresses, and Indonesian phone numbers. Messaging links such as `t.me`
+and `wa.me` also match. A single contact detail places the review in Pending,
+including legitimate course links that a moderator can approve. The local check
+does not assess promotional intent or detect obfuscated links such as `example[.]com`.
+
+If the local check is clear, the Worker sends the body and any chosen display name
+to OpenAI's Moderations API with `omni-moderation-latest`. It omits the generated
+`Anonymous` placeholder. Only flags for `harassment`, `harassment/threatening`,
+`hate`, and `hate/threatening` place the review in Pending. Other category flags and the overall `flagged`
+value are ignored. Provider errors,
+timeouts, malformed responses, and missing API keys also send reviews to Pending.
+
+After OpenAI clears a review, the Worker checks the body and chosen display name
+for profanity. Whole-word matches go to Pending. The matcher uses the conservative
+dictionary from [indonesian-badwords](https://github.com/drizki/indonesian-badwords),
+which excludes common literal terms such as `anjing`. For English, it uses literal
+spellings from general entries rated moderate or higher in
+[@dsojevic/profanity-list](https://github.com/dsojevic/profanity-list).
+
+When screening is clear, a review publishes immediately if all three ratings are
+at least 3. A review with any rating of 2 or lower goes to Pending. Pending reviews
+stay out of public listings, ratings, and search aggregates until a moderator approves
+them. Only Pending submissions notify admins and maintainers.
+
 
 The confirmation dialog tells the submitter when a review enters moderation.
 The browser saves the random review ID in lecturer-specific local storage so
@@ -66,8 +94,9 @@ submitted, and the token is generated on demand. See
 | `REVIEW_RATE_LIMIT_SECRET` | yes      | 32+ random characters. Server-only; HMACs the per-IP rate-limit key.                                                 |
 | `TURNSTILE_SITE_KEY`       | no       | Public widget site key. Delivered to the browser through the `loadTurnstileSiteKey` server function, not the bundle. |
 | `TURNSTILE_SECRET_KEY`     | no       | Server-only Turnstile secret used by Siteverify. Never reaches the browser.                                          |
+| `OPENAI_API_KEY`           | yes for staging/production | Server-only Moderations API key. If missing or invalid, reviews are held in Pending. |
 
-`packages/env` validates all three in `parseSubmissionEnvironment`. `REVIEW_RATE_LIMIT_SECRET`
+`packages/env` validates these values in `parseSubmissionEnvironment`. `REVIEW_RATE_LIMIT_SECRET`
 must be present. The Turnstile keys are optional **but fail closed**: when
 `TURNSTILE_SECRET_KEY` is empty, `verifyTurnstileToken` returns `false` and every
 submission is rejected with `400 "captcha"`. There is no "skip when unset" mode — to
@@ -81,9 +110,12 @@ in the keys. Production: set each value as a Worker secret from `apps/web`:
 bunx cf workers secrets update REVIEW_RATE_LIMIT_SECRET
 bunx cf workers secrets update TURNSTILE_SITE_KEY
 bunx cf workers secrets update TURNSTILE_SECRET_KEY
+bunx cf workers secrets update OPENAI_API_KEY
 ```
 
 The bindings are declared in [`cloudflare.config.ts`](../apps/web/cloudflare.config.ts).
+Set `OPENAI_API_KEY` on staging and production before rollout. Local E2E mode injects
+a deterministic clear result and does not contact OpenAI.
 
 ## Fail-closed behavior
 
@@ -141,9 +173,16 @@ the rejection path. Production keys reject dummy tokens and vice versa.
 Invisible mode requires referencing Cloudflare's
 [Turnstile Privacy Addendum](https://www.cloudflare.com/trust-hub/privacy-and-compliance/)
 in the app's own privacy policy. The server passes the visitor's `CF-Connecting-IP` to
-Siteverify as `remoteip` and uses the same IP for the hourly per-IP backstop; the
-browser identifier is HMAC'd before storage. Raw IPs are not stored in review records
+Siteverify as `remoteip`. The hourly IP quotas for submissions and likes group IPv6
+addresses by their `/64` network, so rotating privacy addresses within a network
+share a quota. IPv4 and IPv4-mapped IPv6 addresses use the same IPv4 quota.
+Rate-limit identities and the submission browser identifier are HMAC'd before
+storage. Raw IPs are not stored in review records
 (see `packages/db/README.md`).
+
+OpenAI receives only the review body and a chosen display name. Review, lecturer, and
+course IDs, ratings, IP addresses, browser IDs, and raw provider responses are not sent
+or persisted by the moderation flow.
 
 ## Verifying a change
 

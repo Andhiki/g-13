@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Typography } from "./typography";
 
@@ -27,7 +27,7 @@ function Icon({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       aria-hidden="true"
-      className={twMerge("mb-4 text-text-sub-600 [&>svg]:size-8", className)}
+      className={cn("mb-4 text-text-sub-600 [&>svg]:size-8", className)}
       {...props}
     />
   );
@@ -39,7 +39,7 @@ function Title({ className, ...props }: Omit<ComponentProps<"h3">, "color">) {
       as="h3"
       variant="subtitle2"
       color="strong"
-      className={twMerge("m-0", className)}
+      className={cn("m-0", className)}
       {...props}
     />
   );
@@ -51,16 +51,14 @@ function Description({ className, ...props }: Omit<ComponentProps<"p">, "color">
       as="p"
       variant="paragraph"
       color="muted"
-      className={twMerge("mb-0 mt-2 text-pretty", className)}
+      className={cn("mb-0 mt-2 text-pretty", className)}
       {...props}
     />
   );
 }
 
 function Actions({ className, ...props }: ComponentProps<"div">) {
-  return (
-    <div className={twMerge("mt-4 flex flex-wrap items-center gap-2", className)} {...props} />
-  );
+  return <div className={cn("mt-4 flex flex-wrap items-center gap-2", className)} {...props} />;
 }
 
 export const AlignEmptyState = { Root, Icon, Title, Description, Actions };

@@ -23,7 +23,13 @@ export const loadAdminAnnouncements = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectAnnouncements(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectAnnouncements(
+        createDatabase(env.DB),
+        session.user,
+        data.offset,
+        data.status,
+        data.query,
+      ),
     );
     if (result.error !== null) rejectAnnouncementOperation(result.error);
     return {

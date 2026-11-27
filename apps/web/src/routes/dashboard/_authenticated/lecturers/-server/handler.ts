@@ -23,7 +23,7 @@ export const loadAdminLecturers = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectLecturers(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectLecturers(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
     );
     if (result.error !== null) rejectLecturerAdminOperation(result.error);
     return {

@@ -116,6 +116,7 @@ export function AdminFormField({
   inputMode,
   autoComplete,
   readOnly = false,
+  showCounter = false,
   onChange,
   onBlur,
 }: {
@@ -132,6 +133,7 @@ export function AdminFormField({
   inputMode?: "text" | "url" | "numeric";
   autoComplete?: string;
   readOnly?: boolean;
+  showCounter?: boolean;
   onChange: (value: string) => void;
   onBlur?: () => void;
 }) {
@@ -150,15 +152,20 @@ export function AdminFormField({
 
   return (
     <div>
-      <Typography
-        as="label"
-        variant="labelSmall"
-        color="strong"
-        htmlFor={id}
-        className="mb-1.5 block"
-      >
-        {label}
-      </Typography>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <Typography as="label" variant="labelSmall" color="strong" htmlFor={id}>
+          {label}
+        </Typography>
+        {showCounter && (
+          <Typography
+            variant="caption"
+            color={value.length > maxLength ? "danger" : "muted"}
+            className="shrink-0 tabular-nums"
+          >
+            {value.length}/{maxLength}
+          </Typography>
+        )}
+      </div>
       {multiline ? (
         <FormTextarea
           {...controlProps}

@@ -1,10 +1,10 @@
-﻿import { expect } from "e2e";
+import { expect } from "e2e";
 import { randomUUID } from "node:crypto";
-import { fillReview, profile } from "./review-form.ts";
-import { exhaustReviewLimit, fixture } from "../database.ts";
-import { test } from "../isolated-test.ts";
+import { fillReview, profile } from "../fixtures/review-form.ts";
+import { exhaustReviewLimit, fixture } from "../fixtures/database.ts";
+import { test } from "../fixtures/local-test.ts";
 import { notFound } from "../routes.ts";
-import { isolatedOrigin } from "../targets.ts";
+import { localOrigin } from "../local-worker.ts";
 
 function expectRetryAfter(response: { status: number; headers: Readonly<Record<string, string>> }) {
   expect(response.status).toBe(429);
@@ -55,7 +55,7 @@ test("Empty and unknown lecturer profiles show their distinct recovery screens",
   await app.open("/lecturers/e2e-does-not-exist");
   await expect(screen.getByRole("heading", { name: notFound })).toBeVisible();
   await screen.getByRole("link", { name: /^(kembali|back)$/i }).click();
-  await expect.poll(async () => new URL(await browser.url()).origin).toBe(isolatedOrigin);
+  await expect.poll(async () => new URL(await browser.url()).origin).toBe(app.baseUrl);
 });
 
 for (const author of [undefined, "E2E Reviewer"]) {
@@ -103,7 +103,7 @@ for (const failure of [
       const browserId = await browser.evaluate(
         () => localStorage.getItem("lecturer-review-browser-id") ?? "",
       );
-      await exhaustReviewLimit("submission", browserId);
+      await exhaustReviewLimit(localOrigin(app.baseUrl), "submission", browserId);
     }
     const body = `This disposable review should never appear ${randomUUID()}.`;
     const submit = await fillReview({ app, browser, screen }, body, failure);
@@ -181,7 +181,7 @@ test("A rate-limited like rolls back the count and pressed state", async ({
   browser,
   screen,
 }) => {
-  await exhaustReviewLimit("like");
+  await exhaustReviewLimit(localOrigin(app.baseUrl), "like");
   await app.open(profile);
   const review = screen.getByRole("article").filter({ hasText: fixture.review });
   const likeButton = review.getByRole("button", { name: like });
@@ -190,7 +190,9 @@ test("A rate-limited like rolls back the count and pressed state", async ({
   await likeButton.click();
   expectRetryAfter(await response);
   await expect(
-    screen.getByText(/could not update like|gagal.*suka|tidak dapat memperbarui suka/i),
+    screen.getByText(
+      /like limit reached\. resets at \d{2}:\d{2}|batas suka tercapai\. diatur ulang pukul \d{2}:\d{2}/i,
+    ),
   ).toBeVisible();
   await expect(review.getByRole("button", { name: like })).toHaveText("0");
 });

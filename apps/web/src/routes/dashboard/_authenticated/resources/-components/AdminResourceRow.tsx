@@ -39,7 +39,6 @@ export function AdminResourceRow({
   const label = resource.titleId;
   const host = resourceHost(resource.url);
   const updated = formatRelativeTime(resource.updatedAt.getTime(), language);
-  const linkLabel = `${host} — open ${label} in a new tab`;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: resource.id,
     disabled: !sortable,
@@ -48,6 +47,35 @@ export function AdminResourceRow({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const resourceIdentity = (
+    <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-1 lg:gap-2">
+        <button
+          type="button"
+          className={`flex size-11 shrink-0 touch-none max-lg:-ml-2 lg:size-6 items-center justify-center rounded text-text-sub-600 outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base ${
+            sortable
+              ? "cursor-grab hover:bg-bg-soft-200/60 hover:text-text-strong-950 active:cursor-grabbing"
+              : "cursor-not-allowed opacity-40"
+          }`}
+          aria-label={`Reorder ${label}`}
+          title={sortable ? "Drag to reorder" : "Clear the search to reorder"}
+          disabled={!sortable}
+          {...attributes}
+          {...listeners}
+        >
+          <RiDraggable aria-hidden="true" className="size-4 max-lg:size-5" />
+        </button>
+        <ResourceRowIdentity
+          resource={resource}
+          selected={selected}
+          onSelect={onSelect}
+          host={host}
+          updated={updated}
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -60,69 +88,9 @@ export function AdminResourceRow({
         onSelect={onSelect}
         className={`${resourceTableColumns} lg:items-center`}
       >
-        <div className="min-w-0">
-          <div className="flex min-w-0 items-center gap-1 lg:gap-2">
-            <button
-              type="button"
-              className={`flex size-11 shrink-0 touch-none max-lg:-ml-2 lg:size-6 items-center justify-center rounded text-text-sub-600 outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-base ${
-                sortable
-                  ? "cursor-grab hover:bg-bg-soft-200/60 hover:text-text-strong-950 active:cursor-grabbing"
-                  : "cursor-not-allowed opacity-40"
-              }`}
-              aria-label={`Reorder ${label}`}
-              title={sortable ? "Drag to reorder" : "Clear the search to reorder"}
-              disabled={!sortable}
-              {...attributes}
-              {...listeners}
-            >
-              <RiDraggable aria-hidden="true" className="size-4 max-lg:size-5" />
-            </button>
-            <div className="min-w-0 flex-1">
-              <div className="flex min-w-0 items-center gap-2 lg:block">
-                <AdminTableInspectButton
-                  ariaLabel={`Inspect ${label}`}
-                  selected={selected}
-                  onSelect={onSelect}
-                >
-                  {resource.titleId}
-                </AdminTableInspectButton>
-                <div className="shrink-0 lg:hidden">
-                  <RecordStatusBadge deleted={deleted} />
-                </div>
-              </div>
-              <Typography
-                variant="caption"
-                color="muted"
-                className="mt-0.5 hidden truncate lg:block"
-              >
-                {resource.titleEn}
-              </Typography>
-              <AdminTableMeta>
-                <span className="truncate" title={`${host} · ${updated} · ${resource.titleEn}`}>
-                  {host} · {updated} · {resource.titleEn}
-                </span>
-              </AdminTableMeta>
-            </div>
-          </div>
-        </div>
+        {resourceIdentity}
 
-        <div className="hidden min-w-0 lg:block">
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={resource.url}
-            aria-label={linkLabel}
-            className="group flex min-w-0 items-center gap-1.5 text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
-          >
-            <ResourceFavicon url={resource.url} />
-            <span className="truncate">{host}</span>
-            <RiExternalLinkLine
-              aria-hidden="true"
-              className="size-3.5 shrink-0 text-text-soft-400 group-hover:text-text-strong-950"
-            />
-          </a>
-        </div>
+        <ResourceRowLink url={resource.url} host={host} label={label} />
 
         <Typography
           variant="caption"
@@ -140,6 +108,67 @@ export function AdminResourceRow({
           onRestore={() => onLifecycle({ resourceId: resource.id, action: "restore" }, label)}
         />
       </AdminTableRow>
+    </div>
+  );
+}
+
+function ResourceRowIdentity({
+  resource,
+  selected,
+  onSelect,
+  host,
+  updated,
+}: {
+  resource: AdminResource;
+  selected: boolean;
+  onSelect: () => void;
+  host: string;
+  updated: string;
+}) {
+  return (
+    <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 items-center gap-2 lg:block">
+        <AdminTableInspectButton
+          ariaLabel={`Inspect ${resource.titleId}`}
+          selected={selected}
+          onSelect={onSelect}
+        >
+          {resource.titleId}
+        </AdminTableInspectButton>
+        <div className="shrink-0 lg:hidden">
+          <RecordStatusBadge deleted={resource.deletedAt !== null} />
+        </div>
+      </div>
+      <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
+        {resource.titleEn}
+      </Typography>
+      <AdminTableMeta>
+        <span className="truncate" title={`${host} · ${updated} · ${resource.titleEn}`}>
+          {host} · {updated} · {resource.titleEn}
+        </span>
+      </AdminTableMeta>
+    </div>
+  );
+}
+
+function ResourceRowLink({ url, host, label }: { url: string; host: string; label: string }) {
+  return (
+    <div className="hidden min-w-0 lg:block">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={url}
+        aria-label={`${host} — open ${label} in a new tab`}
+        className="group flex min-w-0 items-center gap-1.5 text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
+      >
+        <ResourceFavicon url={url} />
+        <span className="truncate">{host}</span>
+        <RiExternalLinkLine
+          aria-hidden="true"
+          className="size-3.5 shrink-0 text-text-soft-400 group-hover:text-text-strong-950"
+        />
+      </a>
     </div>
   );
 }

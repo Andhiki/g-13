@@ -7,6 +7,7 @@ import {
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { Typography } from "@/ui/typography";
 import {
+  RESOURCE_FIELD_LIMITS,
   resourceFieldsSchema,
   resourceUrlSchema,
   type ResourceFieldsInput,
@@ -119,7 +120,8 @@ function ResourceFormBody({
         id="resource-title-id"
         name="titleId"
         label="Title (Indonesian)"
-        maxLength={120}
+        maxLength={RESOURCE_FIELD_LIMITS.title}
+        showCounter
         placeholder="e.g. Arsip ujian HIMAKOM UGM"
         value={titleId}
         error={fieldErrors.titleId}
@@ -133,7 +135,8 @@ function ResourceFormBody({
         id="resource-title-en"
         name="titleEn"
         label="Title (English)"
-        maxLength={120}
+        maxLength={RESOURCE_FIELD_LIMITS.title}
+        showCounter
         placeholder="e.g. HIMAKOM UGM exam archive"
         value={titleEn}
         error={fieldErrors.titleEn}
@@ -147,7 +150,8 @@ function ResourceFormBody({
         id="resource-description-id"
         name="descriptionId"
         label="Description (Indonesian)"
-        maxLength={400}
+        maxLength={RESOURCE_FIELD_LIMITS.description}
+        showCounter
         multiline
         placeholder="Jelaskan singkat isi dan manfaat tautan ini."
         value={descriptionId}
@@ -162,7 +166,8 @@ function ResourceFormBody({
         id="resource-description-en"
         name="descriptionEn"
         label="Description (English)"
-        maxLength={400}
+        maxLength={RESOURCE_FIELD_LIMITS.description}
+        showCounter
         multiline
         placeholder="Briefly describe what this link offers."
         value={descriptionEn}
@@ -177,7 +182,8 @@ function ResourceFormBody({
         id="resource-url"
         name="url"
         label="Link"
-        maxLength={500}
+        maxLength={RESOURCE_FIELD_LIMITS.url}
+        showCounter
         placeholder="https://example.com"
         inputMode="url"
         autoComplete="url"

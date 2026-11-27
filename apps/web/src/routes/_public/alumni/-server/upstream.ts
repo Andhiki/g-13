@@ -40,7 +40,8 @@ const fields = [
 export const alumniUpstream = {
   maxPages: 5,
   timeoutMs: 8_000,
-  pageUrl: (page: number) => `${strapiOrigin()}/api/alumnis?${fields}&pagination[page]=${page}`,
+  pageUrl: (requestedPageNumber: number) =>
+    `${strapiOrigin()}/api/alumnis?${fields}&pagination[page]=${requestedPageNumber}`,
 };
 
 export async function fetchAlumniPages(token: string): Promise<StrapiAlumniResponse[]> {
@@ -57,16 +58,53 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
     ];
   }
   const pages: StrapiAlumniResponse[] = [];
-  for (let page = 1; page <= alumniUpstream.maxPages; page++) {
-    const response = await fetch(alumniUpstream.pageUrl(page), {
+  let expectedPageCount: number | undefined;
+  for (
+    let requestedPageNumber = 1;
+    requestedPageNumber <= alumniUpstream.maxPages;
+    requestedPageNumber++
+  ) {
+    const response = await fetch(alumniUpstream.pageUrl(requestedPageNumber), {
       headers: { authorization: `Bearer ${token}`, accept: "application/json" },
       signal: AbortSignal.timeout(alumniUpstream.timeoutMs),
     });
     if (!response.ok) throw new Error(`upstream ${response.status}`);
-    const body = (await response.json()) as StrapiAlumniResponse;
-    pages.push(body);
-    const pageCount = body.meta?.pagination?.pageCount;
-    if (typeof pageCount !== "number" || page >= pageCount) break;
+    const body: unknown = await response.json();
+    if (!body || typeof body !== "object" || !("data" in body) || !Array.isArray(body.data)) {
+      throw new Error("Invalid alumni upstream data");
+    }
+    const strapiPage = body as StrapiAlumniResponse & { data: unknown[] };
+    const pagination = strapiPage.meta?.pagination;
+    if (!pagination || typeof pagination !== "object" || Array.isArray(pagination)) {
+      throw new Error("Invalid alumni upstream pagination");
+    }
+    const returnedPageNumber = pagination.page;
+    const pageCount = pagination.pageCount;
+    if (
+      typeof returnedPageNumber !== "number" ||
+      !Number.isSafeInteger(returnedPageNumber) ||
+      returnedPageNumber !== requestedPageNumber
+    ) {
+      throw new Error("Invalid alumni upstream page");
+    }
+    if (typeof pageCount !== "number" || !Number.isSafeInteger(pageCount) || pageCount < 0) {
+      throw new Error("Invalid alumni upstream pagination");
+    }
+    if (pageCount > alumniUpstream.maxPages) {
+      throw new Error("Alumni upstream page limit exceeded");
+    }
+    if (
+      (pageCount === 0 && strapiPage.data.length > 0) ||
+      (pageCount > 0 && strapiPage.data.length === 0)
+    ) {
+      throw new Error("Invalid alumni upstream pagination");
+    }
+    if (expectedPageCount !== undefined && pageCount !== expectedPageCount) {
+      throw new Error("Inconsistent alumni upstream pagination");
+    }
+    expectedPageCount = pageCount;
+    pages.push(strapiPage);
+    if (requestedPageNumber >= pageCount) break;
   }
   return pages;
 }

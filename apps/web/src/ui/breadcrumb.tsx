@@ -7,8 +7,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 
 type BreadcrumbProps = ComponentProps<"div"> & { asChild?: boolean };
 
@@ -29,7 +28,7 @@ function renderChild(
   const child = childElementOf(children, name) as ReactElement<{ className?: string }>;
   const childProps = {
     ...props,
-    className: twMerge(
+    className: cn(
       className,
       typeof child.props.className === "string" ? child.props.className : undefined,
     ),
@@ -38,7 +37,7 @@ function renderChild(
 }
 
 function Root({ asChild, className, ...props }: BreadcrumbProps) {
-  const classes = twMerge("flex flex-wrap gap-1.5", className);
+  const classes = cn("flex flex-wrap gap-1.5", className);
   const { children, ...rest } = props;
   return asChild ? (
     renderChild(children, "Breadcrumb.Root", classes, rest)
@@ -48,14 +47,12 @@ function Root({ asChild, className, ...props }: BreadcrumbProps) {
 }
 
 function Item({ asChild, active, className, ...props }: BreadcrumbProps & { active?: boolean }) {
-  const classes = twMerge(
-    clsx(
-      "flex items-center gap-1.5 transition-colors duration-200 ease-out",
-      "text-label-sm text-text-sub-600",
-      active
-        ? "text-text-strong-950"
-        : "underline decoration-transparent hover:text-text-strong-950 hover:decoration-current",
-    ),
+  const classes = cn(
+    "flex items-center gap-1.5 transition-colors duration-200 ease-out",
+    "text-label-sm text-text-sub-600",
+    active
+      ? "text-text-strong-950"
+      : "underline decoration-transparent hover:text-text-strong-950 hover:decoration-current",
     className,
   );
   const { children, ...rest } = props;
@@ -67,7 +64,7 @@ function Item({ asChild, active, className, ...props }: BreadcrumbProps & { acti
 }
 
 function ArrowIcon({ asChild, className, ...props }: BreadcrumbProps) {
-  const classes = twMerge(
+  const classes = cn(
     "flex size-5 select-none items-center justify-center text-text-disabled-300",
     className,
   );

@@ -29,8 +29,12 @@ test("Strapi origin accepts a valid override and drops any path", () => {
 
 test("fetches each upstream page and stops at the reported page count", async () => {
   const fetchSpy = spyOn(globalThis, "fetch")
-    .mockResolvedValueOnce(Response.json({ data: [1], meta: { pagination: { pageCount: 2 } } }))
-    .mockResolvedValueOnce(Response.json({ data: [2], meta: { pagination: { pageCount: 2 } } }));
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [2], meta: { pagination: { page: 2, pageCount: 2 } } }),
+    );
   try {
     const pages = await fetchAlumniPages("test-token");
     expect(pages.map((page) => page.data)).toEqual([[1], [2]]);
@@ -53,6 +57,138 @@ test("rejects upstream errors without returning partial pages", async () => {
   );
   try {
     await expect(fetchAlumniPages("test-token")).rejects.toThrow("upstream 503");
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test.each([null, { error: "unavailable" }, { data: {} }])(
+  "rejects a successful upstream response with an invalid data envelope",
+  async (body) => {
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body));
+    try {
+      await expect(fetchAlumniPages("test-token")).rejects.toThrow("Invalid alumni upstream data");
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  },
+);
+
+test("rejects a successful upstream response without pagination metadata", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ data: [1] }));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a malformed later page instead of returning a partial directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [], meta: { pagination: { page: 2, pageCount: "2" } } }),
+    );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects an empty page when Strapi reports a positive page count", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({ data: [], meta: { pagination: { page: 1, pageCount: 1 } } }),
+  );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects an empty later page instead of returning an incomplete directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [], meta: { pagination: { page: 2, pageCount: 2 } } }),
+    );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a repeated page response instead of returning duplicate upstream pages", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow("Invalid alumni upstream page");
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a page count that changes while fetching the directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [2], meta: { pagination: { page: 2, pageCount: 3 } } }),
+    );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Inconsistent alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects directories larger than the upstream page limit instead of returning partial data", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 6 } } }),
+  );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Alumni upstream page limit exceeded",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("accepts a valid empty directory", async () => {
+  const body = { data: [], meta: { pagination: { page: 1, pageCount: 0, total: 0 } } };
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body));
+  try {
+    expect(await fetchAlumniPages("test-token")).toEqual([body]);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   } finally {
     fetchSpy.mockRestore();
   }

@@ -88,6 +88,9 @@ it("enforces RBAC, CRUD, drag ordering, soft delete, restore, and public visibil
     expect(activeList.rows.map((row) => row.id)).toEqual([first.id, second.id, third.id]);
     expect(activeList.rows.map((row) => row.sortOrder)).toEqual([0, 1, 2]);
     expect(activeList.counts).toEqual({ active: 3, deleted: 0 });
+    const match = resultData(await inspectResources(db, admin, 0, "active", "KARIER TEKNOLOGI"));
+    expect(match.rows.map(({ id }) => id)).toEqual([second.id]);
+    expect(match.total).toBe(1);
     const timestampsBefore = new Map(
       activeList.rows.map((row) => [row.id, row.updatedAt.getTime()]),
     );

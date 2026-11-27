@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -257,7 +258,7 @@ function ReviewsContent({
         {!reviewsState.isPending && !reviewsState.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="reviews"
             hasNext={hasNext}
@@ -300,9 +301,8 @@ function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
   const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<ReviewStatus>("all");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(!!linkedReviewId);
   const [syncedLinkId, setSyncedLinkId] = useState(linkedReviewId);
@@ -313,27 +313,25 @@ function LecturerReviewsPage() {
   }
   const [confirmation, setConfirmation] = useState<ReviewConfirmation | null>(null);
   const queryClient = useQueryClient();
-  const reviews = useQuery(moderationReviewsQuery(offset, status));
+  const reviews = useQuery(moderationReviewsQuery(offset, status, needle));
   const counts = reviews.data?.counts ?? initialData.counts;
-  const reviewRows = reviews.data?.rows ?? [];
-  const pageRows = reviewRows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) =>
-        `${row.lecturerName} ${row.courseCode} ${row.courseNameId} ${row.courseNameEn} ${row.termLabel} ${row.authorName} ${row.body}`
-          .toLowerCase()
-          .includes(needle),
-      )
-    : pageRows;
+  const listState = {
+    isPending: searchPending || reviews.isPending,
+    isError: !searchPending && reviews.isError,
+  };
+  const reviewRows = searchPending ? [] : (reviews.data?.rows ?? []);
+  const visibleRows = reviewRows.slice(0, 50);
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = reviews.data?.total ?? 0;
   // A notification can link to a review outside the loaded page; load it directly rather
   // than falling back to an unrelated row the moderator might act on by mistake.
   const linkedOffPage =
     selectedId !== null &&
     selectedId === linkedReviewId &&
+    !searchPending &&
     reviews.isSuccess &&
-    !pageRows.some((review) => review.id === selectedId);
+    !visibleRows.some((review) => review.id === selectedId);
   const linkedReview = useQuery({
     ...moderationReviewQuery(selectedId ?? ""),
     enabled: linkedOffPage,
@@ -341,7 +339,8 @@ function LecturerReviewsPage() {
   const selectedReview = linkedOffPage
     ? (linkedReview.data ?? undefined)
     : (visibleRows.find((review) => review.id === selectedId) ?? visibleRows[0]);
-  const detailsVisible = detailsOpen && !!selectedReview && !reviews.isPending && !reviews.isError;
+  const detailsVisible =
+    detailsOpen && !!selectedReview && !listState.isPending && !listState.isError;
   const mutation = useMutation({
     mutationFn: (input: ModerateReviewInput) => changeReviewVisibility({ data: input }),
     onSuccess: async () => {
@@ -357,7 +356,7 @@ function LecturerReviewsPage() {
     const review =
       selectedReview?.id === input.reviewId
         ? selectedReview
-        : pageRows.find(({ id }) => id === input.reviewId);
+        : visibleRows.find(({ id }) => id === input.reviewId);
     if (!review) return;
     mutation.reset();
     setConfirmation({ input, label, status: review.status });
@@ -400,12 +399,12 @@ function LecturerReviewsPage() {
         {searchAndDetails}
       </AdminFilterBar>
       <ReviewsContent
-        reviewsState={reviews}
+        reviewsState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && reviewRows.length > 50}
+        hasNext={reviewRows.length > 50}
         needle={needle}
         status={status}
         allCount={counts.all}

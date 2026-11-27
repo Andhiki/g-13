@@ -35,6 +35,14 @@
     "./schema/notifications": {
       "types": "./dist/schema/notifications.d.mts",
       "import": "./dist/schema/notifications.mjs"
+    },
+    "./schema/theses": {
+      "types": "./dist/schema/theses.d.mts",
+      "import": "./dist/schema/theses.mjs"
+    },
+    "./schema/thesis-fields": {
+      "types": "./dist/schema/thesis-fields.d.mts",
+      "import": "./dist/schema/thesis-fields.mjs"
     }
   },
   "scripts": {

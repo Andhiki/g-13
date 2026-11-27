@@ -1,4 +1,11 @@
-import { useImperativeHandle, useRef, useState, type Ref } from "react";
+import {
+  useImperativeHandle,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type Ref,
+  type RefObject,
+} from "react";
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCalendarLine, RiCloseLine } from "@remixicon/react";
 import { datePattern } from "@ui-sdk/react/date";
 import {
@@ -16,9 +23,15 @@ import {
   DatePickerHint,
   DatePickerInput,
   DatePickerTrigger,
+  type DatePickerValue,
 } from "@ui-sdk/react/date-picker";
 import { FieldSet, FieldLegend } from "@ui-sdk/react/field";
-import { createTimeInputController, TimeInput, TimeInputSegment } from "@ui-sdk/react/time-input";
+import {
+  createTimeInputController,
+  TimeInput,
+  TimeInputSegment,
+  type TimeInputSegmentData,
+} from "@ui-sdk/react/time-input";
 import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import { AlignButton } from "@/ui/button";
@@ -177,6 +190,54 @@ export function DateTimeField({
   const errorId = `${id}-error`;
   const hintId = `${id}-hint`;
 
+  function changeDate(next: DatePickerValue) {
+    const nextDate = typeof next === "string" ? next : null;
+    setHasDateDraft(nextDate !== null);
+    if (nextDate === null) {
+      timeInputController.clear();
+      setHasTimeDraft(false);
+    }
+    onChange({ date: nextDate, time: nextDate ? (value.time ?? "00:00") : null });
+  }
+
+  function changeDateDraft(input: string) {
+    setHasDateDraft(input.trim().length > 0);
+    onInputActivity?.();
+  }
+
+  function changeTime(nextTime: DateTimeParts["time"]) {
+    setHasTimeDraft(nextTime !== null);
+    onChange({ ...value, time: nextTime });
+  }
+
+  function trackTimeDraft() {
+    onInputActivity?.();
+    queueMicrotask(() => setHasTimeDraft(hasFilledTimeSegment(timeGroupRef.current)));
+  }
+
+  function trackTimeKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (isTimeEditKey(event.key)) trackTimeDraft();
+  }
+
+  function clearDateTime() {
+    datePickerController.clear();
+    timeInputController.clear();
+    setHasDateDraft(false);
+    setHasTimeDraft(false);
+    onChange(EMPTY_DATE_TIME_PARTS);
+    onInputActivity?.();
+  }
+
+  function renderTimeSegments({ segments }: { segments: readonly TimeInputSegmentData[] }) {
+    return (
+      <TimeFieldSegments
+        segments={segments}
+        invalid={timeInvalid}
+        errorId={error ? errorId : undefined}
+      />
+    );
+  }
+
   return (
     <FieldSet disabled={disabled} className="min-w-0 disabled:opacity-70">
       <FieldLegend className="mb-1.5 block text-label-xs text-text-strong-950">{label}</FieldLegend>
@@ -189,44 +250,19 @@ export function DateTimeField({
           required={required}
           controller={datePickerController}
           value={value.date}
-          onValueChange={(next) => {
-            const nextDate = typeof next === "string" ? next : null;
-            setHasDateDraft(nextDate !== null);
-            if (nextDate === null) {
-              timeInputController.clear();
-              setHasTimeDraft(false);
-            }
-            onChange({
-              date: nextDate,
-              time: nextDate ? (value.time ?? "00:00") : null,
-            });
-          }}
+          onValueChange={changeDate}
           className="min-w-0 flex-1"
         >
-          <div
-            className={`${controlClass} justify-between gap-1 pl-3 pr-1.5 ${dateInvalid ? "border-error-base" : ""} has-[[data-invalid]]:border-error-base`}
-          >
-            <DatePickerInput
-              ref={dateInputRef}
-              id={id}
-              aria-label={label}
-              aria-invalid={dateInvalid ? true : undefined}
-              aria-describedby={error ? `${hintId} ${errorId}` : hintId}
-              placeholder={datePlaceholder}
-              onChange={(event) => {
-                setHasDateDraft(event.currentTarget.value.trim().length > 0);
-                onInputActivity?.();
-              }}
-              className="min-w-0 flex-1 bg-transparent py-1 text-base text-text-strong-950 outline-none placeholder:text-text-sub-600 sm:pointer-fine:text-paragraph-xs"
-            />
-            <DatePickerTrigger
-              aria-label={`Open calendar for ${label.toLowerCase()}`}
-              className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-text-sub-600 outline-none hover:bg-bg-weak-50 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35"
-            >
-              <RiCalendarLine aria-hidden="true" className="size-4" />
-            </DatePickerTrigger>
-          </div>
-          <DatePickerHint id={hintId} className="sr-only" />
+          <DatePickerControl
+            inputRef={dateInputRef}
+            id={id}
+            label={label}
+            invalid={dateInvalid}
+            descriptionId={error ? `${hintId} ${errorId}` : hintId}
+            hintId={hintId}
+            placeholder={datePlaceholder}
+            onDraftChange={changeDateDraft}
+          />
           <DateTimeCalendarContent />
         </DatePicker>
         <TimeInput
@@ -239,40 +275,13 @@ export function DateTimeField({
           aria-describedby={error ? errorId : undefined}
           controller={timeInputController}
           value={value.time}
-          onValueChange={(nextTime) => {
-            setHasTimeDraft(nextTime !== null);
-            onChange({ ...value, time: nextTime });
-          }}
-          onBeforeInputCapture={() => {
-            onInputActivity?.();
-            queueMicrotask(() => setHasTimeDraft(hasFilledTimeSegment(timeGroupRef.current)));
-          }}
-          onPasteCapture={() => {
-            onInputActivity?.();
-            queueMicrotask(() => setHasTimeDraft(hasFilledTimeSegment(timeGroupRef.current)));
-          }}
-          onKeyDownCapture={(event) => {
-            if (!isTimeEditKey(event.key)) return;
-            onInputActivity?.();
-            queueMicrotask(() => setHasTimeDraft(hasFilledTimeSegment(timeGroupRef.current)));
-          }}
+          onValueChange={changeTime}
+          onBeforeInputCapture={trackTimeDraft}
+          onPasteCapture={trackTimeDraft}
+          onKeyDownCapture={trackTimeKeyDown}
           className={`${controlClass} shrink-0 px-2.5 ${timeInvalid ? "border-error-base" : ""}`}
         >
-          {({ segments }) =>
-            segments.map((segment) => (
-              <TimeInputSegment
-                key={segment.key}
-                segment={segment}
-                aria-invalid={segment.editable && timeInvalid ? true : undefined}
-                aria-describedby={segment.editable && error ? errorId : undefined}
-                className={
-                  segment.editable
-                    ? "w-[2.4ch] rounded px-0.5 text-center tabular-nums outline-none focus:bg-primary-alpha-10 focus:text-text-strong-950 data-empty:text-text-sub-600 data-[type=dayPeriod]:w-[3.4ch]"
-                    : "px-0.5 text-text-sub-600 select-none"
-                }
-              />
-            ))
-          }
+          {renderTimeSegments}
         </TimeInput>
         {optional && hasValue && (
           <AlignButton.Root
@@ -282,14 +291,7 @@ export function DateTimeField({
             iconOnly
             disabled={disabled}
             aria-label={`Clear ${label.toLowerCase()}`}
-            onClick={() => {
-              datePickerController.clear();
-              timeInputController.clear();
-              setHasDateDraft(false);
-              setHasTimeDraft(false);
-              onChange(EMPTY_DATE_TIME_PARTS);
-              onInputActivity?.();
-            }}
+            onClick={clearDateTime}
           >
             <RiCloseLine aria-hidden="true" className="size-4" />
           </AlignButton.Root>
@@ -302,4 +304,74 @@ export function DateTimeField({
       )}
     </FieldSet>
   );
+}
+
+function DatePickerControl({
+  inputRef,
+  id,
+  label,
+  invalid,
+  descriptionId,
+  hintId,
+  placeholder,
+  onDraftChange,
+}: {
+  inputRef: RefObject<HTMLInputElement | null>;
+  id: string;
+  label: string;
+  invalid: boolean;
+  descriptionId: string;
+  hintId: string;
+  placeholder: string;
+  onDraftChange: (value: string) => void;
+}) {
+  return (
+    <>
+      <div
+        className={`${controlClass} justify-between gap-1 pl-3 pr-1.5 ${invalid ? "border-error-base" : ""} has-[[data-invalid]]:border-error-base`}
+      >
+        <DatePickerInput
+          ref={inputRef}
+          id={id}
+          aria-label={label}
+          aria-invalid={invalid ? true : undefined}
+          aria-describedby={descriptionId}
+          placeholder={placeholder}
+          onChange={(event) => onDraftChange(event.currentTarget.value)}
+          className="min-w-0 flex-1 bg-transparent py-1 text-base text-text-strong-950 outline-none placeholder:text-text-sub-600 sm:pointer-fine:text-paragraph-xs"
+        />
+        <DatePickerTrigger
+          aria-label={`Open calendar for ${label.toLowerCase()}`}
+          className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-text-sub-600 outline-none hover:bg-bg-weak-50 hover:text-text-strong-950 focus-visible:outline-2 focus-visible:outline-stroke-strong-950/35"
+        >
+          <RiCalendarLine aria-hidden="true" className="size-4" />
+        </DatePickerTrigger>
+      </div>
+      <DatePickerHint id={hintId} className="sr-only" />
+    </>
+  );
+}
+
+function TimeFieldSegments({
+  segments,
+  invalid,
+  errorId,
+}: {
+  segments: readonly TimeInputSegmentData[];
+  invalid: boolean;
+  errorId?: string;
+}) {
+  return segments.map((segment) => (
+    <TimeInputSegment
+      key={segment.key}
+      segment={segment}
+      aria-invalid={segment.editable && invalid ? true : undefined}
+      aria-describedby={segment.editable ? errorId : undefined}
+      className={
+        segment.editable
+          ? "w-[2.4ch] rounded px-0.5 text-center tabular-nums outline-none focus:bg-primary-alpha-10 focus:text-text-strong-950 data-empty:text-text-sub-600 data-[type=dayPeriod]:w-[3.4ch]"
+          : "px-0.5 text-text-sub-600 select-none"
+      }
+    />
+  ));
 }

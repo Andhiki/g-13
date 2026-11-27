@@ -126,14 +126,14 @@ function AuthorNameField({
         </Typography>
         <label
           htmlFor="review-anonymous"
-          className="mt-2 flex min-h-9 cursor-pointer items-center gap-3 text-paragraph-sm sm:mt-1"
+          className="mt-2 flex min-h-9 cursor-interactive items-center gap-3 text-paragraph-sm sm:mt-1"
         >
           <AlignSwitch.Root
             id="review-anonymous"
             checked={anonymous}
             onCheckedChange={onAnonymousChange}
           />
-          {text("Publish as Anonymous")}
+          {text("Submit anonymously")}
         </label>
       </div>
       <AuthorNameInputBox

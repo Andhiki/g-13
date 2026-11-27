@@ -1,6 +1,12 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type ComponentProps } from "react";
 import { RiArrowLeftLine, RiStarFill } from "@remixicon/react";
 import { CourseChip } from "@/ui/course-chip";
 import { useLocale } from "@/useLocale";
@@ -13,18 +19,22 @@ import { Typography } from "@/ui/typography";
 import { toast, SuccessToast } from "@/ui/toast";
 import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
 import { RatingGuidePopover } from "./RatingGuidePopover";
+import { ReviewFeedPagination } from "./ReviewFeedPagination";
 import { ReviewList } from "./ReviewList";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { RatingStars } from "./LecturerReviewCard";
 import { courseDisplayName } from "../-shared/course-search";
-import { filterReviewsByCourse, orderReviews, type ReviewOrder } from "../-shared/review-order";
+import { defaultReviewOrder, type ReviewOrder } from "../-shared/review-order";
 import {
   lecturerBrowserLikesQueryOptions,
   lecturerDetailQueryOptions,
+  lecturerReviewsKey,
+  lecturerReviewsQueryOptions,
   ownPendingReviewsQueryOptions,
 } from "../-client/queries";
 import { readPendingReviewIds, writePendingReviewIds } from "../-client/pending-review-storage";
 import { updateReviewLikeMutationOptions } from "../-client/mutations";
+import { likeErrorMessage } from "../-client/submission-error-message";
 
 type LecturerDetail = ReturnType<
   typeof useSuspenseQuery<
@@ -287,8 +297,13 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const courseFilterId = useId();
   const [browserId, setBrowserId] = useState<string | null>(null);
   const [storageUnavailable, setStorageUnavailable] = useState(false);
-  const [reviewOrder, setReviewOrder] = useState<ReviewOrder>("newest");
+  const [reviewOrder, setReviewOrder] = useState<ReviewOrder>(defaultReviewOrder);
   const [courseId, setCourseId] = useState<string | null>(null);
+  const reviewQuery = useInfiniteQuery(
+    lecturerReviewsQueryOptions(lecturerId, courseId, reviewOrder),
+  );
+  const publishedReviews = reviewQuery.data?.pages.flatMap((page) => page.reviews) ?? [];
+  const publishedIds = new Set(publishedReviews.map(({ id }) => id));
   const selectedCourse = data.lecturer.courses.find(({ id }) => id === courseId);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [pendingConfirmation, setPendingConfirmation] = useState<"tracked" | "untracked" | null>(
@@ -297,9 +312,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const [pendingIds, setPendingIds] = useState<string[]>([]);
   const pendingStorageKey = `lecturer-pending-reviews:${lecturerId}`;
   const pendingQuery = useQuery(ownPendingReviewsQueryOptions(lecturerId, pendingIds));
-  const pendingReviews = (pendingQuery.data ?? []).filter(
-    (review) => !data.reviews.some(({ id }) => id === review.id),
-  );
+  const pendingReviews = (pendingQuery.data ?? []).filter((review) => !publishedIds.has(review.id));
   useEffect(() => {
     const syncPendingIds = () => {
       try {
@@ -324,6 +337,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
     void queryClient.invalidateQueries({
       queryKey: lecturerDetailQueryOptions(lecturerId).queryKey,
     });
+    void queryClient.invalidateQueries({ queryKey: lecturerReviewsKey(lecturerId) });
     try {
       const ids = readPendingReviewIds(pendingStorageKey).filter((id) => !resolvedIds.includes(id));
       writePendingReviewIds(pendingStorageKey, ids);
@@ -346,8 +360,6 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
     enabled: browserId !== null,
   });
   const likeMutation = useMutation(updateReviewLikeMutationOptions(queryClient));
-  const likedReviews = likesQuery.data ?? [];
-  const reviews = orderReviews(filterReviewsByCourse(data.reviews, courseId), reviewOrder);
   useEffect(() => {
     try {
       const key = "lecturer-review-browser-id";
@@ -360,9 +372,11 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   }, []);
   const likeError = storageUnavailable
     ? text("Enable browser storage to like reviews.")
-    : likesQuery.isError || likeMutation.isError
-      ? text("Could not update like. Please try again.")
-      : "";
+    : likeMutation.isError
+      ? likeErrorMessage(likeMutation.error, text)
+      : likesQuery.isError
+        ? text("Could not update like. Please try again.")
+        : "";
 
   const handleToggleLike = async (reviewId: string, liked: boolean) => {
     if (!browserId) return;
@@ -371,11 +385,45 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
       .catch(() => undefined);
   };
 
+  const handleReviewSubmitted: ComponentProps<typeof ReviewSubmissionDialog>["onSubmitted"] = ({
+    reviewId,
+    status,
+  }) => {
+    setReviewDialogOpen(false);
+    if (status === "published") {
+      toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
+      return;
+    }
+    try {
+      const ids = [...readPendingReviewIds(pendingStorageKey), reviewId];
+      writePendingReviewIds(pendingStorageKey, ids);
+      setPendingIds(ids);
+      setPendingConfirmation("tracked");
+    } catch {
+      setPendingConfirmation("untracked");
+    }
+  };
+
+  const canLike = browserId !== null && !likesQuery.isPending && !likesQuery.isError;
   const emptyReviews = (
     <EmptyReviewsState
       hasCourseFilter={courseId !== null}
       onWriteReview={() => setReviewDialogOpen(true)}
       onClearFilter={() => setCourseId(null)}
+    />
+  );
+
+  const reviewList = (
+    <ReviewList
+      reviews={publishedReviews}
+      pendingReviews={pendingReviews}
+      language={language}
+      emptyState={reviewQuery.isPending || reviewQuery.isError ? null : emptyReviews}
+      likedReviews={likesQuery.data ?? []}
+      pendingLike={likeMutation.isPending ? likeMutation.variables : undefined}
+      canLike={canLike}
+      likePending={likeMutation.isPending}
+      onLike={handleToggleLike}
     />
   );
 
@@ -404,16 +452,8 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
               {likeError}
             </Typography>
           )}
-          <ReviewList
-            reviews={reviews}
-            pendingReviews={pendingReviews}
-            language={language}
-            emptyState={emptyReviews}
-            likedReviews={likedReviews}
-            canLike={browserId !== null && !likesQuery.isPending && !likesQuery.isError}
-            likePending={likeMutation.isPending}
-            onLike={handleToggleLike}
-          />
+          {reviewList}
+          <ReviewFeedPagination key={JSON.stringify([courseId, reviewOrder])} query={reviewQuery} />
         </section>
       </div>
       <ReviewSubmissionDialog
@@ -424,53 +464,61 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
         browserId={browserId}
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
-        onSubmitted={({ reviewId, status }) => {
-          setReviewDialogOpen(false);
-          if (status === "published") {
-            toast.custom(() => <SuccessToast message={text("Your review is published.")} />);
-            return;
-          }
-          try {
-            const ids = [...readPendingReviewIds(pendingStorageKey), reviewId];
-            writePendingReviewIds(pendingStorageKey, ids);
-            setPendingIds(ids);
-            setPendingConfirmation("tracked");
-          } catch {
-            setPendingConfirmation("untracked");
-          }
-        }}
+        onSubmitted={handleReviewSubmitted}
       />
-      <AlignModal.Root
+      <PendingReviewConfirmation
         open={pendingConfirmation !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingConfirmation(null);
-        }}
-      >
-        <AlignModal.Content showClose={false}>
-          <div className="flex flex-col gap-3 p-5">
-            <AlignModal.Title asChild>
-              <Typography as="h2" variant="subtitle2" className="m-0">
-                {text("Your review is pending moderator review.")}
-              </Typography>
-            </AlignModal.Title>
-            <AlignModal.Description asChild>
-              <Typography as="p" variant="paragraph" color="muted" className="m-0">
-                {text("A moderator checks reviews before they appear publicly.")}
-                {pendingConfirmation === "tracked" && (
-                  <>
-                    {" "}
-                    {text("Your review will appear here marked as pending until it is approved.")}
-                  </>
-                )}
-              </Typography>
-            </AlignModal.Description>
-            <AlignModal.Close asChild>
-              <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
-            </AlignModal.Close>
-          </div>
-        </AlignModal.Content>
-      </AlignModal.Root>
+        tracked={pendingConfirmation === "tracked"}
+        onClose={() => setPendingConfirmation(null)}
+      />
     </main>
+  );
+}
+
+function PendingReviewConfirmation({
+  open,
+  tracked,
+  onClose,
+}: {
+  open: boolean;
+  tracked: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <AlignModal.Root
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <AlignModal.Content showClose={false}>
+        <PendingReviewConfirmationContent tracked={tracked} />
+      </AlignModal.Content>
+    </AlignModal.Root>
+  );
+}
+
+function PendingReviewConfirmationContent({ tracked }: { tracked: boolean }) {
+  const { text } = useLocale("lecturers");
+  return (
+    <div className="flex flex-col gap-3 p-5">
+      <AlignModal.Title asChild>
+        <Typography as="h2" variant="subtitle2" className="m-0">
+          {text("Your review is pending moderator review.")}
+        </Typography>
+      </AlignModal.Title>
+      <AlignModal.Description asChild>
+        <Typography as="p" variant="paragraph" color="muted" className="m-0">
+          {text("A moderator checks reviews before they appear publicly.")}
+          {tracked && (
+            <> {text("Your review will appear here marked as pending until it is approved.")}</>
+          )}
+        </Typography>
+      </AlignModal.Description>
+      <AlignModal.Close asChild>
+        <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
+      </AlignModal.Close>
+    </div>
   );
 }
 

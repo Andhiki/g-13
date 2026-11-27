@@ -1,12 +1,19 @@
 import { z } from "zod";
+import { adminPageSchema } from "../../-shared/admin-search";
 
 export const resourceStatusSchema = z.enum(["active", "deleted"]);
 export type ResourceStatus = z.infer<typeof resourceStatusSchema>;
 
-export const resourcePageSchema = z.object({
-  offset: z.number().int().min(0),
+export const resourcePageSchema = adminPageSchema.extend({
   status: resourceStatusSchema,
 });
+
+/** Shared by the admin form `maxLength` props and the Zod limits below. */
+export const RESOURCE_FIELD_LIMITS = {
+  title: 120,
+  description: 400,
+  url: 500,
+} as const;
 
 const localizedText = (label: string, max: number) =>
   z
@@ -63,15 +70,18 @@ export const resourceUrlSchema = z
     z
       .string()
       .min(1, "Enter the link.")
-      .max(500, "The link must be 500 characters or fewer.")
+      .max(
+        RESOURCE_FIELD_LIMITS.url,
+        `The link must be ${RESOURCE_FIELD_LIMITS.url} characters or fewer.`,
+      )
       .refine(isHttpsResourceUrl, "Enter a full https:// address."),
   );
 
 export const resourceFieldsSchema = z.object({
-  titleId: localizedText("Indonesian title", 120),
-  titleEn: localizedText("English title", 120),
-  descriptionId: localizedText("Indonesian description", 400),
-  descriptionEn: localizedText("English description", 400),
+  titleId: localizedText("Indonesian title", RESOURCE_FIELD_LIMITS.title),
+  titleEn: localizedText("English title", RESOURCE_FIELD_LIMITS.title),
+  descriptionId: localizedText("Indonesian description", RESOURCE_FIELD_LIMITS.description),
+  descriptionEn: localizedText("English description", RESOURCE_FIELD_LIMITS.description),
   url: resourceUrlSchema,
 });
 export type ResourceFieldsInput = z.infer<typeof resourceFieldsSchema>;

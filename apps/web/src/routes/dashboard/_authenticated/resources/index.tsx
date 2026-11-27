@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -46,6 +47,7 @@ import {
   reorderAdminResources,
   updateAdminResource,
 } from "./-server/handler";
+import { resourceMutationErrorMessage } from "./-shared/errors";
 import {
   resourceStatusSchema,
   type ReorderResourcesInput,
@@ -314,13 +316,32 @@ function ResourcesContent({
   onLifecycle: (input: ResourceLifecycleInput, label: string) => void;
   onReorder: (movedId: string, orderedIds: string[]) => void;
 }) {
+  const list = (
+    <ResourcesListBody
+      queryState={queryState}
+      visibleRows={visibleRows}
+      needle={needle}
+      status={status}
+      activeCount={activeCount}
+      selectedId={selectedResource?.id}
+      sortable={sortable}
+      onClearSearch={onClearSearch}
+      onViewActive={onViewActive}
+      onCreate={onCreate}
+      onSelect={onSelect}
+      onEdit={onEdit}
+      onLifecycle={onLifecycle}
+      onReorder={onReorder}
+    />
+  );
+
   return (
     <div className="flex min-h-0 flex-1">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
         {!queryState.isPending && !queryState.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="resources"
             hasNext={hasNext}
@@ -338,22 +359,7 @@ function ResourcesContent({
         <div
           className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
         >
-          <ResourcesListBody
-            queryState={queryState}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            activeCount={activeCount}
-            selectedId={selectedResource?.id}
-            sortable={sortable}
-            onClearSearch={onClearSearch}
-            onViewActive={onViewActive}
-            onCreate={onCreate}
-            onSelect={onSelect}
-            onEdit={onEdit}
-            onLifecycle={onLifecycle}
-            onReorder={onReorder}
-          />
+          {list}
         </div>
       </div>
       <AdminInspector
@@ -483,9 +489,8 @@ function ResourcesModals({
 function AdminResourcesPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<ResourceStatus>("active");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
@@ -499,29 +504,27 @@ function AdminResourcesPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const resourcesQuery = useQuery(adminResourcesQuery(offset, status));
+  const resourcesQuery = useQuery(adminResourcesQuery(offset, status, needle));
   const counts = resourcesQuery.data?.counts ?? initialData.counts;
-  const resourceRows = resourcesQuery.data?.rows ?? [];
+  const listState = {
+    isPending: searchPending || resourcesQuery.isPending,
+    isError: !searchPending && resourcesQuery.isError,
+  };
+  const resourceRows = searchPending ? [] : (resourcesQuery.data?.rows ?? []);
   const basePageRows = resourceRows.slice(0, 50);
-  const pageRows = orderedIds
-    ? orderedIds
-        .map((id) => basePageRows.find((row) => row.id === id))
-        .filter((row): row is AdminResource => row !== undefined)
-    : basePageRows;
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) =>
-        `${row.titleId} ${row.titleEn} ${row.descriptionId} ${row.descriptionEn} ${row.url}`
-          .toLowerCase()
-          .includes(needle),
-      )
-    : pageRows;
+  const visibleRows =
+    !needle && orderedIds
+      ? orderedIds
+          .map((id) => basePageRows.find((row) => row.id === id))
+          .filter((row): row is AdminResource => row !== undefined)
+      : basePageRows;
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = resourcesQuery.data?.total ?? 0;
   const selectedResource =
     visibleRows.find((resource) => resource.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedResource && !resourcesQuery.isPending && !resourcesQuery.isError;
+    detailsOpen && !!selectedResource && !listState.isPending && !listState.isError;
 
   async function invalidateResourceQueries() {
     await Promise.all([
@@ -576,7 +579,7 @@ function AdminResourcesPage() {
     reorderMutation.mutate({ movedId, orderedIds: ids });
   }
 
-  const sortable = !needle && !reorderMutation.isPending && visibleRows.length > 1;
+  const sortable = !query.trim() && !needle && !reorderMutation.isPending && visibleRows.length > 1;
 
   function openCreateModal() {
     saveMutation.reset();
@@ -593,6 +596,11 @@ function AdminResourcesPage() {
     setConfirmation({ input, label });
   }
 
+  const formError = saveMutation.isError
+    ? (resourceMutationErrorMessage(saveMutation.error) ??
+      "Could not save resource. Refresh and try again.")
+    : undefined;
+
   return (
     <>
       <ResourcesToolbar
@@ -607,17 +615,20 @@ function AdminResourcesPage() {
           setSelectedId(null);
           setOrderedIds(null);
         }}
-        onQueryChange={setQuery}
+        onQueryChange={(value) => {
+          setOrderedIds(null);
+          setQuery(value);
+        }}
         onToggleDetails={() => setDetailsOpen((open) => !open)}
         onCreate={openCreateModal}
       />
       <ResourcesContent
-        queryState={resourcesQuery}
+        queryState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && resourceRows.length > 50}
+        hasNext={resourceRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}
@@ -655,9 +666,7 @@ function AdminResourcesPage() {
       <ResourcesModals
         formState={formModal}
         formPending={saveMutation.isPending}
-        formError={
-          saveMutation.isError ? "Could not save resource. Refresh and try again." : undefined
-        }
+        formError={formError}
         confirmation={confirmation}
         lifecyclePending={lifecycleMutation.isPending}
         lifecycleError={lifecycleMutation.isError}

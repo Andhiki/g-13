@@ -10,5 +10,5 @@
     "types": ["node"],
     "typeRoots": ["../apps/web/node_modules/@types"]
   },
-  "include": ["./**/*.ts", "../e2e.config.ts"]
+  "include": ["./**/*.ts", "../e2e*.config.ts"]
 }

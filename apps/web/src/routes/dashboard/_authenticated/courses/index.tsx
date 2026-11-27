@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -265,7 +266,7 @@ function CoursesContent({
         {!queryState.isPending && !queryState.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="courses"
             hasNext={hasNext}
@@ -314,9 +315,8 @@ function CoursesContent({
 function AdminCoursesPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<CourseStatus>("active");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{ open: boolean; course: AdminCourse | null }>({
@@ -329,21 +329,20 @@ function AdminCoursesPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const coursesQuery = useQuery(adminCoursesQuery(offset, status));
+  const coursesQuery = useQuery(adminCoursesQuery(offset, status, needle));
   const counts = coursesQuery.data?.counts ?? initialData.counts;
-  const courseRows = coursesQuery.data?.rows ?? [];
-  const pageRows = courseRows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) =>
-        `${row.code} ${row.nameId} ${row.nameEn} ${row.id}`.toLowerCase().includes(needle),
-      )
-    : pageRows;
+  const listState = {
+    isPending: searchPending || coursesQuery.isPending,
+    isError: !searchPending && coursesQuery.isError,
+  };
+  const courseRows = searchPending ? [] : (coursesQuery.data?.rows ?? []);
+  const visibleRows = courseRows.slice(0, 50);
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = coursesQuery.data?.total ?? 0;
   const selectedCourse = visibleRows.find((course) => course.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedCourse && !coursesQuery.isPending && !coursesQuery.isError;
+    detailsOpen && !!selectedCourse && !listState.isPending && !listState.isError;
 
   async function invalidateCourseQueries() {
     await Promise.all([
@@ -440,12 +439,12 @@ function AdminCoursesPage() {
         {searchAndDetails}
       </AdminFilterBar>
       <CoursesContent
-        queryState={coursesQuery}
+        queryState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && courseRows.length > 50}
+        hasNext={courseRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}

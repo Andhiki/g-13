@@ -9,11 +9,12 @@ import {
   browserLikesInputSchema,
   coursePickerInputSchema,
   lecturerDetailInputSchema,
+  lecturerReviewsInputSchema,
   ownPendingReviewsInputSchema,
   publishReviewInputSchema,
   reviewLikeInputSchema,
 } from "../-shared/schemas";
-import { getLecturerDetail, getLecturerDirectory } from "./read.service";
+import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import {
   rejectRateLimitedReview,
@@ -22,8 +23,9 @@ import {
 } from "./failures";
 import { REVIEW_ERRORS } from "../-shared/errors";
 import { setReviewLike } from "./likes.service";
-import { submitReview } from "./submission.service";
+import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 import { verifyTurnstileToken } from "./turnstile";
+import { hasReviewContactDetails, type ReviewScreeningInput } from "./review-moderation";
 
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () =>
   runServerOperation(() => getLecturerDirectory(createDatabase(env.DB))),
@@ -33,6 +35,12 @@ export const loadLecturerDetail = createServerFn({ method: "GET" })
   .validator(lecturerDetailInputSchema)
   .handler(async ({ data }) =>
     runServerOperation(() => getLecturerDetail(createDatabase(env.DB), data.lecturerId)),
+  );
+
+export const loadLecturerReviewsPage = createServerFn({ method: "GET" })
+  .validator(lecturerReviewsInputSchema)
+  .handler(async ({ data }) =>
+    runServerOperation(() => getLecturerReviewsPage(createDatabase(env.DB), data)),
   );
 
 export const loadCoursePickerPage = createServerFn({ method: "GET" })
@@ -52,8 +60,11 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
   .validator(publishReviewInputSchema)
   .handler(async ({ data }) => {
     const result = await runServerOperation(async () => {
-      const { REVIEW_RATE_LIMIT_SECRET: secret, TURNSTILE_SECRET_KEY: turnstileSecret } =
-        parseSubmissionEnvironment(env);
+      const {
+        REVIEW_RATE_LIMIT_SECRET: secret,
+        TURNSTILE_SECRET_KEY: turnstileSecret,
+        OPENAI_API_KEY: openAiApiKey,
+      } = parseSubmissionEnvironment(env);
       const ip = reviewClientIp(getRequest());
       const { turnstileToken, browserId, ...review } = data;
       const verified = await verifyTurnstileToken({
@@ -61,8 +72,20 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
         token: turnstileToken,
         remoteip: ip,
       });
-      if (!verified) return { data: null, error: REVIEW_ERRORS.CAPTCHA } as const;
-      return submitReview(createDatabase(env.DB), review, { ip, browserId, secret });
+      return submitReviewAfterCaptcha(verified, () => {
+        const classify =
+          env.REVIEW_CLASSIFICATION_TEST_MODE === "clear"
+            ? async (screening: ReviewScreeningInput) =>
+                hasReviewContactDetails(screening) ? ("flagged" as const) : ("clear" as const)
+            : undefined;
+        return submitReview(createDatabase(env.DB), review, {
+          ip,
+          browserId,
+          secret,
+          openAiApiKey,
+          classify,
+        });
+      });
     });
     if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
     if (result.error !== null) return rejectSubmissionOperation(result.error);

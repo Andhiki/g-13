@@ -21,6 +21,7 @@ type Actor = { id: string; role?: string | null };
 type CourseListData = {
   rows: Awaited<ReturnType<typeof listAdminCourses>>;
   counts: Awaited<ReturnType<typeof getAdminCourseCounts>>;
+  total: number;
 };
 
 export async function inspectCourses(
@@ -28,13 +29,15 @@ export async function inspectCourses(
   actor: Actor,
   offset = 0,
   status: CourseStatus = "active",
+  query = "",
 ): Promise<CourseAdminResult<CourseListData>> {
   if (!canModerate(actor.role)) return { data: null, error: COURSE_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts] = await Promise.all([
-    listAdminCourses(db, offset, status),
+  const [rows, counts, matchingCounts] = await Promise.all([
+    listAdminCourses(db, offset, status, query),
     getAdminCourseCounts(db),
+    query ? getAdminCourseCounts(db, query) : undefined,
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function createCourse(
