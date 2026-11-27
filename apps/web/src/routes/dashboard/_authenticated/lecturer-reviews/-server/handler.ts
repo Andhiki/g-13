@@ -14,7 +14,7 @@ export const loadModerationReviews = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { session } = context;
     const result = await runServerOperation(() =>
-      inspectReviews(createDatabase(env.DB), session.user, data.offset, data.status),
+      inspectReviews(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
     );
     if (result.error !== null) rejectModerationOperation(result.error);
     return {

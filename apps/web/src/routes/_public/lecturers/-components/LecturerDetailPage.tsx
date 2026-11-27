@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState, type ComponentProps } from "react";
 import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine, RiStarFill } from "@remixicon/react";
@@ -13,14 +19,17 @@ import { Typography } from "@/ui/typography";
 import { toast, SuccessToast } from "@/ui/toast";
 import { ReviewSubmissionDialog } from "./ReviewSubmissionDialog";
 import { RatingGuidePopover } from "./RatingGuidePopover";
+import { ReviewFeedPagination } from "./ReviewFeedPagination";
 import { ReviewList } from "./ReviewList";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { RatingStars } from "./LecturerReviewCard";
 import { courseDisplayName } from "../-shared/course-search";
-import { filterReviewsByCourse, orderReviews, type ReviewOrder } from "../-shared/review-order";
+import { defaultReviewOrder, type ReviewOrder } from "../-shared/review-order";
 import {
   lecturerBrowserLikesQueryOptions,
   lecturerDetailQueryOptions,
+  lecturerReviewsKey,
+  lecturerReviewsQueryOptions,
   ownPendingReviewsQueryOptions,
 } from "../-client/queries";
 import { readPendingReviewIds, writePendingReviewIds } from "../-client/pending-review-storage";
@@ -296,8 +305,13 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const courseFilterId = useId();
   const [browserId, setBrowserId] = useState<string | null>(null);
   const [storageUnavailable, setStorageUnavailable] = useState(false);
-  const [reviewOrder, setReviewOrder] = useState<ReviewOrder>("newest");
+  const [reviewOrder, setReviewOrder] = useState<ReviewOrder>(defaultReviewOrder);
   const [courseId, setCourseId] = useState<string | null>(null);
+  const reviewQuery = useInfiniteQuery(
+    lecturerReviewsQueryOptions(lecturerId, courseId, reviewOrder),
+  );
+  const publishedReviews = reviewQuery.data?.pages.flatMap((page) => page.reviews) ?? [];
+  const publishedIds = new Set(publishedReviews.map(({ id }) => id));
   const selectedCourse = data.lecturer.courses.find(({ id }) => id === courseId);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [pendingConfirmation, setPendingConfirmation] = useState<"tracked" | "untracked" | null>(
@@ -306,9 +320,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
   const [pendingIds, setPendingIds] = useState<string[]>([]);
   const pendingStorageKey = `lecturer-pending-reviews:${lecturerId}`;
   const pendingQuery = useQuery(ownPendingReviewsQueryOptions(lecturerId, pendingIds));
-  const pendingReviews = (pendingQuery.data ?? []).filter(
-    (review) => !data.reviews.some(({ id }) => id === review.id),
-  );
+  const pendingReviews = (pendingQuery.data ?? []).filter((review) => !publishedIds.has(review.id));
   useEffect(() => {
     const syncPendingIds = () => {
       try {
@@ -333,6 +345,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
     void queryClient.invalidateQueries({
       queryKey: lecturerDetailQueryOptions(lecturerId).queryKey,
     });
+    void queryClient.invalidateQueries({ queryKey: lecturerReviewsKey(lecturerId) });
     try {
       const ids = readPendingReviewIds(pendingStorageKey).filter((id) => !resolvedIds.includes(id));
       writePendingReviewIds(pendingStorageKey, ids);
@@ -355,8 +368,6 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
     enabled: browserId !== null,
   });
   const likeMutation = useMutation(updateReviewLikeMutationOptions(queryClient));
-  const likedReviews = likesQuery.data ?? [];
-  const reviews = orderReviews(filterReviewsByCourse(data.reviews, courseId), reviewOrder);
   useEffect(() => {
     try {
       const key = "lecturer-review-browser-id";
@@ -412,11 +423,12 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
 
   const reviewList = (
     <ReviewList
-      reviews={reviews}
+      reviews={publishedReviews}
       pendingReviews={pendingReviews}
       language={language}
-      emptyState={emptyReviews}
-      likedReviews={likedReviews}
+      emptyState={reviewQuery.isPending || reviewQuery.isError ? null : emptyReviews}
+      likedReviews={likesQuery.data ?? []}
+      pendingLike={likeMutation.isPending ? likeMutation.variables : undefined}
       canLike={canLike}
       likePending={likeMutation.isPending}
       onLike={handleToggleLike}
@@ -449,6 +461,7 @@ export function LecturerDetailPage({ lecturerId }: { lecturerId: string }) {
             </Typography>
           )}
           {reviewList}
+          <ReviewFeedPagination key={JSON.stringify([courseId, reviewOrder])} query={reviewQuery} />
         </section>
       </div>
       <ReviewSubmissionDialog

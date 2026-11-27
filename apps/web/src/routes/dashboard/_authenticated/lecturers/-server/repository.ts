@@ -1,3 +1,4 @@
+import { adminSearchCondition } from "../../-server/search";
 import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -12,13 +13,22 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
+function searchCondition(query: string) {
+  return adminSearchCondition(query, [lecturers.name, lecturers.id]);
+}
+
 async function allocateLecturerId(db: Database, name: string): Promise<string> {
   return allocateCatalogId(name, "lecturer", (pattern) =>
     db.select({ id: lecturers.id }).from(lecturers).where(like(lecturers.id, pattern)),
   );
 }
 
-export async function listAdminLecturers(db: Database, offset: number, status: LecturerStatus) {
+export async function listAdminLecturers(
+  db: Database,
+  offset: number,
+  status: LecturerStatus,
+  query = "",
+) {
   return db
     .select({
       id: lecturers.id,
@@ -28,20 +38,26 @@ export async function listAdminLecturers(db: Database, offset: number, status: L
     })
     .from(lecturers)
     .leftJoin(reviews, eq(reviews.lecturerId, lecturers.id))
-    .where(status === "active" ? isNull(lecturers.deletedAt) : isNotNull(lecturers.deletedAt))
+    .where(
+      and(
+        status === "active" ? isNull(lecturers.deletedAt) : isNotNull(lecturers.deletedAt),
+        searchCondition(query),
+      ),
+    )
     .groupBy(lecturers.id)
     .orderBy(asc(lecturers.name), asc(lecturers.id))
     .limit(51)
     .offset(offset);
 }
 
-export async function getAdminLecturerCounts(db: Database) {
+export async function getAdminLecturerCounts(db: Database, query = "") {
   const [counts] = await db
     .select({
       active: sql<number>`coalesce(sum(case when ${lecturers.deletedAt} is null then 1 else 0 end), 0)`,
       deleted: sql<number>`coalesce(sum(case when ${lecturers.deletedAt} is not null then 1 else 0 end), 0)`,
     })
-    .from(lecturers);
+    .from(lecturers)
+    .where(searchCondition(query));
   return counts;
 }
 

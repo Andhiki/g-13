@@ -126,6 +126,15 @@ it("enforces RBAC, CRUD, countdown behavior, toggles, and public visibility for 
     expect(disabledList.rows.map((row) => row.id)).toEqual([created.id]);
     expect(resultData(await inspectAnnouncements(db, admin, 0, "live")).rows).toEqual([]);
 
+    const match = resultData(
+      await inspectAnnouncements(db, admin, 0, "disabled", "UTS diperbarui"),
+    );
+    expect(match.rows.map(({ id }) => id)).toEqual([created.id]);
+    expect(match.total).toBe(1);
+    expect(
+      resultData(await inspectAnnouncements(db, admin, 0, "live", "UTS diperbarui")).total,
+    ).toBe(0);
+
     // Re-enabling brings it back live.
     expect(
       await changeAnnouncementLifecycle(db, admin, {

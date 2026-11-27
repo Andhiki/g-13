@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { adminPageSchema } from "../../-shared/admin-search";
 
 export const courseStatusSchema = z.enum(["active", "deleted"]);
 export type CourseStatus = z.infer<typeof courseStatusSchema>;
 
-export const coursePageSchema = z.object({
-  offset: z.number().int().min(0),
+export const coursePageSchema = adminPageSchema.extend({
   status: courseStatusSchema,
 });
 
