@@ -93,7 +93,10 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
     if (pageCount > alumniUpstream.maxPages) {
       throw new Error("Alumni upstream page limit exceeded");
     }
-    if (pageCount === 0 && strapiPage.data.length > 0) {
+    if (
+      (pageCount === 0 && strapiPage.data.length > 0) ||
+      (pageCount > 0 && strapiPage.data.length === 0)
+    ) {
       throw new Error("Invalid alumni upstream pagination");
     }
     if (expectedPageCount !== undefined && pageCount !== expectedPageCount) {

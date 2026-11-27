@@ -103,6 +103,38 @@ test("rejects a malformed later page instead of returning a partial directory", 
   }
 });
 
+test("rejects an empty page when Strapi reports a positive page count", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({ data: [], meta: { pagination: { page: 1, pageCount: 1 } } }),
+  );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects an empty later page instead of returning an incomplete directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      Response.json({ data: [1], meta: { pagination: { page: 1, pageCount: 2 } } }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ data: [], meta: { pagination: { page: 2, pageCount: 2 } } }),
+    );
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Invalid alumni upstream pagination",
+    );
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
 test("rejects a repeated page response instead of returning duplicate upstream pages", async () => {
   const fetchSpy = spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(
