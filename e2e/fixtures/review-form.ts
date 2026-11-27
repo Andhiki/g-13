@@ -1,6 +1,6 @@
-﻿import { expect, type TestFixtures } from "e2e";
+import { expect, type TestFixtures } from "e2e";
 import type { WebFixtures } from "@e2e-dev/web";
-import { fixture } from "../database.ts";
+import { fixture } from "./database.ts";
 
 export const profile = `/lecturers/${fixture.lecturerId}`;
 

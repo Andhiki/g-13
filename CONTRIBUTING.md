@@ -27,39 +27,57 @@ skill proyek tersedia di [AGENTS.md](AGENTS.md).
 Agent dapat memakai [skill PR body](.agents/skills/pr-body/SKILL.md) yang tersedia
 di repo. Skill mengikuti template PR dan meminta hasil verifikasi aktual.
 
-## Regresi browser di staging
+## Regresi browser
 
-Suite browser memakai [e2e](https://e2e.com/docs) dengan Chromium pada viewport
-1440 × 900. Jalankan dengan Bun sesuai versi di `package.json` dan Node.js 26.13
-atau lebih baru, karena runner E2E dijalankan dengan `node` dan memanggil CLI
-Cloudflare.
+Suite browser menggunakan [e2e](https://e2e.com/docs) dengan Chromium pada viewport
+1440 × 900. Gunakan versi Bun dan Node.js di `package.json`.
 
 ```sh
 bun install --frozen-lockfile
 bun node_modules/@e2e-dev/web/dist/bin.js install chromium
+bun run build:packages
+bun run test:e2e
 bun run test:e2e:smoke
 ```
 
-Smoke mengunjungi staging bersama sebagai pengunjung tanpa sesi. Hasil
-dilaporkan per rute. Kegagalan upstream alumni menampilkan status HTTP terpisah
-dari skenario retry yang memakai data fixture. Setelah workflow tersedia pada
-branch default, smoke juga bisa dijalankan dari tab Actions melalui **Staging
-browser tests**. Laporan, JUnit, dan trace kegagalan tersedia di `.e2e/` dan
-sebagai artefak Actions.
+Skenario di `e2e/local/` menjalankan Worker lokal dengan D1 SQLite sementara.
+E2E memulai launcher, menunggu Worker siap, dan menghentikan launcher setelah
+tes. Launcher menerapkan migrasi dan menghapus database sementara saat berhenti.
+Fixture di `e2e/fixtures/` membuat sesi, ulasan, dan batas rate limit lokal.
+Jalankan suite dengan satu worker karena fixture mereset database yang dipakai
+bersama. Mode `local-e2e` menyediakan fixture alumni dan Turnstile serta
+kredensial GitHub uji. Perintah ini bisa dijalankan tanpa akun Cloudflare.
 
-`bun run test:e2e` menjalankan skenario fungsional pada Worker lokal dengan D1
-SQLite sementara. Perintah ini menerapkan migrasi ke direktori temporer, memulai
-Worker lokal, menjalankan browser Chromium, lalu menghentikan Worker dan menghapus
-database tersebut. Sesi, data ulasan, dan batas rate limit dibuat langsung pada
-D1 lokal. Tidak diperlukan akun Cloudflare, token, deployment Worker, atau
-database D1 jangka panjang.
+Suite `e2e/smoke/` hanya mengirim GET dan HEAD ke origin staging bersama.
+Tes direktori alumni melaporkan status endpoint upstream dan menunggu halaman
+selesai dimuat. Workflow **Staging browser tests** menjalankan suite lokal
+tanpa model pada setiap PR ke `staging`, termasuk PR dari fork. Jalankan smoke
+melalui workflow manual atau perintah di atas. Laporan, JUnit, log Worker lokal,
+dan trace kegagalan tersedia di `.e2e/local/` atau `.e2e/smoke/`.
 
-Workflow **Staging browser tests** menjalankan suite fungsional tersebut untuk
-setiap PR ke `staging`, termasuk PR dari fork, setelah membangun paket workspace
-dan memasang Chromium. Workflow manual tetap menjalankan smoke test read-only
-terhadap staging bersama. Mode `local-e2e` menggunakan fixture alumni, Turnstile,
-dan kredensial GitHub dummy agar skenario tidak menghubungi layanan eksternal.
-Pemeriksaan data dan logika aplikasi tetap dijalankan dengan `bun run check`.
+### Skenario agen
+
+Skenario di `e2e/agent/` memakai `agent.act()` untuk menyelesaikan alur pengguna
+dan assertion yang presisi untuk memeriksa hasilnya. Untuk merekam skenario
+secara lokal, masuk dengan akun ChatGPT yang memiliki akses Codex.
+
+```sh
+node node_modules/e2e/dist/cli/bin.js login openai
+bun run test:e2e:agent
+```
+
+Tambahkan `--device` saat login dari terminal jarak jauh. Gunakan
+`E2E_AGENT_MODEL` untuk memilih model lain yang tersedia di akunmu.
+Commit rekaman aksi yang terverifikasi di `e2e/cache/`. Jalankan
+`CI=1 bun run test:e2e:agent` untuk memeriksa replay tanpa login atau model.
+Workflow **Staging browser tests** menjalankan perintah ini untuk setiap PR.
+Jika rekaman hilang atau tidak lagi cocok, perbarui dari run lokal dan commit
+hasilnya. Laporan agen tersedia di `.e2e/agent/`.
+
+Untuk menulis atau men-debug tes dengan coding agent, baca panduan versi
+terpasang dengan `node node_modules/e2e/dist/cli/bin.js guide`. Server MCP lokal
+dapat dijalankan dengan `node node_modules/e2e/dist/cli/bin.js mcp --max-sessions 1`
+setelah paket workspace dibangun.
 
 ## Catatan rilis
 
@@ -103,8 +121,8 @@ yang ambigu. Pertahankan provenance di data sumber dan tambahkan tes yang releva
   dokumen sumber. Ikuti [panduan impor](docs/curriculum-import.md); jangan simpan
   skrip ekstraksi PDF sekali pakai. Perubahan sumber harus menyertakan provenance.
 - `*.test.ts`: tes Bun untuk perilaku data dan logika aplikasi.
-- Verifikasi perubahan UI secara manual. Jangan menambahkan tes UI, termasuk
-  pemeriksaan teks, posisi piksel, ukuran, tata letak, atau animasi.
+- Verifikasi tampilan UI secara manual. Pakai E2E untuk perilaku pengguna dan
+  hasil yang dapat diamati, seperti navigasi, persistensi, dan pemulihan dari error.
 - Ikuti gaya kode di sekitar perubahan. Gunakan `bun run format` dan
   `bun run lint:fix` seperlunya. Jangan edit `apps/web/src/routeTree.gen.ts` manual.
 - Aturan design system untuk `apps/web` didefinisikan di `.oxlintrc.json` lewat

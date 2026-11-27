@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "trace-1",
+  "createdAt": "2026-11-27T17:26:45.945Z",
+  "payload": {
+    "actions": [
+      {
+        "name": "tap",
+        "summary": "tap button \"2026\"",
+        "target": {
+          "role": "button",
+          "name": "2026"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Lanjut\"",
+        "target": {
+          "role": "button",
+          "name": "Lanjut"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Reguler\" in \"IUP\"",
+        "target": {
+          "role": "button",
+          "name": "Reguler",
+          "within": "IUP"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Lanjut\"",
+        "target": {
+          "role": "button",
+          "name": "Lanjut"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Analisis Data\"",
+        "target": {
+          "role": "button",
+          "name": "Analisis Data"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Lanjut\"",
+        "target": {
+          "role": "button",
+          "name": "Lanjut"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Tidak\" in \"Ya\"",
+        "target": {
+          "role": "button",
+          "name": "Tidak",
+          "within": "Ya"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Lihat roadmap\"",
+        "target": {
+          "role": "button",
+          "name": "Lihat roadmap"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap button \"Buka filter roadmap\" in \"Filter roadmap\"",
+        "target": {
+          "role": "button",
+          "name": "Buka filter roadmap",
+          "within": "Filter roadmap"
+        }
+      },
+      {
+        "name": "tap",
+        "summary": "tap radio \"7 semester\" in \"Filter roadmap\"",
+        "target": {
+          "role": "radio",
+          "name": "7 semester",
+          "within": "Filter roadmap"
+        }
+      }
+    ],
+    "executor": {
+      "name": "e2e-default-agent",
+      "version": "2"
+    },
+    "recordedFor": {
+      "testId": "e2e/agent/roadmap.e2e.ts::A%20first-time%20student%20can%20create%20and%20share%20a%202026%20seven-semester%20roadmap",
+      "targetId": "local-roadmap-agent",
+      "instructionDigest": "a85810f334ef6da62ba04b06c0270364a357425824d542f06fea98ef629461d0",
+      "paramsDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "callIndex": 0,
+      "agent": "default"
+    },
+    "recordedBy": {
+      "provider": "chatgpt.responses",
+      "model": "gpt-6-luna"
+    },
+    "summary": "Generated the 2026 regular-student roadmap for Analisis Data with no internship, opened Buka filter roadmap, and selected 7 semester. The result remains open and shows the checked 7 semester filter and “Target selesai 7 semester.”",
+    "startPath": "/roadmap?lulus=8&semesterPaparan=6",
+    "endPath": "/roadmap?kurikulum=%222026%22&minat=Analisis+Data&iup=tidak&magang=tidak&lulus=7&semesterPaparan=6&hasil=true",
+    "endAnchors": [
+      {
+        "role": "heading",
+        "name": "Roadmap personal"
+      },
+      {
+        "text": "Roadmapmu mengikuti kurikulum 2026, pilihan Analisis Data, dan targetmu selesai dalam 7 semester. Kegiatanmu: Tanpa kegiatan tambahan. Ada 3 hal yang perlu kamu periksa di catatan roadmap."
+      },
+      {
+        "text": "Bagikan"
+      },
+      {
+        "text": "Semester 1 · 20 SKS"
+      },
+      {
+        "text": "UNKU26000X"
+      },
+      {
+        "text": "2 SKS"
+      },
+      {
+        "text": "Agama"
+      },
+      {
+        "text": "PACS262101"
+      }
+    ],
+    "goneAnchors": [
+      {
+        "role": "heading",
+        "name": "Kurikulum mana yang kamu ikuti?"
+      },
+      {
+        "text": "Rencana dimulai dari semester 1. Gunakan versi kurikulum yang berlaku untukmu."
+      },
+      {
+        "role": "button",
+        "name": "Kembali"
+      },
+      {
+        "role": "button",
+        "name": "Lanjut"
+      },
+      {
+        "role": "region",
+        "name": "Kurikulum mana yang kamu ikuti?"
+      },
+      {
+        "role": "group",
+        "name": "Pilihan jawaban"
+      }
+    ],
+    "endWaitMs": 12736,
+    "keyedBy": {
+      "cacheSchema": "trace-1",
+      "policyVersion": "conservative/6",
+      "project": "6c841479b6d3f158a40781555e63f162b426bcc6930413c7fb06dc6d2e58a484",
+      "platform": "web",
+      "engineName": "web",
+      "engineSpiVersion": 1,
+      "appIdentity": "71abf04f26b8060a0d1e20de165288ce3bdbe3658e652836593c8c38bf8942d9",
+      "agentContextDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

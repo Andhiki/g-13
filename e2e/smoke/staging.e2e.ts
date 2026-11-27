@@ -1,12 +1,11 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
 import { notFound, protectedRoutes, publicRoutes } from "../routes.ts";
-import { sharedOrigin } from "../targets.ts";
 
-test.beforeEach(async ({ browser }) => {
+test.beforeEach(async ({ app, browser }) => {
   await browser.route("**/*", async (route) => {
     if (
-      new URL(route.request.url).origin !== sharedOrigin ||
+      new URL(route.request.url).origin !== app.baseUrl ||
       !["GET", "HEAD"].includes(route.request.method)
     ) {
       await route.abort();
@@ -29,14 +28,22 @@ for (const { path, primary } of publicRoutes) {
 test("GET /alumni/all loads the live directory", async ({ app, browser, screen }) => {
   await app.open("/alumni");
   await screen.getByRole("link", { name: /jelajahi semua alumni|explore all alumni/i }).click();
-  await expect(screen.getByRole("heading", { name: /semua alumni|all alumni/i })).toBeVisible();
-  const status = await browser.evaluate(async () => (await fetch("/api/alumni")).status);
-  expect(status, `Shared staging alumni upstream returned HTTP ${status}`).toBe(200);
+  try {
+    await expect(screen.getByRole("heading", { name: /semua alumni|all alumni/i })).toBeVisible({
+      timeout: 20_000,
+    });
+  } finally {
+    const status = await browser.evaluate(async () => {
+      const response = await fetch("/api/alumni", { signal: AbortSignal.timeout(15_000) });
+      return response.status;
+    });
+    expect(status, `Shared staging alumni upstream returned HTTP ${status}`).toBe(200);
+  }
+  await expect(screen.getByRole("searchbox")).toBeVisible();
   await expect(
     screen.getByRole("button", { name: /coba lagi|try again/i }),
     "Shared staging could not load the alumni directory on entry",
   ).toBeHidden();
-  await expect(screen.getByRole("searchbox")).toBeVisible();
 });
 
 test("GET /lecturers/afiahayati loads a public lecturer profile", async ({ app, screen }) => {
@@ -70,5 +77,8 @@ test("GET /missing-app-page offers a link back to the curriculum", async ({
   await app.open("/missing-app-page");
   await expect(screen.getByRole("heading", { name: notFound })).toBeVisible();
   await screen.getByRole("link", { name: /^(kembali|back)$/i }).click();
-  await expect(browser).toHaveURL(new RegExp(`^${sharedOrigin.replaceAll(".", "\\.")}/(?:[?#]|$)`));
+  await expect(screen.getByRole("button", { name: publicRoutes[0].primary }).first()).toBeVisible();
+  const destination = new URL(await browser.url());
+  expect(destination.origin).toBe(app.baseUrl);
+  expect(destination.pathname).toBe("/");
 });

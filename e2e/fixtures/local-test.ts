@@ -1,4 +1,5 @@
 import { test as base } from "@e2e-dev/web";
+import { localOrigin } from "../local-worker.ts";
 import { resetFixtures, seedSession, type Role } from "./database.ts";
 
 export const test = base.extend<{
@@ -8,8 +9,8 @@ export const test = base.extend<{
   // Reset per test attempt, not once per test: a retry must not see the
   // previous attempt's writes.
   reset: [
-    async ({ browser }, use) => {
-      await resetFixtures();
+    async ({ app, browser }, use) => {
+      await resetFixtures(localOrigin(app.baseUrl));
       // The fixture writes directly to the local D1 database. A retry can reuse
       // the previous attempt's page, so reload it to drop any cached rows; the
       // first attempt has no page yet.
@@ -18,10 +19,10 @@ export const test = base.extend<{
     },
     { auto: true },
   ],
-  signIn: async ({ browser }, use) => {
+  signIn: async ({ app, browser }, use) => {
     await use(async (role, { expired = false } = {}) => {
       await browser.clearCookies();
-      await browser.setCookies(await seedSession(role, expired));
+      await browser.setCookies(await seedSession(localOrigin(app.baseUrl), role, expired));
     });
   },
 });
