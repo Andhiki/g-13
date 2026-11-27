@@ -1,4 +1,10 @@
 import { useAdminSearch } from "../-client/useAdminSearch";
+import {
+  getAdminPageRows,
+  getNextAdminPageOffset,
+  getPreviousAdminPageOffset,
+  hasNextAdminPage,
+} from "../-shared/admin-pagination";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -339,7 +345,7 @@ function AdminLecturersPage() {
     isError: !searchPending && lecturersQuery.isError,
   };
   const lecturerRows = searchPending ? [] : (lecturersQuery.data?.rows ?? []);
-  const visibleRows = lecturerRows.slice(0, 50);
+  const visibleRows = getAdminPageRows(lecturerRows);
 
   const count = visibleRows.length;
   const total = lecturersQuery.data?.total ?? 0;
@@ -448,7 +454,6 @@ function AdminLecturersPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={lecturerRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}
@@ -456,8 +461,9 @@ function AdminLecturersPage() {
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={hasNextAdminPage(offset, total)}
+        onPreviousPage={() => setOffset(getPreviousAdminPageOffset(offset))}
+        onNextPage={() => setOffset(getNextAdminPageOffset(offset))}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
