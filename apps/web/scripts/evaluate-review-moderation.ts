@@ -30,20 +30,21 @@ export async function runEvaluationCli(args: string[], options: CliOptions = {})
     return 2;
   }
 
-  const live = args.includes("--live");
-  const apiKey = live ? options.apiKey?.trim() : undefined;
-  if (live && !apiKey) {
+  const runLiveGroq = args.includes("--live");
+  const apiKey = runLiveGroq ? options.apiKey?.trim() : undefined;
+  if (runLiveGroq && !apiKey) {
     stderr("Groq evaluation requested, but GROQ_API_KEY is unset. No request was sent.");
     return 2;
   }
 
   const records = await evaluateSyntheticCases(syntheticModerationCases, {
+    runLiveGroq,
     apiKey,
     fetcher: options.fetcher,
   });
   const report = {
     model: GROQ_MODEL,
-    mode: live ? "synthetic_with_groq" : "synthetic_local_only",
+    mode: runLiveGroq ? "synthetic_with_groq" : "synthetic_local_only",
     cases: records,
     summary: summarizeEvaluation(records),
   };

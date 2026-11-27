@@ -12,11 +12,12 @@ import {
   type ModelClassification,
 } from "./review-moderation-evaluation";
 
+function providerResponse(envelope: unknown) {
+  return new Response(JSON.stringify(envelope), { status: 200 });
+}
+
 function groqResponse(content: unknown) {
-  return new Response(
-    JSON.stringify({ choices: [{ message: { content: JSON.stringify(content) } }] }),
-    { status: 200 },
-  );
+  return providerResponse({ choices: [{ message: { content: JSON.stringify(content) } }] });
 }
 
 it("keeps synthetic held-out cases across languages and moderation edge cases", () => {
@@ -84,7 +85,11 @@ it("sends both fields separately in one strict JSON-schema Groq request", async 
   );
 
   expect(calls).toBe(1);
-  expect(result).toEqual({ status: "ok", review: "flag", chosenName: "flag" });
+  expect(result).toEqual({
+    status: "ok",
+    reviewDecision: "flag",
+    chosenNameDecision: "flag",
+  });
 });
 
 it("accepts uncertainty as a model decision and null for an absent chosen name", async () => {
@@ -93,7 +98,11 @@ it("accepts uncertainty as a model decision and null for an absent chosen name",
     "fake-test-key",
     async () => groqResponse({ review: "uncertain", chosen_name: null }),
   );
-  expect(result).toEqual({ status: "ok", review: "uncertain", chosenName: null });
+  expect(result).toEqual({
+    status: "ok",
+    reviewDecision: "uncertain",
+    chosenNameDecision: null,
+  });
 });
 
 it("distinguishes request errors from invalid model output without exposing provider content", async () => {
@@ -104,8 +113,8 @@ it("distinguishes request errors from invalid model output without exposing prov
   );
   expect(failedHttp).toEqual({
     status: "request_error",
-    review: null,
-    chosenName: null,
+    reviewDecision: null,
+    chosenNameDecision: null,
     errorCode: "http_429",
   });
 
@@ -119,8 +128,8 @@ it("distinguishes request errors from invalid model output without exposing prov
   );
   expect(invalidJson).toEqual({
     status: "validation_error",
-    review: null,
-    chosenName: null,
+    reviewDecision: null,
+    chosenNameDecision: null,
     errorCode: "invalid_model_json",
   });
 
@@ -155,6 +164,7 @@ it("rejects non-decisions and inconsistent absent-name output", async () => {
 it("runs local synthetic evaluation without a provider request", async () => {
   let calls = 0;
   const records = await evaluateSyntheticCases(syntheticModerationCases, {
+    apiKey: "fake-test-key",
     fetcher: async () => {
       calls += 1;
       return groqResponse({ review: "clear", chosen_name: null });
@@ -173,13 +183,13 @@ it("runs local synthetic evaluation without a provider request", async () => {
 it("reports field-level uncertainty separately from request and validation failures", () => {
   const uncertain: ModelClassification = {
     status: "ok",
-    review: "uncertain",
-    chosenName: "clear",
+    reviewDecision: "uncertain",
+    chosenNameDecision: "clear",
   };
   const failed: ModelClassification = {
     status: "request_error",
-    review: null,
-    chosenName: null,
+    reviewDecision: null,
+    chosenNameDecision: null,
     errorCode: "http_503",
   };
   const records = [
@@ -187,8 +197,8 @@ it("reports field-level uncertainty separately from request and validation failu
     makeEvaluationRecord(syntheticModerationCases[1]!, failed),
     makeEvaluationRecord(syntheticModerationCases[2]!, {
       status: "validation_error",
-      review: null,
-      chosenName: null,
+      reviewDecision: null,
+      chosenNameDecision: null,
       errorCode: "invalid_decision",
     }),
   ];
@@ -204,19 +214,43 @@ it("reports field-level uncertainty separately from request and validation failu
   });
 });
 
-it("handles non-record provider messages and timeouts cleanly", async () => {
-  const nonRecordMessage = await classifyWithGroq(
-    { body: "A synthetic review" },
-    "fake-test-key",
-    async () =>
-      new Response(JSON.stringify({ choices: [{ message: "unexpected" }] }), { status: 200 }),
-  );
-  expect(nonRecordMessage).toEqual({
-    status: "request_error",
-    review: null,
-    chosenName: null,
-    errorCode: "missing_provider_content",
+it("validates malformed provider envelopes and continues with later fixtures", async () => {
+  const malformedEnvelopes: [unknown, string][] = [
+    [null, "provider_envelope_not_object"],
+    [{ choices: "not-an-array" }, "invalid_provider_choices"],
+    [{ choices: [] }, "invalid_provider_choices"],
+    [{ choices: [null] }, "invalid_provider_choice"],
+    [{ choices: [{ message: "unexpected" }] }, "invalid_provider_message"],
+    [{ choices: [{ message: {} }] }, "missing_provider_content"],
+    [{ choices: [{ message: { content: null } }] }, "invalid_model_content_type"],
+  ];
+
+  for (const [envelope, errorCode] of malformedEnvelopes) {
+    const result = await classifyWithGroq(
+      { body: "A synthetic review" },
+      "fake-test-key",
+      async () => providerResponse(envelope),
+    );
+    expect(result.status).toBe("validation_error");
+    expect(result.errorCode).toBe(errorCode);
+  }
+
+  let calls = 0;
+  const records = await evaluateSyntheticCases(syntheticModerationCases.slice(0, 2), {
+    runLiveGroq: true,
+    apiKey: "fake-test-key",
+    fetcher: async () => {
+      calls += 1;
+      if (calls === 1) {
+        return providerResponse({ choices: [{ message: "unexpected" }] });
+      }
+      return groqResponse({ review: "clear", chosen_name: "clear" });
+    },
   });
+  expect(calls).toBe(2);
+  expect(records[0]?.modelStatus).toBe("validation_error");
+  expect(records[0]?.errorCode).toBe("invalid_provider_message");
+  expect(records[1]?.modelStatus).toBe("ok");
 
   const timedOut = await classifyWithGroq(
     { body: "A synthetic review" },
@@ -227,8 +261,8 @@ it("handles non-record provider messages and timeouts cleanly", async () => {
   );
   expect(timedOut).toEqual({
     status: "request_error",
-    review: null,
-    chosenName: null,
+    reviewDecision: null,
+    chosenNameDecision: null,
     errorCode: "timeout",
   });
 });
@@ -237,18 +271,18 @@ it("computes accuracy, precision, and recall across evaluated records", () => {
   const records = [
     makeEvaluationRecord(syntheticModerationCases[0]!, {
       status: "ok",
-      review: "flag",
-      chosenName: "clear",
+      reviewDecision: "flag",
+      chosenNameDecision: "clear",
     }),
     makeEvaluationRecord(syntheticModerationCases[1]!, {
       status: "ok",
-      review: "clear",
-      chosenName: "flag",
+      reviewDecision: "clear",
+      chosenNameDecision: "flag",
     }),
     makeEvaluationRecord(syntheticModerationCases[5]!, {
       status: "ok",
-      review: "clear",
-      chosenName: "clear",
+      reviewDecision: "clear",
+      chosenNameDecision: "clear",
     }),
   ];
   const summary = summarizeEvaluation(records);

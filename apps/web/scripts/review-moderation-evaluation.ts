@@ -17,8 +17,8 @@ export type LocalChecks = {
 
 export type ModelClassification = {
   status: ModelStatus;
-  review: ModerationDecision | null;
-  chosenName: ModerationDecision | null;
+  reviewDecision: ModerationDecision | null;
+  chosenNameDecision: ModerationDecision | null;
   errorCode?: string;
 };
 
@@ -40,7 +40,6 @@ export type EvaluationRecord = {
 };
 
 export type GroqFetcher = (input: string, init?: RequestInit) => Promise<Response>;
-type GroqResponse = { choices?: { message?: { content?: unknown } }[] };
 
 const decisions = ["clear", "flag", "uncertain"] as const;
 
@@ -89,8 +88,8 @@ function invalidModelOutput(content: unknown, errorCode: string): ModelClassific
   const output = isRecord(content) ? content : {};
   return {
     status: "validation_error",
-    review: isDecision(output.review) ? output.review : null,
-    chosenName: isDecision(output.chosen_name) ? output.chosen_name : null,
+    reviewDecision: isDecision(output.review) ? output.review : null,
+    chosenNameDecision: isDecision(output.chosen_name) ? output.chosen_name : null,
     errorCode,
   };
 }
@@ -104,8 +103,8 @@ export async function classifyWithGroq(
   if (!trimmedKey) {
     return {
       status: "request_error",
-      review: null,
-      chosenName: null,
+      reviewDecision: null,
+      chosenNameDecision: null,
       errorCode: "missing_api_key",
     };
   }
@@ -145,8 +144,8 @@ export async function classifyWithGroq(
       (error.name === "TimeoutError" || error.name === "AbortError");
     return {
       status: "request_error",
-      review: null,
-      chosenName: null,
+      reviewDecision: null,
+      chosenNameDecision: null,
       errorCode: isTimeout ? "timeout" : "fetch_failed",
     };
   }
@@ -154,8 +153,8 @@ export async function classifyWithGroq(
   if (!response.ok) {
     return {
       status: "request_error",
-      review: null,
-      chosenName: null,
+      reviewDecision: null,
+      chosenNameDecision: null,
       errorCode: `http_${response.status}`,
     };
   }
@@ -166,25 +165,30 @@ export async function classifyWithGroq(
   } catch {
     return {
       status: "request_error",
-      review: null,
-      chosenName: null,
+      reviewDecision: null,
+      chosenNameDecision: null,
       errorCode: "invalid_provider_json",
     };
   }
 
-  const message = isRecord(envelope) ? (envelope as GroqResponse).choices?.[0]?.message : null;
-  if (!isRecord(message) || !("content" in message)) {
-    return {
-      status: "request_error",
-      review: null,
-      chosenName: null,
-      errorCode: "missing_provider_content",
-    };
+  if (!isRecord(envelope)) return invalidModelOutput(null, "provider_envelope_not_object");
+  const choices = envelope.choices;
+  if (!Array.isArray(choices) || choices.length === 0) {
+    return invalidModelOutput(null, "invalid_provider_choices");
+  }
+  const firstChoice = choices[0];
+  if (!isRecord(firstChoice)) return invalidModelOutput(null, "invalid_provider_choice");
+  const message = firstChoice.message;
+  if (!isRecord(message)) return invalidModelOutput(null, "invalid_provider_message");
+  if (!Object.hasOwn(message, "content")) {
+    return invalidModelOutput(null, "missing_provider_content");
   }
 
   let content: unknown;
   try {
-    if (typeof message.content !== "string") throw new Error("Model content is not text");
+    if (typeof message.content !== "string") {
+      return invalidModelOutput(null, "invalid_model_content_type");
+    }
     content = JSON.parse(message.content);
   } catch {
     return invalidModelOutput(null, "invalid_model_json");
@@ -208,7 +212,7 @@ export async function classifyWithGroq(
     return invalidModelOutput(content, "name_presence_mismatch");
   }
 
-  return { status: "ok", review, chosenName };
+  return { status: "ok", reviewDecision: review, chosenNameDecision: chosenName };
 }
 
 export function makeEvaluationRecord(
@@ -223,14 +227,14 @@ export function makeEvaluationRecord(
       text: testCase.review.text,
       expected: testCase.review.expected,
       local: localChecks(testCase.review.text),
-      model: model.review,
+      model: model.reviewDecision,
     },
     chosenName: testCase.chosenName
       ? {
           text: testCase.chosenName.text,
           expected: testCase.chosenName.expected,
           local: localChecks(testCase.chosenName.text),
-          model: model.chosenName,
+          model: model.chosenNameDecision,
         }
       : null,
     modelStatus: model.status,
@@ -297,11 +301,11 @@ function addPrediction(
   }
 
   counts.evaluated += 1;
-  const actualFlag = expected === "flag";
+  const expectedFlag = expected === "flag";
   const predictedFlag = predicted === "flag";
-  if (actualFlag && predictedFlag) counts.truePositive += 1;
-  else if (!actualFlag && predictedFlag) counts.falsePositive += 1;
-  else if (actualFlag) counts.falseNegative += 1;
+  if (expectedFlag && predictedFlag) counts.truePositive += 1;
+  else if (!expectedFlag && predictedFlag) counts.falsePositive += 1;
+  else if (expectedFlag) counts.falseNegative += 1;
   else counts.trueNegative += 1;
   if (predicted === expected) counts.correct += 1;
 }
@@ -351,12 +355,11 @@ export function summarizeEvaluation(records: EvaluationRecord[]) {
 
 export async function evaluateSyntheticCases(
   cases: SyntheticModerationCase[],
-  options: { apiKey?: string; fetcher?: GroqFetcher } = {},
+  options: { runLiveGroq?: boolean; apiKey?: string; fetcher?: GroqFetcher } = {},
 ): Promise<EvaluationRecord[]> {
-  const hasLiveCredentials = Boolean(options.apiKey?.trim());
   const records: EvaluationRecord[] = [];
   for (const testCase of cases) {
-    const model = hasLiveCredentials
+    const model = options.runLiveGroq
       ? await classifyWithGroq(
           {
             body: testCase.review.text,
@@ -367,8 +370,8 @@ export async function evaluateSyntheticCases(
         )
       : {
           status: "not_run" as const,
-          review: null,
-          chosenName: null,
+          reviewDecision: null,
+          chosenNameDecision: null,
         };
     records.push(makeEvaluationRecord(testCase, model));
   }
