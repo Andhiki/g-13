@@ -51,12 +51,12 @@ function AdminLayout() {
   });
   return (
     <main className="h-full min-h-0 bg-bg-weak-50 text-text-strong-950 md:p-1.5">
-      <div className="relative h-full min-h-0 [--sidebar-width:220px] [--sidebar-slide-duration:200ms] md:overflow-clip">
+      <div className="relative h-full min-h-0 [--sidebar-width:220px] md:overflow-clip">
         <ModerationSidebar identity={identity} />
-        {/* Keep the panel full-width while it slides, then fit it beside the sidebar. */}
+        {/* Reveal the stationary sidebar while keeping the panel’s far edge anchored. */}
         <section
           data-sidebar-open={sidebarOpen}
-          className="relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border md:transition-[translate,width] md:[transition-duration:var(--sidebar-slide-duration),0s] md:ease-out md:data-[sidebar-open=true]:w-[calc(100%-var(--sidebar-width))] md:data-[sidebar-open=true]:translate-x-(--sidebar-width) md:data-[sidebar-open=true]:[transition-delay:0s,var(--sidebar-slide-duration)] md:rtl:data-[sidebar-open=true]:-translate-x-(--sidebar-width) motion-reduce:transition-none"
+          className="relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden border-primary-base/20 bg-bg-white-0 md:rounded-xl md:border md:absolute md:inset-y-0 md:start-0 md:end-0 md:z-10 md:w-auto md:motion-safe:transition-[inset-inline-start] md:motion-safe:duration-200 md:motion-safe:ease-out md:data-[sidebar-open=true]:start-(--sidebar-width) motion-reduce:transition-none"
         >
           <Outlet />
         </section>
