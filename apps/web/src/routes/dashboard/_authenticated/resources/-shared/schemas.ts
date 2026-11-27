@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { adminPageSchema } from "../../-shared/admin-search";
 
 export const resourceStatusSchema = z.enum(["active", "deleted"]);
 export type ResourceStatus = z.infer<typeof resourceStatusSchema>;
 
-export const resourcePageSchema = z.object({
-  offset: z.number().int().min(0),
+export const resourcePageSchema = adminPageSchema.extend({
   status: resourceStatusSchema,
 });
 

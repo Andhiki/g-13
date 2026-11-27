@@ -24,6 +24,7 @@ type Actor = { id: string; role?: string | null };
 export type ResourceListData = {
   rows: Awaited<ReturnType<typeof listAdminResources>>;
   counts: Awaited<ReturnType<typeof getAdminResourceCounts>>;
+  total: number;
 };
 
 export async function inspectResources(
@@ -31,13 +32,15 @@ export async function inspectResources(
   actor: Actor,
   offset = 0,
   status: ResourceStatus = "active",
+  query = "",
 ): Promise<ResourceAdminResult<ResourceListData>> {
   if (!canModerate(actor.role)) return { data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts] = await Promise.all([
-    listAdminResources(db, offset, status),
+  const [rows, counts, matchingCounts] = await Promise.all([
+    listAdminResources(db, offset, status, query),
     getAdminResourceCounts(db),
+    query ? getAdminResourceCounts(db, query) : undefined,
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function createResource(

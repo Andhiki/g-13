@@ -5,12 +5,10 @@ import { AlignBadge } from "@/ui/badge";
 import { AlignButton } from "@/ui/button";
 import { CourseChip } from "@/ui/course-chip";
 import { Typography } from "@/ui/typography";
-import type { lecturerDetailQueryOptions } from "../-client/queries";
+import type { loadLecturerReviewsPage } from "../-server/handler";
 import { courseDisplayName } from "../-shared/course-search";
 
-type Review = Awaited<
-  ReturnType<NonNullable<ReturnType<typeof lecturerDetailQueryOptions>["queryFn"]>>
->["reviews"][number];
+type Review = Awaited<ReturnType<typeof loadLecturerReviewsPage>>["reviews"][number];
 
 type ReviewCardData = Omit<Review, "overall" | "likeCount">;
 
@@ -99,6 +97,7 @@ export function ReviewList({
   language,
   emptyState,
   likedReviews,
+  pendingLike,
   canLike,
   likePending,
   onLike,
@@ -108,6 +107,7 @@ export function ReviewList({
   language: "id" | "en";
   emptyState: ReactNode;
   likedReviews: string[];
+  pendingLike?: { reviewId: string; liked: boolean };
   canLike: boolean;
   likePending: boolean;
   onLike: (reviewId: string, liked: boolean) => Promise<void>;
@@ -131,23 +131,28 @@ export function ReviewList({
           }
         />
       ))}
-      {reviews.map((review) => (
-        <ReviewCard
-          key={review.id}
-          review={review}
-          language={language}
-          action={
-            <ReviewLikeButton
-              reviewId={review.id}
-              count={review.likeCount}
-              liked={likedReviews.includes(review.id)}
-              canLike={canLike}
-              pending={likePending}
-              onLike={onLike}
-            />
-          }
-        />
-      ))}
+      {reviews.map((review) => {
+        const savedLike = likedReviews.includes(review.id);
+        const liked = pendingLike?.reviewId === review.id ? pendingLike.liked : savedLike;
+        const count = review.likeCount + Number(liked) - Number(savedLike);
+        return (
+          <ReviewCard
+            key={review.id}
+            review={review}
+            language={language}
+            action={
+              <ReviewLikeButton
+                reviewId={review.id}
+                count={count}
+                liked={liked}
+                canLike={canLike}
+                pending={likePending}
+                onLike={onLike}
+              />
+            }
+          />
+        );
+      })}
     </div>
   );
 }

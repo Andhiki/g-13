@@ -1,3 +1,4 @@
+import { adminSearchCondition } from "../../-server/search";
 import { and, asc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
@@ -11,6 +12,16 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
+function searchCondition(query: string) {
+  return adminSearchCondition(query, [
+    learningResources.titleId,
+    learningResources.titleEn,
+    learningResources.descriptionId,
+    learningResources.descriptionEn,
+    learningResources.url,
+  ]);
+}
+
 async function allocateResourceId(db: Database, title: string): Promise<string> {
   return allocateCatalogId(title, "resource", (pattern) =>
     db
@@ -20,7 +31,12 @@ async function allocateResourceId(db: Database, title: string): Promise<string> 
   );
 }
 
-export async function listAdminResources(db: Database, offset: number, status: ResourceStatus) {
+export async function listAdminResources(
+  db: Database,
+  offset: number,
+  status: ResourceStatus,
+  query = "",
+) {
   return db
     .select({
       id: learningResources.id,
@@ -35,9 +51,12 @@ export async function listAdminResources(db: Database, offset: number, status: R
     })
     .from(learningResources)
     .where(
-      status === "active"
-        ? isNull(learningResources.deletedAt)
-        : isNotNull(learningResources.deletedAt),
+      and(
+        status === "active"
+          ? isNull(learningResources.deletedAt)
+          : isNotNull(learningResources.deletedAt),
+        searchCondition(query),
+      ),
     )
     .orderBy(
       asc(learningResources.sortOrder),
@@ -48,13 +67,14 @@ export async function listAdminResources(db: Database, offset: number, status: R
     .offset(offset);
 }
 
-export async function getAdminResourceCounts(db: Database) {
+export async function getAdminResourceCounts(db: Database, query = "") {
   const [counts] = await db
     .select({
       active: sql<number>`coalesce(sum(case when ${learningResources.deletedAt} is null then 1 else 0 end), 0)`,
       deleted: sql<number>`coalesce(sum(case when ${learningResources.deletedAt} is not null then 1 else 0 end), 0)`,
     })
-    .from(learningResources);
+    .from(learningResources)
+    .where(searchCondition(query));
   return counts;
 }
 

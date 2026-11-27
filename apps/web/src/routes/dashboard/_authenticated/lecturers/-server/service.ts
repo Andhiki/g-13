@@ -20,6 +20,7 @@ type Actor = { id: string; role?: string | null };
 type LecturerListData = {
   rows: Awaited<ReturnType<typeof listAdminLecturers>>;
   counts: Awaited<ReturnType<typeof getAdminLecturerCounts>>;
+  total: number;
 };
 
 export async function inspectLecturers(
@@ -27,13 +28,15 @@ export async function inspectLecturers(
   actor: Actor,
   offset = 0,
   status: LecturerStatus = "active",
+  query = "",
 ): Promise<LecturerAdminResult<LecturerListData>> {
   if (!canModerate(actor.role)) return { data: null, error: LECTURER_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts] = await Promise.all([
-    listAdminLecturers(db, offset, status),
+  const [rows, counts, matchingCounts] = await Promise.all([
+    listAdminLecturers(db, offset, status, query),
     getAdminLecturerCounts(db),
+    query ? getAdminLecturerCounts(db, query) : undefined,
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function createLecturer(

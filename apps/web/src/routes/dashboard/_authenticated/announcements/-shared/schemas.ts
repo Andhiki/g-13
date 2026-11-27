@@ -1,5 +1,6 @@
 import { announcementVariants } from "@g13/db/schema/announcements";
 import { z } from "zod";
+import { adminPageSchema } from "../../-shared/admin-search";
 
 export const ANNOUNCEMENT_TITLE_MAX_LENGTH = 40;
 export const ANNOUNCEMENT_BODY_MAX_LENGTH = 100;
@@ -9,8 +10,7 @@ export const ANNOUNCEMENT_CTA_LINK_MAX_LENGTH = 500;
 export const announcementStatusSchema = z.enum(["live", "scheduled", "expired", "disabled"]);
 export type AnnouncementStatus = z.infer<typeof announcementStatusSchema>;
 
-export const announcementPageSchema = z.object({
-  offset: z.number().int().min(0),
+export const announcementPageSchema = adminPageSchema.extend({
   status: announcementStatusSchema,
 });
 
