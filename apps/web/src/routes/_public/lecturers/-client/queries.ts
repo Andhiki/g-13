@@ -1,3 +1,4 @@
+import { defaultReviewOrder, type ReviewOrder } from "../-shared/review-order";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { notFound } from "@tanstack/react-router";
 import type { Language } from "@g13/i18n";
@@ -6,10 +7,15 @@ import {
   loadCoursePickerPage,
   loadLecturerDetail,
   loadLecturerDirectory,
+  loadLecturerReviewsPage,
   loadOwnPendingReviews,
   loadTurnstileSiteKey,
 } from "../-server/handler";
-import { pendingReviewBatchSize, type CoursePickerCursor } from "../-shared/schemas";
+import {
+  pendingReviewBatchSize,
+  type CoursePickerCursor,
+  type LecturerReviewCursor,
+} from "../-shared/schemas";
 
 const publicDataStaleTime = 5 * 60 * 1000;
 const firstPage: CoursePickerCursor | null = null;
@@ -56,6 +62,25 @@ export function lecturerDetailQueryOptions(lecturerId: string) {
       if (!data) throw notFound();
       return data;
     },
+    staleTime: publicDataStaleTime,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export const lecturerReviewsKey = (lecturerId: string) =>
+  ["lecturer-reviews", "published", lecturerId] as const;
+
+export function lecturerReviewsQueryOptions(
+  lecturerId: string,
+  courseId: string | null = null,
+  order: ReviewOrder = defaultReviewOrder,
+) {
+  return infiniteQueryOptions({
+    queryKey: [...lecturerReviewsKey(lecturerId), courseId, order],
+    queryFn: ({ pageParam }: { pageParam: LecturerReviewCursor | null }) =>
+      loadLecturerReviewsPage({ data: { lecturerId, courseId, order, cursor: pageParam } }),
+    initialPageParam: null,
+    getNextPageParam: (page) => page.nextCursor,
     staleTime: publicDataStaleTime,
     refetchOnWindowFocus: false,
   });

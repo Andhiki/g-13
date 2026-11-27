@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -221,7 +222,7 @@ function AnnouncementsContent({
         {!queryState.isPending && !queryState.isError && (
           <AdminPagination
             count={count}
-            offset={needle ? 0 : offset}
+            offset={offset}
             total={total}
             label="announcements"
             hasNext={hasNext}
@@ -361,9 +362,8 @@ function AnnouncementReplacementModal({
 function AdminAnnouncementsPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<AnnouncementStatus>("live");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{
@@ -381,18 +381,17 @@ function AdminAnnouncementsPage() {
   const [replacement, setReplacement] = useState<Replacement | null>(null);
 
   const queryClient = useQueryClient();
-  const announcementsQuery = useQuery(adminAnnouncementsQuery(offset, status));
+  const announcementsQuery = useQuery(adminAnnouncementsQuery(offset, status, needle));
   const counts = announcementsQuery.data?.counts ?? initialData.counts;
-  const announcementRows = announcementsQuery.data?.rows ?? [];
-  const pageRows = announcementRows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) =>
-        `${row.id} ${row.titleId} ${row.titleEn}`.toLowerCase().includes(needle),
-      )
-    : pageRows;
+  const listState = {
+    isPending: searchPending || announcementsQuery.isPending,
+    isError: !searchPending && announcementsQuery.isError,
+  };
+  const announcementRows = searchPending ? [] : (announcementsQuery.data?.rows ?? []);
+  const visibleRows = announcementRows.slice(0, 50);
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = announcementsQuery.data?.total ?? 0;
   const selectedAnnouncement =
     visibleRows.find((announcement) => announcement.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
@@ -506,12 +505,12 @@ function AdminAnnouncementsPage() {
         {searchAndDetails}
       </AdminFilterBar>
       <AnnouncementsContent
-        queryState={announcementsQuery}
+        queryState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && announcementRows.length > 50}
+        hasNext={announcementRows.length > 50}
         needle={needle}
         status={status}
         selectedAnnouncement={selectedAnnouncement}
