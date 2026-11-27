@@ -8,6 +8,8 @@ import { RatingGuidePopover } from "./RatingGuidePopover";
 import { ReviewSortMenu } from "./ReviewSortMenu";
 import { orderLecturers, type LecturerOrder } from "../-shared/review-order";
 import { searchLecturers } from "../-shared/lecturer-search";
+import { Route } from "../../lecturers.index";
+import { defaultLecturerOrder } from "../-shared/search";
 import { lecturerDirectoryQueryOptions } from "../-client/queries";
 
 function LecturerSearchSection({
@@ -62,7 +64,12 @@ export function LecturerReviewsPage() {
   const { data } = useSuspenseQuery(lecturerDirectoryQueryOptions());
   const { text } = useLocale("lecturers");
   const [query, setQuery] = useState("");
-  const [lecturerOrder, setLecturerOrder] = useState<LecturerOrder>("name");
+  const { sort: lecturerOrder = defaultLecturerOrder } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  function changeLecturerOrder(sort: LecturerOrder) {
+    void navigate({ search: sort === defaultLecturerOrder ? {} : { sort }, resetScroll: false });
+  }
   const visibleLecturers = orderLecturers(
     searchLecturers(data.lecturers, data.courses, query),
     lecturerOrder,
@@ -85,7 +92,7 @@ export function LecturerReviewsPage() {
             lecturerOrder={lecturerOrder}
             visibleCount={visibleLecturers.length}
             onQueryChange={setQuery}
-            onOrderChange={setLecturerOrder}
+            onOrderChange={changeLecturerOrder}
           />
           <section
             aria-label={text("Lecturers and reviews")}
