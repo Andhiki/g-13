@@ -29,29 +29,34 @@ export function orderReviews<T extends Review>(reviews: T[], order: ReviewOrder)
 export function orderLecturers<
   T extends { id: string; name: string; reviewCount: number; overallAverage: number | null },
 >(lecturers: T[], lecturerOrder: LecturerOrder): T[] {
-  return [...lecturers].sort((a, b) => {
-    const byName = a.name.localeCompare(b.name, "id", { sensitivity: "base" });
-    const byId = a.id.localeCompare(b.id);
-    const tieBreak = byName || byId;
+  return [...lecturers].sort((leftLecturer, rightLecturer) => {
+    const nameComparison = leftLecturer.name.localeCompare(rightLecturer.name, "id", {
+      sensitivity: "base",
+    });
+    const idComparison = leftLecturer.id.localeCompare(rightLecturer.id);
+    const nameThenIdComparison = nameComparison || idComparison;
     switch (lecturerOrder) {
       case "name-desc":
-        return -byName || byId;
+        return -nameComparison || idComparison;
       case "reviews":
-        return b.reviewCount - a.reviewCount || tieBreak;
+        return rightLecturer.reviewCount - leftLecturer.reviewCount || nameThenIdComparison;
       case "reviews-asc":
-        return a.reviewCount - b.reviewCount || tieBreak;
+        return leftLecturer.reviewCount - rightLecturer.reviewCount || nameThenIdComparison;
       case "rating":
       case "rating-asc":
-        if (a.overallAverage === null || b.overallAverage === null) {
-          return Number(b.overallAverage !== null) - Number(a.overallAverage !== null) || tieBreak;
+        if (leftLecturer.overallAverage === null || rightLecturer.overallAverage === null) {
+          return (
+            Number(rightLecturer.overallAverage !== null) -
+              Number(leftLecturer.overallAverage !== null) || nameThenIdComparison
+          );
         }
         return (
           (lecturerOrder === "rating"
-            ? b.overallAverage - a.overallAverage
-            : a.overallAverage - b.overallAverage) || tieBreak
+            ? rightLecturer.overallAverage - leftLecturer.overallAverage
+            : leftLecturer.overallAverage - rightLecturer.overallAverage) || nameThenIdComparison
         );
       default:
-        return tieBreak;
+        return nameThenIdComparison;
     }
   });
 }
