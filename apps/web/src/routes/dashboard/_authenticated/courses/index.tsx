@@ -1,6 +1,5 @@
 import { useAdminSearch } from "../-client/useAdminSearch";
 import {
-  getAdminPageRows,
   getNextAdminPageOffset,
   getPreviousAdminPageOffset,
   hasNextAdminPage,
@@ -341,8 +340,7 @@ function AdminCoursesPage() {
     isPending: searchPending || coursesQuery.isPending,
     isError: !searchPending && coursesQuery.isError,
   };
-  const courseRows = searchPending ? [] : (coursesQuery.data?.rows ?? []);
-  const visibleRows = getAdminPageRows(courseRows);
+  const visibleRows = searchPending ? [] : (coursesQuery.data?.rows ?? []);
 
   const count = visibleRows.length;
   const total = coursesQuery.data?.total ?? 0;

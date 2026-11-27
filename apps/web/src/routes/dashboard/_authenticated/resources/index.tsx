@@ -1,6 +1,5 @@
 import { useAdminSearch } from "../-client/useAdminSearch";
 import {
-  getAdminPageRows,
   getNextAdminPageOffset,
   getPreviousAdminPageOffset,
   hasNextAdminPage,
@@ -516,8 +515,7 @@ function AdminResourcesPage() {
     isPending: searchPending || resourcesQuery.isPending,
     isError: !searchPending && resourcesQuery.isError,
   };
-  const resourceRows = searchPending ? [] : (resourcesQuery.data?.rows ?? []);
-  const basePageRows = getAdminPageRows(resourceRows);
+  const basePageRows = searchPending ? [] : (resourcesQuery.data?.rows ?? []);
   const visibleRows =
     !needle && orderedIds
       ? orderedIds

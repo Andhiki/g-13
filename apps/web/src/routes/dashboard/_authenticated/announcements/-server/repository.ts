@@ -1,3 +1,4 @@
+import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
 import { adminSearchCondition } from "../../-server/search";
 import {
   and,
@@ -60,7 +61,7 @@ export async function listAdminAnnouncements(
     .from(announcements)
     .where(and(statusCondition(status, now), searchCondition(query)))
     .orderBy(desc(announcements.startsAt), desc(announcements.id))
-    .limit(51)
+    .limit(ADMIN_PAGE_SIZE)
     .offset(offset);
 }
 

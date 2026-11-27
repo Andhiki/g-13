@@ -1,6 +1,5 @@
 import { canManageUsers } from "@g13/auth";
 import type { createDatabase } from "@g13/db/client";
-import { getAdminPageRows } from "../../-shared/admin-pagination";
 import {
   ANNOUNCEMENT_ADMIN_ERRORS,
   type AnnouncementAdminResult,
@@ -45,14 +44,7 @@ export async function inspectAnnouncements(
     getAnnouncementCounts(db, now),
     query ? getAnnouncementCounts(db, now, query) : undefined,
   ]);
-  return {
-    data: {
-      rows: getAdminPageRows(rows),
-      counts,
-      total: (matchingCounts ?? counts)[status],
-    },
-    error: null,
-  };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function createAnnouncement(

@@ -1,5 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
-import { ADMIN_PAGE_SIZE } from "../../-shared/admin-pagination";
+import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
 import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
