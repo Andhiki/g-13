@@ -46,6 +46,7 @@
         "@g13/curriculum": "workspace:*",
         "@g13/db": "workspace:*",
         "@g13/env": "workspace:*",
+        "@g13/error-reporting": "workspace:*",
         "@g13/i18n": "workspace:*",
         "@remixicon/react": "^4.9.0",
         "@tanstack/react-query": "^5.107.1",
@@ -142,6 +143,19 @@
         "@types/node": "^26.6.6",
         "oxlint": "^1.90.0",
         "tsdown": "^0.23.4",
+        "typescript": "^7.0.2",
+      },
+    },
+    "packages/error-reporting": {
+      "name": "@g13/error-reporting",
+      "version": "0.1.0",
+      "dependencies": {
+        "zod": "^4.5.4",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.4.4",
+        "@types/node": "^26.6.6",
+        "oxlint": "^1.90.0",
         "typescript": "^7.0.2",
       },
     },
@@ -334,6 +348,8 @@
     "@g13/db": ["@g13/db@workspace:packages/db"],
 
     "@g13/env": ["@g13/env@workspace:packages/env"],
+
+    "@g13/error-reporting": ["@g13/error-reporting@workspace:packages/error-reporting"],
 
     "@g13/i18n": ["@g13/i18n@workspace:packages/i18n"],
 

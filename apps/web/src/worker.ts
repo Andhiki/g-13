@@ -1,5 +1,6 @@
 import startHandler from "@tanstack/react-start/server-entry";
 import { createDatabase } from "@g13/db/client";
+import { withServerErrorReporting } from "./server/error-reporting";
 import { pruneOldNotifications } from "./server/notifications";
 
 const NOTIFICATION_PRUNE_CRON = "0 3 * * *";
@@ -80,7 +81,9 @@ export default {
     if (import.meta.env.MODE === "local-e2e" && isLocalHost && url.pathname === E2E_DATABASE_PATH) {
       return handleE2EDatabase(request, env);
     }
-    return startHandler.fetch(request);
+    return withServerErrorReporting(request, async (nextRequest) =>
+      startHandler.fetch(nextRequest),
+    );
   },
   scheduled: handleScheduled,
 };

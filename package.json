@@ -29,6 +29,7 @@
     "format:check": "turbo run format:check",
     "check": "turbo run lint format:check typecheck test && bun run typecheck:e2e",
     "test": "turbo run test",
+    "report-incidents": "bun packages/error-reporting/scripts/report-incidents.ts",
     "test:e2e": "node e2e/run-local.ts",
     "test:e2e:smoke": "E2E_MODE=smoke E2E_TELEMETRY_DISABLED=1 node node_modules/e2e/dist/cli/bin.js run",
     "db:migrate": "test -n \"$D1_DATABASE_ID\" || { echo \"D1_DATABASE_ID is required; refusing to run migrations\"; exit 1; }; cf d1 migrations apply \"$D1_DATABASE_ID\" --dir packages/db/migrations"
