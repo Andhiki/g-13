@@ -46,7 +46,7 @@ export const syntheticModerationCases: SyntheticModerationCase[] = [
     language: "id",
     focus: ["typo"],
     review: {
-      text: "Penjelasan materinya goblokk banget.",
+      text: "Pak, Anda goblokk dan tidak pantas mengajar.",
       expected: "flag",
     },
     chosenName: { text: "Rina", expected: "clear" },
