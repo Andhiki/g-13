@@ -2,13 +2,7 @@ import { FormInput, FormTextarea } from "@/ui/form-control";
 import { Typography } from "@/ui/typography";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  RiArrowDownSLine,
-  RiArrowRightLine,
-  RiCheckLine,
-  RiSpyLine,
-  RiUserLine,
-} from "@remixicon/react";
+import { RiArrowDownSLine, RiCheckLine, RiSpyLine, RiUserLine } from "@remixicon/react";
 import {
   Select,
   SelectContent,
@@ -297,8 +291,6 @@ function ReviewFormFooter({
           type="submit"
           size="small"
           isLoading={isSubmitting}
-          icon={<RiArrowRightLine className="size-5" />}
-          iconPosition="end"
           disabled={isSubmitting}
           className="w-full sm:w-auto"
         >

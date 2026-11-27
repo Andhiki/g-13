@@ -61,7 +61,6 @@ function ExamKeyboardTips({ searchText }: { searchText: string }) {
   ];
   return (
     <div className="mt-8 hidden text-text-sub-600 min-[650px]:block">
-      <Typography className="mb-2">{text("Tip:")}</Typography>
       <ul className="m-0 list-none space-y-1 p-0">
         {pairs.map((tip) => (
           <li key={tip.label}>

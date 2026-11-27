@@ -1,7 +1,6 @@
 import { useLocale } from "@/useLocale";
 import { Typography } from "@/ui/typography";
 import { useMemo, useRef, useState } from "react";
-import { RiSearchLine } from "@remixicon/react";
 import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { AlignButton } from "@/ui/button";
 import { AlignCommandMenu } from "@/ui/command-menu";
@@ -133,15 +132,11 @@ function CourseSearchDialog({
               />
             ))}
           </AlignCommandMenu.Group>
-        ) : (
-          <div className="px-5 py-4 text-text-sub-600" role={query.trim() ? "status" : undefined}>
-            <Typography>
-              {query.trim()
-                ? text("Tidak ada mata kuliah yang cocok.")
-                : text("Ketik nama, kode, atau prasyarat untuk mencari.")}
-            </Typography>
+        ) : query.trim() ? (
+          <div className="px-5 py-4 text-text-sub-600" role="status">
+            <Typography>{text("Tidak ada mata kuliah yang cocok.")}</Typography>
           </div>
-        )}
+        ) : null}
       </AlignCommandMenu.List>
       <CourseSearchFooter />
     </AlignCommandMenu.Dialog>
@@ -186,7 +181,6 @@ export function CourseSearch({
         onClick={() => setOpen(true)}
       >
         <span className="min-w-0 flex-1 truncate text-left">{text("Cari mata kuliah")}</span>
-        <RiSearchLine className="size-5 shrink-0 min-[650px]:hidden" aria-hidden="true" />
         <AlignKbd.Root aria-hidden="true">{searchHint.text}</AlignKbd.Root>
       </AlignButton.Root>
       <CourseSearchDialog

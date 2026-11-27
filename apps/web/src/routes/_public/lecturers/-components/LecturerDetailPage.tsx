@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useState } from "react";
-import { RiArrowLeftLine, RiArrowRightLine, RiChatQuoteLine, RiStarFill } from "@remixicon/react";
+import { RiArrowLeftLine, RiStarFill } from "@remixicon/react";
 import { CourseChip } from "@/ui/course-chip";
 import { useLocale } from "@/useLocale";
 import { AlignFancyButton } from "@/ui/fancy-button";
@@ -69,7 +69,6 @@ function LecturerDetailHeader({
           <Typography as="span" variant="paragraph">
             {text("Write a review")}
           </Typography>
-          <RiArrowRightLine aria-hidden="true" className="size-4" />
         </AlignFancyButton.Root>
         <Typography as="span" variant="caption" color="muted">
           {text(lecturer.reviewCount === 1 ? "{{count}} review" : "{{count}} reviews", {
@@ -262,21 +261,14 @@ function EmptyReviewsState({
   const { text } = useLocale("lecturers");
   return (
     <AlignEmptyState.Root align="center">
-      <AlignEmptyState.Icon>
-        <RiChatQuoteLine />
-      </AlignEmptyState.Icon>
       <AlignEmptyState.Title>
         {text(hasCourseFilter ? "No reviews for this course" : "No reviews yet")}
       </AlignEmptyState.Title>
-      <AlignEmptyState.Description>
-        {text("Share an experience to help other students choose their classes.")}
-      </AlignEmptyState.Description>
       <AlignEmptyState.Actions>
         <AlignFancyButton.Root compact className="h-9" onClick={onWriteReview}>
           <Typography as="span" variant="paragraph">
             {text("Write a review")}
           </Typography>
-          <RiArrowRightLine aria-hidden="true" className="size-4" />
         </AlignFancyButton.Root>
         {hasCourseFilter && (
           <AlignButton.Root variant="neutral" mode="ghost" size="small" onClick={onClearFilter}>

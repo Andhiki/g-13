@@ -13,7 +13,7 @@ export function ResourcesPage() {
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(250px,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-24">
         <header className="lg:sticky lg:top-28 lg:self-start">
           <Typography as="h1" variant="pageTitle" className="m-0">
-            {text("Looking for a place to start?")}
+            {text("Learning resources")}
           </Typography>
         </header>
         <section

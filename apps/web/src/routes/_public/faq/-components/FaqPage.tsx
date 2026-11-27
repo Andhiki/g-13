@@ -372,11 +372,6 @@ export function FaqPage() {
           <Typography as="h1" variant="pageTitle" className="m-0">
             {text("FAQ")}
           </Typography>
-          <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-5 max-w-md">
-            {text(
-              "Find answers about study requirements, specializations, final projects, and curriculum transitions.",
-            )}
-          </Typography>
         </header>
 
         <section aria-label={text("FAQ")} className="grid grid-cols-1 content-start">
