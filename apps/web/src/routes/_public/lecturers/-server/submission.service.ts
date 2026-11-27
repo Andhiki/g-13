@@ -6,12 +6,7 @@ import { allowReviewAction } from "./rate-limit";
 import { createReview, getReviewReferences } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewSubmission } from "../-shared/submission-schema";
-import {
-  classifyReviewText,
-  type ReviewScreeningInput,
-  type ReviewScreeningResult,
-} from "./review-moderation";
-import { hasReviewProfanity } from "./review-profanity";
+import { screenReviewText, type ReviewModerationProvider } from "./review-screening";
 
 type Database = ReturnType<typeof createDatabase>;
 
@@ -31,8 +26,7 @@ export async function submitReview(
     browserId?: string | null;
     secret: string;
     now?: number;
-    openAiApiKey: string;
-    classify?: (input: ReviewScreeningInput) => Promise<ReviewScreeningResult>;
+    provider: ReviewModerationProvider;
   },
 ): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
   const ip = context.ip;
@@ -55,20 +49,7 @@ export async function submitReview(
   const screeningInput = anonymous
     ? { body: review.body }
     : { body: review.body, displayName: authorName };
-  let screening: ReviewScreeningResult;
-  try {
-    screening = await (
-      context.classify ?? ((input) => classifyReviewText(input, context.openAiApiKey))
-    )(screeningInput);
-    if (
-      screening === "clear" &&
-      [screeningInput.body, screeningInput.displayName ?? ""].some(hasReviewProfanity)
-    ) {
-      screening = "flagged";
-    }
-  } catch {
-    screening = "unscorable";
-  }
+  const screening = await screenReviewText(screeningInput, context.provider);
   const ratingPending = Math.min(review.clarity, review.support, review.organization) <= 2;
   const status = screening === "clear" && !ratingPending ? "published" : "pending";
   await createReview(db, {

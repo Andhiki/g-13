@@ -17,14 +17,13 @@ import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from 
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import { lecturerReviewsInputSchema, type CoursePickerCursor } from "../-shared/schemas";
 import { reviewOrders } from "../-shared/review-order";
-import { classifyReviewText } from "./review-moderation";
+import { createOmniModerationProvider, type ReviewModerationProvider } from "./review-screening";
 import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
 
 const firstReviewPage = lecturerReviewsInputSchema.parse({ lecturerId: "p" });
 
-const clearScreening = {
-  openAiApiKey: "test-key",
-  classify: async () => "clear" as const,
+const clearScreening: { provider: ReviewModerationProvider } = {
+  provider: async () => "clear",
 };
 
 const rawInput = {
@@ -128,10 +127,9 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
       now: 3_600_000,
-      openAiApiKey: "test-key",
-      classify: async () => {
+      provider: async (): Promise<"clear"> => {
         classifierCalls += 1;
-        return "clear" as const;
+        return "clear";
       },
     };
 
@@ -307,12 +305,11 @@ it("holds Indonesian and English profanity after Omni clears it", async () => {
       .insert(courses)
       .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
 
-    const screened = mock(async () => "clear" as const);
+    const screened = mock(async (): Promise<"clear"> => "clear");
     const context = {
       ip: "192.0.2.31",
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: screened,
+      provider: screened,
     };
     const reviews = [
       { body: "Tes anjing ＢＡＮＧＳＡＴ! Contoh ulasan." },
@@ -365,8 +362,7 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     const context = (ip: string) => ({
       ip,
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: async (value: { body: string; displayName?: string }) => {
+      provider: async (value: { body: string; displayName?: string }) => {
         screened.push(value);
         return outcomes[outcomeIndex++] ?? "clear";
       },
@@ -428,12 +424,10 @@ https://t.me/example`;
     const context = {
       ip: "192.0.2.36",
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: (input: Parameters<typeof classifyReviewText>[0]) =>
-        classifyReviewText(input, "test-key", async () => {
-          providerCalls += 1;
-          throw new Error("Contact matches should skip the moderation provider");
-        }),
+      provider: createOmniModerationProvider("test-key", async () => {
+        providerCalls += 1;
+        throw new Error("Contact matches should skip the moderation provider");
+      }),
     };
     const heldReviewIds = [];
     for (const body of [campaign, courseFeedback]) {
@@ -507,10 +501,9 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     const ip = "198.51.100.23";
     let classifierCalls = 0;
     const screening = {
-      openAiApiKey: "test-key",
-      classify: async () => {
+      provider: async (): Promise<"clear"> => {
         classifierCalls += 1;
-        return "clear" as const;
+        return "clear";
       },
     };
     const browserA = crypto.randomUUID();
