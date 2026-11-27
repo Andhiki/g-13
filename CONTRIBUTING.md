@@ -58,12 +58,21 @@ dan trace kegagalan tersedia di `.e2e/local/` atau `.e2e/smoke/`.
 ### Skenario agen
 
 Skenario di `e2e/agent/` memakai `agent.act()` untuk menyelesaikan alur pengguna
-dan assertion yang presisi untuk memeriksa hasilnya. Atur `AI_GATEWAY_API_KEY`
-untuk Vercel AI Gateway, lalu jalankan `bun run test:e2e:agent`. Gunakan
-`E2E_AGENT_MODEL` untuk memilih model lain. E2E menyimpan aksi yang terverifikasi
-di `.e2e/cache/` agar dapat diputar ulang pada run berikutnya. Gunakan
-`bun run test:e2e:agent --no-cache` untuk menguji ulang dengan model.
-Laporan agen tersedia di `.e2e/agent/`.
+dan assertion yang presisi untuk memeriksa hasilnya. Untuk merekam skenario
+secara lokal, masuk dengan akun ChatGPT yang memiliki akses Codex.
+
+```sh
+node node_modules/e2e/dist/cli/bin.js login openai
+bun run test:e2e:agent
+```
+
+Tambahkan `--device` saat login dari terminal jarak jauh. Gunakan
+`E2E_AGENT_MODEL` untuk memilih model lain yang tersedia di akunmu.
+Commit rekaman aksi yang terverifikasi di `e2e/cache/`. Jalankan
+`CI=1 bun run test:e2e:agent` untuk memeriksa replay tanpa login atau model.
+Workflow **Staging browser tests** menjalankan perintah ini untuk setiap PR.
+Jika rekaman hilang atau tidak lagi cocok, perbarui dari run lokal dan commit
+hasilnya. Laporan agen tersedia di `.e2e/agent/`.
 
 Untuk menulis atau men-debug tes dengan coding agent, baca panduan versi
 terpasang dengan `node node_modules/e2e/dist/cli/bin.js guide`. Server MCP lokal

@@ -8,6 +8,10 @@ test("A first-time student can create and share a 2026 seven-semester roadmap", 
   screen,
 }) => {
   await browser.addInitScript(() => {
+    // Keep the unrelated GitHub prompt out of the recorded end state.
+    if (location.protocol === "http:") {
+      localStorage.setItem("g13-star-nudge", '{"starred":true}');
+    }
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText: () => Promise.reject(new Error("Clipboard unavailable")) },
     });
@@ -15,10 +19,12 @@ test("A first-time student can create and share a 2026 seven-semester roadmap", 
   await app.open("/roadmap");
 
   await agent.act(
-    "Create a 2026 roadmap for a regular student interested in Data Analysis (Analisis Data) who will not do an internship. Set the target to seven semesters and open the share dialog.",
+    "Create a 2026 roadmap for a regular student interested in Data Analysis (Analisis Data) who will not do an internship. After generating the roadmap, open the roadmap filters (Buka filter roadmap) and choose 7 semester under Target selesai. Leave the result screen open.",
     { maxSteps: 20, maxModelCalls: 20, timeout: 90_000 },
   );
 
+  await expect(screen.getByRole("heading", { name: /target selesai 7 semester/i })).toBeVisible();
+  await screen.getByRole("button", { name: /^bagikan$|^share$/i }).click();
   const sharedLink = screen.getByLabel(/tautan roadmap|roadmap link/i);
   await expect(sharedLink).toBeVisible();
   const link = new URL(await sharedLink.inputValue());
@@ -33,5 +39,5 @@ test("A first-time student can create and share a 2026 seven-semester roadmap", 
   await app.clearState();
   await app.open(link.href);
   await expect(screen.getByRole("button", { name: /^bagikan$|^share$/i })).toBeVisible();
-  await expect(screen.getByText(/(?:semester 7|7 semester)/i).first()).toBeVisible();
+  await expect(screen.getByRole("heading", { name: /target selesai 7 semester/i })).toBeVisible();
 });
