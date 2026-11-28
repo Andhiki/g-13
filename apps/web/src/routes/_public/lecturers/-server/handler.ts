@@ -3,7 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 import { createDatabase } from "@g13/db/client";
 import { parseSubmissionEnvironment } from "@g13/env";
-import { reviewClientIp } from "@/server/request-identity";
+import { serverAdapters } from "@/server/adapters";
 import { runServerOperation } from "@/server/server-function-error";
 import {
   browserLikesInputSchema,
@@ -16,16 +16,9 @@ import {
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
-import {
-  rejectRateLimitedReview,
-  rejectReviewLikeOperation,
-  rejectSubmissionOperation,
-} from "./failures";
-import { REVIEW_ERRORS } from "../-shared/errors";
+import { respondToReviewOperation } from "./failures";
 import { setReviewLike } from "./likes.service";
-import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
-import { verifyTurnstileToken } from "./turnstile";
-import { hasReviewContactDetails, type ReviewScreeningInput } from "./review-moderation";
+import { submitReview } from "./submission.service";
 
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () =>
   runServerOperation(() => getLecturerDirectory(createDatabase(env.DB))),
@@ -65,31 +58,22 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
         TURNSTILE_SECRET_KEY: turnstileSecret,
         OPENAI_API_KEY: openAiApiKey,
       } = parseSubmissionEnvironment(env);
-      const ip = reviewClientIp(getRequest());
+      const ip = serverAdapters.clientIp(getRequest());
       const { turnstileToken, browserId, ...review } = data;
-      const verified = await verifyTurnstileToken({
-        secret: turnstileSecret,
-        token: turnstileToken,
-        remoteip: ip,
-      });
-      return submitReviewAfterCaptcha(verified, () => {
-        const classify =
-          env.REVIEW_CLASSIFICATION_TEST_MODE === "clear"
-            ? async (screening: ReviewScreeningInput) =>
-                hasReviewContactDetails(screening) ? ("flagged" as const) : ("clear" as const)
-            : undefined;
-        return submitReview(createDatabase(env.DB), review, {
-          ip,
-          browserId,
-          secret,
-          openAiApiKey,
-          classify,
-        });
+      return submitReview(createDatabase(env.DB), review, {
+        ip,
+        browserId,
+        secret,
+        verifyCaptcha: () =>
+          serverAdapters.verifyCaptcha({
+            secret: turnstileSecret,
+            token: turnstileToken,
+            remoteip: ip,
+          }),
+        provider: serverAdapters.reviewModeration(openAiApiKey),
       });
     });
-    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
-    if (result.error !== null) return rejectSubmissionOperation(result.error);
-    return result.data;
+    return respondToReviewOperation("submission", result);
   });
 
 export const loadOwnPendingReviews = createServerFn({ method: "POST" })
@@ -111,10 +95,8 @@ export const updateReviewLike = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const result = await runServerOperation(async () => {
       const { REVIEW_RATE_LIMIT_SECRET: secret } = parseSubmissionEnvironment(env);
-      const ip = reviewClientIp(getRequest());
+      const ip = serverAdapters.clientIp(getRequest());
       return setReviewLike(createDatabase(env.DB), data, { ip, secret });
     });
-    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
-    if (result.error !== null) return rejectReviewLikeOperation(result.error);
-    return result.data;
+    return respondToReviewOperation("like", result);
   });

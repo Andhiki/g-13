@@ -10,41 +10,65 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from "../-shared/schemas";
-import { hasValidScheduleWindow } from "../-shared/schemas";
+import {
+  announcementStatusCondition,
+  announcementStatuses,
+  hasValidScheduleWindow,
+  type AnnouncementStatus,
+} from "@/routes/-announcements/schedule";
+import { loadAdminList, type AdminListData } from "../../-server/admin-list";
 import {
   createAnnouncementRecord,
   deleteAnnouncement,
-  getAnnouncementCounts,
-  listAdminAnnouncements,
+  adminAnnouncementSearchColumns,
+  countAdminAnnouncements,
+  selectAdminAnnouncements,
   setAnnouncementEnabled,
   updateAnnouncementRecord,
+  type AnnouncementWrite,
 } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
 
-export type AnnouncementListData = {
-  rows: Awaited<ReturnType<typeof listAdminAnnouncements>>;
-  counts: Awaited<ReturnType<typeof getAnnouncementCounts>>;
-  total: number;
-};
+/** Maps a schedule-checked write to its result: missing, conflicting, or done. */
+function writeResult<T>(
+  write: AnnouncementWrite | undefined,
+  data: (written: { id: string }) => T,
+): AnnouncementWriteResult<T> {
+  if (!write) return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE };
+  if ("conflicts" in write) {
+    return { data: null, error: "SCHEDULE_CONFLICT", conflicts: write.conflicts };
+  }
+  return { data: data(write), error: null };
+}
+
+export type AnnouncementListData = AdminListData<
+  AnnouncementStatus,
+  Awaited<ReturnType<typeof selectAdminAnnouncements>>[number]
+>;
 
 export async function inspectAnnouncements(
   db: Database,
   actor: Actor,
   offset = 0,
-  status: "live" | "scheduled" | "expired" | "disabled" = "live",
+  status: AnnouncementStatus = "live",
   query = "",
+  now = new Date(),
 ): Promise<AnnouncementAdminResult<AnnouncementListData>> {
-  if (!canManageUsers(actor.role))
-    return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
-  const now = new Date();
-  const [rows, counts, matchingCounts] = await Promise.all([
-    listAdminAnnouncements(db, offset, status, now, query),
-    getAnnouncementCounts(db, now),
-    query ? getAnnouncementCounts(db, now, query) : undefined,
-  ]);
-  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
+  const data = await loadAdminList(
+    {
+      canView: canManageUsers,
+      statuses: announcementStatuses,
+      statusCondition: (tab) => announcementStatusCondition(tab, now.getTime()),
+      searchColumns: adminAnnouncementSearchColumns,
+      rows: (where, page) => selectAdminAnnouncements(db, where, page),
+      count: (counts, where) => countAdminAnnouncements(db, counts, where),
+    },
+    actor,
+    { offset, status, query },
+  );
+  return data ? { data, error: null } : { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
 }
 
 export async function createAnnouncement(
@@ -57,10 +81,7 @@ export async function createAnnouncement(
   if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
-  const created = await createAnnouncementRecord(db, input, actor.id);
-  if ("conflicts" in created)
-    return { data: null, error: "SCHEDULE_CONFLICT", conflicts: created.conflicts };
-  return { data: created, error: null };
+  return writeResult(await createAnnouncementRecord(db, input, actor.id), ({ id }) => ({ id }));
 }
 
 export async function updateAnnouncement(
@@ -73,13 +94,9 @@ export async function updateAnnouncement(
   if (!hasValidScheduleWindow(input)) {
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.INVALID_SCHEDULE };
   }
-  const updated = await updateAnnouncementRecord(db, input);
-  if (!updated) {
-    return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE };
-  }
-  if ("conflicts" in updated)
-    return { data: null, error: "SCHEDULE_CONFLICT", conflicts: updated.conflicts };
-  return { data: { announcementId: input.announcementId }, error: null };
+  return writeResult(await updateAnnouncementRecord(db, input), () => ({
+    announcementId: input.announcementId,
+  }));
 }
 
 export async function changeAnnouncementLifecycle(
@@ -89,18 +106,22 @@ export async function changeAnnouncementLifecycle(
 ): Promise<AnnouncementWriteResult<AnnouncementLifecycleInput>> {
   if (!canManageUsers(actor.role))
     return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
-  const updated =
-    input.action === "delete"
-      ? await deleteAnnouncement(db, input.announcementId)
-      : await setAnnouncementEnabled(
-          db,
-          input.announcementId,
-          input.action === "enable",
-          input.confirmedConflictIds,
-        );
-  if (!updated) return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.ANNOUNCEMENT_UNAVAILABLE };
-  if (typeof updated === "object" && "conflicts" in updated) {
-    return { data: null, error: "SCHEDULE_CONFLICT", conflicts: updated.conflicts };
+  const data = () => ({ announcementId: input.announcementId, action: input.action });
+  if (input.action === "delete") {
+    return writeResult(
+      (await deleteAnnouncement(db, input.announcementId))
+        ? { id: input.announcementId }
+        : undefined,
+      data,
+    );
   }
-  return { data: { announcementId: input.announcementId, action: input.action }, error: null };
+  return writeResult(
+    await setAnnouncementEnabled(
+      db,
+      input.announcementId,
+      input.action === "enable",
+      input.confirmedConflictIds,
+    ),
+    data,
+  );
 }

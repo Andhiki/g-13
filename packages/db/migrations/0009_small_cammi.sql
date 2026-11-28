@@ -1,0 +1,1 @@
+ALTER TABLE `reviews` ADD `pending_reasons` text;

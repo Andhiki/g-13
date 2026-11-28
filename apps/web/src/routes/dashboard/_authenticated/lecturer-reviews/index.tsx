@@ -1,5 +1,5 @@
 import { AdminSearchHighlightScope } from "../-client/search-highlight";
-import { useAdminSearch } from "../-client/useAdminSearch";
+import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -60,13 +60,13 @@ function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
 function reviewEmptyDescription(needle: string, status: ReviewStatus): string {
   if (needle) return "Try another search term or clear the search to see submitted reviews.";
   if (status === "all") {
-    return "Reviews with any rating of 2 or lower wait in Pending; all others publish immediately.";
+    return "Reviews with any rating of 2 or lower, or text flagged by screening, wait in Pending; all others publish immediately.";
   }
   if (status === "pending") {
-    return "Reviews with a rating of 2 or lower wait here until an admin approves or hides them.";
+    return "Reviews with a rating of 2 or lower, or text flagged by screening, wait here until an admin approves or hides them.";
   }
   if (status === "published") {
-    return "Reviews with every rating at 3 or higher publish immediately and appear here.";
+    return "Reviews with every rating at 3 or higher and clear screening publish immediately and appear here.";
   }
   return `Reviews appear here after an admin moves them to ${status}.`;
 }
@@ -304,8 +304,21 @@ function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
   const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<ReviewStatus>("all");
+  const {
+    query,
+    setQuery,
+    needle,
+    searchPending,
+    offset,
+    status,
+    setStatus,
+    result: reviews,
+    counts,
+    listState,
+    rows: visibleRows,
+    total,
+    page,
+  } = useAdminList("all", moderationReviewsQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(!!linkedReviewId);
   const [syncedLinkId, setSyncedLinkId] = useState(linkedReviewId);
@@ -316,17 +329,8 @@ function LecturerReviewsPage() {
   }
   const [confirmation, setConfirmation] = useState<ReviewConfirmation | null>(null);
   const queryClient = useQueryClient();
-  const reviews = useQuery(moderationReviewsQuery(offset, status, needle));
-  const counts = reviews.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || reviews.isPending,
-    isError: !searchPending && reviews.isError,
-  };
-  const reviewRows = searchPending ? [] : (reviews.data?.rows ?? []);
-  const visibleRows = reviewRows.slice(0, 50);
 
   const count = visibleRows.length;
-  const total = reviews.data?.total ?? 0;
   // A notification can link to a review outside the loaded page; load it directly rather
   // than falling back to an unrelated row the moderator might act on by mistake.
   const linkedOffPage =
@@ -353,6 +357,8 @@ function LecturerReviewsPage() {
       ]);
       setConfirmation(null);
     },
+    // A rejected move usually means another moderator changed the review first.
+    onError: () => queryClient.invalidateQueries({ queryKey: ["admin"] }),
   });
 
   function confirmReview(input: ModerateReviewInput, label: string) {
@@ -395,7 +401,6 @@ function LecturerReviewsPage() {
         tabLabelClassName="capitalize"
         onTabChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
         }}
       >
@@ -407,7 +412,6 @@ function LecturerReviewsPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={reviewRows.length > 50}
         needle={needle}
         status={status}
         allCount={counts.all}
@@ -415,12 +419,12 @@ function LecturerReviewsPage() {
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={page.hasNext}
+        onPreviousPage={page.previous}
+        onNextPage={page.next}
         onClearSearch={() => setQuery("")}
         onViewAll={() => {
           setStatus("all");
-          setOffset(0);
           setSelectedId(null);
         }}
         onSelectReview={(id) => {

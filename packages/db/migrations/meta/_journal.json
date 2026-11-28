@@ -64,6 +64,13 @@
       "when": 1795671604039,
       "tag": "0008_lazy_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1795859097215,
+      "tag": "0009_small_cammi",
+      "breakpoints": true
     }
   ]
 }

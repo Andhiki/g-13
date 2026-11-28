@@ -210,3 +210,63 @@ it("holds pending reviews out of public reads until an admin approves or hides t
     await platform.dispose();
   }
 }, 30_000);
+
+it("accepts only legal moderation moves", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "lecturer", name: "Lecturer" });
+    await db.insert(courses).values({ id: "course", code: "CS", nameId: "Data", nameEn: "Data" });
+    const admin = { id: "admin", role: "admin" };
+    const states = ["pending", "published", "hidden"] as const;
+    const legal: Record<string, (typeof states)[number] | "deleted" | null> = {
+      "pending:approve": "published",
+      "pending:hide": "hidden",
+      "pending:restore": null,
+      "pending:delete": "deleted",
+      "published:approve": null,
+      "published:hide": "hidden",
+      "published:restore": null,
+      "published:delete": "deleted",
+      "hidden:approve": null,
+      "hidden:hide": null,
+      "hidden:restore": "published",
+      "hidden:delete": "deleted",
+    };
+    for (const [move, expected] of Object.entries(legal)) {
+      const [from, action] = move.split(":") as [
+        (typeof states)[number],
+        "approve" | "hide" | "restore" | "delete",
+      ];
+      const reviewId = `review-${move}`;
+      await db.insert(reviews).values({
+        id: reviewId,
+        lecturerId: "lecturer",
+        courseId: "course",
+        termLabel: "2026",
+        authorName: "Anonymous",
+        clarity: 5,
+        support: 5,
+        organization: 5,
+        body: "Feedback",
+        status: from,
+      });
+      const result = await moderateLecturerReview(db, admin, { reviewId, action });
+      const review = resultData(await inspectReview(db, admin, reviewId));
+      if (expected === null) {
+        expect(result, move).toEqual({
+          data: null,
+          error: MODERATION_ERRORS.REVIEW_ACTION_UNAVAILABLE,
+        });
+        expect(review?.status, move).toBe(from);
+        expect(review?.deletedAt, move).toBeNull();
+      } else {
+        expect(result.error, move).toBeNull();
+        if (expected === "deleted") expect(review?.deletedAt, move).not.toBeNull();
+        else expect(review?.status, move).toBe(expected);
+      }
+    }
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);

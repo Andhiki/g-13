@@ -9,10 +9,13 @@ import { activeAnnouncementsQuery } from "./queries";
 import {
   DISMISSED_ANNOUNCEMENTS_KEY,
   dismissAnnouncement,
-  filterAnnouncementsNotDismissed,
   parseDismissedAnnouncements,
   type DismissedAnnouncements,
 } from "./dismissals";
+import { nextVisibilityChange, visibleAnnouncements } from "./visibility";
+
+// setTimeout overflows above 2^31-1 ms; re-arm in steps for far-off windows.
+const maxTimerDelay = 2_147_483_647;
 
 export function AnnouncementBanner() {
   const { text, language } = useLocale();
@@ -27,7 +30,21 @@ export function AnnouncementBanner() {
     );
   }, []);
 
-  const rows = data ? filterAnnouncementsNotDismissed(data, dismissed) : [];
+  const [now, setNow] = useState(() => Date.now());
+  const nextChange = data ? nextVisibilityChange(data, now) : null;
+
+  // The query is cached for minutes; re-check each window on the client clock
+  // so an announcement disappears the moment it ends.
+  useEffect(() => {
+    if (nextChange === null) return;
+    const timer = window.setTimeout(
+      () => setNow(Date.now()),
+      Math.min(Math.max(nextChange - Date.now(), 0), maxTimerDelay),
+    );
+    return () => window.clearTimeout(timer);
+  }, [nextChange]);
+
+  const rows = data ? visibleAnnouncements(data, dismissed, now) : [];
   const latestCountdown = rows.reduce(
     (latest, row) => Math.max(latest, row.countdownAt?.getTime() ?? 0),
     0,

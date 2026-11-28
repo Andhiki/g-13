@@ -1,6 +1,7 @@
 import type { Node } from "@xyflow/react";
 import type { Course } from "@g13/curriculum";
-import type { MapCourseState } from "./map-state";
+
+export type MapCourseState = "selected" | "prerequisite" | "dependent" | "unrelated" | null;
 export type CourseNodeData = {
   kind: "course";
   course: Course;

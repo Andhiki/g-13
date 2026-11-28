@@ -1,7 +1,7 @@
 import { AdminSearchHighlightScope } from "../-client/search-highlight";
-import { useAdminSearch } from "../-client/useAdminSearch";
+import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { RiBookOpenLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
@@ -318,8 +318,19 @@ function CoursesContent({
 function AdminCoursesPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<CourseStatus>("active");
+  const {
+    query,
+    setQuery,
+    needle,
+    offset,
+    status,
+    setStatus,
+    counts,
+    listState,
+    rows: visibleRows,
+    total,
+    page,
+  } = useAdminList("active", adminCoursesQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{ open: boolean; course: AdminCourse | null }>({
@@ -332,17 +343,8 @@ function AdminCoursesPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const coursesQuery = useQuery(adminCoursesQuery(offset, status, needle));
-  const counts = coursesQuery.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || coursesQuery.isPending,
-    isError: !searchPending && coursesQuery.isError,
-  };
-  const courseRows = searchPending ? [] : (coursesQuery.data?.rows ?? []);
-  const visibleRows = courseRows.slice(0, 50);
 
   const count = visibleRows.length;
-  const total = coursesQuery.data?.total ?? 0;
   const selectedCourse = visibleRows.find((course) => course.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
     detailsOpen && !!selectedCourse && !listState.isPending && !listState.isError;
@@ -370,7 +372,6 @@ function AdminCoursesPage() {
       setFormModal({ open: false, course: null });
       if (result.created) {
         setStatus("active");
-        setOffset(0);
         setSelectedId(result.id);
       }
     },
@@ -435,7 +436,6 @@ function AdminCoursesPage() {
         activeTab={status}
         onTabChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
         }}
       >
@@ -447,7 +447,6 @@ function AdminCoursesPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={courseRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}
@@ -455,12 +454,12 @@ function AdminCoursesPage() {
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={page.hasNext}
+        onPreviousPage={page.previous}
+        onNextPage={page.next}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
-          setOffset(0);
           setSelectedId(null);
         }}
         onCreate={openCreateModal}

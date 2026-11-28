@@ -14,6 +14,7 @@ import {
 import { AlignButton } from "@/ui/button";
 import { RatingStars } from "@/ui/rating-stars";
 import { Typography } from "@/ui/typography";
+import { pendingReasonLabels } from "../-shared/moderation";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 import type { loadModerationReviews } from "../-server/handler";
@@ -169,6 +170,7 @@ export function ReviewInspector({
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
   const createdMs = review.createdAt.getTime();
+  const heldFor = pendingReasonLabels(review.pendingReasons);
 
   useEffect(() => {
     const element = bodyRef.current;
@@ -217,6 +219,11 @@ export function ReviewInspector({
         <AdminInspectorMetaRow label="Author" valueClassName="break-words">
           {review.authorName}
         </AdminInspectorMetaRow>
+        {pending && heldFor.length > 0 && (
+          <AdminInspectorMetaRow label="Held for" valueClassName="break-words">
+            {heldFor.join(" · ")}
+          </AdminInspectorMetaRow>
+        )}
         <AdminInspectorMetaRow
           label={pending ? "Submitted" : "Published"}
           title={formatAbsoluteTime(createdMs, language)}

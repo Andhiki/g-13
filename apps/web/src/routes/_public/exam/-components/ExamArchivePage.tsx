@@ -16,7 +16,7 @@ import { useKeyboardShortcuts, useShortcutHint } from "@/ui/shortcuts";
 import { Typography } from "@/ui/typography";
 import { browseArchive, prepareCourseSearch, resolveArchive } from "../-shared/archive";
 import { folderSearch } from "../-shared/search";
-import { examArchive } from "../-shared/catalog";
+import { examCourses } from "../-shared/catalog";
 import { archiveUpdatedAt } from "../-shared/metadata";
 import { Route } from "@/routes/_public/exam";
 import type { ArchiveLocation } from "../-shared/contracts";
@@ -419,7 +419,8 @@ export function ExamArchivePage() {
   );
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { location, paper } = resolveArchive(search);
+  const course = Route.useLoaderData();
+  const { location, paper } = resolveArchive(search, course);
   const [query, setQuery] = useState("");
   const searchInput = useRef<HTMLInputElement>(null);
   const focusSearch = useRef(false);
@@ -498,12 +499,13 @@ export function ExamArchivePage() {
     }
   }, [locationKey]);
   const searchIndex = useMemo(
-    () => prepareCourseSearch(examArchive, (course) => text(course.name), language),
+    () => prepareCourseSearch(examCourses, (course) => text(course.name), language),
     [text, language],
   );
   const folder = browseArchive({
     location,
     query,
+    course,
     searchIndex,
     displayName: (course) => text(course.name),
     locale: language,

@@ -1,14 +1,16 @@
 import { announcementVariants } from "@g13/db/schema/announcements";
 import { z } from "zod";
 import { adminPageSchema } from "../../-shared/admin-search";
+import { announcementStatuses, hasValidScheduleWindow } from "@/routes/-announcements/schedule";
+
+export type { AnnouncementStatus } from "@/routes/-announcements/schedule";
 
 export const ANNOUNCEMENT_TITLE_MAX_LENGTH = 40;
 export const ANNOUNCEMENT_BODY_MAX_LENGTH = 100;
 export const ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH = 24;
 export const ANNOUNCEMENT_CTA_LINK_MAX_LENGTH = 500;
 
-export const announcementStatusSchema = z.enum(["live", "scheduled", "expired", "disabled"]);
-export type AnnouncementStatus = z.infer<typeof announcementStatusSchema>;
+export const announcementStatusSchema = z.enum(announcementStatuses);
 
 export const announcementPageSchema = adminPageSchema.extend({
   status: announcementStatusSchema,
@@ -39,13 +41,6 @@ export function isValidAnnouncementHref(value: string): boolean {
 }
 
 /** An announcement may run forever, but it may not expire before it starts. */
-export function hasValidScheduleWindow(input: {
-  startsAt: number;
-  endsAt: number | null;
-}): boolean {
-  return input.endsAt === null || input.endsAt > input.startsAt;
-}
-
 export const announcementFieldsShape = z.object({
   variant: z.enum(announcementVariants).default("primary"),
   titleId: localizedText("Indonesian title", ANNOUNCEMENT_TITLE_MAX_LENGTH),

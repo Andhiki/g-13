@@ -1,4 +1,5 @@
 import { expect, spyOn, test } from "bun:test";
+import { collectAlumni } from "../-shared/directory";
 import { alumniCache, alumniCdnCache, fetchAlumniPages, strapiOrigin } from "./upstream";
 
 test("Strapi origin falls back to the canonical host for empty or invalid values", () => {
@@ -202,5 +203,91 @@ test("directory policies allow stale serving with separate browser and edge fres
     expect(policy).toContain("stale-while-revalidate=86400");
     expect(policy).toContain("stale-if-error=86400");
     expect(policy).not.toMatch(/s-maxage|must-revalidate|proxy-revalidate/);
+  }
+});
+
+const alumniPage = (page: number, pageCount: number, total: number | undefined, ids: number[]) =>
+  Response.json({
+    data: ids.map((id) => ({ id, name: `Alumni ${id}`, batch: 2020 })),
+    meta: { pagination: { page, pageCount, total } },
+  });
+
+test("rejects correctly numbered pages that repeat an upstream record id", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(alumniPage(1, 2, 4, [1, 2]))
+    .mockResolvedValueOnce(alumniPage(2, 2, 4, [2, 3]));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Overlapping alumni upstream pages",
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a nonempty page set shorter than the reported total", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(alumniPage(1, 2, 5, [1, 2]))
+    .mockResolvedValueOnce(alumniPage(2, 2, 5, [3, 4]));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Incomplete alumni upstream directory",
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("rejects a reported total that changes while fetching the directory", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(alumniPage(1, 2, 4, [1, 2]))
+    .mockResolvedValueOnce(alumniPage(2, 2, 3, [3]));
+  try {
+    await expect(fetchAlumniPages("test-token")).rejects.toThrow(
+      "Inconsistent alumni upstream total",
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("accepts a complete multi-page directory whose rows match the reported total", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(alumniPage(1, 2, 3, [1, 2]))
+    .mockResolvedValueOnce(alumniPage(2, 2, 3, [3]));
+  try {
+    const pages = await fetchAlumniPages("test-token");
+    expect(collectAlumni(pages).items.map((item) => item.id)).toEqual([1, 2, 3]);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("counts unusable records toward the total and leaves them to the sanitizer", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({
+      data: [{ id: 1, name: "Alya", batch: 2020 }, { id: 2 }, null],
+      meta: { pagination: { page: 1, pageCount: 1, total: 3 } },
+    }),
+  );
+  try {
+    const pages = await fetchAlumniPages("test-token");
+    expect(collectAlumni(pages).items.map((item) => item.id)).toEqual([1]);
+  } finally {
+    fetchSpy.mockRestore();
+  }
+});
+
+test("ignores malformed total metadata", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({
+      data: [{ id: 1, name: "Alya", batch: 2020 }],
+      meta: { pagination: { page: 1, pageCount: 1, total: "9" } },
+    }),
+  );
+  try {
+    expect(await fetchAlumniPages("test-token")).toHaveLength(1);
+  } finally {
+    fetchSpy.mockRestore();
   }
 });

@@ -13,7 +13,8 @@ import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-val
 import { Typography } from "@/ui/typography";
 import { toast } from "@/ui/toast";
 import { useTranslation } from "react-i18next";
-import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import { announcementStatusLabel } from "../-shared/status";
 
 export function AnnouncementPreview({
   variant,

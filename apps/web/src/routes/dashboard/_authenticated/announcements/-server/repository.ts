@@ -1,4 +1,4 @@
-import { adminSearchCondition } from "../../-server/search";
+import { adminSearchColumns } from "../../-server/search";
 import { announcementSearchFields } from "../-shared/schemas";
 import {
   and,
@@ -14,70 +14,43 @@ import {
 } from "drizzle-orm";
 import { announcements } from "@g13/db/schema/announcements";
 import type { createDatabase } from "@g13/db/client";
-import type {
-  AnnouncementStatus,
-  CreateAnnouncementInput,
-  UpdateAnnouncementInput,
-} from "../-shared/schemas";
+import type { BatchItem } from "drizzle-orm/batch";
+import type { CreateAnnouncementInput, UpdateAnnouncementInput } from "../-shared/schemas";
+import { enabledAnnouncementOverlapCondition } from "@/routes/-announcements/schedule";
 
 import type { AnnouncementConflict } from "../-shared/errors";
 
-type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConflict[] };
+export type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConflict[] };
 
 type Database = ReturnType<typeof createDatabase>;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, announcementSearchFields, {
-    id: announcements.id,
-    titleId: announcements.titleId,
-    titleEn: announcements.titleEn,
-  });
-}
+export const adminAnnouncementSearchColumns = adminSearchColumns(announcementSearchFields, {
+  id: announcements.id,
+  titleId: announcements.titleId,
+  titleEn: announcements.titleEn,
+});
 
-/** Single definition of each schedule state, shared by the list filter and the counts aggregate. */
-function statusCondition(status: AnnouncementStatus, now: Date): SQL {
-  const at = now.getTime();
-  switch (status) {
-    case "live":
-      return sql`${announcements.enabled} = true and ${announcements.startsAt} <= ${at} and (${announcements.endsAt} is null or ${announcements.endsAt} > ${at})`;
-    case "scheduled":
-      return sql`${announcements.enabled} = true and ${announcements.startsAt} > ${at}`;
-    case "expired":
-      return sql`${announcements.enabled} = true and ${announcements.endsAt} is not null and ${announcements.endsAt} <= ${at}`;
-    case "disabled":
-      return sql`${announcements.enabled} = false`;
-  }
-}
-
-export async function listAdminAnnouncements(
+export async function selectAdminAnnouncements(
   db: Database,
-  offset: number,
-  status: AnnouncementStatus,
-  now: Date,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select()
     .from(announcements)
-    .where(and(statusCondition(status, now), searchCondition(query)))
+    .where(where)
     .orderBy(desc(announcements.startsAt), desc(announcements.id))
-    .limit(51)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
-export async function getAnnouncementCounts(db: Database, now: Date, query = "") {
-  const count = (status: AnnouncementStatus) =>
-    sql<number>`coalesce(sum(case when ${statusCondition(status, now)} then 1 else 0 end), 0)`;
-  const [counts] = await db
-    .select({
-      live: count("live"),
-      scheduled: count("scheduled"),
-      expired: count("expired"),
-      disabled: count("disabled"),
-    })
-    .from(announcements)
-    .where(searchCondition(query));
-  return counts;
+export async function countAdminAnnouncements(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db.select(counts).from(announcements).where(where);
+  return result;
 }
 
 function announcementValues(input: CreateAnnouncementInput) {
@@ -98,24 +71,28 @@ function announcementValues(input: CreateAnnouncementInput) {
   };
 }
 
-// Keep the end exclusive, matching the public visibility query.
-function overlaps(id: string, startsAt: number | SQL, endsAt: number | null | SQL) {
-  return sql`${announcements.id} <> ${id}
-    and ${announcements.enabled} = true
-    and (${endsAt} is null or ${announcements.startsAt} < ${endsAt})
-    and (${announcements.endsAt} is null or ${announcements.endsAt} > ${startsAt})`;
-}
-
-// Each write runs these operations in one D1 batch. Leave every conflict enabled
-// if any is unconfirmed, and write the target only once its window is clear.
-function conflictQueries(
+// Enabling an announcement must leave its window clear of other enabled ones.
+// Each write runs in one D1 batch: disable the confirmed conflicts (all or
+// none: if any conflict is unconfirmed, every conflict stays enabled), write
+// the target only once its window is clear, then report what still conflicts.
+async function writeClearOfConflicts(
   db: Database,
-  condition: SQL,
-  confirmedIds: string[] = [],
-  targetExists: SQL = sql`true`,
-) {
+  window: {
+    id: string;
+    startsAt: number | SQL;
+    endsAt: number | null | SQL;
+    confirmedIds?: string[];
+    /** For an existing target: only act while it still exists. */
+    target?: SQL;
+  },
+  write: (clear: SQL) => BatchItem<"sqlite">,
+): Promise<AnnouncementWrite | undefined> {
+  const condition = enabledAnnouncementOverlapCondition(window.id, window.startsAt, window.endsAt);
+  const targetExists = window.target
+    ? exists(db.select({ id: announcements.id }).from(announcements).where(window.target))
+    : sql`true`;
   // json_each binds the whole confirmed set with one D1 parameter.
-  const confirmed = sql`(select value from json_each(${JSON.stringify(confirmedIds)}))`;
+  const confirmed = sql`(select value from json_each(${JSON.stringify(window.confirmedIds ?? [])}))`;
   const conflicts = db
     .select({
       id: announcements.id,
@@ -131,7 +108,6 @@ function conflictQueries(
     .select({ id: announcements.id })
     .from(announcements)
     .where(and(condition, notInArray(announcements.id, confirmed)));
-
   const disable = db
     .update(announcements)
     .set({ enabled: false, updatedAt: new Date() })
@@ -139,14 +115,19 @@ function conflictQueries(
       and(targetExists, condition, inArray(announcements.id, confirmed), notExists(unconfirmed)),
     );
 
-  return { disable, conflicts, clear: notExists(conflictIds) };
+  const [, written, remaining] = (await db.batch([
+    disable,
+    write(notExists(conflictIds)),
+    conflicts,
+  ])) as [unknown, { id: string }[], AnnouncementConflict[]];
+  return written[0] ?? (remaining.length ? { conflicts: remaining } : undefined);
 }
 
 export async function createAnnouncementRecord(
   db: Database,
   input: CreateAnnouncementInput,
   createdById: string,
-): Promise<AnnouncementWrite> {
+): Promise<AnnouncementWrite | undefined> {
   const id = crypto.randomUUID();
   const values = { ...announcementValues(input), id, createdById };
   if (!input.enabled) {
@@ -154,23 +135,26 @@ export async function createAnnouncementRecord(
     return { id };
   }
 
-  const { disable, conflicts, clear } = conflictQueries(
-    db,
-    overlaps(id, input.startsAt, input.endsAt),
-    input.confirmedConflictIds,
-  );
   const now = new Date();
   const row: typeof announcements.$inferSelect = { ...values, createdAt: now, updatedAt: now };
   const columns = getTableColumns(announcements);
   const parameters = (Object.keys(columns) as (keyof typeof columns)[]).map((key) =>
     sql.param(row[key], columns[key]),
   );
-  const insert = db
-    .insert(announcements)
-    .select(sql`select ${sql.join(parameters, sql`, `)} where ${clear}`)
-    .returning({ id: announcements.id });
-  const [, [created], remaining] = await db.batch([disable, insert, conflicts]);
-  return created ?? { conflicts: remaining };
+  return writeClearOfConflicts(
+    db,
+    {
+      id,
+      startsAt: input.startsAt,
+      endsAt: input.endsAt,
+      confirmedIds: input.confirmedConflictIds,
+    },
+    (clear) =>
+      db
+        .insert(announcements)
+        .select(sql`select ${sql.join(parameters, sql`, `)} where ${clear}`)
+        .returning({ id: announcements.id }),
+  );
 }
 
 export async function updateAnnouncementRecord(
@@ -187,19 +171,17 @@ export async function updateAnnouncementRecord(
     const [updated] = await update.where(target).returning(returning);
     return updated;
   }
-
-  const { disable, conflicts, clear } = conflictQueries(
+  return writeClearOfConflicts(
     db,
-    overlaps(id, input.startsAt, input.endsAt),
-    input.confirmedConflictIds,
-    exists(db.select({ id: announcements.id }).from(announcements).where(target)),
+    {
+      id,
+      startsAt: input.startsAt,
+      endsAt: input.endsAt,
+      confirmedIds: input.confirmedConflictIds,
+      target,
+    },
+    (clear) => update.where(and(target, clear)).returning(returning),
   );
-  const [, [updated], remaining] = await db.batch([
-    disable,
-    update.where(and(target, clear)).returning(returning),
-    conflicts,
-  ]);
-  return updated ?? (remaining.length ? { conflicts: remaining } : undefined);
 }
 
 export async function setAnnouncementEnabled(
@@ -215,21 +197,19 @@ export async function setAnnouncementEnabled(
     const [updated] = await update.where(target).returning(returning);
     return updated;
   }
-
-  const startsAt = sql`(${db.select({ value: announcements.startsAt }).from(announcements).where(target)})`;
-  const endsAt = sql`(${db.select({ value: announcements.endsAt }).from(announcements).where(target)})`;
-  const { disable, conflicts, clear } = conflictQueries(
+  const column = (value: typeof announcements.startsAt | typeof announcements.endsAt) =>
+    sql`(${db.select({ value }).from(announcements).where(target)})`;
+  return writeClearOfConflicts(
     db,
-    overlaps(id, startsAt, endsAt),
-    confirmedIds,
-    exists(db.select({ id: announcements.id }).from(announcements).where(target)),
+    {
+      id,
+      startsAt: column(announcements.startsAt),
+      endsAt: column(announcements.endsAt),
+      confirmedIds,
+      target,
+    },
+    (clear) => update.where(and(target, clear)).returning(returning),
   );
-  const [, [updated], remaining] = await db.batch([
-    disable,
-    update.where(and(target, clear)).returning(returning),
-    conflicts,
-  ]);
-  return updated ?? (remaining.length ? { conflicts: remaining } : undefined);
 }
 
 export async function deleteAnnouncement(db: Database, announcementId: string): Promise<boolean> {

@@ -17,14 +17,25 @@ import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from 
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
 import { lecturerReviewsInputSchema, type CoursePickerCursor } from "../-shared/schemas";
 import { reviewOrders } from "../-shared/review-order";
-import { classifyReviewText } from "./review-moderation";
-import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+import { createOmniModerationProvider, type ReviewModerationProvider } from "./review-screening";
+import { submitReview as submitReviewWithCaptcha } from "./submission.service";
+
+type SubmissionContext = Parameters<typeof submitReviewWithCaptcha>[2];
+
+/** Submits with a passing captcha unless the test supplies its own verifier. */
+function submitReview(
+  db: Parameters<typeof submitReviewWithCaptcha>[0],
+  review: Parameters<typeof submitReviewWithCaptcha>[1],
+  context: Omit<SubmissionContext, "verifyCaptcha"> &
+    Partial<Pick<SubmissionContext, "verifyCaptcha">>,
+) {
+  return submitReviewWithCaptcha(db, review, { verifyCaptcha: async () => true, ...context });
+}
 
 const firstReviewPage = lecturerReviewsInputSchema.parse({ lecturerId: "p" });
 
-const clearScreening = {
-  openAiApiKey: "test-key",
-  classify: async () => "clear" as const,
+const clearScreening: { provider: ReviewModerationProvider } = {
+  provider: async () => "clear",
 };
 
 const rawInput = {
@@ -128,10 +139,9 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
       now: 3_600_000,
-      openAiApiKey: "test-key",
-      classify: async () => {
+      provider: async (): Promise<"clear"> => {
         classifierCalls += 1;
-        return "clear" as const;
+        return "clear";
       },
     };
 
@@ -307,12 +317,11 @@ it("holds Indonesian and English profanity after Omni clears it", async () => {
       .insert(courses)
       .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
 
-    const screened = mock(async () => "clear" as const);
+    const screened = mock(async (): Promise<"clear"> => "clear");
     const context = {
       ip: "192.0.2.31",
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: screened,
+      provider: screened,
     };
     const reviews = [
       { body: "Tes anjing ＢＡＮＧＳＡＴ! Contoh ulasan." },
@@ -365,8 +374,7 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     const context = (ip: string) => ({
       ip,
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: async (value: { body: string; displayName?: string }) => {
+      provider: async (value: { body: string; displayName?: string }) => {
         screened.push(value);
         return outcomes[outcomeIndex++] ?? "clear";
       },
@@ -401,6 +409,19 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     );
     expect(anonymous.data?.status).toBe("published");
     expect(screened.at(-1)).toEqual({ body: input.body });
+
+    // Each held review records why, so moderators can see it.
+    const reasonsOf = async (reviewId: string | undefined) =>
+      (
+        await db
+          .select({ pendingReasons: reviews.pendingReasons })
+          .from(reviews)
+          .where(eq(reviews.id, reviewId ?? ""))
+      )[0]?.pendingReasons;
+    expect(await reasonsOf(published.data?.reviewId)).toBeNull();
+    expect(await reasonsOf(flagged.data?.reviewId)).toEqual(["moderation"]);
+    expect(await reasonsOf(unscorable.data?.reviewId)).toEqual(["unscorable"]);
+    expect(await reasonsOf(lowRated.data?.reviewId)).toEqual(["low-rating"]);
   } finally {
     await platform.dispose();
   }
@@ -428,12 +449,10 @@ https://t.me/example`;
     const context = {
       ip: "192.0.2.36",
       secret: "test-secret-".repeat(4),
-      openAiApiKey: "test-key",
-      classify: (input: Parameters<typeof classifyReviewText>[0]) =>
-        classifyReviewText(input, "test-key", async () => {
-          providerCalls += 1;
-          throw new Error("Contact matches should skip the moderation provider");
-        }),
+      provider: createOmniModerationProvider("test-key", async () => {
+        providerCalls += 1;
+        throw new Error("Contact matches should skip the moderation provider");
+      }),
     };
     const heldReviewIds = [];
     for (const body of [campaign, courseFeedback]) {
@@ -480,15 +499,44 @@ https://t.me/example`;
   }
 }, 30_000);
 
-it("does not invoke review screening when CAPTCHA verification fails", async () => {
-  let classifierCalls = 0;
-  const result = await submitReviewAfterCaptcha(false, async () => {
-    classifierCalls += 1;
-    return { data: { reviewId: "unexpected", status: "published" as const }, error: null };
-  });
-  expect(result).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
-  expect(classifierCalls).toBe(0);
-});
+it("a failed captcha stops before screening, rate limits and storage", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db.insert(courses).values({
+      id: "c",
+      code: "CS101",
+      nameId: "Dasar Komputer",
+      nameEn: "Computer Basics",
+    });
+    const input = submissionInputSchema.parse(rawInput);
+    const context = {
+      ip: "198.51.100.40",
+      browserId: crypto.randomUUID(),
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+    };
+    let classifierCalls = 0;
+    const provider = async (): Promise<"clear"> => {
+      classifierCalls += 1;
+      return "clear";
+    };
+    for (let attempt = 0; attempt < 5; attempt++) {
+      expect(
+        await submitReview(db, input, { ...context, provider, verifyCaptcha: async () => false }),
+      ).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
+    }
+    expect(classifierCalls).toBe(0);
+    expect(await db.select().from(reviews)).toEqual([]);
+    // Rejected captchas used none of the browser's three hourly submissions.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      expect((await submitReview(db, input, { ...context, provider })).error).toBeNull();
+    }
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
 
 it("limits submissions per browser and keeps an IP ceiling", async () => {
   const platform = await createTestPlatformProxy();
@@ -507,10 +555,9 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     const ip = "198.51.100.23";
     let classifierCalls = 0;
     const screening = {
-      openAiApiKey: "test-key",
-      classify: async () => {
+      provider: async (): Promise<"clear"> => {
         classifierCalls += 1;
-        return "clear" as const;
+        return "clear";
       },
     };
     const browserA = crypto.randomUUID();

@@ -1,7 +1,7 @@
 import { AdminSearchHighlightScope } from "../-client/search-highlight";
-import { useAdminSearch } from "../-client/useAdminSearch";
+import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { RiUserVoiceLine } from "@remixicon/react";
 import { AlignButton } from "@/ui/button";
@@ -321,8 +321,19 @@ function LecturersContent({
 function AdminLecturersPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<LecturerStatus>("active");
+  const {
+    query,
+    setQuery,
+    needle,
+    offset,
+    status,
+    setStatus,
+    counts,
+    listState,
+    rows: visibleRows,
+    total,
+    page,
+  } = useAdminList("active", adminLecturersQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{ open: boolean; lecturer: AdminLecturer | null }>({
@@ -335,17 +346,8 @@ function AdminLecturersPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const lecturersQuery = useQuery(adminLecturersQuery(offset, status, needle));
-  const counts = lecturersQuery.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || lecturersQuery.isPending,
-    isError: !searchPending && lecturersQuery.isError,
-  };
-  const lecturerRows = searchPending ? [] : (lecturersQuery.data?.rows ?? []);
-  const visibleRows = lecturerRows.slice(0, 50);
 
   const count = visibleRows.length;
-  const total = lecturersQuery.data?.total ?? 0;
   const selectedLecturer =
     visibleRows.find((lecturer) => lecturer.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
@@ -374,7 +376,6 @@ function AdminLecturersPage() {
       setFormModal({ open: false, lecturer: null });
       if (result.created) {
         setStatus("active");
-        setOffset(0);
         setSelectedId(result.id);
       }
     },
@@ -439,7 +440,6 @@ function AdminLecturersPage() {
         activeTab={status}
         onTabChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
         }}
       >
@@ -451,7 +451,6 @@ function AdminLecturersPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={lecturerRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}
@@ -459,12 +458,12 @@ function AdminLecturersPage() {
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={page.hasNext}
+        onPreviousPage={page.previous}
+        onNextPage={page.next}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
-          setOffset(0);
           setSelectedId(null);
         }}
         onCreate={openCreateModal}

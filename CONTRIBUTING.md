@@ -1,9 +1,13 @@
 # Berkontribusi ke g-13
 
-Kontribusi dalam bahasa Indonesia atau Inggris diterima: koreksi data, laporan bug,
+Kontribusi diterima: koreksi data, laporan bug,
 aksesibilitas, dokumentasi, dan kode. Baca [README](README.md) dan
 [aturan komunitas](CODE_OF_CONDUCT.md) sebelum mulai. Panduan workflow agent dan
 skill proyek tersedia di [AGENTS.md](AGENTS.md).
+
+Tulis issue, pull request, komentar, dan pesan commit dalam bahasa Inggris
+agar mudah dibaca semua maintainer dan agent. Teks sumber berbahasa Indonesia
+(dokumen kurikulum, teks antarmuka) boleh dikutip apa adanya.
 
 ## Alur kontribusi
 
@@ -83,7 +87,7 @@ setelah paket workspace dibangun.
 
 [GitHub Releases](https://github.com/Andhiki/g-13/releases) menyimpan riwayat rilis publik.
 Untuk perubahan yang berdampak pada pengguna, jelaskan hasilnya secara singkat dalam bahasa
-Indonesia di deskripsi PR. Untuk koreksi kurikulum atau prasyarat, sertakan edisi, kode mata
+Inggris di deskripsi PR. Untuk koreksi kurikulum atau prasyarat, sertakan edisi, kode mata
 kuliah, sumber resmi, nomor halaman, serta nilai sebelum dan sesudah koreksi.
 
 PR promosi dari `staging` ke `main` membawa seluruh perubahan yang ada di

@@ -1,0 +1,233 @@
+import type { ExamCourseDetail } from "../../contracts";
+
+const course: ExamCourseDetail = {
+  sourceFolderId: "1ddDAUmY0Md2nu4k2DuuxjyBBZe4SoU6H",
+  years: [
+    {
+      name: "2010",
+      createdAt: null,
+      papers: [
+        {
+          id: "1rYVZ4Fehp8RrjStPtry3E_tc6OIsbEcu",
+          name: "PTI - UAS - 2010.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+      ],
+    },
+    {
+      name: "2011",
+      createdAt: null,
+      papers: [
+        {
+          id: "1Uw1a2DN9xsKWvbztnqSNy2giuB9OnDZI",
+          name: "PTI - UAS - 2011.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+      ],
+    },
+    {
+      name: "2009",
+      createdAt: null,
+      papers: [
+        {
+          id: "1ctQW6P4TOyqXijxIEV1Halj7c3krr-fl",
+          name: "PTI - UTS - 2009.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1Dc8Hk_pCG1Rp279XnkFiSqcXfaeCej__",
+          name: "PTI - UTS - 2009.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1Ldls8rwt7qV3WIGBeCaBOcFIltzckA9p",
+          name: "PTI - UTS - 2009(1).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1YKfRK3gyk6DejhLv9KL0wXhwHuQ567Ld",
+          name: "TIK - UAS - 2009.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+      ],
+    },
+    {
+      name: "2013",
+      createdAt: null,
+      papers: [
+        {
+          id: "1II4hVH--voVIitEeDGW_biPfVCRHHMbM",
+          name: "TIK - UAS - 2013 HAL 2.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1byqNwWYVUqggCLxnB7cBqh0qp_en4Z_n",
+          name: "TIK - UAS - 2013 HAL. 1.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+      ],
+    },
+    {
+      name: "2014",
+      createdAt: null,
+      papers: [
+        {
+          id: "16A12F4SRyovoCYBlhrnqYXS5gq97BXSR",
+          name: "TIK - UAS - 2014 (Page 1).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1cPHZ20Pp5rCnUxdyHjl3VSrYAdunZ2OA",
+          name: "TIK - UAS - 2014 (Page 2).pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1uvxWPLalnn76gEB1MArkdPZ26K6cDdko",
+          name: "TIK - UTS - 2014  HAL. 1.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1LMxBpb0Rgp0ttQnOuJ6Zao_XSlRyN0bR",
+          name: "TIK - UTS - 2014 HAL 2.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+      ],
+    },
+    {
+      name: "2015",
+      createdAt: null,
+      papers: [
+        {
+          id: "1auqbV7YqTSwM-dWMat2Z45PahnfmWuHK",
+          name: "TIK - UAS - 2015 HAL 2.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1gMjYTiMkgGriOS-vJ6uS2Lh_Gml3QSQl",
+          name: "TIK - UAS - 2015 HAL. 1.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1vwvauZ4SfSVn5GfWfgIJbpdISZlxk5E0",
+          name: "TIK - UAS - 2015.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1gVDm_K6TAUva-AwzVXTXmMOEyNCVRc6R",
+          name: "TIK - UTS - 2015  HALAMAN 1.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1O02xVIjvSaVWsf-ELQ0q0G65wuXURuFB",
+          name: "TIK - UTS - 2015 HALAMAN 2.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1CQlNKk-BDXrvW0VQ4UmXKBPEvBml45Ou",
+          name: "TIK - UTS - 2015.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+      ],
+    },
+    {
+      name: "2016",
+      createdAt: null,
+      papers: [
+        {
+          id: "1LzRzyvuLyFAG2FD5b267Vvger2WtsAMt",
+          name: "TIK - UAS - 2016 HALAMAN 1.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:11.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+        {
+          id: "1qrQviFIx5ksuqodIEF7IX0LJMzJTFdaM",
+          name: "TIK - UAS - 2016 HALAMAN 2.JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:10.000Z",
+          exam: "UAS",
+          sourceFolderId: "1ieCqKpm06srU48IHakvCI6PTiYmLEyrg",
+        },
+      ],
+    },
+    {
+      name: "2012",
+      createdAt: null,
+      papers: [
+        {
+          id: "1TT7xfr6wMsg01BLU_LJiWtGeu9wyyRdl",
+          name: "TIK - UTS - 2012 HAL 1.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+        {
+          id: "1mCyWKRN16PcUzd3AHecH9-_rAv-AbokG",
+          name: "TIK - UTS - 2012 HAL 2.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "1cFk4QQVnlP08y-b3HJATK0iYfZ0J8qLS",
+        },
+      ],
+    },
+  ],
+};
+
+export default course;

@@ -2,6 +2,7 @@ import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { getActiveAnnouncements } from "@/routes/_public/-announcements/service";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
 import { createTestPlatformProxy } from "@/test/database";
 import { announcementFieldsShape } from "../-shared/schemas";
 import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementWriteResult } from "../-shared/errors";
@@ -269,6 +270,39 @@ it("schedules announcements by start and expiry windows", async () => {
       data: null,
       error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN,
     });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("uses the same inclusive-start and exclusive-end instant for public and dashboard schedules", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await seedUsers(db);
+    const admin = { id: "admin-1", role: "admin" };
+    const now = Date.now();
+    const startsNow = resultData(
+      await createAnnouncement(db, admin, createBulletin({ startsAt: now, endsAt: now + day })),
+    );
+    const endsNow = resultData(
+      await createAnnouncement(db, admin, createBulletin({ startsAt: now - day, endsAt: now })),
+    );
+    const at = new Date(now);
+
+    const publicRows = await getActiveAnnouncements(db, now);
+    const liveRows = resultData(await inspectAnnouncements(db, admin, 0, "live", "", at)).rows;
+    const expiredRows = resultData(
+      await inspectAnnouncements(db, admin, 0, "expired", "", at),
+    ).rows;
+    const { counts } = resultData(await inspectAnnouncements(db, admin, 0, "live", "", at));
+
+    expect(publicRows.map(({ id }) => id)).toEqual([startsNow.id]);
+    expect(liveRows.map(({ id }) => id)).toEqual([startsNow.id]);
+    expect(expiredRows.map(({ id }) => id)).toEqual([endsNow.id]);
+    expect(counts).toMatchObject({ live: 1, scheduled: 0, expired: 1, disabled: 0 });
+    expect(liveRows.map((row) => resolveAnnouncementStatus(row, now))).toEqual(["live"]);
+    expect(expiredRows.map((row) => resolveAnnouncementStatus(row, now))).toEqual(["expired"]);
   } finally {
     await platform.dispose();
   }

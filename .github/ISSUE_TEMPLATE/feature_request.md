@@ -1,13 +1,13 @@
 ---
-name: Usulan fitur
-about: Usulkan perbaikan berdasarkan kebutuhan pengguna
+name: Feature request
+about: Propose an improvement based on a user need. Please write in English.
 title: ""
 labels: ""
 assignees: ""
 ---
 
-## Kebutuhan pengguna
+## User need
 
-## Usulan solusi
+## Proposed solution
 
-## Alternatif dan batas cakupan
+## Alternatives and scope

@@ -1,5 +1,13 @@
 import { expect, test } from "bun:test";
-import { normalizeArchive, parseCourses, parseFolder } from "./import-exam-archive";
+import { readdir } from "node:fs/promises";
+import {
+  normalizeArchive,
+  parseCourses,
+  parseFolder,
+  readCatalog,
+  renderCatalog,
+} from "./import-exam-archive";
+import { examCourses } from "@/routes/_public/exam/-shared/catalog";
 import type { ExamCourse } from "@/routes/_public/exam/-shared/contracts";
 
 const pdf = (id: string, name: string) => ({
@@ -141,4 +149,48 @@ test("shared source folders keep distinct course identities without cycles", () 
   });
   expect(new Set(result.catalog.map((course) => course.id)).size).toBe(2);
   expect(result.catalog.map((course) => course.years[0].papers.length)).toEqual([1, 1]);
+});
+
+test("the course index omits paper metadata and each course gets its own module", () => {
+  const paper = {
+    id: "p",
+    name: "UTS.pdf",
+    exam: "UTS" as const,
+    mimeType: "application/pdf",
+    createdAt: null,
+    sourceFolderId: "paper-folder",
+  };
+  const files = renderCatalog([
+    {
+      id: "a",
+      name: "Basis Data",
+      sourceFolderId: "src-a",
+      createdAt: null,
+      years: [{ name: "2024", createdAt: null, papers: [paper] }],
+    },
+    { id: "b", name: "Basis-Data", sourceFolderId: "src-b", createdAt: null, years: [] },
+  ]);
+  expect([...files.keys()]).toEqual([
+    "courses/basis-data.ts",
+    "courses/basis-data-2.ts",
+    "index.ts",
+  ]);
+  const index = files.get("index.ts") ?? "";
+  expect(index).toContain('load: () => import("./courses/basis-data-2")');
+  expect(index).not.toContain("sourceFolderId");
+  expect(index).not.toContain("UTS.pdf");
+  expect(files.get("courses/basis-data.ts")).toContain('"paper-folder"');
+});
+
+test("the live catalog index references every course module exactly once", async () => {
+  const dir = new URL("../src/routes/_public/exam/-shared/catalog/", import.meta.url);
+  const modules = (await readdir(new URL("courses/", dir))).map((file) =>
+    file.replace(/\.ts$/, ""),
+  );
+  const index = await Bun.file(new URL("index.ts", dir)).text();
+  const referenced = [...index.matchAll(/import\("\.\/courses\/([^"]+)"\)/g)].map((m) => m[1]);
+  expect(referenced.sort()).toEqual(modules.sort());
+  expect(new Set(examCourses.map((course) => course.id)).size).toBe(examCourses.length);
+  const catalog = await readCatalog();
+  expect(catalog.map((course) => course.id)).toEqual(examCourses.map((course) => course.id));
 });

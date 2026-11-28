@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { AlumniDirectoryData } from "../-shared/directory";
+import { parseAlumniDirectory, type AlumniDirectoryData } from "../-shared/directory";
 
 export type AlumniDirectoryState =
   | { status: "loading" }
@@ -24,7 +24,9 @@ export function useAlumniDirectory(
     fetch("/api/alumni", { signal: controller.signal, headers: { accept: "application/json" } })
       .then(async (response) => {
         if (!response.ok) throw new Error(String(response.status));
-        return (await response.json()) as AlumniDirectoryData;
+        const data = parseAlumniDirectory(await response.json());
+        if (!data) throw new Error("Invalid directory data");
+        return data;
       })
       .then((data) => {
         if (active) setState({ status: "ready", data });

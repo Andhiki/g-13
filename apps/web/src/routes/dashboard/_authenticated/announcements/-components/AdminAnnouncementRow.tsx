@@ -11,7 +11,8 @@ import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime } from "@/date-format";
 import type { loadAdminAnnouncements } from "../-server/handler";
-import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import { announcementStatusLabel } from "../-shared/status";
 import { createSearchHighlight } from "../../-client/search-highlight";
 import { announcementSearchFields, type AnnouncementLifecycleInput } from "../-shared/schemas";
 

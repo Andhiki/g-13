@@ -9,7 +9,8 @@ import { RiEditLine } from "@remixicon/react";
 import { formatAbsoluteTime, formatRelativeTime } from "@/date-format";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
-import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import { announcementStatusLabel } from "../-shared/status";
 import type { AnnouncementLifecycleInput } from "../-shared/schemas";
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
 

@@ -1,21 +1,21 @@
 ---
-name: Koreksi data kurikulum
-about: Koreksi mata kuliah, SKS, prasyarat, atau aturan roadmap
+name: Curriculum data correction
+about: Correct a course, credits, prerequisite, or roadmap rule. Please write in English.
 title: ""
 labels: ""
 assignees: ""
 ---
 
-## Kurikulum dan mata kuliah
+## Curriculum and course
 
-<!-- Versi kurikulum, kode dan nama mata kuliah. -->
+<!-- Curriculum version, course code and name. Quote Indonesian names as they appear. -->
 
-## Data saat ini dan koreksi yang diusulkan
+## Current data and proposed correction
 
-## Sumber resmi
+## Official source
 
-<!-- URL, judul dokumen, halaman atau kutipan pendek yang relevan. -->
+<!-- URL, document title, page, or a short relevant quote. -->
 
-## Dampak
+## Impact
 
-<!-- Contoh hubungan prasyarat atau roadmap yang berubah. -->
+<!-- An example prerequisite or roadmap relationship that changes. -->

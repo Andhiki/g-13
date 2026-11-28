@@ -1,6 +1,6 @@
-import { adminSearchCondition } from "../../-server/search";
+import { adminSearchColumns } from "../../-server/search";
 import { lecturerSearchFields } from "../-shared/schemas";
-import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, like, sql, type SQL } from "drizzle-orm";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
@@ -8,18 +8,15 @@ import { allocateCatalogId } from "@/routes/dashboard/_authenticated/-server/slu
 import type {
   CreateLecturerInput,
   LecturerLifecycleInput,
-  LecturerStatus,
   UpdateLecturerInput,
 } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, lecturerSearchFields, {
-    name: lecturers.name,
-    id: lecturers.id,
-  });
-}
+export const adminLecturerSearchColumns = adminSearchColumns(lecturerSearchFields, {
+  name: lecturers.name,
+  id: lecturers.id,
+});
 
 async function allocateLecturerId(db: Database, name: string): Promise<string> {
   return allocateCatalogId(name, "lecturer", (pattern) =>
@@ -27,11 +24,10 @@ async function allocateLecturerId(db: Database, name: string): Promise<string> {
   );
 }
 
-export async function listAdminLecturers(
+export async function selectAdminLecturerRows(
   db: Database,
-  offset: number,
-  status: LecturerStatus,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select({
@@ -42,27 +38,20 @@ export async function listAdminLecturers(
     })
     .from(lecturers)
     .leftJoin(reviews, eq(reviews.lecturerId, lecturers.id))
-    .where(
-      and(
-        status === "active" ? isNull(lecturers.deletedAt) : isNotNull(lecturers.deletedAt),
-        searchCondition(query),
-      ),
-    )
+    .where(where)
     .groupBy(lecturers.id)
     .orderBy(asc(lecturers.name), asc(lecturers.id))
-    .limit(51)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
-export async function getAdminLecturerCounts(db: Database, query = "") {
-  const [counts] = await db
-    .select({
-      active: sql<number>`coalesce(sum(case when ${lecturers.deletedAt} is null then 1 else 0 end), 0)`,
-      deleted: sql<number>`coalesce(sum(case when ${lecturers.deletedAt} is not null then 1 else 0 end), 0)`,
-    })
-    .from(lecturers)
-    .where(searchCondition(query));
-  return counts;
+export async function countAdminLecturers(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db.select(counts).from(lecturers).where(where);
+  return result;
 }
 
 export async function createLecturerRecord(db: Database, input: CreateLecturerInput) {
