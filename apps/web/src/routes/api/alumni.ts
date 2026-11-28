@@ -1,17 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { collectAlumni } from "../_public/alumni/-shared/directory";
-import {
-  alumniCache,
-  alumniCdnCache,
-  fetchAlumniPages,
-  strapiToken,
-} from "../_public/alumni/-server/upstream";
+import { alumniCache, alumniCdnCache } from "../_public/alumni/-server/upstream";
+import { serverAdapters } from "@/server/adapters";
 
 export const Route = createFileRoute("/api/alumni")({
   server: {
     handlers: {
       GET: async () => {
-        const token = strapiToken();
+        const token = serverAdapters.alumni.token();
         if (!token) {
           return Response.json(
             { error: "unconfigured" },
@@ -20,7 +16,7 @@ export const Route = createFileRoute("/api/alumni")({
         }
 
         try {
-          return Response.json(collectAlumni(await fetchAlumniPages(token)), {
+          return Response.json(collectAlumni(await serverAdapters.alumni.fetchPages(token)), {
             headers: {
               "cache-control": alumniCache,
               "cdn-cache-control": alumniCdnCache,

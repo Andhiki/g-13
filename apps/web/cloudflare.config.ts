@@ -103,7 +103,6 @@ export default defineConfig(({ mode }) => {
 				TURNSTILE_SITE_KEY: isE2E ? bindings.text("isolated-e2e-site") : bindings.secret(),
 				TURNSTILE_SECRET_KEY: isE2E ? bindings.text("isolated-e2e-verifier") : bindings.secret(),
 				OPENAI_API_KEY: isE2E ? bindings.text("") : bindings.secret(),
-				REVIEW_CLASSIFICATION_TEST_MODE: isE2E ? bindings.text("clear") : undefined,
 			},
 		},
 	};

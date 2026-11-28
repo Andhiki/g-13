@@ -8,12 +8,8 @@ import { Loading } from "@/ui/loading";
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { env } = await import("cloudflare:workers");
   try {
-    if (
-      import.meta.env.MODE === "local-e2e" &&
-      getRequest().headers.get("x-e2e-alumni-failure") === "1"
-    ) {
-      throw new Error("Simulated directory outage");
-    }
+    const { serverAdapters } = await import("@/server/adapters");
+    if (serverAdapters.alumni.outage(getRequest())) throw new Error("Directory outage");
     // Service-binding fetches share Workers Cache with browser requests to this endpoint.
     const response = await env.ALUMNI.fetch("https://alumni.internal/api/alumni");
     if (!response.ok) throw new Error("Directory unavailable");
