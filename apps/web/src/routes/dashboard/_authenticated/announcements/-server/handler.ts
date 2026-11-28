@@ -9,7 +9,7 @@ import {
   createAnnouncementSchema,
   updateAnnouncementSchema,
 } from "../-shared/schemas";
-import { rejectAnnouncementOperation } from "./failures";
+import { rejectAnnouncementOperation, respondToAnnouncementWrite } from "./failures";
 import {
   changeAnnouncementLifecycle,
   createAnnouncement,
@@ -52,9 +52,7 @@ export const createAdminAnnouncement = createServerFn({ method: "POST" })
     const result = await runServerOperation(() =>
       createAnnouncement(createDatabase(env.DB), session.user, data),
     );
-    if (result.error === "SCHEDULE_CONFLICT") return { conflicts: result.conflicts };
-    if (result.error !== null) rejectAnnouncementOperation(result.error);
-    return result.data;
+    return respondToAnnouncementWrite(result);
   });
 
 export const updateAdminAnnouncement = createServerFn({ method: "POST" })
@@ -65,9 +63,7 @@ export const updateAdminAnnouncement = createServerFn({ method: "POST" })
     const result = await runServerOperation(() =>
       updateAnnouncement(createDatabase(env.DB), session.user, data),
     );
-    if (result.error === "SCHEDULE_CONFLICT") return { conflicts: result.conflicts };
-    if (result.error !== null) rejectAnnouncementOperation(result.error);
-    return result.data;
+    return respondToAnnouncementWrite(result);
   });
 
 export const changeAdminAnnouncementLifecycle = createServerFn({ method: "POST" })
@@ -78,7 +74,5 @@ export const changeAdminAnnouncementLifecycle = createServerFn({ method: "POST" 
     const result = await runServerOperation(() =>
       changeAnnouncementLifecycle(createDatabase(env.DB), session.user, data),
     );
-    if (result.error === "SCHEDULE_CONFLICT") return { conflicts: result.conflicts };
-    if (result.error !== null) rejectAnnouncementOperation(result.error);
-    return result.data;
+    return respondToAnnouncementWrite(result);
   });

@@ -1,23 +1,4 @@
-import type { AnnouncementStatus } from "./schemas";
-import { isAnnouncementWindowActive } from "@/routes/-announcements/schedule";
-
-export type AnnouncementStatusFields = {
-  enabled: boolean;
-  startsAt: Date;
-  endsAt: Date | null;
-};
-
-/** Derives the schedule state shown in admin filters, rows, and the inspector. */
-export function resolveAnnouncementStatus(
-  row: AnnouncementStatusFields,
-  now = Date.now(),
-): AnnouncementStatus {
-  if (!row.enabled) return "disabled";
-  const startsAt = row.startsAt.getTime();
-  const endsAt = row.endsAt?.getTime() ?? null;
-  if (isAnnouncementWindowActive(startsAt, endsAt, now)) return "live";
-  return startsAt > now ? "scheduled" : "expired";
-}
+import type { AnnouncementStatus } from "@/routes/-announcements/schedule";
 
 export function announcementStatusLabel(status: AnnouncementStatus): string {
   switch (status) {

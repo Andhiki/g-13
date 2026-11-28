@@ -11,7 +11,8 @@ import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime } from "@/date-format";
 import type { loadAdminAnnouncements } from "../-server/handler";
-import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import { announcementStatusLabel } from "../-shared/status";
 import type { AnnouncementLifecycleInput } from "../-shared/schemas";
 
 export const announcementTableColumns = "lg:grid-cols-[minmax(0,1fr)_200px_110px_176px]";
