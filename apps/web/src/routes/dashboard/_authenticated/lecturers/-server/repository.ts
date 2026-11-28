@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
 import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -46,7 +47,7 @@ export async function listAdminLecturers(
     )
     .groupBy(lecturers.id)
     .orderBy(asc(lecturers.name), asc(lecturers.id))
-    .limit(51)
+    .limit(ADMIN_PAGE_SIZE)
     .offset(offset);
 }
 

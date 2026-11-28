@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
 import { and, asc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
@@ -63,7 +64,7 @@ export async function listAdminResources(
       asc(learningResources.titleId),
       asc(learningResources.id),
     )
-    .limit(51)
+    .limit(ADMIN_PAGE_SIZE)
     .offset(offset);
 }
 

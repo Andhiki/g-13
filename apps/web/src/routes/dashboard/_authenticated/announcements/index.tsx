@@ -1,4 +1,9 @@
 import { useAdminSearch } from "../-client/useAdminSearch";
+import {
+  getNextAdminPageOffset,
+  getPreviousAdminPageOffset,
+  hasNextAdminPage,
+} from "../-shared/admin-pagination";
 import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -387,8 +392,7 @@ function AdminAnnouncementsPage() {
     isPending: searchPending || announcementsQuery.isPending,
     isError: !searchPending && announcementsQuery.isError,
   };
-  const announcementRows = searchPending ? [] : (announcementsQuery.data?.rows ?? []);
-  const visibleRows = announcementRows.slice(0, 50);
+  const visibleRows = searchPending ? [] : (announcementsQuery.data?.rows ?? []);
 
   const count = visibleRows.length;
   const total = announcementsQuery.data?.total ?? 0;
@@ -510,15 +514,15 @@ function AdminAnnouncementsPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={announcementRows.length > 50}
         needle={needle}
         status={status}
         selectedAnnouncement={selectedAnnouncement}
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={hasNextAdminPage(offset, total)}
+        onPreviousPage={() => setOffset(getPreviousAdminPageOffset(offset))}
+        onNextPage={() => setOffset(getNextAdminPageOffset(offset))}
         onClearSearch={() => setQuery("")}
         onOpenCreate={openCreateModal}
         onSelect={(id) => {
