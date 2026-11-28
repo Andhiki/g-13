@@ -3,6 +3,7 @@ import { test as browserTest } from "@e2e-dev/web";
 import { test } from "../fixtures/local-test.ts";
 import { protectedRoutes } from "../routes.ts";
 
+const homeURL = /\/dashboard\/?(?:[?#]|$)/;
 const queueURL = /\/dashboard\/lecturer-reviews\/?(?:[?#]|$)/;
 const loginURL = /\/dashboard\/login\/?(?:[?#]|$)/;
 
@@ -45,8 +46,8 @@ for (const role of ["maintainer", "admin"] as const) {
     await signIn(role);
     for (const path of ["/dashboard", "/dashboard/login"]) {
       await app.open(path);
-      await expect(browser).toHaveURL(queueURL);
-      await expect(screen.getByRole("heading", { name: "Lecturer reviews" })).toBeVisible();
+      await expect(browser).toHaveURL(homeURL);
+      await expect(screen.getByRole("heading", { name: "Welcome back, Fixture" })).toBeVisible();
     }
     const navigation = screen.getByRole("navigation", { name: "Moderation sections" });
     await expect(navigation.getByRole("link", { name: "Courses" })).toBeVisible();
@@ -115,7 +116,7 @@ test("Admin grants and revokes access and can cancel a role change", async ({
   await expect(account.getByText("maintainer", { exact: true })).toBeVisible();
   await signIn("user");
   await app.open("/dashboard");
-  await expect(browser).toHaveURL(queueURL);
+  await expect(browser).toHaveURL(homeURL);
 
   await signIn("admin");
   await app.open("/dashboard/users");
