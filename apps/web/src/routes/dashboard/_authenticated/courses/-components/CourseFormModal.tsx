@@ -3,6 +3,7 @@ import {
   AdminForm,
   AdminFormField,
   AdminFormModal,
+  AdminFormRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { courseFieldsSchema, type CourseFieldsInput } from "../-shared/schemas";
 import type { AdminCourse } from "./AdminCourseRow";
@@ -25,7 +26,12 @@ export function CourseFormModal({
   onSubmit: (values: CourseFieldsInput) => void;
 }) {
   return (
-    <AdminFormModal open={open} pending={pending} onClose={onClose}>
+    <AdminFormModal
+      open={open}
+      pending={pending}
+      contentClassName="max-w-[640px]"
+      onClose={onClose}
+    >
       <CourseFormBody
         key={course?.id ?? "new"}
         course={course}
@@ -82,46 +88,51 @@ function CourseFormBody({
         onSubmit(parsed.data);
       }}
     >
-      <AdminFormField
-        id="course-code"
-        name="code"
-        label="Course code"
-        maxLength={40}
-        placeholder="e.g. PACS262301"
-        value={code}
-        readOnly={editing}
-        error={fieldErrors.code}
-        onChange={(value) => {
-          setCode(value);
-          clearFieldError("code");
-        }}
-      />
-      <AdminFormField
-        id="course-name-id"
-        name="nameId"
-        label="Name (Indonesian)"
-        maxLength={200}
-        placeholder="e.g. Basis Data"
-        value={nameId}
-        error={fieldErrors.nameId}
-        onChange={(value) => {
-          setNameId(value);
-          clearFieldError("nameId");
-        }}
-      />
-      <AdminFormField
-        id="course-name-en"
-        name="nameEn"
-        label="Name (English)"
-        maxLength={200}
-        placeholder="e.g. Database"
-        value={nameEn}
-        error={fieldErrors.nameEn}
-        onChange={(value) => {
-          setNameEn(value);
-          clearFieldError("nameEn");
-        }}
-      />
+      <AdminFormRow label="Code" htmlFor="course-code">
+        <AdminFormField
+          id="course-code"
+          name="code"
+          maxLength={40}
+          placeholder="PACS262301"
+          value={code}
+          readOnly={editing}
+          error={fieldErrors.code}
+          onChange={(value) => {
+            setCode(value);
+            clearFieldError("code");
+          }}
+        />
+      </AdminFormRow>
+      <AdminFormRow label="Name">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <AdminFormField
+            id="course-name-id"
+            name="nameId"
+            label="Indonesian"
+            maxLength={200}
+            placeholder="Basis Data"
+            value={nameId}
+            error={fieldErrors.nameId}
+            onChange={(value) => {
+              setNameId(value);
+              clearFieldError("nameId");
+            }}
+          />
+          <AdminFormField
+            id="course-name-en"
+            name="nameEn"
+            label="English"
+            maxLength={200}
+            placeholder="Database"
+            value={nameEn}
+            error={fieldErrors.nameEn}
+            onChange={(value) => {
+              setNameEn(value);
+              clearFieldError("nameEn");
+            }}
+          />
+        </div>
+      </AdminFormRow>
     </AdminForm>
   );
 }

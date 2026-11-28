@@ -1,5 +1,5 @@
 import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import * as SegmentedControl from "@/ui/segmented-control";
 import * as AlignSwitch from "@/ui/switch";
 import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
@@ -15,6 +15,7 @@ import {
   AdminForm,
   AdminFormField,
   AdminFormModal,
+  AdminFormRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { Typography } from "@/ui/typography";
 import {
@@ -35,39 +36,6 @@ const variantLabels = { primary: "Primary", error: "Error", neutral: "Neutral" }
   string
 >;
 
-function FormRow({
-  label,
-  optional = false,
-  centered = false,
-  children,
-}: {
-  label: string;
-  optional?: boolean;
-  centered?: boolean;
-  children: ReactNode;
-}) {
-  const labelId = useId();
-  return (
-    <div
-      className={`grid gap-x-6 gap-y-2 sm:grid-cols-[128px_minmax(0,1fr)] ${centered ? "sm:items-center" : ""}`}
-    >
-      <div>
-        <Typography id={labelId} variant="labelSmall" color="strong">
-          {label}
-        </Typography>
-        {optional && (
-          <Typography variant="caption" color="muted">
-            Optional
-          </Typography>
-        )}
-      </div>
-      <div role="group" aria-labelledby={labelId}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function AnnouncementVariantField({
   value,
   onChange,
@@ -78,7 +46,7 @@ function AnnouncementVariantField({
   disabled: boolean;
 }) {
   return (
-    <FormRow label="Variant" centered>
+    <AdminFormRow label="Variant" centered>
       <SegmentedControl.Root
         aria-label="Variant"
         name="variant"
@@ -101,7 +69,7 @@ function AnnouncementVariantField({
           </SegmentedControl.Item>
         ))}
       </SegmentedControl.Root>
-    </FormRow>
+    </AdminFormRow>
   );
 }
 
@@ -248,7 +216,7 @@ function AnnouncementTextFields({
 }) {
   return (
     <>
-      <FormRow label="Title">
+      <AdminFormRow label="Title">
         <div className="grid gap-3 sm:grid-cols-2">
           <AdminFormField
             id="announcement-title-id"
@@ -271,8 +239,8 @@ function AnnouncementTextFields({
             onChange={onTitleEnChange}
           />
         </div>
-      </FormRow>
-      <FormRow label="Message">
+      </AdminFormRow>
+      <AdminFormRow label="Message">
         <div className="grid gap-3 sm:grid-cols-2">
           <AdminFormField
             id="announcement-body-id"
@@ -301,7 +269,7 @@ function AnnouncementTextFields({
             onChange={onBodyEnChange}
           />
         </div>
-      </FormRow>
+      </AdminFormRow>
     </>
   );
 }
@@ -362,7 +330,7 @@ function AnnouncementScheduleAndCtaFields({
   return (
     <>
       <section aria-label="Button">
-        <FormRow label="Button" optional>
+        <AdminFormRow label="Button" optional>
           <div className="space-y-3">
             <AdminFormField
               id="announcement-cta-href"
@@ -409,10 +377,10 @@ function AnnouncementScheduleAndCtaFields({
               </div>
             )}
           </div>
-        </FormRow>
+        </AdminFormRow>
       </section>
       <section aria-label="Schedule">
-        <FormRow label="Schedule">
+        <AdminFormRow label="Schedule">
           <div className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <DateTimeField
@@ -469,7 +437,7 @@ function AnnouncementScheduleAndCtaFields({
               </div>
             </div>
           </div>
-        </FormRow>
+        </AdminFormRow>
       </section>
     </>
   );

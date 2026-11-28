@@ -4,6 +4,7 @@ import {
   AdminForm,
   AdminFormField,
   AdminFormModal,
+  AdminFormRow,
 } from "@/routes/dashboard/_authenticated/-components/AdminFormModal";
 import { Typography } from "@/ui/typography";
 import {
@@ -37,7 +38,7 @@ export function ResourceFormModal({
       open={open}
       pending={pending}
       onClose={onClose}
-      contentClassName="max-w-[560px]"
+      contentClassName="max-w-[760px]"
     >
       <ResourceFormBody
         key={resource?.id ?? "new"}
@@ -116,107 +117,118 @@ function ResourceFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
-      <AdminFormField
-        id="resource-title-id"
-        name="titleId"
-        label="Title (Indonesian)"
-        maxLength={RESOURCE_FIELD_LIMITS.title}
-        showCounter
-        placeholder="e.g. Arsip ujian HIMAKOM UGM"
-        value={titleId}
-        error={fieldErrors.titleId}
-        onChange={(value) => {
-          setTitleId(value);
-          clearFieldError("titleId");
-        }}
-        onBlur={() => validateField("titleId", titleId)}
-      />
-      <AdminFormField
-        id="resource-title-en"
-        name="titleEn"
-        label="Title (English)"
-        maxLength={RESOURCE_FIELD_LIMITS.title}
-        showCounter
-        placeholder="e.g. HIMAKOM UGM exam archive"
-        value={titleEn}
-        error={fieldErrors.titleEn}
-        onChange={(value) => {
-          setTitleEn(value);
-          clearFieldError("titleEn");
-        }}
-        onBlur={() => validateField("titleEn", titleEn)}
-      />
-      <AdminFormField
-        id="resource-description-id"
-        name="descriptionId"
-        label="Description (Indonesian)"
-        maxLength={RESOURCE_FIELD_LIMITS.description}
-        showCounter
-        multiline
-        placeholder="Jelaskan singkat isi dan manfaat tautan ini."
-        value={descriptionId}
-        error={fieldErrors.descriptionId}
-        onChange={(value) => {
-          setDescriptionId(value);
-          clearFieldError("descriptionId");
-        }}
-        onBlur={() => validateField("descriptionId", descriptionId)}
-      />
-      <AdminFormField
-        id="resource-description-en"
-        name="descriptionEn"
-        label="Description (English)"
-        maxLength={RESOURCE_FIELD_LIMITS.description}
-        showCounter
-        multiline
-        placeholder="Briefly describe what this link offers."
-        value={descriptionEn}
-        error={fieldErrors.descriptionEn}
-        onChange={(value) => {
-          setDescriptionEn(value);
-          clearFieldError("descriptionEn");
-        }}
-        onBlur={() => validateField("descriptionEn", descriptionEn)}
-      />
-      <AdminFormField
-        id="resource-url"
-        name="url"
-        label="Link"
-        maxLength={RESOURCE_FIELD_LIMITS.url}
-        showCounter
-        placeholder="https://example.com"
-        inputMode="url"
-        autoComplete="url"
-        value={url}
-        error={fieldErrors.url}
-        onChange={(value) => {
-          setUrl(value);
-          clearFieldError("url");
-        }}
-        onBlur={() => validateField("url", url)}
-      />
-      {previewUrl.success && (
-        <div className="flex items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2">
-          <ResourceFavicon url={previewUrl.data} />
-          <Typography variant="caption" color="strong" className="min-w-0 truncate">
-            {resourceHost(previewUrl.data)}
-          </Typography>
-          <a
-            href={previewUrl.data}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto inline-flex shrink-0 items-center gap-1 text-label-xs text-primary-base underline-offset-2 hover:underline"
-          >
-            Open link
-            <RiExternalLinkLine aria-hidden="true" className="size-3.5" />
-          </a>
-        </div>
-      )}
-      <Typography variant="caption" color="muted" className="block">
-        {editing
-          ? "Order is managed by dragging rows on the resources list."
-          : "New resources are added to the end; drag rows on the list to change the order."}
-      </Typography>
+      <div className="divide-y divide-stroke-soft-200 *:space-y-4 *:py-5 *:first:pt-0 *:last:pb-0">
+        <section aria-label="Content">
+          <AdminFormRow label="Title">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminFormField
+                id="resource-title-id"
+                name="titleId"
+                label="Indonesian"
+                maxLength={RESOURCE_FIELD_LIMITS.title}
+                showCounter
+                placeholder="Arsip ujian HIMAKOM UGM"
+                value={titleId}
+                error={fieldErrors.titleId}
+                onChange={(value) => {
+                  setTitleId(value);
+                  clearFieldError("titleId");
+                }}
+                onBlur={() => validateField("titleId", titleId)}
+              />
+              <AdminFormField
+                id="resource-title-en"
+                name="titleEn"
+                label="English"
+                maxLength={RESOURCE_FIELD_LIMITS.title}
+                showCounter
+                placeholder="HIMAKOM UGM exam archive"
+                value={titleEn}
+                error={fieldErrors.titleEn}
+                onChange={(value) => {
+                  setTitleEn(value);
+                  clearFieldError("titleEn");
+                }}
+                onBlur={() => validateField("titleEn", titleEn)}
+              />
+            </div>
+          </AdminFormRow>
+          <AdminFormRow label="Description">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminFormField
+                id="resource-description-id"
+                name="descriptionId"
+                label="Indonesian"
+                maxLength={RESOURCE_FIELD_LIMITS.description}
+                showCounter
+                multiline
+                placeholder="Jelaskan singkat isi dan manfaat tautan ini."
+                value={descriptionId}
+                error={fieldErrors.descriptionId}
+                onChange={(value) => {
+                  setDescriptionId(value);
+                  clearFieldError("descriptionId");
+                }}
+                onBlur={() => validateField("descriptionId", descriptionId)}
+              />
+              <AdminFormField
+                id="resource-description-en"
+                name="descriptionEn"
+                label="English"
+                maxLength={RESOURCE_FIELD_LIMITS.description}
+                showCounter
+                multiline
+                placeholder="Briefly describe what this link offers."
+                value={descriptionEn}
+                error={fieldErrors.descriptionEn}
+                onChange={(value) => {
+                  setDescriptionEn(value);
+                  clearFieldError("descriptionEn");
+                }}
+                onBlur={() => validateField("descriptionEn", descriptionEn)}
+              />
+            </div>
+          </AdminFormRow>
+        </section>
+        <section aria-label="Link">
+          <AdminFormRow label="Link" htmlFor="resource-url">
+            <div className="space-y-3">
+              <AdminFormField
+                id="resource-url"
+                name="url"
+                maxLength={RESOURCE_FIELD_LIMITS.url}
+                placeholder="https://example.com"
+                inputMode="url"
+                autoComplete="url"
+                value={url}
+                error={fieldErrors.url}
+                onChange={(value) => {
+                  setUrl(value);
+                  clearFieldError("url");
+                }}
+                onBlur={() => validateField("url", url)}
+              />
+              {previewUrl.success && (
+                <div className="flex items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2">
+                  <ResourceFavicon url={previewUrl.data} />
+                  <Typography variant="caption" color="strong" className="min-w-0 truncate">
+                    {resourceHost(previewUrl.data)}
+                  </Typography>
+                  <a
+                    href={previewUrl.data}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-auto inline-flex shrink-0 items-center gap-1 text-label-xs text-primary-base underline-offset-2 hover:underline"
+                  >
+                    Open link
+                    <RiExternalLinkLine aria-hidden="true" className="size-3.5" />
+                  </a>
+                </div>
+              )}
+            </div>
+          </AdminFormRow>
+        </section>
+      </div>
     </AdminForm>
   );
 }
