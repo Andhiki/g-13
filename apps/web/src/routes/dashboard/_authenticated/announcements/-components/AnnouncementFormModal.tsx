@@ -1,5 +1,6 @@
 import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
-import { useRef, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
+import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio";
 import * as AlignSwitch from "@/ui/switch";
 import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
 import {
@@ -19,6 +20,10 @@ import { Typography } from "@/ui/typography";
 import {
   announcementFieldsSchema,
   announcementFieldsShape,
+  ANNOUNCEMENT_BODY_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH,
+  ANNOUNCEMENT_CTA_LINK_MAX_LENGTH,
+  ANNOUNCEMENT_TITLE_MAX_LENGTH,
   type AnnouncementFieldsInput,
 } from "../-shared/schemas";
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
@@ -28,6 +33,54 @@ const variantLabels = { primary: "Primary", error: "Error", neutral: "Neutral" }
   AnnouncementVariant,
   string
 >;
+
+function AnnouncementVariantField({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: AnnouncementVariant;
+  onChange: (value: AnnouncementVariant) => void;
+  disabled: boolean;
+}) {
+  const labelId = useId();
+  return (
+    <div className="space-y-1.5">
+      <Typography id={labelId} variant="label" color="strong">
+        Variant
+      </Typography>
+      <RadioGroup
+        aria-labelledby={labelId}
+        name="variant"
+        value={value}
+        disabled={disabled}
+        onValueChange={(value) => {
+          const option = announcementVariants.find((candidate) => candidate === value);
+          if (option) onChange(option);
+        }}
+        className="flex flex-wrap gap-2"
+      >
+        {announcementVariants.map((option) => (
+          <Radio
+            key={option}
+            value={option}
+            className="group flex min-h-9 cursor-interactive items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
+          >
+            <span
+              aria-hidden="true"
+              className="grid size-4 shrink-0 place-items-center rounded-full border border-stroke-sub-300 group-data-checked:border-primary-base"
+            >
+              <RadioIndicator className="size-2 rounded-full bg-primary-base" />
+            </span>
+            <Typography as="span" variant="label" color="strong">
+              {variantLabels[option]}
+            </Typography>
+          </Radio>
+        ))}
+      </RadioGroup>
+    </div>
+  );
+}
 
 type FieldErrors = Partial<Record<keyof AnnouncementFieldsInput, string>>;
 type DateTimeErrorParts = Partial<
@@ -177,7 +230,7 @@ function AnnouncementTextFields({
           id="announcement-title-id"
           name="titleId"
           label="Title (Indonesian)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Jadwal UTS"
           value={titleId}
           error={fieldErrors.titleId}
@@ -187,7 +240,7 @@ function AnnouncementTextFields({
           id="announcement-title-en"
           name="titleEn"
           label="Title (English)"
-          maxLength={120}
+          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
           placeholder="e.g. Midterm schedule"
           value={titleEn}
           error={fieldErrors.titleEn}
@@ -198,7 +251,7 @@ function AnnouncementTextFields({
         id="announcement-body-id"
         name="bodyId"
         label="Message (Indonesian)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Jadwal UTS sudah terbit, cek arsip ujian."
         value={bodyId}
         error={fieldErrors.bodyId}
@@ -208,7 +261,7 @@ function AnnouncementTextFields({
         id="announcement-body-en"
         name="bodyEn"
         label="Message (English)"
-        maxLength={280}
+        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
         placeholder="Midterm schedule is out, check the exam archive."
         value={bodyEn}
         error={fieldErrors.bodyEn}
@@ -277,7 +330,7 @@ function AnnouncementScheduleAndCtaFields({
         id="announcement-cta-href"
         name="ctaHref"
         label="CTA link (optional)"
-        maxLength={500}
+        maxLength={ANNOUNCEMENT_CTA_LINK_MAX_LENGTH}
         placeholder="https://example.com or /exam"
         value={ctaHref}
         error={fieldErrors.ctaHref}
@@ -300,7 +353,7 @@ function AnnouncementScheduleAndCtaFields({
           id="announcement-cta-label-id"
           name="ctaLabelId"
           label="CTA label (Indonesian, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Selengkapnya"
           value={ctaLabelId}
           error={fieldErrors.ctaLabelId}
@@ -310,7 +363,7 @@ function AnnouncementScheduleAndCtaFields({
           id="announcement-cta-label-en"
           name="ctaLabelEn"
           label="CTA label (English, optional)"
-          maxLength={60}
+          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
           placeholder="Learn more"
           value={ctaLabelEn}
           error={fieldErrors.ctaLabelEn}
@@ -478,27 +531,7 @@ function AnnouncementFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
-      <fieldset className="space-y-1.5">
-        <legend className="text-label-sm text-text-strong-950">Variant</legend>
-        <div className="flex flex-wrap gap-2">
-          {announcementVariants.map((option) => (
-            <label
-              key={option}
-              className="flex min-h-9 cursor-pointer items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 text-label-sm text-text-strong-950 has-checked:border-primary-base"
-            >
-              <input
-                type="radio"
-                name="variant"
-                value={option}
-                checked={variant === option}
-                onChange={() => setVariant(option)}
-                className="size-4 accent-primary-base"
-              />
-              {variantLabels[option]}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <AnnouncementVariantField value={variant} onChange={setVariant} disabled={pending} />
       <AnnouncementTextFields
         titleId={titleId}
         titleEn={titleEn}

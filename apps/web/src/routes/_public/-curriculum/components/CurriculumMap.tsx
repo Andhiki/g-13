@@ -167,11 +167,6 @@ function MapTitle({
           <Typography as="h1" variant="graphTitle" color="strong" className="m-0 whitespace-nowrap">
             {text("Everything CS UGM")}
           </Typography>
-          <Typography as="p" variant="paragraph" color="muted" className="m-0 max-w-xl">
-            {text(
-              "Jelajahi mata kuliah, pahami prasyarat, dan rencanakan perjalanan kuliah Ilmu Komputer UGM.",
-            )}
-          </Typography>
           <span className="pointer-events-auto nodrag nopan">
             <AlignFancyButton.Root asChild>
               <Link to="/roadmap" search={{ lulus: 8, semesterPaparan: 6 }}>

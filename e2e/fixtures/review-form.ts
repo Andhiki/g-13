@@ -1,6 +1,6 @@
-﻿import { expect, type TestFixtures } from "e2e";
+import { expect, type TestFixtures } from "e2e";
 import type { WebFixtures } from "@e2e-dev/web";
-import { fixture } from "../database.ts";
+import { fixture } from "./database.ts";
 
 export const profile = `/lecturers/${fixture.lecturerId}`;
 
@@ -50,7 +50,7 @@ export async function fillReview(
   }
   await dialog.getByLabel(/pengalamanmu|pengalaman anda|your experience/i).fill(body);
   if (options.author !== undefined) {
-    await dialog.getByLabel(/terbitkan sebagai anonim|publish as anonymous/i).click();
+    await dialog.getByLabel(/kirim sebagai anonim|submit anonymously/i).click();
     await dialog.getByLabel(/nama tampilan|display name/i).fill(options.author);
   }
   await expect.poll(() => browser.evaluate(() => "turnstile" in window)).toBe(true);

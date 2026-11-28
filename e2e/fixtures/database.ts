@@ -1,5 +1,4 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { isolatedOrigin } from "./targets.ts";
 
 export const fixture = {
   lecturerId: "e2e-lecturer",
@@ -19,8 +18,8 @@ function required(name: string) {
   return value;
 }
 
-async function localD1(body: unknown) {
-  const response = await fetch(`${isolatedOrigin}/__e2e/database`, {
+async function localD1(origin: string, body: unknown) {
+  const response = await fetch(`${origin}/__e2e/database`, {
     method: "POST",
     headers: {
       authorization: `Bearer ${required("E2E_FIXTURE_TOKEN")}`,
@@ -50,9 +49,9 @@ const cleanup = [
   "DELETE FROM courses WHERE id LIKE 'e2e-%' OR code LIKE 'E2ETEST%'",
 ];
 
-export async function resetFixtures() {
+export async function resetFixtures(origin: string) {
   const rows = cleanup.map((sql) => ({ sql }));
-  await localD1({
+  await localD1(origin, {
     batch: [
       ...rows,
       {
@@ -108,11 +107,11 @@ export async function resetFixtures() {
   });
 }
 
-export async function seedSession(role: Role, expired = false) {
+export async function seedSession(origin: string, role: Role, expired = false) {
   const secret = required("E2E_AUTH_SECRET");
   if (secret.length < 32) throw new Error("E2E_AUTH_SECRET must have at least 32 characters");
   const token = randomBytes(32).toString("hex");
-  await localD1({
+  await localD1(origin, {
     sql: `INSERT INTO auth_session (id, token, user_id, expires_at, created_at, updated_at)
           VALUES (?, ?, ?, ?, unixepoch() * 1000, unixepoch() * 1000)`,
     params: [token, token, `e2e-${role}`, Date.now() + (expired ? -3_600_000 : 3_600_000)],
@@ -121,15 +120,19 @@ export async function seedSession(role: Role, expired = false) {
   const value = encodeURIComponent(`${token}.${signature}`);
   const attributes = {
     value,
-    url: isolatedOrigin,
-    secure: new URL(isolatedOrigin).protocol === "https:",
+    url: origin,
+    secure: new URL(origin).protocol === "https:",
     httpOnly: true,
     sameSite: "Lax" as const,
   };
   return [{ name: "better-auth.session_token", ...attributes }];
 }
 
-export async function exhaustReviewLimit(action: "submission" | "like", browserId?: string) {
+export async function exhaustReviewLimit(
+  origin: string,
+  action: "submission" | "like",
+  browserId?: string,
+) {
   const secret = required("E2E_REVIEW_RATE_LIMIT_SECRET");
   if (action === "submission" && !browserId) {
     throw new Error("Missing browser id for submission limit exhaustion");
@@ -151,10 +154,10 @@ export async function exhaustReviewLimit(action: "submission" | "like", browserI
       : [
           {
             identity: (hour: number) => `like:${hour}:192.0.2.60`,
-            limit: 60,
+            limit: 300,
           },
         ];
-  await localD1({
+  await localD1(origin, {
     batch: buckets.flatMap(({ identity, limit }) =>
       windows.map((hour) => ({
         sql: `INSERT INTO review_submission_limits ("key", "count", "expires_at") VALUES (?, ?, ?)

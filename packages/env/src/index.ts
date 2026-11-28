@@ -61,17 +61,20 @@ export function parseSubmissionEnvironment(input: unknown): {
   REVIEW_RATE_LIMIT_SECRET: string;
   TURNSTILE_SITE_KEY: string;
   TURNSTILE_SECRET_KEY: string;
+  OPENAI_API_KEY: string;
 } {
   const parsed = z
     .object({
       REVIEW_RATE_LIMIT_SECRET: z.string().min(32),
       TURNSTILE_SITE_KEY: z.string().optional(),
       TURNSTILE_SECRET_KEY: z.string().optional(),
+      OPENAI_API_KEY: z.string().optional(),
     })
     .parse(input);
   return {
     REVIEW_RATE_LIMIT_SECRET: parsed.REVIEW_RATE_LIMIT_SECRET,
     TURNSTILE_SITE_KEY: parsed.TURNSTILE_SITE_KEY?.trim() ?? "",
     TURNSTILE_SECRET_KEY: parsed.TURNSTILE_SECRET_KEY?.trim() ?? "",
+    OPENAI_API_KEY: parsed.OPENAI_API_KEY?.trim() ?? "",
   };
 }

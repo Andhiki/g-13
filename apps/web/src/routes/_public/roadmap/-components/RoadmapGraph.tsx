@@ -130,10 +130,7 @@ function ActivityCard({ data }: NodeProps<ActivityNode>) {
   const { text } = useLocale("roadmap");
   return (
     <div className="w-[246px] rounded-lg border border-primary-base bg-bg-white-0 p-4 text-text-strong-950">
-      <Typography as="p" variant="caption" color="brand" className="m-0">
-        {text("Kegiatan")}
-      </Typography>
-      <Typography as="h3" variant="label" className="mb-1 mt-1">
+      <Typography as="h3" variant="label" className="mb-1 mt-0">
         {text(data.activity.title)}
       </Typography>
       <Typography as="p" variant="caption" color="muted" className="m-0">

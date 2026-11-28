@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-export const adminPageSchema = z.object({ offset: z.number().int().min(0) });
+import { adminPageSchema } from "../../-shared/admin-search";
 
 export const reviewStatusSchema = z.enum(["all", "pending", "published", "hidden", "deleted"]);
 export const moderationPageSchema = adminPageSchema.extend({ status: reviewStatusSchema });

@@ -1,3 +1,4 @@
+import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -6,7 +7,7 @@ import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
 import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
-import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
+import { AdminInspectorLayout, desktopInspectorQuery } from "../-components/AdminInspector";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
@@ -263,63 +264,62 @@ function LecturersContent({
   onLifecycle: (input: LecturerLifecycleInput, label: string) => void;
 }) {
   return (
-    <div className="flex min-h-0 flex-1">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-        {!queryState.isPending && !queryState.isError && (
-          <AdminPagination
-            count={count}
-            offset={needle ? 0 : offset}
-            total={total}
-            label="lecturers"
-            hasNext={hasNext}
-            onPrevious={onPreviousPage}
-            onNext={onNextPage}
-          />
-        )}
-        <div
-          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-        >
-          <LecturersListBody
-            queryState={queryState}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            activeCount={activeCount}
-            selectedId={selectedLecturer?.id}
-            onClearSearch={onClearSearch}
-            onViewActive={onViewActive}
-            onCreate={onCreate}
-            onSelect={onSelect}
-            onEdit={onEdit}
-            onLifecycle={onLifecycle}
-          />
-        </div>
-      </div>
-      <AdminInspector
-        title="Lecturer details"
-        desktopOpen={detailsVisible}
-        mobileOpen={mobileDetailsOpen}
-        onMobileOpenChange={onMobileDetailsOpenChange}
-      >
-        {selectedLecturer && !queryState.isPending && !queryState.isError && (
+    <AdminInspectorLayout
+      title="Lecturer details"
+      desktopOpen={detailsVisible}
+      mobileOpen={mobileDetailsOpen}
+      onMobileOpenChange={onMobileDetailsOpenChange}
+      details={
+        selectedLecturer &&
+        !queryState.isPending &&
+        !queryState.isError && (
           <LecturerInspector
             key={selectedLecturer.id}
             lecturer={selectedLecturer}
             onEdit={onEdit}
             onLifecycle={onLifecycle}
           />
-        )}
-      </AdminInspector>
-    </div>
+        )
+      }
+    >
+      {!queryState.isPending && !queryState.isError && (
+        <AdminPagination
+          count={count}
+          offset={offset}
+          total={total}
+          label="lecturers"
+          hasNext={hasNext}
+          onPrevious={onPreviousPage}
+          onNext={onNextPage}
+        />
+      )}
+      <div
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+      >
+        <LecturersListBody
+          queryState={queryState}
+          visibleRows={visibleRows}
+          needle={needle}
+          status={status}
+          activeCount={activeCount}
+          selectedId={selectedLecturer?.id}
+          onClearSearch={onClearSearch}
+          onViewActive={onViewActive}
+          onCreate={onCreate}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onLifecycle={onLifecycle}
+        />
+      </div>
+    </AdminInspectorLayout>
   );
 }
 
 function AdminLecturersPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const [offset, setOffset] = useState(0);
+  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
   const [status, setStatus] = useState<LecturerStatus>("active");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{ open: boolean; lecturer: AdminLecturer | null }>({
@@ -332,20 +332,21 @@ function AdminLecturersPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const lecturersQuery = useQuery(adminLecturersQuery(offset, status));
+  const lecturersQuery = useQuery(adminLecturersQuery(offset, status, needle));
   const counts = lecturersQuery.data?.counts ?? initialData.counts;
-  const lecturerRows = lecturersQuery.data?.rows ?? [];
-  const pageRows = lecturerRows.slice(0, 50);
-  const needle = query.trim().toLowerCase();
-  const visibleRows = needle
-    ? pageRows.filter((row) => `${row.name} ${row.id}`.toLowerCase().includes(needle))
-    : pageRows;
+  const listState = {
+    isPending: searchPending || lecturersQuery.isPending,
+    isError: !searchPending && lecturersQuery.isError,
+  };
+  const lecturerRows = searchPending ? [] : (lecturersQuery.data?.rows ?? []);
+  const visibleRows = lecturerRows.slice(0, 50);
+
   const count = visibleRows.length;
-  const total = needle ? visibleRows.length : counts[status];
+  const total = lecturersQuery.data?.total ?? 0;
   const selectedLecturer =
     visibleRows.find((lecturer) => lecturer.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedLecturer && !lecturersQuery.isPending && !lecturersQuery.isError;
+    detailsOpen && !!selectedLecturer && !listState.isPending && !listState.isError;
 
   async function invalidateLecturerQueries() {
     await Promise.all([
@@ -442,12 +443,12 @@ function AdminLecturersPage() {
         {searchAndDetails}
       </AdminFilterBar>
       <LecturersContent
-        queryState={lecturersQuery}
+        queryState={listState}
         visibleRows={visibleRows}
         count={count}
         offset={offset}
         total={total}
-        hasNext={!needle && lecturerRows.length > 50}
+        hasNext={lecturerRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}

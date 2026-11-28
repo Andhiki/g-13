@@ -11,7 +11,7 @@ import {
   MenuTrigger as MenuTriggerPrimitive,
 } from "@ui-sdk/react/menu";
 import { RiCheckLine } from "@remixicon/react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 import { Children, isValidElement, type ComponentProps, type ReactNode } from "react";
 
 const Root = Menu;
@@ -50,7 +50,7 @@ function Content({
 }: ComponentProps<typeof MenuContentPrimitive>) {
   return (
     <MenuContentPrimitive
-      className={twMerge(
+      className={cn(
         "z-50 flex w-max flex-col gap-1 overflow-hidden rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-inset ring-stroke-soft-200 data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom data-starting-style:animate-in data-starting-style:fade-in-0 data-ending-style:animate-out data-ending-style:fade-out-0 data-ending-style:zoom-out-95 data-starting-style:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         typeof className === "string" ? className : undefined,
       )}
@@ -68,7 +68,7 @@ function Item({
 }: ComponentProps<typeof MenuItemPrimitive> & AsChildProps) {
   return (
     <MenuItemPrimitive
-      className={twMerge(
+      className={cn(
         "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-xs font-medium text-text-strong-950 outline-none transition duration-200 ease-out data-highlighted:bg-bg-weak-50 data-disabled:text-text-disabled-300",
         typeof className === "string" ? className : undefined,
       )}
@@ -83,7 +83,7 @@ function Item({
 function Separator({ className, ...props }: ComponentProps<typeof MenuSeparatorPrimitive>) {
   return (
     <MenuSeparatorPrimitive
-      className={twMerge(
+      className={cn(
         "my-1 h-px bg-stroke-soft-200",
         typeof className === "string" ? className : undefined,
       )}
@@ -99,7 +99,7 @@ function RadioItem({
 }: ComponentProps<typeof MenuRadioItemPrimitive>) {
   return (
     <MenuRadioItemPrimitive
-      className={twMerge(
+      className={cn(
         "group/item relative flex cursor-[var(--interactive-cursor)] select-none items-center gap-2 rounded-lg p-2 text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out data-highlighted:bg-bg-weak-50 data-disabled:text-text-disabled-300",
         typeof className === "string" ? className : undefined,
       )}

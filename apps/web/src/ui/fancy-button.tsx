@@ -17,9 +17,9 @@ const fancyButton = tv({
     "disabled:pointer-events-none disabled:text-text-disabled-300",
     "disabled:bg-bg-weak-50 disabled:bg-none disabled:shadow-none disabled:before:hidden disabled:after:hidden",
     "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit]",
-    "before:bg-gradient-to-b before:p-px before:from-static-white/[.12] before:to-transparent",
+    "before:bg-linear-to-b before:p-px before:from-static-white/[.12] before:to-transparent",
     "before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[mask-image:linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)]",
-    "after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-to-b after:from-static-white after:to-transparent",
+    "after:absolute after:inset-0 after:rounded-[inherit] after:bg-linear-to-b after:from-static-white after:to-transparent",
     "after:pointer-events-none after:opacity-[.16] after:transition after:duration-200 after:ease-out hover:after:opacity-[.24]",
   ],
   variants: {

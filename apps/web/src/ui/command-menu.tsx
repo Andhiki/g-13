@@ -17,7 +17,7 @@ import {
   type CommandShortcutState,
 } from "@ui-sdk/react/command";
 import type { PartProps } from "@ui-sdk/react/primitive";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 import { tv, type VariantProps } from "tailwind-variants";
 import { AlignModal } from "./modal";
 
@@ -59,15 +59,15 @@ function Dialog({
         overlayClassName={overlayClassName}
         showClose={false}
         onCloseAutoFocus={onCloseAutoFocus}
-        className={twMerge(
+        className={cn(
           "mt-20 mb-auto flex max-h-[calc(100dvh-6rem)] max-w-[720px] flex-col overflow-hidden rounded-2xl",
           className,
         )}
       >
         <Command
-          className={twMerge(
-            "grid min-h-0 auto-cols-auto grid-flow-row divide-y divide-stroke-soft-200",
-            "max-[650px]:flex-1 max-[650px]:grid-rows-[auto_minmax(0,1fr)_auto]",
+          className={cn(
+            "grid min-h-0 flex-auto auto-cols-auto grid-flow-row grid-rows-[auto_minmax(0,1fr)_auto] divide-y divide-stroke-soft-200",
+            "max-[650px]:flex-1",
           )}
           {...props}
         >
@@ -84,7 +84,7 @@ const DialogDescription = AlignModal.Description;
 function Input({ className, ...props }: InputProps) {
   return (
     <CommandInput
-      className={twMerge(
+      className={cn(
         "w-full bg-transparent text-paragraph-sm text-text-strong-950 outline-none transition duration-200 ease-out placeholder:[transition:inherit] placeholder:text-text-soft-400 focus:outline-none",
         className,
       )}
@@ -107,7 +107,7 @@ function List({
 }
 
 function Group({ className, ...props }: ClassProps<Record<string, never>>) {
-  return <CommandGroup className={twMerge("relative px-2 py-3", className)} {...props} />;
+  return <CommandGroup className={cn("relative px-2 py-3", className)} {...props} />;
 }
 
 const Empty = CommandEmpty;
@@ -132,7 +132,7 @@ function Item({ className, size, ...props }: ItemProps & VariantProps<typeof ite
 function Shortcut({ className, ...props }: ClassProps<CommandShortcutState>) {
   return (
     <CommandShortcut
-      className={twMerge("ms-auto text-label-xs text-text-sub-600", className)}
+      className={cn("ms-auto text-label-xs text-text-sub-600", className)}
       {...props}
     />
   );

@@ -18,7 +18,7 @@ import {
   type SnapPoint,
 } from "@ui-sdk/react/drawer";
 import type { PartProps } from "@ui-sdk/react/primitive";
-import { twMerge } from "tailwind-merge";
+import { cn } from "cn";
 
 // The asChild part's props land on the single child element. Narrowing with isValidElement keeps
 // the render contract explicit and fails loudly for invalid composition.
@@ -141,7 +141,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
             : undefined
         }
         style={style}
-        className={twMerge(
+        className={cn(
           "relative flex w-full max-w-[400px] flex-col border-stroke-soft-200 bg-bg-white-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] focus:outline-none after:pointer-events-none after:absolute after:bg-inherit after:content-[''] data-[side=left]:border-r data-[side=left]:after:inset-y-0 data-[side=left]:after:right-full data-[side=left]:after:w-24 data-[side=right]:border-l data-[side=right]:after:inset-y-0 data-[side=right]:after:left-full data-[side=right]:after:w-24 data-[side=bottom]:border-t data-[side=bottom]:after:-inset-x-px data-[side=bottom]:after:top-full data-[side=bottom]:after:h-24 data-[side=top]:border-b data-[side=top]:after:-inset-x-px data-[side=top]:after:bottom-full data-[side=top]:after:h-24",
           (side === "bottom" || side === "top") && "h-auto max-h-[85dvh] max-w-none",
           side === "bottom" && "rounded-t-10 pt-0",
@@ -165,7 +165,7 @@ type HandleProps = Omit<PartProps<"button", DrawerHandleState>, "className" | "c
 
 function Handle({ className, children, ...props }: HandleProps) {
   return (
-    <div className={twMerge("flex shrink-0 justify-center py-1.5", className)}>
+    <div className={cn("flex shrink-0 justify-center py-1.5", className)}>
       <DrawerHandle
         {...props}
         className="relative flex h-6 w-24 cursor-grab items-center justify-center rounded-lg outline-none select-none active:cursor-grabbing before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-[''] focus-visible:[&>span]:bg-primary-base"
@@ -182,7 +182,7 @@ function Grip({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   return (
     <div
       aria-hidden="true"
-      className={twMerge("flex shrink-0 justify-center pt-2.5 pb-1", className)}
+      className={cn("flex shrink-0 justify-center pt-2.5 pb-1", className)}
       {...props}
     >
       <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
@@ -258,7 +258,7 @@ Close.displayName = "AlignDrawerClose";
 function Header({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   return (
     <div
-      className={twMerge("flex items-center gap-3 border-stroke-soft-200 p-5", className)}
+      className={cn("flex items-center gap-3 border-stroke-soft-200 p-5", className)}
       {...props}
     />
   );
@@ -267,7 +267,7 @@ function Header({ className, ...props }: React.ComponentPropsWithoutRef<"div">) 
 function Body({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   return (
     <div
-      className={twMerge("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
+      className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
       {...props}
     />
   );

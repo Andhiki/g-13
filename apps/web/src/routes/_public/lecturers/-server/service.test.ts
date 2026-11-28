@@ -1,19 +1,31 @@
 import { eq } from "drizzle-orm";
-import { expect, it } from "bun:test";
+import { expect, it, mock } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { notificationEvents } from "@g13/db/schema/notifications";
+import { moderateLecturerReview } from "@/routes/dashboard/_authenticated/lecturer-reviews/-server/service";
 import { createTestPlatformProxy } from "@/test/database";
 import { REVIEW_ERRORS } from "../-shared/errors";
+import { searchLecturers } from "../-shared/lecturer-search";
 import { REVIEW_BODY_MIN_LENGTH, submissionInputSchema } from "../-shared/submission-schema";
+import { allowReviewAction } from "./rate-limit";
 import { setReviewLike } from "./likes.service";
-import { getLecturerDetail, getLecturerDirectory } from "./read.service";
+import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
-import type { CoursePickerCursor } from "../-shared/schemas";
-import { submitReview } from "./submission.service";
+import { lecturerReviewsInputSchema, type CoursePickerCursor } from "../-shared/schemas";
+import { reviewOrders } from "../-shared/review-order";
+import { classifyReviewText } from "./review-moderation";
+import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+
+const firstReviewPage = lecturerReviewsInputSchema.parse({ lecturerId: "p" });
+
+const clearScreening = {
+  openAiApiKey: "test-key",
+  classify: async () => "clear" as const,
+};
 
 const rawInput = {
   lecturerId: "p",
@@ -57,6 +69,7 @@ it("returns only requested, live pending reviews for the matching lecturer", asy
     const result = await submitReview(db, input, {
       ip: "192.0.2.1",
       secret: "test-secret-".repeat(4),
+      ...clearScreening,
     });
     if (!result.data) throw new Error("Expected a pending review");
     const { reviewId } = result.data;
@@ -67,14 +80,14 @@ it("returns only requested, live pending reviews for the matching lecturer", asy
     expect(await getOwnPendingReviews(db, "p", [reviewId, unknownId])).toEqual([
       expect.objectContaining({ id: reviewId, body: input.body, code: "CS101" }),
     ]);
-    expect((await getLecturerDetail(db, "p"))?.reviews).toEqual([]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
 
     for (const status of ["published", "hidden"] as const) {
       await db.update(reviews).set({ status }).where(eq(reviews.id, reviewId));
       expect(await getOwnPendingReviews(db, "p", [reviewId])).toEqual([]);
-      expect((await getLecturerDetail(db, "p"))?.reviews.map(({ id }) => id)).toEqual(
-        status === "published" ? [reviewId] : [],
-      );
+      expect(
+        (await getLecturerReviewsPage(db, firstReviewPage)).reviews.map(({ id }) => id),
+      ).toEqual(status === "published" ? [reviewId] : []);
     }
     await db
       .update(reviews)
@@ -110,7 +123,17 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
 
     const input = submissionInputSchema.parse(rawInput);
-    const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
+    let classifierCalls = 0;
+    const context = {
+      ip: "192.0.2.1",
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
+    };
 
     expect(await submitReview(db, input, { ...context, ip: null })).toEqual({
       data: null,
@@ -127,6 +150,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         error: REVIEW_ERRORS.INVALID,
       });
     }
+    expect(classifierCalls).toBe(0);
 
     expect(await submitReview(db, input, context)).toMatchObject({
       data: { reviewId: expect.any(String), status: "published" },
@@ -139,6 +163,7 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
         context,
       ),
     ).toMatchObject({ data: { reviewId: expect.any(String), status: "published" }, error: null });
+    expect(classifierCalls).toBe(2);
     expect(await db.select().from(notificationEvents)).toEqual([]);
 
     // Any rating of 2 or lower waits for moderation and never reaches public reads.
@@ -161,11 +186,13 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     );
     expect(storedPending?.status).toBe("pending");
     expect(
-      (await getLecturerDetail(db, "p"))?.reviews.some((row) => row.body === "Pending feedback"),
+      (await getLecturerReviewsPage(db, firstReviewPage)).reviews.some(
+        (row) => row.body === "Pending feedback",
+      ),
     ).toBe(false);
-    expect((await db.select().from(notificationEvents)).map((event) => event.resourceId)).toEqual([
-      pendingReviewId,
-    ]);
+    const notifications = await db.select().from(notificationEvents);
+    expect(notifications.map((event) => event.resourceId)).toEqual([pendingReviewId]);
+    expect(classifierCalls).toBe(3);
 
     // Hidden/deleted reviews and soft-deleted lecturers must not affect public reads or aggregates,
     // while existing published reviews for soft-deleted courses remain visible on active lecturers.
@@ -238,13 +265,14 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     });
 
     const detail = await getLecturerDetail(db, "p");
-    expect(detail?.courses.map((row) => row.id)).toEqual(["c"]);
-    expect(detail?.reviews.map((row) => row.authorName).sort()).toEqual([
+    expect(detail?.lecturer.courses.map((row) => row.id).sort()).toEqual(["c", "deleted-course"]);
+    const page = await getLecturerReviewsPage(db, firstReviewPage);
+    expect(page.reviews.map((row) => row.authorName).sort()).toEqual([
       "Anonymous",
       "Student",
       "Student",
     ]);
-    expect(detail?.reviews.some((row) => row.courseId === "deleted-course")).toBe(true);
+    expect(page.reviews.some((row) => row.courseId === "deleted-course")).toBe(true);
     expect(await getLecturerDetail(db, "deleted-lecturer")).toBeNull();
     expect(await getLecturerDetail(db, "missing")).toBeNull();
 
@@ -254,18 +282,213 @@ it("publishes reviews, excludes hidden/deleted entries from public metrics, and 
     );
     expect(attempts.filter((result) => result.error === null)).toHaveLength(1);
     expect(attempts.filter((result) => result.error === REVIEW_ERRORS.RATE_LIMIT)).toHaveLength(4);
+    expect(classifierCalls).toBe(4);
     expect(await submitReview(db, input, { ...context, ip: "192.0.2.2" })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(5);
     expect(await submitReview(db, input, { ...context, now: 7_200_000 })).toMatchObject({
       error: null,
     });
+    expect(classifierCalls).toBe(6);
     const limits = await db.$client.prepare("SELECT * FROM review_submission_limits").all();
     expect(JSON.stringify(limits)).not.toContain("192.0.2");
   } finally {
     await platform.dispose();
   }
 }, 30_000);
+
+it("holds Indonesian and English profanity after Omni clears it", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const screened = mock(async () => "clear" as const);
+    const context = {
+      ip: "192.0.2.31",
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: screened,
+    };
+    const reviews = [
+      { body: "Tes anjing ＢＡＮＧＳＡＴ! Contoh ulasan." },
+      { body: "This lecture was FUCKING confusing." },
+      { authorName: "Asshole!" },
+    ];
+    for (const [index, review] of reviews.entries()) {
+      const result = await submitReview(
+        db,
+        submissionInputSchema.parse({ ...rawInput, ...review }),
+        {
+          ...context,
+          ip: `192.0.2.${31 + index}`,
+        },
+      );
+      expect(result.data?.status).toBe("pending");
+    }
+    expect(screened).toHaveBeenCalledTimes(reviews.length);
+    expect(screened).toHaveBeenCalledWith({
+      body: "This lecture was FUCKING confusing.",
+      displayName: "Student",
+    });
+    expect(screened).toHaveBeenCalledWith({ body: rawInput.body.trim(), displayName: "Asshole!" });
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
+
+    const body = "Kelas membahas anjing dan sex determination. The class moved too fast.";
+    const result = await submitReview(db, submissionInputSchema.parse({ ...rawInput, body }), {
+      ...context,
+      ip: "192.0.2.34",
+    });
+    expect(result.data?.status).toBe("published");
+    expect(screened).toHaveBeenCalledWith({ body, displayName: "Student" });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("screens valid review text and sends flagged or unscorable reviews to Pending", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const screened: { body: string; displayName?: string }[] = [];
+    const outcomes = ["clear", "flagged", "unscorable", "clear", "clear"] as const;
+    let outcomeIndex = 0;
+    const context = (ip: string) => ({
+      ip,
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: async (value: { body: string; displayName?: string }) => {
+        screened.push(value);
+        return outcomes[outcomeIndex++] ?? "clear";
+      },
+    });
+    const input = submissionInputSchema.parse({
+      ...rawInput,
+      body: "The lecturer ignored questions. I would not recommend the class.",
+    });
+
+    const published = await submitReview(db, input, context("192.0.2.31"));
+    expect(published.data?.status).toBe("published");
+    expect(screened[0]).toEqual({ body: input.body, displayName: "Student" });
+
+    const flagged = await submitReview(db, input, context("192.0.2.32"));
+    expect(flagged.data?.status).toBe("pending");
+    expect(
+      (await getLecturerReviewsPage(db, firstReviewPage)).reviews.some(
+        (review) => review.id === flagged.data?.reviewId,
+      ),
+    ).toBe(false);
+
+    const unscorable = await submitReview(db, input, context("192.0.2.33"));
+    expect(unscorable.data?.status).toBe("pending");
+
+    const lowRated = await submitReview(db, { ...input, organization: 2 }, context("192.0.2.34"));
+    expect(lowRated.data?.status).toBe("pending");
+
+    const anonymous = await submitReview(
+      db,
+      submissionInputSchema.parse({ ...input, anonymous: true, authorName: "" }),
+      context("192.0.2.35"),
+    );
+    expect(anonymous.data?.status).toBe("published");
+    expect(screened.at(-1)).toEqual({ body: input.body });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("holds the reported five-star campaign and lets moderators approve a legitimate link", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db
+      .insert(courses)
+      .values({ id: "c", code: "CS101", nameId: "Dasar Komputer", nameEn: "Computer Basics" });
+
+    const campaign = `Guys, gue kaget banget hari ini!
+Cobain spin gratis iseng-iseng, taunya dapet Rp900.000 — dan udah berhasil gue tarik ke rekening!
+Mahjong Ways hari ini lagi gacor-gacornya, sumpah!
+Nih gue kasih kode gratisnya: EY5T999
+https://example.test/#/wheelspinevent?invitationCode=example
+Oh iya, follow channel Telegram kami juga ya! Ada kode bonus GRATIS tiap hari, sayang kalau dilewatin!
+https://t.me/example`;
+    const courseFeedback = "The course guide at https://example.edu/course helped me prepare.";
+    const ratings = { clarity: 5, support: 5, organization: 5 };
+    let providerCalls = 0;
+    const context = {
+      ip: "192.0.2.36",
+      secret: "test-secret-".repeat(4),
+      openAiApiKey: "test-key",
+      classify: (input: Parameters<typeof classifyReviewText>[0]) =>
+        classifyReviewText(input, "test-key", async () => {
+          providerCalls += 1;
+          throw new Error("Contact matches should skip the moderation provider");
+        }),
+    };
+    const heldReviewIds = [];
+    for (const body of [campaign, courseFeedback]) {
+      const result = await submitReview(
+        db,
+        submissionInputSchema.parse({ ...rawInput, ...ratings, body }),
+        context,
+      );
+      if (result.error !== null) throw new Error(result.error);
+      expect(result.data.status).toBe("pending");
+      heldReviewIds.push(result.data.reviewId);
+    }
+    expect(providerCalls).toBe(0);
+
+    expect(await db.select({ status: reviews.status }).from(reviews)).toEqual([
+      { status: "pending" },
+      { status: "pending" },
+    ]);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toEqual([]);
+    const directory = await getLecturerDirectory(db);
+    expect(directory.lecturers[0]).toMatchObject({ reviewCount: 0, overallAverage: null });
+    expect(searchLecturers(directory.lecturers, directory.courses, "CS101")).toEqual([]);
+
+    const [, courseReviewId] = heldReviewIds;
+    if (!courseReviewId) throw new Error("Expected the course-link review to be stored");
+    const approval = await moderateLecturerReview(
+      db,
+      { id: "admin", role: "admin" },
+      { action: "approve", reviewId: courseReviewId },
+    );
+    expect(approval.error).toBeNull();
+    expect(await getLecturerDetail(db, "p")).toMatchObject({
+      lecturer: { reviewCount: 1, overallAverage: 5 },
+    });
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews).toMatchObject([
+      { id: courseReviewId, body: courseFeedback },
+    ]);
+    const updatedDirectory = await getLecturerDirectory(db);
+    expect(searchLecturers(updatedDirectory.lecturers, updatedDirectory.courses, "CS101")).toEqual([
+      expect.objectContaining({ id: "p", reviewCount: 1, overallAverage: 5 }),
+    ]);
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it("does not invoke review screening when CAPTCHA verification fails", async () => {
+  let classifierCalls = 0;
+  const result = await submitReviewAfterCaptcha(false, async () => {
+    classifierCalls += 1;
+    return { data: { reviewId: "unexpected", status: "published" as const }, error: null };
+  });
+  expect(result).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
+  expect(classifierCalls).toBe(0);
+});
 
 it("limits submissions per browser and keeps an IP ceiling", async () => {
   const platform = await createTestPlatformProxy();
@@ -282,17 +505,27 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     const secret = "test-secret-".repeat(4);
     const now = 7_200_000;
     const ip = "198.51.100.23";
+    let classifierCalls = 0;
+    const screening = {
+      openAiApiKey: "test-key",
+      classify: async () => {
+        classifierCalls += 1;
+        return "clear" as const;
+      },
+    };
     const browserA = crypto.randomUUID();
     const browserB = crypto.randomUUID();
 
     // Two browsers behind the same shared IP each get their own hourly quota.
     for (const browserId of [browserA, browserB]) {
       for (let i = 0; i < 3; i++) {
-        expect(await submitReview(db, input, { ip, browserId, secret, now })).toMatchObject({
+        expect(
+          await submitReview(db, input, { ip, browserId, secret, now, ...screening }),
+        ).toMatchObject({
           error: null,
         });
       }
-      expect(await submitReview(db, input, { ip, browserId, secret, now })).toEqual({
+      expect(await submitReview(db, input, { ip, browserId, secret, now, ...screening })).toEqual({
         data: null,
         error: REVIEW_ERRORS.RATE_LIMIT,
         resetAt: 10_800_000,
@@ -301,7 +534,13 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
 
     // The quota follows the browser, not the network.
     expect(
-      await submitReview(db, input, { ip: "198.51.100.24", browserId: browserA, secret, now }),
+      await submitReview(db, input, {
+        ip: "198.51.100.24",
+        browserId: browserA,
+        secret,
+        now,
+        ...screening,
+      }),
     ).toEqual({ data: null, error: REVIEW_ERRORS.RATE_LIMIT, resetAt: 10_800_000 });
 
     // The IP backstop allows 14 more of the 21 rotated-browser attempts (6 used above).
@@ -310,13 +549,20 @@ it("limits submissions per browser and keeps an IP ceiling", async () => {
     for (let browser = 0; browser < 7; browser++) {
       const browserId = crypto.randomUUID();
       for (let attempt = 0; attempt < 3; attempt++) {
-        const result = await submitReview(db, input, { ip, browserId, secret, now });
+        const result = await submitReview(db, input, {
+          ip,
+          browserId,
+          secret,
+          now,
+          ...screening,
+        });
         if (result.error === null) allowed++;
         else if (result.error === REVIEW_ERRORS.RATE_LIMIT) rejected++;
       }
     }
     expect(allowed).toBe(14);
     expect(rejected).toBe(7);
+    expect(classifierCalls).toBe(20);
   } finally {
     await platform.dispose();
   }
@@ -465,7 +711,12 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
 
     const browserId = crypto.randomUUID();
     const input = { reviewId: "r", browserId, liked: true };
-    const context = { ip: "192.0.2.1", secret: "test-secret-".repeat(4), now: 3_600_000 };
+    const context = {
+      ip: "192.0.2.1",
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+      ...clearScreening,
+    };
 
     for (const reviewId of ["hidden", "deleted-lecturer-review"]) {
       expect(await setReviewLike(db, { ...input, reviewId }, context)).toEqual({
@@ -479,15 +730,15 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     });
 
     expect(await setReviewLike(db, input, context)).toEqual({
-      data: { reviewId: "r", liked: true },
+      data: { reviewId: "r", liked: true, likeCount: 1 },
       error: null,
     });
     expect(await setReviewLike(db, input, context)).toEqual({
-      data: { reviewId: "r", liked: true },
+      data: { reviewId: "r", liked: true, likeCount: 1 },
       error: null,
     });
     expect(await getBrowserReviewLikes(db, browserId)).toEqual(["r"]);
-    expect((await getLecturerDetail(db, "p"))?.reviews[0]?.likeCount).toBe(1);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews[0]?.likeCount).toBe(1);
 
     await db.$client.prepare("UPDATE reviews SET status = 'hidden' WHERE id = 'r'").run();
     expect(await getBrowserReviewLikes(db, browserId)).toEqual([]);
@@ -500,11 +751,11 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     await db.$client.prepare("UPDATE lecturers SET deleted_at = NULL WHERE id = 'p'").run();
 
     expect(await setReviewLike(db, { ...input, liked: false }, context)).toEqual({
-      data: { reviewId: "r", liked: false },
+      data: { reviewId: "r", liked: false, likeCount: 0 },
       error: null,
     });
     expect(await getBrowserReviewLikes(db, browserId)).toEqual([]);
-    expect((await getLecturerDetail(db, "p"))?.reviews[0]?.likeCount).toBe(0);
+    expect((await getLecturerReviewsPage(db, firstReviewPage)).reviews[0]?.likeCount).toBe(0);
 
     for (let i = 0; i < 57; i++) {
       expect((await setReviewLike(db, input, context)).error).toBeNull();
@@ -519,6 +770,106 @@ it("likes and unlikes visible reviews idempotently and enforces rate limits", as
     expect(await submitReview(db, submissionInputSchema.parse(rawInput), context)).toMatchObject({
       data: { reviewId: expect.any(String) },
       error: null,
+    });
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
+
+it.each([
+  ["submission", 3],
+  ["like", 60],
+] as const)(
+  "%s quotas group IPv6 by network and share IPv4 buckets with mapped addresses",
+  async (action, limit) => {
+    const platform = await createTestPlatformProxy();
+    try {
+      const db = createDatabase(platform.env.DB);
+      const attempt = (ip: string) =>
+        allowReviewAction(db, { ip, secret: "test-secret-".repeat(4), now: 3_600_000 }, action);
+      for (let count = 0; count < limit; count++) {
+        expect(await attempt("2001:db8:0:1::1")).toBe(true);
+        expect(await attempt("192.0.2.7")).toBe(true);
+      }
+      expect(await attempt("2001:0db8:0000:0001:abcd:0:0:2")).toBe(false);
+      expect(await attempt("2001:db8:0:2::1")).toBe(true);
+      expect(await attempt("::ffff:192.0.2.7")).toBe(false);
+    } finally {
+      await platform.dispose();
+    }
+  },
+);
+
+it("paginates only published lecturer reviews in every sort order and course filter", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db.insert(courses).values([
+      { id: "c", code: "CS101", nameId: "Dasar", nameEn: "Basics" },
+      { id: "other", code: "CS102", nameId: "Lanjut", nameEn: "Advanced" },
+    ]);
+    const published = Array.from({ length: 44 }, (_, index) => ({
+      id: `review-${String(index).padStart(2, "0")}`,
+      lecturerId: "p",
+      courseId: index < 41 ? "c" : "other",
+      termLabel: "Term",
+      authorName: "Student",
+      clarity: 2 + (index % 3),
+      support: 4,
+      organization: 5,
+      body: "Example review body",
+      createdAt: new Date(1000 * (index % 2)),
+    }));
+    const [first, ...remaining] = published;
+    await db.batch([
+      db.insert(reviews).values(first!),
+      ...remaining.map((review) => db.insert(reviews).values(review)),
+      db.insert(reviews).values({ ...first!, id: "pending", status: "pending" }),
+      db.insert(reviews).values({ ...first!, id: "deleted", deletedAt: new Date() }),
+    ]);
+
+    const summary = await getLecturerDetail(db, "p");
+    expect(summary?.lecturer.reviewCount).toBe(published.length);
+    expect(summary?.lecturer.overallAverage).toBeCloseTo(
+      published.reduce((sum, row) => sum + row.clarity + row.support + row.organization, 0) /
+        (3 * published.length),
+    );
+    expect(summary?.lecturer.courses.map(({ id }) => id)).toEqual(["c", "other"]);
+
+    for (const order of reviewOrders) {
+      for (const courseId of [null, "c"]) {
+        const expected = published
+          .filter((review) => courseId === null || review.courseId === courseId)
+          .sort((left, right) => {
+            const rating = left.clarity - right.clarity;
+            const youngest = right.createdAt.getTime() - left.createdAt.getTime();
+            const difference = order === "highest" ? -rating : order === "lowest" ? rating : 0;
+            return (
+              difference ||
+              (order === "oldest" ? -youngest : youngest) ||
+              left.id.localeCompare(right.id)
+            );
+          })
+          .map(({ id }) => id);
+        const input = { ...firstReviewPage, order, courseId };
+        const first = await getLecturerReviewsPage(db, input);
+        expect(first.reviews).toHaveLength(20);
+        expect(first.nextCursor).not.toBeNull();
+        const second = await getLecturerReviewsPage(db, { ...input, cursor: first.nextCursor });
+        expect(second.reviews).toHaveLength(20);
+        expect(second.nextCursor).not.toBeNull();
+        const last = await getLecturerReviewsPage(db, { ...input, cursor: second.nextCursor });
+        expect(last.nextCursor).toBeNull();
+        expect([...first.reviews, ...second.reviews, ...last.reviews].map(({ id }) => id)).toEqual(
+          expected,
+        );
+      }
+    }
+    await db.update(lecturers).set({ deletedAt: new Date() });
+    expect(await getLecturerReviewsPage(db, firstReviewPage)).toEqual({
+      reviews: [],
+      nextCursor: null,
     });
   } finally {
     await platform.dispose();

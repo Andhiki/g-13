@@ -15,6 +15,7 @@ type Actor = { id: string; role?: string | null };
 type ReviewListData = {
   rows: Awaited<ReturnType<typeof listModerationReviews>>;
   counts: Awaited<ReturnType<typeof getModerationCounts>>;
+  total: number;
 };
 type ReviewActionData = Pick<ModerateReviewInput, "reviewId" | "action">;
 
@@ -23,13 +24,15 @@ export async function inspectReviews(
   actor: Actor,
   offset = 0,
   status: ReviewStatus = "all",
+  query = "",
 ): Promise<ModerationOperationResult<ReviewListData>> {
   if (!canModerate(actor.role)) return { data: null, error: MODERATION_ERRORS.FORBIDDEN };
-  const [rows, counts] = await Promise.all([
-    listModerationReviews(db, offset, status),
+  const [rows, counts, matchingCounts] = await Promise.all([
+    listModerationReviews(db, offset, status, query),
     getModerationCounts(db),
+    query ? getModerationCounts(db, query) : undefined,
   ]);
-  return { data: { rows, counts }, error: null };
+  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
 }
 
 export async function inspectReview(

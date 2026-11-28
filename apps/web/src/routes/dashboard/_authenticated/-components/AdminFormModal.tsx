@@ -25,7 +25,7 @@ export function AdminFormModal({
         if (!nextOpen && !pending) onClose();
       }}
     >
-      <AlignModal.Content className={`${contentClassName} p-0`} aria-describedby={undefined}>
+      <AlignModal.Content className={contentClassName} aria-describedby={undefined}>
         {open && children}
       </AlignModal.Content>
     </AlignModal.Root>
@@ -57,6 +57,7 @@ export function AdminForm({
     <form
       ref={formRef}
       noValidate
+      className="flex min-h-0 flex-auto flex-col overflow-hidden"
       onSubmit={(event) => {
         event.preventDefault();
         if (pending) return;
@@ -67,23 +68,25 @@ export function AdminForm({
         }
       }}
     >
-      <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
+      <AlignModal.Header>
         <AlignModal.Title asChild>
           <Typography as="h2" variant="subtitle2" color="strong">
             {title}
           </Typography>
         </AlignModal.Title>
-      </header>
-      {beforeFields}
-      <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
-        {children}
-        {error && (
-          <Typography role="alert" variant="caption" color="danger">
-            {error}
-          </Typography>
-        )}
-      </fieldset>
-      <footer className="flex items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
+      </AlignModal.Header>
+      <AlignModal.Body className="p-0">
+        {beforeFields}
+        <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
+          {children}
+          {error && (
+            <Typography role="alert" variant="caption" color="danger">
+              {error}
+            </Typography>
+          )}
+        </fieldset>
+      </AlignModal.Body>
+      <AlignModal.Footer>
         <AlignButton.Root
           size="xsmall"
           variant="neutral"
@@ -97,7 +100,7 @@ export function AdminForm({
         <AlignFancyButton.Root type="submit" size="xsmall" isLoading={pending}>
           {submitLabel}
         </AlignFancyButton.Root>
-      </footer>
+      </AlignModal.Footer>
     </form>
   );
 }
@@ -116,6 +119,7 @@ export function AdminFormField({
   inputMode,
   autoComplete,
   readOnly = false,
+  showCounter = false,
   onChange,
   onBlur,
 }: {
@@ -132,6 +136,7 @@ export function AdminFormField({
   inputMode?: "text" | "url" | "numeric";
   autoComplete?: string;
   readOnly?: boolean;
+  showCounter?: boolean;
   onChange: (value: string) => void;
   onBlur?: () => void;
 }) {
@@ -150,15 +155,20 @@ export function AdminFormField({
 
   return (
     <div>
-      <Typography
-        as="label"
-        variant="labelSmall"
-        color="strong"
-        htmlFor={id}
-        className="mb-1.5 block"
-      >
-        {label}
-      </Typography>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <Typography as="label" variant="labelSmall" color="strong" htmlFor={id}>
+          {label}
+        </Typography>
+        {showCounter && (
+          <Typography
+            variant="caption"
+            color={value.length > maxLength ? "danger" : "muted"}
+            className="shrink-0 tabular-nums"
+          >
+            {value.length}/{maxLength}
+          </Typography>
+        )}
+      </div>
       {multiline ? (
         <FormTextarea
           {...controlProps}

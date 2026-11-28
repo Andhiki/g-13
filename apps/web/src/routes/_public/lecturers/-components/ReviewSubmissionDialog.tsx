@@ -29,10 +29,7 @@ export function ReviewSubmissionDialog({
         if (!value) onClose();
       }}
     >
-      <AlignModal.Content
-        aria-describedby={undefined}
-        className="max-h-[calc(100dvh-2rem)] max-w-[760px] overflow-hidden p-0"
-      >
+      <AlignModal.Content aria-describedby={undefined} className="max-w-[760px]">
         {open && (
           <ReviewSubmissionForm
             initialCourse={initialCourse}

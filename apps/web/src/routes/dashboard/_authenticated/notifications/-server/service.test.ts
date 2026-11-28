@@ -73,7 +73,13 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
         organization: 5,
         body: "Clear lectures and helpful feedback.",
       },
-      { ip: "127.0.0.1", secret: "a".repeat(32), now: baseNow },
+      {
+        ip: "127.0.0.1",
+        secret: "a".repeat(32),
+        now: baseNow,
+        openAiApiKey: "test-key",
+        classify: async () => "clear" as const,
+      },
     );
     expect(review.error).toBeNull();
     expect(review.data?.status).toBe("pending");

@@ -1,5 +1,5 @@
 import { useLocale } from "@/useLocale";
-import { RiLinkedinBoxFill, RiArrowRightLine } from "@remixicon/react";
+import { RiLinkedinBoxFill } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignButton } from "@/ui/button";
@@ -170,16 +170,8 @@ export function AlumniPage() {
           <Typography as="h1" variant="pageTitle" className="m-0">
             {text("Meet Our Alumni")}
           </Typography>
-          <Typography as="p" variant="paragraph" color="muted" className="mb-0 mt-5 max-w-md">
-            {text(
-              "Meet Ilmu Komputer UGM alumni building products, leading teams, and growing careers across technology.",
-            )}
-          </Typography>
           <AlignFancyButton.Root asChild className="mt-6">
-            <Link to="/alumni/all">
-              {text("Jelajahi semua alumni")}
-              <RiArrowRightLine aria-hidden="true" className="size-5" />
-            </Link>
+            <Link to="/alumni/all">{text("Jelajahi semua alumni")}</Link>
           </AlignFancyButton.Root>
         </header>
         <section aria-label={text("Alumni stories")} className="grid content-start gap-4">

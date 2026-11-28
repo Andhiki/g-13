@@ -113,9 +113,9 @@ function AlumniResultsContent({
   const { text } = useLocale("alumni");
   return (
     <Tabs.Content value={batch}>
-      <p aria-live="polite" className="mt-6 text-paragraph-sm text-text-sub-600">
+      <Typography as="p" variant="paragraph" color="muted" aria-live="polite" className="mt-6">
         {status === "ready" && text("Menampilkan {{v0}} alumni", { v0: String(filtered.length) })}
-      </p>
+      </Typography>
       {status === "loading" && (
         <div className="mt-6 flex min-h-64">
           <Loading />
@@ -239,6 +239,16 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
     [text],
   );
 
+  const results = (
+    <AlumniResultsContent
+      batch={batch}
+      status={directory.status}
+      filtered={filtered}
+      listRef={listRef}
+      onReload={directory.reload}
+    />
+  );
+
   return (
     <main className="min-h-[calc(100dvh-var(--app-header-height))] bg-bg-white-0 px-5 py-8 text-text-strong-950 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-6xl">
@@ -250,7 +260,9 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
             <RiArrowLeftLine aria-hidden="true" className="size-4" />
             {text("Kembali ke alumni")}
           </Link>
-          <h1 className="sr-only">{text("Semua alumni")}</h1>
+          <Typography as="h1" className="sr-only">
+            {text("Semua alumni")}
+          </Typography>
         </header>
 
         <Tabs.Root value={batch} onValueChange={(value) => setBatch(value ?? allBatches)}>
@@ -266,13 +278,7 @@ export function AlumniDirectory({ initialData }: { initialData: AlumniDirectoryD
             onQueryChange={setQuery}
           />
           {directory.status === "ready" && <AlumniBatchTabs batches={batches} />}
-          <AlumniResultsContent
-            batch={batch}
-            status={directory.status}
-            filtered={filtered}
-            listRef={listRef}
-            onReload={directory.reload}
-          />
+          {results}
         </Tabs.Root>
       </div>
       {letters.length > 1 && (
