@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { resourceSearchFields } from "../-shared/schemas";
 import { and, asc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
@@ -13,13 +14,13 @@ import type {
 type Database = ReturnType<typeof createDatabase>;
 
 function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    learningResources.titleId,
-    learningResources.titleEn,
-    learningResources.descriptionId,
-    learningResources.descriptionEn,
-    learningResources.url,
-  ]);
+  return adminSearchCondition(query, resourceSearchFields, {
+    titleId: learningResources.titleId,
+    titleEn: learningResources.titleEn,
+    descriptionId: learningResources.descriptionId,
+    descriptionEn: learningResources.descriptionEn,
+    url: learningResources.url,
+  });
 }
 
 async function allocateResourceId(db: Database, title: string): Promise<string> {

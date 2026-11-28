@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { lecturerSearchFields } from "../-shared/schemas";
 import { and, asc, eq, isNotNull, isNull, like, sql } from "drizzle-orm";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -14,7 +15,10 @@ import type {
 type Database = ReturnType<typeof createDatabase>;
 
 function searchCondition(query: string) {
-  return adminSearchCondition(query, [lecturers.name, lecturers.id]);
+  return adminSearchCondition(query, lecturerSearchFields, {
+    name: lecturers.name,
+    id: lecturers.id,
+  });
 }
 
 async function allocateLecturerId(db: Database, name: string): Promise<string> {

@@ -1,3 +1,4 @@
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminSearch } from "../-client/useAdminSearch";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -160,16 +161,18 @@ function LecturersListBody({
           })}
         />
       )}
-      {visibleRows.map((lecturer) => (
-        <AdminLecturerRow
-          key={lecturer.id}
-          lecturer={lecturer}
-          selected={selectedId === lecturer.id}
-          onSelect={() => onSelect(lecturer.id)}
-          onEdit={onEdit}
-          onLifecycle={onLifecycle}
-        />
-      ))}
+      <AdminSearchHighlightScope needle={needle}>
+        {visibleRows.map((lecturer) => (
+          <AdminLecturerRow
+            key={lecturer.id}
+            lecturer={lecturer}
+            selected={selectedId === lecturer.id}
+            onSelect={() => onSelect(lecturer.id)}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        ))}
+      </AdminSearchHighlightScope>
     </>
   );
 }

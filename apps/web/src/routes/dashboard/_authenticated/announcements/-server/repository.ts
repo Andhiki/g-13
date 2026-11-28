@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { announcementSearchFields } from "../-shared/schemas";
 import {
   and,
   desc,
@@ -26,11 +27,11 @@ type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConflict[] };
 type Database = ReturnType<typeof createDatabase>;
 
 function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    announcements.id,
-    announcements.titleId,
-    announcements.titleEn,
-  ]);
+  return adminSearchCondition(query, announcementSearchFields, {
+    id: announcements.id,
+    titleId: announcements.titleId,
+    titleEn: announcements.titleEn,
+  });
 }
 
 /** Single definition of each schedule state, shared by the list filter and the counts aggregate. */

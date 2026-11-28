@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { courseSearchFields } from "../-shared/schemas";
 import { and, asc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -13,7 +14,12 @@ import type {
 type Database = ReturnType<typeof createDatabase>;
 
 function searchCondition(query: string) {
-  return adminSearchCondition(query, [courses.code, courses.nameId, courses.nameEn, courses.id]);
+  return adminSearchCondition(query, courseSearchFields, {
+    code: courses.code,
+    nameId: courses.nameId,
+    nameEn: courses.nameEn,
+    id: courses.id,
+  });
 }
 
 export async function listAdminCourses(

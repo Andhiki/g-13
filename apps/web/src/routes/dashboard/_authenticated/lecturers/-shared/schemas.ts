@@ -34,3 +34,6 @@ export const lecturerLifecycleSchema = z.object({
   action: z.enum(["delete", "restore"]),
 });
 export type LecturerLifecycleInput = z.infer<typeof lecturerLifecycleSchema>;
+
+/** Fields the admin search matches; the UI may highlight only these. */
+export const lecturerSearchFields = ["name", "id"] as const;

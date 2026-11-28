@@ -1,3 +1,4 @@
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminSearch } from "../-client/useAdminSearch";
 import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
@@ -161,16 +162,18 @@ function AnnouncementsListBody({
           action={emptyAction}
         />
       )}
-      {visibleRows.map((announcement) => (
-        <AdminAnnouncementRow
-          key={announcement.id}
-          announcement={announcement}
-          selected={selectedId === announcement.id}
-          onSelect={() => onSelect(announcement.id)}
-          onEdit={onEdit}
-          onLifecycle={onLifecycle}
-        />
-      ))}
+      <AdminSearchHighlightScope needle={needle}>
+        {visibleRows.map((announcement) => (
+          <AdminAnnouncementRow
+            key={announcement.id}
+            announcement={announcement}
+            selected={selectedId === announcement.id}
+            onSelect={() => onSelect(announcement.id)}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        ))}
+      </AdminSearchHighlightScope>
     </>
   );
 }

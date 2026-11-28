@@ -1,4 +1,5 @@
 import { adminSearchCondition } from "../../-server/search";
+import { reviewSearchFields } from "../-shared/schemas";
 import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
@@ -10,15 +11,15 @@ import type { ReviewStatus } from "../-shared/schemas";
 type Database = ReturnType<typeof createDatabase>;
 
 function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    lecturers.name,
-    courses.code,
-    courses.nameId,
-    courses.nameEn,
-    reviews.termLabel,
-    reviews.authorName,
-    reviews.body,
-  ]);
+  return adminSearchCondition(query, reviewSearchFields, {
+    lecturerName: lecturers.name,
+    courseCode: courses.code,
+    courseNameId: courses.nameId,
+    courseNameEn: courses.nameEn,
+    termLabel: reviews.termLabel,
+    authorName: reviews.authorName,
+    body: reviews.body,
+  });
 }
 
 const moderationReviewColumns = {

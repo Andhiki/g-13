@@ -95,3 +95,6 @@ export const announcementLifecycleSchema = z.object({
   confirmedConflictIds,
 });
 export type AnnouncementLifecycleInput = z.infer<typeof announcementLifecycleSchema>;
+
+/** Fields the admin search matches; the UI may highlight only these. */
+export const announcementSearchFields = ["id", "titleId", "titleEn"] as const;
