@@ -17,6 +17,8 @@ export type ActiveAnnouncement = {
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
   countdownAt: Date | null;
+  startsAt: Date;
+  endsAt: Date | null;
 };
 
 export async function listActiveAnnouncements(
@@ -36,6 +38,8 @@ export async function listActiveAnnouncements(
       ctaLabelId: announcements.ctaLabelId,
       ctaLabelEn: announcements.ctaLabelEn,
       countdownAt: announcements.countdownAt,
+      startsAt: announcements.startsAt,
+      endsAt: announcements.endsAt,
     })
     .from(announcements)
     .where(and(eq(announcements.enabled, true), announcementActiveAtCondition(now)))
