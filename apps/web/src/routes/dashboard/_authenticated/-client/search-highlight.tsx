@@ -24,7 +24,11 @@ export function createSearchHighlight<const F extends string>(fields: readonly F
     if (!fields.includes(field)) return children;
     const segments = adminSearchSegments(children, needle).map((segment, index) =>
       segment.match ? (
-        <mark key={index} className="rounded-[2px] bg-warning-light text-inherit">
+        <mark
+          key={index}
+          data-testid="search-match"
+          className="rounded-[2px] bg-warning-light text-inherit"
+        >
           {segment.text}
         </mark>
       ) : (
