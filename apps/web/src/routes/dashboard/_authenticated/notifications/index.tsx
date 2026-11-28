@@ -245,8 +245,8 @@ function NotificationsFeed({
   filter,
   displayedRows,
   pendingReadIdSet,
-  busy,
-  archivingId,
+  isBusy,
+  isArchiving,
   nextPageRef,
   onViewAll,
   onMarkRead,
@@ -261,8 +261,8 @@ function NotificationsFeed({
   filter: NotificationFilter;
   displayedRows: NotificationItem[];
   pendingReadIdSet: Set<string>;
-  busy: boolean;
-  archivingId?: string;
+  isBusy: (id: string) => boolean;
+  isArchiving: (id: string) => boolean;
   nextPageRef: React.RefObject<HTMLDivElement | null>;
   onViewAll: () => void;
   onMarkRead: (id: string) => void;
@@ -295,9 +295,9 @@ function NotificationsFeed({
           <NotificationRow
             key={item.id}
             item={item}
-            busy={busy}
+            busy={isBusy(item.id)}
             optimisticallyRead={pendingReadIdSet.has(item.id)}
-            archiving={archivingId === item.id}
+            archiving={isArchiving(item.id)}
             onMarkRead={onMarkRead}
             onArchive={onArchive}
           />
@@ -352,7 +352,8 @@ function NotificationsPage() {
     return () => observer.disconnect();
   }, [filter, fetchNextPage, hasNextPage, isFetching, isFetchNextPageError]);
 
-  const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
+  const { readMutation, readAllMutation, archiveMutation, isBusy, isArchiving } =
+    useNotificationActions();
   const mutationError = readMutation.isError || readAllMutation.isError || archiveMutation.isError;
   const errorMessage =
     list.isError && !isFetchNextPageError ? text("error.load") : text("error.update");
@@ -383,7 +384,7 @@ function NotificationsPage() {
           compact
           isLoading={readAllMutation.isPending}
           icon={<RiCheckDoubleLine className="size-3.5" />}
-          disabled={busy}
+          disabled={readAllMutation.isPending}
           onClick={() => readAllMutation.mutate()}
         >
           {text("action.markAllRead")}
@@ -409,8 +410,8 @@ function NotificationsPage() {
           filter={filter}
           displayedRows={displayedRows}
           pendingReadIdSet={pendingReadIdSet}
-          busy={busy}
-          archivingId={archiveMutation.isPending ? archiveMutation.variables : undefined}
+          isBusy={isBusy}
+          isArchiving={isArchiving}
           nextPageRef={nextPage}
           onViewAll={handleViewAll}
           onMarkRead={(id) => readMutation.mutate(id)}

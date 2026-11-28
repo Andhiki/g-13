@@ -9,7 +9,7 @@ import { assignedCoreSemester, creditsFor } from "@/courses/course-utils";
 import { type PlanningInput } from "./planning-input";
 import { electiveOptions } from "./options";
 import { planActivities } from "./activities";
-import { scheduleCourses } from "./schedule";
+import { scheduleCourses, totalRoadmapCredits } from "./schedule";
 import { findConflicts, type Conflict } from "./conflicts";
 
 export type PlannedCourse = {
@@ -77,12 +77,7 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
   });
   const relations = getRelations(data.id);
   const { activities, blocked, notes } = planActivities(answers);
-  const activityCredits = activities.reduce(
-    (sum, activity) => sum + activity.recommendedCredits,
-    0,
-  );
-  let total =
-    activityCredits + courses.reduce((sum, item) => sum + (creditsFor(item.course) ?? 0), 0);
+  let total = totalRoadmapCredits(courses, activities);
   for (const course of candidates) {
     if (total >= data.totalCredits) break;
     if (courses.some((item) => item.course.id === course.id)) continue;
@@ -115,16 +110,13 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
     item.course = course;
     item.semester = Math.min(...course.placements.map((p) => p.semester ?? 5));
   }
-  scheduleCourses(courses, relations, answers, blocked, activities);
+  const scheduled = scheduleCourses(courses, relations, answers, blocked, activities);
   const plan: Roadmap = {
-    courses,
+    courses: scheduled,
     activities,
     relations,
-    requiredCredits: courses
-      .filter((x) => x.kind === "required")
-      .reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0),
-    totalCredits:
-      activityCredits + courses.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0),
+    requiredCredits: totalRoadmapCredits(scheduled.filter((x) => x.kind === "required")),
+    totalCredits: totalRoadmapCredits(scheduled, activities),
     conflicts: [],
     notes: [
       "Rencana dari semester 1, dengan asumsi mata kuliah selesai sesuai urutan. Batas perencanaan 24 SKS memerlukan hak SKS sesuai IP. Penawaran aktual, nilai, aturan KKN, dan persetujuan dosen belum diverifikasi.",
@@ -132,6 +124,5 @@ export function buildRoadmap(answers: PlanningInput): Roadmap {
       ...data.readingNotes,
     ],
   };
-  plan.conflicts = findConflicts(plan, answers, blocked);
-  return plan;
+  return { ...plan, conflicts: findConflicts(plan, answers, blocked) };
 }

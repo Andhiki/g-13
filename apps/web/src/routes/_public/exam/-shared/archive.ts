@@ -1,5 +1,11 @@
-import { archiveSource, examArchive } from "./catalog";
-import type { ArchiveLocation, ExamCourse, ExamPaper } from "./contracts";
+import { archiveSource, examCourses } from "./catalog";
+import type {
+  ArchiveLocation,
+  ExamCourse,
+  ExamCourseEntry,
+  ExamCourseSummary,
+  ExamPaper,
+} from "./contracts";
 import type { ArchiveSearch } from "./search";
 
 function oneTypoApart(query: string, title: string) {
@@ -40,8 +46,8 @@ function tokens(value: string, locale: string) {
 }
 
 export function prepareCourseSearch(
-  catalog: readonly ExamCourse[],
-  displayName: (course: ExamCourse) => string,
+  catalog: readonly ExamCourseSummary[],
+  displayName: (course: ExamCourseSummary) => string,
   locale: string,
 ) {
   return catalog.map((course) => ({
@@ -97,25 +103,31 @@ type ArchiveEntry =
     }
   | { kind: "paper"; id: string; name: string; paper: ExamPaper; createdAt: string | null };
 
+/**
+ * Lists the folder at `location`. The root lists `catalog`; a course folder
+ * lists the loaded `course`, so the root never needs paper metadata.
+ */
 export function browseArchive({
   location,
   query = "",
-  catalog = examArchive,
-  displayName = (course: ExamCourse) => course.name,
+  catalog = examCourses,
+  course: openedCourse = null,
+  displayName = (course: ExamCourseSummary) => course.name,
   locale = "id",
   searchIndex,
 }: {
   location: ArchiveLocation;
   query?: string;
-  catalog?: readonly ExamCourse[];
-  displayName?: (course: ExamCourse) => string;
+  catalog?: readonly ExamCourseSummary[];
+  course?: ExamCourse | null;
+  displayName?: (course: ExamCourseSummary) => string;
   locale?: string;
   searchIndex?: ReturnType<typeof prepareCourseSearch>;
 }) {
   const breadcrumbs: { name: string; location: ArchiveLocation }[] = [
     { name: "Arsip Ujian", location: [] },
   ];
-  const course = catalog.find((entry) => entry.id === location[0]);
+  const course = openedCourse?.id === location[0] ? openedCourse : null;
   let entries: ArchiveEntry[];
   if (!course) {
     const search = tokens(query, locale);
@@ -184,12 +196,23 @@ export function paperLinks(paper: ExamPaper) {
   };
 }
 
+/** Loads a course's paper metadata, or `null` for an unknown course. */
+export async function loadExamCourse(
+  id: string | undefined,
+  catalog: readonly ExamCourseEntry[] = examCourses,
+): Promise<ExamCourse | null> {
+  const entry = catalog.find((course) => course.id === id);
+  if (!entry) return null;
+  const { load, ...summary } = entry;
+  return { ...summary, ...(await load()).default };
+}
+
+/** Resolves URL search params against the course loaded for `search.course`. */
 export function resolveArchive(
   search: ArchiveSearch,
-  catalog: readonly ExamCourse[] = examArchive,
+  course: ExamCourse | null,
 ): { location: ArchiveLocation; paper: ExamPaper | null } {
-  const course = catalog.find((entry) => entry.id === search.course);
-  if (!course) return { location: [], paper: null };
+  if (!course || course.id !== search.course) return { location: [], paper: null };
   const year = course.years.find((entry) => entry.name === search.year);
   if (!year) return { location: [course.id], paper: null };
   return {

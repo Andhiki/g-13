@@ -7,7 +7,10 @@ import { CatalogRowActions } from "@/routes/dashboard/_authenticated/-components
 import { RecordStatusBadge } from "@/routes/dashboard/_authenticated/-components/RecordStatusBadge";
 import { Typography } from "@/ui/typography";
 import type { loadAdminCourses } from "../-server/handler";
-import type { CourseLifecycleInput } from "../-shared/schemas";
+import { createSearchHighlight } from "../../-client/search-highlight";
+import { courseSearchFields, type CourseLifecycleInput } from "../-shared/schemas";
+
+const Highlight = createSearchHighlight(courseSearchFields);
 
 export const courseTableColumns = "lg:grid-cols-[148px_minmax(0,1fr)_88px_148px]";
 
@@ -37,7 +40,7 @@ export function AdminCourseRow({
     >
       <div className="hidden min-w-0 items-center gap-2 lg:flex">
         <Typography variant="code" color="strong" weight="medium" className="truncate">
-          {course.code}
+          <Highlight field="code">{course.code}</Highlight>
         </Typography>
       </div>
 
@@ -48,19 +51,23 @@ export function AdminCourseRow({
             selected={selected}
             onSelect={onSelect}
           >
-            {course.nameId}
+            <Highlight field="nameId">{course.nameId}</Highlight>
           </AdminTableInspectButton>
           <div className="shrink-0 lg:hidden">
             <RecordStatusBadge deleted={deleted} />
           </div>
         </div>
         <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
-          {course.nameEn}
+          <Highlight field="nameEn">{course.nameEn}</Highlight>
         </Typography>
         <AdminTableMeta>
-          <span className="shrink-0 font-mono">{course.code}</span>
+          <span className="shrink-0 font-mono">
+            <Highlight field="code">{course.code}</Highlight>
+          </span>
           <span className="shrink-0">· Reviews: {course.reviewCount}</span>
-          <span className="truncate">· {course.nameEn}</span>
+          <span className="truncate">
+            · <Highlight field="nameEn">{course.nameEn}</Highlight>
+          </span>
         </AdminTableMeta>
       </div>
 

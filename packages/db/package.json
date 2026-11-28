@@ -8,6 +8,10 @@
       "types": "./dist/client.d.mts",
       "import": "./dist/client.mjs"
     },
+    "./rate-limit": {
+      "types": "./dist/rate-limit.d.mts",
+      "import": "./dist/rate-limit.mjs"
+    },
     "./schema/announcements": {
       "types": "./dist/schema/announcements.d.mts",
       "import": "./dist/schema/announcements.mjs"

@@ -1,26 +1,24 @@
-import { adminSearchCondition } from "../../-server/search";
-import { and, asc, eq, inArray, isNotNull, isNull, like, sql } from "drizzle-orm";
+import { adminSearchColumns } from "../../-server/search";
+import { resourceSearchFields } from "../-shared/schemas";
+import { and, asc, eq, inArray, isNotNull, isNull, like, sql, type SQL } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
 import { allocateCatalogId } from "@/routes/dashboard/_authenticated/-server/slug";
 import type {
   CreateResourceInput,
   ResourceLifecycleInput,
-  ResourceStatus,
   UpdateResourceInput,
 } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    learningResources.titleId,
-    learningResources.titleEn,
-    learningResources.descriptionId,
-    learningResources.descriptionEn,
-    learningResources.url,
-  ]);
-}
+export const adminResourceSearchColumns = adminSearchColumns(resourceSearchFields, {
+  titleId: learningResources.titleId,
+  titleEn: learningResources.titleEn,
+  descriptionId: learningResources.descriptionId,
+  descriptionEn: learningResources.descriptionEn,
+  url: learningResources.url,
+});
 
 async function allocateResourceId(db: Database, title: string): Promise<string> {
   return allocateCatalogId(title, "resource", (pattern) =>
@@ -31,11 +29,10 @@ async function allocateResourceId(db: Database, title: string): Promise<string> 
   );
 }
 
-export async function listAdminResources(
+export async function selectAdminResourceRows(
   db: Database,
-  offset: number,
-  status: ResourceStatus,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select({
@@ -50,32 +47,23 @@ export async function listAdminResources(
       deletedAt: learningResources.deletedAt,
     })
     .from(learningResources)
-    .where(
-      and(
-        status === "active"
-          ? isNull(learningResources.deletedAt)
-          : isNotNull(learningResources.deletedAt),
-        searchCondition(query),
-      ),
-    )
+    .where(where)
     .orderBy(
       asc(learningResources.sortOrder),
       asc(learningResources.titleId),
       asc(learningResources.id),
     )
-    .limit(51)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
-export async function getAdminResourceCounts(db: Database, query = "") {
-  const [counts] = await db
-    .select({
-      active: sql<number>`coalesce(sum(case when ${learningResources.deletedAt} is null then 1 else 0 end), 0)`,
-      deleted: sql<number>`coalesce(sum(case when ${learningResources.deletedAt} is not null then 1 else 0 end), 0)`,
-    })
-    .from(learningResources)
-    .where(searchCondition(query));
-  return counts;
+export async function countAdminResources(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db.select(counts).from(learningResources).where(where);
+  return result;
 }
 
 /** New resources append after every existing row, including soft-deleted ones. */

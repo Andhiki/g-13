@@ -77,8 +77,8 @@ test("dispatches, deduplicates, isolates, filters, and hides notifications after
         ip: "127.0.0.1",
         secret: "a".repeat(32),
         now: baseNow,
-        openAiApiKey: "test-key",
-        classify: async () => "clear" as const,
+        verifyCaptcha: async () => true,
+        provider: async () => "clear",
       },
     );
     expect(review.error).toBeNull();

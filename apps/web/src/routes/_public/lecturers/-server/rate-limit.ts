@@ -1,19 +1,22 @@
 import type { createDatabase } from "@g13/db/client";
-import { REVIEW_RATE_LIMIT_WINDOW_MS, reviewRateLimitResetAt } from "../-shared/rate-limit-window";
+import { consumeRateLimit } from "@g13/db/rate-limit";
+import { reviewSubmissionLimits } from "@g13/db/schema/lecturer-reviews";
 import { reviewRateLimitIp } from "./rate-limit-ip";
-import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
+
+const REVIEW_RATE_LIMIT_WINDOW_MS = 3_600_000;
+
+/** When the current hourly rate-limit window ends. */
+export function reviewRateLimitResetAt(now: number): number {
+  return (Math.floor(now / REVIEW_RATE_LIMIT_WINDOW_MS) + 1) * REVIEW_RATE_LIMIT_WINDOW_MS;
+}
 
 const SUBMISSION_LIMIT_PER_BROWSER = 3;
 const SUBMISSION_LIMIT_PER_IP = 20;
 const LIKE_LIMIT_PER_BROWSER = 60;
 const LIKE_LIMIT_PER_IP = 300;
 const LIKE_LIMIT_PER_IP_WITHOUT_BROWSER = 60;
-
-function encodeHex(bytes: Uint8Array): string {
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
 
 function createSubmissionBrowserIdentity(browserId: string, window: number) {
   return `submission:browser:${window}:${browserId.toLowerCase()}`;
@@ -31,30 +34,18 @@ function createLikeBrowserIdentity(browserId: string, window: number) {
   return `like:browser:${window}:${browserId.toLowerCase()}`;
 }
 
-async function deriveReviewActionKey(secret: string, identity: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(identity));
-  return encodeHex(new Uint8Array(signature));
-}
-
-async function incrementLimit(
+function incrementLimit(
   db: Database,
   context: { secret: string; now: number },
   identity: string,
   limit: number,
 ): Promise<boolean> {
-  const key = await deriveReviewActionKey(context.secret, identity);
-  return incrementReviewActionLimit(db, {
-    key,
+  return consumeRateLimit(db, reviewSubmissionLimits, {
+    secret: context.secret,
+    identity,
+    limit,
     now: context.now,
     expiresAt: reviewRateLimitResetAt(context.now),
-    limit,
   });
 }
 

@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExamArchivePage } from "./exam/-components/ExamArchivePage";
 import { validateArchiveSearch } from "./exam/-shared/search";
+import { loadExamCourse } from "./exam/-shared/archive";
 
 export const Route = createFileRoute("/_public/exam")({
   validateSearch: validateArchiveSearch,
+  // Paper metadata is split per course; the root only needs the course index.
+  loaderDeps: ({ search }) => ({ course: search.course }),
+  loader: ({ deps }) => loadExamCourse(deps.course),
   head: ({ match }) => ({
     meta: [
       { title: match.context.common["Arsip Ujian"] },

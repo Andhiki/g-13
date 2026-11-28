@@ -1,20 +1,20 @@
 ---
-name: Laporan bug
-about: Laporkan perilaku aplikasi yang tidak sesuai
+name: Bug report
+about: Report app behavior that is wrong. Please write in English.
 title: ""
 labels: ""
 assignees: ""
 ---
 
-## Masalah
+## Problem
 
-## Langkah reproduksi
+## Steps to reproduce
 
 1.
 2.
 
-## Hasil yang diharapkan dan aktual
+## Expected and actual result
 
-## Lingkungan
+## Environment
 
-<!-- URL/commit, browser, perangkat; screenshot tanpa data pribadi bila membantu. -->
+<!-- URL/commit, browser, device; a screenshot without personal data if it helps. -->

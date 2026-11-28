@@ -1,6 +1,5 @@
 import type { createDatabase } from "@g13/db/client";
-import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
-import { allowReviewAction } from "./rate-limit";
+import { allowReviewAction, reviewRateLimitResetAt } from "./rate-limit";
 import { getVisibleReviewId, writeReviewLike } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewLikeInput } from "../-shared/schemas";

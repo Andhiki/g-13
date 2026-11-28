@@ -1,6 +1,7 @@
-import { asc, and, eq, gt, isNull, lte, or } from "drizzle-orm";
+import { asc, and, eq } from "drizzle-orm";
 import { announcements, type AnnouncementVariant } from "@g13/db/schema/announcements";
 import type { createDatabase } from "@g13/db/client";
+import { announcementActiveAtCondition } from "@/routes/-announcements/schedule";
 
 type Database = ReturnType<typeof createDatabase>;
 
@@ -16,6 +17,8 @@ export type ActiveAnnouncement = {
   ctaLabelId: string | null;
   ctaLabelEn: string | null;
   countdownAt: Date | null;
+  startsAt: Date;
+  endsAt: Date | null;
 };
 
 export async function listActiveAnnouncements(
@@ -35,14 +38,10 @@ export async function listActiveAnnouncements(
       ctaLabelId: announcements.ctaLabelId,
       ctaLabelEn: announcements.ctaLabelEn,
       countdownAt: announcements.countdownAt,
+      startsAt: announcements.startsAt,
+      endsAt: announcements.endsAt,
     })
     .from(announcements)
-    .where(
-      and(
-        eq(announcements.enabled, true),
-        lte(announcements.startsAt, new Date(now)),
-        or(isNull(announcements.endsAt), gt(announcements.endsAt, new Date(now))),
-      ),
-    )
+    .where(and(eq(announcements.enabled, true), announcementActiveAtCondition(now)))
     .orderBy(asc(announcements.startsAt), asc(announcements.id));
 }

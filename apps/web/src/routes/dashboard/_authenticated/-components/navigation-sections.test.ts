@@ -10,6 +10,7 @@ function visiblePaths(role: Parameters<typeof getVisibleSectionGroups>[0]) {
 
 it("shows all moderation and catalog sections to admins", () => {
   expect(visiblePaths("admin")).toEqual([
+    { heading: undefined, paths: ["/dashboard"] },
     {
       heading: "Moderation",
       paths: ["/dashboard/lecturer-reviews", "/dashboard/users", "/dashboard/announcements"],
@@ -23,6 +24,7 @@ it("shows all moderation and catalog sections to admins", () => {
 
 it("hides admin-only sections from maintainers", () => {
   expect(visiblePaths("maintainer")).toEqual([
+    { heading: undefined, paths: ["/dashboard"] },
     {
       heading: "Moderation",
       paths: ["/dashboard/lecturer-reviews"],

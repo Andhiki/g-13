@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { AlignModal } from "@/ui/modal";
@@ -125,7 +125,8 @@ export function AdminFormField({
 }: {
   id: string;
   name: string;
-  label: string;
+  /** Omit when an `AdminFormRow` with `htmlFor` labels this field. */
+  label?: string;
   value: string;
   maxLength: number;
   placeholder: string;
@@ -155,20 +156,22 @@ export function AdminFormField({
 
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline justify-between gap-2">
-        <Typography as="label" variant="labelSmall" color="strong" htmlFor={id}>
-          {label}
-        </Typography>
-        {showCounter && (
-          <Typography
-            variant="caption"
-            color={value.length > maxLength ? "danger" : "muted"}
-            className="shrink-0 tabular-nums"
-          >
-            {value.length}/{maxLength}
+      {label && (
+        <div className="mb-1.5 flex items-baseline justify-between gap-2">
+          <Typography as="label" variant="labelSmall" color="strong" htmlFor={id}>
+            {label}
           </Typography>
-        )}
-      </div>
+          {showCounter && (
+            <Typography
+              variant="caption"
+              color={value.length > maxLength ? "danger" : "muted"}
+              className="shrink-0 tabular-nums"
+            >
+              {value.length}/{maxLength}
+            </Typography>
+          )}
+        </div>
+      )}
       {multiline ? (
         <FormTextarea
           {...controlProps}
@@ -192,6 +195,52 @@ export function AdminFormField({
           {error}
         </Typography>
       )}
+    </div>
+  );
+}
+
+/**
+ * One row of a dashboard form: the label sits in a left column on wider screens.
+ * With `htmlFor` the label names that single control; otherwise it names the
+ * group of labelled fields in the right column.
+ */
+export function AdminFormRow({
+  label,
+  htmlFor,
+  optional = false,
+  centered = false,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  optional?: boolean;
+  centered?: boolean;
+  children: ReactNode;
+}) {
+  const labelId = useId();
+  return (
+    <div
+      className={`grid gap-x-6 gap-y-2 sm:grid-cols-[128px_minmax(0,1fr)] ${centered ? "sm:items-center" : htmlFor ? "sm:items-baseline" : ""}`}
+    >
+      <div>
+        {htmlFor ? (
+          <Typography as="label" htmlFor={htmlFor} variant="labelSmall" color="strong">
+            {label}
+          </Typography>
+        ) : (
+          <Typography id={labelId} variant="labelSmall" color="strong">
+            {label}
+          </Typography>
+        )}
+        {optional && (
+          <Typography variant="caption" color="muted">
+            Optional
+          </Typography>
+        )}
+      </div>
+      <div role={htmlFor ? undefined : "group"} aria-labelledby={htmlFor ? undefined : labelId}>
+        {children}
+      </div>
     </div>
   );
 }

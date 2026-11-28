@@ -1,6 +1,8 @@
 # Agent instructions
 
-Be concise. Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution, verification, and release notes requirements. Use the relevant skill under `.agents/skills/`.
+Be concise. Write every GitHub issue, pull request, comment, review, and commit message in English, even when the conversation, the code, or existing text is in Indonesian. User-facing app copy and its Indonesian translations are product content and stay as they are.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution, verification, and release notes requirements. Use the relevant skill under `.agents/skills/`.
 
 For substantial work, use only the stages needed from the curated `gthirteen` skillset: `gthirteen:grill-with-docs` for domain decisions, `gthirteen:to-spec` for behavior, `gthirteen:to-tickets` for implementation tickets, and `gthirteen:implement` for implementation. GitHub Issues are the skillset's spec and progress tracking. For every task, read the relevant issues first — spec, tickets, blockers, and their labels per [docs/triage-labels.md](docs/triage-labels.md), following [docs/issue-tracker.md](docs/issue-tracker.md) — and keep them updated: post progress comments as work advances and close a ticket once its acceptance criteria are met.
 

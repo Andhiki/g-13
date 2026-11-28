@@ -1,6 +1,8 @@
-import { useAdminSearch } from "../-client/useAdminSearch";
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
+import { useAdminList } from "../-client/useAdminList";
+import { adminListSearchSchema } from "../-shared/admin-search";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   closestCenter,
@@ -57,6 +59,7 @@ import {
 } from "./-shared/schemas";
 
 export const Route = createFileRoute("/dashboard/_authenticated/resources/")({
+  validateSearch: adminListSearchSchema,
   loader: async ({ context }) => {
     try {
       return await context.queryClient.fetchQuery(adminResourcesQuery());
@@ -199,24 +202,26 @@ function ResourcesListBody({
           })}
         />
       )}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={visibleRows.map((resource) => resource.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {visibleRows.map((resource) => (
-            <AdminResourceRow
-              key={resource.id}
-              resource={resource}
-              selected={selectedId === resource.id}
-              sortable={sortable}
-              onSelect={() => onSelect(resource.id)}
-              onEdit={onEdit}
-              onLifecycle={onLifecycle}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+      <AdminSearchHighlightScope needle={needle}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={visibleRows.map((resource) => resource.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {visibleRows.map((resource) => (
+              <AdminResourceRow
+                key={resource.id}
+                resource={resource}
+                selected={selectedId === resource.id}
+                sortable={sortable}
+                onSelect={() => onSelect(resource.id)}
+                onEdit={onEdit}
+                onLifecycle={onLifecycle}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      </AdminSearchHighlightScope>
     </>
   );
 }
@@ -339,6 +344,7 @@ function ResourcesContent({
     <AdminInspectorLayout
       title="Resource details"
       desktopOpen={detailsVisible}
+      pending={queryState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -489,8 +495,19 @@ function ResourcesModals({
 function AdminResourcesPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<ResourceStatus>("active");
+  const {
+    query,
+    setQuery,
+    needle,
+    offset,
+    status,
+    setStatus,
+    counts,
+    listState,
+    rows: basePageRows,
+    total,
+    page,
+  } = useAdminList("active", adminResourcesQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
@@ -504,14 +521,6 @@ function AdminResourcesPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const resourcesQuery = useQuery(adminResourcesQuery(offset, status, needle));
-  const counts = resourcesQuery.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || resourcesQuery.isPending,
-    isError: !searchPending && resourcesQuery.isError,
-  };
-  const resourceRows = searchPending ? [] : (resourcesQuery.data?.rows ?? []);
-  const basePageRows = resourceRows.slice(0, 50);
   const visibleRows =
     !needle && orderedIds
       ? orderedIds
@@ -520,11 +529,10 @@ function AdminResourcesPage() {
       : basePageRows;
 
   const count = visibleRows.length;
-  const total = resourcesQuery.data?.total ?? 0;
   const selectedResource =
     visibleRows.find((resource) => resource.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedResource && !listState.isPending && !listState.isError;
+    detailsOpen && !listState.isError && (listState.isPending || !!selectedResource);
 
   async function invalidateResourceQueries() {
     await Promise.all([
@@ -550,7 +558,6 @@ function AdminResourcesPage() {
       setFormModal({ open: false, resource: null });
       if (result.created) {
         setStatus("active");
-        setOffset(0);
         setSelectedId(result.id);
       }
     },
@@ -607,11 +614,10 @@ function AdminResourcesPage() {
         counts={counts}
         status={status}
         query={query}
-        selectedAvailable={!!selectedResource}
+        selectedAvailable={listState.isPending || !!selectedResource}
         detailsVisible={detailsVisible}
         onStatusChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
           setOrderedIds(null);
         }}
@@ -628,7 +634,6 @@ function AdminResourcesPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={resourceRows.length > 50}
         needle={needle}
         status={status}
         activeCount={counts.active}
@@ -638,18 +643,18 @@ function AdminResourcesPage() {
         sortable={sortable}
         reorderError={reorderMutation.isError}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
+        hasNext={page.hasNext}
         onPreviousPage={() => {
           setOrderedIds(null);
-          setOffset((current) => Math.max(0, current - 50));
+          page.previous();
         }}
         onNextPage={() => {
           setOrderedIds(null);
-          setOffset((current) => current + 50);
+          page.next();
         }}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
-          setOffset(0);
           setSelectedId(null);
           setOrderedIds(null);
         }}

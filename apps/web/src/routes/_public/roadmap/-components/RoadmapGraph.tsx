@@ -1,5 +1,5 @@
 import { RiRefreshLine } from "@remixicon/react";
-import { mapCourseState } from "@/graph/map-state";
+import { withCourseFocus } from "@/graph/graph-builder";
 import { useLocale } from "@/useLocale";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
@@ -310,15 +310,12 @@ export function RoadmapGraph({
         if (selectedId !== null && (node.type !== "course" || !focusIds.has(node.id)))
           return { ...node, hidden: true };
         if (node.type !== "course") return node;
-        return {
-          ...node,
-          ...(selectedId !== null ? { position: focusPositions.get(node.id)! } : {}),
-          data: {
-            ...node.data,
-            choose,
-            state: mapCourseState(node.id, selectedId, node.data.incoming, node.data.outgoing),
-          },
-        };
+        return withCourseFocus(
+          node,
+          selectedId,
+          choose,
+          selectedId !== null ? focusPositions.get(node.id) : undefined,
+        );
       }),
     [graph, selectedId, choose, focusIds, focusPositions],
   );

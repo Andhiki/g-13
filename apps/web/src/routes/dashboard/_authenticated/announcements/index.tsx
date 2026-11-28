@@ -1,7 +1,9 @@
-import { useAdminSearch } from "../-client/useAdminSearch";
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
+import { useAdminList } from "../-client/useAdminList";
+import { adminListSearchSchema } from "../-shared/admin-search";
 import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { formatAbsoluteTime } from "@/date-format";
 import { useLocale } from "@/useLocale";
@@ -58,6 +60,7 @@ const emptyStateCopy: Record<AnnouncementStatus, { title: string; description: s
 };
 
 export const Route = createFileRoute("/dashboard/_authenticated/announcements/")({
+  validateSearch: adminListSearchSchema,
   loader: async ({ context }) => {
     try {
       return await context.queryClient.fetchQuery(adminAnnouncementsQuery());
@@ -161,16 +164,18 @@ function AnnouncementsListBody({
           action={emptyAction}
         />
       )}
-      {visibleRows.map((announcement) => (
-        <AdminAnnouncementRow
-          key={announcement.id}
-          announcement={announcement}
-          selected={selectedId === announcement.id}
-          onSelect={() => onSelect(announcement.id)}
-          onEdit={onEdit}
-          onLifecycle={onLifecycle}
-        />
-      ))}
+      <AdminSearchHighlightScope needle={needle}>
+        {visibleRows.map((announcement) => (
+          <AdminAnnouncementRow
+            key={announcement.id}
+            announcement={announcement}
+            selected={selectedId === announcement.id}
+            onSelect={() => onSelect(announcement.id)}
+            onEdit={onEdit}
+            onLifecycle={onLifecycle}
+          />
+        ))}
+      </AdminSearchHighlightScope>
     </>
   );
 }
@@ -220,6 +225,7 @@ function AnnouncementsContent({
     <AdminInspectorLayout
       title="Announcement details"
       desktopOpen={detailsVisible}
+      pending={queryState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -362,8 +368,20 @@ function AnnouncementReplacementModal({
 function AdminAnnouncementsPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<AnnouncementStatus>("live");
+  const {
+    query,
+    setQuery,
+    needle,
+    offset,
+    status,
+    setStatus,
+    result: announcementsQuery,
+    counts,
+    listState,
+    rows: visibleRows,
+    total,
+    page,
+  } = useAdminList("live", adminAnnouncementsQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [formModal, setFormModal] = useState<{
@@ -381,24 +399,14 @@ function AdminAnnouncementsPage() {
   const [replacement, setReplacement] = useState<Replacement | null>(null);
 
   const queryClient = useQueryClient();
-  const announcementsQuery = useQuery(adminAnnouncementsQuery(offset, status, needle));
-  const counts = announcementsQuery.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || announcementsQuery.isPending,
-    isError: !searchPending && announcementsQuery.isError,
-  };
-  const announcementRows = searchPending ? [] : (announcementsQuery.data?.rows ?? []);
-  const visibleRows = announcementRows.slice(0, 50);
 
   const count = visibleRows.length;
-  const total = announcementsQuery.data?.total ?? 0;
   const selectedAnnouncement =
     visibleRows.find((announcement) => announcement.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
     detailsOpen &&
-    !!selectedAnnouncement &&
-    !announcementsQuery.isPending &&
-    !announcementsQuery.isError;
+    !announcementsQuery.isError &&
+    (announcementsQuery.isPending || !!selectedAnnouncement);
 
   async function invalidateAnnouncementQueries() {
     await Promise.all([
@@ -427,7 +435,6 @@ function AdminAnnouncementsPage() {
       setFormModal({ open: false, announcement: null });
       if (result.created) {
         setStatus("live");
-        setOffset(0);
         setSelectedId(result.id);
       }
     },
@@ -471,7 +478,7 @@ function AdminAnnouncementsPage() {
         ariaLabel="Filter announcements"
       />
       <DetailsToggleButton
-        available={!!selectedAnnouncement}
+        available={announcementsQuery.isPending || !!selectedAnnouncement}
         visible={detailsVisible}
         onToggle={() => setDetailsOpen((open) => !open)}
       />
@@ -498,7 +505,6 @@ function AdminAnnouncementsPage() {
         activeTab={status}
         onTabChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
         }}
       >
@@ -510,15 +516,15 @@ function AdminAnnouncementsPage() {
         count={count}
         offset={offset}
         total={total}
-        hasNext={announcementRows.length > 50}
         needle={needle}
         status={status}
         selectedAnnouncement={selectedAnnouncement}
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        onPreviousPage={() => setOffset((current) => Math.max(0, current - 50))}
-        onNextPage={() => setOffset((current) => current + 50)}
+        hasNext={page.hasNext}
+        onPreviousPage={page.previous}
+        onNextPage={page.next}
         onClearSearch={() => setQuery("")}
         onOpenCreate={openCreateModal}
         onSelect={(id) => {

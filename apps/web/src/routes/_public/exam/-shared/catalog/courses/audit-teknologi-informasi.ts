@@ -1,0 +1,225 @@
+import type { ExamCourseDetail } from "../../contracts";
+
+const course: ExamCourseDetail = {
+  sourceFolderId: "1R4k1_nBxOxyPLR0FD2lnHlLLUErD-dIM",
+  years: [
+    {
+      name: "Tanpa tahun",
+      createdAt: null,
+      papers: [
+        {
+          id: "1FQOLd1QcJcfuoSyhemwLNdsw6g04VV81",
+          name: "ADA2 UAS 15.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "1mvhLJYBfyAdAVTZhsiYRI2ac6jR2BAg6",
+          name: "Audit dan Kontrol IT - UAS.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "1aHdJrNXqdn1mYFYJNwf2xZtyYWhT8eBH",
+          name: "Audit dan Kontrol IT - UAS.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "1S-AxZlbqcmIIgCnQPpY2PLAEFcIw7qQP",
+          name: "Audit dan Kontrol IT - UAS(1).pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "1WoIclpF03MSV7bvsdOA-k-3JmZ6zeIgv",
+          name: "Audit dan Kontrol IT - UTS.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1rQhpetKh7MwDC3GVktFlbHjSRWTs3ufY",
+          name: "Audit dan Kontrol IT - UTS(2).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1_hu0hiHSZBbxMnqitEqk62cdiPDqFqjB",
+          name: "Audit dan Kontrol IT - UTS(3).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1pj2fXE3z_VbpfIAG2EGZ4L5CHxAz8TUa",
+          name: "Audit dan kontrol it.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1ZLmqLiRweXxJBcNYkiR-ntvH78qQih2B",
+          name: "AUDIT UTS- MARDANI (1).JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1bE4MUSLgmA_UaQKcx6tgZDbO3ykDlFV5",
+          name: "AUDIT UTS- MARDANI (2).JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "1JIvOTdwwM9QGBaQExbLe5w6679Gct7vA",
+          name: "AUDIT UTS- MARDANI (3).JPG",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2014",
+      createdAt: null,
+      papers: [
+        {
+          id: "1w3dnr8P0SQyuXHznxEVAWHxXxeyrDhxa",
+          name: "Audit dan Kontrol IT - UAS - 2014 - Reguler.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+      ],
+    },
+    {
+      name: "2015",
+      createdAt: null,
+      papers: [
+        {
+          id: "1DuZsDqoAy0UE57nZ9O0YuCF-abkwLD3n",
+          name: "Audit dan Kontrol IT - UAS - 2015 - Reguler.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "16Dd5fpHPbkaw0Qrr9pwI2gm3Q6Cdpojk",
+          name: "Audit dan Kontrol IT - UTS - 2015 - Reguler.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+        {
+          id: "18iaIQdbtNsbywOUkMfq3A9meS5nfOvb-",
+          name: "Audit dan Kontrol IT - UTS - 2015.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2019",
+      createdAt: null,
+      papers: [
+        {
+          id: "1Z0-HtYLtGeD_zS2xrT9jTAcKuuRo_RPL",
+          name: "Audit dan Kontrol IT - UAS - 2019 - Reguler.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UAS",
+          sourceFolderId: "1-VTQVjoSx739uS7RDv_23oxfSoQLo8nh",
+        },
+        {
+          id: "1yZefbDNGGVO4YUgXl8xeslqRGBmk9TDx",
+          name: "Audit dan Kontrol IT - UTS - 2019 - Reguler.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2012",
+      createdAt: null,
+      papers: [
+        {
+          id: "1X983tPMooucTJuonabosAsf7tXz7gU2P",
+          name: "Audit dan Kontrol IT - UTS - 2012 - Reguler.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2013",
+      createdAt: null,
+      papers: [
+        {
+          id: "1hAUraxNoE4MvfNYimeuSdVZhnTtD3ZF_",
+          name: "Audit dan Kontrol IT - UTS - 2013.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:32:10.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2024",
+      createdAt: null,
+      papers: [
+        {
+          id: "1zhKoFfQWP4K-Q3dGFgZWM6fsK5u8Btyb",
+          name: "AUDIT UTS- REG 2024.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+    {
+      name: "2020",
+      createdAt: null,
+      papers: [
+        {
+          id: "176WmdR2lJsLebNytclNXiDIhlboG7T3w",
+          name: "IT Audit dan Kontrol - UTS - 2020 - Reg.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:32:09.000Z",
+          exam: "UTS",
+          sourceFolderId: "16V_NSkjD9-CfpOFFNvcEumjyJX2l_uWB",
+        },
+      ],
+    },
+  ],
+};
+
+export default course;

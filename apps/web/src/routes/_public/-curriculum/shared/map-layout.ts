@@ -1,9 +1,6 @@
-import type { Edge } from "@xyflow/react";
 import type { Course, Curriculum, Relation } from "@g13/curriculum";
-import { mapCourseState } from "@/graph/map-state";
 import { assignedCoreSemester, isCore } from "@/courses/course-utils";
-import { semesterRelations } from "@/graph/semester-relations";
-
+import { buildCourseGraph, createLaneNode, crossSemesterRelations } from "@/graph/graph-builder";
 import { LANE_X, LANE_STEP, LANE_WIDTH, type MapNode } from "@/graph/model";
 const CHOICE_COLUMNS = 8;
 const CHOICE_ROWS = 6;
@@ -71,7 +68,7 @@ function shortenConnections(semesters: Map<number, Course[]>, relations: Relatio
 }
 
 export function createMapLayout(data: Curriculum, relations: Relation[]) {
-  const graphRelations = semesterRelations(
+  const graphRelations = crossSemesterRelations(
     relations,
     new Map(data.all.map((course) => [course.id, assignedCoreSemester(course)])),
   );
@@ -109,21 +106,16 @@ export function createMapLayout(data: Curriculum, relations: Relation[]) {
   const positions = new Map<string, { x: number; y: number }>();
   for (let term = 1; term <= lastSemester; term += 1) {
     const courses = layoutCore.get(term) ?? [];
-    nodes.push({
-      id: "lane-semester-" + term,
-      type: "lane",
-      position: { x: LANE_X + (term - 1) * LANE_STEP, y: 100 },
-      className: "w-[270px]! h-10!",
-      zIndex: -1,
-      data: {
-        kind: "lane",
+    nodes.push(
+      createLaneNode({
+        id: "lane-semester-" + term,
         title: "Semester " + term,
-        active: false,
-      },
-      selectable: false,
-      draggable: false,
-      connectable: false,
-    });
+        position: { x: LANE_X + (term - 1) * LANE_STEP, y: 100 },
+        className: "w-[270px]! h-10!",
+        zIndex: -1,
+        locked: true,
+      }),
+    );
     courses.forEach((course, index) => {
       const position = {
         x: LANE_X + (term - 1) * LANE_STEP + COURSE_X_OFFSET,
@@ -133,21 +125,16 @@ export function createMapLayout(data: Curriculum, relations: Relation[]) {
     });
   }
 
-  nodes.push({
-    id: "lane-choices",
-    type: "lane",
-    position: { x: LANE_X, y: choiceStartY },
-    style: { width: (CHOICE_COLUMNS - 1) * LANE_STEP + LANE_WIDTH, height: 40 },
-    zIndex: -1,
-    data: {
-      kind: "lane",
+  nodes.push(
+    createLaneNode({
+      id: "lane-choices",
       title: "Mata Kuliah Pilihan",
-      active: false,
-    },
-    selectable: false,
-    draggable: false,
-    connectable: false,
-  });
+      position: { x: LANE_X, y: choiceStartY },
+      style: { width: (CHOICE_COLUMNS - 1) * LANE_STEP + LANE_WIDTH, height: 40 },
+      zIndex: -1,
+      locked: true,
+    }),
+  );
   const choiceMembers = new Map<string, string[]>();
   let groupY = choiceStartY + 64;
   let column = 0;
@@ -168,17 +155,16 @@ export function createMapLayout(data: Curriculum, relations: Relation[]) {
         id,
         chunk.map((course) => course.id),
       );
-      nodes.push({
-        id,
-        type: "lane",
-        position: { x, y: groupY },
-        style: { width: (columns - 1) * LANE_STEP + LANE_WIDTH, height: 56 },
-        zIndex: -1,
-        data: { kind: "lane", title: group, active: false },
-        selectable: false,
-        draggable: false,
-        connectable: false,
-      });
+      nodes.push(
+        createLaneNode({
+          id,
+          title: group,
+          position: { x, y: groupY },
+          style: { width: (columns - 1) * LANE_STEP + LANE_WIDTH, height: 56 },
+          zIndex: -1,
+          locked: true,
+        }),
+      );
       chunk.forEach((course, index) => {
         positions.set(course.id, {
           x: x + COURSE_X_OFFSET + Math.floor(index / CHOICE_ROWS) * LANE_STEP,
@@ -237,62 +223,29 @@ export function buildMap(
     }
   }
   const connections = selectedId ? focusedRelations : availableRelations;
-  const incoming = new Map<string, string[]>();
-  const outgoing = new Map<string, string[]>();
-  for (const relation of connections) {
-    outgoing.set(relation.source, [...(outgoing.get(relation.source) ?? []), relation.target]);
-    incoming.set(relation.target, [...(incoming.get(relation.target) ?? []), relation.source]);
-  }
-  const byVerticalPosition = (left: string, right: string) =>
-    (positions.get(left)?.y ?? 0) - (positions.get(right)?.y ?? 0);
-  for (const course of courses) {
+  const placements = courses.flatMap((course) => {
     const position = positions.get(course.id);
-    if (!position) continue;
-    nodes.push({
-      id: course.id,
-      type: "course",
-      position,
-      data: {
-        kind: "course",
-        course,
-        state: mapCourseState(
-          course.id,
-          selectedId,
-          incoming.get(course.id) ?? [],
-          outgoing.get(course.id) ?? [],
-        ),
-        incoming: (incoming.get(course.id) ?? []).sort(byVerticalPosition),
-        outgoing: (outgoing.get(course.id) ?? []).sort(byVerticalPosition),
-        choose,
-      },
-      className: "pointer-events-auto!",
-      zIndex: 2,
-    });
-  }
-
-  const coreIds = new Set(data.all.filter(isCore).map((course) => course.id));
-  const edges: Edge[] = connections.map((relation) => {
-    const isPrerequisite = relation.target === selectedId;
-    return {
-      id: relation.source + "->" + relation.target,
-      source: relation.source,
-      sourceHandle: "out",
-      target: relation.target,
-      targetHandle: "in",
-      type: "default",
-      zIndex: 3,
-      data: {
-        optional: !coreIds.has(relation.source) || !coreIds.has(relation.target),
-      },
-      style: {
-        stroke: selectedId
-          ? isPrerequisite
-            ? "var(--color-warning-dark)"
-            : "var(--color-feature-dark)"
-          : "var(--color-text-soft-400)",
-        strokeWidth: selectedId ? 2.2 : 1.2,
-      },
-    };
+    return position ? [{ course, position }] : [];
   });
+  const coreIds = new Set(data.all.filter(isCore).map((course) => course.id));
+  const { nodes: courseNodes, edges } = buildCourseGraph({
+    placements,
+    relations: connections,
+    selectedId,
+    choose,
+    sortNeighborsByY: true,
+    coreIds,
+    edgeType: "default",
+    edgeZIndex: () => 3,
+    edgeStyle: (relation) => ({
+      stroke: selectedId
+        ? relation.target === selectedId
+          ? "var(--color-warning-dark)"
+          : "var(--color-feature-dark)"
+        : "var(--color-text-soft-400)",
+      strokeWidth: selectedId ? 2.2 : 1.2,
+    }),
+  });
+  nodes.push(...courseNodes);
   return { nodes, edges, positions, relationCount: availableRelations.length, lastSemester };
 }

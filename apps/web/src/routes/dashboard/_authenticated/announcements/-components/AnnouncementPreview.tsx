@@ -1,5 +1,5 @@
 import type { AnnouncementVariant } from "@g13/db/schema/announcements";
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Language } from "@g13/i18n";
 import { loadMessages } from "@g13/i18n/messages";
 import {
@@ -10,10 +10,10 @@ import {
 import { AnnouncementBannerRow, resolveAnnouncementCopy } from "@/ui/announcement-banner";
 import { useAnnouncementClock } from "@/ui/announcement-countdown";
 import { dateTimePartsToTimestamp, type DateTimeParts } from "@/ui/date-time-value";
-import { Typography } from "@/ui/typography";
 import { toast } from "@/ui/toast";
 import { useTranslation } from "react-i18next";
-import { announcementStatusLabel, resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import { AnnouncementStatusBadge } from "./AdminAnnouncementRow";
 
 export function AnnouncementPreview({
   variant,
@@ -49,7 +49,6 @@ export function AnnouncementPreview({
     i18n.resolvedLanguage === "en" ? "en" : "id",
   );
   const previewText = i18n.getFixedT(previewLanguage, "common");
-  const headingId = useId();
 
   async function changePreviewLanguage(language: Language) {
     try {
@@ -100,38 +99,38 @@ export function AnnouncementPreview({
 
   return (
     <section
-      aria-labelledby={headingId}
-      className="border-b border-stroke-soft-200 bg-bg-weak-50/50 pt-3.5"
+      aria-label="Banner preview"
+      className="space-y-3 border-b border-stroke-soft-200 bg-bg-weak-50 px-5 py-4"
     >
-      <div className="mb-2.5 flex items-center justify-between gap-3 px-5">
-        <div>
-          <Typography as="h3" id={headingId} variant="labelSmall" color="strong">
-            Banner preview
-          </Typography>
-          <Typography as="p" variant="caption" color="muted">
-            {scheduleStatus === "live"
-              ? "Live on the site now"
-              : announcementStatusLabel(scheduleStatus)}
-          </Typography>
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <AnnouncementStatusBadge status={scheduleStatus} />
         <PreviewLanguagePicker value={previewLanguage} onChange={changePreviewLanguage} />
       </div>
-      <AnnouncementBannerRow
-        variant={variant}
-        title={copy.title}
-        body={copy.body}
-        titlePlaceholder={titlePlaceholder}
-        bodyPlaceholder={bodyPlaceholder}
-        ctaLabel={copy.ctaLabel}
-        ctaHref={copy.ctaHref}
-        ctaOpenInNewTab={copy.ctaOpenInNewTab}
-        closeLabel={closeLabel}
-        interactiveCta={false}
-        countdownAt={countdownAtMs}
-        countdownNow={now}
-        countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
-        onDismiss={() => {}}
-      />
+      <div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xs">
+        <AnnouncementBannerRow
+          variant={variant}
+          title={copy.title}
+          body={copy.body}
+          titlePlaceholder={titlePlaceholder}
+          bodyPlaceholder={bodyPlaceholder}
+          ctaLabel={copy.ctaLabel}
+          ctaHref={copy.ctaHref}
+          ctaOpenInNewTab={copy.ctaOpenInNewTab}
+          closeLabel={closeLabel}
+          interactiveCta={false}
+          countdownAt={countdownAtMs}
+          countdownNow={now}
+          countdownText={(key) => previewText(key, { keySeparator: false, defaultValue: key })}
+          onDismiss={() => {}}
+        />
+        <div aria-hidden="true" className="flex items-center gap-3 px-4 py-3">
+          <span className="h-3 w-8 rounded-sm bg-bg-soft-200" />
+          <span className="h-2 w-12 rounded-sm bg-bg-weak-50" />
+          <span className="h-2 w-10 rounded-sm bg-bg-weak-50" />
+          <span className="h-2 w-14 rounded-sm bg-bg-weak-50" />
+          <span className="ms-auto h-5 w-16 rounded-md bg-bg-weak-50" />
+        </div>
+      </div>
     </section>
   );
 }

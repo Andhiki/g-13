@@ -1,28 +1,26 @@
 import type { createDatabase } from "@g13/db/client";
+import type { ReviewPendingReason } from "@g13/db/schema/lecturer-reviews";
 import { dispatchNotification } from "@/server/notifications";
 
-import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
-import { allowReviewAction } from "./rate-limit";
+import { allowReviewAction, reviewRateLimitResetAt } from "./rate-limit";
 import { createReview, getReviewReferences } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewSubmission } from "../-shared/submission-schema";
-import {
-  classifyReviewText,
-  type ReviewScreeningInput,
-  type ReviewScreeningResult,
-} from "./review-moderation";
-import { hasReviewProfanity } from "./review-profanity";
+import { screenReviewText, type ReviewModerationProvider } from "./review-screening";
 
 type Database = ReturnType<typeof createDatabase>;
 
-export function submitReviewAfterCaptcha<T>(
-  verified: boolean,
-  submit: () => Promise<ReviewOperationResult<T>>,
-): Promise<ReviewOperationResult<T>> {
-  if (!verified) return Promise.resolve({ data: null, error: REVIEW_ERRORS.CAPTCHA });
-  return submit();
+/** Any rating of 2 or lower holds a review for moderation. */
+function hasLowRating(review: ReviewSubmission) {
+  return Math.min(review.clarity, review.support, review.organization) <= 2;
 }
 
+/**
+ * Runs the whole submission policy, in order: captcha, requester identity,
+ * lecturer/course references, rate limit, text screening, then the
+ * publish-or-hold decision. A failed step never consumes a later one (a
+ * rejected captcha does not use up the rate limit).
+ */
 export async function submitReview(
   db: Database,
   review: ReviewSubmission,
@@ -31,10 +29,12 @@ export async function submitReview(
     browserId?: string | null;
     secret: string;
     now?: number;
-    openAiApiKey: string;
-    classify?: (input: ReviewScreeningInput) => Promise<ReviewScreeningResult>;
+    /** Verifies this submission's captcha token; fails closed. */
+    verifyCaptcha: () => Promise<boolean>;
+    provider: ReviewModerationProvider;
   },
 ): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
+  if (!(await context.verifyCaptcha())) return { data: null, error: REVIEW_ERRORS.CAPTCHA };
   const ip = context.ip;
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   const references = await getReviewReferences(db, review);
@@ -55,26 +55,17 @@ export async function submitReview(
   const screeningInput = anonymous
     ? { body: review.body }
     : { body: review.body, displayName: authorName };
-  let screening: ReviewScreeningResult;
-  try {
-    screening = await (
-      context.classify ?? ((input) => classifyReviewText(input, context.openAiApiKey))
-    )(screeningInput);
-    if (
-      screening === "clear" &&
-      [screeningInput.body, screeningInput.displayName ?? ""].some(hasReviewProfanity)
-    ) {
-      screening = "flagged";
-    }
-  } catch {
-    screening = "unscorable";
-  }
-  const ratingPending = Math.min(review.clarity, review.support, review.organization) <= 2;
-  const status = screening === "clear" && !ratingPending ? "published" : "pending";
+  const screening = await screenReviewText(screeningInput, context.provider);
+  const pendingReasons: ReviewPendingReason[] = [
+    ...(hasLowRating(review) ? (["low-rating"] as const) : []),
+    ...(screening === "clear" ? [] : [screening]),
+  ];
+  const status = pendingReasons.length ? "pending" : "published";
   await createReview(db, {
     ...values,
     id: reviewId,
     authorName,
+    pendingReasons: pendingReasons.length ? pendingReasons : null,
     status,
   });
   if (status === "pending") {

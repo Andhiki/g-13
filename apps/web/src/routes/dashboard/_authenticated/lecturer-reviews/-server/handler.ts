@@ -1,54 +1,39 @@
 import { createServerFn } from "@tanstack/react-start";
-import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db/client";
-import { runServerOperation } from "@/server/server-function-error";
 import { authorize } from "@/server/auth-middleware";
-import { moderationPageSchema, moderationReviewSchema } from "../-shared/schemas";
+import { loadAdminPage, runAdminOperation } from "../../-server/admin-handler";
+import { MODERATION_ERRORS, type ModerationOperationError } from "../-shared/errors";
 import { moderateReviewSchema } from "../-shared/moderation";
-import { rejectModerationOperation } from "./failures";
+import { moderationPageSchema, moderationReviewSchema } from "../-shared/schemas";
 import { inspectReview, inspectReviews, moderateLecturerReview } from "./service";
+
+const moderationErrorStatuses = {
+  [MODERATION_ERRORS.FORBIDDEN]: 403,
+  [MODERATION_ERRORS.REVIEW_ACTION_UNAVAILABLE]: 409,
+} satisfies Record<ModerationOperationError, number>;
 
 export const loadModerationReviews = createServerFn({ method: "GET" })
   .middleware([authorize("moderate")])
   .validator(moderationPageSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      inspectReviews(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
-    );
-    if (result.error !== null) rejectModerationOperation(result.error);
-    return {
-      ...result.data,
-      identity: {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        role: session.user.role,
-        image: session.user.image,
-      },
-    };
-  });
+  .handler(({ data, context: { session } }) =>
+    loadAdminPage(session.user, moderationErrorStatuses, (db) =>
+      inspectReviews(db, session.user, data.offset, data.status, data.query),
+    ),
+  );
 
 export const loadModerationReview = createServerFn({ method: "GET" })
   .middleware([authorize("moderate")])
   .validator(moderationReviewSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      inspectReview(createDatabase(env.DB), session.user, data.reviewId),
-    );
-    if (result.error !== null) rejectModerationOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(moderationErrorStatuses, (db) =>
+      inspectReview(db, session.user, data.reviewId),
+    ),
+  );
 
 export const changeReviewVisibility = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
   .validator(moderateReviewSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      moderateLecturerReview(createDatabase(env.DB), session.user, data),
-    );
-    if (result.error !== null) rejectModerationOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(moderationErrorStatuses, (db) =>
+      moderateLecturerReview(db, session.user, data),
+    ),
+  );

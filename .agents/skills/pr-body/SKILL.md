@@ -9,7 +9,7 @@ Read `.github/PULL_REQUEST_TEMPLATE.md`, then inspect the diff against the inten
 base branch. For an existing PR, include all changes in its final scope rather
 than only the latest commit. Use `CONTEXT.md` for curriculum terminology.
 
-Fill the repository template in Indonesian or the language requested by the user.
+Fill the repository template in English, whatever language the conversation uses.
 Lead with the user-visible problem and resulting behavior. Keep small PRs brief;
 include a before/after example when it makes the change easier to assess.
 

@@ -1,41 +1,27 @@
 import { createServerFn } from "@tanstack/react-start";
-import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db/client";
 import { authorize } from "@/server/auth-middleware";
-import { runServerOperation } from "@/server/server-function-error";
+import { loadAdminPage, runAdminOperation } from "../../-server/admin-handler";
+import { USER_ERRORS, type UserOperationError } from "../-shared/errors";
 import { assignRoleSchema, userPageSchema } from "../-shared/schemas";
-import { rejectUserOperation } from "./failures";
 import { approveUserRole, inspectUsers } from "./service";
+
+const userErrorStatuses = {
+  [USER_ERRORS.FORBIDDEN]: 403,
+  [USER_ERRORS.USER_NOT_FOUND]: 404,
+} satisfies Record<UserOperationError, number>;
 
 export const loadAdminUsers = createServerFn({ method: "GET" })
   .middleware([authorize("manage-users")])
   .validator(userPageSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      inspectUsers(createDatabase(env.DB), session.user, data.offset, data.status),
-    );
-    if (result.error !== null) rejectUserOperation(result.error);
-    return {
-      ...result.data,
-      identity: {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        role: session.user.role,
-        image: session.user.image,
-      },
-    };
-  });
+  .handler(({ data, context: { session } }) =>
+    loadAdminPage(session.user, userErrorStatuses, (db) =>
+      inspectUsers(db, session.user, data.offset, data.status),
+    ),
+  );
 
 export const changeUserRole = createServerFn({ method: "POST" })
   .middleware([authorize("manage-users")])
   .validator(assignRoleSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      approveUserRole(createDatabase(env.DB), session.user, data),
-    );
-    if (result.error !== null) rejectUserOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(userErrorStatuses, (db) => approveUserRole(db, session.user, data)),
+  );

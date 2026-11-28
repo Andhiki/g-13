@@ -188,7 +188,11 @@ function ModerationNavItem({
 }) {
   const { to, label, Icon } = section;
   const link = (
-    <Link to={to} className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}>
+    <Link
+      to={to}
+      activeOptions={{ exact: true, includeSearch: false }}
+      className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}
+    >
       <Icon className="size-4 shrink-0" />
       <span className="truncate">{label}</span>
     </Link>
@@ -208,12 +212,14 @@ function ModerationNavSections({
   return (
     <nav aria-label="Moderation sections" className="space-y-4">
       {groups.map((group) => (
-        <div key={group.heading} className="space-y-1">
-          <div className="px-2.5">
-            <Typography variant="caption" color="muted">
-              {group.heading}
-            </Typography>
-          </div>
+        <div key={group.heading ?? "home"} className="space-y-1">
+          {group.heading && (
+            <div className="px-2.5">
+              <Typography variant="caption" color="muted">
+                {group.heading}
+              </Typography>
+            </div>
+          )}
           <div className="space-y-0.5">
             {group.items.map((section) => (
               <ModerationNavItem

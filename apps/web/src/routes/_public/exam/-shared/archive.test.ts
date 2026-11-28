@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
-import { browseArchive, paperLinks, resolveArchive } from "./archive";
+import { browseArchive, loadExamCourse, paperLinks, resolveArchive } from "./archive";
 import { folderSearch, validateArchiveSearch } from "./search";
-import type { ArchiveLocation, ExamCourse } from "./contracts";
+import type { ArchiveSearch } from "./search";
+import type { ArchiveLocation, ExamCourse, ExamCourseEntry } from "./contracts";
 
 const catalog = [
   {
@@ -31,26 +32,30 @@ const catalog = [
   { id: "agama", name: "Agama Hindu", sourceFolderId: "agama", createdAt: null, years: [] },
 ] satisfies ExamCourse[];
 
+const opened = (id: string | undefined) => catalog.find((course) => course.id === id) ?? null;
+const open = (location: ArchiveLocation) => ({ catalog, location, course: opened(location[0]) });
+const resolve = (search: ArchiveSearch) => resolveArchive(search, opened(search.course));
+
 test("course search ignores years and filenames and preserves empty courses", () => {
-  expect(browseArchive({ catalog, location: [] }).entries.map((entry) => entry.name)).toEqual([
+  expect(browseArchive(open([])).entries.map((entry) => entry.name)).toEqual([
     "Agama Hindu",
     "Basis Data",
   ]);
   expect(
-    browseArchive({ catalog, location: [], query: "  BASIS  " }).entries.map((entry) => entry.id),
+    browseArchive({ ...open([]), query: "  BASIS  " }).entries.map((entry) => entry.id),
   ).toEqual(["basis-data"]);
-  expect(browseArchive({ catalog, location: [], query: "UTS" }).entries).toEqual([]);
-  expect(browseArchive({ catalog, location: [], query: "2024" }).entries).toEqual([]);
-  expect(browseArchive({ catalog, location: ["agama"] }).entries).toEqual([]);
+  expect(browseArchive({ ...open([]), query: "UTS" }).entries).toEqual([]);
+  expect(browseArchive({ ...open([]), query: "2024" }).entries).toEqual([]);
+  expect(browseArchive(open(["agama"])).entries).toEqual([]);
 });
 
 test("course search handles punctuation, word order, and typos", () => {
   for (const query of ["basis-data", "data basis", "bais data", "basiss data", "baiss data"]) {
-    expect(
-      browseArchive({ catalog, location: [], query }).entries.map((entry) => entry.id),
-    ).toEqual(["basis-data"]);
+    expect(browseArchive({ ...open([]), query }).entries.map((entry) => entry.id)).toEqual([
+      "basis-data",
+    ]);
   }
-  expect(browseArchive({ catalog, location: [], query: "---" }).entries).toEqual([]);
+  expect(browseArchive({ ...open([]), query: "---" }).entries).toEqual([]);
 });
 
 test("course search ranks close matches and supports aliases and incomplete typos", () => {
@@ -88,12 +93,14 @@ test("course search ranks close matches and supports aliases and incomplete typo
 });
 
 test("folder navigation sorts years newest first and resolves papers without filtering filenames", () => {
-  expect(
-    browseArchive({ catalog, location: ["basis-data"] }).entries.map((entry) => entry.name),
-  ).toEqual(["2024", "2023", "Tanpa tahun"]);
+  expect(browseArchive(open(["basis-data"])).entries.map((entry) => entry.name)).toEqual([
+    "2024",
+    "2023",
+    "Tanpa tahun",
+  ]);
   expect(catalog[0].years.map((year) => year.name)).toEqual(["2023", "2024", "Tanpa tahun"]);
-  expect(browseArchive({ catalog, location: ["basis-data", "2023"] }).entries).toEqual([]);
-  const folder = browseArchive({ catalog, location: ["basis-data", "2024"], query: "no match" });
+  expect(browseArchive(open(["basis-data", "2023"])).entries).toEqual([]);
+  const folder = browseArchive({ ...open(["basis-data", "2024"]), query: "no match" });
   expect(folder.breadcrumbs).toEqual([
     { name: "Arsip Ujian", location: [] },
     { name: "Basis Data", location: ["basis-data"] },
@@ -118,10 +125,10 @@ test("parent navigation goes up one folder, including empty folders, and stops a
     { location: ["agama"], parent: [] },
   ];
   for (const { location, parent } of cases) {
-    const folder = browseArchive({ catalog, location });
+    const folder = browseArchive(open(location));
     expect(folder.breadcrumbs.at(-2)?.location).toEqual(parent);
     if (parent) {
-      expect(resolveArchive(folderSearch(parent), catalog).location).toEqual(parent);
+      expect(resolve(folderSearch(parent)).location).toEqual(parent);
     }
   }
 });
@@ -136,21 +143,41 @@ test("URL validation drops malformed input and resolves papers only inside the r
     validateArchiveSearch({ course: "basis-data", year: 2024, file: "https://example.com" }),
   ).toEqual({ course: "basis-data", year: "2024", file: undefined });
   const search = validateArchiveSearch({ course: "basis-data", year: 2024, file: "pdf-id" });
-  const resolved = resolveArchive(search, catalog);
+  const resolved = resolve(search);
   expect(resolved.location).toEqual(["basis-data", "2024"]);
   expect(resolved.paper?.id).toBe("pdf-id");
   expect(folderSearch(resolved.location)).toEqual({ course: "basis-data", year: "2024" });
-  expect(resolveArchive({ ...search, course: "agama" }, catalog)).toEqual({
+  expect(resolve({ ...search, course: "agama" })).toEqual({
     location: ["agama"],
     paper: null,
   });
-  expect(resolveArchive({ ...search, year: "2023" }, catalog).paper).toBeNull();
-  expect(resolveArchive({ ...search, course: "missing" }, catalog)).toEqual({
+  expect(resolve({ ...search, year: "2023" }).paper).toBeNull();
+  expect(resolve({ ...search, course: "missing" })).toEqual({
     location: [],
     paper: null,
   });
-  expect(resolveArchive({ ...search, file: "missing" }, catalog)).toEqual({
+  expect(resolve({ ...search, file: "missing" })).toEqual({
     location: ["basis-data", "2024"],
     paper: null,
   });
+});
+
+test("a course's paper metadata loads on demand and an unopened course stays a summary", async () => {
+  let loads = 0;
+  const entries: ExamCourseEntry[] = catalog.map(({ sourceFolderId, years, ...summary }) => ({
+    ...summary,
+    load: async () => {
+      loads++;
+      return { default: { sourceFolderId, years } };
+    },
+  }));
+  expect(browseArchive({ catalog: entries, location: [] }).entries).toHaveLength(2);
+  expect(loads).toBe(0);
+  expect(await loadExamCourse("basis-data", entries)).toEqual(catalog[0]);
+  expect(await loadExamCourse("missing", entries)).toBeNull();
+  expect(await loadExamCourse(undefined, entries)).toBeNull();
+  expect(loads).toBe(1);
+  // A course folder whose metadata has not loaded falls back to the root.
+  expect(browseArchive({ catalog, location: ["basis-data"] }).breadcrumbs).toHaveLength(1);
+  expect(resolveArchive({ course: "basis-data", year: "2024" }, null).location).toEqual([]);
 });

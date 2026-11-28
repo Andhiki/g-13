@@ -15,8 +15,12 @@ import {
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import type { loadModerationReviews } from "../-server/handler";
+import { createSearchHighlight } from "../../-client/search-highlight";
 import type { ModerateReviewInput } from "../-shared/moderation";
+import { reviewSearchFields } from "../-shared/schemas";
 import { ReviewStatusBadge } from "./ReviewStatusBadge";
+
+const Highlight = createSearchHighlight(reviewSearchFields);
 
 export const reviewTableColumns = "lg:grid-cols-[minmax(190px,1.05fr)_minmax(0,2fr)_104px_148px]";
 
@@ -38,7 +42,8 @@ export function AdminReviewRow({
   const label = `${review.lecturerName} · ${review.authorName}`;
   const overall = (review.clarity + review.support + review.organization) / 3;
   const ratingDetails = `Clarity ${review.clarity}/5 · Support ${review.support}/5 · Organization ${review.organization}/5`;
-  const courseName = language === "en" ? review.courseNameEn : review.courseNameId;
+  const courseNameField = language === "en" ? "courseNameEn" : "courseNameId";
+  const courseName = review[courseNameField];
 
   return (
     <AdminTableRow
@@ -53,7 +58,7 @@ export function AdminReviewRow({
             selected={selected}
             onSelect={onSelect}
           >
-            {review.lecturerName}
+            <Highlight field="lecturerName">{review.lecturerName}</Highlight>
           </AdminTableInspectButton>
           <ReviewStatusBadge status={review.status} deleted={deleted} />
         </div>
@@ -64,9 +69,15 @@ export function AdminReviewRow({
           ratingDetails={ratingDetails}
         />
         <div className="hidden lg:contents lg:[&>span]:mb-1">
-          <CourseChip muted code={review.courseCode} name={courseName} />
+          <CourseChip
+            muted
+            code={review.courseCode}
+            name={courseName}
+            codeContent={<Highlight field="courseCode">{review.courseCode}</Highlight>}
+            nameContent={<Highlight field={courseNameField}>{courseName}</Highlight>}
+          />
           <Typography variant="caption" color="muted" className="block truncate">
-            {review.termLabel}
+            <Highlight field="termLabel">{review.termLabel}</Highlight>
           </Typography>
         </div>
       </div>
@@ -96,10 +107,10 @@ function ReviewDesktopExcerpt({ review }: { review: Review }) {
           "whitespace-pre-wrap break-words text-[13px] xl:line-clamp-2"
         }
       >
-        {review.body}
+        <Highlight field="body">{review.body}</Highlight>
       </Typography>
       <Typography variant="caption" color="muted" className="mt-1 block">
-        {review.authorName}
+        <Highlight field="authorName">{review.authorName}</Highlight>
       </Typography>
     </div>
   );
@@ -127,10 +138,11 @@ function ReviewMobileMeta({
         {overall.toFixed(1)}
       </span>
       <span className="shrink-0 font-mono" title={`${courseName} · ${review.termLabel}`}>
-        {review.courseCode}
+        <Highlight field="courseCode">{review.courseCode}</Highlight>
       </span>
       <span className="truncate" title={excerpt}>
-        · {excerpt}
+        · <Highlight field="authorName">{review.authorName}</Highlight> ·{" "}
+        <Highlight field="body">{review.body}</Highlight>
       </span>
     </AdminTableMeta>
   );

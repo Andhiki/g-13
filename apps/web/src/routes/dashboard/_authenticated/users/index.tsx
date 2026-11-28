@@ -139,6 +139,7 @@ function UsersContent({
     <AdminInspectorLayout
       title="Account details"
       desktopOpen={detailsVisible}
+      pending={users.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -247,7 +248,7 @@ function AdminUsersPage() {
     visibleRows.find((user) => user.id === selectedUserId) ??
     visibleRows.find((user) => !canModerate(user.role)) ??
     visibleRows[0];
-  const detailsVisible = detailsOpen && !!selectedUser && !users.isPending && !users.isError;
+  const detailsVisible = detailsOpen && !users.isError && (users.isPending || !!selectedUser);
   const mutation = useMutation({
     mutationFn: (input: AssignRoleInput) => changeUserRole({ data: input }),
     onSuccess: async () => {
@@ -292,7 +293,7 @@ function AdminUsersPage() {
         }}
       >
         <DetailsToggleButton
-          available={!!selectedUser}
+          available={users.isPending || !!selectedUser}
           visible={detailsVisible}
           onToggle={() => setDetailsOpen((open) => !open)}
         />
