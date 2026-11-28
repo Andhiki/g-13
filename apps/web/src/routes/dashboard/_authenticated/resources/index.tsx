@@ -1,11 +1,6 @@
-import { useAdminSearch } from "../-client/useAdminSearch";
-import {
-  getNextAdminPageOffset,
-  getPreviousAdminPageOffset,
-  hasNextAdminPage,
-} from "../-shared/admin-pagination";
+import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   closestCenter,
@@ -494,8 +489,19 @@ function ResourcesModals({
 function AdminResourcesPage() {
   const initialData = Route.useLoaderData();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<ResourceStatus>("active");
+  const {
+    query,
+    setQuery,
+    needle,
+    offset,
+    status,
+    setStatus,
+    counts,
+    listState,
+    rows: basePageRows,
+    total,
+    page,
+  } = useAdminList("active", adminResourcesQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
@@ -509,13 +515,6 @@ function AdminResourcesPage() {
   } | null>(null);
 
   const queryClient = useQueryClient();
-  const resourcesQuery = useQuery(adminResourcesQuery(offset, status, needle));
-  const counts = resourcesQuery.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || resourcesQuery.isPending,
-    isError: !searchPending && resourcesQuery.isError,
-  };
-  const basePageRows = searchPending ? [] : (resourcesQuery.data?.rows ?? []);
   const visibleRows =
     !needle && orderedIds
       ? orderedIds
@@ -524,7 +523,6 @@ function AdminResourcesPage() {
       : basePageRows;
 
   const count = visibleRows.length;
-  const total = resourcesQuery.data?.total ?? 0;
   const selectedResource =
     visibleRows.find((resource) => resource.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
@@ -554,7 +552,6 @@ function AdminResourcesPage() {
       setFormModal({ open: false, resource: null });
       if (result.created) {
         setStatus("active");
-        setOffset(0);
         setSelectedId(result.id);
       }
     },
@@ -615,7 +612,6 @@ function AdminResourcesPage() {
         detailsVisible={detailsVisible}
         onStatusChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
           setOrderedIds(null);
         }}
@@ -641,19 +637,18 @@ function AdminResourcesPage() {
         sortable={sortable}
         reorderError={reorderMutation.isError}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        hasNext={hasNextAdminPage(offset, total)}
+        hasNext={page.hasNext}
         onPreviousPage={() => {
           setOrderedIds(null);
-          setOffset(getPreviousAdminPageOffset(offset));
+          page.previous();
         }}
         onNextPage={() => {
           setOrderedIds(null);
-          setOffset(getNextAdminPageOffset(offset));
+          page.next();
         }}
         onClearSearch={() => setQuery("")}
         onViewActive={() => {
           setStatus("active");
-          setOffset(0);
           setSelectedId(null);
           setOrderedIds(null);
         }}

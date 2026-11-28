@@ -1,5 +1,6 @@
 import { canModerate } from "@g13/auth";
 import type { createDatabase } from "@g13/db/client";
+import { courses } from "@g13/db/schema/courses";
 import { COURSE_ADMIN_ERRORS, type CourseAdminResult } from "../-shared/errors";
 import type {
   CourseLifecycleInput,
@@ -10,19 +11,25 @@ import type {
 import {
   courseCodeExists,
   createCourseRecord,
-  getAdminCourseCounts,
-  listAdminCourses,
   setCourseDeletedState,
   updateCourseRecord,
+  adminCourseSearchColumns,
+  countAdminCourses,
+  selectAdminCourseRows,
 } from "./repository";
+import {
+  loadAdminList,
+  softDeleteCondition,
+  softDeleteStatuses,
+  type AdminListData,
+} from "../../-server/admin-list";
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
-type CourseListData = {
-  rows: Awaited<ReturnType<typeof listAdminCourses>>;
-  counts: Awaited<ReturnType<typeof getAdminCourseCounts>>;
-  total: number;
-};
+type CourseListData = AdminListData<
+  CourseStatus,
+  Awaited<ReturnType<typeof selectAdminCourseRows>>[number]
+>;
 
 export async function inspectCourses(
   db: Database,
@@ -31,13 +38,19 @@ export async function inspectCourses(
   status: CourseStatus = "active",
   query = "",
 ): Promise<CourseAdminResult<CourseListData>> {
-  if (!canModerate(actor.role)) return { data: null, error: COURSE_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, matchingCounts] = await Promise.all([
-    listAdminCourses(db, offset, status, query),
-    getAdminCourseCounts(db),
-    query ? getAdminCourseCounts(db, query) : undefined,
-  ]);
-  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
+  const data = await loadAdminList(
+    {
+      canView: canModerate,
+      statuses: softDeleteStatuses,
+      statusCondition: softDeleteCondition(courses.deletedAt),
+      searchColumns: adminCourseSearchColumns,
+      rows: (where, page) => selectAdminCourseRows(db, where, page),
+      count: (counts, where) => countAdminCourses(db, counts, where),
+    },
+    actor,
+    { offset, status, query },
+  );
+  return data ? { data, error: null } : { data: null, error: COURSE_ADMIN_ERRORS.FORBIDDEN };
 }
 
 export async function createCourse(

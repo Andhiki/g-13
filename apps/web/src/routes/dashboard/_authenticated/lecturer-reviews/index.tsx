@@ -1,9 +1,4 @@
-import { useAdminSearch } from "../-client/useAdminSearch";
-import {
-  getNextAdminPageOffset,
-  getPreviousAdminPageOffset,
-  hasNextAdminPage,
-} from "../-shared/admin-pagination";
+import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -306,8 +301,21 @@ function LecturerReviewsPage() {
   const initialData = Route.useLoaderData();
   const { review: linkedReviewId } = Route.useSearch();
   const { detailsOpen, setDetailsOpen } = useAdminLayout();
-  const { query, setQuery, needle, offset, setOffset, searchPending } = useAdminSearch();
-  const [status, setStatus] = useState<ReviewStatus>("all");
+  const {
+    query,
+    setQuery,
+    needle,
+    searchPending,
+    offset,
+    status,
+    setStatus,
+    result: reviews,
+    counts,
+    listState,
+    rows: visibleRows,
+    total,
+    page,
+  } = useAdminList("all", moderationReviewsQuery, initialData.counts);
   const [selectedId, setSelectedId] = useState<string | null>(linkedReviewId ?? null);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(!!linkedReviewId);
   const [syncedLinkId, setSyncedLinkId] = useState(linkedReviewId);
@@ -318,16 +326,8 @@ function LecturerReviewsPage() {
   }
   const [confirmation, setConfirmation] = useState<ReviewConfirmation | null>(null);
   const queryClient = useQueryClient();
-  const reviews = useQuery(moderationReviewsQuery(offset, status, needle));
-  const counts = reviews.data?.counts ?? initialData.counts;
-  const listState = {
-    isPending: searchPending || reviews.isPending,
-    isError: !searchPending && reviews.isError,
-  };
-  const visibleRows = searchPending ? [] : (reviews.data?.rows ?? []);
 
   const count = visibleRows.length;
-  const total = reviews.data?.total ?? 0;
   // A notification can link to a review outside the loaded page; load it directly rather
   // than falling back to an unrelated row the moderator might act on by mistake.
   const linkedOffPage =
@@ -398,7 +398,6 @@ function LecturerReviewsPage() {
         tabLabelClassName="capitalize"
         onTabChange={(value) => {
           setStatus(value);
-          setOffset(0);
           setSelectedId(null);
         }}
       >
@@ -417,13 +416,12 @@ function LecturerReviewsPage() {
         detailsVisible={detailsVisible}
         mobileDetailsOpen={mobileDetailsOpen}
         onMobileDetailsOpenChange={setMobileDetailsOpen}
-        hasNext={hasNextAdminPage(offset, total)}
-        onPreviousPage={() => setOffset(getPreviousAdminPageOffset(offset))}
-        onNextPage={() => setOffset(getNextAdminPageOffset(offset))}
+        hasNext={page.hasNext}
+        onPreviousPage={page.previous}
+        onNextPage={page.next}
         onClearSearch={() => setQuery("")}
         onViewAll={() => {
           setStatus("all");
-          setOffset(0);
           setSelectedId(null);
         }}
         onSelectReview={(id) => {

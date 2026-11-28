@@ -10,12 +10,19 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from "../-shared/schemas";
-import { hasValidScheduleWindow } from "@/routes/-announcements/schedule";
+import {
+  announcementStatusCondition,
+  announcementStatuses,
+  hasValidScheduleWindow,
+  type AnnouncementStatus,
+} from "@/routes/-announcements/schedule";
+import { loadAdminList, type AdminListData } from "../../-server/admin-list";
 import {
   createAnnouncementRecord,
   deleteAnnouncement,
-  getAnnouncementCounts,
-  listAdminAnnouncements,
+  adminAnnouncementSearchColumns,
+  countAdminAnnouncements,
+  selectAdminAnnouncements,
   setAnnouncementEnabled,
   updateAnnouncementRecord,
   type AnnouncementWrite,
@@ -36,28 +43,32 @@ function writeResult<T>(
   return { data: data(write), error: null };
 }
 
-export type AnnouncementListData = {
-  rows: Awaited<ReturnType<typeof listAdminAnnouncements>>;
-  counts: Awaited<ReturnType<typeof getAnnouncementCounts>>;
-  total: number;
-};
+export type AnnouncementListData = AdminListData<
+  AnnouncementStatus,
+  Awaited<ReturnType<typeof selectAdminAnnouncements>>[number]
+>;
 
 export async function inspectAnnouncements(
   db: Database,
   actor: Actor,
   offset = 0,
-  status: "live" | "scheduled" | "expired" | "disabled" = "live",
+  status: AnnouncementStatus = "live",
   query = "",
   now = new Date(),
 ): Promise<AnnouncementAdminResult<AnnouncementListData>> {
-  if (!canManageUsers(actor.role))
-    return { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, matchingCounts] = await Promise.all([
-    listAdminAnnouncements(db, offset, status, now, query),
-    getAnnouncementCounts(db, now),
-    query ? getAnnouncementCounts(db, now, query) : undefined,
-  ]);
-  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
+  const data = await loadAdminList(
+    {
+      canView: canManageUsers,
+      statuses: announcementStatuses,
+      statusCondition: (tab) => announcementStatusCondition(tab, now.getTime()),
+      searchColumns: adminAnnouncementSearchColumns,
+      rows: (where, page) => selectAdminAnnouncements(db, where, page),
+      count: (counts, where) => countAdminAnnouncements(db, counts, where),
+    },
+    actor,
+    { offset, status, query },
+  );
+  return data ? { data, error: null } : { data: null, error: ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN };
 }
 
 export async function createAnnouncement(

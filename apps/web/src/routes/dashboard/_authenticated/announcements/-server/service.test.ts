@@ -2,7 +2,6 @@ import { expect, it } from "bun:test";
 import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { getActiveAnnouncements } from "@/routes/_public/-announcements/service";
-import { getAnnouncementCounts, listAdminAnnouncements } from "./repository";
 import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
 import { createTestPlatformProxy } from "@/test/database";
 import { announcementFieldsShape } from "../-shared/schemas";
@@ -292,9 +291,11 @@ it("uses the same inclusive-start and exclusive-end instant for public and dashb
     const at = new Date(now);
 
     const publicRows = await getActiveAnnouncements(db, now);
-    const liveRows = await listAdminAnnouncements(db, 0, "live", at);
-    const expiredRows = await listAdminAnnouncements(db, 0, "expired", at);
-    const counts = await getAnnouncementCounts(db, at);
+    const liveRows = resultData(await inspectAnnouncements(db, admin, 0, "live", "", at)).rows;
+    const expiredRows = resultData(
+      await inspectAnnouncements(db, admin, 0, "expired", "", at),
+    ).rows;
+    const { counts } = resultData(await inspectAnnouncements(db, admin, 0, "live", "", at));
 
     expect(publicRows.map(({ id }) => id)).toEqual([startsNow.id]);
     expect(liveRows.map(({ id }) => id)).toEqual([startsNow.id]);

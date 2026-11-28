@@ -1,5 +1,6 @@
 import { canModerate } from "@g13/auth";
 import type { createDatabase } from "@g13/db/client";
+import { lecturers } from "@g13/db/schema/lecturers";
 import { LECTURER_ADMIN_ERRORS, type LecturerAdminResult } from "../-shared/errors";
 import type {
   CreateLecturerInput,
@@ -9,19 +10,25 @@ import type {
 } from "../-shared/schemas";
 import {
   createLecturerRecord,
-  getAdminLecturerCounts,
-  listAdminLecturers,
   setLecturerDeletedState,
   updateLecturerRecord,
+  adminLecturerSearchColumns,
+  countAdminLecturers,
+  selectAdminLecturerRows,
 } from "./repository";
+import {
+  loadAdminList,
+  softDeleteCondition,
+  softDeleteStatuses,
+  type AdminListData,
+} from "../../-server/admin-list";
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
-type LecturerListData = {
-  rows: Awaited<ReturnType<typeof listAdminLecturers>>;
-  counts: Awaited<ReturnType<typeof getAdminLecturerCounts>>;
-  total: number;
-};
+type LecturerListData = AdminListData<
+  LecturerStatus,
+  Awaited<ReturnType<typeof selectAdminLecturerRows>>[number]
+>;
 
 export async function inspectLecturers(
   db: Database,
@@ -30,13 +37,19 @@ export async function inspectLecturers(
   status: LecturerStatus = "active",
   query = "",
 ): Promise<LecturerAdminResult<LecturerListData>> {
-  if (!canModerate(actor.role)) return { data: null, error: LECTURER_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, matchingCounts] = await Promise.all([
-    listAdminLecturers(db, offset, status, query),
-    getAdminLecturerCounts(db),
-    query ? getAdminLecturerCounts(db, query) : undefined,
-  ]);
-  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
+  const data = await loadAdminList(
+    {
+      canView: canModerate,
+      statuses: softDeleteStatuses,
+      statusCondition: softDeleteCondition(lecturers.deletedAt),
+      searchColumns: adminLecturerSearchColumns,
+      rows: (where, page) => selectAdminLecturerRows(db, where, page),
+      count: (counts, where) => countAdminLecturers(db, counts, where),
+    },
+    actor,
+    { offset, status, query },
+  );
+  return data ? { data, error: null } : { data: null, error: LECTURER_ADMIN_ERRORS.FORBIDDEN };
 }
 
 export async function createLecturer(

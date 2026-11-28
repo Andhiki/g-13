@@ -1,27 +1,21 @@
-import { adminSearchCondition } from "../../-server/search";
-import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
-import { and, asc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
 import type {
   CourseLifecycleInput,
-  CourseStatus,
   CreateCourseInput,
   UpdateCourseInput,
 } from "../-shared/schemas";
 
 type Database = ReturnType<typeof createDatabase>;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, [courses.code, courses.nameId, courses.nameEn, courses.id]);
-}
+export const adminCourseSearchColumns = [courses.code, courses.nameId, courses.nameEn, courses.id];
 
-export async function listAdminCourses(
+export async function selectAdminCourseRows(
   db: Database,
-  offset: number,
-  status: CourseStatus,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select({
@@ -34,27 +28,20 @@ export async function listAdminCourses(
     })
     .from(courses)
     .leftJoin(reviews, eq(reviews.courseId, courses.id))
-    .where(
-      and(
-        status === "active" ? isNull(courses.deletedAt) : isNotNull(courses.deletedAt),
-        searchCondition(query),
-      ),
-    )
+    .where(where)
     .groupBy(courses.id)
     .orderBy(asc(courses.code), asc(courses.id))
-    .limit(ADMIN_PAGE_SIZE)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
-export async function getAdminCourseCounts(db: Database, query = "") {
-  const [counts] = await db
-    .select({
-      active: sql<number>`coalesce(sum(case when ${courses.deletedAt} is null then 1 else 0 end), 0)`,
-      deleted: sql<number>`coalesce(sum(case when ${courses.deletedAt} is not null then 1 else 0 end), 0)`,
-    })
-    .from(courses)
-    .where(searchCondition(query));
-  return counts;
+export async function countAdminCourses(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db.select(counts).from(courses).where(where);
+  return result;
 }
 
 export async function courseCodeExists(db: Database, code: string): Promise<boolean> {

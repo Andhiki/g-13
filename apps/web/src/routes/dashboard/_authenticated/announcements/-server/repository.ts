@@ -1,5 +1,3 @@
-import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
-import { adminSearchCondition } from "../../-server/search";
 import {
   and,
   desc,
@@ -16,11 +14,7 @@ import { announcements } from "@g13/db/schema/announcements";
 import type { createDatabase } from "@g13/db/client";
 import type { BatchItem } from "drizzle-orm/batch";
 import type { CreateAnnouncementInput, UpdateAnnouncementInput } from "../-shared/schemas";
-import {
-  announcementStatusCondition,
-  enabledAnnouncementOverlapCondition,
-  type AnnouncementStatus,
-} from "@/routes/-announcements/schedule";
+import { enabledAnnouncementOverlapCondition } from "@/routes/-announcements/schedule";
 
 import type { AnnouncementConflict } from "../-shared/errors";
 
@@ -28,47 +22,33 @@ export type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConfli
 
 type Database = ReturnType<typeof createDatabase>;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    announcements.id,
-    announcements.titleId,
-    announcements.titleEn,
-  ]);
-}
+export const adminAnnouncementSearchColumns = [
+  announcements.id,
+  announcements.titleId,
+  announcements.titleEn,
+];
 
-function statusCondition(status: AnnouncementStatus, now: Date): SQL {
-  return announcementStatusCondition(status, now.getTime());
-}
-
-export async function listAdminAnnouncements(
+export async function selectAdminAnnouncements(
   db: Database,
-  offset: number,
-  status: AnnouncementStatus,
-  now: Date,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select()
     .from(announcements)
-    .where(and(statusCondition(status, now), searchCondition(query)))
+    .where(where)
     .orderBy(desc(announcements.startsAt), desc(announcements.id))
-    .limit(ADMIN_PAGE_SIZE)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
-export async function getAnnouncementCounts(db: Database, now: Date, query = "") {
-  const count = (status: AnnouncementStatus) =>
-    sql<number>`coalesce(sum(case when ${statusCondition(status, now)} then 1 else 0 end), 0)`;
-  const [counts] = await db
-    .select({
-      live: count("live"),
-      scheduled: count("scheduled"),
-      expired: count("expired"),
-      disabled: count("disabled"),
-    })
-    .from(announcements)
-    .where(searchCondition(query));
-  return counts;
+export async function countAdminAnnouncements(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db.select(counts).from(announcements).where(where);
+  return result;
 }
 
 function announcementValues(input: CreateAnnouncementInput) {
