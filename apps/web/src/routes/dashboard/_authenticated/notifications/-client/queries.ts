@@ -1,8 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { loadNotifications } from "../-server/handler";
 import type { NotificationCursor, NotificationFilter } from "../-shared/schemas";
+import {
+  ADMIN_STALE_TIME,
+  adminRefetchOnFocus,
+} from "@/routes/dashboard/_authenticated/-client/admin-query";
 
-const dashboardStaleTime = 5 * 60 * 1000;
 const firstPage: NotificationCursor | null = null;
 
 export const notificationReadMutationKey = ["notifications", "mark-read"];
@@ -14,8 +17,8 @@ export function notificationsQuery(filter: NotificationFilter = "all") {
       loadNotifications({ data: { cursor: pageParam, filter } }),
     initialPageParam: firstPage,
     getNextPageParam: (page) => page.nextCursor,
-    staleTime: dashboardStaleTime,
-    refetchOnWindowFocus: false,
+    staleTime: ADMIN_STALE_TIME,
+    refetchOnWindowFocus: adminRefetchOnFocus,
   });
 }
 
@@ -23,7 +26,7 @@ export function notificationPopoverQuery() {
   return queryOptions({
     queryKey: ["notifications", "popover"],
     queryFn: () => loadNotifications({ data: { filter: "unread" } }),
-    staleTime: dashboardStaleTime,
-    refetchOnWindowFocus: false,
+    staleTime: ADMIN_STALE_TIME,
+    refetchOnWindowFocus: adminRefetchOnFocus,
   });
 }

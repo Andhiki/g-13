@@ -17,7 +17,7 @@ export const Route = createFileRoute("/dashboard/login/")({
       return { identity: null };
     }
     const identity = await loadAdminIdentity();
-    if (canModerate(identity?.role)) throw redirect({ to: "/dashboard/lecturer-reviews" });
+    if (canModerate(identity?.role)) throw redirect({ to: "/dashboard" });
     clearDashboardIdentity(context.queryClient);
     return { identity };
   },
