@@ -1,3 +1,5 @@
+import { adminSearchColumns } from "../../-server/search";
+import { lecturerSearchFields } from "../-shared/schemas";
 import { and, asc, eq, isNotNull, isNull, like, sql, type SQL } from "drizzle-orm";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -11,7 +13,10 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-export const adminLecturerSearchColumns = [lecturers.name, lecturers.id];
+export const adminLecturerSearchColumns = adminSearchColumns(lecturerSearchFields, {
+  name: lecturers.name,
+  id: lecturers.id,
+});
 
 async function allocateLecturerId(db: Database, name: string): Promise<string> {
   return allocateCatalogId(name, "lecturer", (pattern) =>

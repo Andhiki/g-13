@@ -1,3 +1,4 @@
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminList } from "../-client/useAdminList";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -131,15 +132,17 @@ function ReviewsListBody({
           }
         />
       )}
-      {visibleRows.map((review) => (
-        <AdminReviewRow
-          key={review.id}
-          review={review}
-          selected={selectedReviewId === review.id}
-          onSelect={() => onSelectReview(review.id)}
-          onAction={onAction}
-        />
-      ))}
+      <AdminSearchHighlightScope needle={needle}>
+        {visibleRows.map((review) => (
+          <AdminReviewRow
+            key={review.id}
+            review={review}
+            selected={selectedReviewId === review.id}
+            onSelect={() => onSelectReview(review.id)}
+            onAction={onAction}
+          />
+        ))}
+      </AdminSearchHighlightScope>
     </>
   );
 }

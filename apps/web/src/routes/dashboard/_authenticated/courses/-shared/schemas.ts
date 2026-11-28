@@ -44,3 +44,6 @@ export const courseLifecycleSchema = z.object({
   action: z.enum(["delete", "restore"]),
 });
 export type CourseLifecycleInput = z.infer<typeof courseLifecycleSchema>;
+
+/** Fields the admin search matches; the UI may highlight only these. */
+export const courseSearchFields = ["code", "nameId", "nameEn", "id"] as const;

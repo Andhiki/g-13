@@ -1,3 +1,5 @@
+import { adminSearchColumns } from "../../-server/search";
+import { announcementSearchFields } from "../-shared/schemas";
 import {
   and,
   desc,
@@ -22,11 +24,11 @@ export type AnnouncementWrite = { id: string } | { conflicts: AnnouncementConfli
 
 type Database = ReturnType<typeof createDatabase>;
 
-export const adminAnnouncementSearchColumns = [
-  announcements.id,
-  announcements.titleId,
-  announcements.titleEn,
-];
+export const adminAnnouncementSearchColumns = adminSearchColumns(announcementSearchFields, {
+  id: announcements.id,
+  titleId: announcements.titleId,
+  titleEn: announcements.titleEn,
+});
 
 export async function selectAdminAnnouncements(
   db: Database,

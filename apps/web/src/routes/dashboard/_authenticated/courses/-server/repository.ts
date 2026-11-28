@@ -1,3 +1,5 @@
+import { adminSearchColumns } from "../../-server/search";
+import { courseSearchFields } from "../-shared/schemas";
 import { and, asc, eq, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -10,7 +12,12 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-export const adminCourseSearchColumns = [courses.code, courses.nameId, courses.nameEn, courses.id];
+export const adminCourseSearchColumns = adminSearchColumns(courseSearchFields, {
+  code: courses.code,
+  nameId: courses.nameId,
+  nameEn: courses.nameEn,
+  id: courses.id,
+});
 
 export async function selectAdminCourseRows(
   db: Database,

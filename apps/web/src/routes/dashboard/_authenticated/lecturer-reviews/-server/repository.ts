@@ -1,3 +1,5 @@
+import { adminSearchColumns } from "../../-server/search";
+import { reviewSearchFields } from "../-shared/schemas";
 import { and, desc, eq, inArray, isNotNull, isNull, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
@@ -30,15 +32,15 @@ const transitions = {
   { from: StoredReviewStatus[]; to: StoredReviewStatus | null }
 >;
 
-export const moderationSearchColumns = [
-  lecturers.name,
-  courses.code,
-  courses.nameId,
-  courses.nameEn,
-  reviews.termLabel,
-  reviews.authorName,
-  reviews.body,
-];
+export const moderationSearchColumns = adminSearchColumns(reviewSearchFields, {
+  lecturerName: lecturers.name,
+  courseCode: courses.code,
+  courseNameId: courses.nameId,
+  courseNameEn: courses.nameEn,
+  termLabel: reviews.termLabel,
+  authorName: reviews.authorName,
+  body: reviews.body,
+});
 
 const moderationReviewColumns = {
   id: reviews.id,

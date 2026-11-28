@@ -12,8 +12,11 @@ import { formatRelativeTime } from "@/date-format";
 import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import type { loadAdminResources } from "../-server/handler";
-import type { ResourceLifecycleInput } from "../-shared/schemas";
+import { createSearchHighlight } from "../../-client/search-highlight";
+import { resourceSearchFields, type ResourceLifecycleInput } from "../-shared/schemas";
 import { ResourceFavicon, resourceHost } from "./ResourceFavicon";
+
+const Highlight = createSearchHighlight(resourceSearchFields);
 
 export const resourceTableColumns = "lg:grid-cols-[minmax(0,1fr)_220px_120px_148px]";
 
@@ -133,18 +136,19 @@ function ResourceRowIdentity({
           selected={selected}
           onSelect={onSelect}
         >
-          {resource.titleId}
+          <Highlight field="titleId">{resource.titleId}</Highlight>
         </AdminTableInspectButton>
         <div className="shrink-0 lg:hidden">
           <RecordStatusBadge deleted={resource.deletedAt !== null} />
         </div>
       </div>
       <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
-        {resource.titleEn}
+        <Highlight field="titleEn">{resource.titleEn}</Highlight>
       </Typography>
       <AdminTableMeta>
         <span className="truncate" title={`${host} · ${updated} · ${resource.titleEn}`}>
-          {host} · {updated} · {resource.titleEn}
+          <Highlight field="url">{host}</Highlight> · {updated} ·{" "}
+          <Highlight field="titleEn">{resource.titleEn}</Highlight>
         </span>
       </AdminTableMeta>
     </div>
@@ -163,7 +167,9 @@ function ResourceRowLink({ url, host, label }: { url: string; host: string; labe
         className="group flex min-w-0 items-center gap-1.5 text-label-xs text-text-sub-600 underline-offset-2 hover:text-text-strong-950 hover:underline"
       >
         <ResourceFavicon url={url} />
-        <span className="truncate">{host}</span>
+        <span className="truncate">
+          <Highlight field="url">{host}</Highlight>
+        </span>
         <RiExternalLinkLine
           aria-hidden="true"
           className="size-3.5 shrink-0 text-text-soft-400 group-hover:text-text-strong-950"
