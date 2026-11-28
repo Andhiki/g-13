@@ -1,70 +1,47 @@
 import { createServerFn } from "@tanstack/react-start";
-import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db/client";
 import { authorize } from "@/server/auth-middleware";
-import { runServerOperation } from "@/server/server-function-error";
+import { loadAdminPage, runAdminOperation } from "../../-server/admin-handler";
+import { COURSE_ADMIN_ERRORS, type CourseAdminError } from "../-shared/errors";
 import {
   courseLifecycleSchema,
   coursePageSchema,
   createCourseSchema,
   updateCourseSchema,
 } from "../-shared/schemas";
-import { rejectCourseAdminOperation } from "./failures";
 import { changeCourseLifecycle, createCourse, inspectCourses, updateCourse } from "./service";
+
+const courseErrorStatuses = {
+  [COURSE_ADMIN_ERRORS.FORBIDDEN]: 403,
+  [COURSE_ADMIN_ERRORS.COURSE_ACTION_UNAVAILABLE]: 409,
+  [COURSE_ADMIN_ERRORS.COURSE_CODE_TAKEN]: 409,
+} satisfies Record<CourseAdminError, number>;
 
 export const loadAdminCourses = createServerFn({ method: "GET" })
   .middleware([authorize("moderate")])
   .validator(coursePageSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      inspectCourses(createDatabase(env.DB), session.user, data.offset, data.status, data.query),
-    );
-    if (result.error !== null) rejectCourseAdminOperation(result.error);
-    return {
-      ...result.data,
-      identity: {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        role: session.user.role,
-        image: session.user.image,
-      },
-    };
-  });
+  .handler(({ data, context: { session } }) =>
+    loadAdminPage(session.user, courseErrorStatuses, (db) =>
+      inspectCourses(db, session.user, data.offset, data.status, data.query),
+    ),
+  );
 
 export const createAdminCourse = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
   .validator(createCourseSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      createCourse(createDatabase(env.DB), session.user, data),
-    );
-    if (result.error !== null) rejectCourseAdminOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(courseErrorStatuses, (db) => createCourse(db, session.user, data)),
+  );
 
 export const updateAdminCourse = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
   .validator(updateCourseSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      updateCourse(createDatabase(env.DB), session.user, data),
-    );
-    if (result.error !== null) rejectCourseAdminOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(courseErrorStatuses, (db) => updateCourse(db, session.user, data)),
+  );
 
 export const changeAdminCourseLifecycle = createServerFn({ method: "POST" })
   .middleware([authorize("moderate")])
   .validator(courseLifecycleSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      changeCourseLifecycle(createDatabase(env.DB), session.user, data),
-    );
-    if (result.error !== null) rejectCourseAdminOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(courseErrorStatuses, (db) => changeCourseLifecycle(db, session.user, data)),
+  );

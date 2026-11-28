@@ -1,10 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { env } from "cloudflare:workers";
-import { createDatabase } from "@g13/db/client";
-import { runServerOperation } from "@/server/server-function-error";
 import { authenticatedMiddleware } from "@/server/auth-middleware";
+import { loadAdminPage, runAdminOperation } from "../../-server/admin-handler";
+import { NOTIFICATION_ERRORS, type NotificationError } from "../-shared/errors";
 import { notificationIdSchema, notificationsPageSchema } from "../-shared/schemas";
-import { rejectNotificationOperation } from "./failures";
 import {
   archiveUserNotification,
   inspectNotifications,
@@ -12,58 +10,58 @@ import {
   readNotification,
 } from "./service";
 
+const notificationErrorStatuses = {
+  [NOTIFICATION_ERRORS.NOT_FOUND]: 404,
+  [NOTIFICATION_ERRORS.FORBIDDEN]: 403,
+} satisfies Record<NotificationError, number>;
+
+const notificationErrorMessages = {
+  [NOTIFICATION_ERRORS.NOT_FOUND]: "Notification not found",
+  [NOTIFICATION_ERRORS.FORBIDDEN]: "Access denied",
+} satisfies Record<NotificationError, string>;
+
+const rejectNotification = (status: number, error: NotificationError): never => {
+  throw new Response(notificationErrorMessages[error], { status });
+};
+
 export const loadNotifications = createServerFn({ method: "GET" })
   .middleware([authenticatedMiddleware])
   .validator(notificationsPageSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      inspectNotifications(createDatabase(env.DB), session.user, data.cursor, data.filter),
-    );
-    if (result.error !== null) rejectNotificationOperation(result.error);
-    return {
-      ...result.data,
-      identity: {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        role: session.user.role,
-        image: session.user.image,
-      },
-    };
-  });
+  .handler(({ data, context: { session } }) =>
+    loadAdminPage(
+      session.user,
+      notificationErrorStatuses,
+      (db) => inspectNotifications(db, session.user, data.cursor, data.filter),
+      { reject: rejectNotification },
+    ),
+  );
 
 export const markNotificationAsRead = createServerFn({ method: "POST" })
   .middleware([authenticatedMiddleware])
   .validator(notificationIdSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      readNotification(createDatabase(env.DB), session.user, data.notificationId),
-    );
-    if (result.error !== null) rejectNotificationOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(
+      notificationErrorStatuses,
+      (db) => readNotification(db, session.user, data.notificationId),
+      { reject: rejectNotification },
+    ),
+  );
 
 export const markAllNotificationsAsRead = createServerFn({ method: "POST" })
   .middleware([authenticatedMiddleware])
-  .handler(async ({ context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      readAllNotifications(createDatabase(env.DB), session.user),
-    );
-    if (result.error !== null) rejectNotificationOperation(result.error);
-    return result.data;
-  });
+  .handler(({ context: { session } }) =>
+    runAdminOperation(notificationErrorStatuses, (db) => readAllNotifications(db, session.user), {
+      reject: rejectNotification,
+    }),
+  );
 
 export const archiveNotificationAction = createServerFn({ method: "POST" })
   .middleware([authenticatedMiddleware])
   .validator(notificationIdSchema)
-  .handler(async ({ data, context }) => {
-    const { session } = context;
-    const result = await runServerOperation(() =>
-      archiveUserNotification(createDatabase(env.DB), session.user, data.notificationId),
-    );
-    if (result.error !== null) rejectNotificationOperation(result.error);
-    return result.data;
-  });
+  .handler(({ data, context: { session } }) =>
+    runAdminOperation(
+      notificationErrorStatuses,
+      (db) => archiveUserNotification(db, session.user, data.notificationId),
+      { reject: rejectNotification },
+    ),
+  );
