@@ -1,0 +1,233 @@
+import type { ExamCourseDetail } from "../../contracts";
+
+const course: ExamCourseDetail = {
+  sourceFolderId: "1ZzDOyJXe24v2Xl7vnz16W70_3C4dmLbd",
+  years: [
+    {
+      name: "2020",
+      createdAt: null,
+      papers: [
+        {
+          id: "1VnzBdbyvQ1Dci8GBHgHPNysi9Tc2-uFW",
+          name: "Metode Penelitian - UTS - 2020 - Reg A.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1ALpiNgKZ86uuWGwAR0dEHnxWUivMWDGU",
+          name: "Metode Penelitian - UTS - 2020 - Reg B.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1ztXrfqxVmnY3uPGCslS9ZPRjPW8WyY1e",
+          name: "MetodePenelitian - UAS - 2020 - RegA.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "15SqZZVYovMVs1cBNVrRIG5SPNnS7Gx2o",
+          name: "Metodologi Penelitian - UAS - 2020 - Reg B.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "1p06WuaKM-lFaWp6jA7c4lfndmUInJPay",
+          name: "metodologi penelitian-UAS-2020-IUP.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+      ],
+    },
+    {
+      name: "2013",
+      createdAt: null,
+      papers: [
+        {
+          id: "1LGhIPOFSILng9QJW8k8uRhDhPaY7_udJ",
+          name: "MPIK - UAS - 2013 (1).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "1YXZyKD_VxSzU4sc7_10_bQ9fL64BnUvn",
+          name: "MPIK - UAS - 2013 (2).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "1W5Ro8qPS1qOWQOOZtOKRFq30y4XcOK_L",
+          name: "MPIK - UAS - 2013 (3).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "1GjaW_X2YBFgmdMTS5EabE5cAohItpEkM",
+          name: "MPIK - UAS - 2013 (4).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+      ],
+    },
+    {
+      name: "Tanpa tahun",
+      createdAt: null,
+      papers: [
+        {
+          id: "1J6dbX_6aB0LbX5YWk9Ub7jC9lNb-lBQh",
+          name: "UAS_Metopen2.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UAS",
+          sourceFolderId: "1EufuSAia9O_e9PkI64VNxK_FjgAyhGij",
+        },
+        {
+          id: "1op92QQufx9kDkFVtMaZk92FL9nQGCK42",
+          name: "UTS_Metopen.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+    {
+      name: "2021",
+      createdAt: null,
+      papers: [
+        {
+          id: "1VfwoS6qsVWKs75DW2E_MbslHAYX5pfCv",
+          name: "Metode Penelitian CS - UTS - 2021 - IUP B.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1-3MkK0i0sE1x8OwiBzHmZuHyCjc4aX-1",
+          name: "Metodologi Penelitian Ilmu Komputer - UTS - 2021 - Reg B.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1wHPXb7gI3UNqx-Go2ZQjfLirFsMqRvog",
+          name: "Metopen - UTS - 2021 - Reg A.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+    {
+      name: "2012",
+      createdAt: null,
+      papers: [
+        {
+          id: "1OYpxyhVM2402sVkHPKZSBX7FJLPKCtNI",
+          name: "MPIK - UTS - 2012.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+    {
+      name: "2014",
+      createdAt: null,
+      papers: [
+        {
+          id: "1yz982TtvoOy49yoVZYWgj6QFNARhUbo8",
+          name: "MPIK - UTS - 2014 (1).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1yeVnvoKb3jLduHm8rbh4hnpY3B01FoD3",
+          name: "MPIK - UTS - 2014 (2).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1QBW65sFj-zyVRTs_S0_hICCt1rFDDjaM",
+          name: "MPIK - UTS - 2014 (3).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:44.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "1Pktb3ShB6SNWG_7_t1YR5J5emF2411ry",
+          name: "MPIK - UTS - 2014 (4).jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+        {
+          id: "18gaGqC3KW37eQ-s_DYb2c0rdzcewhmTi",
+          name: "MPIK - UTS - 2014.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+    {
+      name: "2016",
+      createdAt: null,
+      papers: [
+        {
+          id: "16f7BLqP7gZHC_RZZanqyV2JqHuQ1tm3n",
+          name: "MPIK - UTS - 2016.jpg",
+          mimeType: "image/jpeg",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+    {
+      name: "2019",
+      createdAt: null,
+      papers: [
+        {
+          id: "1cUhU8e8o246NQPYAMk5aIacZc1nK1UXg",
+          name: "MPIK - UTS - 2019.pdf",
+          mimeType: "application/pdf",
+          createdAt: "2026-08-19T02:31:45.000Z",
+          exam: "UTS",
+          sourceFolderId: "1ZownIC-L-pqi3jiu6Ft4AhM2pFFfK9IW",
+        },
+      ],
+    },
+  ],
+};
+
+export default course;

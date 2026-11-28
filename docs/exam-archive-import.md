@@ -4,19 +4,27 @@ The catalog contains metadata from [Himakom's exam archive](https://himakom.ugm.
 and its linked public Google Drive folders. Files stay on Drive. Browsing uses the saved
 TypeScript catalog and never lists Drive folders at runtime.
 
+The catalog lives in `apps/web/src/routes/_public/exam/-shared/catalog/`:
+
+- `index.ts` lists every course's `id`, `name`, and `createdAt`, plus a `load` import of
+  its paper metadata. The archive root downloads only this index for listing and search.
+- `courses/<slug>.ts` holds one course's `sourceFolderId` and `years`. The route loader
+  imports it when a course or paper URL is opened, so each course is a separate chunk.
+
 ## Initial import
 
 From the repository root:
 
 ```sh
-bun apps/web/scripts/import-exam-archive.ts /tmp/exam-catalog.ts
+bun apps/web/scripts/import-exam-archive.ts /tmp/exam-catalog
 ```
 
 This is a one-time import tool, not a recurring synchronization command. It requires
 public source access, uses four concurrent requests with timeouts, and writes a candidate
-plus `/tmp/exam-catalog.ts.report.json`. It refuses to write directly to the live catalog.
+catalog directory plus `/tmp/exam-catalog.report.json`. It reads the live catalog as the
+previous snapshot and refuses to write directly to it.
 
-Review the report before copying the candidate into the archive's `catalog.ts`:
+Review the report before replacing the archive's `catalog/` directory with the candidate:
 
 - Unreadable folders and unrecognized/paginated listing formats are failures, not empty
   folders. A failed descendant preserves the entire previous course snapshot. If a new
@@ -38,15 +46,16 @@ Review the report before copying the candidate into the archive's `catalog.ts`:
   to an empty “Tanpa tahun” folder.
 
 After adopting the candidate, run formatting, repository checks, and a production build,
-then inspect the archive in the browser. The catalog's `satisfies ExamCourse[]` checks
-manual edits, while
-the explicit array annotation prevents the full dataset from expanding inferred types
-throughout callers. The production route keeps this catalog out of unrelated page loads.
+then inspect the archive in the browser. The explicit `ExamCourseEntry[]` and
+`ExamCourseDetail` annotations check manual edits and keep the dataset from expanding
+inferred types throughout callers. A test checks that the index references every course
+module exactly once.
 
 ## Human maintenance
 
-After the initial import, edit the TypeScript catalog directly. Add or remove courses,
-years, or files as needed. Keep an existing course's `id` when renaming it, and use the
+After the initial import, edit the TypeScript catalog directly. Edit a course's papers and
+years in its `courses/` module. To add a course, create its module and add an entry with a
+`load` import to `index.ts`; to remove one, delete both. Keep an existing course's `id` when renaming it, and use the
 Drive file ID as each paper's `id`. Keep `sourceFolderId` and MIME types accurate. Leave
 an unknown exam label as `null` and an unknown year as “Tanpa tahun” until reviewed.
 

@@ -1,6 +1,7 @@
-import { rename } from "node:fs/promises";
-import { resolve } from "node:path";
-import { examArchive, archiveSource } from "@/routes/_public/exam/-shared/catalog";
+import { mkdir, rename, rm } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
+import { examCourses, archiveSource } from "@/routes/_public/exam/-shared/catalog";
+import { loadExamCourse } from "@/routes/_public/exam/-shared/archive";
 import type { ExamCourse, ExamPaper } from "@/routes/_public/exam/-shared/contracts";
 
 type SourceCourse = { name: string; folderId: string };
@@ -236,14 +237,75 @@ async function fetchHtml(url: string) {
   return response.text();
 }
 
+function courseFileName(name: string, used: Set<string>) {
+  const base =
+    name
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "course";
+  let fileName = base;
+  for (let suffix = 2; used.has(fileName); suffix++) fileName = `${base}-${suffix}`;
+  used.add(fileName);
+  return fileName;
+}
+
+/**
+ * Renders the catalog as a compact course index plus one module of paper
+ * metadata per course, keyed by path relative to the catalog directory.
+ */
+export function renderCatalog(catalog: readonly ExamCourse[]) {
+  const files = new Map<string, string>();
+  const used = new Set<string>();
+  const entries = catalog.map(({ sourceFolderId, years, ...summary }) => {
+    const fileName = courseFileName(summary.name, used);
+    files.set(
+      `courses/${fileName}.ts`,
+      `import type { ExamCourseDetail } from "../../contracts";\n\nconst course: ExamCourseDetail = ${JSON.stringify({ sourceFolderId, years }, null, 2)};\n\nexport default course;\n`,
+    );
+    const fields = Object.entries(summary)
+      .map(([key, value]) => `    ${key}: ${JSON.stringify(value)},`)
+      .join("\n");
+    return `  {\n${fields}\n    load: () => import("./courses/${fileName}"),\n  },`;
+  });
+  files.set(
+    "index.ts",
+    `import type { ExamCourseEntry } from "../contracts";\n\nexport const archiveSource = ${JSON.stringify(archiveSource)};\n\nexport const examCourses: ExamCourseEntry[] = [\n${entries.join("\n")}\n];\n`,
+  );
+  return files;
+}
+
+/** Loads every course's paper metadata from the live catalog. */
+export async function readCatalog() {
+  return Promise.all(
+    examCourses.map(async (entry) => {
+      const course = await loadExamCourse(entry.id);
+      if (!course) throw new Error(`Missing course ${entry.id}`);
+      return course;
+    }),
+  );
+}
+
+export async function writeCatalog(target: string, catalog: readonly ExamCourse[]) {
+  const staging = `${target}.tmp`;
+  await rm(staging, { recursive: true, force: true });
+  for (const [path, source] of renderCatalog(catalog)) {
+    await mkdir(dirname(join(staging, path)), { recursive: true });
+    await Bun.write(join(staging, path), source);
+  }
+  await rm(target, { recursive: true, force: true });
+  await rename(staging, target);
+}
+
 async function main() {
   const output = process.argv[2];
   if (!output)
     throw new Error(
-      "Usage: bun scripts/import-exam-archive.ts <candidate.ts>; review before replacing the human-maintained catalog",
+      "Usage: bun scripts/import-exam-archive.ts <candidate-dir>; review before replacing the human-maintained catalog",
     );
   const target = resolve(output);
-  const liveCatalog = resolve(import.meta.dir, "../src/routes/_public/exam/-shared/catalog.ts");
+  const liveCatalog = resolve(import.meta.dir, "../src/routes/_public/exam/-shared/catalog");
   if (target === liveCatalog)
     throw new Error(
       "Write a candidate file; never overwrite the human-maintained catalog directly",
@@ -275,7 +337,7 @@ async function main() {
     if (folders.size % 20 === 0 || !queue.length)
       console.info(`Read ${folders.size} folders; ${queue.length} remaining`);
   }
-  const result = normalizeArchive({ courses, folders, previous: examArchive });
+  const result = normalizeArchive({ courses, folders, previous: await readCatalog() });
   const report = {
     source: archiveSource,
     importedAt: new Date().toISOString(),
@@ -291,9 +353,7 @@ async function main() {
   await Bun.write(`${target}.report.json`, JSON.stringify(report, null, 2) + "\n");
   if (!result.writable)
     throw new Error(`Import incomplete; catalog untouched. See ${target}.report.json`);
-  const source = `import type { ExamCourse } from "./contracts";\n\nexport const archiveSource = ${JSON.stringify(archiveSource)};\n\nexport const examArchive: ExamCourse[] = ${JSON.stringify(result.catalog, null, 2)} satisfies ExamCourse[];\n`;
-  await Bun.write(`${target}.tmp`, source);
-  await rename(`${target}.tmp`, target);
+  await writeCatalog(target, result.catalog);
   console.info(
     `Wrote candidate: ${courses.length} courses, ${report.files} files. Review ${target}.report.json before adopting.`,
   );
