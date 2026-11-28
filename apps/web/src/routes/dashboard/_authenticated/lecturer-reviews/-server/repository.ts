@@ -1,6 +1,4 @@
-import { adminSearchCondition } from "../../-server/search";
-import { ADMIN_PAGE_SIZE } from "@/routes/dashboard/_authenticated/-shared/admin-pagination";
-import { and, desc, eq, inArray, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
 import { reviews } from "@g13/db/schema/lecturer-reviews";
@@ -12,14 +10,10 @@ type Database = ReturnType<typeof createDatabase>;
 type StoredReviewStatus = (typeof reviews.status.enumValues)[number];
 
 /** Which reviews each moderation tab holds. The list and its counts share this. */
-function statusCondition(status: ReviewStatus): SQL | undefined {
+export function moderationStatusCondition(status: ReviewStatus): SQL | undefined {
   if (status === "all") return undefined;
   if (status === "deleted") return isNotNull(reviews.deletedAt);
   return and(eq(reviews.status, status), isNull(reviews.deletedAt));
-}
-
-function countWhere(status: Exclude<ReviewStatus, "all">) {
-  return sql<number>`coalesce(sum(case when ${statusCondition(status)} then 1 else 0 end), 0)`;
 }
 
 /**
@@ -36,17 +30,15 @@ const transitions = {
   { from: StoredReviewStatus[]; to: StoredReviewStatus | null }
 >;
 
-function searchCondition(query: string) {
-  return adminSearchCondition(query, [
-    lecturers.name,
-    courses.code,
-    courses.nameId,
-    courses.nameEn,
-    reviews.termLabel,
-    reviews.authorName,
-    reviews.body,
-  ]);
-}
+export const moderationSearchColumns = [
+  lecturers.name,
+  courses.code,
+  courses.nameId,
+  courses.nameEn,
+  reviews.termLabel,
+  reviews.authorName,
+  reviews.body,
+];
 
 const moderationReviewColumns = {
   id: reviews.id,
@@ -65,21 +57,20 @@ const moderationReviewColumns = {
   createdAt: reviews.createdAt,
 };
 
-export async function listModerationReviews(
+export async function selectModerationReviews(
   db: Database,
-  offset: number,
-  status: ReviewStatus,
-  query = "",
+  where: SQL | undefined,
+  page: { limit: number; offset: number },
 ) {
   return db
     .select(moderationReviewColumns)
     .from(reviews)
     .innerJoin(lecturers, eq(lecturers.id, reviews.lecturerId))
     .innerJoin(courses, eq(courses.id, reviews.courseId))
-    .where(and(statusCondition(status), searchCondition(query)))
+    .where(where)
     .orderBy(desc(reviews.createdAt), desc(reviews.id))
-    .limit(ADMIN_PAGE_SIZE)
-    .offset(offset);
+    .limit(page.limit)
+    .offset(page.offset);
 }
 
 export async function getModerationReview(db: Database, reviewId: string) {
@@ -92,20 +83,18 @@ export async function getModerationReview(db: Database, reviewId: string) {
   return review ?? null;
 }
 
-export async function getModerationCounts(db: Database, query = "") {
-  const [counts] = await db
-    .select({
-      all: sql<number>`count(*)`,
-      pending: countWhere("pending"),
-      published: countWhere("published"),
-      hidden: countWhere("hidden"),
-      deleted: countWhere("deleted"),
-    })
+export async function countModerationReviews(
+  db: Database,
+  counts: Record<string, SQL<number>>,
+  where: SQL | undefined,
+) {
+  const [result] = await db
+    .select(counts)
     .from(reviews)
     .innerJoin(lecturers, eq(lecturers.id, reviews.lecturerId))
     .innerJoin(courses, eq(courses.id, reviews.courseId))
-    .where(searchCondition(query));
-  return counts;
+    .where(where);
+  return result;
 }
 
 /**

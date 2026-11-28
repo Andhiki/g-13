@@ -1,5 +1,6 @@
 import { canModerate } from "@g13/auth";
 import type { createDatabase } from "@g13/db/client";
+import { learningResources } from "@g13/db/schema/learning-resources";
 import { RESOURCE_ADMIN_ERRORS, type ResourceAdminResult } from "../-shared/errors";
 import type {
   CreateResourceInput,
@@ -11,21 +12,27 @@ import type {
 import {
   applyResourceSortOrders,
   createResourceRecord,
-  getAdminResourceCounts,
-  listAdminResources,
   listResourceSortOrders,
   setResourceDeletedState,
   updateResourceRecord,
+  adminResourceSearchColumns,
+  countAdminResources,
+  selectAdminResourceRows,
 } from "./repository";
+import {
+  loadAdminList,
+  softDeleteCondition,
+  softDeleteStatuses,
+  type AdminListData,
+} from "../../-server/admin-list";
 
 type Database = ReturnType<typeof createDatabase>;
 type Actor = { id: string; role?: string | null };
 
-export type ResourceListData = {
-  rows: Awaited<ReturnType<typeof listAdminResources>>;
-  counts: Awaited<ReturnType<typeof getAdminResourceCounts>>;
-  total: number;
-};
+export type ResourceListData = AdminListData<
+  ResourceStatus,
+  Awaited<ReturnType<typeof selectAdminResourceRows>>[number]
+>;
 
 export async function inspectResources(
   db: Database,
@@ -34,13 +41,19 @@ export async function inspectResources(
   status: ResourceStatus = "active",
   query = "",
 ): Promise<ResourceAdminResult<ResourceListData>> {
-  if (!canModerate(actor.role)) return { data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN };
-  const [rows, counts, matchingCounts] = await Promise.all([
-    listAdminResources(db, offset, status, query),
-    getAdminResourceCounts(db),
-    query ? getAdminResourceCounts(db, query) : undefined,
-  ]);
-  return { data: { rows, counts, total: (matchingCounts ?? counts)[status] }, error: null };
+  const data = await loadAdminList(
+    {
+      canView: canModerate,
+      statuses: softDeleteStatuses,
+      statusCondition: softDeleteCondition(learningResources.deletedAt),
+      searchColumns: adminResourceSearchColumns,
+      rows: (where, page) => selectAdminResourceRows(db, where, page),
+      count: (counts, where) => countAdminResources(db, counts, where),
+    },
+    actor,
+    { offset, status, query },
+  );
+  return data ? { data, error: null } : { data: null, error: RESOURCE_ADMIN_ERRORS.FORBIDDEN };
 }
 
 export async function createResource(
