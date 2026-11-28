@@ -17,11 +17,13 @@ test("Publishing and disabling an announcement updates the public banner", async
   await app.open(dashboard);
   await screen.getByRole("button", { name: "Add announcement", exact: true }).first().click();
   const form = screen.getByRole("dialog", { name: "Add announcement" });
-  await form.getByRole("textbox", { name: "Title (Indonesian)" }).fill(title);
-  await form.getByRole("textbox", { name: "Title (English)" }).fill("Test announcement");
-  await form.getByRole("textbox", { name: "Message (Indonesian)" }).fill(message);
-  await form
-    .getByRole("textbox", { name: "Message (English)" })
+  const titles = form.getByRole("group", { name: "Title" });
+  const messages = form.getByRole("group", { name: "Message" });
+  await titles.getByRole("textbox", { name: "Indonesian" }).fill(title);
+  await titles.getByRole("textbox", { name: "English" }).fill("Test announcement");
+  await messages.getByRole("textbox", { name: "Indonesian" }).fill(message);
+  await messages
+    .getByRole("textbox", { name: "English" })
     .fill("This message is only shown while the announcement is active.");
   await form.getByRole("button", { name: "Add announcement", exact: true }).click();
   await expect(form).toBeHidden();
@@ -64,7 +66,10 @@ test("Announcement modal keeps header and footer fixed while scrolling and switc
 
   const form = screen.getByRole("dialog", { name: "Add announcement" });
   await expect(form).toBeVisible();
-  await form.getByRole("textbox", { name: "CTA link (optional)" }).fill("https://example.com");
+  await form
+    .getByRole("group", { name: "Button" })
+    .getByRole("textbox", { name: "Link" })
+    .fill("https://example.com");
 
   const variants = form.getByRole("radiogroup", { name: "Variant" });
   await expect(variants.getByRole("radio", { name: "Primary" })).toBeChecked();

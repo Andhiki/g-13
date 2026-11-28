@@ -1,4 +1,5 @@
 import { useAdminList } from "../-client/useAdminList";
+import { adminListSearchSchema } from "../-shared/admin-search";
 import { RiMegaphoneLine } from "@remixicon/react";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -58,6 +59,7 @@ const emptyStateCopy: Record<AnnouncementStatus, { title: string; description: s
 };
 
 export const Route = createFileRoute("/dashboard/_authenticated/announcements/")({
+  validateSearch: adminListSearchSchema,
   loader: async ({ context }) => {
     try {
       return await context.queryClient.fetchQuery(adminAnnouncementsQuery());

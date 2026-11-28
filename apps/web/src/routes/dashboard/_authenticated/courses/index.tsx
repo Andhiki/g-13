@@ -1,4 +1,5 @@
 import { useAdminList } from "../-client/useAdminList";
+import { adminListSearchSchema } from "../-shared/admin-search";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -34,6 +35,7 @@ import {
 } from "./-shared/schemas";
 
 export const Route = createFileRoute("/dashboard/_authenticated/courses/")({
+  validateSearch: adminListSearchSchema,
   loader: async ({ context }) => {
     try {
       return await context.queryClient.fetchQuery(adminCoursesQuery());

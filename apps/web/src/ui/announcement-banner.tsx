@@ -40,7 +40,7 @@ export function resolveAnnouncementCopy(
   };
 }
 
-const announcementSurfaces = {
+export const announcementSurfaces = {
   primary: "bg-primary-base",
   error: "bg-red-800",
   neutral: "bg-neutral-700",

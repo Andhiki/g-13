@@ -1,4 +1,4 @@
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { RiCloseLine } from "@remixicon/react";
 import { CompactButton } from "@/ui/compact-button";
 import { AlignDrawer } from "@/ui/drawer";
@@ -31,6 +31,9 @@ export function AdminInspectorLayout({
     () => window.matchMedia(desktopInspectorQuery).matches,
     () => true,
   );
+  // Mount the drawer closed so one that starts open, from a linked record, still slides in.
+  const [entered, setEntered] = useState(false);
+  useEffect(() => setEntered(true), []);
 
   return (
     <div
@@ -50,7 +53,7 @@ export function AdminInspectorLayout({
         </div>
       ) : (
         <AlignDrawer.Root
-          open={mobileOpen && !!details}
+          open={entered && mobileOpen && !!details}
           onOpenChange={onMobileOpenChange}
           side="bottom"
         >

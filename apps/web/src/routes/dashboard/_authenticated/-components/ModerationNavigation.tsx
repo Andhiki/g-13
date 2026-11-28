@@ -190,7 +190,7 @@ function ModerationNavItem({
   const link = (
     <Link
       to={to}
-      activeOptions={{ exact: true }}
+      activeOptions={{ exact: true, includeSearch: false }}
       className={`${navLinkClass} ${closeOnNavigate ? "min-h-11" : "h-8"}`}
     >
       <Icon className="size-4 shrink-0" />

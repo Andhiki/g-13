@@ -1,6 +1,6 @@
 import { announcementVariants, type AnnouncementVariant } from "@g13/db/schema/announcements";
 import { useId, useRef, useState, type ReactNode } from "react";
-import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio";
+import * as SegmentedControl from "@/ui/segmented-control";
 import * as AlignSwitch from "@/ui/switch";
 import { DateTimeField, type DateTimeFieldHandle } from "@/ui/date-time-field";
 import {
@@ -27,12 +27,46 @@ import {
   type AnnouncementFieldsInput,
 } from "../-shared/schemas";
 import type { AdminAnnouncement } from "./AdminAnnouncementRow";
+import { announcementSurfaces } from "@/ui/announcement-banner";
 import { AnnouncementPreview } from "./AnnouncementPreview";
 
 const variantLabels = { primary: "Primary", error: "Error", neutral: "Neutral" } satisfies Record<
   AnnouncementVariant,
   string
 >;
+
+function FormRow({
+  label,
+  optional = false,
+  centered = false,
+  children,
+}: {
+  label: string;
+  optional?: boolean;
+  centered?: boolean;
+  children: ReactNode;
+}) {
+  const labelId = useId();
+  return (
+    <div
+      className={`grid gap-x-6 gap-y-2 sm:grid-cols-[128px_minmax(0,1fr)] ${centered ? "sm:items-center" : ""}`}
+    >
+      <div>
+        <Typography id={labelId} variant="labelSmall" color="strong">
+          {label}
+        </Typography>
+        {optional && (
+          <Typography variant="caption" color="muted">
+            Optional
+          </Typography>
+        )}
+      </div>
+      <div role="group" aria-labelledby={labelId}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function AnnouncementVariantField({
   value,
@@ -43,42 +77,31 @@ function AnnouncementVariantField({
   onChange: (value: AnnouncementVariant) => void;
   disabled: boolean;
 }) {
-  const labelId = useId();
   return (
-    <div className="space-y-1.5">
-      <Typography id={labelId} variant="label" color="strong">
-        Variant
-      </Typography>
-      <RadioGroup
-        aria-labelledby={labelId}
+    <FormRow label="Variant" centered>
+      <SegmentedControl.Root
+        aria-label="Variant"
         name="variant"
         value={value}
         disabled={disabled}
-        onValueChange={(value) => {
-          const option = announcementVariants.find((candidate) => candidate === value);
+        onValueChange={(next) => {
+          const option = announcementVariants.find((candidate) => candidate === next);
           if (option) onChange(option);
         }}
-        className="flex flex-wrap gap-2"
+        className="w-fit"
       >
+        <SegmentedControl.Indicator />
         {announcementVariants.map((option) => (
-          <Radio
-            key={option}
-            value={option}
-            className="group flex min-h-9 cursor-interactive items-center gap-2 rounded-10 border border-stroke-soft-200 bg-bg-white-0 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-base data-checked:border-primary-base data-disabled:cursor-default"
-          >
+          <SegmentedControl.Item key={option} value={option}>
             <span
               aria-hidden="true"
-              className="grid size-4 shrink-0 place-items-center rounded-full border border-stroke-sub-300 group-data-checked:border-primary-base"
-            >
-              <RadioIndicator className="size-2 rounded-full bg-primary-base" />
-            </span>
-            <Typography as="span" variant="label" color="strong">
-              {variantLabels[option]}
-            </Typography>
-          </Radio>
+              className={`size-2.5 shrink-0 rounded-full ${announcementSurfaces[option]}`}
+            />
+            {variantLabels[option]}
+          </SegmentedControl.Item>
         ))}
-      </RadioGroup>
-    </div>
+      </SegmentedControl.Root>
+    </FormRow>
   );
 }
 
@@ -114,7 +137,7 @@ export function AnnouncementFormModal({
     <AdminFormModal
       open={open}
       pending={pending}
-      contentClassName="max-w-[900px]"
+      contentClassName="max-w-[760px]"
       onClose={onClose}
     >
       <AnnouncementFormBody
@@ -225,48 +248,60 @@ function AnnouncementTextFields({
 }) {
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <AdminFormField
-          id="announcement-title-id"
-          name="titleId"
-          label="Title (Indonesian)"
-          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
-          placeholder="e.g. Jadwal UTS"
-          value={titleId}
-          error={fieldErrors.titleId}
-          onChange={onTitleIdChange}
-        />
-        <AdminFormField
-          id="announcement-title-en"
-          name="titleEn"
-          label="Title (English)"
-          maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
-          placeholder="e.g. Midterm schedule"
-          value={titleEn}
-          error={fieldErrors.titleEn}
-          onChange={onTitleEnChange}
-        />
-      </div>
-      <AdminFormField
-        id="announcement-body-id"
-        name="bodyId"
-        label="Message (Indonesian)"
-        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
-        placeholder="Jadwal UTS sudah terbit, cek arsip ujian."
-        value={bodyId}
-        error={fieldErrors.bodyId}
-        onChange={onBodyIdChange}
-      />
-      <AdminFormField
-        id="announcement-body-en"
-        name="bodyEn"
-        label="Message (English)"
-        maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
-        placeholder="Midterm schedule is out, check the exam archive."
-        value={bodyEn}
-        error={fieldErrors.bodyEn}
-        onChange={onBodyEnChange}
-      />
+      <FormRow label="Title">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <AdminFormField
+            id="announcement-title-id"
+            name="titleId"
+            label="Indonesian"
+            maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
+            placeholder="Jadwal UTS"
+            value={titleId}
+            error={fieldErrors.titleId}
+            onChange={onTitleIdChange}
+          />
+          <AdminFormField
+            id="announcement-title-en"
+            name="titleEn"
+            label="English"
+            maxLength={ANNOUNCEMENT_TITLE_MAX_LENGTH}
+            placeholder="Midterm schedule"
+            value={titleEn}
+            error={fieldErrors.titleEn}
+            onChange={onTitleEnChange}
+          />
+        </div>
+      </FormRow>
+      <FormRow label="Message">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <AdminFormField
+            id="announcement-body-id"
+            name="bodyId"
+            label="Indonesian"
+            multiline
+            rows={2}
+            showCounter
+            maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
+            placeholder="Jadwal UTS sudah terbit, cek arsip ujian."
+            value={bodyId}
+            error={fieldErrors.bodyId}
+            onChange={onBodyIdChange}
+          />
+          <AdminFormField
+            id="announcement-body-en"
+            name="bodyEn"
+            label="English"
+            multiline
+            rows={2}
+            showCounter
+            maxLength={ANNOUNCEMENT_BODY_MAX_LENGTH}
+            placeholder="Midterm schedule is out, check the exam archive."
+            value={bodyEn}
+            error={fieldErrors.bodyEn}
+            onChange={onBodyEnChange}
+          />
+        </div>
+      </FormRow>
     </>
   );
 }
@@ -326,102 +361,116 @@ function AnnouncementScheduleAndCtaFields({
 }) {
   return (
     <>
-      <AdminFormField
-        id="announcement-cta-href"
-        name="ctaHref"
-        label="CTA link (optional)"
-        maxLength={ANNOUNCEMENT_CTA_LINK_MAX_LENGTH}
-        placeholder="https://example.com or /exam"
-        value={ctaHref}
-        error={fieldErrors.ctaHref}
-        onChange={onCtaHrefChange}
-      />
-      {ctaHref.trim() && (
-        <div className="flex items-center justify-between gap-2">
-          <Typography as="label" htmlFor="announcement-cta-new-tab" variant="labelSmall">
-            Open in new tab
-          </Typography>
-          <AlignSwitch.Root
-            id="announcement-cta-new-tab"
-            checked={ctaOpenInNewTab}
-            onCheckedChange={onCtaOpenInNewTabChange}
-          />
-        </div>
-      )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <AdminFormField
-          id="announcement-cta-label-id"
-          name="ctaLabelId"
-          label="CTA label (Indonesian, optional)"
-          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
-          placeholder="Selengkapnya"
-          value={ctaLabelId}
-          error={fieldErrors.ctaLabelId}
-          onChange={onCtaLabelIdChange}
-        />
-        <AdminFormField
-          id="announcement-cta-label-en"
-          name="ctaLabelEn"
-          label="CTA label (English, optional)"
-          maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
-          placeholder="Learn more"
-          value={ctaLabelEn}
-          error={fieldErrors.ctaLabelEn}
-          onChange={onCtaLabelEnChange}
-        />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <DateTimeField
-          ref={startsAtRef}
-          id="announcement-starts-at"
-          name="startsAt"
-          label="Start date"
-          value={startsAt}
-          required
-          disabled={pending}
-          error={fieldErrors.startsAt}
-          errorPart={errorParts.startsAt}
-          onChange={onStartsAtChange}
-          onInputActivity={onStartsAtActivity}
-        />
-        <DateTimeField
-          ref={endsAtRef}
-          id="announcement-ends-at"
-          name="endsAt"
-          label="Expiry date (optional)"
-          value={endsAt}
-          optional
-          disabled={pending}
-          error={fieldErrors.endsAt}
-          errorPart={errorParts.endsAt}
-          onChange={onEndsAtChange}
-          onInputActivity={onEndsAtActivity}
-        />
-      </div>
-      <DateTimeField
-        ref={countdownAtRef}
-        id="announcement-countdown-at"
-        name="countdownAt"
-        label="Countdown target (optional)"
-        value={countdownAt}
-        optional
-        disabled={pending}
-        error={fieldErrors.countdownAt}
-        errorPart={errorParts.countdownAt}
-        onChange={onCountdownAtChange}
-        onInputActivity={onCountdownAtActivity}
-      />
-      <div className="flex items-center justify-between gap-2">
-        <Typography as="label" htmlFor="announcement-enabled" variant="labelSmall">
-          Enabled
-        </Typography>
-        <AlignSwitch.Root
-          id="announcement-enabled"
-          name="enabled"
-          checked={enabled}
-          onCheckedChange={onEnabledChange}
-        />
-      </div>
+      <section aria-label="Button">
+        <FormRow label="Button" optional>
+          <div className="space-y-3">
+            <AdminFormField
+              id="announcement-cta-href"
+              name="ctaHref"
+              label="Link"
+              maxLength={ANNOUNCEMENT_CTA_LINK_MAX_LENGTH}
+              placeholder="https://example.com or /exam"
+              value={ctaHref}
+              error={fieldErrors.ctaHref}
+              onChange={onCtaHrefChange}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminFormField
+                id="announcement-cta-label-id"
+                name="ctaLabelId"
+                label="Indonesian"
+                maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
+                placeholder="Selengkapnya"
+                value={ctaLabelId}
+                error={fieldErrors.ctaLabelId}
+                onChange={onCtaLabelIdChange}
+              />
+              <AdminFormField
+                id="announcement-cta-label-en"
+                name="ctaLabelEn"
+                label="English"
+                maxLength={ANNOUNCEMENT_CTA_LABEL_MAX_LENGTH}
+                placeholder="Learn more"
+                value={ctaLabelEn}
+                error={fieldErrors.ctaLabelEn}
+                onChange={onCtaLabelEnChange}
+              />
+            </div>
+            {ctaHref.trim() && (
+              <div className="flex items-center justify-between gap-2">
+                <Typography as="label" htmlFor="announcement-cta-new-tab" variant="labelSmall">
+                  Open in new tab
+                </Typography>
+                <AlignSwitch.Root
+                  id="announcement-cta-new-tab"
+                  checked={ctaOpenInNewTab}
+                  onCheckedChange={onCtaOpenInNewTabChange}
+                />
+              </div>
+            )}
+          </div>
+        </FormRow>
+      </section>
+      <section aria-label="Schedule">
+        <FormRow label="Schedule">
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <DateTimeField
+                ref={startsAtRef}
+                id="announcement-starts-at"
+                name="startsAt"
+                label="Starts"
+                value={startsAt}
+                required
+                disabled={pending}
+                error={fieldErrors.startsAt}
+                errorPart={errorParts.startsAt}
+                onChange={onStartsAtChange}
+                onInputActivity={onStartsAtActivity}
+              />
+              <DateTimeField
+                ref={endsAtRef}
+                id="announcement-ends-at"
+                name="endsAt"
+                label="Ends (optional)"
+                value={endsAt}
+                optional
+                disabled={pending}
+                error={fieldErrors.endsAt}
+                errorPart={errorParts.endsAt}
+                onChange={onEndsAtChange}
+                onInputActivity={onEndsAtActivity}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
+              <DateTimeField
+                ref={countdownAtRef}
+                id="announcement-countdown-at"
+                name="countdownAt"
+                label="Count down to (optional)"
+                value={countdownAt}
+                optional
+                disabled={pending}
+                error={fieldErrors.countdownAt}
+                errorPart={errorParts.countdownAt}
+                onChange={onCountdownAtChange}
+                onInputActivity={onCountdownAtActivity}
+              />
+              <div className="flex h-8 items-center justify-between gap-2 rounded-10 border border-stroke-soft-200 px-3">
+                <Typography as="label" htmlFor="announcement-enabled" variant="labelSmall">
+                  Enabled
+                </Typography>
+                <AlignSwitch.Root
+                  id="announcement-enabled"
+                  name="enabled"
+                  checked={enabled}
+                  onCheckedChange={onEnabledChange}
+                />
+              </div>
+            </div>
+          </div>
+        </FormRow>
+      </section>
     </>
   );
 }
@@ -531,76 +580,80 @@ function AnnouncementFormBody({
       onClose={onClose}
       onSubmit={handleFormSubmit}
     >
-      <AnnouncementVariantField value={variant} onChange={setVariant} disabled={pending} />
-      <AnnouncementTextFields
-        titleId={titleId}
-        titleEn={titleEn}
-        bodyId={bodyId}
-        bodyEn={bodyEn}
-        fieldErrors={fieldErrors}
-        onTitleIdChange={(value) => {
-          setTitleId(value);
-          clearFieldError("titleId");
-        }}
-        onTitleEnChange={(value) => {
-          setTitleEn(value);
-          clearFieldError("titleEn");
-        }}
-        onBodyIdChange={(value) => {
-          setBodyId(value);
-          clearFieldError("bodyId");
-        }}
-        onBodyEnChange={(value) => {
-          setBodyEn(value);
-          clearFieldError("bodyEn");
-        }}
-      />
-      <AnnouncementScheduleAndCtaFields
-        ctaHref={ctaHref}
-        ctaOpenInNewTab={ctaOpenInNewTab}
-        ctaLabelId={ctaLabelId}
-        ctaLabelEn={ctaLabelEn}
-        startsAt={startsAt}
-        endsAt={endsAt}
-        countdownAt={countdownAt}
-        enabled={enabled}
-        pending={pending}
-        fieldErrors={fieldErrors}
-        errorParts={errorParts}
-        startsAtRef={startsAtRef}
-        endsAtRef={endsAtRef}
-        countdownAtRef={countdownAtRef}
-        onCtaOpenInNewTabChange={setCtaOpenInNewTab}
-        onCtaHrefChange={(value) => {
-          setCtaHref(value);
-          if (!value.trim()) setCtaOpenInNewTab(false);
-          clearFieldError("ctaHref");
-        }}
-        onCtaLabelIdChange={(value) => {
-          setCtaLabelId(value);
-          clearFieldError("ctaLabelId");
-        }}
-        onCtaLabelEnChange={(value) => {
-          setCtaLabelEn(value);
-          clearFieldError("ctaLabelEn");
-        }}
-        onStartsAtChange={(value) => {
-          setStartsAt(value);
-          clearScheduleError("startsAt");
-        }}
-        onEndsAtChange={(value) => {
-          setEndsAt(value);
-          clearScheduleError("endsAt");
-        }}
-        onCountdownAtChange={(value) => {
-          setCountdownAt(value);
-          clearScheduleError("countdownAt");
-        }}
-        onStartsAtActivity={() => clearScheduleError("startsAt")}
-        onEndsAtActivity={() => clearScheduleError("endsAt")}
-        onCountdownAtActivity={() => clearScheduleError("countdownAt")}
-        onEnabledChange={setEnabled}
-      />
+      <div className="divide-y divide-stroke-soft-200 *:space-y-4 *:py-5 *:first:pt-0 *:last:pb-0">
+        <section aria-label="Content">
+          <AnnouncementVariantField value={variant} onChange={setVariant} disabled={pending} />
+          <AnnouncementTextFields
+            titleId={titleId}
+            titleEn={titleEn}
+            bodyId={bodyId}
+            bodyEn={bodyEn}
+            fieldErrors={fieldErrors}
+            onTitleIdChange={(value) => {
+              setTitleId(value);
+              clearFieldError("titleId");
+            }}
+            onTitleEnChange={(value) => {
+              setTitleEn(value);
+              clearFieldError("titleEn");
+            }}
+            onBodyIdChange={(value) => {
+              setBodyId(value);
+              clearFieldError("bodyId");
+            }}
+            onBodyEnChange={(value) => {
+              setBodyEn(value);
+              clearFieldError("bodyEn");
+            }}
+          />
+        </section>
+        <AnnouncementScheduleAndCtaFields
+          ctaHref={ctaHref}
+          ctaOpenInNewTab={ctaOpenInNewTab}
+          ctaLabelId={ctaLabelId}
+          ctaLabelEn={ctaLabelEn}
+          startsAt={startsAt}
+          endsAt={endsAt}
+          countdownAt={countdownAt}
+          enabled={enabled}
+          pending={pending}
+          fieldErrors={fieldErrors}
+          errorParts={errorParts}
+          startsAtRef={startsAtRef}
+          endsAtRef={endsAtRef}
+          countdownAtRef={countdownAtRef}
+          onCtaOpenInNewTabChange={setCtaOpenInNewTab}
+          onCtaHrefChange={(value) => {
+            setCtaHref(value);
+            if (!value.trim()) setCtaOpenInNewTab(false);
+            clearFieldError("ctaHref");
+          }}
+          onCtaLabelIdChange={(value) => {
+            setCtaLabelId(value);
+            clearFieldError("ctaLabelId");
+          }}
+          onCtaLabelEnChange={(value) => {
+            setCtaLabelEn(value);
+            clearFieldError("ctaLabelEn");
+          }}
+          onStartsAtChange={(value) => {
+            setStartsAt(value);
+            clearScheduleError("startsAt");
+          }}
+          onEndsAtChange={(value) => {
+            setEndsAt(value);
+            clearScheduleError("endsAt");
+          }}
+          onCountdownAtChange={(value) => {
+            setCountdownAt(value);
+            clearScheduleError("countdownAt");
+          }}
+          onStartsAtActivity={() => clearScheduleError("startsAt")}
+          onEndsAtActivity={() => clearScheduleError("endsAt")}
+          onCountdownAtActivity={() => clearScheduleError("countdownAt")}
+          onEnabledChange={setEnabled}
+        />
+      </div>
     </AdminForm>
   );
 }
