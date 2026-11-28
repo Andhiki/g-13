@@ -1,5 +1,5 @@
 import { expect, it } from "bun:test";
-import { classifyReviewText, hasReviewContactDetails } from "./review-moderation";
+import { createOmniModerationProvider, screenReviewText } from "./review-screening";
 
 type ModerationFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -34,49 +34,67 @@ it.each([
   "s.kom.id",
   "s.kom/course",
   "https://s.kom",
-])("holds a review body containing %s on its own", (detail) => {
-  expect(hasReviewContactDetails({ body: `Contact detail: (${detail}).` })).toBe(true);
+])("holds a review body containing %s on its own", async (detail) => {
+  let providerCalls = 0;
+  expect(
+    await screenReviewText({ body: `Contact detail: (${detail}).` }, async () => {
+      providerCalls += 1;
+      return "clear";
+    }),
+  ).toBe("flagged");
+  expect(providerCalls).toBe(0);
 });
 
 it.each(["example.org", "office@example.edu", "62-812-3456-7890", "discord.gg/channel"])(
   "holds a review when the chosen display name contains %s",
-  (displayName) => {
-    expect(hasReviewContactDetails({ body: "The material was clear.", displayName })).toBe(true);
+  async (displayName) => {
+    expect(
+      await screenReviewText({ body: "The material was clear.", displayName }, async () => "clear"),
+    ).toBe("flagged");
   },
 );
 
-it("treats standalone S.Kom. as an academic title in review text and display names", () => {
+it("treats standalone S.Kom. as an academic title in review text and display names", async () => {
   expect(
-    hasReviewContactDetails({ body: "Pak Budi, S.Kom., menjelaskan materi dengan jelas." }),
-  ).toBe(false);
+    await screenReviewText(
+      { body: "Pak Budi, S.Kom., menjelaskan materi dengan jelas." },
+      async () => "clear",
+    ),
+  ).toBe("clear");
   expect(
-    hasReviewContactDetails({ body: "The material was clear.", displayName: "Budi S.Kom" }),
-  ).toBe(false);
+    await screenReviewText(
+      { body: "The material was clear.", displayName: "Budi S.Kom" },
+      async () => "clear",
+    ),
+  ).toBe("clear");
   expect(
-    hasReviewContactDetails({ body: "Pak Budi, S.Kom., shared the notes at example.edu." }),
-  ).toBe(true);
+    await screenReviewText(
+      { body: "Pak Budi, S.Kom., shared the notes at example.edu." },
+      async () => "clear",
+    ),
+  ).toBe("flagged");
 });
 
-it("preserves clean criticism with course codes, dates, and decimal grades", () => {
+it("preserves clean criticism with course codes, dates, and decimal grades", async () => {
   expect(
-    hasReviewContactDetails({
-      body: "Penjelasan CS101 tanggal 02-11-2026 kurang jelas. Nilai saya 3.75.",
-    }),
-  ).toBe(false);
+    await screenReviewText(
+      { body: "Penjelasan CS101 tanggal 02-11-2026 kurang jelas. Nilai saya 3.75." },
+      async () => "clear",
+    ),
+  ).toBe("clear");
 });
 
 it("flags a link in the chosen display name before making a provider request", async () => {
   let calls = 0;
-  const result = await classifyReviewText(
+  const result = await screenReviewText(
     {
       body: "The course materials were useful.",
       displayName: "example.com",
     },
-    "test-key",
-    async () => {
+    createOmniModerationProvider("test-key", async () => {
       calls += 1;
       return moderationResponse(clearCategories, clearCategories);
-    },
+    }),
   );
 
   expect(result).toBe("flagged");
@@ -93,10 +111,13 @@ it("ignores unrelated Omni flags and reports only harassment or hate category fl
       "self-harm": true,
     });
   };
-  expect(await classifyReviewText({ body: "The course was difficult." }, "test-key", fetcher)).toBe(
-    "clear",
-  );
-  const request = JSON.parse(String(calls[0]?.body)) as { model: string; input: string[] };
+  expect(
+    await screenReviewText(
+      { body: "The course was difficult." },
+      createOmniModerationProvider("test-key", fetcher),
+    ),
+  ).toBe("clear");
+  const request: unknown = JSON.parse(String(calls[0]?.body));
   expect(request).toEqual({
     model: "omni-moderation-latest",
     input: ["The course was difficult."],
@@ -105,20 +126,18 @@ it("ignores unrelated Omni flags and reports only harassment or hate category fl
   const bodyFlaggedFetcher: ModerationFetcher = async () =>
     moderationResponse({ ...clearCategories, harassment: true }, clearCategories);
   expect(
-    await classifyReviewText(
+    await screenReviewText(
       { body: "A challenging class.", displayName: "Chosen Name" },
-      "test-key",
-      bodyFlaggedFetcher,
+      createOmniModerationProvider("test-key", bodyFlaggedFetcher),
     ),
   ).toBe("flagged");
 
   const flaggedFetcher: ModerationFetcher = async () =>
     moderationResponse(clearCategories, { ...clearCategories, hate: true });
   expect(
-    await classifyReviewText(
+    await screenReviewText(
       { body: "Helpful course notes.", displayName: "Chosen Name" },
-      "test-key",
-      flaggedFetcher,
+      createOmniModerationProvider("test-key", flaggedFetcher),
     ),
   ).toBe("flagged");
 });
@@ -129,19 +148,36 @@ it("returns unscorable for missing credentials, provider errors, and malformed r
     calls += 1;
     return new Response("{}", { status: 200 });
   };
-  expect(await classifyReviewText({ body: "A review" }, "", fetcher)).toBe("unscorable");
+  expect(await createOmniModerationProvider("", fetcher)({ body: "A review" })).toBe("unscorable");
   expect(calls).toBe(0);
-  expect(await classifyReviewText({ body: "A review" }, "test-key", fetcher)).toBe("unscorable");
+  expect(await createOmniModerationProvider("test-key", fetcher)({ body: "A review" })).toBe(
+    "unscorable",
+  );
   expect(
-    await classifyReviewText(
-      { body: "A review" },
+    await createOmniModerationProvider(
       "test-key",
       async () => new Response("", { status: 503 }),
-    ),
+    )({
+      body: "A review",
+    }),
   ).toBe("unscorable");
   expect(
-    await classifyReviewText({ body: "A review" }, "test-key", async () => {
+    await createOmniModerationProvider("test-key", async () => {
       throw new Error();
+    })({ body: "A review" }),
+  ).toBe("unscorable");
+});
+
+it("runs profanity screening after a clear provider result", async () => {
+  expect(
+    await screenReviewText({ body: "This lecturer is a fucking idiot." }, async () => "clear"),
+  ).toBe("flagged");
+});
+
+it("maps a provider exception to unscorable", async () => {
+  expect(
+    await screenReviewText({ body: "A review without profanity." }, async () => {
+      throw new Error("provider unavailable");
     }),
   ).toBe("unscorable");
 });
