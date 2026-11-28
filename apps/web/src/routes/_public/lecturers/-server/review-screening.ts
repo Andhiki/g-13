@@ -2,6 +2,10 @@ import englishEntries from "@dsojevic/profanity-list/en.json";
 
 export type ReviewScreeningResult = "clear" | "flagged" | "unscorable";
 
+/** What screening found, by cause: contact details, a moderation flag, profanity, or no score. */
+export type ReviewScreeningOutcome =
+  "clear" | "contact-details" | "moderation" | "profanity" | "unscorable";
+
 export type ReviewScreeningInput = {
   body: string;
   displayName?: string;
@@ -103,8 +107,8 @@ export function createOmniModerationProvider(
 export async function screenReviewText(
   input: ReviewScreeningInput,
   provider: ReviewModerationProvider,
-): Promise<ReviewScreeningResult> {
-  if (hasContactDetails(input)) return "flagged";
+): Promise<ReviewScreeningOutcome> {
+  if (hasContactDetails(input)) return "contact-details";
 
   let moderation: ReviewScreeningResult;
   try {
@@ -113,6 +117,7 @@ export async function screenReviewText(
     return "unscorable";
   }
 
-  if (moderation !== "clear") return moderation;
-  return hasProfanity(input) ? "flagged" : "clear";
+  if (moderation === "flagged") return "moderation";
+  if (moderation === "unscorable") return "unscorable";
+  return hasProfanity(input) ? "profanity" : "clear";
 }

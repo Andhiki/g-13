@@ -53,6 +53,7 @@ const moderationReviewColumns = {
   support: reviews.support,
   organization: reviews.organization,
   status: reviews.status,
+  pendingReasons: reviews.pendingReasons,
   deletedAt: reviews.deletedAt,
   createdAt: reviews.createdAt,
 };

@@ -1,7 +1,12 @@
 import { and, asc, desc, eq, gt, inArray, isNull, lt, lte, sql, or, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
-import { reviews, reviewLikes, reviewSubmissionLimits } from "@g13/db/schema/lecturer-reviews";
+import {
+  reviews,
+  reviewLikes,
+  reviewSubmissionLimits,
+  type ReviewPendingReason,
+} from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
 import type {
   CoursePickerCursor,
@@ -258,6 +263,7 @@ export async function createReview(
     organization: number;
     body: string;
     status: "pending" | "published" | "hidden";
+    pendingReasons: ReviewPendingReason[] | null;
   },
 ): Promise<void> {
   await db.insert(reviews).values(review);
