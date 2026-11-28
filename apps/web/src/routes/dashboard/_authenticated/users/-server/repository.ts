@@ -1,4 +1,4 @@
-import { asc, eq, inArray, notInArray, sql } from "drizzle-orm";
+import { asc, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
 import { authUser } from "@g13/db/schema/auth";
 import type { createDatabase } from "@g13/db/client";
 import type { AssignRoleInput, UserStatus } from "../-shared/schemas";
@@ -26,6 +26,21 @@ export async function listAdminUsers(db: Database, offset: number, status: UserS
     .orderBy(asc(authUser.name), asc(authUser.id))
     .limit(51)
     .offset(offset);
+}
+
+export async function listNewestPendingUsers(db: Database, limit: number) {
+  return db
+    .select({
+      id: authUser.id,
+      name: authUser.name,
+      email: authUser.email,
+      image: authUser.image,
+      createdAt: authUser.createdAt,
+    })
+    .from(authUser)
+    .where(notInArray(authUser.role, ["admin", "maintainer"]))
+    .orderBy(desc(authUser.createdAt), desc(authUser.id))
+    .limit(limit);
 }
 
 export async function getUserCounts(db: Database) {

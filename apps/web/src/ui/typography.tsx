@@ -31,8 +31,13 @@ export const typographyVariants = tv(
         brand: "text-primary-base",
         danger: "text-error-base",
       },
+      wrap: {
+        inherit: "",
+        pretty: "text-pretty",
+        balance: "text-balance",
+      },
     },
-    defaultVariants: { variant: "paragraph", weight: "inherit", color: "inherit" },
+    defaultVariants: { variant: "paragraph", weight: "inherit", color: "inherit", wrap: "inherit" },
   },
   {
     twMergeConfig: {
@@ -77,6 +82,7 @@ export function Typography<T extends TextElement = "p">({
   variant,
   weight,
   color,
+  wrap,
   className,
   ...props
 }: TypographyProps<T>) {
@@ -86,6 +92,7 @@ export function Typography<T extends TextElement = "p">({
       variant,
       weight,
       color,
+      wrap,
       className: [as?.startsWith("h") && "font-display", className],
     }),
   });

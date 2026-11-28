@@ -4,6 +4,7 @@ import {
   RiBookOpenLine,
   RiChatCheckLine,
   RiGroupLine,
+  RiHome5Line,
   RiLinksLine,
   RiMegaphoneLine,
   RiUserVoiceLine,
@@ -18,11 +19,14 @@ export type ModerationSection = {
 };
 
 export type ModerationSectionGroup = {
-  heading: string;
+  heading?: string;
   items: ModerationSection[];
 };
 
 export const sectionGroups = [
+  {
+    items: [{ to: "/dashboard", label: "Home", Icon: RiHome5Line, permission: "moderate" }],
+  },
   {
     heading: "Moderation",
     items: [

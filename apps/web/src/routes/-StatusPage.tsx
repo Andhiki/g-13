@@ -1,5 +1,5 @@
 import { defaultCurriculumId } from "@g13/curriculum/ids";
-import { StatusIllustration } from "../ui/status-illustration";
+import { HalftoneIllustration } from "../ui/halftone";
 import { Typography } from "../ui/typography";
 import { AlignButton } from "../ui/button";
 import { RiArrowLeftLine, RiRefreshLine } from "@remixicon/react";
@@ -11,11 +11,14 @@ export function StatusPage({ kind, reset }: { kind: "notFound" | "error"; reset?
   return (
     <main className="flex min-h-[70dvh] items-center justify-center px-6 py-16 text-center">
       <div className="flex w-full max-w-lg flex-col items-center">
-        <StatusIllustration kind={kind} />
+        <HalftoneIllustration
+          items={[{ glyph: kind === "error" ? "warning" : "pin" }]}
+          className="mb-8 h-36 w-auto"
+        />
         <Typography as="h1" variant="title">
           {t(`${kind}.title`)}
         </Typography>
-        <Typography color="muted" className="mt-3">
+        <Typography color="muted" wrap="pretty" className="mt-3">
           {t(`${kind}.description`)}
         </Typography>
         <div className="mt-6 flex flex-wrap justify-center gap-3">

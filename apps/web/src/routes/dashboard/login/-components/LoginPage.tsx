@@ -35,7 +35,7 @@ export function LoginPage({ identity }: { identity: Identity }) {
     try {
       const result = await authClient.signIn.social({
         provider: "github",
-        callbackURL: "/dashboard/lecturer-reviews",
+        callbackURL: "/dashboard",
       });
       if (result.error) {
         setError(true);
