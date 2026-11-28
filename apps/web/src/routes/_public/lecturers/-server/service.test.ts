@@ -409,6 +409,19 @@ it("screens valid review text and sends flagged or unscorable reviews to Pending
     );
     expect(anonymous.data?.status).toBe("published");
     expect(screened.at(-1)).toEqual({ body: input.body });
+
+    // Each held review records why, so moderators can see it.
+    const reasonsOf = async (reviewId: string | undefined) =>
+      (
+        await db
+          .select({ pendingReasons: reviews.pendingReasons })
+          .from(reviews)
+          .where(eq(reviews.id, reviewId ?? ""))
+      )[0]?.pendingReasons;
+    expect(await reasonsOf(published.data?.reviewId)).toBeNull();
+    expect(await reasonsOf(flagged.data?.reviewId)).toEqual(["moderation"]);
+    expect(await reasonsOf(unscorable.data?.reviewId)).toEqual(["unscorable"]);
+    expect(await reasonsOf(lowRated.data?.reviewId)).toEqual(["low-rating"]);
   } finally {
     await platform.dispose();
   }

@@ -1,4 +1,5 @@
 import type { createDatabase } from "@g13/db/client";
+import type { ReviewPendingReason } from "@g13/db/schema/lecturer-reviews";
 import { dispatchNotification } from "@/server/notifications";
 
 import { allowReviewAction, reviewRateLimitResetAt } from "./rate-limit";
@@ -55,11 +56,16 @@ export async function submitReview(
     ? { body: review.body }
     : { body: review.body, displayName: authorName };
   const screening = await screenReviewText(screeningInput, context.provider);
-  const status = screening === "clear" && !hasLowRating(review) ? "published" : "pending";
+  const pendingReasons: ReviewPendingReason[] = [
+    ...(hasLowRating(review) ? (["low-rating"] as const) : []),
+    ...(screening === "clear" ? [] : [screening]),
+  ];
+  const status = pendingReasons.length ? "pending" : "published";
   await createReview(db, {
     ...values,
     id: reviewId,
     authorName,
+    pendingReasons: pendingReasons.length ? pendingReasons : null,
     status,
   });
   if (status === "pending") {

@@ -41,7 +41,7 @@ it.each([
       providerCalls += 1;
       return "clear";
     }),
-  ).toBe("flagged");
+  ).toBe("contact-details");
   expect(providerCalls).toBe(0);
 });
 
@@ -50,7 +50,7 @@ it.each(["example.org", "office@example.edu", "62-812-3456-7890", "discord.gg/ch
   async (displayName) => {
     expect(
       await screenReviewText({ body: "The material was clear.", displayName }, async () => "clear"),
-    ).toBe("flagged");
+    ).toBe("contact-details");
   },
 );
 
@@ -72,7 +72,7 @@ it("treats standalone S.Kom. as an academic title in review text and display nam
       { body: "Pak Budi, S.Kom., shared the notes at example.edu." },
       async () => "clear",
     ),
-  ).toBe("flagged");
+  ).toBe("contact-details");
 });
 
 it("preserves clean criticism with course codes, dates, and decimal grades", async () => {
@@ -97,7 +97,7 @@ it("flags a link in the chosen display name before making a provider request", a
     }),
   );
 
-  expect(result).toBe("flagged");
+  expect(result).toBe("contact-details");
   expect(calls).toBe(0);
 });
 
@@ -130,7 +130,7 @@ it("ignores unrelated Omni flags and reports only harassment or hate category fl
       { body: "A challenging class.", displayName: "Chosen Name" },
       createOmniModerationProvider("test-key", bodyFlaggedFetcher),
     ),
-  ).toBe("flagged");
+  ).toBe("moderation");
 
   const flaggedFetcher: ModerationFetcher = async () =>
     moderationResponse(clearCategories, { ...clearCategories, hate: true });
@@ -139,7 +139,7 @@ it("ignores unrelated Omni flags and reports only harassment or hate category fl
       { body: "Helpful course notes.", displayName: "Chosen Name" },
       createOmniModerationProvider("test-key", flaggedFetcher),
     ),
-  ).toBe("flagged");
+  ).toBe("moderation");
 });
 
 it("returns unscorable for missing credentials, provider errors, and malformed responses", async () => {
@@ -171,7 +171,7 @@ it("returns unscorable for missing credentials, provider errors, and malformed r
 it("runs profanity screening after a clear provider result", async () => {
   expect(
     await screenReviewText({ body: "This lecturer is a fucking idiot." }, async () => "clear"),
-  ).toBe("flagged");
+  ).toBe("profanity");
 });
 
 it("maps a provider exception to unscorable", async () => {

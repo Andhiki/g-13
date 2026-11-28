@@ -3,6 +3,16 @@ import { check, index, integer, primaryKey, sqliteTable, text } from "drizzle-or
 import { courses } from "./courses";
 import { lecturers } from "./lecturers";
 
+/** Why a submitted review waits for moderation instead of publishing. */
+export const reviewPendingReasons = [
+  "low-rating",
+  "contact-details",
+  "moderation",
+  "profanity",
+  "unscorable",
+] as const;
+export type ReviewPendingReason = (typeof reviewPendingReasons)[number];
+
 export const reviews = sqliteTable(
   "reviews",
   {
@@ -22,6 +32,8 @@ export const reviews = sqliteTable(
     status: text("status", { enum: ["pending", "published", "hidden"] })
       .notNull()
       .default("published"),
+    /** Set when a submission is held; null for reviews that published directly or predate it. */
+    pendingReasons: text("pending_reasons", { mode: "json" }).$type<ReviewPendingReason[]>(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
