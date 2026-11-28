@@ -18,7 +18,19 @@ import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from
 import { lecturerReviewsInputSchema, type CoursePickerCursor } from "../-shared/schemas";
 import { reviewOrders } from "../-shared/review-order";
 import { createOmniModerationProvider, type ReviewModerationProvider } from "./review-screening";
-import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+import { submitReview as submitReviewWithCaptcha } from "./submission.service";
+
+type SubmissionContext = Parameters<typeof submitReviewWithCaptcha>[2];
+
+/** Submits with a passing captcha unless the test supplies its own verifier. */
+function submitReview(
+  db: Parameters<typeof submitReviewWithCaptcha>[0],
+  review: Parameters<typeof submitReviewWithCaptcha>[1],
+  context: Omit<SubmissionContext, "verifyCaptcha"> &
+    Partial<Pick<SubmissionContext, "verifyCaptcha">>,
+) {
+  return submitReviewWithCaptcha(db, review, { verifyCaptcha: async () => true, ...context });
+}
 
 const firstReviewPage = lecturerReviewsInputSchema.parse({ lecturerId: "p" });
 
@@ -474,15 +486,44 @@ https://t.me/example`;
   }
 }, 30_000);
 
-it("does not invoke review screening when CAPTCHA verification fails", async () => {
-  let classifierCalls = 0;
-  const result = await submitReviewAfterCaptcha(false, async () => {
-    classifierCalls += 1;
-    return { data: { reviewId: "unexpected", status: "published" as const }, error: null };
-  });
-  expect(result).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
-  expect(classifierCalls).toBe(0);
-});
+it("a failed captcha stops before screening, rate limits and storage", async () => {
+  const platform = await createTestPlatformProxy();
+  try {
+    const db = createDatabase(platform.env.DB);
+    await db.insert(lecturers).values({ id: "p", name: "Lecturer" });
+    await db.insert(courses).values({
+      id: "c",
+      code: "CS101",
+      nameId: "Dasar Komputer",
+      nameEn: "Computer Basics",
+    });
+    const input = submissionInputSchema.parse(rawInput);
+    const context = {
+      ip: "198.51.100.40",
+      browserId: crypto.randomUUID(),
+      secret: "test-secret-".repeat(4),
+      now: 3_600_000,
+    };
+    let classifierCalls = 0;
+    const provider = async (): Promise<"clear"> => {
+      classifierCalls += 1;
+      return "clear";
+    };
+    for (let attempt = 0; attempt < 5; attempt++) {
+      expect(
+        await submitReview(db, input, { ...context, provider, verifyCaptcha: async () => false }),
+      ).toEqual({ data: null, error: REVIEW_ERRORS.CAPTCHA });
+    }
+    expect(classifierCalls).toBe(0);
+    expect(await db.select().from(reviews)).toEqual([]);
+    // Rejected captchas used none of the browser's three hourly submissions.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      expect((await submitReview(db, input, { ...context, provider })).error).toBeNull();
+    }
+  } finally {
+    await platform.dispose();
+  }
+}, 30_000);
 
 it("limits submissions per browser and keeps an IP ceiling", async () => {
   const platform = await createTestPlatformProxy();

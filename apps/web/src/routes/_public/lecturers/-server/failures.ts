@@ -1,32 +1,42 @@
 import { setResponseHeader, setResponseStatus } from "@tanstack/react-start/server";
-import { rejectServerFunction } from "@/server/server-function-error";
-import { REVIEW_ERRORS, type ReviewOperationError } from "../-shared/errors";
+import {
+  REVIEW_ERRORS,
+  type ReviewOperationError,
+  type ReviewOperationResult,
+} from "../-shared/errors";
 
-type OtherReviewError = Exclude<ReviewOperationError, typeof REVIEW_ERRORS.RATE_LIMIT>;
+/** The one shape a review failure takes on the wire. */
+export type ReviewFailure = { code: ReviewOperationError; resetAt?: number };
 
-const submissionErrorStatuses = {
-  [REVIEW_ERRORS.INVALID]: 400,
-  [REVIEW_ERRORS.UNAVAILABLE]: 503,
-  [REVIEW_ERRORS.CAPTCHA]: 400,
-} satisfies Record<OtherReviewError, number>;
+const statuses = {
+  submission: {
+    [REVIEW_ERRORS.INVALID]: 400,
+    [REVIEW_ERRORS.UNAVAILABLE]: 503,
+    [REVIEW_ERRORS.CAPTCHA]: 400,
+    [REVIEW_ERRORS.RATE_LIMIT]: 429,
+  },
+  like: {
+    [REVIEW_ERRORS.INVALID]: 404,
+    [REVIEW_ERRORS.UNAVAILABLE]: 503,
+    [REVIEW_ERRORS.CAPTCHA]: 400,
+    [REVIEW_ERRORS.RATE_LIMIT]: 429,
+  },
+} satisfies Record<string, Record<ReviewOperationError, number>>;
 
-const likeErrorStatuses = {
-  [REVIEW_ERRORS.INVALID]: 404,
-  [REVIEW_ERRORS.UNAVAILABLE]: 503,
-  [REVIEW_ERRORS.CAPTCHA]: 400,
-} satisfies Record<OtherReviewError, number>;
-
-export function rejectRateLimitedReview(resetAt: number): never {
-  const retryAfter = Math.max(0, Math.ceil((resetAt - Date.now()) / 1_000));
-  setResponseHeader("Retry-After", String(retryAfter));
-  setResponseStatus(429);
-  throw { code: REVIEW_ERRORS.RATE_LIMIT, resetAt };
-}
-
-export function rejectSubmissionOperation(error: OtherReviewError): never {
-  return rejectServerFunction(submissionErrorStatuses[error], error);
-}
-
-export function rejectReviewLikeOperation(error: OtherReviewError): never {
-  return rejectServerFunction(likeErrorStatuses[error], error);
+/** Returns a review operation's data, or sets the HTTP status and throws its failure. */
+export function respondToReviewOperation<T>(
+  operation: keyof typeof statuses,
+  result: ReviewOperationResult<T>,
+  now = Date.now(),
+): T {
+  if (result.error === null) return result.data;
+  setResponseStatus(statuses[operation][result.error]);
+  if (result.error === REVIEW_ERRORS.RATE_LIMIT) {
+    setResponseHeader(
+      "Retry-After",
+      String(Math.max(0, Math.ceil((result.resetAt - now) / 1_000))),
+    );
+    throw { code: result.error, resetAt: result.resetAt } satisfies ReviewFailure;
+  }
+  throw { code: result.error } satisfies ReviewFailure;
 }

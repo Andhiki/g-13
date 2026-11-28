@@ -4,42 +4,28 @@ import { likeErrorMessage, submissionErrorMessage } from "./submission-error-mes
 
 const text = (key: string, values?: Record<string, unknown>) =>
   key.replace("{{time}}", String(values?.time));
+const resetAt = new Date(2026, 10, 25, 14, 0).getTime();
 
-test("a rate-limited submission formats the server reset time in local time", () => {
-  const now = new Date(2026, 10, 25, 10, 15).getTime();
-  const resetAt = new Date(2026, 10, 25, 14, 0).getTime();
+test("a rate-limited submission or like formats the server reset time in local time", () => {
   const error = { code: REVIEW_ERRORS.RATE_LIMIT, resetAt };
-  expect(submissionErrorMessage(error, text, now)).toBe(
-    "Submission limit reached. Resets at 14:00.",
+  expect(submissionErrorMessage(error, text)).toBe("Submission limit reached. Resets at 14:00.");
+  expect(likeErrorMessage(error, text)).toBe("Like limit reached. Resets at 14:00.");
+});
+
+test("review failure codes map to their messages", () => {
+  expect(submissionErrorMessage({ code: REVIEW_ERRORS.CAPTCHA }, text)).toBe(
+    "Security verification failed. Please try again.",
+  );
+  expect(submissionErrorMessage({ code: REVIEW_ERRORS.UNAVAILABLE }, text)).toBe(
+    "Reviews are temporarily unavailable. Please try again later.",
   );
 });
 
-test("a rate-limited submission without a timestamp falls back to the browser clock", () => {
-  const now = new Date(2026, 10, 25, 10, 0).getTime();
-  const error = new Error(REVIEW_ERRORS.RATE_LIMIT);
-  const reset = new Date((Math.floor(now / 3_600_000) + 1) * 3_600_000);
-  const localTime = [reset.getHours(), reset.getMinutes()]
-    .map((part) => String(part).padStart(2, "0"))
-    .join(":");
-  expect(submissionErrorMessage(error, text, now)).toBe(
-    `Submission limit reached. Resets at ${localTime}.`,
-  );
-});
-
-test("a rate-limited like displays its server reset time in local time", () => {
-  const now = new Date(2026, 10, 25, 10, 15).getTime();
-  const resetAt = new Date(2026, 10, 25, 14, 0).getTime();
-  const error = { code: REVIEW_ERRORS.RATE_LIMIT, resetAt };
-  expect(likeErrorMessage(error, text, now)).toBe("Like limit reached. Resets at 14:00.");
-});
-
-test("a rate-limited like without a timestamp falls back to the browser clock", () => {
-  const now = new Date(2026, 10, 25, 10, 0).getTime();
-  const reset = new Date((Math.floor(now / 3_600_000) + 1) * 3_600_000);
-  const localTime = [reset.getHours(), reset.getMinutes()]
-    .map((part) => String(part).padStart(2, "0"))
-    .join(":");
-  expect(likeErrorMessage(new Error(REVIEW_ERRORS.RATE_LIMIT), text, now)).toBe(
-    `Like limit reached. Resets at ${localTime}.`,
-  );
+test("anything that is not a review failure gets the generic message", () => {
+  for (const error of [new Error("INTERNAL_ERROR"), null, { code: 1 }, "x"]) {
+    expect(submissionErrorMessage(error, text)).toBe(
+      "Could not confirm submission. Refresh the page before trying again.",
+    );
+    expect(likeErrorMessage(error, text)).toBe("Could not update like. Please try again.");
+  }
 });

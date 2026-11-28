@@ -16,14 +16,9 @@ import {
 } from "../-shared/schemas";
 import { getLecturerDetail, getLecturerDirectory, getLecturerReviewsPage } from "./read.service";
 import { getBrowserReviewLikes, getCoursePickerPage, getOwnPendingReviews } from "./repository";
-import {
-  rejectRateLimitedReview,
-  rejectReviewLikeOperation,
-  rejectSubmissionOperation,
-} from "./failures";
-import { REVIEW_ERRORS } from "../-shared/errors";
+import { respondToReviewOperation } from "./failures";
 import { setReviewLike } from "./likes.service";
-import { submitReview, submitReviewAfterCaptcha } from "./submission.service";
+import { submitReview } from "./submission.service";
 
 export const loadLecturerDirectory = createServerFn({ method: "GET" }).handler(async () =>
   runServerOperation(() => getLecturerDirectory(createDatabase(env.DB))),
@@ -65,23 +60,20 @@ export const publishLecturerReview = createServerFn({ method: "POST" })
       } = parseSubmissionEnvironment(env);
       const ip = serverAdapters.clientIp(getRequest());
       const { turnstileToken, browserId, ...review } = data;
-      const verified = await serverAdapters.verifyCaptcha({
-        secret: turnstileSecret,
-        token: turnstileToken,
-        remoteip: ip,
-      });
-      return submitReviewAfterCaptcha(verified, () => {
-        return submitReview(createDatabase(env.DB), review, {
-          ip,
-          browserId,
-          secret,
-          provider: serverAdapters.reviewModeration(openAiApiKey),
-        });
+      return submitReview(createDatabase(env.DB), review, {
+        ip,
+        browserId,
+        secret,
+        verifyCaptcha: () =>
+          serverAdapters.verifyCaptcha({
+            secret: turnstileSecret,
+            token: turnstileToken,
+            remoteip: ip,
+          }),
+        provider: serverAdapters.reviewModeration(openAiApiKey),
       });
     });
-    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
-    if (result.error !== null) return rejectSubmissionOperation(result.error);
-    return result.data;
+    return respondToReviewOperation("submission", result);
   });
 
 export const loadOwnPendingReviews = createServerFn({ method: "POST" })
@@ -106,7 +98,5 @@ export const updateReviewLike = createServerFn({ method: "POST" })
       const ip = serverAdapters.clientIp(getRequest());
       return setReviewLike(createDatabase(env.DB), data, { ip, secret });
     });
-    if (result.error === REVIEW_ERRORS.RATE_LIMIT) return rejectRateLimitedReview(result.resetAt);
-    if (result.error !== null) return rejectReviewLikeOperation(result.error);
-    return result.data;
+    return respondToReviewOperation("like", result);
   });

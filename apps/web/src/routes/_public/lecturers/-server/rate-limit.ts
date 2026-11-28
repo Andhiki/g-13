@@ -1,9 +1,15 @@
 import type { createDatabase } from "@g13/db/client";
-import { REVIEW_RATE_LIMIT_WINDOW_MS, reviewRateLimitResetAt } from "../-shared/rate-limit-window";
 import { reviewRateLimitIp } from "./rate-limit-ip";
 import { incrementReviewActionLimit } from "./repository";
 
 type Database = ReturnType<typeof createDatabase>;
+
+const REVIEW_RATE_LIMIT_WINDOW_MS = 3_600_000;
+
+/** When the current hourly rate-limit window ends. */
+export function reviewRateLimitResetAt(now: number): number {
+  return (Math.floor(now / REVIEW_RATE_LIMIT_WINDOW_MS) + 1) * REVIEW_RATE_LIMIT_WINDOW_MS;
+}
 
 const SUBMISSION_LIMIT_PER_BROWSER = 3;
 const SUBMISSION_LIMIT_PER_IP = 20;

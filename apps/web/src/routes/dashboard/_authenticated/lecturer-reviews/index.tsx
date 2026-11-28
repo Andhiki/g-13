@@ -64,13 +64,13 @@ function reviewEmptyTitle(needle: string, status: ReviewStatus): string {
 function reviewEmptyDescription(needle: string, status: ReviewStatus): string {
   if (needle) return "Try another search term or clear the search to see submitted reviews.";
   if (status === "all") {
-    return "Reviews with any rating of 2 or lower wait in Pending; all others publish immediately.";
+    return "Reviews with any rating of 2 or lower, or text flagged by screening, wait in Pending; all others publish immediately.";
   }
   if (status === "pending") {
-    return "Reviews with a rating of 2 or lower wait here until an admin approves or hides them.";
+    return "Reviews with a rating of 2 or lower, or text flagged by screening, wait here until an admin approves or hides them.";
   }
   if (status === "published") {
-    return "Reviews with every rating at 3 or higher publish immediately and appear here.";
+    return "Reviews with every rating at 3 or higher and clear screening publish immediately and appear here.";
   }
   return `Reviews appear here after an admin moves them to ${status}.`;
 }
