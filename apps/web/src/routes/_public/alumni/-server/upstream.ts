@@ -106,7 +106,37 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
     pages.push(strapiPage);
     if (requestedPageNumber >= pageCount) break;
   }
+  assertCompleteSnapshot(pages);
   return pages;
+}
+
+// Rejects page sets that overlap or fall short of Strapi's reported total, so a
+// directory that shifted mid-fetch is never sanitized and cached as a success.
+function assertCompleteSnapshot(pages: StrapiAlumniResponse[]): void {
+  const ids = new Set<number>();
+  let rowCount = 0;
+  let expectedTotal: number | undefined;
+  for (const page of pages) {
+    const records = page.data as unknown[];
+    rowCount += records.length;
+    for (const record of records) {
+      if (!record || typeof record !== "object" || !("id" in record)) continue;
+      const id = record.id;
+      if (typeof id !== "number" || !Number.isSafeInteger(id)) continue;
+      if (ids.has(id)) throw new Error("Overlapping alumni upstream pages");
+      ids.add(id);
+    }
+    const total = page.meta?.pagination?.total;
+    // Strapi omits total on some configurations; only a valid count is checked.
+    if (typeof total !== "number" || !Number.isSafeInteger(total) || total < 0) continue;
+    if (expectedTotal !== undefined && total !== expectedTotal) {
+      throw new Error("Inconsistent alumni upstream total");
+    }
+    expectedTotal = total;
+  }
+  if (expectedTotal !== undefined && rowCount !== expectedTotal) {
+    throw new Error("Incomplete alumni upstream directory");
+  }
 }
 
 export const alumniCache =
