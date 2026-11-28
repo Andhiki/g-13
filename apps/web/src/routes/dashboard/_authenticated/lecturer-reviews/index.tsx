@@ -354,6 +354,8 @@ function LecturerReviewsPage() {
       ]);
       setConfirmation(null);
     },
+    // A rejected move usually means another moderator changed the review first.
+    onError: () => queryClient.invalidateQueries({ queryKey: ["admin"] }),
   });
 
   function confirmReview(input: ModerateReviewInput, label: string) {
