@@ -7,7 +7,7 @@ import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
 import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
-import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
+import { AdminInspectorLayout, desktopInspectorQuery } from "../-components/AdminInspector";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
@@ -261,54 +261,54 @@ function CoursesContent({
   onLifecycle: (input: CourseLifecycleInput, label: string) => void;
 }) {
   return (
-    <div className="flex min-h-0 flex-1">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-        {!queryState.isPending && !queryState.isError && (
-          <AdminPagination
-            count={count}
-            offset={offset}
-            total={total}
-            label="courses"
-            hasNext={hasNext}
-            onPrevious={onPreviousPage}
-            onNext={onNextPage}
-          />
-        )}
-        <div
-          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-        >
-          <CoursesListBody
-            queryState={queryState}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            activeCount={activeCount}
-            selectedId={selectedCourse?.id}
-            onClearSearch={onClearSearch}
-            onViewActive={onViewActive}
-            onCreate={onCreate}
-            onSelect={onSelect}
-            onEdit={onEdit}
-            onLifecycle={onLifecycle}
-          />
-        </div>
-      </div>
-      <AdminInspector
-        title="Course details"
-        desktopOpen={detailsVisible}
-        mobileOpen={mobileDetailsOpen}
-        onMobileOpenChange={onMobileDetailsOpenChange}
-      >
-        {selectedCourse && !queryState.isPending && !queryState.isError && (
+    <AdminInspectorLayout
+      title="Course details"
+      desktopOpen={detailsVisible}
+      mobileOpen={mobileDetailsOpen}
+      onMobileOpenChange={onMobileDetailsOpenChange}
+      details={
+        selectedCourse &&
+        !queryState.isPending &&
+        !queryState.isError && (
           <CourseInspector
             key={selectedCourse.id}
             course={selectedCourse}
             onEdit={onEdit}
             onLifecycle={onLifecycle}
           />
-        )}
-      </AdminInspector>
-    </div>
+        )
+      }
+    >
+      {!queryState.isPending && !queryState.isError && (
+        <AdminPagination
+          count={count}
+          offset={offset}
+          total={total}
+          label="courses"
+          hasNext={hasNext}
+          onPrevious={onPreviousPage}
+          onNext={onNextPage}
+        />
+      )}
+      <div
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+      >
+        <CoursesListBody
+          queryState={queryState}
+          visibleRows={visibleRows}
+          needle={needle}
+          status={status}
+          activeCount={activeCount}
+          selectedId={selectedCourse?.id}
+          onClearSearch={onClearSearch}
+          onViewActive={onViewActive}
+          onCreate={onCreate}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onLifecycle={onLifecycle}
+        />
+      </div>
+    </AdminInspectorLayout>
   );
 }
 
