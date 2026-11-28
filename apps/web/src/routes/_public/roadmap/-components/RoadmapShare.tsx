@@ -50,14 +50,16 @@ function ManualShareModal({ url, onDismiss }: { url: string | null; onDismiss: (
       }}
     >
       <AlignModal.Content>
-        <div className="p-5">
-          <AlignModal.Title asChild className="pr-8">
+        <AlignModal.Header>
+          <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle1">
               {text("Bagikan roadmap")}
             </Typography>
           </AlignModal.Title>
+        </AlignModal.Header>
+        <AlignModal.Body>
           <AlignModal.Description asChild>
-            <Typography as="p" variant="paragraph" color="muted" className="mt-2">
+            <Typography as="p" variant="paragraph" color="muted">
               {text("Salin tautan ini untuk membuka rencana yang sama.")}
             </Typography>
           </AlignModal.Description>
@@ -68,7 +70,7 @@ function ManualShareModal({ url, onDismiss }: { url: string | null; onDismiss: (
             onFocus={(event) => event.currentTarget.select()}
             className="mt-4 block w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-paragraph-sm"
           />
-        </div>
+        </AlignModal.Body>
       </AlignModal.Content>
     </AlignModal.Root>
   );

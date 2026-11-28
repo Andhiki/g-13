@@ -268,7 +268,7 @@ function ReviewFormFooter({
 }) {
   const { text } = useLocale("lecturers");
   return (
-    <footer className="shrink-0 border-t border-stroke-soft-200 p-4">
+    <AlignModal.Footer className="block p-4">
       {message && (
         <div role="status" aria-live="polite" className="mb-3 text-paragraph-sm text-error-base">
           <Typography as="p" variant="paragraph" className="m-0">
@@ -299,7 +299,7 @@ function ReviewFormFooter({
           </Typography>
         </AlignFancyButton.Root>
       </div>
-    </footer>
+    </AlignModal.Footer>
   );
 }
 
@@ -347,7 +347,7 @@ function ReviewFormFields({
   };
 
   return (
-    <div className="min-h-0 overflow-y-auto px-4 pt-4 pb-3 sm:mb-3">
+    <AlignModal.Body className="px-4 pt-4 pb-3 sm:pb-6">
       <fieldset disabled={isSubmitting} className="min-w-0 space-y-4 disabled:opacity-70">
         <AuthorNameField
           anonymous={anonymous}
@@ -398,7 +398,7 @@ function ReviewFormFields({
         </div>
         <ReviewBodyField body={body} error={errors.body} onChange={handleBodyChange} />
       </fieldset>
-    </div>
+    </AlignModal.Body>
   );
 }
 
@@ -480,10 +480,10 @@ export function ReviewSubmissionForm({
     <form
       ref={form}
       noValidate
-      className="flex max-h-[calc(100dvh-2rem)] min-h-0 flex-col"
+      className="flex min-h-0 flex-auto flex-col overflow-hidden"
       onSubmit={handleSubmit}
     >
-      <header className="shrink-0 border-b border-stroke-soft-200 p-4 pr-12">
+      <AlignModal.Header className="p-4 pr-12">
         <AlignModal.Title asChild>
           <Typography
             as="h2"
@@ -498,7 +498,7 @@ export function ReviewSubmissionForm({
             {text("Write a review for {{lecturerName}}", { lecturerName })}
           </Typography>
         </AlignModal.Title>
-      </header>
+      </AlignModal.Header>
       <ReviewFormFields
         initialCourse={initialCourse}
         anonymous={anonymous}

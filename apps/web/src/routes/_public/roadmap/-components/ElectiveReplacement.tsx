@@ -47,37 +47,41 @@ function ElectiveReplacementDialogBody({
 }) {
   const { text, courseName } = useLocale("roadmap");
   return (
-    <div className="p-5">
-      <AlignModal.Title asChild className="pr-8">
-        <Typography as="h2" variant="subtitle1">
-          {text("Ganti mata kuliah pilihan")}
-        </Typography>
-      </AlignModal.Title>
-      <AlignModal.Description asChild>
-        <Typography as="p" variant="paragraph" color="muted" className="mb-5 mt-2">
-          {text("Menggantikan")} {courseName(item.course)}
-          {text(". Beban dan prasyarat rencana dihitung ulang.")}
-        </Typography>
-      </AlignModal.Description>
-      <AlignSelect.Root value={choice} onValueChange={onChoiceChange}>
-        <AlignSelect.Trigger aria-label={text("Mata kuliah pengganti")}>
-          <AlignSelect.Value placeholder={text("Pilih mata kuliah")} />
-        </AlignSelect.Trigger>
-        <AlignSelect.Content>
-          {available.map((x) => (
-            <AlignSelect.Item key={x.id} value={x.id}>
-              {courseName(x)} · {creditsFor(x)} {text("SKS")}
-            </AlignSelect.Item>
-          ))}
-        </AlignSelect.Content>
-      </AlignSelect.Root>
-      {course && <ReplacementCourseSummary course={course} />}
-      <div className="mt-5 flex justify-end">
+    <>
+      <AlignModal.Header>
+        <AlignModal.Title asChild>
+          <Typography as="h2" variant="subtitle1">
+            {text("Ganti mata kuliah pilihan")}
+          </Typography>
+        </AlignModal.Title>
+      </AlignModal.Header>
+      <AlignModal.Body>
+        <AlignModal.Description asChild>
+          <Typography as="p" variant="paragraph" color="muted" className="mb-5">
+            {text("Menggantikan")} {courseName(item.course)}
+            {text(". Beban dan prasyarat rencana dihitung ulang.")}
+          </Typography>
+        </AlignModal.Description>
+        <AlignSelect.Root value={choice} onValueChange={onChoiceChange}>
+          <AlignSelect.Trigger aria-label={text("Mata kuliah pengganti")}>
+            <AlignSelect.Value placeholder={text("Pilih mata kuliah")} />
+          </AlignSelect.Trigger>
+          <AlignSelect.Content>
+            {available.map((x) => (
+              <AlignSelect.Item key={x.id} value={x.id}>
+                {courseName(x)} · {creditsFor(x)} {text("SKS")}
+              </AlignSelect.Item>
+            ))}
+          </AlignSelect.Content>
+        </AlignSelect.Root>
+        {course && <ReplacementCourseSummary course={course} />}
+      </AlignModal.Body>
+      <AlignModal.Footer>
         <AlignButton.Root variant="neutral" disabled={!course} onClick={onConfirm}>
           {text("Gunakan mata kuliah ini")}
         </AlignButton.Root>
-      </div>
-    </div>
+      </AlignModal.Footer>
+    </>
   );
 }
 

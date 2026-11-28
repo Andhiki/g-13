@@ -119,23 +119,23 @@ export function RoadmapNotes({
   return (
     <AlignModal.Root>
       <RoadmapNotesTrigger conflictCount={plan.conflicts.length} />
-      <AlignModal.Content className="max-w-[560px] max-h-[85dvh] overflow-y-auto">
-        <div className="p-5 pr-12">
+      <AlignModal.Content className="max-w-[560px]">
+        <AlignModal.Header>
           <AlignModal.Title asChild>
             <Typography as="h2" variant="title" className="m-0">
               {text("Catatan roadmap")}
             </Typography>
           </AlignModal.Title>
-        </div>
-        <AlignModal.Description asChild>
-          <Typography as="p" variant="caption" className="sr-only">
-            {text("Pemeriksaan rencana, asumsi, dan sumber kurikulum.")}
-          </Typography>
-        </AlignModal.Description>
-        <div className="space-y-6 overflow-y-auto p-5 pt-0">
+          <AlignModal.Description asChild>
+            <Typography as="p" variant="caption" className="sr-only">
+              {text("Pemeriksaan rencana, asumsi, dan sumber kurikulum.")}
+            </Typography>
+          </AlignModal.Description>
+        </AlignModal.Header>
+        <AlignModal.Body className="space-y-6">
           <RoadmapConflictsSection conflicts={plan.conflicts} target={target} />
           <RoadmapAssumptionsSection sourceTitle={sourceTitle} notes={plan.notes} />
-        </div>
+        </AlignModal.Body>
       </AlignModal.Content>
     </AlignModal.Root>
   );
