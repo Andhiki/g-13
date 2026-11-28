@@ -1,6 +1,5 @@
 import { getAcademicRules, getCurriculum } from "@g13/curriculum";
-import { creditsFor } from "@/courses/course-utils";
-import { planningLimit } from "./schedule";
+import { planningLimit, semesterCredits } from "./schedule";
 import type { Course } from "@g13/curriculum";
 import type { Roadmap } from "./planner";
 import type { PlanningInput } from "./planning-input";
@@ -34,11 +33,7 @@ export function findConflicts(plan: Roadmap, answers: PlanningInput, blocked: Se
   ]);
   for (const term of semesters) {
     const list = plan.courses.filter((x) => x.semester === term);
-    const credits =
-      plan.activities
-        .filter((activity) => activity.semester === term)
-        .reduce((sum, activity) => sum + activity.recommendedCredits, 0) +
-      list.reduce((sum, x) => sum + (creditsFor(x.course) ?? 0), 0);
+    const credits = semesterCredits(term, plan.courses, plan.activities);
     if (credits > planningLimit)
       conflicts.push(
         message("Semester {{v0}} memuat {{v1}} SKS, melebihi batas perencanaan {{v2}} SKS.", {

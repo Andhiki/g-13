@@ -1,10 +1,11 @@
 import { expect, test } from "bun:test";
 import { getCurriculum, type Relation } from "@g13/curriculum";
-import { scheduleCourses } from "./schedule";
+import { creditsFor } from "@/courses/course-utils";
+import { scheduleCourses, semesterCredits, totalRoadmapCredits } from "./schedule";
 import { findConflicts } from "./conflicts";
 import { planningInput } from "./planning-input";
 import { validateRoadmapSearch } from "./search";
-import type { PlannedCourse, Roadmap } from "./planner";
+import type { Activity, PlannedCourse, Roadmap } from "./planner";
 
 const input = planningInput(
   validateRoadmapSearch({
@@ -17,7 +18,7 @@ const input = planningInput(
 const template = getCurriculum("2021").core[0];
 
 for (const timing of ["before", "concurrent"] as const) {
-  test(`scheduling and conflicts agree on ${timing} prerequisite timing`, () => {
+  test(`scheduling and conflicts agree on ${timing} prerequisite timing without mutating input`, () => {
     const courses: PlannedCourse[] = [
       {
         course: { ...template, id: "source" },
@@ -33,10 +34,11 @@ for (const timing of ["before", "concurrent"] as const) {
       },
     ];
     const relations: Relation[] = [{ source: "source", target: "target", timing }];
-    scheduleCourses(courses, relations, input, new Set());
-    expect(courses[1].semester).toBe(timing === "concurrent" ? 2 : 4);
+    const scheduled = scheduleCourses(courses, relations, input, new Set());
+    expect(courses[1].semester).toBe(2);
+    expect(scheduled[1].semester).toBe(timing === "concurrent" ? 2 : 4);
     const plan: Roadmap = {
-      courses,
+      courses: scheduled,
       relations,
       activities: [],
       totalCredits: 144,
@@ -49,11 +51,51 @@ for (const timing of ["before", "concurrent"] as const) {
         conflict.key.includes("urutan prasyarat"),
       ),
     ).toBe(false);
-    courses[1].semester = 2;
+    const overlappingPlan: Roadmap = {
+      ...plan,
+      courses: scheduled.map((item) =>
+        item.course.id === "target" ? { ...item, semester: 2 } : item,
+      ),
+    };
     expect(
-      findConflicts(plan, input, new Set()).some((conflict) =>
+      findConflicts(overlappingPlan, input, new Set()).some((conflict) =>
         conflict.key.includes("urutan prasyarat"),
       ),
     ).toBe(timing === "before");
   });
 }
+
+test("semesterCredits and totalRoadmapCredits combine courses and activities", () => {
+  const [first, second] = getCurriculum("2021").core;
+  const firstCredits = creditsFor(first) ?? 0;
+  const secondCredits = creditsFor(second) ?? 0;
+  const courses: PlannedCourse[] = [
+    {
+      course: first,
+      originalId: first.id,
+      semester: 1,
+      kind: "required",
+    },
+    {
+      course: second,
+      originalId: second.id,
+      semester: 6,
+      kind: "elective",
+    },
+  ];
+  const activities: Activity[] = [
+    {
+      id: "exchange",
+      title: "Exchange",
+      semester: 6,
+      endSemester: 6,
+      detail: "",
+      fullSemester: true,
+      recommendedCredits: 20,
+    },
+  ];
+
+  expect(semesterCredits(1, courses, activities)).toBe(firstCredits);
+  expect(semesterCredits(6, courses, activities)).toBe(secondCredits + 20);
+  expect(totalRoadmapCredits(courses, activities)).toBe(firstCredits + secondCredits + 20);
+});
