@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { loadMessages } from "@g13/i18n/messages";
 import { createI18n, messageNamespace } from "./i18n";
-import { examArchive } from "./routes/_public/exam/-shared/catalog";
+import type { ExamCourseSummary } from "./routes/_public/exam/-shared/contracts";
 import { browseArchive } from "./routes/_public/exam/-shared/archive";
 
 const common = await loadMessages("en", "common");
@@ -9,7 +9,7 @@ const roadmap = await loadMessages("en", "roadmap");
 const instance = createI18n({ language: "en", namespace: "roadmap", messages: roadmap, common });
 test("exam courses are searchable in either language", async () => {
   const messages = await loadMessages("en", "exam");
-  const displayName = (course: (typeof examArchive)[number]) => messages[course.name];
+  const displayName = (course: ExamCourseSummary) => messages[course.name];
   const english = browseArchive({ location: [], query: "programming", displayName, locale: "en" });
   const indonesian = browseArchive({
     location: [],
