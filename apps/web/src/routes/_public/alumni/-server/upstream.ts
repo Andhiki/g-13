@@ -53,7 +53,7 @@ export async function fetchAlumniPages(token: string): Promise<StrapiAlumniRespo
           { id: 2, name: "Bima Fixture", batch: 2020 },
           { id: 3, name: "Citra Fixture", batch: 2021 },
         ],
-        meta: { pagination: { pageCount: 1, total: 3 } },
+        meta: { pagination: { page: 1, pageCount: 1, total: 3 } },
       },
     ];
   }

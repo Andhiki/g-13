@@ -9,7 +9,7 @@ export const publicRoutes = [
   { path: "/faq", primary: /^faq$/i, navigation: /^faq$/i },
   {
     path: "/resources",
-    primary: /bingung harus|looking for a place/i,
+    primary: /^sumber belajar$|^learning resources$/i,
     navigation: /sumber belajar|learning resources/i,
   },
   {
