@@ -10,13 +10,15 @@ for (const catalog of [
     kind: "course",
     heading: "Courses",
     filter: /filter code or course name/i,
-    label: "Name (Indonesian)",
+    group: "Name",
+    label: "Indonesian",
   },
   {
     path: "lecturers",
     kind: "lecturer",
     heading: "Lecturers",
     filter: /filter lecturer name or slug/i,
+    group: undefined,
     label: "Full name",
   },
 ]) {
@@ -38,14 +40,18 @@ for (const catalog of [
     await filter.clear();
     await screen.getByRole("button", { name: title }).first().click();
     const form = screen.getByRole("dialog", { name: title });
+    const field = (root: typeof form) =>
+      catalog.group
+        ? root.getByRole("group", { name: catalog.group }).getByLabel(catalog.label)
+        : root.getByLabel(catalog.label);
     const submit = form.getByRole("button", { name: title });
     await submit.click();
-    await expect(form.getByLabel(catalog.label)).toHaveAttribute("aria-invalid", "true");
+    await expect(field(form)).toHaveAttribute("aria-invalid", "true");
     if (catalog.kind === "course") {
-      await form.getByLabel("Course code").fill(`E2ETEST${randomUUID().slice(0, 8)}`);
-      await form.getByLabel("Name (English)").fill(name);
+      await form.getByLabel("Code").fill(`E2ETEST${randomUUID().slice(0, 8)}`);
+      await form.getByRole("group", { name: "Name" }).getByLabel("English").fill(name);
     }
-    await form.getByLabel(catalog.label).fill(name);
+    await field(form).fill(name);
     await submit.click();
     await expect(form).toBeHidden();
 
@@ -61,14 +67,15 @@ for (const catalog of [
     const edit = inspector.getByRole("button", { name: "Edit", exact: true });
     await edit.click();
     const editForm = screen.getByRole("dialog", { name: `Edit ${catalog.kind}` });
-    await editForm.getByLabel(catalog.label).fill("Canceled edit");
+    await field(editForm).fill("Canceled edit");
     await editForm.getByRole("button", { name: "Cancel" }).click();
     await expect(screen.getByText("Canceled edit")).toBeHidden();
     await expect(editForm).toBeHidden();
     // The exit overlay still eats pointer clicks; activate the trigger by keyboard.
     await edit.press("Enter");
-    await editForm.getByLabel(catalog.label).fill(revised);
-    if (catalog.kind === "course") await editForm.getByLabel("Name (English)").fill(revised);
+    await field(editForm).fill(revised);
+    if (catalog.kind === "course")
+      await editForm.getByRole("group", { name: "Name" }).getByLabel("English").fill(revised);
     await editForm.getByRole("button", { name: "Save changes" }).click();
     await expect(editForm).toBeHidden();
     await browser.reload();

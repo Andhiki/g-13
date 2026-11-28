@@ -6,6 +6,11 @@ export const adminPageSchema = z.object({
   query: z.string().trim().max(adminSearchMaxLength).optional(),
 });
 
+/** URL search for dashboard lists; `q` holds the committed (debounced) search. */
+export const adminListSearchSchema = z.object({
+  q: z.string().trim().max(adminSearchMaxLength).optional().catch(undefined),
+});
+
 export type AdminSearchSegment = { text: string; match: boolean };
 
 // Mirrors SQLite's lower(): ASCII-only folding keeps highlights in step with

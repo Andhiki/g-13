@@ -11,7 +11,10 @@ import { Typography } from "@/ui/typography";
 import { useLocale } from "@/useLocale";
 import { formatAbsoluteTime } from "@/date-format";
 import type { loadAdminAnnouncements } from "../-server/handler";
-import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
+import {
+  resolveAnnouncementStatus,
+  type AnnouncementStatus,
+} from "@/routes/-announcements/schedule";
 import { announcementStatusLabel } from "../-shared/status";
 import { createSearchHighlight } from "../../-client/search-highlight";
 import { announcementSearchFields, type AnnouncementLifecycleInput } from "../-shared/schemas";
@@ -22,8 +25,7 @@ export const announcementTableColumns = "lg:grid-cols-[minmax(0,1fr)_200px_110px
 
 export type AdminAnnouncement = Awaited<ReturnType<typeof loadAdminAnnouncements>>["rows"][number];
 
-function AnnouncementStatusBadge({ announcement }: { announcement: AdminAnnouncement }) {
-  const status = resolveAnnouncementStatus(announcement);
+export function AnnouncementStatusBadge({ status }: { status: AnnouncementStatus }) {
   return (
     <AlignBadge.Root
       size="medium"
@@ -84,7 +86,7 @@ export function AdminAnnouncementRow({
             <Highlight field="titleId">{announcement.titleId}</Highlight>
           </AdminTableInspectButton>
           <div className="lg:hidden">
-            <AnnouncementStatusBadge announcement={announcement} />
+            <AnnouncementStatusBadge status={resolveAnnouncementStatus(announcement)} />
           </div>
         </div>
         <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
@@ -112,7 +114,7 @@ export function AdminAnnouncementRow({
       </div>
 
       <div className="hidden lg:block">
-        <AnnouncementStatusBadge announcement={announcement} />
+        <AnnouncementStatusBadge status={resolveAnnouncementStatus(announcement)} />
       </div>
 
       <div className="hidden items-center justify-end gap-1 lg:flex">

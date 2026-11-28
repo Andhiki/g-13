@@ -1,5 +1,6 @@
 import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminList } from "../-client/useAdminList";
+import { adminListSearchSchema } from "../-shared/admin-search";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -25,7 +26,7 @@ import { AdminReviewRow, reviewTableColumns } from "./-components/AdminReviewRow
 import { ReviewStatusBadge } from "./-components/ReviewStatusBadge";
 import { ReviewInspector } from "./-components/ReviewInspector";
 
-const reviewsSearchSchema = z.object({
+const reviewsSearchSchema = adminListSearchSchema.extend({
   review: z.string().optional(),
 });
 
