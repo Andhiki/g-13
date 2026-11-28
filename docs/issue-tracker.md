@@ -4,6 +4,10 @@ All specs and implementation tickets live on **GitHub Issues** (`Andhiki/g-13`).
 There is no local tracker. Publish a spec as its own issue, then one issue per
 ticket, referencing blockers by issue number.
 
+Write issues, pull requests, and their comments in English. Quote Indonesian
+source text (curriculum documents, UI copy) as needed, but write the surrounding
+description in English.
+
 Keep every issue self-contained — external contributors and agents read only
 GitHub. An issue carries what to build, acceptance criteria, and Blocked by
 (referencing issue numbers). Discussion happens in issue comments; append
