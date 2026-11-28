@@ -1,33 +1,33 @@
-## Perubahan dan alasan
+## Changes and why
 
 <!--
-Jelaskan perilaku sebelum dan sesudah.
-Untuk setiap isu yang diselesaikan, tulis Closes #123 atau Resolves #123
-di baris tersendiri pada deskripsi PR, di luar komentar ini. Gunakan
-Refs #123 untuk isu terkait atau pekerjaan yang baru selesai sebagian.
+Describe the behavior before and after. Write in English.
+For each issue this resolves, add Closes #123 or Resolves #123 on its own
+line in the description, outside this comment. Use Refs #123 for related or
+partially completed issues.
 -->
 
-## Verifikasi
+## Verification
 
 - [ ] `bun run check`
 - [ ] `bun run build`
 
-<!-- Tuliskan hasil aktual, pemeriksaan yang belum dilakukan, dan screenshot untuk perubahan tampilan. -->
+<!-- Report actual results, checks not run, and screenshots for visual changes. -->
 
-## Data dan atribusi
+## Data and attribution
 
-<!-- Untuk koreksi kurikulum: versi, kode MK, sumber resmi, halaman.
-Untuk kode/aset pihak ketiga: sumber, lisensi, dan notice. Hapus jika tidak relevan. -->
+<!-- For curriculum corrections: version, course code, official source, page.
+For third-party code/assets: source, license, and notice. Delete if not relevant. -->
 
-## Risiko atau tindak lanjut
+## Risks or follow-ups
 
-<!-- Cantumkan batasan yang berpengaruh pada pengguna atau merge; hapus jika tidak ada. -->
+<!-- List limitations that affect users or merging; delete if none. -->
 
 <!--
-Rilis ke main: pilih tepat satu label release:patch (perbaikan),
-release:minor (fitur kompatibel), atau release:major (perubahan breaking).
-Promosi dari staging membawa semua perubahan di staging.
-Untuk merilis satu perbaikan lebih dulu, buat hotfix/<nama> dari main,
-cherry-pick hanya perbaikannya, dan gunakan release:patch. Setelah rilis,
-gabungkan main kembali ke staging. Lihat CONTRIBUTING.md.
+Release to main: pick exactly one label: release:patch (fixes),
+release:minor (compatible features), or release:major (breaking changes).
+A promotion from staging carries every change on staging.
+To release one fix early, branch hotfix/<name> from main, cherry-pick only
+the fix, and use release:patch. After the release, merge main back into
+staging. See CONTRIBUTING.md.
 -->
