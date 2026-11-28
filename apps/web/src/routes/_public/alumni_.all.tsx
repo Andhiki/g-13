@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest, setResponseStatus } from "@tanstack/react-start/server";
 import { AlumniDirectory } from "./alumni/-components/AlumniDirectory";
-import type { AlumniDirectoryData } from "./alumni/-shared/directory";
+import { parseAlumniDirectory } from "./alumni/-shared/directory";
 import { Loading } from "@/ui/loading";
 
 const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
@@ -10,10 +10,12 @@ const loadDirectory = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const { serverAdapters } = await import("@/server/adapters");
     if (serverAdapters.alumni.outage(getRequest())) throw new Error("Directory outage");
-    // Service-binding fetches share Workers Cache with browser requests to this endpoint.
+    // Service-binding fetches share Workers Cache with browser requests to this endpoint,
+    // so most page loads never reach Strapi. The cached JSON is checked like any other.
     const response = await env.ALUMNI.fetch("https://alumni.internal/api/alumni");
     if (!response.ok) throw new Error("Directory unavailable");
-    const data: AlumniDirectoryData = await response.json();
+    const data = parseAlumniDirectory(await response.json());
+    if (!data) throw new Error("Invalid directory data");
     return data;
   } catch {
     setResponseStatus(503, "Service Unavailable");

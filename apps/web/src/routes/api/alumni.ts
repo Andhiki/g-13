@@ -1,36 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { collectAlumni } from "../_public/alumni/-shared/directory";
-import { alumniCache, alumniCdnCache } from "../_public/alumni/-server/upstream";
 import { serverAdapters } from "@/server/adapters";
+import { alumniDirectoryResponse, loadAlumniDirectory } from "../_public/alumni/-server/directory";
 
 export const Route = createFileRoute("/api/alumni")({
   server: {
     handlers: {
-      GET: async () => {
-        const token = serverAdapters.alumni.token();
-        if (!token) {
-          return Response.json(
-            { error: "unconfigured" },
-            { status: 503, headers: { "cache-control": "no-store" } },
-          );
-        }
-
-        try {
-          return Response.json(collectAlumni(await serverAdapters.alumni.fetchPages(token)), {
-            headers: {
-              "cache-control": alumniCache,
-              "cdn-cache-control": alumniCdnCache,
-              "content-type": "application/json; charset=utf-8",
-            },
-          });
-        } catch {
-          // Never surface upstream detail: it can contain request URLs or token fragments.
-          return Response.json(
-            { error: "upstream" },
-            { status: 502, headers: { "cache-control": "no-store" } },
-          );
-        }
-      },
+      GET: async () => alumniDirectoryResponse(await loadAlumniDirectory(serverAdapters.alumni)),
     },
   },
 });
