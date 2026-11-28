@@ -121,3 +121,12 @@ export const reorderResourcesSchema = z
     path: ["movedId"],
   });
 export type ReorderResourcesInput = z.infer<typeof reorderResourcesSchema>;
+
+/** Fields the admin search matches; the UI may highlight only these. */
+export const resourceSearchFields = [
+  "titleId",
+  "titleEn",
+  "descriptionId",
+  "descriptionEn",
+  "url",
+] as const;

@@ -56,6 +56,7 @@ for (const catalog of [
     await expect(form).toBeHidden();
 
     await filter.fill(name);
+    await expect(screen.getByTestId("search-match").filter({ hasText: name }).first()).toBeVisible();
     await screen.getByRole("button", { name: /inspect.*e2e disposable record/i }).click();
     await expect(
       screen.getByText(`${catalog.kind} details`, { exact: false }).first(),

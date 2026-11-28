@@ -1,3 +1,5 @@
+import { adminSearchColumns } from "../../-server/search";
+import { resourceSearchFields } from "../-shared/schemas";
 import { and, asc, eq, inArray, isNotNull, isNull, like, sql, type SQL } from "drizzle-orm";
 import { learningResources } from "@g13/db/schema/learning-resources";
 import type { createDatabase } from "@g13/db/client";
@@ -10,13 +12,13 @@ import type {
 
 type Database = ReturnType<typeof createDatabase>;
 
-export const adminResourceSearchColumns = [
-  learningResources.titleId,
-  learningResources.titleEn,
-  learningResources.descriptionId,
-  learningResources.descriptionEn,
-  learningResources.url,
-];
+export const adminResourceSearchColumns = adminSearchColumns(resourceSearchFields, {
+  titleId: learningResources.titleId,
+  titleEn: learningResources.titleEn,
+  descriptionId: learningResources.descriptionId,
+  descriptionEn: learningResources.descriptionEn,
+  url: learningResources.url,
+});
 
 async function allocateResourceId(db: Database, title: string): Promise<string> {
   return allocateCatalogId(title, "resource", (pattern) =>

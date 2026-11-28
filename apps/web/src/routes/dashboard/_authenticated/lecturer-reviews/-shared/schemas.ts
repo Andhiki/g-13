@@ -8,3 +8,14 @@ const nonEmpty = z.string().trim().min(1);
 const requiredId = () => nonEmpty.max(100);
 
 export const moderationReviewSchema = z.object({ reviewId: requiredId() });
+
+/** Fields the admin search matches; the UI may highlight only these. */
+export const reviewSearchFields = [
+  "lecturerName",
+  "courseCode",
+  "courseNameId",
+  "courseNameEn",
+  "termLabel",
+  "authorName",
+  "body",
+] as const;

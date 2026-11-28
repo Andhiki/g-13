@@ -16,7 +16,10 @@ import {
   type AnnouncementStatus,
 } from "@/routes/-announcements/schedule";
 import { announcementStatusLabel } from "../-shared/status";
-import type { AnnouncementLifecycleInput } from "../-shared/schemas";
+import { createSearchHighlight } from "../../-client/search-highlight";
+import { announcementSearchFields, type AnnouncementLifecycleInput } from "../-shared/schemas";
+
+const Highlight = createSearchHighlight(announcementSearchFields);
 
 export const announcementTableColumns = "lg:grid-cols-[minmax(0,1fr)_200px_110px_176px]";
 
@@ -64,7 +67,8 @@ export function AdminAnnouncementRow({
     announcement.countdownAt === null
       ? null
       : `Countdown · ${formatAbsoluteTime(announcement.countdownAt.getTime(), language)}`;
-  const summary = [start, expiry, countdown, announcement.titleEn].filter(Boolean).join(" · ");
+  const schedule = [start, expiry, countdown].filter(Boolean).join(" · ");
+  const summary = `${schedule} · ${announcement.titleEn}`;
 
   return (
     <AdminTableRow
@@ -79,18 +83,18 @@ export function AdminAnnouncementRow({
             selected={selected}
             onSelect={onSelect}
           >
-            {announcement.titleId}
+            <Highlight field="titleId">{announcement.titleId}</Highlight>
           </AdminTableInspectButton>
           <div className="lg:hidden">
             <AnnouncementStatusBadge status={resolveAnnouncementStatus(announcement)} />
           </div>
         </div>
         <Typography variant="caption" color="muted" className="mt-0.5 hidden truncate lg:block">
-          {announcement.titleEn}
+          <Highlight field="titleEn">{announcement.titleEn}</Highlight>
         </Typography>
         <AdminTableMeta>
           <span className="truncate" title={summary}>
-            {summary}
+            {schedule} · <Highlight field="titleEn">{announcement.titleEn}</Highlight>
           </span>
         </AdminTableMeta>
       </div>

@@ -1,3 +1,4 @@
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminList } from "../-client/useAdminList";
 import { adminListSearchSchema } from "../-shared/admin-search";
 import { useState } from "react";
@@ -132,15 +133,17 @@ function ReviewsListBody({
           }
         />
       )}
-      {visibleRows.map((review) => (
-        <AdminReviewRow
-          key={review.id}
-          review={review}
-          selected={selectedReviewId === review.id}
-          onSelect={() => onSelectReview(review.id)}
-          onAction={onAction}
-        />
-      ))}
+      <AdminSearchHighlightScope needle={needle}>
+        {visibleRows.map((review) => (
+          <AdminReviewRow
+            key={review.id}
+            review={review}
+            selected={selectedReviewId === review.id}
+            onSelect={() => onSelectReview(review.id)}
+            onAction={onAction}
+          />
+        ))}
+      </AdminSearchHighlightScope>
     </>
   );
 }

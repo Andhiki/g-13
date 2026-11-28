@@ -1,3 +1,4 @@
+import { AdminSearchHighlightScope } from "../-client/search-highlight";
 import { useAdminList } from "../-client/useAdminList";
 import { adminListSearchSchema } from "../-shared/admin-search";
 import { useState } from "react";
@@ -201,24 +202,26 @@ function ResourcesListBody({
           })}
         />
       )}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={visibleRows.map((resource) => resource.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {visibleRows.map((resource) => (
-            <AdminResourceRow
-              key={resource.id}
-              resource={resource}
-              selected={selectedId === resource.id}
-              sortable={sortable}
-              onSelect={() => onSelect(resource.id)}
-              onEdit={onEdit}
-              onLifecycle={onLifecycle}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+      <AdminSearchHighlightScope needle={needle}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={visibleRows.map((resource) => resource.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {visibleRows.map((resource) => (
+              <AdminResourceRow
+                key={resource.id}
+                resource={resource}
+                selected={selectedId === resource.id}
+                sortable={sortable}
+                onSelect={() => onSelect(resource.id)}
+                onEdit={onEdit}
+                onLifecycle={onLifecycle}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      </AdminSearchHighlightScope>
     </>
   );
 }
