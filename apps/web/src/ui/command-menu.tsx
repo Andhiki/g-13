@@ -66,8 +66,8 @@ function Dialog({
       >
         <Command
           className={cn(
-            "grid min-h-0 auto-cols-auto grid-flow-row divide-y divide-stroke-soft-200",
-            "max-[650px]:flex-1 max-[650px]:grid-rows-[auto_minmax(0,1fr)_auto]",
+            "grid min-h-0 flex-auto auto-cols-auto grid-flow-row grid-rows-[auto_minmax(0,1fr)_auto] divide-y divide-stroke-soft-200",
+            "max-[650px]:flex-1",
           )}
           {...props}
         >
