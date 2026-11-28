@@ -3,7 +3,7 @@ import { createDatabase } from "@g13/db/client";
 import { authUser } from "@g13/db/schema/auth";
 import { getActiveAnnouncements } from "@/routes/_public/-announcements/service";
 import { getAnnouncementCounts, listAdminAnnouncements } from "./repository";
-import { resolveAnnouncementStatus } from "../-shared/status";
+import { resolveAnnouncementStatus } from "@/routes/-announcements/schedule";
 import { createTestPlatformProxy } from "@/test/database";
 import { announcementFieldsShape } from "../-shared/schemas";
 import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementWriteResult } from "../-shared/errors";

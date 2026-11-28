@@ -1,5 +1,9 @@
 import { rejectServerFunction } from "@/server/server-function-error";
-import { ANNOUNCEMENT_ADMIN_ERRORS, type AnnouncementAdminError } from "../-shared/errors";
+import {
+  ANNOUNCEMENT_ADMIN_ERRORS,
+  type AnnouncementAdminError,
+  type AnnouncementWriteResult,
+} from "../-shared/errors";
 
 const announcementErrorStatuses = {
   [ANNOUNCEMENT_ADMIN_ERRORS.FORBIDDEN]: 403,
@@ -9,4 +13,11 @@ const announcementErrorStatuses = {
 
 export function rejectAnnouncementOperation(error: AnnouncementAdminError): never {
   return rejectServerFunction(announcementErrorStatuses[error], error);
+}
+
+/** Returns a write's data, its schedule conflicts for the admin to confirm, or throws. */
+export function respondToAnnouncementWrite<T>(result: AnnouncementWriteResult<T>) {
+  if (result.error === "SCHEDULE_CONFLICT") return { conflicts: result.conflicts };
+  if (result.error !== null) return rejectAnnouncementOperation(result.error);
+  return result.data;
 }
