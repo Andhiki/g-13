@@ -1,5 +1,6 @@
 // Pure alumni directory logic shared by the server route and the browser view.
 // No network access here: the route fetches, this module only transforms and filters.
+import { z } from "zod";
 
 export type AlumniCard = {
   id: number;
@@ -16,6 +17,31 @@ export type AlumniDirectoryData = {
   batches: number[];
   total: number;
 };
+
+const alumniDirectorySchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      batch: z.number().int(),
+      employer: z.string(),
+      position: z.string(),
+      education: z.string().optional(),
+      linkedin: z.string().nullable(),
+    }),
+  ),
+  batches: z.array(z.number().int()),
+  total: z.number().int().nonnegative(),
+}) satisfies z.ZodType<AlumniDirectoryData>;
+
+/**
+ * Checks directory data that crossed the network (the API route's JSON, which a
+ * cache or proxy could replace). Returns null for anything else.
+ */
+export function parseAlumniDirectory(value: unknown): AlumniDirectoryData | null {
+  const result = alumniDirectorySchema.safeParse(value);
+  return result.success ? result.data : null;
+}
 
 // Shape of the Strapi response we request. Every field except name/batch is optional
 // because Strapi omits relations a token is not allowed to read.
