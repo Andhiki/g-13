@@ -6,7 +6,6 @@ import type { StrapiAlumniResponse } from "../-shared/directory";
 // serialised into a response, a log line, or the client bundle.
 
 export function strapiToken(): string | undefined {
-  if (import.meta.env.MODE === "local-e2e") return "isolated-e2e";
   const token = process.env.STRAPI_API_TOKEN?.trim();
   return token ? token : undefined;
 }
@@ -45,18 +44,6 @@ export const alumniUpstream = {
 };
 
 export async function fetchAlumniPages(token: string): Promise<StrapiAlumniResponse[]> {
-  if (import.meta.env.MODE === "local-e2e") {
-    return [
-      {
-        data: [
-          { id: 1, name: "Alya Fixture", batch: 2020 },
-          { id: 2, name: "Bima Fixture", batch: 2020 },
-          { id: 3, name: "Citra Fixture", batch: 2021 },
-        ],
-        meta: { pagination: { page: 1, pageCount: 1, total: 3 } },
-      },
-    ];
-  }
   const pages: StrapiAlumniResponse[] = [];
   let expectedPageCount: number | undefined;
   for (
