@@ -1,8 +1,7 @@
 import type { createDatabase } from "@g13/db/client";
 import { dispatchNotification } from "@/server/notifications";
 
-import { reviewRateLimitResetAt } from "../-shared/rate-limit-window";
-import { allowReviewAction } from "./rate-limit";
+import { allowReviewAction, reviewRateLimitResetAt } from "./rate-limit";
 import { createReview, getReviewReferences } from "./repository";
 import { REVIEW_ERRORS, type ReviewOperationResult } from "../-shared/errors";
 import type { ReviewSubmission } from "../-shared/submission-schema";
@@ -10,14 +9,17 @@ import { screenReviewText, type ReviewModerationProvider } from "./review-screen
 
 type Database = ReturnType<typeof createDatabase>;
 
-export function submitReviewAfterCaptcha<T>(
-  verified: boolean,
-  submit: () => Promise<ReviewOperationResult<T>>,
-): Promise<ReviewOperationResult<T>> {
-  if (!verified) return Promise.resolve({ data: null, error: REVIEW_ERRORS.CAPTCHA });
-  return submit();
+/** Any rating of 2 or lower holds a review for moderation. */
+function hasLowRating(review: ReviewSubmission) {
+  return Math.min(review.clarity, review.support, review.organization) <= 2;
 }
 
+/**
+ * Runs the whole submission policy, in order: captcha, requester identity,
+ * lecturer/course references, rate limit, text screening, then the
+ * publish-or-hold decision. A failed step never consumes a later one (a
+ * rejected captcha does not use up the rate limit).
+ */
 export async function submitReview(
   db: Database,
   review: ReviewSubmission,
@@ -26,9 +28,12 @@ export async function submitReview(
     browserId?: string | null;
     secret: string;
     now?: number;
+    /** Verifies this submission's captcha token; fails closed. */
+    verifyCaptcha: () => Promise<boolean>;
     provider: ReviewModerationProvider;
   },
 ): Promise<ReviewOperationResult<{ reviewId: string; status: "pending" | "published" }>> {
+  if (!(await context.verifyCaptcha())) return { data: null, error: REVIEW_ERRORS.CAPTCHA };
   const ip = context.ip;
   if (!ip) return { data: null, error: REVIEW_ERRORS.UNAVAILABLE };
   const references = await getReviewReferences(db, review);
@@ -50,8 +55,7 @@ export async function submitReview(
     ? { body: review.body }
     : { body: review.body, displayName: authorName };
   const screening = await screenReviewText(screeningInput, context.provider);
-  const ratingPending = Math.min(review.clarity, review.support, review.organization) <= 2;
-  const status = screening === "clear" && !ratingPending ? "published" : "pending";
+  const status = screening === "clear" && !hasLowRating(review) ? "published" : "pending";
   await createReview(db, {
     ...values,
     id: reviewId,
