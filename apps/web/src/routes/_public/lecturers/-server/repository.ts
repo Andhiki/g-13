@@ -1,12 +1,7 @@
-import { and, asc, desc, eq, gt, inArray, isNull, lt, lte, sql, or, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNull, sql, or, type SQL } from "drizzle-orm";
 import { courses } from "@g13/db/schema/courses";
 import { lecturers } from "@g13/db/schema/lecturers";
-import {
-  reviews,
-  reviewLikes,
-  reviewSubmissionLimits,
-  type ReviewPendingReason,
-} from "@g13/db/schema/lecturer-reviews";
+import { reviews, reviewLikes, type ReviewPendingReason } from "@g13/db/schema/lecturer-reviews";
 import type { createDatabase } from "@g13/db/client";
 import type {
   CoursePickerCursor,
@@ -303,21 +298,4 @@ export async function writeReviewLike(
     .where(eq(reviewLikes.reviewId, reviewId));
   const [, [row]] = await db.batch([change, count]);
   return row.count;
-}
-
-export async function incrementReviewActionLimit(
-  db: Database,
-  input: { key: string; now: number; expiresAt: number; limit: number },
-): Promise<boolean> {
-  await db.delete(reviewSubmissionLimits).where(lte(reviewSubmissionLimits.expiresAt, input.now));
-  const [allowed] = await db
-    .insert(reviewSubmissionLimits)
-    .values({ key: input.key, count: 1, expiresAt: input.expiresAt })
-    .onConflictDoUpdate({
-      target: reviewSubmissionLimits.key,
-      set: { count: sql`${reviewSubmissionLimits.count} + 1` },
-      setWhere: lt(reviewSubmissionLimits.count, input.limit),
-    })
-    .returning({ count: reviewSubmissionLimits.count });
-  return allowed !== undefined;
 }

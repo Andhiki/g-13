@@ -1,10 +1,16 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { eq } from "drizzle-orm";
-import { authAccount, authSession, authUser, authVerification } from "@g13/db/schema/auth";
+import {
+  authAccount,
+  authRateLimits,
+  authSession,
+  authUser,
+  authVerification,
+} from "@g13/db/schema/auth";
+import { consumeRateLimit } from "@g13/db/rate-limit";
 import type { createDatabase } from "@g13/db/client";
 import { isAllowlistedAdmin, ROLES } from "./index";
-import { consumeAuthLimit } from "./repository";
 
 export type AuthBaseURL =
   | string
@@ -155,7 +161,17 @@ export function createAuth(db: ReturnType<typeof createDatabase>, config: AuthCo
       max: 100,
       customRules: { "/sign-in/social": { window: 60, max: 10 } },
       customStorage: {
-        consume: (key, rule) => consumeAuthLimit(db, config.secret, key, rule),
+        consume: async (key, rule) => {
+          const now = Date.now();
+          const allowed = await consumeRateLimit(db, authRateLimits, {
+            secret: config.secret,
+            identity: `auth-rate-limit:${key}`,
+            limit: rule.max,
+            now,
+            expiresAt: now + rule.window * 1000,
+          });
+          return { allowed, retryAfter: allowed ? null : rule.window };
+        },
       },
     },
   });
