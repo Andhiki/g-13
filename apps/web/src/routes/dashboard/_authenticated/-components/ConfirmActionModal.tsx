@@ -116,7 +116,7 @@ function ConfirmActionFooter({
   onConfirm: () => void;
 }) {
   return (
-    <div className="mt-5 flex items-center justify-end gap-2">
+    <AlignModal.Footer>
       <AlignButton.Root
         size="xsmall"
         variant="neutral"
@@ -134,7 +134,7 @@ function ConfirmActionFooter({
           {confirmLabel}
         </AlignFancyButton.Root>
       )}
-    </div>
+    </AlignModal.Footer>
   );
 }
 
@@ -169,13 +169,15 @@ export function ConfirmActionModal({
       }}
     >
       <AlignModal.Content>
-        <div className="p-5">
-          <AlignModal.Title asChild className="pr-8">
+        <AlignModal.Header>
+          <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle2" color="strong">
               {title}
             </Typography>
           </AlignModal.Title>
-          <AlignModal.Description asChild className="mt-2 pr-4">
+        </AlignModal.Header>
+        <AlignModal.Body>
+          <AlignModal.Description asChild>
             <Typography variant="paragraph" color="muted">
               {description}
             </Typography>
@@ -186,14 +188,14 @@ export function ConfirmActionModal({
               {error}
             </Typography>
           )}
-          <ConfirmActionFooter
-            destructive={destructive}
-            confirmLabel={confirmLabel}
-            pending={pending}
-            onClose={onClose}
-            onConfirm={onConfirm}
-          />
-        </div>
+        </AlignModal.Body>
+        <ConfirmActionFooter
+          destructive={destructive}
+          confirmLabel={confirmLabel}
+          pending={pending}
+          onClose={onClose}
+          onConfirm={onConfirm}
+        />
       </AlignModal.Content>
     </AlignModal.Root>
   );

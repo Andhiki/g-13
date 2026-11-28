@@ -39,7 +39,7 @@ function SettingsBody() {
   const { value: blur } = usePreference(blurPreference);
 
   return (
-    <div className="min-h-0 space-y-6 overflow-y-auto px-5 py-5">
+    <AlignModal.Body className="space-y-6">
       <section
         aria-labelledby="settings-language"
         className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center"
@@ -78,14 +78,14 @@ function SettingsBody() {
           onCheckedChange={(checked) => setCursor(checked ? "pointer" : "default")}
         />
       </section>
-    </div>
+    </AlignModal.Body>
   );
 }
 
 function SettingsFooter() {
   const { t } = useTranslation();
   return (
-    <div className="flex shrink-0 items-center border-t border-stroke-soft-200 px-5 py-3">
+    <AlignModal.Footer className="justify-start py-3">
       <AlignLinkButton.Root
         asChild
         variant="gray"
@@ -99,7 +99,7 @@ function SettingsFooter() {
           </Typography>
         </a>
       </AlignLinkButton.Root>
-    </div>
+    </AlignModal.Footer>
   );
 }
 
@@ -117,17 +117,14 @@ export function SettingsModal({
   return (
     <AlignModal.Root open={open} onOpenChange={onOpenChange}>
       {children}
-      <AlignModal.Content
-        aria-describedby={undefined}
-        className="flex max-h-[calc(100dvh-2rem)] max-w-[640px] flex-col overflow-hidden"
-      >
-        <div className="shrink-0 border-b border-stroke-soft-200 px-5 py-4 pr-14">
+      <AlignModal.Content aria-describedby={undefined} className="max-w-[640px]">
+        <AlignModal.Header className="pr-14">
           <AlignModal.Title asChild>
             <Typography as="h2" variant="subtitle1">
               {t("settings.title")}
             </Typography>
           </AlignModal.Title>
-        </div>
+        </AlignModal.Header>
         <SettingsBody />
         <SettingsFooter />
       </AlignModal.Content>

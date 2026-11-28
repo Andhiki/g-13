@@ -501,24 +501,30 @@ function PendingReviewConfirmation({
 function PendingReviewConfirmationContent({ tracked }: { tracked: boolean }) {
   const { text } = useLocale("lecturers");
   return (
-    <div className="flex flex-col gap-3 p-5">
-      <AlignModal.Title asChild>
-        <Typography as="h2" variant="subtitle2" className="m-0">
-          {text("Your review is pending moderator review.")}
-        </Typography>
-      </AlignModal.Title>
-      <AlignModal.Description asChild>
-        <Typography as="p" variant="paragraph" color="muted" className="m-0">
-          {text("A moderator checks reviews before they appear publicly.")}
-          {tracked && (
-            <> {text("Your review will appear here marked as pending until it is approved.")}</>
-          )}
-        </Typography>
-      </AlignModal.Description>
-      <AlignModal.Close asChild>
-        <AlignButton.Root className="self-end">{text("Got it")}</AlignButton.Root>
-      </AlignModal.Close>
-    </div>
+    <>
+      <AlignModal.Header>
+        <AlignModal.Title asChild>
+          <Typography as="h2" variant="subtitle2" className="m-0">
+            {text("Your review is pending moderator review.")}
+          </Typography>
+        </AlignModal.Title>
+      </AlignModal.Header>
+      <AlignModal.Body>
+        <AlignModal.Description asChild>
+          <Typography as="p" variant="paragraph" color="muted" className="m-0">
+            {text("A moderator checks reviews before they appear publicly.")}
+            {tracked && (
+              <> {text("Your review will appear here marked as pending until it is approved.")}</>
+            )}
+          </Typography>
+        </AlignModal.Description>
+      </AlignModal.Body>
+      <AlignModal.Footer>
+        <AlignModal.Close asChild>
+          <AlignButton.Root>{text("Got it")}</AlignButton.Root>
+        </AlignModal.Close>
+      </AlignModal.Footer>
+    </>
   );
 }
 

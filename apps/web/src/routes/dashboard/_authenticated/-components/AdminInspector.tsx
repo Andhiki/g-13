@@ -11,17 +11,19 @@ function subscribe(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
-export function AdminInspector({
+export function AdminInspectorLayout({
   title,
   desktopOpen,
   mobileOpen,
   onMobileOpenChange,
+  details,
   children,
 }: {
   title: string;
   desktopOpen: boolean;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
+  details: ReactNode;
   children: ReactNode;
 }) {
   const desktop = useSyncExternalStore(
@@ -30,41 +32,47 @@ export function AdminInspector({
     () => true,
   );
 
-  if (!desktop) {
-    return (
-      <AlignDrawer.Root
-        open={mobileOpen && !!children}
-        onOpenChange={onMobileOpenChange}
-        side="bottom"
-      >
-        <AlignDrawer.Content
-          aria-describedby={undefined}
-          className="h-[min(85dvh,40rem)] [&>div>aside]:min-h-0 [&>div>aside]:w-full [&>div>aside]:flex-1 [&>div>aside]:border-0"
-        >
-          <AlignDrawer.Grip />
-          <AlignDrawer.Title className="sr-only">{title}</AlignDrawer.Title>
-          <AlignDrawer.Close asChild>
-            <CompactButton
-              data-drawer-no-drag=""
-              className="absolute top-3 right-3 z-10"
-              aria-label="Close inspector"
-            >
-              <RiCloseLine aria-hidden="true" />
-            </CompactButton>
-          </AlignDrawer.Close>
-          {children}
-        </AlignDrawer.Content>
-      </AlignDrawer.Root>
-    );
-  }
-
   return (
     <div
-      inert={!desktopOpen}
-      data-open={desktopOpen}
-      className="w-0 shrink-0 overflow-clip transition-[width] duration-200 ease-out data-[open=true]:w-[320px] motion-reduce:transition-none"
+      data-inspector-open={desktopOpen}
+      className="group/inspector relative flex min-h-0 flex-1 [--inspector-width:320px]"
     >
-      {children}
+      {/* Reveal the fixed-width inspector by moving only the list’s adjoining edge. */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0 xl:absolute xl:z-10 xl:inset-y-0 xl:start-0 xl:end-0 xl:motion-safe:transition-[inset-inline-end] xl:motion-safe:duration-200 xl:motion-safe:ease-out motion-reduce:transition-none xl:group-data-[inspector-open=true]/inspector:end-(--inspector-width)">
+        {children}
+      </div>
+      {desktop ? (
+        <div
+          inert={!desktopOpen}
+          className="absolute inset-y-0 end-0 hidden w-(--inspector-width) xl:block"
+        >
+          {details}
+        </div>
+      ) : (
+        <AlignDrawer.Root
+          open={mobileOpen && !!details}
+          onOpenChange={onMobileOpenChange}
+          side="bottom"
+        >
+          <AlignDrawer.Content
+            aria-describedby={undefined}
+            className="h-[min(85dvh,40rem)] [&>div>aside]:min-h-0 [&>div>aside]:w-full [&>div>aside]:flex-1 [&>div>aside]:border-0"
+          >
+            <AlignDrawer.Grip />
+            <AlignDrawer.Title className="sr-only">{title}</AlignDrawer.Title>
+            <AlignDrawer.Close asChild>
+              <CompactButton
+                data-drawer-no-drag=""
+                className="absolute top-3 right-3 z-10"
+                aria-label="Close inspector"
+              >
+                <RiCloseLine aria-hidden="true" />
+              </CompactButton>
+            </AlignDrawer.Close>
+            {details}
+          </AlignDrawer.Content>
+        </AlignDrawer.Root>
+      )}
     </div>
   );
 }
@@ -86,7 +94,7 @@ export function AdminInspectorPanel({
     <aside
       id="moderation-inspector"
       aria-label={ariaLabel}
-      className="ml-auto flex h-full w-[320px] flex-col overflow-hidden border-l border-stroke-soft-200 bg-bg-white-0"
+      className="flex h-full w-full flex-col overflow-hidden border-s border-stroke-soft-200 bg-bg-white-0"
     >
       <div className="flex h-11 shrink-0 items-center border-b border-stroke-soft-200 px-4 text-label-xs">
         {title}
