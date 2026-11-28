@@ -109,7 +109,7 @@ function NotificationPopoverList({
   isError,
   isPending,
   items,
-  busy,
+  isBusy,
   onClose,
   onRead,
   onArchive,
@@ -117,7 +117,7 @@ function NotificationPopoverList({
   isError: boolean;
   isPending: boolean;
   items: NotificationItem[];
-  busy: boolean;
+  isBusy: (id: string) => boolean;
   onClose: () => void;
   onRead: (id: string) => void;
   onArchive: (id: string) => void;
@@ -154,7 +154,7 @@ function NotificationPopoverList({
         <NotificationPopoverItem
           key={item.id}
           item={item}
-          busy={busy}
+          busy={isBusy(item.id)}
           onClose={onClose}
           onRead={onRead}
           onArchive={onArchive}
@@ -166,7 +166,8 @@ function NotificationPopoverList({
 
 function NotificationsPopoverPanel({
   hasUnread,
-  busy,
+  markingAllRead,
+  isBusy,
   readMutationError,
   isError,
   isPending,
@@ -177,7 +178,8 @@ function NotificationsPopoverPanel({
   onArchive,
 }: {
   hasUnread: boolean;
-  busy: boolean;
+  markingAllRead: boolean;
+  isBusy: (id: string) => boolean;
   readMutationError: boolean;
   isError: boolean;
   isPending: boolean;
@@ -204,7 +206,7 @@ function NotificationsPopoverPanel({
             iconOnly
             aria-label={text("action.markAllRead")}
             title={text("action.markAllRead")}
-            disabled={busy}
+            disabled={markingAllRead}
             onClick={onMarkAllRead}
           >
             <RiCheckDoubleLine className="size-4" />
@@ -223,7 +225,7 @@ function NotificationsPopoverPanel({
           isError={isError}
           isPending={isPending}
           items={items}
-          busy={busy}
+          isBusy={isBusy}
           onClose={onClose}
           onRead={onRead}
           onArchive={onArchive}
@@ -255,7 +257,7 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
   const hasUnread = serverRows.some((item) => !pendingReadIdSet.has(item.id));
   const items = serverRows.filter((item) => !pendingReadIdSet.has(item.id)).slice(0, 8);
 
-  const { readMutation, readAllMutation, archiveMutation, busy } = useNotificationActions();
+  const { readMutation, readAllMutation, archiveMutation, isBusy } = useNotificationActions();
 
   return (
     <AlignPopover.Root open={open} onOpenChange={setOpen}>
@@ -288,7 +290,8 @@ export function NotificationsPopover({ side = "right" }: { side?: "right" | "bot
       >
         <NotificationsPopoverPanel
           hasUnread={hasUnread}
-          busy={busy}
+          markingAllRead={readAllMutation.isPending}
+          isBusy={isBusy}
           readMutationError={readMutation.isError}
           isError={listQuery.isError}
           isPending={listQuery.isPending}

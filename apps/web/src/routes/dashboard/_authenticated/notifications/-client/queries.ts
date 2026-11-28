@@ -9,6 +9,7 @@ import {
 const firstPage: NotificationCursor | null = null;
 
 export const notificationReadMutationKey = ["notifications", "mark-read"];
+export const notificationArchiveMutationKey = ["notifications", "archive"];
 
 export function notificationsQuery(filter: NotificationFilter = "all") {
   return infiniteQueryOptions({
