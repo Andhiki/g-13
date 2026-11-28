@@ -27,7 +27,7 @@ import { AlignButton } from "@/ui/button";
 import { AlignFancyButton } from "@/ui/fancy-button";
 import { Typography } from "@/ui/typography";
 import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
-import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
+import { AdminInspectorLayout, desktopInspectorQuery } from "../-components/AdminInspector";
 import { useAdminLayout } from "../-components/AdminLayoutContext";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminPagination } from "../-components/AdminPagination";
@@ -341,48 +341,48 @@ function ResourcesContent({
   );
 
   return (
-    <div className="flex min-h-0 flex-1">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-        {!queryState.isPending && !queryState.isError && (
-          <AdminPagination
-            count={count}
-            offset={offset}
-            total={total}
-            label="resources"
-            hasNext={hasNext}
-            onPrevious={onPreviousPage}
-            onNext={onNextPage}
-          />
-        )}
-        {reorderError && !queryState.isPending && !queryState.isError && (
-          <div className="border-b border-stroke-soft-200 px-4 py-2">
-            <Typography role="alert" variant="caption" color="danger">
-              Could not save the new order. Refresh and try again.
-            </Typography>
-          </div>
-        )}
-        <div
-          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-        >
-          {list}
-        </div>
-      </div>
-      <AdminInspector
-        title="Resource details"
-        desktopOpen={detailsVisible}
-        mobileOpen={mobileDetailsOpen}
-        onMobileOpenChange={onMobileDetailsOpenChange}
-      >
-        {selectedResource && !queryState.isPending && !queryState.isError && (
+    <AdminInspectorLayout
+      title="Resource details"
+      desktopOpen={detailsVisible}
+      mobileOpen={mobileDetailsOpen}
+      onMobileOpenChange={onMobileDetailsOpenChange}
+      details={
+        selectedResource &&
+        !queryState.isPending &&
+        !queryState.isError && (
           <ResourceInspector
             key={selectedResource.id}
             resource={selectedResource}
             onEdit={onEdit}
             onLifecycle={onLifecycle}
           />
-        )}
-      </AdminInspector>
-    </div>
+        )
+      }
+    >
+      {!queryState.isPending && !queryState.isError && (
+        <AdminPagination
+          count={count}
+          offset={offset}
+          total={total}
+          label="resources"
+          hasNext={hasNext}
+          onPrevious={onPreviousPage}
+          onNext={onNextPage}
+        />
+      )}
+      {reorderError && !queryState.isPending && !queryState.isError && (
+        <div className="border-b border-stroke-soft-200 px-4 py-2">
+          <Typography role="alert" variant="caption" color="danger">
+            Could not save the new order. Refresh and try again.
+          </Typography>
+        </div>
+      )}
+      <div
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+      >
+        {list}
+      </div>
+    </AdminInspectorLayout>
   );
 }
 

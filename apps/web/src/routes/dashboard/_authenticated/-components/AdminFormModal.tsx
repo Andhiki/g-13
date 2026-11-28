@@ -25,7 +25,7 @@ export function AdminFormModal({
         if (!nextOpen && !pending) onClose();
       }}
     >
-      <AlignModal.Content className={`${contentClassName} p-0`} aria-describedby={undefined}>
+      <AlignModal.Content className={contentClassName} aria-describedby={undefined}>
         {open && children}
       </AlignModal.Content>
     </AlignModal.Root>
@@ -57,6 +57,7 @@ export function AdminForm({
     <form
       ref={formRef}
       noValidate
+      className="flex min-h-0 flex-auto flex-col overflow-hidden"
       onSubmit={(event) => {
         event.preventDefault();
         if (pending) return;
@@ -67,23 +68,25 @@ export function AdminForm({
         }
       }}
     >
-      <header className="border-b border-stroke-soft-200 px-5 py-4 pr-12">
+      <AlignModal.Header>
         <AlignModal.Title asChild>
           <Typography as="h2" variant="subtitle2" color="strong">
             {title}
           </Typography>
         </AlignModal.Title>
-      </header>
-      {beforeFields}
-      <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
-        {children}
-        {error && (
-          <Typography role="alert" variant="caption" color="danger">
-            {error}
-          </Typography>
-        )}
-      </fieldset>
-      <footer className="flex items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5">
+      </AlignModal.Header>
+      <AlignModal.Body className="p-0">
+        {beforeFields}
+        <fieldset disabled={pending} className="space-y-4 p-5 disabled:opacity-70">
+          {children}
+          {error && (
+            <Typography role="alert" variant="caption" color="danger">
+              {error}
+            </Typography>
+          )}
+        </fieldset>
+      </AlignModal.Body>
+      <AlignModal.Footer>
         <AlignButton.Root
           size="xsmall"
           variant="neutral"
@@ -97,7 +100,7 @@ export function AdminForm({
         <AlignFancyButton.Root type="submit" size="xsmall" isLoading={pending}>
           {submitLabel}
         </AlignFancyButton.Root>
-      </footer>
+      </AlignModal.Footer>
     </form>
   );
 }

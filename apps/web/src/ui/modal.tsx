@@ -161,27 +161,82 @@ function Root({ presentation = "auto", ...props }: React.ComponentProps<typeof D
   return <Dialog presentation={presentation} {...props} />;
 }
 
-const ModalOpenContext = React.createContext(false);
+const ModalContext = React.createContext({ open: false, showClose: true });
 
 export function useModalOpen() {
-  return React.useContext(ModalOpenContext);
+  return React.useContext(ModalContext).open;
 }
 
-function ModalBody({ open, children }: { open: boolean; children: React.ReactNode }) {
+function ModalPanel({
+  open,
+  showClose,
+  closeLabel,
+  children,
+}: {
+  open: boolean;
+  showClose: boolean;
+  closeLabel: string;
+  children: React.ReactNode;
+}) {
   const [lastOpenChildren, setLastOpenChildren] = React.useState(children);
 
   // The SDK keeps the panel visible on exit even if the caller clears its content on close.
   if (open && children !== lastOpenChildren) setLastOpenChildren(children);
 
   return (
-    <ModalOpenContext.Provider value={open}>
-      <div
-        inert={!open}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"
-      >
+    <ModalContext.Provider value={{ open, showClose }}>
+      <div inert={!open} className="relative flex min-h-0 flex-auto flex-col overflow-hidden">
         {open ? children : lastOpenChildren}
+        {showClose && (
+          <DialogClose
+            data-drawer-no-drag=""
+            render={
+              <CompactButton className="absolute top-4 right-4 z-10" aria-label={closeLabel} />
+            }
+          >
+            <RiCloseLine aria-hidden="true" />
+          </DialogClose>
+        )}
       </div>
-    </ModalOpenContext.Provider>
+    </ModalContext.Provider>
+  );
+}
+
+function Header({ className, ...props }: React.ComponentProps<"div">) {
+  const { showClose } = React.useContext(ModalContext);
+  return (
+    <div
+      data-slot="modal-header"
+      className={cn(
+        "shrink-0 border-b border-stroke-soft-200 px-5 py-4",
+        showClose && "pr-12",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function Body({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="modal-body"
+      className={cn("min-h-0 flex-auto overflow-y-auto overscroll-contain p-5", className)}
+      {...props}
+    />
+  );
+}
+
+function Footer({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="modal-footer"
+      className={cn(
+        "flex shrink-0 items-center justify-end gap-2 border-t border-stroke-soft-200 px-5 py-3.5",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
@@ -234,22 +289,11 @@ const Content = React.forwardRef<HTMLDivElement, ModalContentProps>(
                   <span className="h-1 w-10 rounded-full bg-stroke-soft-200" />
                 </div>
               )}
-              <ModalBody open={state.open}>{children}</ModalBody>
+              <ModalPanel open={state.open} showClose={showClose} closeLabel={text("Tutup dialog")}>
+                {children}
+              </ModalPanel>
               {state.presentation === "sheet" && (
                 <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
-              )}
-              {showClose && (
-                <DialogClose
-                  data-drawer-no-drag=""
-                  render={
-                    <CompactButton
-                      className="absolute top-4 right-4 z-10"
-                      aria-label={text("Tutup dialog")}
-                    />
-                  }
-                >
-                  <RiCloseLine aria-hidden="true" />
-                </DialogClose>
               )}
             </>
           )}
@@ -267,4 +311,7 @@ export const AlignModal = {
   Title,
   Description,
   Content,
+  Header,
+  Body,
+  Footer,
 };

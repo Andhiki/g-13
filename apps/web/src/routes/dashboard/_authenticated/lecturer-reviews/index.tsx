@@ -16,7 +16,7 @@ import { reviewStatusSchema, type ReviewStatus } from "./-shared/schemas";
 import { AlignButton } from "@/ui/button";
 import { Typography } from "@/ui/typography";
 import { AdminFilterBar, AdminSearchInput } from "../-components/AdminFilterBar";
-import { AdminInspector, desktopInspectorQuery } from "../-components/AdminInspector";
+import { AdminInspectorLayout, desktopInspectorQuery } from "../-components/AdminInspector";
 import { AdminPageHeader, DetailsToggleButton } from "../-components/AdminPageHeader";
 import { AdminTableHeader } from "../-components/AdminTable";
 import { AdminPagination } from "../-components/AdminPagination";
@@ -258,47 +258,47 @@ function ReviewsContent({
   onAction: (input: ModerateReviewInput, label: string) => void;
 }) {
   return (
-    <div className="flex min-h-0 flex-1">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg-white-0">
-        {!reviewsState.isPending && !reviewsState.isError && (
-          <AdminPagination
-            count={count}
-            offset={offset}
-            total={total}
-            label="reviews"
-            hasNext={hasNext}
-            onPrevious={onPreviousPage}
-            onNext={onNextPage}
-          />
-        )}
-        <div
-          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
-        >
-          <ReviewsListBody
-            reviewsState={reviewsState}
-            visibleRows={visibleRows}
-            needle={needle}
-            status={status}
-            allCount={allCount}
-            selectedReviewId={selectedReview?.id}
-            onClearSearch={onClearSearch}
-            onViewAll={onViewAll}
-            onSelectReview={onSelectReview}
-            onAction={onAction}
-          />
-        </div>
-      </div>
-      <AdminInspector
-        title="Review details"
-        desktopOpen={detailsVisible}
-        mobileOpen={mobileDetailsOpen}
-        onMobileOpenChange={onMobileDetailsOpenChange}
-      >
-        {selectedReview && !reviewsState.isPending && !reviewsState.isError && (
+    <AdminInspectorLayout
+      title="Review details"
+      desktopOpen={detailsVisible}
+      mobileOpen={mobileDetailsOpen}
+      onMobileOpenChange={onMobileDetailsOpenChange}
+      details={
+        selectedReview &&
+        !reviewsState.isPending &&
+        !reviewsState.isError && (
           <ReviewInspector key={selectedReview.id} review={selectedReview} onAction={onAction} />
-        )}
-      </AdminInspector>
-    </div>
+        )
+      }
+    >
+      {!reviewsState.isPending && !reviewsState.isError && (
+        <AdminPagination
+          count={count}
+          offset={offset}
+          total={total}
+          label="reviews"
+          hasNext={hasNext}
+          onPrevious={onPreviousPage}
+          onNext={onNextPage}
+        />
+      )}
+      <div
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg-white-0 ${count === 0 ? "flex flex-col" : ""}`}
+      >
+        <ReviewsListBody
+          reviewsState={reviewsState}
+          visibleRows={visibleRows}
+          needle={needle}
+          status={status}
+          allCount={allCount}
+          selectedReviewId={selectedReview?.id}
+          onClearSearch={onClearSearch}
+          onViewAll={onViewAll}
+          onSelectReview={onSelectReview}
+          onAction={onAction}
+        />
+      </div>
+    </AdminInspectorLayout>
   );
 }
 

@@ -124,7 +124,7 @@ function PaperPreviewHeader({
 }) {
   const { text } = useLocale("exam");
   return (
-    <div className="flex min-w-0 items-center justify-between gap-4 p-4">
+    <AlignModal.Header className="flex min-w-0 items-center justify-between gap-4 p-4">
       <AlignModal.Title asChild>
         <Typography
           ref={modalTitle}
@@ -144,7 +144,7 @@ function PaperPreviewHeader({
       <span className="sr-only" role="status" aria-live="polite">
         {copied ? text("Tautan berhasil disalin") : ""}
       </span>
-    </div>
+    </AlignModal.Header>
   );
 }
 
@@ -204,7 +204,7 @@ export function PaperPreview({
           }}
         />
         {share?.status === "manual" && (
-          <div className="border-y border-stroke-soft-200 px-4 py-2">
+          <div className="shrink-0 border-b border-stroke-soft-200 px-4 py-2">
             <Typography variant="caption" role="status">
               {text("Gagal menyalin otomatis. Salin tautan berikut.")}
             </Typography>
