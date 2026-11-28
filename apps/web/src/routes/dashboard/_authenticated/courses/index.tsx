@@ -269,6 +269,7 @@ function CoursesContent({
     <AdminInspectorLayout
       title="Course details"
       desktopOpen={detailsVisible}
+      pending={queryState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -349,7 +350,7 @@ function AdminCoursesPage() {
   const count = visibleRows.length;
   const selectedCourse = visibleRows.find((course) => course.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedCourse && !listState.isPending && !listState.isError;
+    detailsOpen && !listState.isError && (listState.isPending || !!selectedCourse);
 
   async function invalidateCourseQueries() {
     await Promise.all([
@@ -411,7 +412,7 @@ function AdminCoursesPage() {
         ariaLabel="Filter courses"
       />
       <DetailsToggleButton
-        available={!!selectedCourse}
+        available={listState.isPending || !!selectedCourse}
         visible={detailsVisible}
         onToggle={() => setDetailsOpen((open) => !open)}
       />

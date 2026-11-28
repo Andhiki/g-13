@@ -344,6 +344,7 @@ function ResourcesContent({
     <AdminInspectorLayout
       title="Resource details"
       desktopOpen={detailsVisible}
+      pending={queryState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -531,7 +532,7 @@ function AdminResourcesPage() {
   const selectedResource =
     visibleRows.find((resource) => resource.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
-    detailsOpen && !!selectedResource && !listState.isPending && !listState.isError;
+    detailsOpen && !listState.isError && (listState.isPending || !!selectedResource);
 
   async function invalidateResourceQueries() {
     await Promise.all([
@@ -613,7 +614,7 @@ function AdminResourcesPage() {
         counts={counts}
         status={status}
         query={query}
-        selectedAvailable={!!selectedResource}
+        selectedAvailable={listState.isPending || !!selectedResource}
         detailsVisible={detailsVisible}
         onStatusChange={(value) => {
           setStatus(value);

@@ -225,6 +225,7 @@ function AnnouncementsContent({
     <AdminInspectorLayout
       title="Announcement details"
       desktopOpen={detailsVisible}
+      pending={queryState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -404,9 +405,8 @@ function AdminAnnouncementsPage() {
     visibleRows.find((announcement) => announcement.id === selectedId) ?? visibleRows[0];
   const detailsVisible =
     detailsOpen &&
-    !!selectedAnnouncement &&
-    !announcementsQuery.isPending &&
-    !announcementsQuery.isError;
+    !announcementsQuery.isError &&
+    (announcementsQuery.isPending || !!selectedAnnouncement);
 
   async function invalidateAnnouncementQueries() {
     await Promise.all([
@@ -478,7 +478,7 @@ function AdminAnnouncementsPage() {
         ariaLabel="Filter announcements"
       />
       <DetailsToggleButton
-        available={!!selectedAnnouncement}
+        available={announcementsQuery.isPending || !!selectedAnnouncement}
         visible={detailsVisible}
         onToggle={() => setDetailsOpen((open) => !open)}
       />

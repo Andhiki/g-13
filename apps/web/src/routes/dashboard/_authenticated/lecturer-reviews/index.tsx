@@ -260,6 +260,7 @@ function ReviewsContent({
     <AdminInspectorLayout
       title="Review details"
       desktopOpen={detailsVisible}
+      pending={reviewsState.isPending}
       mobileOpen={mobileDetailsOpen}
       onMobileOpenChange={onMobileDetailsOpenChange}
       details={
@@ -348,7 +349,7 @@ function LecturerReviewsPage() {
     ? (linkedReview.data ?? undefined)
     : (visibleRows.find((review) => review.id === selectedId) ?? visibleRows[0]);
   const detailsVisible =
-    detailsOpen && !!selectedReview && !listState.isPending && !listState.isError;
+    detailsOpen && !listState.isError && (listState.isPending || !!selectedReview);
   const mutation = useMutation({
     mutationFn: (input: ModerateReviewInput) => changeReviewVisibility({ data: input }),
     onSuccess: async () => {
@@ -381,7 +382,7 @@ function LecturerReviewsPage() {
         ariaLabel="Filter reviews"
       />
       <DetailsToggleButton
-        available={!!selectedReview}
+        available={listState.isPending || !!selectedReview}
         visible={detailsVisible}
         onToggle={() => setDetailsOpen((open) => !open)}
       />

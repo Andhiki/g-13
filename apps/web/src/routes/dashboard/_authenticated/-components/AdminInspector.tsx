@@ -14,6 +14,7 @@ function subscribe(onChange: () => void) {
 export function AdminInspectorLayout({
   title,
   desktopOpen,
+  pending = false,
   mobileOpen,
   onMobileOpenChange,
   details,
@@ -21,6 +22,8 @@ export function AdminInspectorLayout({
 }: {
   title: string;
   desktopOpen: boolean;
+  /** The list is loading; the open inspector shows a skeleton instead of closing. */
+  pending?: boolean;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
   details: ReactNode;
@@ -31,6 +34,7 @@ export function AdminInspectorLayout({
     () => window.matchMedia(desktopInspectorQuery).matches,
     () => true,
   );
+  const content = pending ? <AdminInspectorSkeleton title={title} /> : details;
   // Mount the drawer closed so one that starts open, from a linked record, still slides in.
   const [entered, setEntered] = useState(false);
   useEffect(() => setEntered(true), []);
@@ -49,11 +53,11 @@ export function AdminInspectorLayout({
           inert={!desktopOpen}
           className="absolute inset-y-0 end-0 hidden w-(--inspector-width) xl:block"
         >
-          {details}
+          {content}
         </div>
       ) : (
         <AlignDrawer.Root
-          open={entered && mobileOpen && !!details}
+          open={entered && mobileOpen && !!content}
           onOpenChange={onMobileOpenChange}
           side="bottom"
         >
@@ -72,11 +76,35 @@ export function AdminInspectorLayout({
                 <RiCloseLine aria-hidden="true" />
               </CompactButton>
             </AlignDrawer.Close>
-            {details}
+            {content}
           </AlignDrawer.Content>
         </AlignDrawer.Root>
       )}
     </div>
+  );
+}
+
+const skeletonBar = "animate-pulse rounded bg-bg-soft-200/80 motion-reduce:animate-none";
+
+function AdminInspectorSkeleton({ title }: { title: string }) {
+  return (
+    <AdminInspectorPanel title={title} ariaLabel={`Loading ${title.toLowerCase()}`}>
+      <div role="status" aria-busy="true" className="space-y-5">
+        <span className="sr-only">Loading</span>
+        <div aria-hidden="true" className="space-y-2">
+          <div className={`h-4 w-2/3 ${skeletonBar}`} />
+          <div className={`h-3 w-1/2 ${skeletonBar}`} />
+        </div>
+        <div aria-hidden="true" className="space-y-3">
+          {["w-1/2", "w-2/3", "w-2/5"].map((width) => (
+            <div key={width} className="grid grid-cols-[76px_minmax(0,1fr)] gap-2">
+              <div className={`h-3 w-14 ${skeletonBar}`} />
+              <div className={`h-3 ${width} ${skeletonBar}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </AdminInspectorPanel>
   );
 }
 
